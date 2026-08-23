@@ -149,6 +149,8 @@ Hình 2.19. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC20)
 Hình 2.20. Biểu đồ lớp miền cốt lõi của hệ thống
 Hình 2.21. Mô hình cơ sở dữ liệu vật lý của hệ thống
 Hình 2.22. Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống
+Hình 2.23. Biểu đồ trình tự Use case Điểm danh bằng mã QR (UC26)
+Hình 2.24. Mô hình dữ liệu bổ sung cho chấm công đa nguồn
 
 ---
 
@@ -282,7 +284,7 @@ Công cụ mô hình hóa là **Ngôn ngữ mô hình hóa thống nhất (UML -
 
 **Hệ quản trị cơ sở dữ liệu:** Kế thừa từ thiết kế của Biểu đồ Lớp, sử dụng Microsoft SQL Server để ánh xạ các đối tượng thành các bảng và cài đặt cơ sở dữ liệu vật lý.
 
-**Môi trường và Ngôn ngữ lập trình:** Sử dụng nền tảng .NET với ngôn ngữ thuần hướng đối tượng C# cho tầng nghiệp vụ, React cho giao diện web quản trị, Flutter cho ứng dụng di động kênh tự phục vụ của người lao động, bảo đảm khả năng đóng gói logic nghiệp vụ và tương tác mượt mà với cơ sở dữ liệu.
+**Môi trường và Ngôn ngữ lập trình:** Sử dụng nền tảng .NET với ngôn ngữ thuần hướng đối tượng C# cho tầng nghiệp vụ, Next.js (framework hiện đại trên nền React với App Router và Server Components) cho giao diện web quản trị cùng màn hình kiosk điểm danh, Flutter cho ứng dụng di động kênh tự phục vụ của người lao động, bảo đảm khả năng đóng gói logic nghiệp vụ và tương tác mượt mà với cơ sở dữ liệu.
 
 ## 1.2. Một số vấn đề liên quan đến chủ đề "Xây dựng hệ thống thông tin quản trị nhân lực cho Công ty Saigon Technology"
 
@@ -458,24 +460,24 @@ _Hình 2.1. Cây kế thừa tác nhân của hệ thống HRMIS_
 
 **Bảng 2.2. Bảng ánh xạ ba tầng — quy trình nghiệp vụ phân rã thành use case hệ thống**
 
-| Quy trình nghiệp vụ (Tầng 1–2)             | Use case hệ thống (Tầng 3)                   | Tác nhân thao tác                                                   |
-| ------------------------------------------ | -------------------------------------------- | ------------------------------------------------------------------- |
-| **QP1. Tuyển dụng**                        | UC04 → UC05 → UC06 → UC07 → UC08             | Trưởng dự án, CV tuyển dụng, Kế toán, Giám đốc, Ứng viên            |
-| **QP2. Tiếp nhận hồ sơ – hội nhập**        | UC09, UC10, UC11                             | CV hồ sơ, NV hành chính, NV IT                                      |
-| **QP3. Thử việc – xếp lương chính thức**   | UC13 (kèm UC10)                              | Trưởng dự án, CV hồ sơ                                              |
-| **QP4. Chấm công – tính lương hằng tháng** | UC18 → UC19/UC20 → UC21 → UC22 → UC23 → UC24 | Nhân viên, Trưởng dự án, CV hồ sơ, CV tiền lương, Kế toán, Giám đốc |
-| **QP5. Tăng lương định kỳ/đột xuất**       | UC15                                         | Trưởng dự án, Giám đốc                                              |
-| **QP6. Thuyên chuyển công tác**            | UC14                                         | Trưởng dự án, Giám đốc                                              |
-| **QP7. Khen thưởng – kỷ luật**             | UC16                                         | Trưởng dự án, ĐLNLĐ, Giám đốc                                       |
-| **QP8. Nghỉ hưu / QP9. Thôi việc**         | UC17                                         | Nhân viên, Trưởng dự án, NV hành chính, NV IT, Kế toán, CV hồ sơ    |
-| **Quản lý hồ sơ xuyên suốt vòng đời**      | UC12                                         | Nhân viên, CV hồ sơ                                                 |
-| **Nền tảng vận hành**                      | UC01, UC02, UC03                             | Toàn bộ; NV IT                                                      |
+| Quy trình nghiệp vụ (Tầng 1–2)             | Use case hệ thống (Tầng 3)                                                       | Tác nhân thao tác                                                   |
+| ------------------------------------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **QP1. Tuyển dụng**                        | UC04 → UC05 → UC06 → UC07 → UC08                                                 | Trưởng dự án, CV tuyển dụng, Kế toán, Giám đốc, Ứng viên            |
+| **QP2. Tiếp nhận hồ sơ – hội nhập**        | UC09, UC10, UC11                                                                 | CV hồ sơ, NV hành chính, NV IT                                      |
+| **QP3. Thử việc – xếp lương chính thức**   | UC13 (kèm UC10)                                                                  | Trưởng dự án, CV hồ sơ                                              |
+| **QP4. Chấm công – tính lương hằng tháng** | UC18 (kèm UC26, UC27 điểm danh đa nguồn) → UC19/UC20 → UC21 → UC22 → UC23 → UC24 | Nhân viên, Trưởng dự án, CV hồ sơ, CV tiền lương, Kế toán, Giám đốc |
+| **QP5. Tăng lương định kỳ/đột xuất**       | UC15                                                                             | Trưởng dự án, Giám đốc                                              |
+| **QP6. Thuyên chuyển công tác**            | UC14                                                                             | Trưởng dự án, Giám đốc                                              |
+| **QP7. Khen thưởng – kỷ luật**             | UC16                                                                             | Trưởng dự án, ĐLNLĐ, Giám đốc                                       |
+| **QP8. Nghỉ hưu / QP9. Thôi việc**         | UC17                                                                             | Nhân viên, Trưởng dự án, NV hành chính, NV IT, Kế toán, CV hồ sơ    |
+| **Quản lý hồ sơ xuyên suốt vòng đời**      | UC12                                                                             | Nhân viên, CV hồ sơ                                                 |
+| **Nền tảng vận hành**                      | UC01, UC02, UC03                                                                 | Toàn bộ; NV IT                                                      |
 
 Đọc một dòng của bảng là thấy một quy trình thực tế chạy qua những màn hình nào, do ai thao tác, theo thứ tự nào — đây chính là bản mô tả cách hệ thống hoạt động.
 
 ### 2.1.3. Danh sách Use case và phân nhóm nhiệm vụ
 
-Hệ thống được tổ chức thành **25 Use case chia 6 nhóm** nhằm bảo đảm tính bao đóng và phân tách trách nhiệm đúng theo cơ cấu tổ chức.
+Hệ thống được tổ chức thành **27 Use case chia 6 nhóm** nhằm bảo đảm tính bao đóng và phân tách trách nhiệm đúng theo cơ cấu tổ chức.
 
 **Bảng 2.3. Danh sách Use case của Hệ thống Quản trị nhân lực HRMIS**
 
@@ -507,6 +509,8 @@ Hệ thống được tổ chức thành **25 Use case chia 6 nhóm** nhằm b�
 | 19                                 | UC19 | Đăng ký làm thêm giờ          | Nhân viên, Trưởng dự án           |
 | 20                                 | UC20 | Đăng ký nghỉ phép             | Nhân viên, Trưởng dự án           |
 | 21                                 | UC21 | Chốt bảng chấm công           | CV tiền lương, Trưởng dự án       |
+| 26                                 | UC26 | Điểm danh bằng mã QR          | Nhân viên (kiosk xoay mã 30 giây) |
+| 27                                 | UC27 | Điểm danh bằng khuôn mặt      | Nhân viên (trình duyệt, WASM)     |
 | **Nhóm F — Lương – Báo cáo**       |      |                               |                                   |
 | 22                                 | UC22 | Cấu hình công thức lương      | CV tiền lương                     |
 | 23                                 | UC23 | Tính bảng lương hằng tháng    | CV tiền lương                     |
@@ -517,33 +521,33 @@ Hệ thống được tổ chức thành **25 Use case chia 6 nhóm** nhằm b�
 
 **Bảng 2.4. Đặc tả tổng hợp các Use case của hệ thống HRMIS**
 
-| Mã UC | Tác nhân chính              | Mục đích – Luồng xử lý                                                                                                                                                                                                                                         |
-| ----- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| UC01  | Tất cả nhân viên            | Mục đích: Bảo mật và cấp quyền hệ thống. Luồng xử lý: Tác nhân nhập tên đăng nhập/mật khẩu. Hệ thống đối chiếu CSDL, hợp lệ thì vào giao diện theo vai trò; sai thì báo lỗi; sai 5 lần liên tiếp khóa tài khoản 15 phút.                                       |
-| UC02  | Nhân viên IT                | Mục đích: Kiểm soát vòng đời tài khoản. Luồng xử lý: Thêm/sửa/khóa tài khoản, gán vai trò. Hệ thống ghi nhật ký mọi thay đổi.                                                                                                                                  |
-| UC03  | Nhân viên IT                | Mục đích: Cây tổ chức là dữ liệu cấu hình. Luồng xử lý: Vẽ/sửa cây phòng ban, khai báo vị trí việc làm kèm định biên. Hệ thống tự tính số hiện hữu so định biên của từng đơn vị.                                                                               |
-| UC04  | Trưởng dự án                | Mục đích: Số hóa bước phát hiện thiếu hụt và trình duyệt chỉ tiêu. Luồng xử lý: Lập phiếu (vị trí, số lượng, lý do) → luồng duyệt ba tầng: CV tuyển dụng thẩm định → Kế toán xác nhận quỹ → Giám đốc ký. Duyệt xong tự mở kế hoạch tuyển.                      |
-| UC05  | CV tuyển dụng, Kế toán      | Mục đích: Thẩm định tính hợp lệ của chỉ tiêu. Luồng xử lý: Đối chiếu nội quy, định biên; nếu có người nội bộ phù hợp → gợi ý luân chuyển, dừng luồng; yêu cầu và nhận xác nhận quỹ lương từ Kế toán.                                                           |
-| UC06  | Giám đốc                    | Mục đích: Quyết định cuối cùng. Luồng xử lý: Xem tờ trình điện tử, ký duyệt từ xa hoặc điều chỉnh/từ chối kèm ý kiến; hệ thống lưu vết và phản hồi Trưởng dự án.                                                                                               |
-| UC07  | CV tuyển dụng, Ứng viên     | Mục đích: Ống dẫn ứng viên đa kênh. Luồng xử lý: Tiếp nhận hồ sơ online/trực tiếp nhập chung một nơi → sàng lọc → phỏng vấn → lưu phiếu đánh giá có điểm số.                                                                                                   |
-| UC08  | CV tuyển dụng               | Mục đích: Chốt ứng viên đạt và mức lương. Luồng xử lý: Soạn thư mời (chức danh, mức lương, ngày nhận việc); vượt khung lương → trình Giám đốc duyệt riêng; ứng viên chấp nhận → chuyển sang luồng hội nhập.                                                    |
-| UC09  | CV hồ sơ                    | Mục đích: Quản lý hồ sơ điện tử. Luồng xử lý: Thêm/sửa thông tin nhân viên (họ tên, ngày sinh, quê quán, dân tộc, căn cước), đổi trạng thái làm việc; mỗi thay đổi ghi vào lịch sử công tác.                                                                   |
-| UC10  | CV hồ sơ                    | Mục đích: Vòng đời hợp đồng. Luồng xử lý: Ký mới, gia hạn, ký phụ lục. Hệ thống tự cảnh báo sắp hết hạn trước 45/30 ngày theo loại hợp đồng.                                                                                                                   |
-| UC11  | CV hồ sơ                    | Mục đích: Kho lưu trữ kép. Luồng xử lý: Lưu văn bằng chứng chỉ kèm bản quét, số hiệu, nơi cấp, vị trí tủ lưu trữ vật lý.                                                                                                                                       |
-| UC12  | Nhân viên, CV hồ sơ         | Mục đích: Mượn – trả bản gốc không thất lạc. Luồng xử lý: Nhân viên gửi yêu cầu mượn → CV hồ sơ duyệt → hệ thống nhắc hạn trả → trả xong xác nhận; đang mượn thì giấy tờ tô đỏ trên hồ sơ.                                                                     |
-| UC13  | Trưởng dự án                | Mục đích: Kết thúc kỳ thử việc đúng hạn. Luồng xử lý: Hệ thống nhắc trước 7 ngày; Trưởng dự án điền phiếu đánh giá; đạt → sinh nhiệm vụ ký hợp đồng chính thức + xếp lương (≥85% lương thử việc); không đạt → sinh nhiệm vụ chấm dứt hợp đồng thử việc.        |
-| UC14  | Trưởng dự án                | Mục đích: Điều chuyển nhân sự giữa các nhóm/trung tâm. Luồng xử lý: Đề xuất kèm xác nhận bàn giao hai phía → duyệt → hệ thống tự đổi đơn vị – chức danh và quyền truy cập.                                                                                     |
-| UC15  | Trưởng dự án                | Mục đích: Điều chỉnh lương theo hiệu lực. Luồng xử lý: Đề xuất mức mới + ngày hiệu lực → duyệt → hệ thống ghi lịch sử lương; hiệu lực giữa tháng tự tính ghép theo tỷ lệ ngày.                                                                                 |
-| UC16  | Trưởng dự án, ĐLNLĐ         | Mục đích: Khen thưởng – kỷ luật đúng thủ tục. Luồng xử lý: Đề xuất kèm minh chứng; kỷ luật bắt buộc qua bước ý kiến đại diện người lao động; quyết định có hiệu lực thì mức thưởng/khấu trừ tự nạp kỳ lương.                                                   |
-| UC17  | Nhân viên và 4 bộ phận      | Mục đích: Thôi việc đúng checklist. Luồng xử lý: Đơn thôi việc → sinh checklist 4 xác nhận (bàn giao việc – thu hồi tài sản – thu hồi tài khoản – quyết toán) → đủ 4 xác nhận mới cho phát hành quyết định chấm dứt hợp đồng; ngày làm cuối tài khoản tự khóa. |
-| UC18  | Nhân viên, CV hồ sơ         | Mục đích: Ghi nhận giờ công. Luồng xử lý: Nhân viên check-in/out trên ứng dụng; CV hồ sơ đồng bộ dữ liệu máy chấm công. Hệ thống ghép ca, tính đi muộn/về sớm, sinh bảng công ngày; bản ghi thiếu vào/ra đánh dấu "lệch" chờ xử lý.                            |
-| UC19  | Nhân viên, Trưởng dự án     | Mục đích: Kiểm soát giờ làm thêm. Luồng xử lý: Nhân viên đăng ký kèm lý do → Trưởng dự án duyệt. Chưa duyệt thì giờ làm thêm không được tính tiền.                                                                                                             |
-| UC20  | Nhân viên, Trưởng dự án     | Mục đích: Quản lý quỹ phép minh bạch. Luồng xử lý: Tạo đơn → hệ thống kiểm quỹ → quản lý duyệt (có ủy quyền khi quản lý nghỉ) → trừ quỹ ngay và tự ghi công phép vào bảng công. Quỹ không đủ thì chặn đơn.                                                     |
-| UC21  | CV tiền lương, Trưởng dự án | Mục đích: Chốt công chuẩn xác. Luồng xử lý: Hợp nhất bảng công tháng, xử lý bản ghi lệch, trình Trưởng dự án xác nhận theo nhóm, chốt ngày 25 và khóa bảng công.                                                                                               |
-| UC22  | CV tiền lương               | Mục đích: Cấu trúc lương linh hoạt. Luồng xử lý: Định nghĩa thành phần lương (cơ bản, phụ cấp, BHXH, thuế TNCN) kèm công thức và thứ tự tính; chạy thử trên nhân viên mẫu trước khi lưu.                                                                       |
-| UC23  | CV tiền lương               | Mục đích: Tính lương đúng, có vết. Luồng xử lý: Tự nạp thưởng/phạt từ quyết định, tạm ứng, người phụ thuộc → tính BHXH, thuế theo tham số → sinh phiếu lương từng nhân viên.                                                                                   |
-| UC24  | Kế toán, Giám đốc           | Mục đích: Kiểm soát và khóa bất biến. Luồng xử lý: Kế toán đối chiếu (khớp → trình duyệt; lệch → ghi chú, tính lại) → Giám đốc duyệt và khóa → xuất lệnh chi ngân hàng, tờ khai BHXH – thuế, phiếu lương điện tử.                                              |
-| UC25  | Nhân viên                   | Mục đích: Tự phục vụ. Luồng xử lý: Xem thông tin cá nhân, số dư phép, bảng công, phiếu lương các tháng; phản hồi nếu phiếu lương có sai lệch.                                                                                                                  |
+| Mã UC | Tác nhân chính              | Mục đích – Luồng xử lý                                                                                                                                                                                                                                                                                                                 |
+| ----- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UC01  | Tất cả nhân viên            | Mục đích: Bảo mật và cấp quyền hệ thống. Luồng xử lý: Tác nhân nhập tên đăng nhập/mật khẩu. Hệ thống đối chiếu CSDL, hợp lệ thì vào giao diện theo vai trò; sai thì báo lỗi; sai 5 lần liên tiếp khóa tài khoản 15 phút.                                                                                                               |
+| UC02  | Nhân viên IT                | Mục đích: Kiểm soát vòng đời tài khoản. Luồng xử lý: Thêm/sửa/khóa tài khoản, gán vai trò. Hệ thống ghi nhật ký mọi thay đổi.                                                                                                                                                                                                          |
+| UC03  | Nhân viên IT                | Mục đích: Cây tổ chức là dữ liệu cấu hình. Luồng xử lý: Vẽ/sửa cây phòng ban, khai báo vị trí việc làm kèm định biên. Hệ thống tự tính số hiện hữu so định biên của từng đơn vị.                                                                                                                                                       |
+| UC04  | Trưởng dự án                | Mục đích: Số hóa bước phát hiện thiếu hụt và trình duyệt chỉ tiêu. Luồng xử lý: Lập phiếu (vị trí, số lượng, lý do) → luồng duyệt ba tầng: CV tuyển dụng thẩm định → Kế toán xác nhận quỹ → Giám đốc ký. Duyệt xong tự mở kế hoạch tuyển.                                                                                              |
+| UC05  | CV tuyển dụng, Kế toán      | Mục đích: Thẩm định tính hợp lệ của chỉ tiêu. Luồng xử lý: Đối chiếu nội quy, định biên; nếu có người nội bộ phù hợp → gợi ý luân chuyển, dừng luồng; yêu cầu và nhận xác nhận quỹ lương từ Kế toán.                                                                                                                                   |
+| UC06  | Giám đốc                    | Mục đích: Quyết định cuối cùng. Luồng xử lý: Xem tờ trình điện tử, ký duyệt từ xa hoặc điều chỉnh/từ chối kèm ý kiến; hệ thống lưu vết và phản hồi Trưởng dự án.                                                                                                                                                                       |
+| UC07  | CV tuyển dụng, Ứng viên     | Mục đích: Ống dẫn ứng viên đa kênh. Luồng xử lý: Tiếp nhận hồ sơ online/trực tiếp nhập chung một nơi → sàng lọc → phỏng vấn → lưu phiếu đánh giá có điểm số.                                                                                                                                                                           |
+| UC08  | CV tuyển dụng               | Mục đích: Chốt ứng viên đạt và mức lương. Luồng xử lý: Soạn thư mời (chức danh, mức lương, ngày nhận việc); vượt khung lương → trình Giám đốc duyệt riêng; ứng viên chấp nhận → chuyển sang luồng hội nhập.                                                                                                                            |
+| UC09  | CV hồ sơ                    | Mục đích: Quản lý hồ sơ điện tử. Luồng xử lý: Thêm/sửa thông tin nhân viên (họ tên, ngày sinh, quê quán, dân tộc, căn cước), đổi trạng thái làm việc; mỗi thay đổi ghi vào lịch sử công tác.                                                                                                                                           |
+| UC10  | CV hồ sơ                    | Mục đích: Vòng đời hợp đồng. Luồng xử lý: Ký mới, gia hạn, ký phụ lục. Hệ thống tự cảnh báo sắp hết hạn trước 45/30 ngày theo loại hợp đồng.                                                                                                                                                                                           |
+| UC11  | CV hồ sơ                    | Mục đích: Kho lưu trữ kép. Luồng xử lý: Lưu văn bằng chứng chỉ kèm bản quét, số hiệu, nơi cấp, vị trí tủ lưu trữ vật lý.                                                                                                                                                                                                               |
+| UC12  | Nhân viên, CV hồ sơ         | Mục đích: Mượn – trả bản gốc không thất lạc. Luồng xử lý: Nhân viên gửi yêu cầu mượn → CV hồ sơ duyệt → hệ thống nhắc hạn trả → trả xong xác nhận; đang mượn thì giấy tờ tô đỏ trên hồ sơ.                                                                                                                                             |
+| UC13  | Trưởng dự án                | Mục đích: Kết thúc kỳ thử việc đúng hạn. Luồng xử lý: Hệ thống nhắc trước 7 ngày; Trưởng dự án điền phiếu đánh giá; đạt → sinh nhiệm vụ ký hợp đồng chính thức + xếp lương (≥85% lương thử việc); không đạt → sinh nhiệm vụ chấm dứt hợp đồng thử việc.                                                                                |
+| UC14  | Trưởng dự án                | Mục đích: Điều chuyển nhân sự giữa các nhóm/trung tâm. Luồng xử lý: Đề xuất kèm xác nhận bàn giao hai phía → duyệt → hệ thống tự đổi đơn vị – chức danh và quyền truy cập.                                                                                                                                                             |
+| UC15  | Trưởng dự án                | Mục đích: Điều chỉnh lương theo hiệu lực. Luồng xử lý: Đề xuất mức mới + ngày hiệu lực → duyệt → hệ thống ghi lịch sử lương; hiệu lực giữa tháng tự tính ghép theo tỷ lệ ngày.                                                                                                                                                         |
+| UC16  | Trưởng dự án, ĐLNLĐ         | Mục đích: Khen thưởng – kỷ luật đúng thủ tục. Luồng xử lý: Đề xuất kèm minh chứng; kỷ luật bắt buộc qua bước ý kiến đại diện người lao động; quyết định có hiệu lực thì mức thưởng/khấu trừ tự nạp kỳ lương.                                                                                                                           |
+| UC17  | Nhân viên và 4 bộ phận      | Mục đích: Thôi việc đúng checklist. Luồng xử lý: Đơn thôi việc → sinh checklist 4 xác nhận (bàn giao việc – thu hồi tài sản – thu hồi tài khoản – quyết toán) → đủ 4 xác nhận mới cho phát hành quyết định chấm dứt hợp đồng; ngày làm cuối tài khoản tự khóa.                                                                         |
+| UC18  | Nhân viên, CV hồ sơ         | Mục đích: Ghi nhận giờ công đa nguồn. Luồng xử lý: Nhân viên check-in/out trên ứng dụng; quét mã QR tại kiosk (UC26); điểm danh khuôn mặt trên trình duyệt (UC27); CV hồ sơ đồng bộ dữ liệu máy chấm công qua webhook/CSV. Hệ thống ghép ca, tính đi muộn/về sớm, sinh bảng công ngày; bản ghi thiếu vào/ra đánh dấu "lệch" chờ xử lý. |
+| UC19  | Nhân viên, Trưởng dự án     | Mục đích: Kiểm soát giờ làm thêm. Luồng xử lý: Nhân viên đăng ký kèm lý do → Trưởng dự án duyệt. Chưa duyệt thì giờ làm thêm không được tính tiền.                                                                                                                                                                                     |
+| UC20  | Nhân viên, Trưởng dự án     | Mục đích: Quản lý quỹ phép minh bạch. Luồng xử lý: Tạo đơn → hệ thống kiểm quỹ → quản lý duyệt (có ủy quyền khi quản lý nghỉ) → trừ quỹ ngay và tự ghi công phép vào bảng công. Quỹ không đủ thì chặn đơn.                                                                                                                             |
+| UC21  | CV tiền lương, Trưởng dự án | Mục đích: Chốt công chuẩn xác. Luồng xử lý: Hợp nhất bảng công tháng, xử lý bản ghi lệch, trình Trưởng dự án xác nhận theo nhóm, chốt ngày 25 và khóa bảng công.                                                                                                                                                                       |
+| UC22  | CV tiền lương               | Mục đích: Cấu trúc lương linh hoạt. Luồng xử lý: Định nghĩa thành phần lương (cơ bản, phụ cấp, BHXH, thuế TNCN) kèm công thức và thứ tự tính; chạy thử trên nhân viên mẫu trước khi lưu.                                                                                                                                               |
+| UC23  | CV tiền lương               | Mục đích: Tính lương đúng, có vết. Luồng xử lý: Tự nạp thưởng/phạt từ quyết định, tạm ứng, người phụ thuộc → tính BHXH, thuế theo tham số → sinh phiếu lương từng nhân viên.                                                                                                                                                           |
+| UC24  | Kế toán, Giám đốc           | Mục đích: Kiểm soát và khóa bất biến. Luồng xử lý: Kế toán đối chiếu (khớp → trình duyệt; lệch → ghi chú, tính lại) → Giám đốc duyệt và khóa → xuất lệnh chi ngân hàng, tờ khai BHXH – thuế, phiếu lương điện tử.                                                                                                                      |
+| UC25  | Nhân viên                   | Mục đích: Tự phục vụ. Luồng xử lý: Xem thông tin cá nhân, số dư phép, bảng công, phiếu lương các tháng; phản hồi nếu phiếu lương có sai lệch.                                                                                                                                                                                          |
 
 **Bảng 2.5. Đặc tả chi tiết các Use case trọng yếu** (khuôn hai cột Người dùng – Hệ thống)
 
@@ -602,6 +606,23 @@ Hệ thống được tổ chức thành **25 Use case chia 6 nhóm** nhằm b�
 | 2   | Bấm "Tính lương"                     | Tự nạp thưởng/phạt từ quyết định UC16, tạm ứng, người phụ thuộc; tính BHXH, thuế TNCN theo tham số; sinh phiếu lương từng nhân viên |
 | 3   | Kế toán đối chiếu                    | Khớp → chuyển "Chờ duyệt"; lệch → ghi chú, tính lại (giữ vết phiên cũ)                                                              |
 | 4   | Giám đốc duyệt và khóa               | Bảng lương bất biến; xuất lệnh chi ngân hàng, tờ khai BHXH – thuế, phiếu lương điện tử                                              |
+
+**UC26 — Điểm danh bằng mã QR** (bổ sung kênh đa nguồn cho UC18)
+
+| #   | Người dùng                                                             | Hệ thống                                                                                                                  |
+| --- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 1   | —                                                                      | Kiosk gọi sinh token ký HMAC {kiosk_id, iat, jti} hết hạn 30 giây; hiển thị mã QR và tự xoay mã mới mỗi 30 giây           |
+| 2   | Nhân viên quét mã bằng camera điện thoại, xác nhận trên trang check-in | Kiểm tra chữ ký, thời hạn ≤ 60 giây, jti chỉ dùng một lần (chặn chụp ảnh tái sử dụng), chưa check-in trong khoảng ±2 phút |
+| 3   | —                                                                      | Hợp lệ → ghi sự kiện điểm danh thô (bất biến, nguồn = QR) → tự tổng hợp bảng công ngày (giờ vào, phút đi muộn)            |
+| 4   | Nhân viên nhận phản hồi "Chấm công 08:02 ✓"                            | Thiếu giờ ra cuối ngày hoặc trùng lặp → đánh dấu "lệch" đưa vào hàng đợi xử lý của chuyên viên hồ sơ                      |
+
+**UC27 — Điểm danh bằng khuôn mặt** (bổ sung kênh đa nguồn cho UC18)
+
+| #   | Người dùng                                                          | Hệ thống                                                                                                                    |
+| --- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Nhân viên đăng ký mẫu: tick đồng ý thu thập dữ liệu sinh trắc học   | Trình duyệt trích vector đặc trưng 128 chiều từ 3–5 ảnh quay mặt (WASM, không gửi ảnh gốc); vector mã hóa AES trước khi lưu |
+| 2   | Nhân viên chọn "Điểm danh khuôn mặt" trên trình duyệt tại văn phòng | Trích vector thời gian thực, so khớp cosine similarity với các mẫu đã mã hóa; vượt ngưỡng → ghi sự kiện (nguồn = khuôn mặt) |
+| 3   | —                                                                   | Không khớp / chưa đăng ký → từ chối rõ ràng; giới hạn số lần thử để chống dò; nhật ký chỉ ghi kết quả, không ghi vector     |
 
 **Bảng 2.6. Danh mục tham số pháp lý của hệ thống** (lưu tại bảng THAMSO kèm ngày hiệu lực)
 
@@ -677,6 +698,8 @@ rectangle "Hệ thống HRMIS — Saigon Technology" {
     usecase "UC19 Đăng ký\nlàm thêm giờ" as UC19
     usecase "UC20 Đăng ký\nnghỉ phép" as UC20
     usecase "UC21 Chốt bảng\nchấm công" as UC21
+    usecase "UC26 Điểm danh\nbằng mã QR" as UC26
+    usecase "UC27 Điểm danh\nbằng khuôn mặt" as UC27
   }
   package "F. Lương – Báo cáo" {
     usecase "UC22 Cấu hình\ncông thức lương" as UC22
@@ -713,6 +736,8 @@ KT --> UC17
 HS --> UC17
 NV --> UC18
 HS --> UC18
+NV --> UC26
+NV --> UC27
 NV --> UC19
 PM --> UC19
 NV --> UC20
@@ -727,6 +752,8 @@ NV --> UC25
 
 UC11 <.. UC12 : <<extend>>\nđang mượn tô đỏ
 UC14 <.. UC21 : <<extend>>\nbàn giao 2 phía
+UC18 <.. UC26 : <<extend>>\nkênh QR xoay 30 giây
+UC18 <.. UC27 : <<extend>>\nkênh khuôn mặt trên trình duyệt
 @enduml
 ```
 
@@ -823,7 +850,9 @@ Trong phương pháp phân tích và thiết kế hướng đối tượng, ki�
 
 **Nhóm Đối tượng Chấm công – Nghỉ phép:**
 
-- **SuKienDiemDanh:** Sự kiện điểm danh thô, bất biến (Thời điểm, Nguồn: máy/ứng dụng, Cờ lệch);
+- **SuKienDiemDanh:** Sự kiện điểm danh thô, bất biến (Thời điểm, Nguồn: máy/ứng dụng/mã QR/khuôn mặt, Cờ lệch);
+- **ThietBiChamCong:** Thiết bị thu nhận sự kiện (Loại: kiosk QR / máy webhook / máy CSV / mô phỏng, Vị trí, Khóa HMAC);
+- **MauKhuonMat:** Mẫu khuôn mặt của người lao động (Vector 128 chiều đã mã hóa AES-256-GCM, Thời điểm đồng thuận, Trạng thái);
 - **CaLamViec:** Khung ca làm việc;
 - **BangCongNgay:** Bảng công từng ngày (Công hữu hiệu, Phút đi muộn, Giờ làm thêm đã duyệt, Loại nghỉ, Cờ lệch);
 - **DonNghiPhep:** Đơn nghỉ phép (Loại, Từ ngày, Đến ngày, Trạng thái);
@@ -1478,7 +1507,7 @@ _Hình 2.20. Biểu đồ lớp miền cốt lõi của hệ thống_
 
 ### 2.4.2. Thiết kế lưu trữ dữ liệu
 
-Thiết kế lưu trữ dữ liệu là quá trình chuyển đổi các Lớp Thực thể thành các bảng trong cơ sở dữ liệu quan hệ. Hệ thống HRMIS được thiết kế với tổng cộng **30 bảng dữ liệu cốt lõi**, chia theo sáu miền nghiệp vụ, bảo đảm khả năng lưu trữ toàn vẹn thông tin cho mọi quy trình.
+Thiết kế lưu trữ dữ liệu là quá trình chuyển đổi các Lớp Thực thể thành các bảng trong cơ sở dữ liệu quan hệ. Hệ thống HRMIS được thiết kế với tổng cộng **32 bảng dữ liệu cốt lõi**, chia theo sáu miền nghiệp vụ (bổ sung hai bảng phục vụ chấm công đa nguồn — xem mục 2.5), bảo đảm khả năng lưu trữ toàn vẹn thông tin cho mọi quy trình.
 
 ```plantuml
 @startuml
@@ -1589,13 +1618,13 @@ DEXUAT ||--o{ BUOC_DUYET
 @enduml
 ```
 
-_Hình 2.21. Mô hình cơ sở dữ liệu vật lý của hệ thống_ (sơ đồ thể hiện 16 bảng chính; 14 bảng còn lại — VAITRO, TAIKHOAN, TAIKHOAN_VAITRO, VITRIVIECLAM, VONG_PHONGVAN, THUMOI, CA_LAM_VIEC, DANGKY_OT, THANHPHAN_LUONG, CAUTRUC_LUONG, QUYETDINH, THONGBAO, NHATKY, NGUOI_PHU_THUOC — vẽ bổ sung theo cùng ký pháp)
+_Hình 2.21. Mô hình cơ sở dữ liệu vật lý của hệ thống_ (sơ đồ thể hiện 16 bảng chính; 16 bảng còn lại — VAITRO, TAIKHOAN, TAIKHOAN_VAITRO, VITRIVIECLAM, VONG_PHONGVAN, THUMOI, CA_LAM_VIEC, DANGKY_OT, THANHPHAN_LUONG, CAUTRUC_LUONG, QUYETDINH, THONGBAO, NHATKY, NGUOI_PHU_THUOC, THIETBI_CHAMCONG, MAU_KHUONMAT — vẽ bổ sung theo cùng ký pháp)
 
 Để đáp ứng nghiệp vụ quản trị, hệ thống dùng bảng **TAIKHOAN** lưu trữ định danh truy cập, kết nối với bảng **VAITRO** qua bảng trung gian **TAIKHOAN_VAITRO** nhằm thiết lập cơ chế phân quyền động hai chiều (quyền chức năng × phạm vi dữ liệu: bản thân / nhóm / cây đơn vị / toàn công ty). Dữ liệu con người tập trung tại **NGUOIDUNG – NHANVIEN**, gắn với cây tổ chức qua **DONVI** (tự tham chiếu cha – con) và **VITRIVIECLAM** (chứa định biên). Vòng đời hồ sơ được lưu vết qua **HOPDONG** (cảnh báo hạn 45/30 ngày), **VANBANG** (kèm bản quét, mã vị trí tủ, cờ đang mượn) và **PHIEU_MUONTRA**.
 
 Trong mạng tuyển dụng, **PHIEU_TUYENDUNG** lưu trạng thái luồng ba tầng, kết nối **UNGVIEN** qua các vòng phỏng vấn **VONG_PHONGVAN** và thư mời **THUMOI**. Nghiệp vụ biến động nhân sự được chuẩn hóa quanh hai bảng chung **DEXUAT – BUOC_DUYET**: mọi loại đề xuất (thuyên chuyển, tăng lương, khen thưởng – kỷ luật, thôi việc) dùng một bộ máy phê duyệt duy nhất, kèm **QUYETDINH** với số tự sinh theo mẫu và năm, và **NHIEMVU_BANGIAO** cho checklist bốn bộ phận khi thôi việc.
 
-Chuỗi chấm công – phép xoay quanh **SUKIEN_DIEMDANH** (bảng sự kiện thô bất biến, nguồn ghi rõ máy/ứng dụng), **BANGCONG_NGAY** (kết quả áp quy tắc từng ngày), **DON_NGHIPHEP – SO_DU_PHEP** (quỹ phép theo năm) và **DANGKY_OT**. Chuỗi lương gồm **THANHPHAN_LUONG** (công thức chuỗi, thứ tự tính), **CAUTRUC_LUONG** (hiệu lực theo khoảng ngày), **KYLUONG – PHIEU_LUONG** (kỳ và phiếu với trạng thái khóa). Ba bảng hệ thống khép lại mô hình: **THAMSO** lưu mọi định mức pháp lý kèm ngày hiệu lực (tỷ lệ BHXH 21,5%/10,5%, trần đóng, biểu thuế 7 bậc, định mức làm thêm, phép năm — luật đổi thì thêm dòng cấu hình mới, kỳ lương quá khứ luôn tính đúng theo quy định tại thời điểm đó), **THONGBAO** và **NHATKY** (bất biến).
+Chuỗi chấm công – phép xoay quanh **SUKIEN_DIEMDANH** (bảng sự kiện thô bất biến, nguồn ghi rõ một trong bốn kênh: máy chấm công, ứng dụng, mã QR tại kiosk, khuôn mặt trên trình duyệt), **BANGCONG_NGAY** (kết quả áp quy tắc từng ngày), **DON_NGHIPHEP – SO_DU_PHEP** (quỹ phép theo năm) và **DANGKY_OT**; hai bảng bổ sung **THIETBI_CHAMCONG** (định danh kiosk/máy kèm khóa HMAC, phục vụ webhook và chống giả mạo) và **MAU_KHUONMAT** (vector đặc trưng mã hóa AES-256-GCM kèm dấu vết đồng thuận của người lao động, không lưu ảnh gốc) được mô tả ở mục 2.5. Chuỗi lương gồm **THANHPHAN_LUONG** (công thức chuỗi, thứ tự tính), **CAUTRUC_LUONG** (hiệu lực theo khoảng ngày), **KYLUONG – PHIEU_LUONG** (kỳ và phiếu với trạng thái khóa). Ba bảng hệ thống khép lại mô hình: **THAMSO** lưu mọi định mức pháp lý kèm ngày hiệu lực (tỷ lệ BHXH 21,5%/10,5%, trần đóng, biểu thuế 7 bậc, định mức làm thêm, phép năm — luật đổi thì thêm dòng cấu hình mới, kỳ lương quá khứ luôn tính đúng theo quy định tại thời điểm đó), **THONGBAO** và **NHATKY** (bất biến).
 
 **Ba ràng buộc kỹ thuật bắt buộc:** (i) bảng SUKIEN_DIEMDANH và NHATKY **chỉ thêm, không sửa xóa** — bảo đảm truy vết tuyệt đối; (ii) PHIEU_LUONG ở trạng thái "Đã khóa" bị chặn UPDATE/DELETE ở tầng ứng dụng — mọi điều chỉnh qua bản ghi kỳ sau; (iii) mọi bảng nghiệp vụ có trường kiểm toán (ngày tạo/người tạo/ngày sửa/người sửa, xóa mềm), tập tin bản quét lưu kho đối tượng riêng với mã băm kiểm tra toàn vẹn.
 
@@ -1611,7 +1640,7 @@ Thiết kế giao diện người dùng đóng vai trò là cầu nối tương 
 
 **Nhóm giao diện tuyển dụng:** Ống dẫn ứng viên dạng kanban sáu cột (Nhận hồ sơ → Sàng lọc → Phỏng vấn vòng 1 → Phỏng vấn vòng 2 → Thư mời → Nhận việc), kéo – thả ứng viên giữa các cột, thẻ ứng viên hiển thị điểm phỏng vấn và nguồn kênh.
 
-**Nhóm giao diện chấm công:** Bảng công cá nhân dạng lịch tháng với mã màu (đi muộn, làm thêm đã duyệt, nghỉ phép); màn hình chốt công của CV tiền lương hiển thị hàng đợi bản ghi lệch kèm nút "hỏi quản lý xác nhận".
+**Nhóm giao diện chấm công:** Bảng công cá nhân dạng lịch tháng với mã màu (đi muộn, làm thêm đã duyệt, nghỉ phép); màn hình chốt công của CV tiền lương hiển thị hàng đợi bản ghi lệch kèm nút "hỏi quản lý xác nhận"; **trang kiosk điểm danh full-screen** hiển thị mã QR tự xoay mỗi 30 giây kèm đồng hồ đếm ngược và nút "giả lập quét" phục vụ trình diễn; **thẻ điểm danh khuôn mặt** hướng dẫn đăng ký 3–5 mẫu với hộp kiểm đồng thuận dữ liệu sinh trắc học bắt buộc trước khi bật camera.
 
 **Nhóm giao diện kỳ lương:** Bàn làm việc với thanh tiến trình năm bước (Khóa công → Tính → Đối chiếu → Duyệt → Đã chi), đếm số phiếu có phản hồi chưa xử lý; trình soạn công thức lương có gợi ý biến ngữ cảnh và nút "chạy thử trên nhân viên mẫu" trước khi lưu.
 
@@ -1619,16 +1648,16 @@ Thiết kế giao diện người dùng đóng vai trò là cầu nối tương 
 
 Thiết kế thành phần là bước tổ chức kiến trúc phần mềm, trong đó hệ thống tổng thể được chia nhỏ thành các khối độc lập nhưng có khả năng tương tác chặt chẽ với nhau. Kiến trúc phần mềm của dự án được thiết kế dựa trên mô hình ba tầng tiêu chuẩn:
 
-**Tầng giao diện người dùng:** Nơi tiếp nhận mọi thao tác từ người dùng, bao gồm ứng dụng web quản trị (React) dành cho các vai CV nhân sự – Trưởng dự án – Kế toán – Giám đốc, và ứng dụng di động (Flutter) kênh tự phục vụ của người lao động. Nhiệm vụ chính là thu thập thông tin đầu vào chính xác, gửi yêu cầu xuống hệ thống bên dưới và hiển thị kết quả phản hồi trực quan.
+**Tầng giao diện người dùng:** Nơi tiếp nhận mọi thao tác từ người dùng, bao gồm ứng dụng web quản trị (Next.js — kế thừa hệ sinh thái React, bổ sung App Router và Server Components) dành cho các vai CV nhân sự – Trưởng dự án – Kế toán – Giám đốc cùng các màn hình kiosk điểm danh QR, và ứng dụng di động (Flutter) kênh tự phục vụ của người lao động. Nhiệm vụ chính là thu thập thông tin đầu vào chính xác, gửi yêu cầu xuống hệ thống bên dưới và hiển thị kết quả phản hồi trực quan.
 
 **Tầng xử lý nghiệp vụ:** Đóng vai trò bộ não của toàn bộ hệ thống, chứa toàn bộ quy tắc và logic cốt lõi: kiểm tra tính hợp lệ, chạy luồng phê duyệt, áp quy tắc chấm công, tính toán lương – bảo hiểm – thuế, kiểm soát quyền truy cập. Tầng này được đóng gói thành sáu khối chức năng độc lập tương ứng sáu nhóm Use case, hoạt động trên nền hai bộ máy dùng chung — **Bộ máy phê duyệt (ApprovalEngine)** và **Bộ máy tính lương (PayrollEngine)** — cùng dịch vụ thông báo. Các khối giao tiếp bằng cơ chế truyền thông điệp: chẳng hạn, khi khối Biến động nhân sự phát hành quyết định khen thưởng, nó tự động gửi thông điệp yêu cầu khối Lương nạp "thu nhập khác" vào kỳ lương kế tiếp — kế toán không phải nhập lại tay.
 
-**Tầng lưu trữ dữ liệu:** Thành phần nằm sâu nhất, chịu trách nhiệm bảo quản toàn bộ thông tin: hệ quản trị cơ sở dữ liệu SQL Server cho 30 bảng nghiệp vụ và kho tập tin riêng cho bản quét hồ sơ. Tầng lưu trữ không trực tiếp giao tiếp với màn hình giao diện mà chỉ cung cấp hoặc nhận dữ liệu qua các lệnh truy xuất từ tầng xử lý nghiệp vụ.
+**Tầng lưu trữ dữ liệu:** Thành phần nằm sâu nhất, chịu trách nhiệm bảo quản toàn bộ thông tin: hệ quản trị cơ sở dữ liệu SQL Server cho 32 bảng nghiệp vụ và kho tập tin riêng cho bản quét hồ sơ. Tầng lưu trữ không trực tiếp giao tiếp với màn hình giao diện mà chỉ cung cấp hoặc nhận dữ liệu qua các lệnh truy xuất từ tầng xử lý nghiệp vụ.
 
 ```plantuml
 @startuml
 package "TẦNG GIAO DIỆN" {
-  [Web quản trị\n(React)] as Web
+  [Web quản trị + Kiosk QR\n(Next.js)] as Web
   [Ứng dụng di động\ntự phục vụ (Flutter)] as Mobile
 }
 package "TẦNG XỬ LÝ NGHIỆP VỤ" {
@@ -1643,7 +1672,7 @@ package "TẦNG XỬ LÝ NGHIỆP VỤ" {
   [NotificationService] as NS
 }
 database "TẦNG LƯU TRỮ" {
-  [SQL Server\n(30 bảng)] as DB
+  [SQL Server\n(32 bảng)] as DB
   [Kho tập tin\nbản quét hồ sơ] as FS
 }
 Web --> K1
@@ -1666,11 +1695,90 @@ _Hình 2.22. Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống_
 
 Sự phân chia kiến trúc thành các tầng và khối thành phần riêng biệt giúp hệ thống sở hữu nền tảng vận hành linh hoạt. Trong tương lai, nếu công ty muốn thay đổi giao diện hoặc bổ sung phân hệ mới (ví dụ tầng trí tuệ nhân tạo dự báo nhân sự), lập trình viên chỉ cần can thiệp vào một thành phần cụ thể mà không làm ảnh hưởng đến cấu trúc lưu trữ hay các quy trình đang diễn ra bình thường.
 
+### 2.5. Bổ sung thiết kế: chấm công đa nguồn (mã QR – khuôn mặt – máy chấm công)
+
+Theo yêu cầu mở rộng phạm vi sau khi hoàn thiện bản thiết kế gốc, phân hệ chấm công (UC18) được nâng cấp từ hai kênh thu nhận (máy chấm công, ứng dụng di động) thành **bốn kênh**, bám sát đúng định hướng "chấm công đa nguồn" đã phân tích ở Phần Bốn và Mức độ thứ hai của tài liệu đặc tả nghiệp vụ: máy vân tay/khuôn mặt đặt tại văn phòng, ứng dụng di động, **mã QR xoay vòng tại kiosk** và **nhận diện khuôn mặt ngay trên trình duyệt**. Hai use case mới UC26, UC27 quan hệ <<extend>> với UC18 — chúng là các kênh đầu vào thay thế, không làm thay đổi luồng ghép ca – tổng hợp bảng công phía sau.
+
+Nguyên tắc thiết kế an toàn cho ba kênh mới:
+
+- **Mã QR chống giả mạo:** kiosk hiển thị token ký HMAC chứa {kiosk_id, iat, jti}, tự xoay mỗi 30 giây, hiệu lực chấp nhận ≤ 60 giây, jti chỉ dùng một lần — chặn hoàn toàn việc chụp ảnh màn hình để tái sử dụng; hệ thống từ chối check-in trùng trong khoảng ±2 phút;
+- **Khuôn mặt bảo vệ dữ liệu cá nhân:** tuân thủ tinh thần Nghị định 13/2023/NĐ-CP — chỉ lưu vector đặc trưng đã mã hóa AES-256-GCM (không lưu ảnh gốc), thu thập sau khi người lao động tick đồng thuận rõ ràng, giới hạn số lần thử khớp, và xóa toàn bộ mẫu khi hoàn tất thủ tục thôi việc (bổ sung một mục mặc định vào checklist bàn giao của UC17);
+- **Máy chấm công kết nối chuẩn hóa:** thiết bị đẩy sự kiện vào API qua webhook kèm chữ ký HMAC theo thiết bị, hoặc nhập tập tin CSV xuất từ máy; khi chưa có phần cứng thật, bộ mô phỏng thiết bị sinh dữ liệu kiểm thử (bao gồm cả bản ghi lệch) — kiến trúc adapter cho phép gắn SDK hãng (ZKTeco…) sau này mà không phải đổi luồng tổng hợp.
+
+Biểu đồ trình tự kênh QR (đại diện cho ba kênh mới):
+
+```plantuml
+@startuml
+actor "Nhân viên" as NV
+boundary "Kiosk\n(màn hình xoay QR)" as K
+control "QrTokenService" as T
+control "AttendanceControl" as C
+entity "SUKIEN_DIEMDANH" as E
+entity "BANGCONG_NGAY" as B
+
+K -> T : xin token (mỗi 30 giây)
+T --> K : token HMAC {kiosk_id, iat, jti}
+K -> K : render mã QR mới
+NV -> K : quét mã bằng điện thoại, xác nhận
+K -> C : checkIn(token)
+C -> T : verify (chữ ký, TTL ≤ 60s, jti chưa dùng)
+alt [Token hợp lệ và chưa check-in ±2 phút]
+  C -> E : INSERT sự kiện (nguồn = QR, bất biến)
+  C -> B : tổng hợp lại công ngày (giờ vào, phút đi muộn)
+  C --> NV : "Chấm công 08:02 ✓"
+else [Token hết hạn / jti đã dùng / trùng lặp]
+  C --> NV : từ chối kèm lý do, ghi nhật ký
+end
+@enduml
+```
+
+_Hình 2.23. Biểu đồ trình tự Use case Điểm danh bằng mã QR (UC26)_
+
+Phần mô hình dữ liệu bổ sung cho ba kênh mới (hai bảng thêm vào mô hình 32 bảng):
+
+```plantuml
+@startuml
+hide circle
+skinparam linetype ortho
+
+entity THIETBI_CHAMCONG {
+  * MaThietBi
+  --
+  Loai : QR_KIOSK | MAY_WEBHOOK | MAY_CSV | MO_PHONG
+  ViTri
+  KhoaHMAC_hash
+  TrangThai, LanCuoiHoatDong
+}
+
+entity SUKIEN_DIEMDANH {
+  * MaSuKien
+  --
+  MaNV, ThoiDiem
+  Nguon : MAY | UNG_DUNG | QR | KHUON_MAT
+  MaThietBi, CoLech
+}
+
+entity MAU_KHUONMAT {
+  * MaMau
+  --
+  MaNV
+  VectorMaHoa_AES
+  SoDuongDo : 128
+  DongThuanLuc, TrangThai
+}
+
+THIETBI_CHAMCONG ||--o{ SUKIEN_DIEMDANH
+MAU_KHUONMAT ||--o{ SUKIEN_DIEMDANH
+@enduml
+```
+
+_Hình 2.24. Mô hình dữ liệu bổ sung cho chấm công đa nguồn_ (SUKIEN_DIEMDANH giữ nguyên tính bất biến, chỉ mở rộng giá trị trường Nguon; token QR xác minh trạng thái nên không cần bảng lưu — jti kiểm tra bằng bộ nhớ đệm có hạn đời 60 giây)
+
 ## Tóm tắt chương 2
 
-Chương 2 trình bày chi tiết quá trình thiết kế hệ thống thông tin quản trị nhân lực HRMIS cho Saigon Technology. Quá trình bắt đầu từ việc xác định **11 tác nhân toàn bộ là con người, ánh xạ một-một với cơ cấu tổ chức** của công ty (bốn tổ của Ban Tổ chức – Hành chính – Nhân sự cho bốn tác nhân chuyên viên; Trưởng dự án, Kế toán, Nhân viên IT, Nhân viên hành chính, Giám đốc, Đại diện người lao động, Nhân viên, Ứng viên); phân tầng yêu cầu thành ba mức **quy trình nghiệp vụ → use case nghiệp vụ → use case hệ thống** với bảng ánh xạ nối liền; đặc tả **25 Use case** chia sáu nhóm, trong đó sáu Use case trọng yếu được đặc tả chi tiết theo khuôn hai cột Người dùng – Hệ thống, kèm bảng tham số pháp lý cấu hình theo hiệu lực ngày.
+Chương 2 trình bày chi tiết quá trình thiết kế hệ thống thông tin quản trị nhân lực HRMIS cho Saigon Technology. Quá trình bắt đầu từ việc xác định **11 tác nhân toàn bộ là con người, ánh xạ một-một với cơ cấu tổ chức** của công ty (bốn tổ của Ban Tổ chức – Hành chính – Nhân sự cho bốn tác nhân chuyên viên; Trưởng dự án, Kế toán, Nhân viên IT, Nhân viên hành chính, Giám đốc, Đại diện người lao động, Nhân viên, Ứng viên); phân tầng yêu cầu thành ba mức **quy trình nghiệp vụ → use case nghiệp vụ → use case hệ thống** với bảng ánh xạ nối liền; đặc tả **27 Use case** chia sáu nhóm (gồm hai use case bổ sung UC26, UC27 cho điểm danh mã QR và khuôn mặt), trong đó các Use case trọng yếu được đặc tả chi tiết theo khuôn hai cột Người dùng – Hệ thống, kèm bảng tham số pháp lý cấu hình theo hiệu lực ngày.
 
-Dựa trên các yêu cầu nghiệp vụ, cấu trúc tĩnh của hệ thống đã được nhận diện qua ba loại lớp Biên – Điều khiển – Thực thể với hai bộ máy dùng chung (ApprovalEngine, PayrollEngine); hành vi động được mô hình hóa toàn diện qua bộ biểu đồ UML: Use case, Trình tự, Hoạt động, Trạng thái (năm vòng đời đối tượng: Nhân viên, Phiếu tuyển dụng, Đơn nghỉ phép, Phiếu mượn – trả, Phiếu lương) và Cộng tác. Tiếp nối bước phân tích, chương đã hiện thực hóa kiến trúc tĩnh thành thiết kế lưu trữ dữ liệu với mô hình cơ sở dữ liệu vật lý gồm 30 bảng có ba ràng buộc bất biến; hệ thống giao diện người dùng thiết kế theo vai tuân thủ nguyên tắc tối giản; cuối cùng hệ thống được quy hoạch theo mô hình kiến trúc phần mềm 3 tầng (giao diện – nghiệp vụ – lưu trữ), bảo đảm tính bảo mật, hiệu năng và khả năng mở rộng.
+Dựa trên các yêu cầu nghiệp vụ, cấu trúc tĩnh của hệ thống đã được nhận diện qua ba loại lớp Biên – Điều khiển – Thực thể với hai bộ máy dùng chung (ApprovalEngine, PayrollEngine); hành vi động được mô hình hóa toàn diện qua bộ biểu đồ UML: Use case, Trình tự, Hoạt động, Trạng thái (năm vòng đời đối tượng: Nhân viên, Phiếu tuyển dụng, Đơn nghỉ phép, Phiếu mượn – trả, Phiếu lương) và Cộng tác. Tiếp nối bước phân tích, chương đã hiện thực hóa kiến trúc tĩnh thành thiết kế lưu trữ dữ liệu với mô hình cơ sở dữ liệu vật lý gồm 32 bảng có ba ràng buộc bất biến; hệ thống giao diện người dùng thiết kế theo vai tuân thủ nguyên tắc tối giản; cuối cùng hệ thống được quy hoạch theo mô hình kiến trúc phần mềm 3 tầng (giao diện – nghiệp vụ – lưu trữ), bảo đảm tính bảo mật, hiệu năng và khả năng mở rộng.
 
 ---
 
@@ -1678,21 +1786,21 @@ Dựa trên các yêu cầu nghiệp vụ, cấu trúc tĩnh của hệ thống 
 
 ## 3.1. Những kết quả đạt được
 
-Sau quá trình khảo sát nghiệp vụ quản trị nhân lực tại Saigon Technology và vận dụng phương pháp phân tích thiết kế hệ thống, đề tài đã xây dựng thành công một thiết kế HRMIS hoàn chỉnh cho công tác quản trị nhân lực của doanh nghiệp. Về mặt chức năng, hệ thống đã xác định 11 tác nhân phản ánh đúng cơ cấu tổ chức, đặc tả chi tiết 25 trường hợp sử dụng cốt lõi chia sáu nhóm, bao phủ toàn bộ vòng đời nhân sự từ khâu tuyển dụng, hồ sơ, thử việc, chấm công, tính lương cho đến các biến động và thôi việc. Các chức năng này được mô hình hóa trực quan thông qua bộ biểu đồ chuẩn hóa, trong đó biểu đồ trạng thái mô tả năm vòng đời đối tượng có ràng buộc bằng chứng pháp lý, giúp lập trình viên dễ dàng nắm bắt logic nghiệp vụ và quy tắc chuyển trạng thái.
+Sau quá trình khảo sát nghiệp vụ quản trị nhân lực tại Saigon Technology và vận dụng phương pháp phân tích thiết kế hệ thống, đề tài đã xây dựng thành công một thiết kế HRMIS hoàn chỉnh cho công tác quản trị nhân lực của doanh nghiệp. Về mặt chức năng, hệ thống đã xác định 11 tác nhân phản ánh đúng cơ cấu tổ chức, đặc tả chi tiết 27 trường hợp sử dụng cốt lõi chia sáu nhóm, bao phủ toàn bộ vòng đời nhân sự từ khâu tuyển dụng, hồ sơ, thử việc, chấm công đa nguồn (máy, ứng dụng, mã QR, khuôn mặt), tính lương cho đến các biến động và thôi việc. Các chức năng này được mô hình hóa trực quan thông qua bộ biểu đồ chuẩn hóa, trong đó biểu đồ trạng thái mô tả năm vòng đời đối tượng có ràng buộc bằng chứng pháp lý, giúp lập trình viên dễ dàng nắm bắt logic nghiệp vụ và quy tắc chuyển trạng thái.
 
-Về cơ sở dữ liệu, đề tài đã chuyển đổi thành công các lớp thực thể thành một mô hình lưu trữ vật lý gồm 30 bảng quan hệ chặt chẽ, với các ràng buộc bất biến bảo đảm tính toàn vẹn của dữ liệu nhân sự nhạy cảm (bảng lương sau khóa không thể sửa ngầm, nhật ký kiểm toán chỉ thêm). Điểm khác biệt so với các bài toán thông thường: toàn bộ định mức pháp luật (tỷ lệ bảo hiểm, biểu thuế, định mức làm thêm giờ, phép năm) được thiết kế thành tham số theo hiệu lực ngày — hệ thống không bao giờ tính sai lương khi quy định thay đổi. Đối với mảng kiến trúc, hệ thống được tổ chức theo mô hình ba tầng với hai bộ máy dùng chung, cho phép bổ sung loại đề xuất mới chỉ bằng cấu hình.
+Về cơ sở dữ liệu, đề tài đã chuyển đổi thành công các lớp thực thể thành một mô hình lưu trữ vật lý gồm 32 bảng quan hệ chặt chẽ, với các ràng buộc bất biến bảo đảm tính toàn vẹn của dữ liệu nhân sự nhạy cảm (bảng lương sau khóa không thể sửa ngầm, nhật ký kiểm toán và sự kiện điểm danh chỉ thêm). Điểm khác biệt so với các bài toán thông thường: toàn bộ định mức pháp luật (tỷ lệ bảo hiểm, biểu thuế, định mức làm thêm giờ, phép năm) được thiết kế thành tham số theo hiệu lực ngày — hệ thống không bao giờ tính sai lương khi quy định thay đổi. Đối với mảng kiến trúc, hệ thống được tổ chức theo mô hình ba tầng với hai bộ máy dùng chung, cho phép bổ sung loại đề xuất mới chỉ bằng cấu hình.
 
 ## 3.2. Đánh giá ưu, nhược điểm
 
 **Ưu điểm nổi bật:** Điểm mạnh lớn nhất của thiết kế nằm ở kiến trúc ba tầng và tính đóng gói cao của phương pháp hướng đối tượng. Cây cơ cấu tổ chức được thiết kế thành dữ liệu cấu hình nên khi công ty mở trung tâm phát triển mới hay tách nhóm dự án, không cần sửa mã nguồn. Việc chuẩn hóa mọi loại đề xuất về một bộ máy phê duyệt dùng chung phản ánh đúng mẫu hình ba mắt xích của tổ chức và giúp thêm quy trình duyệt mới chỉ bằng cấu hình chuỗi bước. Cơ chế khóa bảng lương bất biến và checklist thôi việc bốn xác nhận là ví dụ điển hình của việc phần mềm _cưỡng chế tuân thủ thủ tục_ thay vì chỉ số hóa mẫu biểu. Giao diện phân quyền theo vai với phạm vi dữ liệu giới hạn giúp bảo vệ dữ liệu nhạy cảm và rút ngắn thời gian đào tạo người dùng mới.
 
-**Nhược điểm và thách thức:** Dù sở hữu nhiều ưu điểm, hệ thống vẫn tồn tại một số thách thức khi đưa vào triển khai thực tế. Bản demo chưa kết nối trực tiếp phần cứng máy chấm công vật lý (dữ liệu được đồng bộ thủ công bởi chuyên viên hồ sơ qua API) và chưa ký số thật với cơ quan bảo hiểm – thuế (mới xuất đúng định dạng tập tin). Khối lượng nhập liệu gốc cho hơn bốn trăm hồ sơ nhân sự ban đầu rất lớn, đòi hỏi giai đoạn chạy song song với sổ giấy và sự cam kết từ Ban Giám đốc trong quản trị sự thay đổi. Việc cấu hình đúng công thức lương đòi hỏi người vận hành có kiến thức về thuế và bảo hiểm xã hội.
+**Nhược điểm và thách thức:** Dù sở hữu nhiều ưu điểm, hệ thống vẫn tồn tại một số thách thức khi đưa vào triển khai thực tế. Bản demo đã vận hành được ba kênh điểm danh mới (QR, khuôn mặt, webhook/CSV) nhưng chưa kết nối trực tiếp phần cứng máy chấm công thật qua SDK độc quyền của hãng (dùng bộ mô phỏng thiết bị), tính năng phát hiện người giả (liveness) cho kênh khuôn mặt chưa tích hợp, và chưa ký số thật với cơ quan bảo hiểm – thuế (mới xuất đúng định dạng tập tin). Khối lượng nhập liệu gốc cho hơn bốn trăm hồ sơ nhân sự ban đầu rất lớn, đòi hỏi giai đoạn chạy song song với sổ giấy và sự cam kết từ Ban Giám đốc trong quản trị sự thay đổi. Việc cấu hình đúng công thức lương đòi hỏi người vận hành có kiến thức về thuế và bảo hiểm xã hội.
 
 ## 3.3. Hướng nghiên cứu, phát triển
 
 Để hệ thống thiết kế có thể phát huy tối đa giá trị khi ứng dụng vào môi trường thực tế, đề tài đưa ra một số khuyến nghị phát triển trên các phương diện sau:
 
-**Về tích hợp công nghệ:** Kết nối API trực tiếp với máy chấm công vân tay – khuôn mặt tại hai văn phòng Thành phố Hồ Chí Minh và Đà Nẵng; tích hợp chữ ký số để Giám đốc ký quyết định có giá trị pháp lý đầy đủ; xây dựng kênh truyền dữ liệu điện tử chính thức với cơ quan bảo hiểm xã hội và cơ quan thuế.
+**Về tích hợp công nghệ:** Hoàn thiện adapter kết nối trực tiếp máy chấm công vân tay – khuôn mặt tại hai văn phòng Thành phố Hồ Chí Minh và Đà Nẵng qua SDK hãng (ZKTeco…); bổ sung liveness detection chống giả mạo khuôn mặt và geofencing Wi-Fi nội bộ; tích hợp chữ ký số để Giám đốc ký quyết định có giá trị pháp lý đầy đủ; xây dựng kênh truyền dữ liệu điện tử chính thức với cơ quan bảo hiểm xã hội và cơ quan thuế.
 
 **Về định hướng phát triển phần mềm:** Sau mười tám đến hai mươi bốn tháng vận hành khi dữ liệu tích lũy đủ dày, bổ sung tầng trí tuệ nhân tạo — hệ chuyên gia dự báo nhân sự: quét định biên so với pipeline dự án để cảnh báo thiếu hụt kỹ năng; mô hình học máy tính điểm rủi ro nghỉ việc từ thâm niên, tần suất làm thêm, ngày phép dư, kết quả đánh giá; sinh kế hoạch đào tạo và kế nhiệm; trả kết quả dạng thẻ khuyến nghị kèm lý do suy diễn trên bảng điều khiển — với nguyên tắc bất di bất dịch: máy chỉ khuyến nghị, con người quyết định.
 
@@ -1702,7 +1810,7 @@ Về cơ sở dữ liệu, đề tài đã chuyển đổi thành công các l�
 
 ## Tóm tắt chương 3
 
-Chương 3 đóng vai trò tổng kết và định hướng chiến lược sau khi hoàn thiện bản thiết kế hệ thống thông tin quản trị nhân lực cho Saigon Technology. Đề tài đã hệ thống hóa lại những thành quả cốt lõi đạt được: 11 tác nhân ánh xạ đúng cơ cấu tổ chức, 25 Use case phủ kín vòng đời nhân sự, bộ biểu đồ UML với năm vòng đời trạng thái giàu ràng buộc, mô hình dữ liệu 30 bảng với tham số pháp lý theo hiệu lực ngày, và kiến trúc ba tầng với hai bộ máy dùng chung. Chương này cũng đánh giá thẳng thắn những rào cản khi triển khai: khối lượng nhập liệu gốc, giai đoạn chạy song song, và bài toán quản trị sự thay đổi thói quen làm việc. Để giải quyết triệt để, hàng loạt khuyến nghị đã được đề xuất đồng bộ trên các phương diện: tích hợp công nghệ (máy chấm công, chữ ký số, kênh điện tử cơ quan nhà nước), phát triển tầng trí tuệ nhân tạo dự báo nhân sự, đào tạo con người theo vai, và phân bổ ngân sách vận hành — nhằm giúp doanh nghiệp chuyển hẳn sang mô hình quản trị nhân sự dựa trên dữ liệu, tuyển đúng người trước khi thiếu, giữ người trước khi đơn thôi việc đặt lên bàn.
+Chương 3 đóng vai trò tổng kết và định hướng chiến lược sau khi hoàn thiện bản thiết kế hệ thống thông tin quản trị nhân lực cho Saigon Technology. Đề tài đã hệ thống hóa lại những thành quả cốt lõi đạt được: 11 tác nhân ánh xạ đúng cơ cấu tổ chức, 27 Use case phủ kín vòng đời nhân sự (kèm chấm công đa nguồn QR – khuôn mặt – máy), bộ biểu đồ UML với năm vòng đời trạng thái giàu ràng buộc, mô hình dữ liệu 32 bảng với tham số pháp lý theo hiệu lực ngày, và kiến trúc ba tầng với hai bộ máy dùng chung. Chương này cũng đánh giá thẳng thắn những rào cản khi triển khai: khối lượng nhập liệu gốc, giai đoạn chạy song song, và bài toán quản trị sự thay đổi thói quen làm việc. Để giải quyết triệt để, hàng loạt khuyến nghị đã được đề xuất đồng bộ trên các phương diện: tích hợp công nghệ (adapter máy chấm công, liveness khuôn mặt, chữ ký số, kênh điện tử cơ quan nhà nước), phát triển tầng trí tuệ nhân tạo dự báo nhân sự, đào tạo con người theo vai, và phân bổ ngân sách vận hành — nhằm giúp doanh nghiệp chuyển hẳn sang mô hình quản trị nhân sự dựa trên dữ liệu, tuyển đúng người trước khi thiếu, giữ người trước khi đơn thôi việc đặt lên bàn.
 
 ---
 
@@ -1720,4 +1828,4 @@ Chương 3 đóng vai trò tổng kết và định hướng chiến lược sau
 
 ---
 
-**Hướng dẫn sử dụng bản tài liệu:** (1) Hoàn thiện trang bìa, Mục lục và đánh số trang theo mẫu trường; (2) các biểu đồ đã kèm mã PlantUML — dán vào plantuml.com hoặc plugin VS Code để xuất hình PNG rồi chèn vào đúng vị trí "Hình 2.x"; (3) các biểu đồ của 20 UC còn lại vẽ theo hai khuôn mẫu đã nêu ở mục 2.3.1 và khuôn lớp ba lớp ở mục 2.4.1; (4) phần giao diện (mục 2.4.3) chèn ảnh chụp màn hình demo khi xây dựng xong để thay thế mô tả, đánh số hình tiếp theo Hình 2.23.
+**Hướng dẫn sử dụng bản tài liệu:** (1) Hoàn thiện trang bìa, Mục lục và đánh số trang theo mẫu trường; (2) các biểu đồ đã kèm mã PlantUML — dán vào plantuml.com hoặc plugin VS Code để xuất hình PNG rồi chèn vào đúng vị trí "Hình 2.x"; (3) các biểu đồ của 20 UC còn lại vẽ theo hai khuôn mẫu đã nêu ở mục 2.3.1 và khuôn lớp ba lớp ở mục 2.4.1; (4) phần giao diện (mục 2.4.3) chèn ảnh chụp màn hình demo khi xây dựng xong để thay thế mô tả, đánh số hình tiếp theo Hình 2.25.
