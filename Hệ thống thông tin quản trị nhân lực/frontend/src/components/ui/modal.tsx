@@ -1,0 +1,89 @@
+'use client';
+
+import * as React from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/primitives';
+
+/**
+ * Modal dùng chung (radix dialog) cho mọi form thêm/sửa/xem chi tiết.
+ * Kích thước chuẩn: sm (form ngắn) | md (mặc định) | lg (form nhiều trường).
+ */
+export function Modal({
+  open,
+  onOpenChange,
+  title,
+  description,
+  children,
+  footer,
+  size = 'md',
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg';
+}) {
+  const width = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl' }[size];
+  return (
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-overlay bg-black/50" />
+        <DialogPrimitive.Content
+          className={cn(
+            'fixed left-1/2 top-1/2 z-modal w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2',
+            'max-h-[85dvh] overflow-y-auto rounded-lg border bg-card p-card shadow-xl focus:outline-none',
+            width,
+          )}
+        >
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div>
+              <DialogPrimitive.Title className="text-lg font-semibold leading-tight">{title}</DialogPrimitive.Title>
+              {description ? (
+                <DialogPrimitive.Description className="mt-1 text-sm text-muted-foreground">{description}</DialogPrimitive.Description>
+              ) : null}
+            </div>
+            <DialogPrimitive.Close asChild>
+              <button className="rounded-md p-1.5 hover:bg-accent" aria-label="Đóng">
+                <X className="h-4 w-4" />
+              </button>
+            </DialogPrimitive.Close>
+          </div>
+          {children}
+          {footer ? <div className="mt-5 flex justify-end gap-2">{footer}</div> : null}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+  );
+}
+
+/** Cụm nút chuẩn cho footer modal: Hủy + xác nhận (loading sẵn). */
+export function ModalFooterActions({
+  onCancel,
+  confirmLabel = 'Lưu',
+  cancelLabel = 'Hủy',
+  pending,
+  disabled,
+  onConfirm,
+  confirmVariant = 'default',
+}: {
+  onCancel: () => void;
+  onConfirm?: () => void;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  pending?: boolean;
+  disabled?: boolean;
+  confirmVariant?: 'default' | 'destructive' | 'success';
+}) {
+  return (
+    <>
+      <Button type="button" variant="outline" onClick={onCancel}>{cancelLabel}</Button>
+      <Button type={onConfirm ? 'button' : 'submit'} variant={confirmVariant} disabled={disabled || pending} onClick={onConfirm}>
+        {pending ? 'Đang lưu…' : confirmLabel}
+      </Button>
+    </>
+  );
+}

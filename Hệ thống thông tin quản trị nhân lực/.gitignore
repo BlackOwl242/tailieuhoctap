@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Builds
+backend/dist/
+frontend/.next/
+frontend/out/
+coverage/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Runtime data
+backend/uploads/
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Prisma
+backend/prisma/*.db
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Misc
+.turbo/
+next-env.d.ts.bak

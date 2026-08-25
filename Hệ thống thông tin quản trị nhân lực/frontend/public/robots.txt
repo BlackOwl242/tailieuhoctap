@@ -1,0 +1,3 @@
+# Ứng dụng nội bộ — không cho phép lập chỉ mục
+User-agent: *
+Disallow: /

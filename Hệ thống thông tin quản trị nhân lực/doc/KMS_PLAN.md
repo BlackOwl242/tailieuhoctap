@@ -6,6 +6,8 @@
 **Yêu cầu bao trùm:** Clone-and-run tuyệt đối — `git clone` → `docker compose up` → dùng ngay, không chỉnh sửa gì thêm
 **Bổ sung theo yêu cầu:** Hỗ trợ điểm danh bằng mã QR, khuôn mặt và kết nối máy chấm công; frontend dùng Next.js
 
+> **CẬP NHẬT QUAN TRỌNG (bản hiện hành):** Hệ thống đã mở rộng từ KMS thuần thành **HRMIS — Hệ thống thông tin quản trị nhân lực** (branding "HRMIS Saigon Technology"), trong đó KMS trở thành nhóm phân hệ "Tri thức nội bộ". Toàn bộ chuỗi nghiệp vụ nhân sự theo `doc/PTTK_OOP_HR.md` và `doc/Plan.md` đã được triển khai thật: hồ sơ nhân viên – hợp đồng – văn bằng, nghỉ phép, làm thêm giờ, kỳ lương, tuyển dụng, đánh giá hiệu suất, đào tạo, biến động nhân sự (bộ máy duyệt dùng chung), kho tài liệu quy trình, in phiếu/báo cáo. Chi tiết trạng thái triển khai và kết quả nghiệm thu xem **mục 11**.
+
 ---
 
 ## MỤC LỤC
@@ -20,6 +22,7 @@
 8. [Checklist tiêu chí "Clone-and-Run"](#8-checklist-tiêu-chí-clone-and-run)
 9. [Rủi ro và biện pháp giảm thiểu](#9-rủi-ro-và-biện-pháp-giảm-thiểu)
 10. [Hướng phát triển sau demo](#10-hướng-phát-triển-sau-demo)
+11. [Nhật ký mở rộng HRMIS — đã triển khai & nghiệm thu](#11-nhật-ký-mở-rộng-hrmis--đã-triển-khai--nghiệm-thu-bản-hiện-hành)
 
 ---
 
@@ -36,12 +39,15 @@
 
 **Kết luận đánh giá:** Hai tài liệu là nền phân tích nghiệp vụ chất lượng cao về một công ty phần mềm điển hình (lao động trí tuệ trẻ, turnover cao, tổ chức theo dòng chảy dự án). Chúng không mô tả sẵn một hệ thống quản lý tri thức, nhưng cung cấp **đầy đủ nguyên liệu thiết kế**: bối cảnh bài toán thất thoát tri thức, mô hình tổ chức – phân quyền, mẫu hình luồng duyệt, kỷ luật dữ liệu (truy vết – bất biến), mô hình chấm công đa nguồn, và triết lý kiến trúc 3 tầng. Kế hoạch này **kế thừa các nguyên lý đó và ánh xạ sang miền quản lý tri thức**, chứ không sao chép chức năng nhân sự.
 
-### 1.2. Ranh giới giữa KMS và HRMIS
+### 1.2. Ranh giới giữa KMS và HRMIS _(đã cập nhật theo bản hiện hành)_
 
-- **KMS (hệ thống này):** lưu giữ, chia sẻ, duyệt và khám phá **tri thức phi cấu trúc** — quy trình làm việc, runbook kỹ thuật, bài học dự án, chính sách nội bộ, tài liệu hội nhập.
-- **HRMIS (tài liệu gốc):** quản trị dữ liệu nhân sự có tính pháp lý (hợp đồng, công – lương – bảo hiểm – thuế).
-- **Điểm nối tương lai:** KMS chỉ giữ hồ sơ người dùng **tối giản** (họ tên, đơn vị, chức danh, lĩnh vực chuyên môn) để định danh tác giả và định vị chuyên gia; khi tích hợp thật, KMS sẽ đồng bộ người dùng từ HRMIS qua API/SSO. Không trùng lặp dữ liệu lương – hợp đồng trong KMS.
-- **Bổ sung theo yêu cầu của người giao việc:** hệ thống có thêm phân hệ **Chấm công nhẹ (lightweight attendance)** — điểm danh bằng mã QR, điểm danh bằng khuôn mặt và kết nối máy chấm công — nhằm minh họa năng lực tích hợp thiết bị đã phân tích rất kỹ trong tài liệu gốc (UC18, UC21; Plan.md Phần Bốn mục 2 và Mức độ thứ hai mục a). Phân hệ này chỉ dừng ở **ghi nhận công và xử lý bản ghi lệch**; toàn bộ tính lương – bảo hiểm – thuế vẫn thuộc HRMIS.
+- **Bản gốc:** KMS chỉ giữ tri thức phi cấu trúc; dữ liệu nhân sự có tính pháp lý thuộc HRMIS "bên ngoài".
+- **Bản hiện hành:** hai miền đã **hợp nhất trong một hệ thống HRMIS duy nhất**:
+  - **Nhóm phân hệ Nhân sự (mới):** hồ sơ nhân viên – hợp đồng – văn bằng chứng chỉ, nghỉ phép (quỹ phép theo năm), làm thêm giờ, kỳ lương (tính → đối chiếu → khóa bất biến), tuyển dụng (phiếu đề xuất + danh sách ứng viên), đánh giá hiệu suất, đào tạo, biến động nhân sự (một bộ máy duyệt dùng chung 5 loại), kho tài liệu quy trình, in phiếu/báo cáo;
+  - **Nhóm phân hệ Tri thức nội bộ (KMS cũ):** Space, bài viết, luồng duyệt bản thảo, tìm kiếm toàn văn, hội nhập, bàn giao công việc, tìm chuyên gia;
+  - **Chấm công đa nguồn** là điểm nối tự nhiên giữa hai miền: sự kiện điểm danh sinh bảng công ngày, bảng công đã khóa là đầu vào của bộ máy tính lương.
+- **Điểm nối tương lai (vẫn giữ nguyên):** SSO/đồng bộ từ HRMIS doanh nghiệp thật qua API khi mở rộng.
+- **Bổ sung theo yêu cầu của người giao việc:** phân hệ **Chấm công nhẹ** — điểm danh mã QR, khuôn mặt, máy chấm công (webhook HMAC/CSV/mô phỏng) — đã vận hành và được tính lương tiêu thụ trực tiếp.
 
 ### 1.3. Insight cốt lõi từ tài liệu và ánh xạ thành chức năng KMS
 
@@ -165,6 +171,23 @@ Bảng dưới đây là cầu nối trực tiếp "tài liệu → chức năng
 | KC24 | Đăng ký mẫu khuôn mặt (enroll 3–5 mẫu, có đồng thuận) và điểm danh khuôn mặt ngay trên trình duyệt                                                   | Toàn bộ                           | P1      |
 | KC25 | Kết nối máy chấm công: nhận sự kiện qua webhook ký HMAC, import CSV, chạy bộ mô phỏng thiết bị                                                       | ADMIN, KM_MANAGER                 | P1      |
 | KC26 | Bảng công cá nhân (vào/ra, đi muộn, về sớm); hàng đợi bản ghi lệch; hiệu chỉnh có lý do                                                              | Toàn bộ (xem); ADMIN (hiệu chỉnh) | P1      |
+
+**Nhóm H — Quản trị nhân lực (mở rộng HRMIS — đã triển khai, xem mục 11)**
+
+| Mã   | Use case                                                                                                                                                                            | Tác nhân                         | Ưu tiên | Trang/API chính                        |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ------- | -------------------------------------- |
+| HR01 | Hồ sơ nhân sự: mã NV, ngày vào, trạng thái vòng đời (thử việc → chính thức → thôi/nghỉ hưu)                                                                                         | ADMIN, KM_MANAGER                | P0      | `/employees` · `/employees/:id`        |
+| HR02 | Hợp đồng lao động + văn bằng chứng chỉ (kho lưu trữ kép: bản quét + vị trí tủ bản gốc)                                                                                              | ADMIN, KM_MANAGER                | P0      | `/employees/:id`                       |
+| HR03 | Đơn nghỉ phép: kiểm quỹ trước khi trình, duyệt trừ quỹ NGAY, thâm niên +1 ngày/5 năm                                                                                                | Toàn bộ; duyệt: HR               | P0      | `/leave`                               |
+| HR04 | Đăng ký làm thêm giờ: duyệt trước, chưa duyệt không tính tiền                                                                                                                       | Toàn bộ; duyệt: HR               | P0      | `/overtime`                            |
+| HR05 | Kỳ lương: Tính (từ công + OT đã duyệt, BHXH 10,5% trần 20×lương cơ sở, thuế TNCN lũy tiến 7 bậc) → Đối chiếu → Khóa bất biến                                                        | HR tính; ADMIN khóa              | P0      | `/payroll`                             |
+| HR06 | Phiếu lương điện tử cá nhân + in ấn                                                                                                                                                 | Toàn bộ                          | P0      | `/payroll` (tab cá nhân)               |
+| HR07 | Tuyển dụng: phiếu đề xuất → duyệt chỉ tiêu → danh sách ứng viên 6 giai đoạn                                                                                                         | Trưởng nhóm; duyệt: HR           | P1      | `/recruitment`                         |
+| HR08 | Đánh giá hiệu suất chu kỳ 6 tháng (tạo → nộp → nhân viên xác nhận)                                                                                                                  | HR; xác nhận: nhân viên          | P1      | `/performance`                         |
+| HR09 | Đào tạo: khóa học, ghi danh có giới hạn chỗ, hoàn thành                                                                                                                             | HR tạo; toàn bộ ghi danh         | P1      | `/training`                            |
+| HR10 | Biến động nhân sự: 1 bộ máy duyệt dùng chung 5 loại (thuyên chuyển/điều chỉnh lương/khen thưởng/kỷ luật/thôi việc); duyệt thôi việc tự sinh checklist bàn giao công việc 4 xác nhận | Toàn bộ (thôi việc); ADMIN duyệt | P0      | `/personnel`                           |
+| HR11 | Kho tài liệu quy trình nhân sự (chính sách/biểu mẫu/quyết định/quy trình/báo cáo) + upload tập tin                                                                                  | HR quản lý; toàn bộ đọc          | P1      | `/documents`                           |
+| HR12 | In phiếu/báo cáo cho từng chức năng (A4, khung tiêu đề công ty)                                                                                                                     | Toàn bộ                          | P1      | Nút "In phiếu" trên mọi trang quản trị |
 
 ### 2.2. Nguyên tắc ưu tiên
 
@@ -362,6 +385,26 @@ Quy tắc phụ thuộc: Controller → Service → PrismaService; **Service kh�
 | `attendance_days`        | user_id + work_date (PK composite), first_in_at, last_out_at, worked_minutes, late_minutes, early_minutes, status (PRESENT/LATE/EARLY_LEAVE/MISSING_PAIR/ON_LEAVE/HOLIDAY), updated_at | Tổng hợp 1 dòng/người/ngày — mirror BANGCONG_NGAY; tính lại mỗi khi có sự kiện mới |
 | `attendance_corrections` | id, user_id, work_date, field, old_value, new_value, reason, corrected_by, created_at                                                                                                  | Vết hiệu chỉnh — không sửa ngầm dữ liệu công                                       |
 
+**Miền 8 — Quản trị nhân lực HRMIS (bổ sung bản hiện hành — 16 bảng, migration `20260824000000_hrm_processes`)**
+
+| Bảng                   | Trường chính                                                                                                                                    | Ghi chú thiết kế                                                                       |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `users` (mở rộng)      | + employee_code (unique), hire_date, employment_status (PROBATION/ACTIVE/RESIGNED/RETIRED), base_salary, birth_date, phone, address             | Mã NV tự sinh NV0001…; base_salary là nguồn tính lương, đồng bộ từ hợp đồng ACTIVE     |
+| `contracts`            | user_id, contract_no (unique), type (PROBATION/FIXED_TERM/INDEFINITE/INTERNSHIP), start/end_date, base_salary, insurance_salary, status         | Mirror UC10; tạo hợp đồng ACTIVE tự cập nhật lương hồ sơ                               |
+| `certificates`         | user_id, name, cert_no, issued_by, issued/expiry_date, file_url, storage_spot                                                                   | Mirror UC11 — kho lưu trữ kép                                                          |
+| `leave_requests`       | user_id, type (ANNUAL/SICK/UNPAID/MATERNITY), start/end_date, days (ngày làm việc), reason, status, approver_id, decision_note                  | Mirror UC20 — kiểm quỹ trước khi trình                                                 |
+| `leave_balances`       | user_id + year (PK), entitled (12 + thâm niên), used                                                                                            | Duyệt là trừ quỹ NGAY                                                                  |
+| `overtime_requests`    | user_id, work_date, hours, reason, status, approver_id                                                                                          | Mirror UC19 — chỉ giờ APPROVED được tính tiền                                          |
+| `payroll_periods`      | month + year (unique), status (OPEN/CALCULATED/REVIEWED/LOCKED), calculated_at, locked_at/by                                                    | Mirror UC23–UC24; LOCKED = bất biến, chặn tính lại                                     |
+| `payslips`             | period_id + user_id (unique), working_days, ot_hours, base_salary, ot_amount (150%), insurance (10,5%), income_tax (lũy tiến 7 bậc), net_salary | Mirror PHIEU_LUONG; tính lại = xóa phiếu cũ của kỳ chưa khóa, giữ vết qua audit        |
+| `job_requisitions`     | title, position, headcount, reason, status (DRAFT/PENDING_REVIEW/APPROVED/REJECTED/CLOSED), requested/decided_by                                | Mirror UC04–UC06                                                                       |
+| `candidates`           | requisition_id, full_name, email, phone, source, stage (NEW/SCREENING/INTERVIEW/OFFER/HIRED/REJECTED), rating, notes                            | Mirror UC07–UC08 — danh sách ứng viên theo giai đoạn tuyển                             |
+| `performance_reviews`  | user_id, reviewer_id, period, score (0–100), strengths, improvements, status (DRAFT/SUBMITTED/ACKNOWLEDGED)                                     | Căn cứ tăng lương định kỳ (QP5)                                                        |
+| `training_courses`     | title, description, start/end_date, capacity, status (PLANNED/ONGOING/DONE)                                                                     |                                                                                        |
+| `training_enrollments` | course_id + user_id (PK), status (ENROLLED/COMPLETED/DROPPED)                                                                                   | Chặn ghi danh khi hết chỗ                                                              |
+| `personnel_actions`    | type (TRANSFER/SALARY_ADJUST/AWARD/DISCIPLINE/RESIGNATION), subject_id, requested/decided_by, payload jsonb, status, decision_note              | **ApprovalEngine dùng chung** — duyệt thôi việc tự sinh handover_checklist 4+ xác nhận |
+| `hr_documents`         | title, category (POLICY/FORM/DECISION/PROCESS/REPORT/OTHER), process_area, version, content_md, file_url, tags[]                                | Kho tài liệu quy trình — tập tin lưu volume uploads, tên ngẫu nhiên chống đè           |
+
 **Hai máy trạng thái trung tâm (kế thừa kỷ luật biểu đồ trạng thái của tài liệu gốc):**
 
 ```
@@ -375,37 +418,51 @@ User:  ACTIVE ◀──unlock── LOCKED(temporary, locked_until) ; ACTIVE ─
 
 ### 4.4. Thiết kế API RESTful (tiền tố `/api/v1`)
 
-| Nhóm              | Endpoint                                                   | Method                | Vai được phép                                            | Mô tả                                                                                    |
-| ----------------- | ---------------------------------------------------------- | --------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Auth              | `/auth/login`                                              | POST                  | công khai                                                | Đổi credential → access + refresh; sai 5 lần khóa 15'                                    |
-| Auth              | `/auth/refresh` · `/auth/logout`                           | POST                  | authenticated                                            | Xoay vòng / thu hồi refresh token                                                        |
-| Auth              | `/auth/me`                                                 | GET                   | authenticated                                            | Hồ sơ + vai + quyền hiệu lực                                                             |
-| Users             | `/users` · `/users/:id`                                    | GET/POST/PATCH/DELETE | ADMIN                                                    | Danh sách (phân trang, lọc), tạo, sửa vai/trạng thái                                     |
-| OrgUnits          | `/org-units/tree` · `/org-units`                           | GET/POST/PATCH/DELETE | ADMIN (ghi)                                              | Cây tổ chức dạng JSON                                                                    |
-| Spaces            | `/spaces` · `/spaces/:id`                                  | GET/POST/PATCH/DELETE | KM_MANAGER/ADMIN (ghi)                                   | Lọc theo quyền nhìn thấy                                                                 |
-| Spaces            | `/spaces/:id/members`                                      | GET/POST/PATCH/DELETE | MANAGER Space                                            | Thành viên + vai theo Space                                                              |
-| Articles          | `/spaces/:id/articles` · `/articles/:id`                   | GET/POST/PATCH        | theo vai Space                                           | Danh sách, tạo (DRAFT), cập nhật (sinh version mới)                                      |
-| Articles          | `/articles/:id/versions` · `/versions/:versionId/restore`  | GET/POST              | EDITOR trở lên                                           | Lịch sử bất biến, khôi phục                                                              |
-| Workflow          | `/articles/:id/submit`                                     | POST                  | tác giả                                                  | DRAFT → PENDING_REVIEW                                                                   |
-| Workflow          | `/reviews/pending` · `/articles/:id/review`                | GET/POST              | MANAGER Space, KM_MANAGER                                | Hộp phê duyệt; action: approve/request_changes/reject + ý kiến                           |
-| Comments          | `/articles/:id/comments`                                   | GET/POST/PATCH        | authenticated                                            | Hai cấp; đánh dấu resolved                                                               |
-| Reactions/Views   | `/articles/:id/reaction` · `/articles/:id/view`            | PUT/POST              | authenticated/công khai                                  | Helpful toggle; đếm xem (debounce)                                                       |
-| Search            | `/search?q=&space=&tag=&status=`                           | GET                   | authenticated                                            | FTS toàn văn + bộ lọc, phân trang                                                        |
-| Bookmarks/Follows | `/me/bookmarks` · `/spaces/:id/follow`                     | GET/PUT/DELETE        | authenticated                                            |                                                                                          |
-| Notifications     | `/notifications` · `/notifications/:id/read`               | GET/PATCH             | authenticated                                            |                                                                                          |
-| Onboarding        | `/onboarding/paths` · `/assignments/:id/progress`          | CRUD/PATCH            | KM_MANAGER/nhân viên                                     | Lộ trình + tiến độ                                                                       |
-| Handover          | `/handovers` · `/handovers/:id/items/:itemId`              | CRUD/PATCH            | KM_MANAGER + người xác nhận                              | Checklist chuyển giao                                                                    |
-| People            | `/people?q=` · `/people/:id`                               | GET                   | authenticated                                            | Directory chuyên môn                                                                     |
-| Attendance        | `/attendance/kiosk/token`                                  | GET                   | ADMIN, KM_MANAGER                                        | Sinh token QR ký HMAC cho kiosk (TTL 30s, jti one-time)                                  |
-| Attendance        | `/attendance/check-in`                                     | POST                  | authenticated                                            | Body `{method: QR\|FACE\|WEB, qr_token?, face_embedding?}`; chống replay, dedupe ±2 phút |
-| Attendance        | `/attendance/face/enroll` · `/attendance/face/enrollments` | POST/GET/DELETE       | authenticated (sau đồng thuận)                           | Lưu 3–5 vector mã hóa AES; xem/xóa mẫu của mình                                          |
-| Attendance        | `/attendance/devices` · `/attendance/devices/:id/events`   | CRUD/POST             | ADMIN; webhook dùng device key (HMAC header)             | Quản lý thiết bị; máy chấm công đẩy sự kiện                                              |
-| Attendance        | `/attendance/import/csv` · `/attendance/simulator/run`     | POST                  | ADMIN, KM_MANAGER                                        | Import CSV từ máy; chạy bộ mô phỏng sinh sự kiện                                         |
-| Attendance        | `/attendance/me` · `/attendance/days?date=&unit=`          | GET                   | authenticated (cá nhân); ADMIN/KM_MANAGER (toàn công ty) | Bảng công cá nhân / tổng hợp                                                             |
-| Attendance        | `/attendance/days/:userId/:date/correction`                | POST                  | ADMIN                                                    | Hiệu chỉnh có lý do — ghi `attendance_corrections` + audit                               |
-| Dashboard         | `/dashboard/stats`                                         | GET                   | authenticated                                            | Số liệu theo vai (gồm thống kê công tuần)                                                |
-| Admin             | `/admin/settings` · `/audit-logs`                          | GET/PATCH/GET         | ADMIN                                                    | Tham số; audit (chỉ đọc)                                                                 |
-| Health            | `/healthz` · `/readyz`                                     | GET                   | công khai                                                | Cho Docker healthcheck                                                                   |
+| Nhóm              | Endpoint                                                           | Method                | Vai được phép                                            | Mô tả                                                                                    |
+| ----------------- | ------------------------------------------------------------------ | --------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Auth              | `/auth/login`                                                      | POST                  | công khai                                                | Đổi credential → access + refresh; sai 5 lần khóa 15'                                    |
+| Auth              | `/auth/refresh` · `/auth/logout`                                   | POST                  | authenticated                                            | Xoay vòng / thu hồi refresh token                                                        |
+| Auth              | `/auth/me`                                                         | GET                   | authenticated                                            | Hồ sơ + vai + quyền hiệu lực                                                             |
+| Users             | `/users` · `/users/:id`                                            | GET/POST/PATCH/DELETE | ADMIN                                                    | Danh sách (phân trang, lọc), tạo, sửa vai/trạng thái                                     |
+| OrgUnits          | `/org-units/tree` · `/org-units`                                   | GET/POST/PATCH/DELETE | ADMIN (ghi)                                              | Cây tổ chức dạng JSON                                                                    |
+| Spaces            | `/spaces` · `/spaces/:id`                                          | GET/POST/PATCH/DELETE | KM_MANAGER/ADMIN (ghi)                                   | Lọc theo quyền nhìn thấy                                                                 |
+| Spaces            | `/spaces/:id/members`                                              | GET/POST/PATCH/DELETE | MANAGER Space                                            | Thành viên + vai theo Space                                                              |
+| Articles          | `/spaces/:id/articles` · `/articles/:id`                           | GET/POST/PATCH        | theo vai Space                                           | Danh sách, tạo (DRAFT), cập nhật (sinh version mới)                                      |
+| Articles          | `/articles/:id/versions` · `/versions/:versionId/restore`          | GET/POST              | EDITOR trở lên                                           | Lịch sử bất biến, khôi phục                                                              |
+| Workflow          | `/articles/:id/submit`                                             | POST                  | tác giả                                                  | DRAFT → PENDING_REVIEW                                                                   |
+| Workflow          | `/reviews/pending` · `/articles/:id/review`                        | GET/POST              | MANAGER Space, KM_MANAGER                                | Hộp phê duyệt; action: approve/request_changes/reject + ý kiến                           |
+| Comments          | `/articles/:id/comments`                                           | GET/POST/PATCH        | authenticated                                            | Hai cấp; đánh dấu resolved                                                               |
+| Reactions/Views   | `/articles/:id/reaction` · `/articles/:id/view`                    | PUT/POST              | authenticated/công khai                                  | Helpful toggle; đếm xem (debounce)                                                       |
+| Search            | `/search?q=&space=&tag=&status=`                                   | GET                   | authenticated                                            | FTS toàn văn + bộ lọc, phân trang                                                        |
+| Bookmarks/Follows | `/me/bookmarks` · `/spaces/:id/follow`                             | GET/PUT/DELETE        | authenticated                                            |                                                                                          |
+| Notifications     | `/notifications` · `/notifications/:id/read`                       | GET/PATCH             | authenticated                                            |                                                                                          |
+| Onboarding        | `/onboarding/paths` · `/assignments/:id/progress`                  | CRUD/PATCH            | KM_MANAGER/nhân viên                                     | Lộ trình + tiến độ                                                                       |
+| Handover          | `/handovers` · `/handovers/:id/items/:itemId`                      | CRUD/PATCH            | KM_MANAGER + người xác nhận                              | Checklist chuyển giao                                                                    |
+| People            | `/people?q=` · `/people/:id`                                       | GET                   | authenticated                                            | Directory chuyên môn                                                                     |
+| Attendance        | `/attendance/kiosk/token`                                          | GET                   | ADMIN, KM_MANAGER                                        | Sinh token QR ký HMAC cho kiosk (TTL 30s, jti one-time)                                  |
+| Attendance        | `/attendance/check-in`                                             | POST                  | authenticated                                            | Body `{method: QR\|FACE\|WEB, qr_token?, face_embedding?}`; chống replay, dedupe ±2 phút |
+| Attendance        | `/attendance/face/enroll` · `/attendance/face/enrollments`         | POST/GET/DELETE       | authenticated (sau đồng thuận)                           | Lưu 3–5 vector mã hóa AES; xem/xóa mẫu của mình                                          |
+| Attendance        | `/attendance/devices` · `/attendance/devices/:id/events`           | CRUD/POST             | ADMIN; webhook dùng device key (HMAC header)             | Quản lý thiết bị; máy chấm công đẩy sự kiện                                              |
+| Attendance        | `/attendance/import/csv` · `/attendance/simulator/run`             | POST                  | ADMIN, KM_MANAGER                                        | Import CSV từ máy; chạy bộ mô phỏng sinh sự kiện                                         |
+| Attendance        | `/attendance/me` · `/attendance/days?date=&unit=`                  | GET                   | authenticated (cá nhân); ADMIN/KM_MANAGER (toàn công ty) | Bảng công cá nhân / tổng hợp                                                             |
+| Attendance        | `/attendance/days/:userId/:date/correction`                        | POST                  | ADMIN                                                    | Hiệu chỉnh có lý do — ghi `attendance_corrections` + audit                               |
+| Employees         | `/employees` · `/employees/:id`                                    | GET                   | authenticated                                            | Danh sách hồ sơ NV; chi tiết kèm hợp đồng + chứng chỉ + quỹ phép                         |
+| Employees         | `/employees/:id/profile` · `/:id/contracts` · `/:id/certificates`  | PATCH/POST/DELETE     | ADMIN, KM_MANAGER                                        | Sửa hồ sơ (mã NV tự sinh); hợp đồng; văn bằng (kho lưu trữ kép)                          |
+| Leave             | `/leave` · `/leave/mine` · `/leave/balance`                        | GET/POST              | authenticated; danh sách tất cả: HR                      | Tạo đơn (kiểm quỹ, chặn vượt); quỹ phép theo năm                                         |
+| Leave             | `/leave/:id/approve` · `/reject` · `/cancel`                       | POST                  | HR duyệt; hủy: người tạo                                 | Duyệt = trừ quỹ NGAY; từ chối kèm lý do                                                  |
+| Overtime          | `/overtime` · `/overtime/mine` · `/:id/approve` · `/reject`        | GET/POST              | authenticated; duyệt: HR                                 | Chỉ giờ APPROVED được tính vào bảng lương                                                |
+| Payroll           | `/payroll/periods` · `/:id/calculate` · `/review` · `/lock`        | GET/POST              | HR tính/đối chiếu; ADMIN khóa                            | Chu trình kỳ lương; LOCKED chặn tính lại (409)                                           |
+| Payroll           | `/payroll/periods/:id/payslips` · `/payroll/payslips/mine`         | GET                   | HR (toàn công ty); cá nhân (của mình)                    | Bảng lương kỳ; phiếu lương điện tử                                                       |
+| Recruitment       | `/recruitment/requisitions` (+ approve/reject/close)               | GET/POST              | tạo: mọi người; duyệt: HR                                | Phiếu đề xuất tuyển dụng                                                                 |
+| Recruitment       | `/recruitment/candidates`                                          | GET/POST/PATCH        | HR                                                       | Danh sách ứng viên 6 giai đoạn + điểm phỏng vấn                                          |
+| Performance       | `/performance/mine` · `/team` · `/:id/submit` · `/:id/acknowledge` | GET/POST              | HR tạo/nộp; nhân viên xác nhận                           | Đánh giá hiệu suất chu kỳ 6 tháng                                                        |
+| Training          | `/training/courses` (+ `/mine`, enroll/drop/complete)              | GET/POST              | HR tạo; toàn bộ ghi danh                                 | Chặn ghi danh khi hết chỗ                                                                |
+| PersonnelActions  | `/personnel-actions` (+ `/mine`, approve/reject)                   | GET/POST              | tạo: mọi người (thôi việc của mình); duyệt: ADMIN        | 5 loại đề xuất — duyệt thôi việc tự sinh checklist bàn giao                              |
+| Documents         | `/documents` (+ `/:id`)                                            | GET/POST/PUT/DELETE   | đọc: mọi người; ghi: HR                                  | Kho tài liệu quy trình; upload base64 ≤ 8MB, whitelist đuôi file                         |
+| Auth (mở rộng)    | `/auth/logout-all`                                                 | POST                  | authenticated                                            | Thu hồi TOÀN BỘ refresh token — đăng xuất khỏi mọi thiết bị                              |
+| Dashboard         | `/dashboard/stats`                                                 | GET                   | authenticated                                            | Số liệu theo vai (gồm thống kê công tuần)                                                |
+| Admin             | `/admin/settings` · `/audit-logs`                                  | GET/PATCH/GET         | ADMIN                                                    | Tham số; audit (chỉ đọc)                                                                 |
+| Health            | `/healthz` · `/readyz`                                             | GET                   | công khai                                                | Cho Docker healthcheck                                                                   |
 
 **Quy ước:** tài nguyên danh từ số nhiều; lọc `?page=&limit=&sort=`; mã HTTP chuẩn (200/201/204/400/401/403/404/409/422/429/500); mọi response lỗi theo một shape:
 
@@ -725,3 +782,50 @@ kms-saigon-technology/
 ---
 
 _Tài liệu kế hoạch này là đầu vào duy nhất cần thiết để bắt đầu Giai đoạn G0. Mọi quyết định kiến trúc phát sinh trong quá trình code nên được ghi bổ sung vào `docs/adr/` theo format ADR ngắn._
+
+---
+
+## 11. NHẬT KÝ MỞ RỘNG HRMIS — ĐÃ TRIỂN KHAI & NGHIỆM THU (bản hiện hành)
+
+Giai đoạn mở rộng chuyển KMS thành **HRMIS hoàn chỉnh** đã hoàn tất, bám sát 8 nhóm yêu cầu. Trạng thái: **build + lint + type-check 0 lỗi (backend & frontend)**; kiểm chứng E2E trên stack Docker chạy thật bằng `backend/scripts/verify-hr.mjs`: **39 PASS / 0 FAIL**.
+
+### 11.1. Kết quả theo 8 nhóm yêu cầu
+
+| #   | Yêu cầu                                                      | Kết quả | Bằng chứng chính                                                                                                                                                                                                 |
+| --- | ------------------------------------------------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Chuẩn hóa khoảng cách card/topcard bằng design token         | **ĐẠT** | Token `card/card-lg/stack/section` trong `tailwind.config.ts`; họ Card chuẩn hóa trong `components/ui/primitives.tsx`; `PageHeader` chuẩn `mb-stack`                                                             |
+| 2   | Mở màn hình điểm danh từ trang đăng nhập                     | **ĐẠT** | `GET /attendance/kiosk/token` chuyển PUBLIC (token HMAC TTL 30s + jti one-time nên an toàn); kiosk/check-in có thông báo lỗi thân thiện + tự thử lại; login hỗ trợ `?next=` giữ mã QR                            |
+| 3   | Đăng xuất & đổi tài khoản                                    | **ĐẠT** | Logout: thu hồi token server → xóa state + localStorage `kms-auth` → hủy request + clear React Query cache → hard-reload; thêm `POST /auth/logout-all`; login có banner phiên cũ + clear cache khi đổi tài khoản |
+| 4   | Bổ sung nghiệp vụ còn thiếu theo PTTK_OOP_HR.md + Plan.md    | **ĐẠT** | 9 module mới (employees, leave, overtime, payroll, recruitment, performance, training, personnel-actions, documents) + 16 bảng (Miền 8) + 9 trang frontend; use case HR01–HR12 mục 2.1                           |
+| 5   | Chuẩn hóa thuật ngữ                                          | **ĐẠT** | "Chuyển giao tri thức" → **"Bàn giao công việc"**; "Hộp duyệt" → "Phê duyệt"; "Chuyên gia" → "Tìm chuyên gia"; "Thoát" → "Đăng xuất"; branding KMS → HRMIS; nhãn tập trung tại `frontend/src/lib/hr.ts`          |
+| 6   | Layout chuẩn + data table đầy đủ                             | **ĐẠT** | `PageContainer` max-w-7xl thống nhất; `components/ui/data-table.tsx` (tìm kiếm, lọc, sắp xếp, phân trang, hành động dòng) áp dụng cho 12+ trang                                                                  |
+| 7   | Cơ cấu tổ chức: sửa/xóa/xem chi tiết + nhiều chế độ hiển thị | **ĐẠT** | `/admin/org-units`: thêm/sửa (đổi tên + di chuyển, chặn vòng lặp)/xóa (chặn khi còn ràng buộc)/chi tiết (danh sách NV); 3 chế độ: Cây · Sơ đồ · Bảng                                                             |
+| 8   | In phiếu/báo cáo + quản lý tài liệu quy trình                | **ĐẠT** | `PrintButton`/`PrintFrame` + CSS `@media print` A4 trên mọi trang quản trị; `/documents` kho tài liệu phân loại + upload ≤ 8MB + tải xuống                                                                       |
+
+### 11.2. Các luồng đã kiểm chứng E2E (39/39 PASS)
+
+- Kiosk token công khai (200 không cần đăng nhập); đăng nhập 2 tài khoản;
+- Hồ sơ NV: danh sách, mã NV, trạng thái thử việc, chi tiết kèm hợp đồng + chứng chỉ;
+- Nghỉ phép: xem quỹ → **chặn đơn vượt quỹ (400)** → tạo đơn 2 ngày làm việc → HR duyệt → **quỹ trừ NGAY**;
+- Làm thêm giờ: tạo → duyệt; Tuyển dụng: phiếu → duyệt → ứng viên → chuyển stage;
+- Đánh giá: tạo → nộp → nhân viên xác nhận; Đào tạo: danh sách → ghi danh;
+- Kỳ lương: tạo → tính (có BHXH + thuế + thực lĩnh) → đối chiếu → **khóa bất biến (chặn tính lại 409)** → nhân viên xem phiếu của mình;
+- Biến động: đơn thôi việc → duyệt → **tự sinh checklist bàn giao công việc 5 mục**;
+- Tài liệu: đọc kho tài liệu; Đăng xuất: refresh token bị thu hồi (401), đăng nhập tài khoản khác đúng danh tính, logout-all thu hồi đủ phiên.
+
+### 11.3. Quy ước kỹ thuật mới cần biết khi bảo trì
+
+- **Design token spacing:** chỉ dùng `p-card`, `gap-stack`… — cấm giá trị tùy tiện (mục 1);
+- **DataTable dùng chung:** mọi bảng quản lý mới kế thừa `components/ui/data-table.tsx` thay vì tự viết `<table>`;
+- **Nhãn nghiệp vụ:** map trạng thái qua `lib/hr.ts` — không hardcode chuỗi tiếng Việt rải rác;
+- **In ấn:** nội dung in bọc trong `.print-area`, nút in dùng `PrintButton`; CSS in tại `globals.css`;
+- **Bộ máy duyệt biến động:** thêm loại đề xuất mới = thêm giá trị enum + nhánh hiệu lực trong `personnel-actions.module.ts`, không viết luồng duyệt mới;
+- **Migration:** schema hiện 46 bảng / 8 miền; migration HR chạy tự động qua `prisma migrate deploy` trong entrypoint.
+
+### 11.4. Hạn chế đã biết & hướng phát triển tiếp theo
+
+1. Tham số pháp lý (BHXH, biểu thuế, lương cơ sở) đang neo hằng số trong `payroll.module.ts` — cần chuyển sang bảng THAMSO theo hiệu lực ngày (đúng Bảng 2.6 tài liệu gốc);
+2. Thưởng từ quyết định khen thưởng và tạm ứng chưa tự nạp vào phiếu lương;
+3. Vai "KM_MANAGER" đang kiêm vai chuyên viên nhân sự — có thể tách chi tiết theo 11 tác nhân của tài liệu gốc;
+4. Khuôn mặt dùng vector mô tả rút gọn 16×16 (demo) — hướng phát triển: MediaPipe/face-api.js WASM thật + liveness detection;
+5. Thông báo tự động cho luồng HR (đơn chờ duyệt, nhắc hạn hợp đồng 45/30 ngày) chưa gắn vào `notifications`.

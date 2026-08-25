@@ -1,0 +1,85 @@
+name: kms
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kms}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kms_demo_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-kms}
+      TZ: ${TZ:-Asia/Ho_Chi_Minh}
+    volumes:
+      - kms_db_data:/var/lib/postgresql/data
+    healthcheck:
+      # start_period rộng cho lần khởi động đầu tiên (initdb có thể mất ~2 phút)
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kms} -d ${POSTGRES_DB:-kms}"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 60s
+    ports:
+      - "${DB_PORT_FORWARD:-127.0.0.1:5433}:5432"
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+      DATABASE_URL: ${DATABASE_URL:-postgresql://kms:kms_demo_pw@db:5432/kms?schema=public}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-real-deployment-32chars-min}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      REFRESH_EXPIRES_IN_DAYS: ${REFRESH_EXPIRES_IN_DAYS:-7}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      UPLOAD_DIR: /app/uploads
+      UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-10}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      SEED_ON_FIRST_RUN: ${SEED_ON_FIRST_RUN:-true}
+      DEFAULT_ADMIN_EMAIL: ${DEFAULT_ADMIN_EMAIL:-admin@demo.local}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD:-Admin@123}
+      QR_TOKEN_TTL_SEC: ${QR_TOKEN_TTL_SEC:-30}
+      FACE_EMBEDDING_KEY: ${FACE_EMBEDDING_KEY:-ZmFjZS1lbWJlZGRpbmcta2V5LTMyLWJ5dGVzLWJhc2U2NCEh}
+      FACE_MATCH_THRESHOLD: ${FACE_MATCH_THRESHOLD:-0.55}
+      ATTENDANCE_WORK_START: ${ATTENDANCE_WORK_START:-08:00}
+      ATTENDANCE_WORK_END: ${ATTENDANCE_WORK_END:-17:30}
+      TZ: ${TZ:-Asia/Ho_Chi_Minh}
+    volumes:
+      - kms_uploads:/app/uploads
+    ports:
+      - "${API_PORT:-3001}:3001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/v1/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-KMS Saigon Technology}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      TZ: ${TZ:-Asia/Ho_Chi_Minh}
+    ports:
+      - "${WEB_PORT:-8080}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+volumes:
+  kms_db_data:
+  kms_uploads:

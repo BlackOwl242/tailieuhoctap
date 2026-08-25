@@ -1,0 +1,1099 @@
+// ============================================================================
+// KMS Saigon Technology — Prisma schema
+// 32 tables / 7 domains, mirroring doc/KMS_PLAN.md section 4.3
+// Append-only tables enforced at application layer: AuditLog, AttendanceEvent,
+// ArticleVersion (immutable snapshots).
+// ============================================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  // Thêm target Alpine (musl + OpenSSL 3) cho image Docker production
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 1 — Identity & organization
+// ---------------------------------------------------------------------------
+
+enum UserStatus {
+  ACTIVE
+  LOCKED
+  DISABLED
+}
+
+model User {
+  id                   String     @id @default(uuid())
+  email                String     @unique
+  passwordHash         String
+  fullName             String
+  orgUnitId            String?
+  jobTitle             String?
+  expertise            String[]   @default([])
+  bio                  String?
+  avatarUrl            String?
+  faceConsentAt        DateTime?
+  status               UserStatus @default(ACTIVE)
+  failedLoginAttempts  Int        @default(0)
+  lockedUntil          DateTime?
+  lastLoginAt          DateTime?
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  deletedAt            DateTime?
+
+  // --- Mở rộng HRMIS (Mục 4): hồ sơ nhân sự ---
+  employeeCode         String?  @unique // mã nhân viên NV0001
+  hireDate             DateTime?        // ngày vào làm việc
+  employmentStatus     EmploymentStatus @default(PROBATION)
+  baseSalary           Float?           // lương cơ bản theo tháng (VND)
+  birthDate            DateTime?
+  phone                String?
+  address              String?
+
+  orgUnit              OrgUnit?                    @relation("UserOrgUnit", fields: [orgUnitId], references: [id])
+  roles                UserRole[]
+  refreshTokens        RefreshToken[]
+  authoredArticles     Article[]                   @relation("ArticleAuthor")
+  articleVersions      ArticleVersion[]            @relation("VersionAuthor")
+  attachments          Attachment[]                @relation("AttachmentUploader")
+  reviews              ArticleReview[]             @relation("ReviewReviewer")
+  comments             Comment[]                   @relation("CommentAuthor")
+  reactions            Reaction[]
+  views                ArticleView[]
+  bookmarks            Bookmark[]
+  spaceFollows         SpaceFollow[]
+  spaceMemberships     SpaceMember[]
+  createdSpaces        Space[]                     @relation("SpaceCreator")
+  notifications        Notification[]
+  audits               AuditLog[]                  @relation("AuditActor")
+  onboardingAssignments OnboardingAssignment[]     @relation("AssignmentUser")
+  createdPaths         OnboardingPath[]            @relation("PathCreator")
+  handoverChecklists   HandoverChecklist[]         @relation("HandoverOwner")
+  handoverItemsDone    HandoverItem[]              @relation("HandoverAssignee")
+  settingsUpdated      Setting[]                   @relation("SettingUpdater")
+  attendanceEvents     AttendanceEvent[]
+  attendanceDays       AttendanceDay[]
+  attendanceCorrections AttendanceCorrection[]    @relation("CorrectionBy")
+  faceEmbeddings       FaceEmbedding[]
+  managedDevices       AttendanceDevice[]          @relation("DeviceCreator")
+  correctionsMade      AttendanceCorrection[]      @relation("CorrectionCorrector")
+
+  // --- Quan hệ HRMIS ---
+  contracts            Contract[]
+  contractsCreated     Contract[]                  @relation("ContractCreator")
+  certificates         Certificate[]
+  leaveRequests        LeaveRequest[]
+  leaveApproved        LeaveRequest[]              @relation("LeaveApprover")
+  leaveBalances        LeaveBalance[]
+  overtimeRequests     OvertimeRequest[]
+  overtimeApproved     OvertimeRequest[]           @relation("OvertimeApprover")
+  payslips             Payslip[]
+  periodsLocked        PayrollPeriod[]             @relation("PeriodLocker")
+  perfReviews          PerformanceReview[]         @relation("ReviewEmployee")
+  perfReviewsGiven     PerformanceReview[]         @relation("ReviewReviewerHr")
+  enrollments          TrainingEnrollment[]
+  coursesCreated       TrainingCourse[]            @relation("CourseCreator")
+  actionsOnMe          PersonnelAction[]           @relation("ActionSubject")
+  actionsRequested     PersonnelAction[]           @relation("ActionRequester")
+  actionsDecided       PersonnelAction[]           @relation("ActionDecider")
+  requisitions         JobRequisition[]            @relation("RequisitionRequester")
+  requisitionsDecided  JobRequisition[]            @relation("RequisitionDecider")
+  documentsUploaded    HrDocument[]                @relation("DocumentUploader")
+
+  @@index([orgUnitId])
+  @@index([status])
+  @@index([employmentStatus])
+  @@map("users")
+}
+
+model Role {
+  code        String     @id // ADMIN | KM_MANAGER | USER
+  name        String
+  description String?
+  users       UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  userId   String
+  roleCode String
+  user     User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     Role  @relation(fields: [roleCode], references: [code])
+
+  @@id([userId, roleCode])
+  @@map("user_roles")
+}
+
+model RefreshToken {
+  id         String    @id @default(uuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model OrgUnit {
+  id        String     @id @default(uuid())
+  name      String
+  code      String     @unique
+  parentId  String?
+  path      String     @default("") // materialized "/rootId/childId/"
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  parent   OrgUnit?   @relation("OrgUnitTree", fields: [parentId], references: [id])
+  children OrgUnit[]  @relation("OrgUnitTree")
+  users    User[]     @relation("UserOrgUnit")
+  spaces   Space[]
+  onboardingPaths OnboardingPath[]
+
+  @@index([parentId])
+  @@map("org_units")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 2 — Spaces & content
+// ---------------------------------------------------------------------------
+
+enum SpaceVisibility {
+  PUBLIC
+  RESTRICTED
+  PRIVATE
+}
+
+enum SpaceRole {
+  MANAGER
+  EDITOR
+  CONTRIBUTOR
+  VIEWER
+}
+
+model Space {
+  id          String         @id @default(uuid())
+  slug        String         @unique
+  name        String
+  description String?
+  icon        String         @default("book-open")
+  color       String         @default("#2563eb")
+  parentId    String?
+  orgUnitId   String?
+  visibility  SpaceVisibility @default(PUBLIC)
+  createdBy   String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
+
+  parent    Space?        @relation("SpaceTree", fields: [parentId], references: [id])
+  subSpaces Space[]       @relation("SpaceTree")
+  orgUnit   OrgUnit?      @relation(fields: [orgUnitId], references: [id])
+  creator   User          @relation("SpaceCreator", fields: [createdBy], references: [id])
+  members   SpaceMember[]
+  articles  Article[]
+  follows   SpaceFollow[]
+
+  @@index([visibility])
+  @@index([orgUnitId])
+  @@map("spaces")
+}
+
+model SpaceMember {
+  spaceId   String
+  userId    String
+  spaceRole SpaceRole @default(VIEWER)
+  createdAt DateTime  @default(now())
+  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([spaceId, userId])
+  @@map("space_members")
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  slug     String    @unique
+  parentId String?
+  parent   Category? @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  articles Article[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id       String        @id @default(uuid())
+  name     String
+  slug     String        @unique
+  articles ArticleTag[]
+
+  @@map("tags")
+}
+
+enum ArticleStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+model Article {
+  id               String        @id @default(uuid())
+  spaceId          String
+  categoryId       String?
+  authorId         String
+  title            String
+  slug             String
+  summary          String?
+  status           ArticleStatus @default(DRAFT)
+  currentVersionId String?       @unique
+  publishedAt      DateTime?
+  archivedAt       DateTime?
+  reviewDueAt      DateTime?
+  viewCount        Int           @default(0)
+  helpfulCount     Int           @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  deletedAt        DateTime?
+
+  space          Space            @relation(fields: [spaceId], references: [id])
+  category       Category?        @relation(fields: [categoryId], references: [id])
+  author         User             @relation("ArticleAuthor", fields: [authorId], references: [id])
+  versions       ArticleVersion[] @relation("ArticleVersions")
+  currentVersion ArticleVersion?  @relation("ArticleCurrentVersion", fields: [currentVersionId], references: [id])
+  tags           ArticleTag[]
+  reviews        ArticleReview[]
+  comments       Comment[]
+  reactions      Reaction[]
+  views          ArticleView[]
+  bookmarks      Bookmark[]
+  onboardingItems OnboardingPathItem[]
+  handoverItems  HandoverItem[]
+
+  @@unique([spaceId, slug])
+  @@index([status, publishedAt])
+  @@index([spaceId, status])
+  @@index([authorId])
+  @@map("articles")
+}
+
+model ArticleVersion {
+  id         String   @id @default(uuid())
+  articleId  String
+  versionNo  Int
+  title      String
+  contentMd  String   @db.Text
+  changeNote String?
+  authorId   String
+  createdAt  DateTime @default(now())
+
+  article    Article  @relation("ArticleVersions", fields: [articleId], references: [id], onDelete: Cascade)
+  author     User     @relation("VersionAuthor", fields: [authorId], references: [id])
+  currentOf  Article? @relation("ArticleCurrentVersion")
+  attachments Attachment[]
+
+  @@unique([articleId, versionNo])
+  @@map("article_versions")
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@map("article_tags")
+}
+
+model Attachment {
+  id               String   @id @default(uuid())
+  articleVersionId String?
+  uploaderId       String
+  fileName         String
+  storageKey       String
+  mimeType         String
+  sizeBytes        Int
+  checksumSha256   String?
+  createdAt        DateTime @default(now())
+
+  version ArticleVersion? @relation(fields: [articleVersionId], references: [id])
+  uploader User           @relation("AttachmentUploader", fields: [uploaderId], references: [id])
+
+  @@index([articleVersionId])
+  @@map("attachments")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 3 — Publishing & review workflow
+// ---------------------------------------------------------------------------
+
+enum ReviewAction {
+  SUBMIT
+  APPROVE
+  REQUEST_CHANGES
+  REJECT
+}
+
+model ArticleReview {
+  id         String       @id @default(uuid())
+  articleId  String
+  reviewerId String
+  action     ReviewAction
+  comment    String?
+  createdAt  DateTime     @default(now())
+
+  article  Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  reviewer User    @relation("ReviewReviewer", fields: [reviewerId], references: [id])
+
+  @@index([articleId])
+  @@index([reviewerId, action])
+  @@map("article_reviews")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 4 — Interaction
+// ---------------------------------------------------------------------------
+
+model Comment {
+  id         String    @id @default(uuid())
+  articleId  String
+  authorId   String
+  parentId   String?
+  body       String    @db.Text
+  isQuestion Boolean   @default(false)
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author  User     @relation("CommentAuthor", fields: [authorId], references: [id])
+  parent  Comment? @relation("CommentThread", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentThread")
+
+  @@index([articleId])
+  @@map("comments")
+}
+
+model Reaction {
+  articleId String
+  userId    String
+  value     String  @default("HELPFUL")
+  createdAt DateTime @default(now())
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, userId])
+  @@map("reactions")
+}
+
+model ArticleView {
+  id        String   @id @default(uuid())
+  articleId String
+  userId    String?
+  viewedAt  DateTime @default(now())
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id])
+
+  @@index([articleId, viewedAt])
+  @@map("article_views")
+}
+
+model Bookmark {
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, articleId])
+  @@map("bookmarks")
+}
+
+model SpaceFollow {
+  userId    String
+  spaceId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@id([userId, spaceId])
+  @@map("space_follows")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 5 — Human lifecycle & knowledge lifecycle
+// ---------------------------------------------------------------------------
+
+enum AssignmentStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+model OnboardingPath {
+  id            String   @id @default(uuid())
+  title         String
+  description   String?
+  targetJobTitle String?
+  orgUnitId     String?
+  createdBy     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  orgUnit     OrgUnit?               @relation(fields: [orgUnitId], references: [id])
+  creator     User                   @relation("PathCreator", fields: [createdBy], references: [id])
+  items       OnboardingPathItem[]
+  assignments OnboardingAssignment[]
+
+  @@map("onboarding_paths")
+}
+
+model OnboardingPathItem {
+  id         String  @id @default(uuid())
+  pathId     String
+  articleId  String
+  sortOrder  Int     @default(0)
+  isRequired Boolean @default(true)
+
+  path       OnboardingPath          @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  article    Article                 @relation(fields: [articleId], references: [id])
+  progress   OnboardingItemProgress[]
+
+  @@index([pathId])
+  @@map("onboarding_path_items")
+}
+
+model OnboardingAssignment {
+  id        String           @id @default(uuid())
+  pathId    String
+  userId    String
+  dueDate   DateTime?
+  status    AssignmentStatus @default(IN_PROGRESS)
+  assignedAt DateTime        @default(now())
+
+  path     OnboardingPath            @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  user     User                      @relation("AssignmentUser", fields: [userId], references: [id], onDelete: Cascade)
+  progress OnboardingItemProgress[]
+
+  @@unique([pathId, userId])
+  @@map("onboarding_assignments")
+}
+
+model OnboardingItemProgress {
+  assignmentId String
+  itemId       String
+  completedAt  DateTime @default(now())
+
+  assignment OnboardingAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  item       OnboardingPathItem   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@id([assignmentId, itemId])
+  @@map("onboarding_item_progress")
+}
+
+enum HandoverStatus {
+  OPEN
+  CLOSED
+}
+
+enum ItemStatus {
+  PENDING
+  DONE
+}
+
+model HandoverChecklist {
+  id          String         @id @default(uuid())
+  ownerUserId String
+  leavingDate DateTime
+  status      HandoverStatus @default(OPEN)
+  closedAt    DateTime?
+  createdAt   DateTime       @default(now())
+
+  owner User           @relation("HandoverOwner", fields: [ownerUserId], references: [id])
+  items HandoverItem[]
+
+  @@map("handover_checklists")
+}
+
+model HandoverItem {
+  id          String     @id @default(uuid())
+  checklistId String
+  title       String
+  articleId   String?
+  assigneeId  String?
+  status      ItemStatus @default(PENDING)
+  completedAt DateTime?
+
+  checklist HandoverChecklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  article   Article?          @relation(fields: [articleId], references: [id])
+  assignee  User?             @relation("HandoverAssignee", fields: [assigneeId], references: [id])
+
+  @@index([checklistId])
+  @@map("handover_items")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 6 — System
+// ---------------------------------------------------------------------------
+
+enum NotificationType {
+  REVIEW_REQUESTED
+  REVIEW_RESULT
+  COMMENT_ADDED
+  ARTICLE_PUBLISHED
+  ONBOARDING_ASSIGNED
+  GENERIC
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType @default(GENERIC)
+  title     String
+  body      String?
+  linkPath  String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  beforeData Json?
+  afterData  Json?
+  ip         String?
+  requestId  String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+
+  updater User? @relation("SettingUpdater", fields: [updatedBy], references: [id])
+
+  @@map("settings")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 7 — Attendance (multi-source: QR / face / machine / web)
+// ---------------------------------------------------------------------------
+
+enum DeviceType {
+  QR_KIOSK
+  MACHINE_WEBHOOK
+  MACHINE_CSV
+  SIMULATOR
+}
+
+model AttendanceDevice {
+  id             String     @id @default(uuid())
+  name           String
+  type           DeviceType
+  location       String?
+  secretHash     String?
+  status         String     @default("ACTIVE")
+  lastSeenAt     DateTime?
+  createdById    String
+  createdAt      DateTime   @default(now())
+
+  creator User             @relation("DeviceCreator", fields: [createdById], references: [id])
+  events  AttendanceEvent[]
+
+  @@map("attendance_devices")
+}
+
+model AttendanceEvent {
+  id            String   @id @default(uuid())
+  userId        String
+  deviceId      String?
+  source        String // QR | FACE | WEB | MACHINE | MANUAL
+  occurredAt    DateTime
+  payload       Json?
+  anomalyReason String?
+  createdAt     DateTime @default(now())
+
+  device AttendanceDevice? @relation(fields: [deviceId], references: [id])
+  user   User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, occurredAt])
+  @@index([occurredAt])
+  @@map("attendance_events")
+}
+
+enum DayStatus {
+  PRESENT
+  LATE
+  EARLY_LEAVE
+  MISSING_PAIR
+  ON_LEAVE
+  HOLIDAY
+}
+
+model AttendanceDay {
+  userId        String
+  workDate      DateTime   @db.Date
+  firstInAt     DateTime?
+  lastOutAt     DateTime?
+  workedMinutes Int        @default(0)
+  lateMinutes   Int        @default(0)
+  earlyMinutes  Int        @default(0)
+  status        DayStatus  @default(PRESENT)
+  eventCount    Int        @default(0)
+  updatedAt     DateTime   @updatedAt
+
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, workDate])
+  @@map("attendance_days")
+}
+
+model AttendanceCorrection {
+  id          String   @id @default(uuid())
+  userId      String
+  workDate    DateTime @db.Date
+  field       String
+  oldValue    String?
+  newValue    String?
+  reason      String
+  correctedBy String
+  createdAt   DateTime @default(now())
+
+  user        User @relation("CorrectionBy", fields: [userId], references: [id])
+  correctedByUser User @relation("CorrectionCorrector", fields: [correctedBy], references: [id])
+
+  @@index([userId, workDate])
+  @@map("attendance_corrections")
+}
+
+model FaceEmbedding {
+  id            String   @id @default(uuid())
+  userId        String
+  encryptedData String // base64(iv|tag|ciphertext) AES-256-GCM
+  dimensions    Int      @default(128)
+  source        String   @default("BROWSER")
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, active])
+  @@map("face_embeddings")
+}
+
+// ===========================================================================
+// Domain 8 — HRMIS: hồ sơ nhân sự, chấm công – nghỉ phép – lương, tuyển dụng,
+// đào tạo, đánh giá hiệu suất, biến động nhân sự, tài liệu (Mục 4 + Mục 8)
+// ===========================================================================
+
+enum EmploymentStatus {
+  PROBATION // thử việc
+  ACTIVE // chính thức
+  RESIGNED // đã thôi việc
+  RETIRED // nghỉ hưu
+}
+
+enum ContractType {
+  PROBATION
+  FIXED_TERM
+  INDEFINITE
+  INTERNSHIP
+}
+
+enum ContractStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+model Contract {
+  id              String         @id @default(uuid())
+  userId          String
+  contractNo      String         @unique
+  type            ContractType
+  startDate       DateTime       @db.Date
+  endDate         DateTime?      @db.Date
+  baseSalary      Float
+  insuranceSalary Float?
+  status          ContractStatus @default(ACTIVE)
+  note            String?
+  fileUrl         String? // bản mềm hợp đồng (PDF/scan) upload lên /uploads
+  fileName        String?
+  createdById     String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creator User @relation("ContractCreator", fields: [createdById], references: [id])
+
+  @@index([userId, status])
+  @@map("contracts")
+}
+
+model Certificate {
+  id          String    @id @default(uuid())
+  userId      String
+  name        String
+  certNo      String? // số hiệu văn bằng
+  issuedBy    String? // nơi cấp
+  issuedDate  DateTime? @db.Date
+  expiryDate  DateTime? @db.Date
+  fileUrl     String? // bản quét
+  storageSpot String? // vị trí tủ lưu trữ vật lý
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("certificates")
+}
+
+enum LeaveType {
+  ANNUAL // phép năm
+  SICK // nghỉ ốm
+  UNPAID // không lương
+  MATERNITY // thai sản
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model LeaveRequest {
+  id           String        @id @default(uuid())
+  userId       String
+  type         LeaveType     @default(ANNUAL)
+  startDate    DateTime      @db.Date
+  endDate      DateTime      @db.Date
+  days         Float
+  reason       String
+  status       RequestStatus @default(PENDING)
+  approverId   String?
+  decidedAt    DateTime?
+  decisionNote String?
+  createdAt    DateTime      @default(now())
+
+  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  approver User? @relation("LeaveApprover", fields: [approverId], references: [id])
+
+  @@index([userId, status])
+  @@index([status])
+  @@map("leave_requests")
+}
+
+model LeaveBalance {
+  userId    String
+  year      Int
+  entitled  Float @default(12) // phép năm luật định 12 ngày (+ thâm niên)
+  used      Float @default(0) // trừ NGAY khi duyệt (UC20)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, year])
+  @@map("leave_balances")
+}
+
+model OvertimeRequest {
+  id           String        @id @default(uuid())
+  userId       String
+  workDate     DateTime      @db.Date
+  hours        Float
+  reason       String
+  status       RequestStatus @default(PENDING)
+  approverId   String?
+  decidedAt    DateTime?
+  decisionNote String?
+  createdAt    DateTime      @default(now())
+
+  user     User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  approver User? @relation("OvertimeApprover", fields: [approverId], references: [id])
+
+  @@index([userId, status])
+  @@index([status])
+  @@map("overtime_requests")
+}
+
+enum PayrollStatus {
+  OPEN
+  CALCULATED
+  REVIEWED
+  LOCKED // khóa bất biến — mọi điều chỉnh qua kỳ sau
+}
+
+model PayrollPeriod {
+  id           String        @id @default(uuid())
+  month        Int
+  year         Int
+  status       PayrollStatus @default(OPEN)
+  calculatedAt DateTime?
+  lockedAt     DateTime?
+  lockedById   String?
+  note         String?
+  createdAt    DateTime      @default(now())
+
+  payslips Payslip[]
+  locker   User?     @relation("PeriodLocker", fields: [lockedById], references: [id])
+
+  @@unique([month, year])
+  @@map("payroll_periods")
+}
+
+model Payslip {
+  id            String  @id @default(uuid())
+  periodId      String
+  userId        String
+  workingDays   Float   @default(0) // công hữu hiệu trong kỳ
+  otHours       Float   @default(0) // giờ làm thêm ĐÃ DUYỆT
+  baseSalary    Float   @default(0)
+  otAmount      Float   @default(0) // hệ số 150% ngày thường (Điều 98 BLĐ)
+  allowance     Float   @default(0) // phụ cấp cố định (ăn trưa, đi lại…)
+  bonus         Float   @default(0)
+  insurance     Float   @default(0) // BHXH 10,5% người lao động đóng
+  incomeTax     Float   @default(0) // thuế TNCN lũy tiến giản lược
+  otherDeduct   Float   @default(0)
+  netSalary     Float   @default(0)
+  note          String?
+  createdAt     DateTime @default(now())
+
+  period PayrollPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([periodId, userId])
+  @@index([userId])
+  @@map("payslips")
+}
+
+enum RequisitionStatus {
+  DRAFT
+  PENDING_REVIEW // chờ thẩm định của HR
+  APPROVED // đã duyệt — mở kế hoạch tuyển
+  REJECTED
+  CLOSED // đủ chỉ tiêu / hủy
+}
+
+model JobRequisition {
+  id            String            @id @default(uuid())
+  title         String
+  position      String
+  headcount     Int               @default(1)
+  reason        String?
+  status        RequisitionStatus @default(DRAFT)
+  requestedById String
+  decidedById   String?
+  decidedAt     DateTime?
+  decisionNote  String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  requester User        @relation("RequisitionRequester", fields: [requestedById], references: [id])
+  decider   User?       @relation("RequisitionDecider", fields: [decidedById], references: [id])
+  candidates Candidate[]
+
+  @@index([status])
+  @@map("job_requisitions")
+}
+
+enum CandidateStage {
+  NEW // nhận hồ sơ
+  SCREENING // sàng lọc
+  INTERVIEW // phỏng vấn
+  OFFER // thư mời
+  HIRED // đã nhận việc
+  REJECTED
+}
+
+model Candidate {
+  id            String         @id @default(uuid())
+  requisitionId String?
+  fullName      String
+  email         String?
+  phone         String?
+  source        String? // kênh: LinkedIn, VietnamWorks, giới thiệu nội bộ…
+  stage         CandidateStage @default(NEW)
+  rating        Int? // điểm phỏng vấn 1–5
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  requisition JobRequisition? @relation(fields: [requisitionId], references: [id], onDelete: SetNull)
+
+  @@index([stage])
+  @@index([requisitionId])
+  @@map("candidates")
+}
+
+enum PerfReviewStatus {
+  DRAFT
+  SUBMITTED
+  ACKNOWLEDGED // nhân viên đã xác nhận đọc
+}
+
+model PerformanceReview {
+  id           String          @id @default(uuid())
+  userId       String // người được đánh giá
+  reviewerId   String // người đánh giá (trưởng nhóm)
+  period       String // ví dụ "2026-H1"
+  score        Float? // điểm tổng 0–100
+  strengths    String?
+  improvements String?
+  comment      String?
+  status       PerfReviewStatus @default(DRAFT)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  user     User @relation("ReviewEmployee", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer User @relation("ReviewReviewerHr", fields: [reviewerId], references: [id])
+
+  @@index([userId, period])
+  @@index([reviewerId, status])
+  @@map("performance_reviews")
+}
+
+enum CourseStatus {
+  PLANNED
+  ONGOING
+  DONE
+}
+
+model TrainingCourse {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  startDate   DateTime    @db.Date
+  endDate     DateTime    @db.Date
+  capacity    Int?
+  status      CourseStatus @default(PLANNED)
+  createdById String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  creator     User                 @relation("CourseCreator", fields: [createdById], references: [id])
+  enrollments TrainingEnrollment[]
+
+  @@index([status])
+  @@map("training_courses")
+}
+
+enum EnrollmentStatus {
+  ENROLLED
+  COMPLETED
+  DROPPED
+}
+
+model TrainingEnrollment {
+  courseId    String
+  userId      String
+  status      EnrollmentStatus @default(ENROLLED)
+  enrolledAt  DateTime         @default(now())
+  completedAt DateTime?
+
+  course TrainingCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, userId])
+  @@map("training_enrollments")
+}
+
+// Đề xuất biến động nhân sự — dùng chung một bộ máy duyệt cho 5 loại
+// (thuyên chuyển / điều chỉnh lương / khen thưởng / kỷ luật / thôi việc),
+// đúng mẫu hình ApprovalEngine trong tài liệu thiết kế.
+enum PersonnelActionType {
+  TRANSFER // thuyên chuyển
+  SALARY_ADJUST // điều chỉnh lương
+  AWARD // khen thưởng
+  DISCIPLINE // kỷ luật
+  RESIGNATION // thôi việc
+}
+
+enum PersonnelActionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model PersonnelAction {
+  id            String                @id @default(uuid())
+  type          PersonnelActionType
+  subjectId     String // nhân viên bị tác động
+  requestedById String // người đề xuất
+  decidedById   String?
+  payload       Json // nội dung: {reason, effectiveDate, newOrgUnitId?, newSalary?, amount?…}
+  status        PersonnelActionStatus @default(PENDING)
+  decisionNote  String?
+  decidedAt     DateTime?
+  createdAt     DateTime              @default(now())
+
+  subject   User  @relation("ActionSubject", fields: [subjectId], references: [id])
+  requester User  @relation("ActionRequester", fields: [requestedById], references: [id])
+  decider   User? @relation("ActionDecider", fields: [decidedById], references: [id])
+
+  @@index([status, type])
+  @@index([subjectId])
+  @@map("personnel_actions")
+}
+
+// Mục 8 — kho tài liệu quy trình nhân sự (chính sách, biểu mẫu, quyết định…)
+enum DocumentCategory {
+  POLICY // chính sách / quy định
+  FORM // biểu mẫu
+  DECISION // quyết định nhân sự
+  PROCESS // quy trình nghiệp vụ
+  REPORT // báo cáo
+  OTHER
+}
+
+model HrDocument {
+  id           String           @id @default(uuid())
+  title        String
+  category     DocumentCategory @default(OTHER)
+  processArea  String? // tuyển dụng / hồ sơ / chấm công / lương…
+  version      String           @default("1.0")
+  description  String?
+  contentMd    String?          @db.Text // nội dung dạng markdown (nếu có)
+  fileUrl      String? // tập tin đính kèm (đã upload lên /uploads)
+  fileName     String?
+  fileSize     Int?
+  tags         String[]         @default([])
+  uploadedById String
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  uploader User @relation("DocumentUploader", fields: [uploadedById], references: [id])
+
+  @@index([category])
+  @@map("hr_documents")
+}
+
