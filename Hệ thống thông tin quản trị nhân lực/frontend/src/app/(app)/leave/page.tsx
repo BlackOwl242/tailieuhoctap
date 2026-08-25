@@ -12,7 +12,7 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, 
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface LeaveRow {
   id: string; type: keyof typeof LEAVE_TYPE_LABEL;
@@ -106,10 +106,9 @@ export default function LeavePage() {
         title="Nghỉ phép"
         description="Quỹ phép minh bạch — duyệt là trừ quỹ ngay, tự ghi công phép vào bảng công."
         actions={
-          <>
-            <Button size="sm" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" /> Tạo đơn nghỉ phép</Button>
-            <PrintButton label="In danh sách" />
-          </>
+          <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4" /> Tạo đơn nghỉ phép
+          </Button>
         }
       />
 
@@ -143,7 +142,8 @@ export default function LeavePage() {
           rows={rows}
           rowKey={(r) => r.id}
           loading={tab === 'all' ? allQ.isLoading : mineQ.isLoading}
-          exportFilename="don-nghi-phep"
+          exportFilename="danh-sach-don-nghi-phep"
+          printLabel="In danh sách"
           searchFields={(r) => [r.reason, r.user?.fullName ?? '', LEAVE_TYPE_LABEL[r.type] ?? '']}
           filters={[
             {
@@ -160,7 +160,6 @@ export default function LeavePage() {
           emptyTitle="Chưa có đơn nghỉ phép nào"
           emptyHint="Bấm “Tạo đơn nghỉ phép” để gửi đơn đầu tiên."
           actions={(r): RowActionItem[] => [
-            // "Xem chi tiết" LUÔN có mặt — kebab không bao giờ trống (Mục 8)
             { label: 'Xem chi tiết đơn', icon: Eye, onSelect: () => setDetail(r) },
             ...(tab === 'all' && isHr && r.status === 'PENDING' ? [
               'separator' as const,
@@ -172,6 +171,7 @@ export default function LeavePage() {
             ] : []),
           ]}
         />
+        <PrintSignatureBlock leftTitle="Người làm đơn" middleTitle="Trưởng bộ phận" rightTitle="Trưởng phòng HC-NS" />
       </div>
 
       {/* Modal chi tiết đơn — đầy đủ lý do, thời gian, kết quả duyệt */}

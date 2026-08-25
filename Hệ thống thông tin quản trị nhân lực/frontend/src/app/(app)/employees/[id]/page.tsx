@@ -13,7 +13,7 @@ import { CONTRACT_STATUS_LABEL, CONTRACT_TYPE_LABEL, EMPLOYMENT_STATUS_LABEL, vn
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton, Textarea } from '@/components/ui/primitives';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintButton, PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface ContractRow {
   id: string; contractNo: string; type: keyof typeof CONTRACT_TYPE_LABEL;
@@ -238,7 +238,7 @@ export default function EmployeeDetailPage() {
                     <div className="min-w-0">
                       <p className="font-medium">
                         {c.name} {c.certNo ? <span className="text-muted-foreground">· Số {c.certNo}</span> : null}
-                        {c.fileUrl ? <a href={c.fileUrl} target="_blank" rel="noreferrer" className="ml-2 text-xs text-primary hover:underline">[Tải bản scan]</a> : null}
+                        {c.fileUrl ? <a href={c.fileUrl} target="_blank" rel="noreferrer" className="no-print ml-2 text-xs text-primary hover:underline">[Tải bản scan]</a> : null}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {c.issuedBy ?? '—'}{c.issuedDate ? ` · Cấp ${formatDate(c.issuedDate)}` : ''}
@@ -262,6 +262,7 @@ export default function EmployeeDetailPage() {
             ) : null}
           </CardContent>
         </Card>
+        <PrintSignatureBlock leftTitle="Nhân viên khai báo" middleTitle="Chuyên viên hồ sơ" rightTitle="Trưởng phòng HC-NS" />
       </div>
 
       {/* ------------------------------- Modals ------------------------------- */}

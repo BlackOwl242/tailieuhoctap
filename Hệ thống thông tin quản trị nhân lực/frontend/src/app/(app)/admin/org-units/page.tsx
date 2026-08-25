@@ -2,7 +2,20 @@
 
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight, Eye, Network, Pencil, Plus, Table2, Trash2, TreePine } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  FolderTree,
+  LayoutGrid,
+  Network,
+  Pencil,
+  Plus,
+  Table2,
+  Trash2,
+  TreePine,
+  Users,
+} from 'lucide-react';
 import type { RowActionItem } from '@/components/ui/data-table';
 import { api, errorMessage } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
@@ -10,29 +23,181 @@ import { Button, Card, CardContent, Input, Label, Select, Skeleton } from '@/com
 import { DataTable, type DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintExportDropdown, PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface TreeNode {
-  id: string; name: string; code: string; parentId: string | null;
-  sortOrder: number; memberCount: number; children: TreeNode[];
+  id: string;
+  name: string;
+  code: string;
+  parentId: string | null;
+  sortOrder: number;
+  memberCount: number;
+  children: TreeNode[];
 }
+
 interface EmployeeLite {
-  id: string; fullName: string; employeeCode: string | null;
-  jobTitle: string | null; orgUnit?: { name: string } | null;
+  id: string;
+  fullName: string;
+  employeeCode: string | null;
+  jobTitle: string | null;
+  orgUnit?: { name: string } | null;
 }
 
 type ViewMode = 'tree' | 'chart' | 'table';
 
 /**
+ * Thành phần vẽ Cây sơ đồ tổ chức phân cấp chuẩn trực quan
+ */
+function OrgChartBranch({
+  node,
+  depth,
+  onAddChild,
+  onEdit,
+  onDetail,
+  onDelete,
+  print = false,
+}: {
+  node: TreeNode;
+  depth: number;
+  onAddChild: (node: TreeNode) => void;
+  onEdit: (node: TreeNode) => void;
+  onDetail: (node: TreeNode) => void;
+  onDelete: (node: TreeNode) => void;
+  print?: boolean;
+}) {
+  const [collapsed, setCollapsed] = useState(false);
+  const hasChildren = node.children && node.children.length > 0;
+
+  // Màu sắc phân cấp rõ ràng
+  const depthColors = [
+    'border-blue-600 bg-blue-50/80 dark:bg-blue-950/40 text-blue-950 dark:text-blue-100 shadow-md ring-2 ring-blue-500/20', // Ban Giám Đốc (Level 0)
+    'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/30 text-indigo-950 dark:text-indigo-100 shadow-sm', // Khối / Ban (Level 1)
+    'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-950 dark:text-emerald-100 shadow-sm', // Trung tâm / Phòng (Level 2)
+    'border-slate-300 dark:border-slate-700 bg-card text-foreground shadow-sm', // Nhóm / Tổ (Level 3+)
+  ];
+  const cardStyle = depthColors[Math.min(depth, depthColors.length - 1)];
+
+  return (
+    <div className="flex flex-col items-center">
+      {/* Node Card */}
+      <div
+        className={`group relative flex min-w-[210px] max-w-[260px] flex-col rounded-2xl border-2 p-3.5 text-center transition-all duration-200 hover:shadow-lg ${cardStyle}`}
+      >
+        <div className="flex items-center justify-between gap-1.5 pb-1 border-b border-current/10">
+          <span className="font-mono text-[11px] font-bold uppercase tracking-wider opacity-85">
+            {node.code}
+          </span>
+          <span className="rounded-full bg-current/10 px-2 py-0.5 text-[11px] font-semibold">
+            {node.memberCount} NV
+          </span>
+        </div>
+
+        <h4 className="mt-1.5 font-bold text-sm leading-snug break-words">
+          {node.name}
+        </h4>
+
+        {/* Nút thao tác (ẩn khi in) */}
+        {!print ? (
+          <div className="mt-2.5 flex items-center justify-center gap-1 border-t border-current/10 pt-2 opacity-85 transition-opacity group-hover:opacity-100">
+            <button
+              type="button"
+              onClick={() => onAddChild(node)}
+              className="rounded-lg p-1.5 hover:bg-primary/20 text-primary transition-colors"
+              title="Thêm đơn vị con"
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onEdit(node)}
+              className="rounded-lg p-1.5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              title="Sửa tên / đơn vị cha"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onDetail(node)}
+              className="rounded-lg p-1.5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              title="Xem danh sách nhân viên"
+            >
+              <Eye className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete(node)}
+              className="rounded-lg p-1.5 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors"
+              title="Xóa đơn vị"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : null}
+
+        {/* Nút thu gọn / mở rộng */}
+        {hasChildren && !print ? (
+          <button
+            type="button"
+            onClick={() => setCollapsed(!collapsed)}
+            className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border bg-card px-2 py-0.5 text-[10px] font-bold shadow-sm hover:bg-accent transition-transform"
+            title={collapsed ? 'Mở rộng nhánh' : 'Thu gọn nhánh'}
+          >
+            {collapsed ? `+${node.children.length}` : '−'}
+          </button>
+        ) : null}
+      </div>
+
+      {/* Nhánh con với đường nối thanh lịch */}
+      {hasChildren && (!collapsed || print) ? (
+        <div className="flex flex-col items-center">
+          {/* Đường dọc từ cha xuống thanh ngang */}
+          <div className="h-6 w-0.5 bg-border" />
+
+          {/* Khung chứa các con */}
+          <div className="relative flex justify-center gap-6 pt-6">
+            {/* Thanh ngang kết nối */}
+            {node.children.length > 1 ? (
+              <div
+                className="absolute top-0 h-0.5 bg-border"
+                style={{
+                  left: `calc(${100 / (node.children.length * 2)}%)`,
+                  right: `calc(${100 / (node.children.length * 2)}%)`,
+                }}
+              />
+            ) : null}
+
+            {node.children.map((child) => (
+              <div key={child.id} className="relative flex flex-col items-center">
+                {/* Đường dọc từ thanh ngang xuống con */}
+                <div className="absolute -top-6 h-6 w-0.5 bg-border" />
+                <OrgChartBranch
+                  node={child}
+                  depth={depth + 1}
+                  onAddChild={onAddChild}
+                  onEdit={onEdit}
+                  onDetail={onDetail}
+                  onDelete={onDelete}
+                  print={print}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/**
  * KC03 — Quản lý cây cơ cấu tổ chức (Mục 7):
  * - Đủ nghiệp vụ: THÊM / SỬA / XÓA / XEM CHI TIẾT từng đơn vị;
- * - Ba chế độ hiển thị: Cây mở rộng, Sơ đồ tổ chức, Bảng quản lý;
- * - Nguyên lý "cây tổ chức là dữ liệu cấu hình" — không cần lập trình viên.
+ * - Ba chế độ hiển thị: Cây mở rộng, Sơ đồ tổ chức phân cấp, Bảng quản lý phẳng;
+ * - Hỗ trợ in ấn chuẩn văn bản và xuất Excel.
  */
 export default function AdminOrgUnitsPage() {
   const qc = useQueryClient();
   const toast = useToast();
-  const [view, setView] = useState<ViewMode>('tree');
+  const [view, setView] = useState<ViewMode>('chart');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [addForm, setAddForm] = useState({ name: '', code: '' });
@@ -54,18 +219,33 @@ export default function AdminOrgUnitsPage() {
 
   const create = useMutation({
     mutationFn: async (vars: { name: string; code: string; parentId?: string }) => api.post('/org-units', vars),
-    onSuccess: () => { toast('Đã thêm đơn vị', 'success'); setAddForm({ name: '', code: '' }); setAddingTo(null); invalidate(); },
+    onSuccess: () => {
+      toast('Đã thêm đơn vị', 'success');
+      setAddForm({ name: '', code: '' });
+      setAddingTo(null);
+      invalidate();
+    },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
+
   const update = useMutation({
     mutationFn: async (vars: { id: string; name: string; parentId?: string | null }) =>
       api.patch(`/org-units/${vars.id}`, { name: vars.name, parentId: vars.parentId || null }),
-    onSuccess: () => { toast('Đã cập nhật đơn vị', 'success'); setEditing(null); invalidate(); },
+    onSuccess: () => {
+      toast('Đã cập nhật đơn vị', 'success');
+      setEditing(null);
+      invalidate();
+    },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
+
   const remove = useMutation({
     mutationFn: async (id: string) => api.delete(`/org-units/${id}`),
-    onSuccess: () => { toast('Đã xóa đơn vị', 'success'); setDeleting(null); invalidate(); },
+    onSuccess: () => {
+      toast('Đã xóa đơn vị', 'success');
+      setDeleting(null);
+      invalidate();
+    },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
 
@@ -90,73 +270,139 @@ export default function AdminOrgUnitsPage() {
   function toggle(id: string) {
     setExpanded((s) => {
       const next = new Set(s);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
 
-  /** Danh sách hành động dạng kebab menu — dùng cho chế độ Bảng (Mục 8). */
+  /** Danh sách hành động dạng kebab menu — dùng cho chế độ Bảng. */
   function nodeActionItems(node: TreeNode): RowActionItem[] {
     return [
-      { label: 'Thêm đơn vị con', icon: Plus, onSelect: () => { setAddingTo(addingTo === node.id ? null : node.id); setAddForm({ name: '', code: '' }); } },
-      { label: 'Sửa tên / di chuyển', icon: Pencil, onSelect: () => { setEditing(node); setEditForm({ name: node.name, parentId: node.parentId ?? '' }); } },
+      {
+        label: 'Thêm đơn vị con',
+        icon: Plus,
+        onSelect: () => {
+          setAddingTo(addingTo === node.id ? null : node.id);
+          setAddForm({ name: '', code: '' });
+        },
+      },
+      {
+        label: 'Sửa tên / di chuyển',
+        icon: Pencil,
+        onSelect: () => {
+          setEditing(node);
+          setEditForm({ name: node.name, parentId: node.parentId ?? '' });
+        },
+      },
       { label: 'Xem chi tiết', icon: Eye, onSelect: () => setDetail(node) },
       'separator',
       { label: 'Xóa đơn vị', icon: Trash2, danger: true, onSelect: () => setDeleting(node) },
     ];
   }
 
-  /** Hàng nút icon inline — dùng cho chế độ Cây và Sơ đồ. */
+  /** Hàng nút icon inline — dùng cho chế độ Cây. */
   function nodeActions(node: TreeNode) {
     return (
       <span className="flex items-center gap-0.5">
-        <button className="rounded p-1 text-primary hover:bg-primary/10" aria-label={`Thêm đơn vị con vào ${node.name}`}
-          onClick={() => { setAddingTo(addingTo === node.id ? null : node.id); setAddForm({ name: '', code: '' }); }}>
+        <button
+          className="rounded p-1 text-primary hover:bg-primary/10"
+          aria-label={`Thêm đơn vị con vào ${node.name}`}
+          onClick={() => {
+            setAddingTo(addingTo === node.id ? null : node.id);
+            setAddForm({ name: '', code: '' });
+          }}
+        >
           <Plus className="h-4 w-4" />
         </button>
-        <button className="rounded p-1 text-muted-foreground hover:bg-accent" aria-label={`Sửa ${node.name}`}
-          onClick={() => { setEditing(node); setEditForm({ name: node.name, parentId: node.parentId ?? '' }); }}>
+        <button
+          className="rounded p-1 text-muted-foreground hover:bg-accent"
+          aria-label={`Sửa ${node.name}`}
+          onClick={() => {
+            setEditing(node);
+            setEditForm({ name: node.name, parentId: node.parentId ?? '' });
+          }}
+        >
           <Pencil className="h-4 w-4" />
         </button>
-        <button className="rounded p-1 text-muted-foreground hover:bg-accent" aria-label={`Xem chi tiết ${node.name}`}
-          onClick={() => setDetail(node)}>
+        <button
+          className="rounded p-1 text-muted-foreground hover:bg-accent"
+          aria-label={`Xem chi tiết ${node.name}`}
+          onClick={() => setDetail(node)}
+        >
           <Eye className="h-4 w-4" />
         </button>
-        <button className="rounded p-1 text-destructive hover:bg-destructive/10" aria-label={`Xóa ${node.name}`}
-          onClick={() => setDeleting(node)}>
+        <button
+          className="rounded p-1 text-destructive hover:bg-destructive/10"
+          aria-label={`Xóa ${node.name}`}
+          onClick={() => setDeleting(node)}
+        >
           <Trash2 className="h-4 w-4" />
         </button>
       </span>
     );
   }
 
-  /** Form thêm đơn vị con (inline trong chế độ cây). */
+  /** Form thêm đơn vị con (inline). */
   function addFormInline(parentId: string) {
     return (
-      <div className="mb-2 ml-8 flex flex-wrap items-end gap-2 rounded-md border bg-muted/40 p-card">
-        <div className="space-y-1"><Label>Tên</Label>
-          <Input value={addForm.name} onChange={(e) => setAddForm({ ...addForm, name: e.target.value })} /></div>
-        <div className="space-y-1"><Label>Mã</Label>
-          <Input value={addForm.code} onChange={(e) => setAddForm({ ...addForm, code: e.target.value })} className="w-28" /></div>
-        <Button size="sm" disabled={!addForm.name || !addForm.code || create.isPending}
-          onClick={() => create.mutate({ ...addForm, parentId })}>
+      <div className="mb-2 ml-8 flex flex-wrap items-end gap-2 rounded-xl border bg-muted/40 p-3">
+        <div className="space-y-1">
+          <Label>Tên đơn vị</Label>
+          <Input
+            value={addForm.name}
+            placeholder="Ví dụ: Tổ Phát triển Mobile"
+            onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
+          />
+        </div>
+        <div className="space-y-1">
+          <Label>Mã</Label>
+          <Input
+            value={addForm.code}
+            placeholder="DEV-MOB"
+            onChange={(e) => setAddForm({ ...addForm, code: e.target.value })}
+            className="w-28 uppercase"
+          />
+        </div>
+        <Button
+          size="sm"
+          disabled={!addForm.name || !addForm.code || create.isPending}
+          onClick={() => create.mutate({ ...addForm, parentId })}
+        >
           Thêm
+        </Button>
+        <Button size="sm" variant="ghost" onClick={() => setAddingTo(null)}>
+          Hủy
         </Button>
       </div>
     );
   }
 
-  /** Chế độ 1 — Cây mở rộng. */
+  /** Chế độ 1 — Cây danh mục mở rộng. */
   function renderTreeNode(node: TreeNode, depth = 0): React.ReactNode {
     const isOpen = expanded.has(node.id) || depth === 0;
     return (
       <div key={node.id}>
-        <div className="flex items-center gap-1 rounded-md px-2 py-1.5 hover:bg-accent" style={{ paddingLeft: depth * 16 + 8 }}>
-          <button onClick={() => toggle(node.id)} className="rounded p-0.5 hover:bg-muted" aria-label="Mở/đóng">
-            <ChevronRight className={`h-4 w-4 transition-transform ${node.children.length && isOpen ? 'rotate-90' : ''} ${node.children.length ? '' : 'opacity-0'}`} />
+        <div
+          className="flex items-center gap-2 rounded-lg px-2 py-2 hover:bg-accent/60 transition-colors"
+          style={{ paddingLeft: depth * 20 + 8 }}
+        >
+          <button
+            onClick={() => toggle(node.id)}
+            className="rounded p-1 hover:bg-muted"
+            aria-label="Mở/đóng nhánh"
+          >
+            <ChevronRight
+              className={`h-4 w-4 transition-transform duration-200 ${
+                node.children.length && isOpen ? 'rotate-90 text-primary' : ''
+              } ${node.children.length ? '' : 'opacity-0'}`}
+            />
           </button>
-          <span className="text-sm font-medium">{node.name}</span>
-          <span className="ml-2 text-xs text-muted-foreground">{node.code} · {node.memberCount} NV</span>
+          <span className="text-sm font-semibold text-foreground">{node.name}</span>
+          <span className="text-xs font-mono rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
+            {node.code}
+          </span>
+          <span className="text-xs text-muted-foreground">{node.memberCount} nhân viên</span>
           <span className="ml-auto">{nodeActions(node)}</span>
         </div>
         {addingTo === node.id ? addFormInline(node.id) : null}
@@ -165,39 +411,29 @@ export default function AdminOrgUnitsPage() {
     );
   }
 
-  /**
-   * Sơ đồ tổ chức — layout XẾP DỌC theo cấp, con tự xuống dòng bằng grid:
-   * bề rộng luôn bó trong khung (không bao giờ bị khuyết khi xem web hay in A4).
-   * `print` = true → bản in sạch không nút hành động (Mục 6).
-   */
-  function renderChartNode(node: TreeNode, print = false): React.ReactNode {
-    return (
-      <div key={node.id} className="flex w-full flex-col items-center">
-        <div className={`rounded-lg border-2 border-primary/30 bg-card px-4 py-2 text-center ${print ? '' : 'z-content shadow-sm'}`}>
-          <p className="text-sm font-semibold">{node.name}</p>
-          <p className="text-xs text-muted-foreground">{node.code} · {node.memberCount} NV</p>
-          {!print ? <div className="mt-1 flex justify-center">{nodeActions(node)}</div> : null}
-        </div>
-        {node.children.length > 0 ? (
-          <>
-            <div className="h-4 w-px bg-border" aria-hidden />
-            <div className="grid w-full grid-cols-2 place-items-center gap-3 rounded-lg border border-dashed p-3 md:grid-cols-3 xl:grid-cols-4">
-              {node.children.map((c) => renderChartNode(c, print))}
-            </div>
-          </>
-        ) : null}
-        {!print && addingTo === node.id ? addFormInline(node.id) : null}
-      </div>
-    );
-  }
-
   /** Chế độ 3 — Bảng quản lý phẳng. */
   const tableColumns: DataColumn<{ node: TreeNode; depth: number }>[] = [
-    { key: 'name', header: 'Đơn vị', sortable: true, sortValue: (r) => r.node.name,
-      render: (r) => <span style={{ paddingLeft: r.depth * 16 }} className="font-medium">{r.depth > 0 ? '└ ' : ''}{r.node.name}</span> },
-    { key: 'code', header: 'Mã', sortable: true, render: (r) => r.node.code },
-    { key: 'memberCount', header: 'Số NV', sortable: true, render: (r) => r.node.memberCount },
-    { key: 'parent', header: 'Đơn vị cha', render: (r) => flat.find((f) => f.node.id === r.node.parentId)?.node.name ?? '—' },
+    {
+      key: 'name',
+      header: 'Đơn vị',
+      sortable: true,
+      sortValue: (r) => r.node.name,
+      render: (r) => (
+        <span style={{ paddingLeft: r.depth * 20 }} className="font-semibold text-foreground">
+          {r.depth > 0 ? '└── ' : ''}
+          {r.node.name}
+        </span>
+      ),
+      exportValue: (r) => `${'  '.repeat(r.depth)}${r.node.name}`,
+    },
+    { key: 'code', header: 'Mã đơn vị', sortable: true, render: (r) => r.node.code },
+    { key: 'memberCount', header: 'Số nhân viên', sortable: true, render: (r) => `${r.node.memberCount} NV` },
+    {
+      key: 'parent',
+      header: 'Đơn vị trực thuộc',
+      render: (r) => flat.find((f) => f.node.id === r.node.parentId)?.node.name ?? '— (Gốc)',
+      exportValue: (r) => flat.find((f) => f.node.id === r.node.parentId)?.node.name ?? 'Gốc',
+    },
   ];
 
   if (q.isLoading) return <Skeleton className="h-96" />;
@@ -209,30 +445,81 @@ export default function AdminOrgUnitsPage() {
         title="Cơ cấu tổ chức"
         description="Cây phòng ban là dữ liệu cấu hình — thêm, sửa, xóa, xem chi tiết ngay trên sơ đồ."
         actions={
-          <>
-            <div className="flex gap-1 rounded-md border bg-card p-1">
-              <Button size="sm" variant={view === 'tree' ? 'secondary' : 'ghost'} onClick={() => setView('tree')}><TreePine className="h-4 w-4" /> Cây</Button>
-              <Button size="sm" variant={view === 'chart' ? 'secondary' : 'ghost'} onClick={() => setView('chart')}><Network className="h-4 w-4" /> Sơ đồ</Button>
-              <Button size="sm" variant={view === 'table' ? 'secondary' : 'ghost'} onClick={() => setView('table')}><Table2 className="h-4 w-4" /> Bảng</Button>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1 rounded-xl border bg-card p-1 shadow-sm">
+              <Button
+                size="sm"
+                variant={view === 'chart' ? 'secondary' : 'ghost'}
+                onClick={() => setView('chart')}
+                className="gap-1.5 text-xs font-semibold"
+              >
+                <Network className="h-4 w-4 text-primary" /> Sơ đồ
+              </Button>
+              <Button
+                size="sm"
+                variant={view === 'tree' ? 'secondary' : 'ghost'}
+                onClick={() => setView('tree')}
+                className="gap-1.5 text-xs font-semibold"
+              >
+                <TreePine className="h-4 w-4" /> Cây
+              </Button>
+              <Button
+                size="sm"
+                variant={view === 'table' ? 'secondary' : 'ghost'}
+                onClick={() => setView('table')}
+                className="gap-1.5 text-xs font-semibold"
+              >
+                <Table2 className="h-4 w-4" /> Bảng
+              </Button>
             </div>
-            <PrintButton label="In sơ đồ" />
-          </>
+            <PrintExportDropdown
+              printLabel="In sơ đồ tổ chức"
+              exportLabel="Xuất bảng Excel"
+              onExportExcel={() => {
+                // Xuất danh sách đơn vị ra Excel
+                const cols = ['Tên đơn vị', 'Mã đơn vị', 'Số nhân viên', 'Đơn vị trực thuộc'];
+                const rows = flat.map((f) => [
+                  `${'  '.repeat(f.depth)}${f.node.name}`,
+                  f.node.code,
+                  f.node.memberCount,
+                  flat.find((p) => p.node.id === f.node.parentId)?.node.name ?? 'Gốc',
+                ]);
+                import('@/lib/export').then(({ exportRowsToExcel }) => {
+                  exportRowsToExcel('co-cau-to-chuc', cols, rows);
+                });
+              }}
+            />
+          </div>
         }
       />
 
       <div className="print-area">
-        <PrintFrame title="SƠ ĐỒ CƠ CẤU TỔ CHỨC" />
+        <PrintFrame title="SƠ ĐỒ CƠ CẤU TỔ CHỨC" subtitle="Công ty Cổ phần Phần mềm Saigon Technology" />
 
-        {/* Mục 6 — bản in là TÀI LIỆU báo cáo: sơ đồ sạch (không nút bấm)
-            + bảng tổng hợp; chế độ tương tác (Cây/Sơ đồ/Bảng) chỉ trên màn hình */}
+        {/* Khung Sơ Đồ In Ấn Sạch */}
         <div className="print-only">
-          <div className="flex flex-col items-center gap-10 py-2">
-            {(q.data ?? []).map((n) => renderChartNode(n, true))}
+          <div className="flex flex-col items-center gap-8 py-4">
+            {(q.data ?? []).map((n) => (
+              <OrgChartBranch
+                key={n.id}
+                node={n}
+                depth={0}
+                onAddChild={() => {}}
+                onEdit={() => {}}
+                onDetail={() => {}}
+                onDelete={() => {}}
+                print={true}
+              />
+            ))}
           </div>
-          <table className="mt-6 w-full text-sm">
+
+          <table className="mt-8 w-full text-sm">
             <thead>
               <tr>
-                <th>Đơn vị</th><th>Mã</th><th>Đơn vị cha</th><th>Số nhân viên</th>
+                <th>Đơn vị</th>
+                <th>Mã</th>
+                <th>Đơn vị cha</th>
+                <th>Số nhân viên</th>
               </tr>
             </thead>
             <tbody>
@@ -246,87 +533,206 @@ export default function AdminOrgUnitsPage() {
               ))}
             </tbody>
           </table>
+          <PrintSignatureBlock leftTitle="Người lập sơ đồ" middleTitle="Trưởng phòng HC-NS" rightTitle="Tổng Giám đốc" />
         </div>
 
-        <Card className="no-print">
-          <CardContent>
-            {view === 'tree' ? (
-              <div className="py-1">{(q.data ?? []).map((n) => renderTreeNode(n))}</div>
-            ) : view === 'chart' ? (
-              // Sơ đồ xếp dọc theo cấp, con tự xuống dòng — không bao giờ
-              // tràn ngang cả trên web lẫn bản in (Mục 6 + fix vỡ layout)
-              <div className="w-full p-2">
-                <div className="flex flex-col items-center gap-10">
-                  {(q.data ?? []).map((n) => renderChartNode(n))}
-                </div>
+        {/* Giao diện tương tác Web */}
+        <div className="no-print space-y-4">
+          {view === 'chart' ? (
+            <div className="w-full overflow-x-auto rounded-3xl border bg-card/60 p-8 sm:p-12 shadow-sm">
+              <div className="min-w-max flex flex-col items-center mx-auto gap-8">
+                {(q.data ?? []).map((n) => (
+                  <OrgChartBranch
+                    key={n.id}
+                    node={n}
+                    depth={0}
+                    onAddChild={(node) => {
+                      setAddingTo(node.id);
+                      setAddForm({ name: '', code: '' });
+                    }}
+                    onEdit={(node) => {
+                      setEditing(node);
+                      setEditForm({ name: node.name, parentId: node.parentId ?? '' });
+                    }}
+                    onDetail={(node) => setDetail(node)}
+                    onDelete={(node) => setDeleting(node)}
+                    print={false}
+                  />
+                ))}
               </div>
-            ) : (
-              <DataTable
-                columns={tableColumns}
-                rows={flat}
-                rowKey={(r) => r.node.id}
-                searchFields={(r) => [r.node.name, r.node.code]}
-                emptyTitle="Chưa có đơn vị nào"
-                actions={(r) => nodeActionItems(r.node)}
-              />
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          ) : view === 'tree' ? (
+            <Card className="rounded-3xl shadow-sm">
+              <CardContent className="p-6">
+                <div className="py-1">{(q.data ?? []).map((n) => renderTreeNode(n))}</div>
+              </CardContent>
+            </Card>
+          ) : (
+            <DataTable
+              columns={tableColumns}
+              rows={flat}
+              rowKey={(r) => r.node.id}
+              searchFields={(r) => [r.node.name, r.node.code]}
+              emptyTitle="Chưa có đơn vị nào"
+              actions={(r) => nodeActionItems(r.node)}
+              exportFilename="co-cau-to-chuc"
+              printLabel="In danh sách đơn vị"
+            />
+          )}
+        </div>
       </div>
+
+      {/* Modal thêm đơn vị con */}
+      <Modal
+        open={!!addingTo}
+        onOpenChange={(o) => !o && setAddingTo(null)}
+        title={`Thêm đơn vị trực thuộc: ${flat.find((f) => f.node.id === addingTo)?.node.name ?? ''}`}
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (addingTo) create.mutate({ ...addForm, parentId: addingTo });
+          }}
+          className="space-y-4"
+        >
+          <div className="space-y-1.5">
+            <Label>Tên đơn vị *</Label>
+            <Input
+              required
+              placeholder="Ví dụ: Nhóm Phát triển React Native"
+              value={addForm.name}
+              onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Mã đơn vị *</Label>
+            <Input
+              required
+              placeholder="DEV-RN"
+              value={addForm.code}
+              onChange={(e) => setAddForm({ ...addForm, code: e.target.value })}
+              className="uppercase font-mono"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <ModalFooterActions onCancel={() => setAddingTo(null)} pending={create.isPending} confirmLabel="Thêm mới" />
+          </div>
+        </form>
+      </Modal>
 
       {/* Modal sửa đơn vị */}
       <Modal open={!!editing} onOpenChange={(o) => !o && setEditing(null)} title={`Sửa đơn vị: ${editing?.name ?? ''}`}>
-        <form onSubmit={(e) => { e.preventDefault(); if (editing) update.mutate({ id: editing.id, name: editForm.name, parentId: editForm.parentId || null }); }} className="space-y-3">
-          <div className="space-y-1.5"><Label>Tên đơn vị *</Label>
-            <Input required value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} /></div>
-          <div className="space-y-1.5"><Label>Đơn vị cha</Label>
-            <Select value={editForm.parentId} onChange={(e) => setEditForm({ ...editForm, parentId: e.target.value })}>
-              <option value="">— Gốc (không có cha) —</option>
-              {flat.filter((f) => f.node.id !== editing?.id).map((f) => (
-                <option key={f.node.id} value={f.node.id}>{'— '.repeat(f.depth)}{f.node.name}</option>
-              ))}
-            </Select></div>
-          <div className="flex justify-end gap-2">
-            <ModalFooterActions onCancel={() => setEditing(null)} pending={update.isPending} />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (editing)
+              update.mutate({ id: editing.id, name: editForm.name, parentId: editForm.parentId || null });
+          }}
+          className="space-y-3"
+        >
+          <div className="space-y-1.5">
+            <Label>Tên đơn vị *</Label>
+            <Input
+              required
+              value={editForm.name}
+              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Đơn vị trực thuộc cấp trên</Label>
+            <Select
+              value={editForm.parentId}
+              onChange={(e) => setEditForm({ ...editForm, parentId: e.target.value })}
+            >
+              <option value="">— Gốc (không có cấp trên) —</option>
+              {flat
+                .filter((f) => f.node.id !== editing?.id)
+                .map((f) => (
+                  <option key={f.node.id} value={f.node.id}>
+                    {'— '.repeat(f.depth)}
+                    {f.node.name}
+                  </option>
+                ))}
+            </Select>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <ModalFooterActions onCancel={() => setEditing(null)} pending={update.isPending} confirmLabel="Lưu thay đổi" />
           </div>
         </form>
       </Modal>
 
       {/* Modal xác nhận xóa */}
-      <Modal open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)} title={`Xóa đơn vị: ${deleting?.name ?? ''}`} size="sm"
-        description="Chỉ xóa được khi đơn vị không còn đơn vị con, nhân viên hay không gian nào gắn vào.">
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setDeleting(null)}>Hủy</Button>
-          <Button variant="destructive" disabled={remove.isPending} onClick={() => deleting && remove.mutate(deleting.id)}>
+      <Modal
+        open={!!deleting}
+        onOpenChange={(o) => !o && setDeleting(null)}
+        title={`Xóa đơn vị: ${deleting?.name ?? ''}`}
+        size="sm"
+        description="Chỉ xóa được khi đơn vị không còn đơn vị con hoặc nhân viên trực thuộc."
+      >
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="outline" onClick={() => setDeleting(null)}>
+            Hủy
+          </Button>
+          <Button
+            variant="destructive"
+            disabled={remove.isPending}
+            onClick={() => deleting && remove.mutate(deleting.id)}
+          >
             {remove.isPending ? 'Đang xóa…' : 'Xóa đơn vị'}
           </Button>
         </div>
       </Modal>
 
       {/* Modal chi tiết đơn vị */}
-      <Modal open={!!detail} onOpenChange={(o) => !o && setDetail(null)} title={detail?.name ?? ''} size="lg"
-        description={detail ? `Mã ${detail.code} · ${detail.memberCount} nhân viên` : undefined}>
+      <Modal
+        open={!!detail}
+        onOpenChange={(o) => !o && setDetail(null)}
+        title={detail?.name ?? ''}
+        size="lg"
+        description={detail ? `Mã ${detail.code} · ${detail.memberCount} nhân viên` : undefined}
+      >
         {detail ? (
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div><p className="text-xs uppercase text-muted-foreground">Mã đơn vị</p><p className="font-medium">{detail.code}</p></div>
-              <div><p className="text-xs uppercase text-muted-foreground">Đơn vị cha</p>
-                <p className="font-medium">{flat.find((f) => f.node.id === detail.parentId)?.node.name ?? '— (gốc)'}</p></div>
-              <div><p className="text-xs uppercase text-muted-foreground">Đơn vị con</p>
-                <p className="font-medium">{detail.children.length}</p></div>
-              <div><p className="text-xs uppercase text-muted-foreground">Nhân viên hiện hữu</p>
-                <p className="font-medium">{detail.memberCount}</p></div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+              <div className="p-3 rounded-xl bg-muted/40 border">
+                <p className="text-xs uppercase text-muted-foreground font-semibold">Mã đơn vị</p>
+                <p className="font-bold text-primary font-mono mt-0.5">{detail.code}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-muted/40 border">
+                <p className="text-xs uppercase text-muted-foreground font-semibold">Đơn vị cấp trên</p>
+                <p className="font-medium mt-0.5">
+                  {flat.find((f) => f.node.id === detail.parentId)?.node.name ?? '— (Gốc)'}
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-muted/40 border">
+                <p className="text-xs uppercase text-muted-foreground font-semibold">Đơn vị con</p>
+                <p className="font-bold mt-0.5">{detail.children.length}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-muted/40 border">
+                <p className="text-xs uppercase text-muted-foreground font-semibold">Nhân sự hiện hữu</p>
+                <p className="font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  {detail.memberCount} NV
+                </p>
+              </div>
             </div>
+
             <div>
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Nhân viên đang thuộc đơn vị</p>
+              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Danh sách nhân sự thuộc đơn vị ({detailMembers.length})
+              </p>
               {detailMembers.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Chưa có nhân viên nào.</p>
+                <div className="p-6 rounded-2xl border border-dashed text-center text-sm text-muted-foreground">
+                  Chưa có nhân viên nào được phân bổ vào đơn vị này.
+                </div>
               ) : (
-                <ul className="divide-y rounded-md border">
+                <ul className="divide-y rounded-2xl border bg-card max-h-64 overflow-y-auto">
                   {detailMembers.map((m) => (
-                    <li key={m.id} className="flex items-center justify-between px-3 py-2 text-sm">
-                      <span className="font-medium">{m.fullName}</span>
-                      <span className="text-xs text-muted-foreground">{m.employeeCode ?? ''} {m.jobTitle ? `· ${m.jobTitle}` : ''}</span>
+                    <li key={m.id} className="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-muted/30">
+                      <span className="font-medium text-foreground">{m.fullName}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {m.employeeCode ? <span className="font-mono">{m.employeeCode} · </span> : ''}
+                        {m.jobTitle ?? 'Nhân viên'}
+                      </span>
                     </li>
                   ))}
                 </ul>

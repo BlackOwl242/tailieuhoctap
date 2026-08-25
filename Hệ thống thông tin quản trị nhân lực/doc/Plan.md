@@ -4,10 +4,7 @@
 
 ---
 
-## PHẦN MỘT — GIỚI THIỆU CHI TIẾT VỀ ĐƠN VỊ NGHIÊN CỨU TÌNH HUỐNG
-
-Trước khi đi vào đặc tả bất kỳ hệ thống thông tin nào, người phân tích nghiệp vụ phải trả lời dứt khoát câu hỏi: _hệ thống này được xây dựng cho một tổ chức cụ thể nào, tổ chức đó vận hành ra sao, và đặc điểm gì của họ khiến nhu cầu số hóa trở nên cấp thiết?_ Vì vậy, cần dành một dung lượng đầy đủ để giới thiệu đơn vị được chọn thay vì chỉ nêu tên cho có.
-
+## PHẦN MỘT — GIỚI THIỆU CHI TIẾT VỀ ĐƠN VỊ NGHIÊN CỨU
 ### 1. Lịch sử hình thành và quá trình phát triển
 
 Công ty Cổ phần Phần mềm Saigon Technology là một doanh nghiệp công nghệ thông tin thuần Việt, hoạt động trong lĩnh vực phát triển phần mềm theo mô hình linh hoạt (Agile) và gia công phần mềm cho thị trường quốc tế:
@@ -55,82 +52,70 @@ Saigon Technology vừa đủ lớn để các quy trình nhân sự trở nên 
 
 ### 2. Sơ đồ tổ chức của Công ty Saigon Technology (tái dựng theo thực tiễn vận hành)
 
-Cấu trúc quản trị của công ty gồm các tầng và các khối sau:
+**Hình 1 — Sơ đồ cơ cấu tổ chức tổng thể Công ty Saigon Technology (Nét thẳng, 5 Khối ngang hàng)**
 
-- **Đại hội đồng cổ đông và Hội đồng quản trị** — cấp quản trị chiến lược cao nhất của công ty cổ phần, quyết định các vấn đề trọng đại;
-- **Ban Giám đốc:** Tổng Giám đốc (kiêm đồng sáng lập) cùng các Phó Tổng Giám đốc phụ trách các mảng kinh doanh quốc tế, chuyển giao dự án và vận hành;
-- **Ban Tổ chức – Hành chính – Nhân sự:** giữ đúng vai trò "ban tổ chức cán bộ" trong môi trường doanh nghiệp, bên trong chia thành bốn tổ chuyên trách: tổ tuyển dụng, tổ hồ sơ và hợp đồng lao động, tổ tiền lương – bảo hiểm – chế độ, và tổ hành chính – văn thư;
-- **Khối Chuyển giao Dự án (khối Delivery):** trái tim sản xuất của công ty, bao gồm các trung tâm phát triển phần mềm tại Thành phố Hồ Chí Minh và Đà Nẵng; bên trong chia thành nhiều nhóm dự án (squad) theo công nghệ: nhóm Java, nhóm .NET, nhóm NodeJS/PHP, nhóm ứng dụng di động, nhóm kiểm thử chất lượng, nhóm DevOps; mỗi nhóm dự án do một Trưởng dự án đứng đầu;
-- **Khối Kinh doanh và Marketing:** tìm kiếm khách hàng quốc tế, tư vấn giải pháp trước bán hàng (presale), chăm sóc quan hệ khách hàng;
-- **Khối Công nghệ và Hạ tầng nội bộ:** kiến trúc sư giải pháp, nghiên cứu và phát triển, bộ phận trợ giúp kỹ thuật nội bộ (quản lý máy tính, mạng, tài khoản hệ thống cho toàn công ty);
-- **Phòng Tài chính – Kế toán:** kế toán tiền lương, kế toán bảo hiểm xã hội, quyết toán thuế thu nhập cá nhân;
-- **Tổ Hành chính – Văn thư** (nằm trong Ban Tổ chức – Hành chính – Nhân sự nhưng giữ vai trò ngang hàng khi phối hợp): quản lý tài sản, chỗ ngồi, văn bản, con dấu.
+```mermaid
+graph TD
+    %% TẦNG 1: QUẢN TRỊ SỞ HỮU & BAN ĐIỀU HÀNH
+    DHDCD["<b>ĐẠI HỘI ĐỒNG CỔ ĐÔNG</b><br/><i>(Cơ quan quyền lực cao nhất)</i>"]
+    HDQT["<b>HỘI ĐỒNG QUẢN TRỊ</b><br/><i>(Quản trị chiến lược công ty)</i>"]
+    BGD["<b>BAN GIÁM ĐỐC ĐIỀU HÀNH</b><br/>(Tổng Giám đốc CEO · COO · CTO · CFO · CBO)"]
 
-Toàn bộ cây tổ chức trên được khái quát bằng sơ đồ sau:
+    DHDCD --> HDQT
+    HDQT --> BGD
 
-**Hình 1 — Sơ đồ cơ cấu tổ chức tổng thể của Công ty Saigon Technology**
+    %% TẦNG 2: 5 KHỐI / PHÒNG BAN CHỨC NĂNG (CÙNG CẤP NGANG HÀNG NHAU)
+    BGD --> K_DEL["<b>KHỐI CHUYỂN GIAO DỰ ÁN</b><br/>(Delivery Director & RMO)"]
+    BGD --> K_BIZ["<b>KHỐI KINH DOANH & MKT</b><br/>(Giám đốc Kinh doanh CBO)"]
+    BGD --> K_TECH["<b>KHỐI CÔNG NGHỆ & IT</b><br/>(Giám đốc Công nghệ CTO)"]
+    BGD --> K_HR["<b>BAN TC – HC – NHÂN SỰ</b><br/>(Trưởng ban TC-HC-NS)"]
+    BGD --> K_FIN["<b>PHÒNG TÀI CHÍNH – KẾ TOÁN</b><br/>(Kế toán trưởng / CFO)"]
 
-```
-                      ┌───────────────────────────────┐
-                      │     ĐẠI HỒI ĐỒNG CỔ ĐÔNG      │
-                      └───────────────┬───────────────┘
-                                      │
-                      ┌───────────────┴───────────────┐
-                      │      HỘI ĐỒNG QUẢN TRỊ        │
-                      └───────────────┬───────────────┘
-                                      │
-                      ┌───────────────┴───────────────┐
-                      │          BAN GIÁM ĐỐC         │
-                      │   Tổng Giám đốc và các Phó    │
-                      │        Tổng Giám đốc          │
-                      └───────────────┬───────────────┘
-                                      │
-       ┌───────────────┬───────────────┼───────────────┬───────────────┐
-       │               │               │               │               │
-   Khối Kinh      Khối Chuyển      Khối Công      Ban Tổ chức –    Phòng Tài
-   doanh &        giao Dự án       nghệ & Hạ      Hành chính –     chính –
-   Marketing      (Delivery)       tầng nội bộ    Nhân sự          Kế toán
+    %% TẦNG 3: CÁC ĐƠN VỊ / TỔ TRỰC THUỘC (NẰM THẲNG HÀNG DƯỚI TỪNG KHỐI TƯƠNG ỨNG)
+    K_DEL --> DEL_SUB["<b>Trung tâm Sản xuất:</b><br/>• ODC TP.HCM (Java, .NET, Mobile, Web, QA, DevOps)<br/>• ODC Đà Nẵng (Java, PHP, Mobile, QA, DevOps)<br/>• VP Quốc tế (Mỹ, Úc, Thụy Sĩ, Singapore)"]
+    
+    K_BIZ --> BIZ_SUB["<b>Kinh doanh & Thị trường:</b><br/>• Kinh doanh Quốc tế (Global Sales)<br/>• Tư vấn Giải pháp Tiền bán hàng (Pre-Sales)<br/>• Marketing & Truyền thông thương hiệu"]
+    
+    K_TECH --> TECH_SUB["<b>Công nghệ & Hạ tầng:</b><br/>• Viện R&D & AI Lab Nghiên cứu Công nghệ<br/>• IT Helpdesk & An toàn thông tin ISO 27001"]
+    
+    K_HR --> HR_SUB["<b>Nghiệp vụ Nhân sự – Hành chính:</b><br/>• Tổ Tuyển dụng Nhân tài (Talent Acquisition)<br/>• Tổ Hồ sơ & HĐLĐ (Lưu trữ gốc, mượn-trả)<br/>• Tổ Tiền lương & Phúc lợi (C&B, Chấm công)<br/>• Tổ Hành chính – Văn thư & Quản trị tài sản"]
+    
+    K_FIN --> FIN_SUB["<b>Tài chính & Kế toán:</b><br/>• Kế toán Tiền lương, Thuế TNCN & BHXH<br/>• Kế toán Doanh thu Dự án & Khách hàng<br/>• Quản trị Tài chính & Ngân sách"]
 ```
 
-_Ghi chú phân tích kèm Hình 1:_ hai cấp trên cùng (Đại hội đồng cổ đông, Hội đồng quản trị) thuộc tầng quản trị sở hữu, ít tham gia nghiệp vụ nhân sự hằng ngày nên trong HRMIS chỉ cần vai trò **xem báo cáo**; tầng Ban Giám đốc là điểm hội tụ duy nhất của mọi luồng phê duyệt — căn cứ để thiết kế đúng một vai "Người phê duyệt cuối"; năm đơn vị cấp dưới chia làm hai bản chất khác nhau: ba khối **sản xuất – kinh doanh** (phát sinh nhu cầu nhân sự) và hai khối **nghiệp vụ trung tâm** về nhân sự – tài chính (xử lý và phản ánh nhu cầu đó).
+_Ghi chú phân tích kèm Hình 1:_
+- **Tính tổng thể và bao quát toàn diện**: Hai cấp trên cùng (Đại hội đồng cổ đông, Hội đồng quản trị) thuộc tầng quản trị sở hữu, ít tham gia nghiệp vụ nhân sự hằng ngày nên trong HRMIS chỉ cần vai trò **xem báo cáo**; tầng Ban Giám đốc là điểm hội tụ duy nhất của mọi luồng phê duyệt — căn cứ để thiết kế đúng một vai "Người phê duyệt cuối".
+- **Khối Chuyển giao Dự án (Delivery Unit) gắn kết chặt chẽ trong hệ sinh thái doanh nghiệp**: Không đứng độc lập mà liên kết trực tiếp với Khối Kinh doanh (nhận dự án), Ban TC-HC-NS (nhận nhân lực, định biên, đề xuất tăng lương, đánh giá), Khối Công nghệ & IT (nhận hạ tầng, repo, tuân thủ an toàn thông tin ISO 27001) và Phòng Kế toán (kiểm soát chi phí nhân sự và nghiệm thu dự án).
+- **Mô hình tổ chức là dữ liệu động**: Mọi phòng ban, trung tâm ODC và nhóm dự án đều được cấu hình động trên hệ thống HRMIS, cho phép thêm mới hoặc thuyên chuyển nhân sự dễ dàng.
 
-Hai đơn vị trọng yếu nhất đối với bài toán nhân sự được tách chi tiết ở hai sơ đồ tiếp theo. Trước hết là "van điều phối" Ban Tổ chức – Hành chính – Nhân sự:
+**Hình 2 — Cơ cấu chi tiết Ban Tổ chức – Hành chính – Nhân sự (4 Tổ chuyên môn ngang hàng)**
 
-**Hình 2 — Cơ cấu chi tiết Ban Tổ chức – Hành chính – Nhân sự**
-
-```
-                BAN TỔ CHỨC – HÀNH CHÍNH – NHÂN SỰ
-               (Trưởng ban và các chuyên viên chính)
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                     │
-  TỔ TUYỂN DỤNG        TỔ HỒ SƠ VÀ HỢP       TỔ TIỀN LƯƠNG –
-  (tuyển đa kênh,      ĐỒNG LAO ĐỘNG         BẢO HIỂM – CHẾ ĐỘ
-  sàng lọc, phối hợp   (lưu trữ hồ sơ gốc,   (chấm công, tính lương,
-  phỏng vấn, offer)    mượn – trả bản gốc)   bảo hiểm, chế độ)
-
-                              │
-                    TỔ HÀNH CHÍNH – VĂN THƯ
-                    (tài sản, chỗ ngồi, văn bản, con dấu)
+```mermaid
+graph TD
+    BAN["<b>BAN TỔ CHỨC – HÀNH CHÍNH – NHÂN SỰ</b><br/>(Trưởng ban & các Chuyên viên chính — ~18 nhân sự phục vụ >400 CBNV)"]
+    
+    BAN --> T1["<b>1. TỔ TUYỂN DỤNG NHÂN TÀI</b><br/>• Tuyển dụng đa kênh (LinkedIn, TopCV, VietnamWorks)<br/>• Sàng lọc CV, điều phối phỏng vấn chuyên môn<br/>• Quản lý quan hệ Đại học, thực tập sinh & Gửi Offer"]
+    
+    BAN --> T2["<b>2. TỔ HỒ SƠ & HỢP ĐỒNG LAO ĐỘNG</b><br/>• Tiếp nhận & bảo quản hồ sơ gốc theo mã tủ/ngăn<br/>• Số hóa hồ sơ quét PDF, quản lý mượn-trả văn bằng gốc<br/>• Soạn thảo & quản lý vòng đời HĐLĐ, phụ lục"]
+    
+    BAN --> T3["<b>3. TỔ TIỀN LƯƠNG – BẢO HIỂM – PHÚC LỢI (C&B)</b><br/>• Thu thập & tổng hợp dữ liệu chấm công đa nguồn<br/>• Vận hành bộ máy tính lương tự động, khấu trừ thuế TNCN<br/>• Giải quyết chế độ BHXH, BHYT, BHTN & Phúc lợi"]
+    
+    BAN --> T4["<b>4. TỔ HÀNH CHÍNH – VĂN THƯ & QUẢN TRỊ CƠ SỞ</b><br/>• Quản lý văn thư, lưu trữ công văn, quản lý con dấu pháp nhân<br/>• Cấp phát, thu hồi máy tính, bàn ghế, thẻ từ ra vào<br/>• Điều phối hậu cần, chỗ ngồi tại TP.HCM & Đà Nẵng"]
 ```
 
 Tiếp theo là trái tim sản xuất — Khối Chuyển giao Dự án:
 
-**Hình 3 — Cơ cấu chi tiết Khối Chuyển giao Dự án (Delivery)**
+**Hình 3 — Cơ cấu chi tiết Khối Chuyển giao Dự án (Các Trung tâm ODC & VP Quốc tế)**
 
-```
-                KHỐI CHUYỂN GIAO DỰ ÁN (DELIVERY)
-                              │
-         ┌────────────────────┴────────────────────┐
-         │                                         │
- TRUNG TÂM PHÁT TRIỂN                      TRUNG TÂM PHÁT TRIỂN
- PHẦN MỀM TP.HCM                           PHẦN MỀM ĐÀ NẴNG
-         │                                         │
-   ├── Nhóm dự án Java                      ├── Nhóm dự án Java
-   ├── Nhóm dự án .NET                      ├── Nhóm dự án PHP/NodeJS
-   ├── Nhóm ứng dụng di động                ├── Nhóm ứng dụng di động
-   ├── Nhóm kiểm thử chất lượng             ├── Nhóm kiểm thử chất lượng
-   └── Nhóm DevOps dự án                    └── Nhóm DevOps dự án
+```mermaid
+graph TD
+    DEL["<b>KHỐI CHUYỂN GIAO DỰ ÁN (DELIVERY UNIT)</b><br/>(Ban Giám đốc Khối & Văn phòng Quản lý Nguồn lực RMO)"]
+    
+    DEL --> HCM["<b>TRUNG TÂM PHẦN MỀM TP.HCM (Saigon ODC)</b><br/>• Giám đốc ODC TP.HCM phụ trách<br/>• Nhóm DA Java Enterprise · Nhóm DA .NET Cloud<br/>• Nhóm DA Mobile (Flutter/iOS) · Nhóm DA Web Fullstack<br/>• Nhóm Đảm bảo Chất lượng (QA/QC) · Nhóm DevOps & Hạ tầng"]
+    
+    DEL --> DAD["<b>TRUNG TÂM PHẦN MỀM ĐÀ NẴNG (Danang ODC)</b><br/>• Giám đốc ODC Đà Nẵng phụ trách<br/>• Nhóm DA Java & Microservices · Nhóm DA PHP / NodeJS<br/>• Nhóm DA Mobile Solutions · Nhóm Kiểm thử Chất lượng<br/>• Nhóm DevOps Vận hành DA"]
+    
+    DEL --> REPS["<b>VĂN PHÒNG ĐẠI DIỆN QUỐC TẾ</b><br/>• VP Hoa Kỳ (Reston, VA) · VP Úc (Sydney)<br/>• VP Thụy Sĩ (Zurich) · VP Singapore"]
 ```
 
 _Ghi chú phân tích kèm Hình 2 và Hình 3:_ mỗi nhóm dự án ở Hình 3 do một **Trưởng dự án** đứng đầu — lớp "mắt xích cầu nối" sẽ phân tích sâu ở mục 4; nhân sự kỹ thuật được điều chuyển linh hoạt giữa hai trung tâm nên phân hệ Thuyên chuyển phải hỗ trợ cả chuyển nội địa điểm lẫn liên tỉnh; cùng một chức danh (ví dụ "Lập trình viên Java") tồn tại song song ở hai trung tâm — bài toán mà mô hình "cây tổ chức là dữ liệu" ở phần kiến trúc giải quyết triệt để. Riêng Ban Tổ chức – Hành chính – Nhân sự với bốn tổ nhưng chỉ khoảng mười tám người phục vụ hơn bốn trăm nhân sự là nút cổ chai rõ nhất, lý do trực tiếp để phần mềm gánh phần thao tác lặp lại.
@@ -146,102 +131,75 @@ _Ghi chú phân tích kèm Hình 2 và Hình 3:_ mỗi nhóm dự án ở Hình 
   - _Bộ phận Trợ giúp kỹ thuật nội bộ:_ phải cấp tài khoản email, tài khoản hệ thống quản lý mã nguồn, quyền truy cập dự án cho nhân viên mới trong ngày nhận việc, và thu hồi toàn bộ trong ngày làm việc cuối cùng khi nhân viên nghỉ — sai sót ở khâu thu hồi là rủi ro an ninh thông tin nghiêm trọng, nhất là với một công ty đạt chứng nhận ISO/IEC 27001;
   - _Các nhóm dự án:_ là nơi hưởng lợi trực tiếp khi tuyển được người đúng, và chịu thiệt hại tiến độ ngay lập tức khi có người nghỉ việc đột xuất.
 
-Chuẩn hóa các vai trò trên, mỗi bộ phận được đóng thành một "thẻ chức năng" gồm năm thuộc tính: _vai trò trong hệ thống — nhận vào cái gì — trả ra cái gì — nhiệm vụ chính — vai tương ứng trong phần mềm_. Đây chính là nguyên liệu trực tiếp để lập ma trận quyền hạn chi tiết của HRMIS:
+Chuẩn hóa các vai trò trên, mỗi bộ phận được mô tả theo một mẫu thống nhất gồm năm thuộc tính: _vai trò trong hệ thống — nhận vào cái gì — trả ra cái gì — nhiệm vụ chính — vai tương ứng trong phần mềm_. Đây chính là nguyên liệu trực tiếp để lập ma trận quyền hạn chi tiết của HRMIS:
 
-**Hình 4 — Thẻ chức năng – nhiệm vụ của từng bộ phận dưới góc độ quản trị nhân sự**
+**Hình 4 — Chức năng – nhiệm vụ của từng bộ phận dưới góc độ quản trị nhân sự**
 
-```
-╔═ BAN GIÁM ĐỐC ════════════════════════════════════════════════════
-║ Vai trò trong hệ thống : Mắt xích QUYẾT ĐỊNH cuối cùng
-║ Nhận vào               : Tờ trình tóm tắt kèm số liệu từ Ban TC–HC–NS
-║ Trả ra                 : Quyết định nhân sự có hiệu lực thi hành
-║ Nhiệm vụ chính:
-║  • Phê duyệt định biên lao động và quỹ tiền lương hằng năm
-║  • Ký duyệt chỉ tiêu tuyển dụng, bảng xếp lương, tờ trình tăng lương
-║  • Ký quyết định khen thưởng, kỷ luật, chấm dứt hợp đồng, nghỉ hưu
-║  • Quyết định mở rộng trung tâm phát triển mới, định hướng chiến lược
-║    nhân sự theo lộ trình công nghệ của công ty
-║ Vai trong HRMIS        : "Người phê duyệt" — duyệt từ xa bằng ký điện
-║                          tử, xem bảng điều khiển điều hành thời gian thực
-╚═══════════════════════════════════════════════════════════════════
+**a) Ban Giám đốc**
 
-╔═ BAN TỔ CHỨC – HÀNH CHÍNH – NHÂN SỰ ══════════════════════════════
-║ Vai trò trong hệ thống : Mắt xích ĐẦU MỐI — van điều phối mọi dòng
-║                          chảy nghiệp vụ nhân sự
-║ Nhận vào               : Phiếu đề xuất từ các phòng ban; đơn, tờ khai
-║                          của người lao động; quyết định trả về từ
-║                          Ban Giám đốc
-║ Trả ra                 : Tờ trình trình ký; quyết định nhân sự phát
-║                          hành; hồ sơ lưu trữ; bảng lương tổng hợp
-║ Nhiệm vụ chính:
-║  • Tiếp nhận, thẩm định tính hợp lệ của mọi loại đề xuất nhân sự
-║  • Soạn thảo tờ trình, phát hành và lưu vết quyết định
-║  • Quản lý hồ sơ gốc, mượn – trả văn bằng chứng chỉ
-║  • Vận hành chu kỳ chấm công – tính lương hằng tháng
-║  • Tư vấn tuân thủ pháp luật lao động, nội quy, thang bảng lương
-║ Vai trong HRMIS        : "Chủ trì quy trình" — quyền cao nhất trên
-║                          dữ liệu nhân sự, chịu kiểm toán truy vết
-╚═══════════════════════════════════════════════════════════════════
+- _Vai trò trong hệ thống:_ mắt xích quyết định cuối cùng;
+- _Nhận vào:_ tờ trình tóm tắt kèm số liệu từ Ban Tổ chức – Hành chính – Nhân sự;
+- _Trả ra:_ quyết định nhân sự có hiệu lực thi hành;
+- _Nhiệm vụ chính:_
+  - phê duyệt định biên lao động và quỹ tiền lương hằng năm;
+  - ký duyệt chỉ tiêu tuyển dụng, bảng xếp lương, tờ trình tăng lương;
+  - ký quyết định khen thưởng, kỷ luật, chấm dứt hợp đồng, nghỉ hưu;
+  - quyết định mở rộng trung tâm phát triển mới, định hướng chiến lược nhân sự theo lộ trình công nghệ của công ty;
+- _Vai trong HRMIS:_ "Người phê duyệt" — duyệt từ xa bằng ký điện tử, xem bảng điều khiển điều hành thời gian thực.
 
-╔═ TRƯỞNG DỰ ÁN VÀ TRƯỞNG BỘ PHẬN CHUYÊN MÔN ═══════════════════════
-║ Vai trò trong hệ thống : Mắt xích CẦU NỐI — phát sinh nhu cầu và
-║                          cung cấp dữ liệu thực tế
-║ Nhận vào               : Yêu cầu tiến độ dự án; danh sách nhân sự
-║                          được điều động; quyết định thi hành
-║ Trả ra                 : Phiếu đề xuất tuyển dụng; phiếu đánh giá
-║                          thử việc và hiệu suất; bảng chấm công dự án
-║                          đã xác nhận; biên bản bàn giao
-║ Nhiệm vụ chính:
-║  • Phát hiện thiếu hụt vị trí việc làm trong nhóm mình
-║  • Phỏng vấn chuyên môn vòng một; đánh giá thử việc, đánh giá hiệu suất
-║  • Duyệt giờ làm thêm; xác nhận bảng chấm công nhóm
-║  • Tổ chức bàn giao khi thuyên chuyển hoặc thôi việc
-║ Vai trong HRMIS        : "Người đề xuất / Xác nhận" — thấy đúng phạm vi
-║                          nhóm mình, không can thiệp dữ liệu nhóm khác
-╚═══════════════════════════════════════════════════════════════════
+**b) Ban Tổ chức – Hành chính – Nhân sự**
 
-╔═ PHÒNG TÀI CHÍNH – KẾ TOÁN ═══════════════════════════════════════
-║ Vai trò trong hệ thống : Bộ phận PHẢN ÁNH — mọi biến động nhân sự
-║                          đều đổ về đây dưới dạng chi phí
-║ Nhận vào               : Bảng lương tổng hợp; quyết định khen thưởng,
-║                          kỷ luật, tăng lương đã có hiệu lực
-║ Trả ra                 : Xác nhận khả năng quỹ lương khi thẩm định
-║                          tuyển; lệnh chuyển khoản; báo cáo bảo hiểm
-║                          xã hội; dữ liệu quyết toán thuế thu nhập cá nhân
-║ Nhiệm vụ chính:
-║  • Đối chiếu bảng lương trước khi trình duyệt
-║  • Chi trả lương – thưởng; hạch toán chi phí nhân lực
-║  • Làm thủ tục bảo hiểm xã hội, quyết toán thuế cuối năm
-║ Vai trong HRMIS        : "Đối chiếu – Kế toán" — nhận dữ liệu tự động
-║                          từ bộ máy tính lương, không nhập liệu kép
-╚═══════════════════════════════════════════════════════════════════
+- _Vai trò trong hệ thống:_ mắt xích đầu mối — van điều phối mọi dòng chảy nghiệp vụ nhân sự;
+- _Nhận vào:_ phiếu đề xuất từ các phòng ban; đơn, tờ khai của người lao động; quyết định trả về từ Ban Giám đốc;
+- _Trả ra:_ tờ trình trình ký; quyết định nhân sự phát hành; hồ sơ lưu trữ; bảng lương tổng hợp;
+- _Nhiệm vụ chính:_
+  - tiếp nhận, thẩm định tính hợp lệ của mọi loại đề xuất nhân sự;
+  - soạn thảo tờ trình, phát hành và lưu vết quyết định;
+  - quản lý hồ sơ gốc, mượn – trả văn bằng chứng chỉ;
+  - vận hành chu kỳ chấm công – tính lương hằng tháng;
+  - tư vấn tuân thủ pháp luật lao động, nội quy, thang bảng lương;
+- _Vai trong HRMIS:_ "Chủ trì quy trình" — quyền cao nhất trên dữ liệu nhân sự, chịu kiểm toán truy vết.
 
-╔═ BỘ PHẬN TRỢ GIÚP KỸ THUẬT NỘI BỘ ════════════════════════════════
-║ Vai trò trong hệ thống : Bộ phận BẢO ĐẢM HẠ TẦNG TRUY CẬP
-║ Nhận vào               : Thông báo nhân viên mới / nghỉ việc / chuyển
-║                          đơn vị từ hệ thống
-║ Trả ra                 : Xác nhận đã cấp tài khoản ngày nhận việc;
-║                          xác nhận đã thu hồi toàn bộ tài khoản và
-║                          quyền truy cập ngày làm việc cuối
-║ Nhiệm vụ chính:
-║  • Cấp email, tài khoản quản lý mã nguồn, quyền truy cập dự án
-║  • Thu hồi tài khoản khi nghỉ việc — nghĩa vụ sống còn với cam kết
-║    bảo mật ISO/IEC 27001 của công ty
-║ Vai trong HRMIS        : "Xác nhận checklist hội nhập / offboarding"
-╚═══════════════════════════════════════════════════════════════════
+**c) Trưởng dự án và Trưởng bộ phận chuyên môn**
 
-╔═ NGƯỜI LAO ĐỘNG (TOÀN THỂ NHÂN VIÊN) ═════════════════════════════
-║ Vai trò trong hệ thống : Chủ thể trung tâm — nguồn phát sinh đơn từ
-║                          nghỉ phép, mượn hồ sơ gốc cho tới thôi việc
-║ Trả ra                 : Đơn xin nghỉ phép, đăng ký làm thêm giờ,
-║                          yêu cầu mượn bản gốc văn bằng chứng chỉ,
-║                          đơn xin thôi việc, xác nhận thông tin cá nhân
-║ Vai trong HRMIS        : "Tự phục vụ" — thao tác trên ứng dụng di
-║                          động, không phải ra quầy văn thư
-╚═══════════════════════════════════════════════════════════════════
-```
+- _Vai trò trong hệ thống:_ mắt xích cầu nối — phát sinh nhu cầu và cung cấp dữ liệu thực tế;
+- _Nhận vào:_ yêu cầu tiến độ dự án; danh sách nhân sự được điều động; quyết định thi hành;
+- _Trả ra:_ phiếu đề xuất tuyển dụng; phiếu đánh giá thử việc và hiệu suất; bảng chấm công dự án đã xác nhận; biên bản bàn giao;
+- _Nhiệm vụ chính:_
+  - phát hiện thiếu hụt vị trí việc làm trong nhóm mình;
+  - phỏng vấn chuyên môn vòng một; đánh giá thử việc, đánh giá hiệu suất;
+  - duyệt giờ làm thêm; xác nhận bảng chấm công nhóm;
+  - tổ chức bàn giao khi thuyên chuyển hoặc thôi việc;
+- _Vai trong HRMIS:_ "Người đề xuất / Xác nhận" — thấy đúng phạm vi nhóm mình, không can thiệp dữ liệu nhóm khác.
 
-Sáu thẻ trên bao phủ trọn vẹn các cột "khởi tạo – chủ trì – phê duyệt – bị ảnh hưởng" trong ma trận tác động ở Phần Ba; khi xây dựng phần mềm, mỗi thẻ chuyển hóa thành **một tập quyền (role)** trong cơ chế phân quyền theo vai trò — không thêm, không thiếu.
+**d) Phòng Tài chính – Kế toán**
+
+- _Vai trò trong hệ thống:_ bộ phận phản ánh — mọi biến động nhân sự đều đổ về đây dưới dạng chi phí;
+- _Nhận vào:_ bảng lương tổng hợp; quyết định khen thưởng, kỷ luật, tăng lương đã có hiệu lực;
+- _Trả ra:_ xác nhận khả năng quỹ lương khi thẩm định tuyển; lệnh chuyển khoản; báo cáo bảo hiểm xã hội; dữ liệu quyết toán thuế thu nhập cá nhân;
+- _Nhiệm vụ chính:_
+  - đối chiếu bảng lương trước khi trình duyệt;
+  - chi trả lương – thưởng; hạch toán chi phí nhân lực;
+  - làm thủ tục bảo hiểm xã hội, quyết toán thuế cuối năm;
+- _Vai trong HRMIS:_ "Đối chiếu – Kế toán" — nhận dữ liệu tự động từ bộ máy tính lương, không nhập liệu kép.
+
+**e) Bộ phận Trợ giúp kỹ thuật nội bộ**
+
+- _Vai trò trong hệ thống:_ bộ phận bảo đảm hạ tầng truy cập;
+- _Nhận vào:_ thông báo nhân viên mới / nghỉ việc / chuyển đơn vị từ hệ thống;
+- _Trả ra:_ xác nhận đã cấp tài khoản ngày nhận việc; xác nhận đã thu hồi toàn bộ tài khoản và quyền truy cập ngày làm việc cuối;
+- _Nhiệm vụ chính:_
+  - cấp email, tài khoản quản lý mã nguồn, quyền truy cập dự án;
+  - thu hồi tài khoản khi nghỉ việc — nghĩa vụ sống còn với cam kết bảo mật ISO/IEC 27001 của công ty;
+- _Vai trong HRMIS:_ "Xác nhận checklist hội nhập / offboarding".
+
+**f) Người lao động (toàn thể nhân viên)**
+
+- _Vai trò trong hệ thống:_ chủ thể trung tâm — nguồn phát sinh đơn từ nghỉ phép, mượn hồ sơ gốc cho tới thôi việc;
+- _Trả ra:_ đơn xin nghỉ phép, đăng ký làm thêm giờ, yêu cầu mượn bản gốc văn bằng chứng chỉ, đơn xin thôi việc, xác nhận thông tin cá nhân;
+- _Vai trong HRMIS:_ "Tự phục vụ" — thao tác trên ứng dụng di động, không phải ra quầy văn thư.
+
+Sáu bộ phận trên bao phủ trọn vẹn các cột "khởi tạo – chủ trì – phê duyệt – bị ảnh hưởng" trong ma trận tác động ở Phần Ba; khi xây dựng phần mềm, mỗi bộ phận chuyển hóa thành **một tập quyền (role)** trong cơ chế phân quyền theo vai trò — không thêm, không thiếu.
 
 ### 4. Phân tích sâu vai trò và sự phối hợp của ba mắt xích then chốt
 
@@ -253,36 +211,34 @@ Toàn bộ vòng đời nhân sự xoay quanh ba mắt xích **Ban Giám đốc 
 
 Luồng phối hợp chuẩn vì thế luôn là ba bước chữ sig-ma: **phòng ban đề xuất → Ban Tổ chức – Hành chính – Nhân sự thẩm định và tờ trình → Ban Giám đốc phê duyệt → Ban Tổ chức – Hành chính – Nhân sự phát hành quyết định và phối hợp các bên thi hành**. Mô hình ấy được trực quan hóa như sau:
 
-**Hình 5 — Mô hình phối hợp ba mắt xích trong một vòng xử lý đề xuất nhân sự**
+**Hình 5 — Mô hình phối hợp 3 mắt xích cốt lõi và các bộ phận liên quan (Decision-Hub-Bridge Matrix)**
 
-```
-                 ┌───────────────────────────────┐
-                 │   CÁC PHÒNG BAN CHUYÊN MÔN    │
-                 │ (Trưởng dự án, trưởng bộ phận)│
-                 └───────────────┬───────────────┘
-                                 │ (1) Phiếu đề xuất tuyển / đánh giá /
-                                 │     khen thưởng / kỷ luật / điều động...
-                                 ▼
-                 ┌───────────────────────────────┐
-                 │  BAN TỔ CHỨC – HÀNH CHÍNH –   │◄─── (2a) trả lại bổ sung
-                 │         NHÂN SỰ               │      chứng minh, chỉnh hồ sơ
-                 └───────────────┬───────────────┘
-                                 │ (2) Tờ trình tóm tắt kèm số liệu
-                                 ▼
-                 ┌───────────────────────────────┐
-                 │         BAN GIÁM ĐỐC          │──── (2b) điều chỉnh giảm
-                 └───────────────┬───────────────┘      chỉ tiêu (nếu cần)
-                                 │ (3) Ký phê duyệt / chấp thuận
-                                 ▼
-                 ┌───────────────────────────────┐
-                 │   QUYẾT ĐỊNH CÓ HIỆU LỰC      │
-                 └───────────────┬───────────────┘
-                                 │ (4) Ban Tổ chức – Nhân sự phát hành,
-                                 │     lưu hồ sơ, cập nhật dữ liệu gốc,
-                                 │     thông báo các bên thi hành
-                                 ▼
-        KẾ TOÁN (chi trả, hạch toán) ∥ HÀNH CHÍNH (tài sản, chỗ ngồi) ∥
-        TRỢ GIÚP KỸ THUẬT (tài khoản) ∥ NHÓM DỰ ÁN LIÊN QUAN (thi hành)
+```mermaid
+flowchart TD
+    PB["<b>BƯỚC 1: KHỞI PHÁT NHU CẦU & ĐỀ XUẤT</b><br/><i>(Mắt xích CẦU NỐI — Các Phòng ban chuyên môn & Trưởng dự án)</i><br/>• Lập đề xuất: Tuyển dụng, Thử việc, Khen thưởng/Kỷ luật, Thuyên chuyển<br/>• Xác nhận bảng chấm công & đánh giá nhân sự"]
+    
+    TCNS["<b>BƯỚC 2: THẨM ĐỊNH & SOẠN TỜ TRÌNH</b><br/><i>(Mắt xích ĐẦU MỐI — Ban Tổ chức – Hành chính – Nhân sự)</i><br/>• Thẩm định định biên, ngân sách quỹ lương & nội quy lao động<br/>• Soạn Tờ trình tổng hợp kèm số liệu trình Ban Giám đốc"]
+    
+    BGD2["<b>BƯỚC 3: PHÊ DUYỆT TỐI CAO</b><br/><i>(Mắt xích QUYẾT ĐỊNH CUỐI CÙNG — Ban Giám đốc điều hành)</i><br/>• Xem Dashboard số liệu thời gian thực<br/>• Ký phê duyệt điện tử / Yêu cầu điều chỉnh"]
+    
+    QD["<b>BƯỚC 4: BAN HÀNH QUYẾT ĐỊNH & THI HÀNH ĐỒNG LOẠT</b><br/><i>(Ban hành Quyết định chính thức & Ghi vết kiểm toán bất biến)</i>"]
+    
+    EX_KT["<b>Phòng Kế toán:</b><br/>Chi trả lương/thưởng, BHXH & Thuế"]
+    EX_HC["<b>Tổ Hành chính:</b><br/>Cấp/Thu hồi Laptop, bàn ghế, thẻ từ"]
+    EX_IT["<b>IT Helpdesk (ISO 27001):</b><br/>Cấp/Thu hồi Email, Git, VPN, Server"]
+    EX_DU["<b>Nhóm Dự án:</b><br/>Tiếp nhận/Bàn giao công việc"]
+
+    PB -->|"(1) Gửi phiếu đề xuất"| TCNS
+    TCNS -->|"(2) Trình tờ trình"| BGD2
+    BGD2 -->|"(3) Ký phê duyệt"| QD
+    
+    TCNS -.->|"(Hồi tiếp: Yêu cầu bổ sung)"| PB
+    BGD2 -.->|"(Hồi tiếp: Điều chỉnh chỉ tiêu)"| TCNS
+
+    QD --> EX_KT
+    QD --> EX_HC
+    QD --> EX_IT
+    QD --> EX_DU
 ```
 
 _Cách đọc Hình 5:_ chiều dọc từ trên xuống là chiều đi của quyền lực (đề xuất → thẩm định → phê duyệt → thi hành); hai nhánh hồi tiếp (2a) và (2b) là các vòng sửa chữa. Điểm mấu chốt: **mọi đường đều đi qua Ban Tổ chức – Hành chính – Nhân sự, không có đường tắt nào từ phòng bay thẳng lên Giám đốc** — quy tắc nghiệp vụ này sẽ được cài cứng vào bộ máy luồng xử lý của phần mềm.
@@ -330,23 +286,25 @@ Quy trình khởi phát từ đáy cây tổ chức và leo dần lên đỉnh q
 
 Sáu bước trên gắn với từng chủ thể thực hiện như sơ đồ sau:
 
-**Hình 6 — Luồng quy trình tuyển dụng theo chủ thể thực hiện**
+**Hình 6 — Luồng quy trình tuyển dụng và Tiếp nhận nhân sự mới đa bên (Chuẩn dọc A4)**
 
-```
-(1) TRƯỞNG DỰ ÁN ──── Phiếu đề xuất tuyển dụng ────────────────────► BAN TỔ CHỨC – HÀNH CHÍNH – NHÂN SỰ
-(2) BAN TỔ CHỨC ── Thẩm định định biên; xác nhận quỹ lương với PHÒNG TÀI CHÍNH – KẾ TOÁN
-(3) BAN TỔ CHỨC ──── Tờ trình tuyển dụng ─────────────────────────► BAN GIÁM ĐỐC
-(4) BAN GIÁM ĐỐC ─── Ký phê duyệt / điều chỉnh chỉ tiêu ──────────► BAN TỔ CHỨC – HÀNH CHÍNH – NHÂN SỰ
-(5) ỨNG VIÊN ─────── Hồ sơ trực tuyến (email, biểu mẫu) + trực tiếp ► BAN TỔ CHỨC – NHÂN SỰ
-                    (kênh đăng tin: website, LinkedIn, VietnamWorks,
-                     TopCV, báo chí, trường đại học đối tác)
-(6) BAN TỔ CHỨC +    Sàng lọc → phỏng vấn vòng một (kỹ thuật) →
-    TRƯỞNG DỰ ÁN     phỏng vấn vòng hai (với vị trí cao cấp)
-(7) BAN TỔ CHỨC ──── Thông báo kết quả, Thư mời làm việc ─────────► ỨNG VIÊN ĐẠT
-(8) BAN TỔ CHỨC ──── Xếp lương theo thang bảng, chốt ngày nhận việc
-(9) NGÀY NHẬN VIỆC — ba bộ phận đồng loạt:
-    TỔ HỒ SƠ (tiếp nhận hồ sơ gốc) ∥ HÀNH CHÍNH (chỗ ngồi, máy tính) ∥
-    TRỢ GIÚP KỸ THUẬT (tài khoản, quyền truy cập)
+```mermaid
+flowchart TD
+    %% GIAI ĐOẠN 1
+    P1["<b>GIAI ĐOẠN 1: ĐỀ XUẤT & DUYỆT CHỈ TIÊU</b><br/>• Trưởng DA lập Phiếu đề xuất tuyển dụng<br/>• Ban TC–HC–NS thẩm định định biên & quỹ lương<br/>• Phòng Kế toán xác nhận nguồn ngân sách<br/>• Ban Giám đốc ký phê duyệt chỉ tiêu điện tử"]
+    
+    %% GIAI ĐOẠN 2
+    P2["<b>GIAI ĐOẠN 2: ĐĂNG TIN, SÀNG LỌC & PHỎNG VẤN</b><br/>• Ban TC–HC–NS đăng tin đa kênh (LinkedIn, TopCV, VietnamWorks, ĐH)<br/>• Tiếp nhận CV, sơ tuyển & sàng lọc hồ sơ hợp lệ<br/>• Vòng 1: Trưởng DA phỏng vấn chuyên môn kỹ thuật<br/>• Vòng 2: Ban Giám đốc phỏng vấn ứng viên cấp cao / Lead"]
+    
+    %% GIAI ĐOẠN 3
+    P3["<b>GIAI ĐOẠN 3: OFFER & XẾP LƯƠNG</b><br/>• Ban TC–HC–NS xếp lương theo thang bảng chuẩn<br/>• Gửi Thư mời làm việc (Offer Letter) qua hệ thống<br/>• Ứng viên xác nhận đồng ý nhận việc & chốt ngày Onboarding"]
+    
+    %% GIAI ĐOẠN 4
+    P4["<b>GIAI ĐOẠN 4: NGÀY NHẬN VIỆC (KÍCH HOẠT 3 NHÁNH ĐỒNG LOẠT)</b><br/>• <b>Tổ Hồ sơ & HĐLĐ:</b> Tiếp nhận hồ sơ gốc, quét PDF & ký HĐ thử việc<br/>• <b>IT Helpdesk:</b> Cấp Email, Git Repos, VPN, Server (Chuẩn ISO 27001)<br/>• <b>Tổ Hành chính:</b> Bàn giao Laptop, bàn ghế & thẻ từ ra vào<br/>• <b>Nhóm Dự án:</b> Tiếp nhận nhân sự mới, đào tạo hội nhập & giao việc"]
+
+    P1 -->|"(1) Chỉ tiêu được duyệt"| P2
+    P2 -->|"(2) Ứng viên đạt phỏng vấn"| P3
+    P3 -->|"(3) Ứng viên chấp nhận Offer"| P4
 ```
 
 _Bước (9) chính là nơi quy trình giấy hay gãy nhất_ — ba bộ phận phối hợp chỉ bằng lời nhắn qua nhóm trò chuyện nội bộ. Trong thiết kế phần mềm ở Phần Năm, khi nhân viên tuyển dụng bấm "chuyển ứng viên thành nhân viên", hệ thống tự động sinh **ba nhiệm vụ song song** cho ba bộ phận kèm hạn hoàn tất trước ngày nhận việc.
@@ -371,33 +329,58 @@ _Bước (9) chính là nơi quy trình giấy hay gãy nhất_ — ba bộ ph�
 
 Toàn bộ vòng đời kể trên quy về một mô hình trạng thái duy nhất — đây cũng chính là khung thiết kế cho trường trạng thái của bản ghi nhân viên trong cơ sở dữ liệu:
 
-**Hình 7 — Sơ đồ trạng thái vòng đời của một người lao động**
+**Hình 7 — Sơ đồ máy trạng thái vòng đời nhân sự (UML State Machine of Employee Lifecycle)**
 
-```
-        ỨNG VIÊN nhận Thư mời làm việc
-                      │
-                      ▼
-        [ THỬ VIỆC 1 – 3 tháng ]
-          │                 │
-   đánh giá đạt        đánh giá không đạt
-          │                 │
-          ▼                 ▼
-[ LAO ĐỘNG CHÍNH THỨC ]   [ DỪNG HỢP ĐỒNG THỬ VIỆC ]
-          │
-          │ chu kỳ hằng tháng: chấm công → tính lương → chi trả
-          │
-          │ các sự kiện trong quá trình công tác:
-          │  • tăng lương định kỳ / đột xuất
-          │  • thuyên chuyển công tác
-          │  • khen thưởng / kỷ luật
-          │
-     ┌────┴─────────────────────┐
-     ▼                          ▼
-[ NGHỈ HƯU ]              [ THÔI VIỆC ]
-     └────────────┬─────────────┘
-                  ▼
-     [ HỒ SƠ LƯU TRỮ — đã nghỉ ]
-     (toàn bộ lịch sử vẫn tra cứu được)
+```mermaid
+stateDiagram-v2
+    [*] --> CANDIDATE : Ứng viên nộp hồ sơ & Phỏng vấn đạt
+    
+    CANDIDATE --> PROBATION : Nhận Offer & Ký Hợp đồng thử việc (1-3 tháng)
+    
+    state PROBATION {
+        [*] --> InProbation : Thực hiện công việc theo dự án
+        InProbation --> EvalPass : Đánh giá cuối kỳ ĐẠT
+        InProbation --> EvalFail : Đánh giá KHÔNG ĐẠT
+    }
+    
+    EvalFail --> TERMINATED_PROBATION : Dừng hợp đồng thử việc
+    TERMINATED_PROBATION --> ARCHIVED : Chuyển hồ sơ vào kho lưu trữ
+    
+    EvalPass --> ACTIVE_OFFICIAL : Ký Hợp đồng lao động chính thức & Xếp lương
+    
+    state ACTIVE_OFFICIAL {
+        [*] --> NormalWorking : Làm việc & Chấm công hằng tháng
+        
+        NormalWorking --> PerformanceReview : Chu kỳ đánh giá hiệu suất 6 tháng
+        PerformanceReview --> SalaryAdjustment : Tăng lương định kỳ / Đột xuất
+        SalaryAdjustment --> NormalWorking : Cập nhật mức lương mới
+        
+        NormalWorking --> InternalTransfer : Quyết định điều động / Thuyên chuyển
+        InternalTransfer --> NormalWorking : Cập nhật đơn vị mới (TP.HCM ↔ Đà Nẵng)
+        
+        NormalWorking --> Rewarded : Quyết định khen thưởng thành tích
+        Rewarded --> NormalWorking : Đồng bộ tiền thưởng vào bảng lương
+        
+        NormalWorking --> Disciplined : Biên bản & Quyết định kỷ luật
+        Disciplined --> NormalWorking : Khấu trừ chế độ / Cảnh cáo
+    }
+    
+    ACTIVE_OFFICIAL --> RETIRED : Đủ tuổi nghỉ hưu theo quy định
+    ACTIVE_OFFICIAL --> RESIGNED : Nộp đơn xin thôi việc & Báo trước đủ ngày
+    
+    RETIRED --> OFFBOARDING : Kích hoạt quy trình bàn giao 4 bên
+    RESIGNED --> OFFBOARDING : Kích hoạt quy trình bàn giao 4 bên
+    
+    state OFFBOARDING {
+        [*] --> HandoverWork : (1) Bàn giao công việc cho Trưởng DA
+        HandoverWork --> ReturnAsset : (2) Trả tài sản, máy tính cho Hành chính
+        ReturnAsset --> RevokeAccess : (3) IT thu hồi toàn bộ tài khoản (ISO 27001)
+        RevokeAccess --> FinalPayroll : (4) Kế toán quyết toán công nợ & lương cuối
+    }
+    
+    OFFBOARDING --> ARCHIVED : Ban hành Quyết định thôi việc, trả sổ BHXH & Đóng băng hồ sơ
+    
+    ARCHIVED --> [*] : Hồ sơ bất biến (Tra cứu lịch sử & Kiểm toán)
 ```
 
 _Ghi chú phân tích kèm Hình 7:_ mỗi mũi tên chuyển trạng thái phải đi kèm một **sự kiện pháp lý bắt buộc** — vào thử việc phải có hợp đồng thử việc; chuyển chính thức phải có phiếu đánh giá và quyết định xếp lương; rời trạng thái "đang làm" phải qua trọn bộ checklist bàn giao (Trưởng dự án – Hành chính – Trợ giúp kỹ thuật – Kế toán). Phần mềm sẽ cấm chuyển trạng thái nếu thiếu bằng chứng đầu vào — đó là cách số hóa "buộc tuân thủ thủ tục" chứ không chỉ số hóa mẫu biểu.
@@ -414,36 +397,29 @@ Chiến lược cải tiến tuân theo triết lý kinh điển của xây dự
 
 - Kiến trúc ứng dụng web ba tầng (giao diện – xử lý nghiệp vụ – cơ sở dữ liệu) kèm ứng dụng di động cho kênh **tự phục vụ của người lao động** (xin nghỉ phép, xem bảng lương, cập nhật thông tin cá nhân ngay trên điện thoại);
 - **Cơ cấu tổ chức là dữ liệu cấu hình, không phải mã nguồn:** cây phòng ban, chức danh, định biên được mô hình hóa thành bảng dữ liệu quan hệ cha – con; khi Saigon Technology mở thêm trung tâm phát triển mới hay tách nhóm dự án, quản trị viên tự chỉnh cây tổ chức trên màn hình mà không cần lập trình viên can thiệp — hiện thực hóa đúng nguyên lý "mỗi đơn vị có cơ cấu chức năng riêng";
-- **Phân quyền theo vai trò:** mỗi vai (người lao động, Trưởng dự án, tổ tuyển dụng, tổ hồ sơ, kế toán tiền lương, Giám đốc) nhìn thấy đúng màn hình và đúng phạm vi dữ liệu của mình; quyền gắn theo vị trí trong cây tổ chức nên khi nhân viên thuyên chuyển, hệ thống tự đổi quyền theo đơn vị mới — các vai này chính là sáu thẻ chức năng đã chuẩn hóa ở Hình 4;
+- **Phân quyền theo vai trò:** mỗi vai (người lao động, Trưởng dự án, tổ tuyển dụng, tổ hồ sơ, kế toán tiền lương, Giám đốc) nhìn thấy đúng màn hình và đúng phạm vi dữ liệu của mình; quyền gắn theo vị trí trong cây tổ chức nên khi nhân viên thuyên chuyển, hệ thống tự đổi quyền theo đơn vị mới — các vai này chính là sáu nhóm vai trò đã chuẩn hóa ở Hình 4;
 - **Bộ máy luồng xử lý cấu hình được:** luồng chuẩn _phòng ban → Ban Tổ chức – Hành chính – Nhân sự → Ban Giám đốc_ (đã mô hình hóa ở Hình 5) được cài đặt một lần và tái sử dụng cho mọi loại đề xuất; mỗi bước ghi dấu thời gian, người xử lý, ý kiến; hỗ trợ ký điện tử để Giám đốc duyệt từ xa — xóa sổ điểm nghẽn "chờ tờ trình in giấy";
 - **Một nguồn dữ liệu gốc dùng chung:** mọi phân hệ đọc và ghi trên cùng một cơ sở dữ liệu nhân viên trung tâm, triệt tiêu tình trạng ba bảng Excel ba con số không khớp nhau.
 
 Toàn cảnh các phân hệ theo ba tầng và chiều chảy dữ liệu giữa chúng được khái quát như sau:
 
-**Hình 8 — Kiến trúc phân hệ HRMIS ba mức độ gắn với vai sử dụng**
+**Hình 8 — Kiến trúc phân hệ HRMIS 3 cấp độ và luồng dữ liệu thông minh (Chuẩn dọc A4)**
 
-```
-┌───────────────── TẦNG TRÍ TUỆ NHÂN TẠO — HỆ CHUYÊN GIA (Mức độ 3) ────────────────┐
-│  Dự báo nhu cầu nhân lực  │  Dự đoán rủi ro nghỉ việc  │  Kế hoạch đào tạo –      │
-│  Tư vấn kế nhiệm          │  Mô phỏng kịch bản what-if │  phát triển đội ngũ      │
-└──────────────────────────────────────▲─────────────────────────────────────────────┘
-                                       │ kho dữ liệu tổng hợp
-┌───────────────── TẦNG TÍNH TOÁN – THỐNG KÊ (Mức độ 2) ────────────────────────────┐
-│  Chấm công  │  Bộ máy tính lương  │  Bảo hiểm – thuế  │  Thống kê – báo cáo       │
-│  Bảng điều khiển điều hành cho Ban Giám đốc                                        │
-└──────────────────────────────────────▲─────────────────────────────────────────────┘
-                                       │ dữ liệu sự kiện có cấu trúc
-┌───────────────── TẦNG TÁC NGHIỆP (Mức độ 1) ──────────────────────────────────────┐
-│  Hồ sơ nhân sự điện tử (kèm mượn – trả bản gốc) │  Cơ cấu tổ chức – vị trí việc làm│
-│  Tuyển dụng  │  Thử việc – Xếp lương            │  Thuyên chuyển công tác          │
-│  Khen thưởng – Kỷ luật                           │  Nghỉ hưu – Nghỉ việc            │
-│  Kênh tự phục vụ của người lao động (ứng dụng di động)                             │
-└──────────────────────────────────────▲─────────────────────────────────────────────┘
-                                       │
-              ┌────────────────────────┴────────────────────────┐
-              │   CƠ SỞ DỮ LIỆU GỐC DÙNG CHUNG (MASTER DATA)    │
-              │   Nhân viên – Cây tổ chức – Vai trò – Quyền     │
-              └─────────────────────────────────────────────────┘
+```mermaid
+flowchart BT
+    DB["<b>CƠ SỞ DỮ LIỆU GỐC DÙNG CHUNG (MASTER DATA REPOSITORY)</b><br/>Hồ sơ Nhân viên · Cây Tổ chức động · Vị trí việc làm · Phân quyền RBAC · Nhật ký Kiểm toán"]
+
+    LEVEL1["<b>CẤP ĐỘ 1 — SỐ HÓA TÁC NGHIỆP LIÊN PHÒNG BAN</b><br/>• Hồ sơ nhân sự điện tử (Kèm mượn–trả văn bằng gốc & mã tủ/ngăn)<br/>• Ống dẫn Tuyển dụng đa kênh · Thử việc & Xếp lương<br/>• Thuyên chuyển TP.HCM ↔ Đà Nẵng · Khen thưởng & Kỷ luật<br/>• Nghỉ hưu & Thôi việc ISO 27001 · Kênh tự phục vụ Mobile"]
+
+    LEVEL2["<b>CẤP ĐỘ 2 — TÍNH TOÁN TỰ ĐỘNG, BẢO HIỂM, THUẾ & BÁO CÁO</b><br/>• Chấm công đa nguồn (Vân tay, Khuôn mặt, Kiosk QR)<br/>• Bộ máy Tính lương tự động (C&B Payroll Engine)<br/>• Khai báo Bảo hiểm xã hội điện tử & Quyết toán Thuế TNCN<br/>• Bảng điều khiển Điều hành thời gian thực cho Ban Giám đốc"]
+
+    LEVEL3["<b>CẤP ĐỘ 3 — HỆ CHUYÊN GIA TRÍ TUỆ NHÂN TẠO (AI ENGINE)</b><br/>• Dự báo nhu cầu nhân lực & Cảnh báo thiếu hụt kỹ năng DA<br/>• Dự đoán rủi ro nghỉ việc (Employee Turnover Risk Score)<br/>• Kế hoạch Đào tạo cá nhân hóa & Dự báo tụt hậu công nghệ<br/>• Tư vấn Kế nhiệm vị trí trọng yếu & Mô phỏng kịch bản What-If"]
+
+    DB ==> LEVEL1
+    LEVEL1 ==>|"Dữ liệu sự kiện & biến động có cấu trúc"| LEVEL2
+    LEVEL2 ==>|"Kho dữ liệu tổng hợp & Lịch sử hành vi"| LEVEL3
+
+    LEVEL3 -.->|"Kích hoạt chỉ tiêu tuyển mới"| LEVEL1
 ```
 
 Chiều mũi tên hướng **từ dưới lên** là chiều chảy của dữ liệu — tầng tác nghiệp sinh sự kiện, tầng tính toán chế biến sự kiện thành con số, tầng trí tuệ nhân tạo học từ con số để dự báo; chiều ngược lại là chiều trả kết quả dưới dạng thẻ khuyến nghị hiển thị ngay trên bảng điều khiển của từng vai. Ba mục tiếp theo đi sâu vào từng tầng.
@@ -525,5 +501,3 @@ Sau hai đến ba năm vận hành, hệ thống tích lũy được nền dữ 
 
 - Kế hoạch kế nhiệm: ghép dữ liệu nghỉ hưu (tuổi luật định) với điểm rủi ro nghỉ việc và mức độ sẵn sàng kế nhiệm, hệ chuyên gia cảnh báo: "Trong hai mươi bốn tháng tới, khối Chuyển giao Dự án có ba Trưởng dự án đến tuổi hoặc có nguy cơ nghỉ, hiện chỉ có một ứng viên kế nhiệm sẵn sàng → đề xuất luân chuyển và đào tạo thêm hai ứng viên ngay";
 - Mô phỏng kịch bản giả định: "Nếu tăng nền lương tám phần trăm năm tới, quỹ lương tăng bao nhiêu và tỷ lệ nghỉ việc dự báo giảm bao nhiêu?" — đưa công cụ ra quyết định dựa trên dữ liệu vào tay Giám đốc thay vì cảm tính.
-
-Về kỹ thuật, tầng trí tuệ nhân tạo không phải khối đen tách rời: nó tiêu thụ dữ liệu từ các phân hệ mức một và mức hai qua kho dữ liệu tổng hợp, chạy tính toán định kỳ, và trả kết quả về dạng **thẻ khuyến nghị** ngay trên bảng điều khiển của từng vai đã định nghĩa ở Hình 4 — Trưởng dự án thấy cảnh báo rủi ro đội ngũ của mình, Ban Tổ chức – Hành chính – Nhân sự thấy kế hoạch tuyển và đào tạo, Giám đốc thấy dự báo nhân lực và ngân sách. Mọi khuyến nghị đều kèm **lý do suy diễn** (những dấu hiệu nào dẫn tới kết luận), bảo đảm người quản lý kiểm soát được, đúng tinh thần một hệ chuyên gia minh bạch chứ không phải hộp đen.

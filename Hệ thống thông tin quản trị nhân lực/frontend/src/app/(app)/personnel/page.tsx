@@ -13,7 +13,7 @@ import { Eye } from 'lucide-react';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface ActionRow {
   id: string; type: keyof typeof ACTION_TYPE_LABEL;
@@ -120,10 +120,9 @@ export default function PersonnelActionsPage() {
         title="Biến động nhân sự"
         description="Thuyên chuyển · Điều chỉnh lương · Khen thưởng – kỷ luật · Thôi việc — một luồng duyệt dùng chung."
         actions={
-          <>
-            <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Tạo đề xuất</Button>
-            <PrintButton label="In báo cáo" />
-          </>
+          <Button size="sm" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4" /> Tạo đề xuất
+          </Button>
         }
       />
 
@@ -143,7 +142,8 @@ export default function PersonnelActionsPage() {
           rows={tab === 'all' ? (allQ.data ?? []) : (mineQ.data ?? [])}
           rowKey={(r) => r.id}
           loading={tab === 'all' ? allQ.isLoading : mineQ.isLoading}
-          exportFilename="bien-dong-nhan-su"
+          exportFilename="danh-sach-bien-dong-nhan-su"
+          printLabel="In báo cáo biến động"
           searchFields={(r) => [r.subject?.fullName ?? '', r.payload?.reason ?? '', ACTION_TYPE_LABEL[r.type] ?? '']}
           filters={[
             { key: 'type', label: 'Loại', value: (r) => r.type, options: Object.entries(ACTION_TYPE_LABEL).map(([value, label]) => ({ value, label })) },
@@ -154,7 +154,6 @@ export default function PersonnelActionsPage() {
           emptyTitle="Chưa có đề xuất nào"
           emptyHint="Tạo đề xuất biến động nhân sự đầu tiên."
           actions={(r): RowActionItem[] => [
-            // "Xem chi tiết" LUÔN có mặt — kebab không bao giờ trống (Mục 8)
             { label: 'Xem chi tiết đề xuất', icon: Eye, onSelect: () => setDetail(r) },
             ...(isAdmin && r.status === 'PENDING' ? [
               'separator' as const,
@@ -163,6 +162,7 @@ export default function PersonnelActionsPage() {
             ] : []),
           ]}
         />
+        <PrintSignatureBlock leftTitle="Người lập đề xuất" middleTitle="Trưởng phòng HC-NS" rightTitle="Tổng Giám đốc" />
       </div>
 
       {/* Modal chi tiết đề xuất — xem đầy đủ nội dung, hiệu lực, ghi quyết định */}

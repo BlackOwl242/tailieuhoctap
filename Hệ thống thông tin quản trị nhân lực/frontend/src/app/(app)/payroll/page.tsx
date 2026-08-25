@@ -11,7 +11,7 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, 
 import { DataTable, type DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface PeriodRow {
   id: string; month: number; year: number;
@@ -130,16 +130,23 @@ export default function PayrollPage() {
         title="Lương"
         description="Chu trình kỳ lương: Khóa công → Tính → Đối chiếu → Duyệt & khóa bất biến → Phiếu lương điện tử."
         actions={
-          <>
-            {isHr ? <Button size="sm" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" /> Tạo kỳ lương</Button> : null}
-            <PrintButton label={tab === 'periods' ? 'In bảng lương' : 'In phiếu lương'} />
-          </>
+          isHr ? (
+            <Button size="sm" onClick={() => setCreateOpen(true)}>
+              <Plus className="h-4 w-4" /> Tạo kỳ lương
+            </Button>
+          ) : null
         }
       />
 
       <div className="no-print mb-3 flex gap-2">
-        <Button size="sm" variant={tab === 'mine' ? 'default' : 'outline'} onClick={() => setTab('mine')}>Phiếu lương của tôi</Button>
-        {isHr ? <Button size="sm" variant={tab === 'periods' ? 'default' : 'outline'} onClick={() => setTab('periods')}>Kỳ lương & bảng lương</Button> : null}
+        <Button size="sm" variant={tab === 'mine' ? 'default' : 'outline'} onClick={() => setTab('mine')}>
+          Phiếu lương của tôi
+        </Button>
+        {isHr ? (
+          <Button size="sm" variant={tab === 'periods' ? 'default' : 'outline'} onClick={() => setTab('periods')}>
+            Kỳ lương & bảng lương
+          </Button>
+        ) : null}
       </div>
 
       {tab === 'periods' ? (
@@ -149,7 +156,8 @@ export default function PayrollPage() {
             rows={periodsQ.data ?? []}
             rowKey={(r) => r.id}
             loading={periodsQ.isLoading}
-            exportFilename="ky-luong"
+            exportFilename="danh-sach-ky-luong"
+            printLabel="In danh sách kỳ lương"
             searchFields={(r) => [`${r.month}/${r.year}`]}
             emptyTitle="Chưa có kỳ lương nào"
             emptyHint="Tạo kỳ lương cho tháng cần chi trả."
@@ -158,29 +166,40 @@ export default function PayrollPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="flex items-center gap-2"><Wallet className="h-4 w-4" />
+                  <span className="flex items-center gap-2">
+                    <Wallet className="h-4 w-4" />
                     Bảng lương {selectedPeriodRow ? `${String(selectedPeriodRow.month).padStart(2, '0')}/${selectedPeriodRow.year}` : ''}
                   </span>
-                  <Button size="sm" variant="ghost" onClick={() => setSelectedPeriod(null)}>Đóng</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setSelectedPeriod(null)}>
+                    Đóng
+                  </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {periodSlipsQ.isLoading ? <Skeleton className="h-40" /> : periodSlipsQ.isError ? (
+                {periodSlipsQ.isLoading ? (
+                  <Skeleton className="h-40" />
+                ) : periodSlipsQ.isError ? (
                   <ErrorState message={errorMessage(periodSlipsQ.error)} onRetry={() => periodSlipsQ.refetch()} />
                 ) : (
                   <div className="print-area">
                     <PrintFrame
                       title="BẢNG LƯƠNG THÁNG"
-                      subtitle={selectedPeriodRow ? `Kỳ ${String(selectedPeriodRow.month).padStart(2, '0')}/${selectedPeriodRow.year} — ${PAYROLL_STATUS_LABEL[selectedPeriodRow.status] ?? ''}` : ''}
+                      subtitle={
+                        selectedPeriodRow
+                          ? `Kỳ ${String(selectedPeriodRow.month).padStart(2, '0')}/${selectedPeriodRow.year} — ${PAYROLL_STATUS_LABEL[selectedPeriodRow.status] ?? ''}`
+                          : ''
+                      }
                     />
                     <DataTable
                       columns={slipColumns}
                       rows={periodSlipsQ.data ?? []}
                       rowKey={(r) => r.id}
                       exportFilename={`bang-luong-ky-${selectedPeriodRow?.month ?? ''}-${selectedPeriodRow?.year ?? ''}`}
+                      printLabel="In bảng lương"
                       searchFields={(r) => [r.user?.fullName ?? '', r.user?.employeeCode ?? '']}
                       emptyTitle="Chưa tính lương cho kỳ này"
                     />
+                    <PrintSignatureBlock leftTitle="Người lập biểu" middleTitle="Kế toán trưởng" rightTitle="Giám đốc duyệt chi" />
                   </div>
                 )}
               </CardContent>
@@ -199,11 +218,13 @@ export default function PayrollPage() {
               rowKey={(r) => r.id}
               loading={myQ.isLoading}
               exportFilename="phieu-luong-cua-toi"
+              printLabel="In phiếu lương"
               searchFields={(r) => [r.period ? `${r.period.month}/${r.period.year}` : '']}
               emptyTitle="Chưa có phiếu lương"
               emptyHint="Phiếu lương sẽ xuất hiện sau khi bộ phận tiền lương tính kỳ đầu tiên."
             />
           )}
+          <PrintSignatureBlock leftTitle="Người nhận lương" middleTitle="Kế toán tiền lương" rightTitle="Trưởng phòng HC-NS" />
         </div>
       )}
 

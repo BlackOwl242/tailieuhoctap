@@ -12,7 +12,7 @@ import { Badge, Button, Input, Label, Textarea } from '@/components/ui/primitive
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface CourseRow {
   id: string; title: string; description: string | null;
@@ -80,10 +80,13 @@ export default function TrainingPage() {
       </span>
     ) },
     { key: 'count', header: 'Ghi danh', render: (r) => `${r._count?.enrollments ?? 0}${r.capacity ? `/${r.capacity}` : ''}` },
-    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => <Badge className={TONE[r.status]}>{COURSE_STATUS_LABEL[r.status] ?? r.status}</Badge> },
-    { key: 'mine', header: 'Của tôi', render: (r) => r.enrollments?.[0] ? (
-      <Badge variant="secondary">{ENROLLMENT_STATUS_LABEL[r.enrollments[0].status] ?? r.enrollments[0].status}</Badge>
-    ) : '—' },
+    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => <Badge className={TONE[r.status]}>{COURSE_STATUS_LABEL[r.status] ?? r.status}</Badge>, exportValue: (r) => COURSE_STATUS_LABEL[r.status] ?? r.status },
+    {
+      key: 'mine',
+      header: 'Của tôi',
+      noPrint: true,
+      render: (r) => (r.enrollments?.[0] ? <Badge variant="secondary">{ENROLLMENT_STATUS_LABEL[r.enrollments[0].status] ?? r.enrollments[0].status}</Badge> : '—'),
+    },
   ];
 
   return (
@@ -92,28 +95,31 @@ export default function TrainingPage() {
         title="Đào tạo"
         description="Kế hoạch đào tạo cá nhân hóa — chủ động phát triển đội ngũ thay vì phản ứng bị động."
         actions={
-          <>
-            {isHr ? <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Tạo khóa học</Button> : null}
-            <PrintButton label="In danh sách" />
-          </>
+          isHr ? (
+            <Button size="sm" onClick={() => setOpen(true)}>
+              <Plus className="h-4 w-4" /> Tạo khóa học
+            </Button>
+          ) : null
         }
       />
 
       <div className="print-area">
         <PrintFrame title="DANH SÁCH KHÓA ĐÀO TẠO" />
-        {q.isError ? <ErrorState message={errorMessage(q.error)} onRetry={() => q.refetch()} /> : (
+        {q.isError ? (
+          <ErrorState message={errorMessage(q.error)} onRetry={() => q.refetch()} />
+        ) : (
           <DataTable
             columns={columns}
             rows={q.data ?? []}
             rowKey={(r) => r.id}
             loading={q.isLoading}
-            exportFilename="khoa-dao-tao"
+            exportFilename="danh-sach-khoa-dao-tao"
+            printLabel="In danh sách khóa học"
             searchFields={(r) => [r.title, r.description ?? '']}
             filters={[{ key: 'status', label: 'Trạng thái', value: (r) => r.status, options: Object.entries(COURSE_STATUS_LABEL).map(([value, label]) => ({ value, label })) }]}
             emptyTitle="Chưa có khóa đào tạo nào"
             actions={(r): RowActionItem[] => {
               const mine = r.enrollments?.[0];
-              // "Xem chi tiết" LUÔN có mặt — kebab không bao giờ trống (Mục 8)
               const items: RowActionItem[] = [{ label: 'Xem chi tiết khóa học', icon: Eye, onSelect: () => setDetail(r) }];
               if (mine?.status === 'ENROLLED') {
                 items.push('separator', { label: 'Rút khỏi khóa học', icon: LogOut, danger: true, onSelect: () => drop.mutate(r.id) });
@@ -124,6 +130,7 @@ export default function TrainingPage() {
             }}
           />
         )}
+        <PrintSignatureBlock leftTitle="Người lập danh sách" middleTitle="Trưởng ban Đào tạo" rightTitle="Giám đốc điều hành" />
       </div>
 
       {/* Modal chi tiết khóa học */}

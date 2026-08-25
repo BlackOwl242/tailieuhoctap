@@ -12,7 +12,7 @@ import { Badge, Button, Input, Label, Select, Textarea } from '@/components/ui/p
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 import { MarkdownViewer } from '@/components/common/markdown-viewer';
 
 interface DocumentRow {
@@ -85,26 +85,60 @@ export default function DocumentsPage() {
   }
 
   const columns: DataColumn<DocumentRow>[] = [
-    { key: 'title', header: 'Tài liệu', sortable: true, render: (r) => (
-      <span>
-        <span className="flex items-center gap-1.5 font-medium"><FileText className="h-4 w-4 shrink-0 text-primary" /> {r.title}</span>
-        <span className="block text-xs text-muted-foreground">Phiên bản {r.version} · {r.uploader?.fullName ?? ''} · {formatDate(r.updatedAt)}</span>
-      </span>
-    ) },
-    { key: 'category', header: 'Danh mục', sortable: true, render: (r) => <Badge variant="secondary">{DOCUMENT_CATEGORY_LABEL[r.category] ?? r.category}</Badge> },
+    {
+      key: 'title',
+      header: 'Tài liệu',
+      sortable: true,
+      render: (r) => (
+        <span>
+          <span className="flex items-center gap-1.5 font-medium">
+            <FileText className="h-4 w-4 shrink-0 text-primary" />
+            {r.title}
+          </span>
+          <span className="block text-xs text-muted-foreground">
+            Phiên bản {r.version} · {r.uploader?.fullName ?? ''} · {formatDate(r.updatedAt)}
+          </span>
+        </span>
+      ),
+      exportValue: (r) => `${r.title} (v${r.version})`,
+    },
+    {
+      key: 'category',
+      header: 'Danh mục',
+      sortable: true,
+      render: (r) => <Badge variant="secondary">{DOCUMENT_CATEGORY_LABEL[r.category] ?? r.category}</Badge>,
+      exportValue: (r) => DOCUMENT_CATEGORY_LABEL[r.category] ?? r.category,
+    },
     { key: 'processArea', header: 'Quy trình', sortable: true, render: (r) => r.processArea ?? '—' },
-    { key: 'tags', header: 'Thẻ', render: (r) => (
-      <span className="flex flex-wrap gap-1">{r.tags.map((t) => <Badge key={t} variant="outline">{t}</Badge>)}</span>
-    ) },
-    { key: 'file', header: 'Xem / Tải', render: (r) => r.fileUrl ? (
-      <a href={r.fileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-        <Download className="h-4 w-4" /> Tải xuống
-      </a>
-    ) : r.contentMd ? (
-      <button type="button" onClick={() => setDetail(r)} className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-        <FileText className="h-4 w-4" /> Nội dung số
-      </button>
-    ) : '—' },
+    {
+      key: 'tags',
+      header: 'Thẻ',
+      noPrint: true,
+      render: (r) => (
+        <span className="flex flex-wrap gap-1">
+          {r.tags.map((t) => (
+            <Badge key={t} variant="outline">{t}</Badge>
+          ))}
+        </span>
+      ),
+    },
+    {
+      key: 'file',
+      header: 'Xem / Tải',
+      noPrint: true,
+      render: (r) =>
+        r.fileUrl ? (
+          <a href={r.fileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+            <Download className="h-4 w-4" /> Tải xuống
+          </a>
+        ) : r.contentMd ? (
+          <button type="button" onClick={() => setDetail(r)} className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+            <FileText className="h-4 w-4" /> Nội dung số
+          </button>
+        ) : (
+          '—'
+        ),
+    },
   ];
 
   return (
@@ -113,30 +147,38 @@ export default function DocumentsPage() {
         title="Tài liệu"
         description="Kho tài liệu các quy trình quản trị nhân sự: chính sách, biểu mẫu, quyết định, quy trình nghiệp vụ."
         actions={
-          <>
-            {isHr ? <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Thêm tài liệu</Button> : null}
-            <PrintButton label="In danh mục" />
-          </>
+          isHr ? (
+            <Button size="sm" onClick={() => setOpen(true)}>
+              <Plus className="h-4 w-4" /> Thêm tài liệu
+            </Button>
+          ) : null
         }
       />
 
       <div className="print-area">
         <PrintFrame title="DANH MỤC TÀI LIỆU QUẢN TRỊ NHÂN LỰC" />
-        {q.isError ? <ErrorState message={errorMessage(q.error)} onRetry={() => q.refetch()} /> : (
+        {q.isError ? (
+          <ErrorState message={errorMessage(q.error)} onRetry={() => q.refetch()} />
+        ) : (
           <DataTable
             columns={columns}
             rows={q.data ?? []}
             rowKey={(r) => r.id}
             loading={q.isLoading}
-            exportFilename="tai-lieu"
+            exportFilename="danh-muc-tai-lieu"
+            printLabel="In danh mục"
             searchFields={(r) => [r.title, r.description ?? '', r.processArea ?? '', r.tags.join(' ')]}
             filters={[
-              { key: 'category', label: 'Danh mục', value: (r) => r.category, options: Object.entries(DOCUMENT_CATEGORY_LABEL).map(([value, label]) => ({ value, label })) },
+              {
+                key: 'category',
+                label: 'Danh mục',
+                value: (r) => r.category,
+                options: Object.entries(DOCUMENT_CATEGORY_LABEL).map(([value, label]) => ({ value, label })),
+              },
             ]}
             emptyTitle="Chưa có tài liệu nào"
             emptyHint="Thêm chính sách, biểu mẫu, quy trình để toàn công ty dùng chung một nguồn."
             actions={(r): RowActionItem[] => [
-              // "Xem chi tiết" LUÔN có mặt — kebab không bao giờ trống (Mục 8)
               { label: 'Xem chi tiết tài liệu', icon: Eye, onSelect: () => setDetail(r) },
               ...(r.fileUrl ? [{ label: 'Tải tập tin đính kèm', icon: Download, onSelect: () => window.open(r.fileUrl!, '_blank') }] : []),
               ...(r.contentMd ? [{ label: 'Tải nội dung (.md)', icon: FileDown, onSelect: () => downloadContentMd(r) }] : []),
@@ -144,6 +186,7 @@ export default function DocumentsPage() {
             ]}
           />
         )}
+        <PrintSignatureBlock leftTitle="Người lập danh mục" middleTitle="Trưởng Ban Nhân sự" rightTitle="Giám đốc điều hành" />
       </div>
 
       {/* Modal chi tiết tài liệu — mô tả, phân loại, thẻ, tập tin */}

@@ -61,72 +61,138 @@
 }
 
 /* ==========================================================================
- * LỚP IN ẤN (Mục 8) — mọi phiếu/báo cáo bọc trong .print-area:
- * - Khi in: ẩn toàn bộ ứng dụng (sidebar, topbar, bottom-nav, nút bấm),
- *   chỉ .print-area hiển thị, đặt absolute full trang;
- * - .print-only: chỉ hiện khi in (khung tiêu đề phiếu: logo, thời gian in).
+ * LỚP IN ẤN — ĐỊNH DẠNG VĂN BẢN HÀNH CHÍNH THUẦN TÚY
+ * - Khi in: ẩn toàn bộ thanh điều hướng, nút bấm, avatar, icon, và cột thao tác;
+ * - Nội dung trong .print-area in ra thành văn bản thuần màu đen, chữ rõ ràng;
+ * - Bảng in có viền nét đơn chuẩn hành chính, không bo tròn, không đổ bóng;
+ * - Badge / nhãn màu tự động chuyển thành văn bản chữ thuần.
  * ========================================================================== */
 @media print {
   @page {
-    size: A4;
-    margin: 14mm;
+    size: A4 portrait;
+    margin: 15mm 12mm 15mm 12mm;
   }
-  /* Mục 6 — bản in thuần báo cáo: loại bỏ HOÀN TOÀN khung ứng dụng web
-     (sidebar, topbar, bottom-nav, nút bấm, dropdown, phân trang…) */
+
+  /* Ẩn toàn bộ thành phần điều hướng / giao diện web */
   aside,
   header,
   nav,
-  .no-print {
+  button,
+  .no-print,
+  [data-no-print] {
     display: none !important;
   }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: "Times New Roman", Times, serif, "Segoe UI", Arial, sans-serif !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   body * {
     visibility: hidden;
   }
+
   .print-area,
   .print-area * {
     visibility: visible;
   }
+
   .print-area {
-    position: absolute !important;
-    inset: 0 auto auto 0;
-    width: 100%;
-    padding: 0;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
     box-shadow: none !important;
     border: none !important;
+    background: transparent !important;
   }
+
   .print-only {
     display: block !important;
+    visibility: visible !important;
   }
+
+  /* Định dạng Bảng in thuần văn bản hành chính */
   .print-area table {
-    width: 100%;
-    border-collapse: collapse;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    margin-top: 10px !important;
+    margin-bottom: 20px !important;
+    font-size: 10pt !important;
+    color: #000000 !important;
   }
-  /* Nút sắp xếp ở tiêu đề cột → in thành CHỮ tiêu đề trần như báo cáo doanh nghiệp */
+
+  .print-area th {
+    border: 1px solid #000000 !important;
+    background-color: #f2f2f2 !important;
+    color: #000000 !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    padding: 6px 8px !important;
+    text-align: left !important;
+    font-size: 9.5pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   .print-area th button {
-    all: unset;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.05em;
-    color: inherit;
-    cursor: default;
+    all: unset !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    color: #000000 !important;
+    cursor: default !important;
   }
-  .print-area th button svg {
-    display: none;
-  }
-  .print-area th,
+
   .print-area td {
-    border: 1px solid #cbd5e1;
-    padding: 6px 8px;
-    text-align: left;
-    font-size: 12px;
+    border: 1px solid #000000 !important;
+    padding: 6px 8px !important;
+    color: #000000 !important;
+    background: transparent !important;
+    font-size: 9.5pt !important;
+    vertical-align: middle !important;
   }
-  .print-area thead {
-    background: #f1f5f9 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+
+  /* Khử style Badge thành chữ thuần khi in */
+  .print-area [class*="badge"],
+  .print-area .badge,
+  .print-area span[class*="rounded"] {
+    background: transparent !important;
+    border: none !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    font-weight: normal !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: inline !important;
+  }
+
+  /* Ẩn tất cả SVG icon trong bảng và nội dung khi in */
+  .print-area svg {
+    display: none !important;
+  }
+
+  /* Loại bỏ khung bo góc / đổ bóng của card khi in */
+  .print-area .rounded-lg,
+  .print-area .rounded-xl,
+  .print-area .rounded-2xl,
+  .print-area .border {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Đảm bảo bảng không bị ngắt dòng xé chữ giữa các trang */
+  .print-area tr {
+    page-break-inside: avoid;
   }
 }
+
 .print-only {
   display: none;
 }

@@ -171,15 +171,6 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
           </>
         ) : null}
 
-        <div className="mt-auto pt-4">
-          <Link href="/profile" className="flex items-center gap-2 rounded-md px-2 py-2 hover:bg-accent">
-            <UserCircle2 className="h-8 w-8 text-muted-foreground" />
-            <span className="min-w-0">
-              <span className="block truncate text-sm font-medium">{profile.fullName}</span>
-              <span className="block truncate text-xs text-muted-foreground">{profile.jobTitle ?? profile.email}</span>
-            </span>
-          </Link>
-        </div>
       </aside>
 
       {/* ================= TOPBAR (sticky, mọi màn hình) ================= */}

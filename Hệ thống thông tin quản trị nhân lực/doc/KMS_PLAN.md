@@ -251,6 +251,38 @@ Bảng dưới đây là cầu nối trực tiếp "tài liệu → chức năng
 
 ## 4. KIẾN TRÚC TỔNG THỂ VÀ LUỒNG DỮ LIỆU
 
+### 4.0. Sơ đồ cơ cấu tổ chức doanh nghiệp và phân vùng phân hệ
+
+```mermaid
+graph TD
+    %% TẦNG 1: QUẢN TRỊ SỞ HỮU & BAN ĐIỀU HÀNH
+    DHDCD["<b>ĐẠI HỘI ĐỒNG CỔ ĐÔNG</b><br/><i>(Cơ quan quyền lực cao nhất)</i>"]
+    HDQT["<b>HỘI ĐỒNG QUẢN TRỊ</b><br/><i>(Quản trị chiến lược công ty)</i>"]
+    BGD["<b>BAN GIÁM ĐỐC ĐIỀU HÀNH</b><br/>(Tổng Giám đốc CEO · COO · CTO · CFO · CBO)"]
+
+    DHDCD --> HDQT
+    HDQT --> BGD
+
+    %% TẦNG 2: 5 KHỐI / PHÒNG BAN CHỨC NĂNG (CÙNG CẤP NGANG HÀNG NHAU)
+    BGD --> K_DEL["<b>KHỐI CHUYỂN GIAO DỰ ÁN</b><br/>(Delivery Director & RMO)"]
+    BGD --> K_BIZ["<b>KHỐI KINH DOANH & MKT</b><br/>(Giám đốc Kinh doanh CBO)"]
+    BGD --> K_TECH["<b>KHỐI CÔNG NGHỆ & IT</b><br/>(Giám đốc Công nghệ CTO)"]
+    BGD --> K_HR["<b>BAN TC – HC – NHÂN SỰ</b><br/>(Trưởng ban TC-HC-NS)"]
+    BGD --> K_FIN["<b>PHÒNG TÀI CHÍNH – KẾ TOÁN</b><br/>(Kế toán trưởng / CFO)"]
+
+    %% TẦNG 3: CÁC ĐƠN VỊ / TỔ TRỰC THUỘC (NẰM THẲNG HÀNG DƯỚI TỪNG KHỐI TƯƠNG ỨNG)
+    K_DEL --> DEL_SUB["<b>Trung tâm Sản xuất:</b><br/>• ODC TP.HCM (Java, .NET, Mobile, Web, QA, DevOps)<br/>• ODC Đà Nẵng (Java, PHP, Mobile, QA, DevOps)<br/>• VP Quốc tế (Mỹ, Úc, Thụy Sĩ, Singapore)"]
+    
+    K_BIZ --> BIZ_SUB["<b>Kinh doanh & Thị trường:</b><br/>• Kinh doanh Quốc tế (Global Sales)<br/>• Tư vấn Giải pháp Tiền bán hàng (Pre-Sales)<br/>• Marketing & Truyền thông thương hiệu"]
+    
+    K_TECH --> TECH_SUB["<b>Công nghệ & Hạ tầng:</b><br/>• Viện R&D & AI Lab Nghiên cứu Công nghệ<br/>• IT Helpdesk & An toàn thông tin ISO 27001"]
+    
+    K_HR --> HR_SUB["<b>Nghiệp vụ Nhân sự – Hành chính:</b><br/>• Tổ Tuyển dụng Nhân tài (Talent Acquisition)<br/>• Tổ Hồ sơ & HĐLĐ (Lưu trữ gốc, mượn-trả)<br/>• Tổ Tiền lương & Phúc lợi (C&B, Chấm công)<br/>• Tổ Hành chính – Văn thư & Quản trị tài sản"]
+    
+    K_FIN --> FIN_SUB["<b>Tài chính & Kế toán:</b><br/>• Kế toán Tiền lương, Thuế TNCN & BHXH<br/>• Kế toán Doanh thu Dự án & Khách hàng<br/>• Quản trị Tài chính & Ngân sách"]
+```
+
+
 ### 4.1. Sơ đồ triển khai (deployment view)
 
 ```

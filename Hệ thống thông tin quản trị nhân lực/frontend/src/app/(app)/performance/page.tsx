@@ -12,7 +12,7 @@ import { Badge, Button, Input, Label, Select, Textarea } from '@/components/ui/p
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface ReviewRow {
   id: string; period: string; score: number | null;
@@ -104,10 +104,11 @@ export default function PerformancePage() {
         title="Đánh giá hiệu suất"
         description="Chu kỳ 6 tháng/lần — kết quả là căn cứ cho tăng lương định kỳ và kế hoạch phát triển."
         actions={
-          <>
-            {isHr ? <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Tạo phiếu đánh giá</Button> : null}
-            <PrintButton label="In báo cáo" />
-          </>
+          isHr ? (
+            <Button size="sm" onClick={() => setOpen(true)}>
+              <Plus className="h-4 w-4" /> Tạo phiếu đánh giá
+            </Button>
+          ) : null
         }
       />
 
@@ -127,7 +128,8 @@ export default function PerformancePage() {
           rows={rows}
           rowKey={(r) => r.id}
           loading={tab === 'team' ? teamQ.isLoading : mineQ.isLoading}
-          exportFilename="danh-gia-hieu-suat"
+          exportFilename="danh-sach-danh-gia-hieu-suat"
+          printLabel="In báo cáo đánh giá"
           searchFields={(r) => [r.period, r.user?.fullName ?? '', r.reviewer?.fullName ?? '', r.strengths ?? '']}
           filters={[{ key: 'status', label: 'Trạng thái', value: (r) => r.status, options: Object.entries(PERF_STATUS_LABEL).map(([value, label]) => ({ value, label })) }]}
           emptyTitle="Chưa có phiếu đánh giá nào"
@@ -142,6 +144,7 @@ export default function PerformancePage() {
             return [];
           }}
         />
+        <PrintSignatureBlock leftTitle="Người được đánh giá" middleTitle="Trưởng phòng đánh giá" rightTitle="Giám đốc điều hành" />
       </div>
 
       <Modal open={open} onOpenChange={setOpen} title="Tạo phiếu đánh giá hiệu suất">

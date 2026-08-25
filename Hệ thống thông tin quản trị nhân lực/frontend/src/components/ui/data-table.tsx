@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { exportRowsToExcel } from '@/lib/export';
 import { Button, Input, Select, Skeleton } from '@/components/ui/primitives';
 import { EmptyState } from '@/components/common/states';
+import { PrintExportDropdown } from '@/components/ui/print';
 
 /* ============================================================================
  * DataTable dùng chung (Mục 6 + Mục 8) — bảng quản lý đầy đủ tính năng:
@@ -59,8 +60,15 @@ interface DataTableProps<T> {
   emptyHint?: string;
   toolbarExtra?: React.ReactNode;
   className?: string;
-  /** Đặt để hiện nút "Xuất Excel" — xuất toàn bộ dòng đang lọc/sắp xếp. */
+  /** Đặt tên file để kích hoạt nút xuất Excel (.xlsx/.csv). */
   exportFilename?: string;
+  exportLabel?: string;
+  /** Nhãn nút in trong menu dropdown (mặc định: 'In danh sách'). */
+  printLabel?: string;
+  /** Hàm in tùy chỉnh (mặc định: window.print()). */
+  onPrint?: () => void;
+  /** Hiện nút in ngay cả khi không có exportFilename. */
+  showPrint?: boolean;
 }
 
 type SortState = { key: string; dir: 'asc' | 'desc' } | null;
@@ -178,6 +186,10 @@ export function DataTable<T>({
   toolbarExtra,
   className,
   exportFilename,
+  exportLabel,
+  printLabel,
+  onPrint,
+  showPrint,
 }: DataTableProps<T>) {
   const [search, setSearch] = React.useState('');
   const [filterValues, setFilterValues] = React.useState<Record<string, string>>({});
@@ -227,7 +239,7 @@ export function DataTable<T>({
     });
   }
 
-  const hasToolbar = searchFields || filters.length > 0 || toolbarExtra || exportFilename;
+  const hasToolbar = searchFields || filters.length > 0 || toolbarExtra || exportFilename || showPrint || printLabel;
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
@@ -267,24 +279,30 @@ export function DataTable<T>({
           ) : null}
           <div className="flex items-center gap-2 lg:ml-auto">
             {toolbarExtra}
-            {exportFilename ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  exportRowsToExcel(
-                    exportFilename,
-                    columns.map((c) => c.header),
-                    sorted.map((r) => columns.map((c) => {
-                      if (c.exportValue) return c.exportValue(r);
-                      const raw = (r as Record<string, unknown>)[c.key];
-                      return raw == null ? '' : (raw as string | number);
-                    })),
-                  )
+            {exportFilename || showPrint || printLabel ? (
+              <PrintExportDropdown
+                printLabel={printLabel ?? 'In danh sách'}
+                exportLabel={exportLabel ?? 'Xuất bảng tính Excel'}
+                onPrint={onPrint ?? (() => window.print())}
+                onExportExcel={
+                  exportFilename
+                    ? () => {
+                        const printableCols = columns.filter((c) => !c.noPrint);
+                        exportRowsToExcel(
+                          exportFilename,
+                          printableCols.map((c) => c.header),
+                          sorted.map((r) =>
+                            printableCols.map((c) => {
+                              if (c.exportValue) return c.exportValue(r);
+                              const raw = (r as Record<string, unknown>)[c.key];
+                              return raw == null ? '' : (raw as string | number);
+                            }),
+                          ),
+                        );
+                      }
+                    : undefined
                 }
-              >
-                <FileSpreadsheet className="h-4 w-4" /> Xuất Excel
-              </Button>
+              />
             ) : null}
           </div>
         </div>

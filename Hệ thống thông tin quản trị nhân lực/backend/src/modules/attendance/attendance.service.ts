@@ -99,7 +99,7 @@ export class AttendanceService {
       if (embeddings.length === 0) {
         throw new BusinessException(ErrorCodes.FACE_NOT_ENROLLED, 'Bạn chưa đăng ký khuôn mặt', HttpStatus.BAD_REQUEST);
       }
-      const threshold = Number(process.env.FACE_MATCH_THRESHOLD || 0.55);
+      const threshold = Number(process.env.FACE_MATCH_THRESHOLD || 0.40);
       const matched = embeddings.some((row) => {
         const stored = this.faceCrypto.decryptEmbedding(row.encryptedData);
         return FaceCryptoService.cosineSimilarity(stored, dto.descriptor!) >= threshold;

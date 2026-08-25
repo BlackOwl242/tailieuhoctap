@@ -13,7 +13,7 @@ import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { StarRating } from '@/components/ui/star-rating';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface RequisitionRow {
   id: string; title: string; position: string; headcount: number; reason: string | null;
@@ -160,11 +160,10 @@ export default function RecruitmentPage() {
         title="Tuyển dụng"
         description="Từ phiếu đề xuất của trưởng nhóm → thẩm định & duyệt → danh sách ứng viên từ đa kênh."
         actions={
-          <>
+          <div className="flex items-center gap-2">
             <Button size="sm" onClick={() => setReqOpen(true)}><Plus className="h-4 w-4" /> Đề xuất tuyển</Button>
             {isHr ? <Button size="sm" variant="outline" onClick={() => setCandOpen(true)}><Users className="h-4 w-4" /> Thêm ứng viên</Button> : null}
-            <PrintButton label="In báo cáo" />
-          </>
+          </div>
         }
       />
 
@@ -183,6 +182,7 @@ export default function RecruitmentPage() {
               rowKey={(r) => r.id}
               loading={candQ.isLoading}
               exportFilename="danh-sach-ung-vien"
+              printLabel="In danh sách ứng viên"
               searchFields={(r) => [r.fullName, r.email ?? '', r.source ?? '', r.requisition?.title ?? '']}
               filters={[
                 { key: 'stage', label: 'Giai đoạn', value: (r) => r.stage, options: Object.entries(CANDIDATE_STAGE_LABEL).map(([value, label]) => ({ value, label })) },
@@ -213,6 +213,7 @@ export default function RecruitmentPage() {
               rowKey={(r) => r.id}
               loading={reqQ.isLoading}
               exportFilename="phieu-tuyen-dung"
+              printLabel="In phiếu đề xuất tuyển dụng"
               searchFields={(r) => [r.title, r.position, r.requester?.fullName ?? '']}
               filters={[{ key: 'status', label: 'Trạng thái', value: (r) => r.status, options: Object.entries(REQUISITION_STATUS_LABEL).map(([value, label]) => ({ value, label })) }]}
               emptyTitle="Chưa có phiếu đề xuất nào"
@@ -232,6 +233,7 @@ export default function RecruitmentPage() {
             />
           )
         )}
+        <PrintSignatureBlock leftTitle="Người lập báo cáo" middleTitle="Trưởng phòng HC-NS" rightTitle="Giám đốc điều hành" />
       </div>
 
       <Modal open={reqOpen} onOpenChange={setReqOpen} title="Lập phiếu đề xuất tuyển dụng" description="UC04 — phiếu sẽ chuyển sang chờ thẩm định của bộ phận nhân sự.">

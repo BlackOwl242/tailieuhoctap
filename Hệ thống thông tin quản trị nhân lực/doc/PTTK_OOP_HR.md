@@ -121,36 +121,43 @@ PHẦN MỞ ĐẦU
 
 # DANH MỤC BẢNG BIỂU, SƠ ĐỒ
 
-Bảng 2.1. Ánh xạ tác nhân hệ thống với cơ cấu tổ chức của Saigon Technology
-Bảng 2.2. Bảng ánh xạ ba tầng: quy trình nghiệp vụ – use case nghiệp vụ – use case hệ thống
-Bảng 2.3. Danh sách Use case của Hệ thống Quản trị nhân lực HRMIS
-Bảng 2.4. Đặc tả tổng hợp các Use case của hệ thống HRMIS
-Bảng 2.5. Đặc tả chi tiết các Use case trọng yếu
-Bảng 2.6. Danh mục tham số pháp lý của hệ thống
-Hình 2.1. Cây kế thừa tác nhân của hệ thống HRMIS
-Hình 2.2. Biểu đồ Use case tổng quan Hệ thống HRMIS
-Hình 2.3. Biểu đồ Use case nhóm B — Tuyển dụng
-Hình 2.4. Biểu đồ trình tự Use case Đăng nhập (UC01)
-Hình 2.5. Biểu đồ trình tự Use case Lập phiếu đề xuất tuyển dụng (UC04)
-Hình 2.6. Biểu đồ trình tự Use case Xử lý thôi việc (UC17)
-Hình 2.7. Biểu đồ trình tự Use case Đăng ký nghỉ phép (UC20)
-Hình 2.8. Biểu đồ trình tự Use case Tính bảng lương hằng tháng (UC23)
-Hình 2.9. Biểu đồ hoạt động Use case Đăng nhập (UC01)
-Hình 2.10. Biểu đồ hoạt động Use case Đăng ký nghỉ phép (UC20)
-Hình 2.11. Biểu đồ hoạt động Use case Chốt bảng chấm công (UC21)
-Hình 2.12. Biểu đồ trạng thái vòng đời Nhân viên
-Hình 2.13. Biểu đồ trạng thái Phiếu tuyển dụng
-Hình 2.14. Biểu đồ trạng thái Đơn nghỉ phép
-Hình 2.15. Biểu đồ trạng thái Phiếu mượn – trả hồ sơ
-Hình 2.16. Biểu đồ trạng thái Phiếu lương
-Hình 2.17. Biểu đồ gói tổng quan của hệ thống HRMIS
-Hình 2.18. Biểu đồ lớp Use case Đăng nhập (UC01)
-Hình 2.19. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC20)
-Hình 2.20. Biểu đồ lớp miền cốt lõi của hệ thống
-Hình 2.21. Mô hình cơ sở dữ liệu vật lý của hệ thống
-Hình 2.22. Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống
-Hình 2.23. Biểu đồ trình tự Use case Điểm danh bằng mã QR (UC26)
-Hình 2.24. Mô hình dữ liệu bổ sung cho chấm công đa nguồn
+**DANH MỤC BẢNG BIỂU:**
+- Bảng 2.1. Ánh xạ tác nhân hệ thống với cơ cấu tổ chức của Saigon Technology
+- Bảng 2.2. Bảng ánh xạ ba tầng: quy trình nghiệp vụ – use case nghiệp vụ – use case hệ thống
+- Bảng 2.3. Danh sách Use case của Hệ thống Quản trị nhân lực HRMIS
+- Bảng 2.4. Đặc tả tổng hợp các Use case của hệ thống HRMIS
+- Bảng 2.5. Đặc tả chi tiết các Use case trọng yếu
+- Bảng 2.6. Danh mục tham số pháp lý của hệ thống
+
+**DANH MỤC SƠ ĐỒ, HÌNH VẼ:**
+- Hình 1.1. Sơ đồ cơ cấu tổ chức tổng thể và mạng lưới liên kết Công ty Saigon Technology
+- Hình 1.2. Cơ cấu chi tiết Ban Tổ chức – Hành chính – Nhân sự
+- Hình 1.3. Cơ cấu chi tiết Khối Chuyển giao Dự án (Delivery Unit)
+- Hình 1.4. Mô hình phối hợp 3 mắt xích cốt lõi và các bên liên quan (Decision-Hub-Bridge Matrix)
+- Hình 2.1. Cây kế thừa tác nhân của hệ thống HRMIS
+- Hình 2.2. Biểu đồ Use case tổng quan Hệ thống HRMIS
+- Hình 2.3. Biểu đồ Use case nhóm B — Tuyển dụng
+- Hình 2.4. Biểu đồ trình tự Use case Đăng nhập (UC01)
+- Hình 2.5. Biểu đồ trình tự Use case Lập phiếu đề xuất tuyển dụng (UC04)
+- Hình 2.6. Biểu đồ trình tự Use case Xử lý thôi việc (UC17)
+- Hình 2.7. Biểu đồ trình tự Use case Đăng ký nghỉ phép (UC20)
+- Hình 2.8. Biểu đồ trình tự Use case Tính bảng lương hằng tháng (UC23)
+- Hình 2.9. Biểu đồ hoạt động Use case Đăng nhập (UC01)
+- Hình 2.10. Biểu đồ hoạt động Use case Đăng ký nghỉ phép (UC20)
+- Hình 2.11. Biểu đồ hoạt động Use case Chốt bảng chấm công (UC21)
+- Hình 2.12. Biểu đồ trạng thái vòng đời Nhân viên
+- Hình 2.13. Biểu đồ trạng thái Phiếu tuyển dụng
+- Hình 2.14. Biểu đồ trạng thái Đơn nghỉ phép
+- Hình 2.15. Biểu đồ trạng thái Phiếu mượn – trả hồ sơ
+- Hình 2.16. Biểu đồ trạng thái Phiếu lương
+- Hình 2.17. Biểu đồ gói tổng quan của hệ thống HRMIS
+- Hình 2.18. Biểu đồ lớp Use case Đăng nhập (UC01)
+- Hình 2.19. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC20)
+- Hình 2.20. Biểu đồ lớp miền cốt lõi của hệ thống
+- Hình 2.21. Mô hình cơ sở dữ liệu vật lý của hệ thống
+- Hình 2.22. Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống
+- Hình 2.23. Biểu đồ trình tự Use case Điểm danh bằng mã QR (UC26)
+- Hình 2.24. Mô hình dữ liệu bổ sung cho chấm công đa nguồn
 
 ---
 
@@ -170,6 +177,8 @@ Việc thực hiện đề tài này mang lại cơ hội vận dụng tư duy p
 
 ## 2. Tổng quan về Công ty Cổ phần Phần mềm Saigon Technology
 
+### 2.1. Lịch sử hình thành và lĩnh vực hoạt động kinh doanh
+
 Công ty Cổ phần Phần mềm Saigon Technology (tên pháp nhân đăng ký kinh doanh từ ngày 13/11/2015: Công ty Cổ phần Công nghệ Phần mềm STS Software, mã số thuế 0313534747) là doanh nghiệp công nghệ thông tin thuần Việt, hoạt động trong lĩnh vực phát triển phần mềm theo mô hình linh hoạt (Agile) và gia công phần mềm cho thị trường quốc tế:
 
 - **Năm 2012:** Công ty được thành lập tại Thành phố Hồ Chí Minh, xuất phát điểm chỉ với ba kỹ sư phần mềm, tập trung phát triển ứng dụng web và ứng dụng di động;
@@ -178,7 +187,43 @@ Công ty Cổ phần Phần mềm Saigon Technology (tên pháp nhân đăng ký
 
 Công ty cung cấp các dịch vụ phát triển phần mềm theo yêu cầu, cho thuê đội ngũ kỹ sư theo dự án (mô hình dedicated team), trung tâm phát triển phần mềm đặt tại Việt Nam cho khách hàng quốc tế, cùng dịch vụ kiểm thử chất lượng và ứng dụng trí tuệ nhân tạo. Về chứng nhận và danh hiệu: ISO 9001, ISO/IEC 27001, Giải thưởng Sao Khuê 2020, Top 15 công ty gia công phần mềm Agile hàng đầu Việt Nam (VINASA), nhà phát triển phần mềm hàng đầu đến từ Việt Nam năm 2022 (Clutch).
 
-Điểm khiến Saigon Technology trở thành tình huống nghiên cứu giàu tính đại diện nằm ở nghịch lý quy mô: lực lượng khoảng 43% là kỹ thuật trực tiếp, phần còn lại là quản lý dự án, thiết kế, kinh doanh, hành chính — trong khi toàn bộ mảng nhân sự chỉ có khoảng mười tám người phụ trách cho hơn bốn trăm nhân sự. Hiện trạng vận hành công tác nhân sự vẫn là sự pha trộn giữa giấy tờ, sổ tay, bảng tính Excel rời rạc và email. Đứng trước rào cản đó, Ban Giám đốc đặt ra yêu cầu thiết kế và xây dựng một hệ thống thông tin quản trị nhân lực toàn diện, thay thế phương thức thủ công và giải quyết triệt để các vướng mắc trong quy trình nghiệp vụ nội bộ.
+Điểm khiến Saigon Technology trở thành tình huống nghiên cứu giàu tính đại diện nằm ở **nghịch lý quy mô**: lực lượng kỹ thuật trực tiếp và sản xuất chiếm hơn 430 kỹ sư phần mềm — trong khi toàn bộ Ban Tổ chức – Hành chính – Nhân sự chỉ có khoảng 18 nhân sự phục vụ cho toàn bộ công ty. Hiện trạng vận hành công tác nhân sự vẫn là sự pha trộn giữa giấy tờ, sổ tay, bảng tính Excel rời rạc và email. Đứng trước rào cản đó, Ban Giám đốc đặt ra yêu cầu thiết kế và xây dựng một hệ thống thông tin quản trị nhân lực toàn diện, thay thế phương thức thủ công và giải quyết triệt để các vướng mắc trong quy trình nghiệp vụ nội bộ.
+
+### 2.2. Cơ cấu tổ chức bộ máy quản lý và mạng lưới ODC
+
+Cơ cấu tổ chức của Công ty Saigon Technology được thiết kế theo mô hình ma trận chức năng kết hợp phân tán địa lý, bảo đảm tính linh hoạt cao trong chuyển giao dự án phần mềm cho thị trường quốc tế:
+
+![Hình 1.1: Sơ đồ cơ cấu tổ chức tổng thể Công ty Saigon Technology](images/hinh_1_1_org_chart.png)
+
+**Hình 1.1. Sơ đồ cơ cấu tổ chức tổng thể Công ty Saigon Technology (Nét thẳng, 5 Khối ngang hàng)**
+
+
+#### A. Cấp Quản trị Sở hữu và Ban Giám đốc Điều hành
+- **Đại hội đồng Cổ đông & Hội đồng Quản trị:** Cơ quan hoạch định chiến lược phát triển dài hạn, phê duyệt ngân sách và các chính sách nhân sự lớn của công ty cổ phần.
+- **Ban Giám đốc Điều hành (CEO, COO, CTO, CFO, CBO):** Đóng vai trò hạt nhân điều hành toàn diện mọi hoạt động, là đỉnh phê duyệt tối cao của các quy trình nhân sự trọng yếu (định biên năm, bổ nhiệm cấp cao, tăng lương vượt khung, kỷ luật sa thải).
+
+#### B. Ban Tổ chức – Hành chính – Nhân sự (Đầu mối điều phối)
+Ban Tổ chức – Hành chính – Nhân sự là mắt xích đầu mối của mọi nghiệp vụ nhân sự trong công ty, gồm khoảng 18 nhân sự được tổ chức thành 4 tổ chuyên môn:
+
+![Hình 1.2: Cơ cấu chi tiết Ban Tổ chức – Hành chính – Nhân sự](images/hinh_1_2_hr_admin.png)
+
+**Hình 1.2. Cơ cấu chi tiết Ban Tổ chức – Hành chính – Nhân sự (4 Tổ chuyên môn ngang hàng)**
+
+
+#### C. Khối Chuyển giao Dự án (Delivery Unit — Trung tâm Sản xuất)
+Khối Delivery là trung tâm sản xuất phần mềm trực tiếp tạo ra giá trị doanh thu, bao gồm 2 Trung tâm phát triển phần mềm (ODC) lớn tại TP.HCM và Đà Nẵng cùng mạng lưới các Văn phòng đại diện quốc tế:
+
+![Hình 1.3: Cơ cấu chi tiết Khối Chuyển giao Dự án](images/hinh_1_3_delivery.png)
+
+
+### 2.3. Mối quan hệ liên kết nghiệp vụ và Mô hình phối hợp 3 mắt xích
+
+Mọi quyết định và luồng nghiệp vụ nhân sự trong toàn công ty được vận hành theo cơ chế phối hợp ba mắt xích cốt lõi: **Ban Giám đốc (Quyết định) — Ban TC–HC–NS (Đầu mối/Van điều phối) — Các phòng ban/Nhóm dự án (Cầu nối/Thực thi)**:
+
+![Hình 1.4: Mô hình phối hợp 3 mắt xích cốt lõi](images/hinh_1_4_matrix_3links.png)
+
+**Hình 1.4. Mô hình phối hợp 3 mắt xích cốt lõi và các bên liên quan (Decision-Hub-Bridge Matrix)**
+
 
 ## 3. Mục tiêu và nhiệm vụ
 
@@ -421,34 +466,8 @@ Tác nhân của hệ thống được xác định trực tiếp từ cơ cấu
 
 Quan hệ kế thừa: **Nhân viên** là tác nhân cha; các vai nội bộ còn lại đều kế thừa từ Nhân viên vì họ đồng thời là người lao động (đều phải chấm công, xin nghỉ phép, xem thông tin cá nhân của chính mình).
 
-```plantuml
-@startuml
-skinparam actorStyle awesome
-actor "Ứng viên" as UV
-actor "Nhân viên" as NV
-actor "Trưởng dự án" as PM
-actor "CV tuyển\ndụng" as TD
-actor "CV hồ sơ" as HS
-actor "CV tiền\nlương" as TL
-actor "Nhân viên\nhành chính" as HC
-actor "Kế toán" as KT
-actor "Nhân viên IT" as IT
-actor "Đại diện\nngười lao động" as DDL
-actor "Giám đốc" as GD
 
-NV <|-- PM
-NV <|-- TD
-NV <|-- HS
-NV <|-- TL
-NV <|-- HC
-NV <|-- KT
-NV <|-- IT
-NV <|-- DDL
-NV <|-- GD
-@enduml
-```
-
-_Hình 2.1. Cây kế thừa tác nhân của hệ thống HRMIS_
+![Hình 2.1: Cây kế thừa tác nhân của hệ thống HRMIS](images/hinh_2_1_actor_tree.png)
 
 ### 2.1.2. Phân tầng yêu cầu: quy trình nghiệp vụ — use case nghiệp vụ — use case hệ thống
 
@@ -643,158 +662,13 @@ Hệ thống được tổ chức thành **27 Use case chia 6 nhóm** nhằm b�
 
 **Biểu đồ Use case tổng quan:**
 
-```plantuml
-@startuml
-left to right direction
-actor "Ứng viên" as UV
-actor "Nhân viên" as NV
-actor "Trưởng dự án" as PM
-actor "CV tuyển\ndụng" as TD
-actor "CV hồ sơ" as HS
-actor "CV tiền\nlương" as TL
-actor "Nhân viên\nhành chính" as HC
-actor "Kế toán" as KT
-actor "Nhân viên IT" as IT
-actor "Đại diện\nngười lao động" as DDL
-actor "Giám đốc" as GD
-NV <|-- PM
-NV <|-- TD
-NV <|-- HS
-NV <|-- TL
-NV <|-- HC
-NV <|-- KT
-NV <|-- IT
-NV <|-- DDL
-NV <|-- GD
 
-rectangle "Hệ thống HRMIS — Saigon Technology" {
-  package "A. Quản trị hệ thống" {
-    usecase "UC01 Đăng nhập" as UC01
-    usecase "UC02 Quản lý\ntài khoản" as UC02
-    usecase "UC03 Quản lý cây\ntổ chức" as UC03
-  }
-  package "B. Tuyển dụng" {
-    usecase "UC04 Lập phiếu\nđề xuất tuyển" as UC04
-    usecase "UC05 Thẩm định\nchỉ tiêu" as UC05
-    usecase "UC06 Phê duyệt\nchỉ tiêu" as UC06
-    usecase "UC07 Quản lý hồ sơ\nứng viên" as UC07
-    usecase "UC08 Gửi thư mời\nvà xếp lương" as UC08
-  }
-  package "C. Hồ sơ – Thử việc" {
-    usecase "UC09 Quản lý hồ sơ\nnhân viên" as UC09
-    usecase "UC10 Quản lý\nhợp đồng" as UC10
-    usecase "UC11 Quản lý văn bằng\n– chứng chỉ" as UC11
-    usecase "UC12 Mượn – trả\nbản gốc" as UC12
-    usecase "UC13 Đánh giá\nthử việc" as UC13
-  }
-  package "D. Biến động nhân sự" {
-    usecase "UC14 Đề xuất\nthuyên chuyển" as UC14
-    usecase "UC15 Đề xuất\nđiều chỉnh lương" as UC15
-    usecase "UC16 Đề xuất khen thưởng\n– kỷ luật" as UC16
-    usecase "UC17 Xử lý\nthôi việc" as UC17
-  }
-  package "E. Chấm công – Nghỉ phép" {
-    usecase "UC18 Ghi nhận\nchấm công" as UC18
-    usecase "UC19 Đăng ký\nlàm thêm giờ" as UC19
-    usecase "UC20 Đăng ký\nnghỉ phép" as UC20
-    usecase "UC21 Chốt bảng\nchấm công" as UC21
-    usecase "UC26 Điểm danh\nbằng mã QR" as UC26
-    usecase "UC27 Điểm danh\nbằng khuôn mặt" as UC27
-  }
-  package "F. Lương – Báo cáo" {
-    usecase "UC22 Cấu hình\ncông thức lương" as UC22
-    usecase "UC23 Tính bảng\nlương" as UC23
-    usecase "UC24 Duyệt\nbảng lương" as UC24
-    usecase "UC25 Xem thông tin\ncá nhân" as UC25
-  }
-}
-
-IT --> UC01
-IT --> UC02
-IT --> UC03
-PM --> UC04
-TD --> UC05
-KT --> UC05
-GD --> UC06
-UV --> UC07
-TD --> UC07
-TD --> UC08
-HS --> UC09
-HS --> UC10
-HS --> UC11
-NV --> UC12
-HS --> UC12
-PM --> UC13
-PM --> UC14
-PM --> UC15
-PM --> UC16
-DDL --> UC16
-NV --> UC17
-PM --> UC17
-HC --> UC17
-KT --> UC17
-HS --> UC17
-NV --> UC18
-HS --> UC18
-NV --> UC26
-NV --> UC27
-NV --> UC19
-PM --> UC19
-NV --> UC20
-PM --> UC20
-HS --> UC21
-PM --> UC21
-TL --> UC22
-TL --> UC23
-KT --> UC24
-GD --> UC24
-NV --> UC25
-
-UC11 <.. UC12 : <<extend>>\nđang mượn tô đỏ
-UC14 <.. UC21 : <<extend>>\nbàn giao 2 phía
-UC18 <.. UC26 : <<extend>>\nkênh QR xoay 30 giây
-UC18 <.. UC27 : <<extend>>\nkênh khuôn mặt trên trình duyệt
-@enduml
-```
-
-_Hình 2.2. Biểu đồ Use case tổng quan Hệ thống HRMIS_
+![Hình 2.2: Biểu đồ Use case tổng quan Hệ thống HRMIS](images/hinh_2_2_usecase_overview.png)
 
 **Biểu đồ Use case nhóm B — Tuyển dụng** (đại diện cho cách vẽ chi tiết một nhóm; năm nhóm còn lại nhân bản theo cùng khuôn):
 
-```plantuml
-@startuml
-left to right direction
-actor "Ứng viên" as UV
-actor "Trưởng dự án" as PM
-actor "CV tuyển dụng" as TD
-actor "Kế toán" as KT
-actor "Giám đốc" as GD
 
-rectangle "Nhóm B — Tuyển dụng (QP1)" {
-  usecase "UC04 Lập phiếu\nđề xuất tuyển dụng" as UC04
-  usecase "UC05 Thẩm định\nchỉ tiêu" as UC05
-  usecase "Xác nhận quỹ lương" as INC1
-  usecase "UC06 Phê duyệt\nchỉ tiêu" as UC06
-  usecase "UC07 Quản lý hồ sơ\nứng viên" as UC07
-  usecase "UC08 Gửi thư mời\nvà xếp lương" as UC08
-  usecase "Trình duyệt mức lương\nvượt khung" as EXT1
-}
-UC05 ..> INC1 : <<include>>
-UC08 ..> EXT1 : <<extend>>
-
-PM --> UC04
-TD --> UC05
-KT --> INC1
-GD --> UC06
-UV --> UC07
-TD --> UC07
-TD --> UC08
-GD --> EXT1
-UC04 ..> UC05 : <<include>>
-UC05 ..> UC06 : <<include>>
-UC08 ..> UC07 : <<extend>>
-@enduml
-```
+![Hình 2.3: Biểu đồ Use case nhóm B — Tuyển dụng](images/hinh_2_3_usecase_recruitment.png)
 
 _Hình 2.3. Biểu đồ Use case nhóm B — Tuyển dụng. Quan hệ include/extend phản ánh đúng trình tự nghiệp vụ: lập phiếu tất yếu dẫn tới thẩm định, thẩm định tất yếu có xác nhận quỹ; chỉ khi mức lương vượt khung mới phát sinh bước trình duyệt riêng._
 
@@ -879,170 +753,34 @@ Tầng điều khiển gồm các lớp điều khiển theo từng nhóm UC (Lo
 
 **Biểu đồ trình tự Use case Đăng nhập (UC01):**
 
-```plantuml
-@startuml
-actor "Người dùng" as U
-boundary "Màn hình\nĐăng nhập" as F
-control "LoginControl" as C
-entity "TaiKhoan" as E
 
-U -> F : nhập (tên đăng nhập, mật khẩu)
-F -> C : authenticate()
-C -> E : đốiChiếuCSDL()
-E --> C : kết quả kiểm tra
-alt [Đăng nhập hợp lệ]
-  C -> E : ghi nhật ký truy cập
-  C -> F : chuyển hướng theo vai trò
-  F --> U : hiển thị giao diện làm việc
-else [Đăng nhập không hợp lệ]
-  C -> F : thông báo lỗi
-  F --> U : yêu cầu nhập lại
-  note right : sai 5 lần liên tiếp\n→ khóa tài khoản 15 phút
-end
-@enduml
-```
-
-_Hình 2.4. Biểu đồ trình tự Use case Đăng nhập (UC01)_
+![Hình 2.4: Biểu đồ trình tự Use case Đăng nhập (UC01)](images/hinh_2_4_seq_login.png)
 
 **Tác nhân:** Người dùng. **Các đối tượng (Lifelines):** Màn hình Đăng nhập (Boundary) — LoginControl (Control) — TaiKhoan (Entity). **Luồng sự kiện chính:** Tác nhân nhập thông tin và gửi yêu cầu qua Boundary; Boundary chuyển tiếp đến Controller để xử lý xác thực; Controller gửi yêu cầu đối chiếu tới Entity; Entity truy xuất cơ sở dữ liệu và trả kết quả. **Khung phân nhánh (alt):** hợp lệ — cấp quyền và chuyển hướng; không hợp lệ — báo lỗi, quá ngưỡng thì khóa tạm.
 
 **Biểu đồ trình tự Use case Lập phiếu đề xuất tuyển dụng (UC04):**
 
-```plantuml
-@startuml
-actor "Trưởng dự án" as PM
-actor "CV tuyển dụng" as TD
-actor "Kế toán" as KT
-actor "Giám đốc" as GD
-boundary "Màn hình\nĐề xuất tuyển" as F
-control "Điều khiển\nTuyển dụng" as C
-entity "Phiếu tuyển dụng" as P
 
-PM -> F : lập phiếu, gửi
-F -> C : submit()
-C -> P : lưu "Chờ thẩm định"
-C --> TD : thông báo
-TD -> F : thẩm định
-F -> C : yêu cầu xác nhận quỹ
-C --> KT : gửi yêu cầu
-KT --> C : xác nhận quỹ
-C -> P : cập nhật "Chờ phê duyệt"
-C --> GD : gửi tờ trình
-GD -> F : ký duyệt
-F -> C : approve()
-C -> P : cập nhật "Đã duyệt"
-C --> TD : kích hoạt kế hoạch tuyển
-@enduml
-```
-
-_Hình 2.5. Biểu đồ trình tự Use case Lập phiếu đề xuất tuyển dụng (UC04)_
+![Hình 2.5: Biểu đồ trình tự Use case Lập phiếu đề xuất tuyển dụng (UC04)](images/hinh_2_5_seq_recruitment.png)
 
 **Tác nhân:** Trưởng dự án, CV tuyển dụng, Kế toán, Giám đốc. **Các đối tượng:** Màn hình Đề xuất tuyển (Boundary) — Điều khiển Tuyển dụng (Control) — Phiếu tuyển dụng (Entity). **Luồng sự kiện chính:** Trưởng dự án lập phiếu và gửi; hệ thống lưu với trạng thái "Chờ thẩm định" và thông báo CV tuyển dụng; sau thẩm định, hệ thống gửi yêu cầu xác nhận quỹ song song tới Kế toán; đủ điều kiện thì chuyển "Chờ phê duyệt" và gửi tờ trình điện tử tới Giám đốc; Giám đốc ký từ xa, hệ thống cập nhật "Đã duyệt" và kích hoạt kế hoạch tuyển đa kênh.
 
 **Biểu đồ trình tự Use case Xử lý thôi việc (UC17):**
 
-```plantuml
-@startuml
-actor "Nhân viên" as NV
-actor "Trưởng dự án" as PM
-actor "NV hành chính" as HC
-actor "Nhân viên IT" as IT
-actor "Kế toán" as KT
-actor "CV hồ sơ" as HS
-boundary "Màn hình\nThôi việc" as F
-control "Điều khiển\nBiến động" as C
-entity "Đơn thôi việc" as D
 
-NV -> F : nộp đơn
-F -> C : submit()
-C -> D : lưu "Chờ duyệt" + sinh checklist 4 xác nhận
-PM -> F : xác nhận bàn giao việc
-C -> D : (1/4)
-HC -> F : xác nhận thu hồi tài sản
-C -> D : (2/4)
-IT -> F : xác nhận thu hồi tài khoản
-C -> D : (3/4)
-KT -> F : xác nhận quyết toán
-C -> D : (4/4)
-C -> C : bật nút "Phát hành quyết định"
-HS -> F : phát hành, trình Giám đốc ký
-C -> D : "Hiệu lực" → hồ sơ chuyển "Lưu trữ"
-@enduml
-```
-
-_Hình 2.6. Biểu đồ trình tự Use case Xử lý thôi việc (UC17)_
+![Hình 2.6: Biểu đồ trình tự Use case Xử lý thôi việc (UC17)](images/hinh_2_6_seq_resignation.png)
 
 **Tác nhân:** Nhân viên và năm bộ phận liên quan. **Luồng sự kiện chính:** Đơn thôi việc phát sinh checklist bốn xác nhận theo đúng ma trận tác động của tổ chức; từng bộ phận lần lượt xác nhận; chỉ khi đủ bốn xác nhận, nút "Phát hành quyết định" mới được bật — đây là cách phần mềm cưỡng chế tuân thủ thủ tục. Ngày làm việc cuối, hệ thống tự khóa tài khoản lúc 23:59.
 
 **Biểu đồ trình tự Use case Đăng ký nghỉ phép (UC20):**
 
-```plantuml
-@startuml
-actor "Nhân viên" as NV
-actor "Trưởng dự án" as PM
-boundary "Màn hình\nNghỉ phép" as F
-control "Điều khiển\nNghỉ phép" as C
-entity "Đơn nghỉ phép" as D
-entity "SoDuPhep" as Q
 
-NV -> F : tạo đơn, gửi
-F -> C : submit()
-C -> Q : kiểm tra số dư
-alt [Quỹ không đủ]
-  C --> F : từ chối, hiển thị số dư
-else [Quỹ đủ]
-  C -> D : lưu "Đã trình"
-  C --> PM : thông báo
-  PM -> F : duyệt / từ chối
-  alt [Duyệt]
-    C -> Q : trừ quỹ ngay
-    C -> D : cập nhật "Đã duyệt"
-    C -> C : ghi công phép vào bảng công
-    C --> NV : thông báo kết quả
-  else [Từ chối]
-    C -> D : cập nhật "Đã từ chối" + lý do
-    C --> NV : thông báo lý do
-  end
-end
-@enduml
-```
-
-_Hình 2.7. Biểu đồ trình tự Use case Đăng ký nghỉ phép (UC20)_
+![Hình 2.7: Biểu đồ trình tự Use case Đăng ký nghỉ phép (UC20)](images/hinh_2_7_seq_leave.png)
 
 **Biểu đồ trình tự Use case Tính bảng lương hằng tháng (UC23):**
 
-```plantuml
-@startuml
-actor "CV tiền lương" as TL
-actor "Kế toán" as KT
-actor "Giám đốc" as GD
-boundary "Bàn làm việc\nkỳ lương" as F
-control "PayrollEngine" as C
-entity "KyLuong" as KY
-entity "PhieuLuong" as PL
 
-TL -> F : chốt công ngày 25
-F -> C : lockAttendance()
-C -> KY : "Đã khóa công"
-TL -> F : bấm tính lương
-C -> C : nạp thưởng/phạt (UC16), tạm ứng, phụ thuộc
-C -> C : tính BHXH, thuế theo tham số
-C -> PL : sinh phiếu lương
-C --> KT : gửi đối chiếu
-alt [Lệch]
-  KT -> F : ghi chú điều chỉnh
-  F -> C : tính lại (giữ vết phiên cũ)
-else [Khớp]
-  C -> KY : "Chờ duyệt"
-  C --> GD : trình bảng lương
-  GD -> F : duyệt, khóa
-  C -> KY : "Đã khóa" (bất biến)
-  C -> C : xuất lệnh chi + tờ khai + phiếu lương
-end
-@enduml
-```
-
-_Hình 2.8. Biểu đồ trình tự Use case Tính bảng lương hằng tháng (UC23)_
+![Hình 2.8: Biểu đồ trình tự Use case Tính bảng lương hằng tháng (UC23)](images/hinh_2_8_seq_payroll.png)
 
 Hai mươi Use case còn lại được xây dựng theo **hai khuôn mẫu lặp lại**: (1) **khuôn quản lý danh mục** cho UC02, UC03, UC09, UC10, UC11, UC22, UC25 — mở màn hình → hiển thị danh sách → khung phân nhánh alt Thêm/Sửa/Xóa → lưu và ghi nhật ký → làm mới giao diện; (2) **khuôn luồng duyệt ngắn một bước** cho UC12, UC13, UC14, UC15, UC16, UC19 — tạo đề xuất → duyệt → hiệu lực. Các biểu đồ được vẽ bằng cách nhân bản khuôn và thay tên tác nhân – đối tượng tương ứng.
 
@@ -1050,104 +788,20 @@ Hai mươi Use case còn lại được xây dựng theo **hai khuôn mẫu lặ
 
 **Biểu đồ hoạt động Use case Đăng nhập (UC01):**
 
-```plantuml
-@startuml
-|Nhân viên|
-start
-:Truy cập hệ thống;
-:Nhập thông tin\n(tên đăng nhập, mật khẩu);
-|Hệ thống|
-:Kiểm tra thông tin định danh;
-if (Thông tin hợp lệ?) then (không)
-  :Hiển thị thông báo lỗi;
-  |Nhân viên|
-  :Yêu cầu nhập lại;
-  stop
-else (có)
-  |Hệ thống|
-  :Xác định vai trò người dùng;
-  :Cấp quyền truy cập tương ứng;
-  |Nhân viên|
-  :Hiển thị giao diện làm việc;
-  stop
-endif
-@enduml
-```
 
-_Hình 2.9. Biểu đồ hoạt động Use case Đăng nhập (UC01)_
+![Hình 2.9: Biểu đồ hoạt động Use case Đăng nhập (UC01)](images/hinh_2_9_act_login.png)
 
 **Phân làn tác nhân (Swimlanes):** Nhân viên, Hệ thống. **Luồng hoạt động chính:** Tại làn Nhân viên, quá trình bắt đầu khi truy cập hệ thống và nhập thông tin; dữ liệu được đẩy sang làn Hệ thống để kiểm tra định danh; rẽ nhánh theo tính hợp lệ — nhánh không hợp lệ hiển thị lỗi và kết thúc luồng phụ; nhánh hợp lệ tiếp tục xác định vai trò, cấp quyền và hiển thị giao diện làm việc.
 
 **Biểu đồ hoạt động Use case Đăng ký nghỉ phép (UC20):**
 
-```plantuml
-@startuml
-|Nhân viên|
-start
-:Tạo đơn nghỉ phép\n(loại, từ ngày – đến ngày, lý do);
-|Hệ thống|
-:Kiểm tra số dư quỹ phép;
-if (Đủ quỹ phép?) then (có)
-  :Lưu đơn (Đã trình);
-  if (Quản lý đang nghỉ — có ủy quyền?) then (có)
-    :Chuyển người ủy quyền, ghi "duyệt thay";
-  else (không)
-    :Thông báo Trưởng dự án (hạn 24 giờ);
-  endif
-  |Trưởng dự án|
-  if (Duyệt đơn?) then (đồng ý)
-    |Hệ thống|
-    :Trừ quỹ phép ngay lúc duyệt;
-    :Ghi công phép vào bảng công các ngày nghỉ;
-    :Phản hồi kết quả cho nhân viên;
-    stop
-  else (từ chối)
-    |Hệ thống|
-    :Cập nhật "Đã từ chối" + lưu lý do;
-    :Phản hồi lý do cho nhân viên;
-    stop
-  endif
-else (không)
-  |Hệ thống|
-  :Chặn đơn, thông báo số dư còn lại;
-  stop
-endif
-@enduml
-```
 
-_Hình 2.10. Biểu đồ hoạt động Use case Đăng ký nghỉ phép (UC20)_
+![Hình 2.10: Biểu đồ hoạt động Use case Đăng ký nghỉ phép (UC20)](images/hinh_2_10_act_leave.png)
 
 **Biểu đồ hoạt động Use case Chốt bảng chấm công (UC21)** (có nhánh song song hợp nhất dữ liệu đa nguồn):
 
-```plantuml
-@startuml
-|Hệ thống|
-start
-fork
-  :Đọc dữ liệu máy chấm công\n(CV hồ sơ đồng bộ);
-fork again
-  :Đọc điểm danh ứng dụng\ncủa nhân viên;
-fork again
-  :Đọc đơn đã duyệt:\nnghỉ phép (UC20), làm thêm (UC19);
-end fork
-:Ghép ca, áp quy tắc từng ngày;
-:Sinh bảng công nháp kèm cờ lệch;
-if (Có bản ghi lệch?) then (có)
-  |CV hồ sơ|
-  :Xử lý lệch — liên hệ nhân viên/quản lý xác nhận;
-else (không)
-endif
-|Trưởng dự án|
-:Xác nhận bảng công nhóm mình;
-|CV tiền lương|
-:Chốt bảng công toàn công ty ngày 25;
-|Hệ thống|
-:Khóa bảng công → đẩy sang tính lương (UC23);
-stop
-@enduml
-```
 
-_Hình 2.11. Biểu đồ hoạt động Use case Chốt bảng chấm công (UC21)_
+![Hình 2.11: Biểu đồ hoạt động Use case Chốt bảng chấm công (UC21)](images/hinh_2_11_act_timesheet.png)
 
 **Phân làn tác nhân:** Hệ thống, CV hồ sơ, Trưởng dự án, CV tiền lương. **Luồng hoạt động chính:** Ba nguồn dữ liệu (máy chấm công, ứng dụng, đơn đã duyệt) được hợp nhất song song; hệ thống ghép ca và áp quy tắc sinh bảng công nháp kèm cờ lệch; các bản ghi lệch được CV hồ sơ xử lý; Trưởng dự án xác nhận bảng công nhóm; cuối cùng CV tiền lương chốt toàn công ty ngày 25 và khóa bảng công để chuyển sang tính lương.
 
@@ -1157,93 +811,30 @@ Nhóm biểu đồ trọng tâm của đề tài — mô tả vòng đời các 
 
 **Biểu đồ trạng thái vòng đời Nhân viên:**
 
-```plantuml
-@startuml
-[*] --> ThuViec : nhận thư mời, ký HĐ thử việc
-ThuViec --> ChinhThuc : đánh giá đạt (UC13) + xếp lương
-ThuViec --> [*] : không đạt
-ChinhThuc --> ChinhThuc : thuyên chuyển (UC14) / tăng lương (UC15) /\nkhen thưởng – kỷ luật (UC16)
-ChinhThuc --> ThoiViec : đơn thôi việc + đủ 4 xác nhận (UC17)
-ChinhThuc --> NghiHuu : đủ tuổi luật định
-ThoiViec --> LuuTru
-NghiHuu --> LuuTru
-LuuTru --> [*]
-@enduml
-```
 
-_Hình 2.12. Biểu đồ trạng thái vòng đời Nhân viên_
+![Hình 2.12: Biểu đồ trạng thái vòng đời Nhân viên](images/hinh_2_12_state_employee.png)
 
 **Khởi tạo:** Khi ứng viên nhận thư mời và ký hợp đồng thử việc, bản ghi nhân viên sinh ra ở trạng thái Thử việc. **Vòng đời chuyển đổi:** Qua đánh giá thử việc đạt và quyết định xếp lương, chuyển sang Chính thức; trong quá trình công tác có các chuyển tự tham chiếu (thuyên chuyển, tăng lương, khen thưởng – kỷ luật); rời trạng thái Chính thức theo hai nhánh nghỉ hưu (đủ tuổi luật định) hoặc thôi việc (bắt buộc đủ bốn xác nhận checklist). **Kết thúc:** Toàn bộ hồ sơ chuyển sang trạng thái Lưu trữ — dữ liệu đóng băng nhưng lịch sử vẫn tra cứu được. Mỗi chuyển trạng thái gắn đúng Use case phát sinh nó, và phần mềm cấm chuyển nếu thiếu bằng chứng đầu vào.
 
 **Biểu đồ trạng thái Phiếu tuyển dụng:**
 
-```plantuml
-@startuml
-[*] --> ChoThamDinh : UC04 — trưởng dự án lập phiếu
-ChoThamDinh --> ChoPheDuyet : UC05 — thẩm định + xác nhận quỹ
-ChoThamDinh --> BiTraVe : thiếu chứng minh
-BiTraVe --> ChoThamDinh : chỉnh sửa lại
-ChoPheDuyet --> DaDuyet : UC06 — giám đốc ký
-ChoPheDuyet --> BiGiam : điều chỉnh giảm chỉ tiêu
-DaDuyet --> DangTuyen : mở kế hoạch tuyển
-DangTuyen --> HoanThanh : đủ chỉ tiêu
-HoanThanh --> [*]
-BiGiam --> [*]
-@enduml
-```
 
-_Hình 2.13. Biểu đồ trạng thái Phiếu tuyển dụng_
+![Hình 2.13: Biểu đồ trạng thái Phiếu tuyển dụng](images/hinh_2_13_state_requisition.png)
 
 **Biểu đồ trạng thái Đơn nghỉ phép:**
 
-```plantuml
-@startuml
-[*] --> DaTrinh : UC20 — nhân viên gửi đơn (đã qua kiểm quỹ)
-DaTrinh --> DaDuyet : duyệt → trừ quỹ + ghi công phép
-DaTrinh --> TuChoi : từ chối + lý do
-DaTrinh --> DaHuy : nhân viên thu hồi
-DaDuyet --> DaTieuDung : hết ngày nghỉ, khớp bảng công
-DaTieuDung --> [*]
-TuChoi --> [*]
-DaHuy --> [*]
-@enduml
-```
 
-_Hình 2.14. Biểu đồ trạng thái Đơn nghỉ phép_
+![Hình 2.14: Biểu đồ trạng thái Đơn nghỉ phép](images/hinh_2_14_state_leave.png)
 
 **Biểu đồ trạng thái Phiếu mượn – trả hồ sơ:**
 
-```plantuml
-@startuml
-[*] --> ChoDuyet : UC12 — nhân viên gửi yêu cầu mượn
-ChoDuyet --> DangMuon : CV hồ sơ duyệt
-ChoDuyet --> TuChoi : không hợp lệ
-DangMuon --> QuaHan : quá ngày hẹn (tự nhắc)
-DangMuon --> DaTra : trả, CV hồ sơ xác nhận
-QuaHan --> DaTra : trả muộn
-DaTra --> [*]
-TuChoi --> [*]
-@enduml
-```
 
-_Hình 2.15. Biểu đồ trạng thái Phiếu mượn – trả hồ sơ_
+![Hình 2.15: Biểu đồ trạng thái Phiếu mượn – trả hồ sơ](images/hinh_2_15_state_doclending.png)
 
 **Biểu đồ trạng thái Phiếu lương:**
 
-```plantuml
-@startuml
-[*] --> DaTinh : UC23 — phiên tính sinh phiếu
-DaTinh --> DaDoiChieu : UC24 — kế toán đối chiếu khớp
-DaTinh --> DaTinh : lệch, tính lại (giữ vết)
-DaDoiChieu --> DaKhoa : giám đốc duyệt, khóa bất biến
-DaKhoa --> DaChi : ngân hàng chi xong
-DaKhoa --> DaDieuChinh : phản hồi nhân viên hợp lệ → phiếu điều chỉnh kỳ sau
-DaChi --> [*]
-DaDieuChinh --> [*]
-@enduml
-```
 
-_Hình 2.16. Biểu đồ trạng thái Phiếu lương_
+![Hình 2.16: Biểu đồ trạng thái Phiếu lương](images/hinh_2_16_state_payslip.png)
 
 **Kết thúc:** Từ trạng thái Đã khóa, đối tượng phiếu lương trở nên bất biến — mọi sửa sau này chỉ có thể qua trạng thái Đã điều chỉnh bằng phiếu của kỳ sau, bảo đảm tính toàn vẹn của dữ liệu tiền lương.
 
@@ -1265,72 +856,13 @@ Mỗi biểu đồ trình tự ở mục 2.3.1 được chuyển sang biểu đ�
 
 **Biểu đồ gói tổng quan của hệ thống HRMIS:**
 
-```plantuml
-@startuml
-package "A. Quản trị hệ thống" {}
-package "B. Tuyển dụng" {}
-package "C. Hồ sơ – Thử việc" {}
-package "D. Biến động nhân sự" {}
-package "E. Chấm công – Nghỉ phép" {}
-package "F. Lương – Báo cáo" {}
-package "Bộ máy dùng chung" {
-  class ApprovalEngine <<control>>
-  class PayrollEngine <<control>>
-  class NotificationService <<control>>
-}
-package "Dữ liệu gốc dùng chung" {
-  class NhanVien <<entity>>
-  class DonVi <<entity>>
-  class VaiTro <<entity>>
-  class ThamSo <<entity>>
-}
-"A. Quản trị hệ thống" ..> "Dữ liệu gốc dùng chung"
-"B. Tuyển dụng" ..> "Dữ liệu gốc dùng chung"
-"B. Tuyển dụng" ..> ApprovalEngine
-"C. Hồ sơ – Thử việc" ..> "Dữ liệu gốc dùng chung"
-"D. Biến động nhân sự" ..> ApprovalEngine
-"E. Chấm công – Nghỉ phép" ..> ApprovalEngine
-"F. Lương – Báo cáo" ..> PayrollEngine
-@enduml
-```
 
-_Hình 2.17. Biểu đồ gói tổng quan của hệ thống HRMIS_
+![Hình 2.17: Biểu đồ gói tổng quan của hệ thống HRMIS](images/hinh_2_17_package_diagram.png)
 
 **Biểu đồ lớp Use case Đăng nhập (UC01):**
 
-```plantuml
-@startuml
-skinparam classAttributeIconSize 0
-class LoginForm <<boundary>> {
-  +display()
-  +inputCredentials()
-}
-class LoginControl <<control>> {
-  +authenticate()
-  +logAccess()
-}
-class TaiKhoan <<entity>> {
-  #tenDangNhap : String
-  #matKhauHash : String
-  #trangThai : String
-}
-class NhanVien <<entity>> {
-  #maNhanVien : String
-  #hoTen : String
-}
-class VaiTro <<entity>> {
-  #maVaiTro : String
-  #quyenChucNang : String
-  #phamViDuLieu : String
-}
-LoginForm ..> LoginControl
-LoginControl ..> TaiKhoan
-TaiKhoan --> NhanVien
-TaiKhoan --> VaiTro
-@enduml
-```
 
-_Hình 2.18. Biểu đồ lớp Use case Đăng nhập (UC01)_
+![Hình 2.18: Biểu đồ lớp Use case Đăng nhập (UC01)](images/hinh_2_18_class_login.png)
 
 **Lớp «Boundary» LoginForm (Lớp giao diện Đăng nhập)**
 
@@ -1355,41 +887,8 @@ _Hình 2.18. Biểu đồ lớp Use case Đăng nhập (UC01)_
 
 **Biểu đồ lớp Use case Đăng ký nghỉ phép (UC20):**
 
-```plantuml
-@startuml
-skinparam classAttributeIconSize 0
-class LeaveRequestForm <<boundary>> {
-  +display()
-  +inputData()
-}
-class LeaveControl <<control>> {
-  +submitRequest()
-  +checkBalance()
-  +approveRequest()
-  +rejectRequest()
-}
-class DonNghiPhep <<entity>> {
-  #maDon : String
-  #loaiPhep : String
-  #tuNgay : Date
-  #denNgay : Date
-  #lyDo : String
-  #trangThai : String
-}
-class SoDuPhep <<entity>> {
-  #maNV : String
-  #nam : int
-  #soDu : Decimal
-  #daDatCho : Decimal
-}
-LeaveRequestForm ..> LeaveControl
-LeaveControl ..> DonNghiPhep
-LeaveControl ..> SoDuPhep
-DonNghiPhep --> SoDuPhep
-@enduml
-```
 
-_Hình 2.19. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC20)_
+![Hình 2.19: Biểu đồ lớp Use case Đăng ký nghỉ phép (UC20)](images/hinh_2_19_class_leave.png)
 
 **Lớp «Boundary» LeaveRequestForm**
 
@@ -1425,83 +924,8 @@ Hai mươi ba Use case còn lại được xây dựng biểu đồ lớp theo *
 
 **Biểu đồ lớp miền cốt lõi của hệ thống:**
 
-```plantuml
-@startuml
-skinparam classAttributeIconSize 0
-class NhanVien <<entity>> {
-  #maNhanVien : String
-  #hoTen : String
-  #ngayVao : Date
-  #trangThai : String
-  #coCamTuyenLai : bool
-}
-class DonVi <<entity>> {
-  #maDonVi : String
-  #maCha : String
-  #dinhBien : int
-}
-class HopDong <<entity>> {
-  #soHopDong : String
-  #loai : String
-  #ngayHieuLuc : Date
-  #luongDongBH : Decimal
-  #trangThai : String
-}
-class CauTrucLuong <<entity>> {
-  #maNV : String
-  #tuNgay : Date
-}
-class ThanhPhanLuong <<entity>> {
-  #ma : String
-  #congThuc : String
-  #thuTuTinh : int
-  #chieu : String
-}
-class KyLuong <<entity>> {
-  #maKy : String
-  #trangThai : String
-}
-class PhieuLuong <<entity>> {
-  #thucLinh : Decimal
-  #trangThai : String
-}
-class BangCongNgay <<entity>> {
-  #maNV : String
-  #ngay : Date
-  #congHuuHieu : Decimal
-  #gioOtDuyet : Decimal
-  #coLech : bool
-}
-class DeXuat <<entity>> {
-  #maDeXuat : String
-  #loai : String
-  #trangThai : String
-}
-class BuocDuyet <<entity>> {
-  #thuTu : int
-  #vaiTroDuyet : String
-  #hanhDong : String
-}
-class PayrollEngine <<control>> {
-  +chayKy(maKy)
-}
-class ApprovalEngine <<control>> {
-  +khoiChay(deXuat)
-  +chuyenBuoc()
-}
-NhanVien "1" --> "0..*" HopDong
-NhanVien "*" --> "1" DonVi
-NhanVien "1" --> "*" CauTrucLuong
-NhanVien "1" --> "*" BangCongNgay
-CauTrucLuong "1" *-- "*" ThanhPhanLuong
-KyLuong "1" --> "*" PhieuLuong
-DeXuat "1" *-- "*" BuocDuyet
-PayrollEngine ..> KyLuong
-ApprovalEngine ..> DeXuat
-@enduml
-```
 
-_Hình 2.20. Biểu đồ lớp miền cốt lõi của hệ thống_
+![Hình 2.20: Biểu đồ lớp miền cốt lõi của hệ thống](images/hinh_2_20_class_domain.png)
 
 **Nhận xét:** Quan hệ tụ hợp (composition) giữa CauTrucLuong – ThanhPhanLuong và DeXuat – BuocDuyet thể hiện tính bao đóng: thành phần lương không tồn tại ngoài cấu trúc lương, bước duyệt không tồn tại ngoài đề xuất. Hai lớp điều khiển dùng chung PayrollEngine và ApprovalEngine được nhiều phân hệ tái sử dụng — đây là quyết định thiết kế giúp hệ thống có chất lượng sản phẩm thật: thêm một loại đề xuất mới chỉ cần cấu hình chuỗi BuocDuyet, không phải viết thêm luồng duyệt.
 
@@ -1509,114 +933,8 @@ _Hình 2.20. Biểu đồ lớp miền cốt lõi của hệ thống_
 
 Thiết kế lưu trữ dữ liệu là quá trình chuyển đổi các Lớp Thực thể thành các bảng trong cơ sở dữ liệu quan hệ. Hệ thống HRMIS được thiết kế với tổng cộng **32 bảng dữ liệu cốt lõi**, chia theo sáu miền nghiệp vụ (bổ sung hai bảng phục vụ chấm công đa nguồn — xem mục 2.5), bảo đảm khả năng lưu trữ toàn vẹn thông tin cho mọi quy trình.
 
-```plantuml
-@startuml
-hide circle
-skinparam linetype ortho
 
-entity NHANVIEN {
-  * MaNV : String
-  --
-  HoTen, NgaySinh, QueQuan
-  MaDonVi, MaViTri, TrangThai
-}
-entity DONVI {
-  * MaDonVi
-  --
-  TenDonVi, MaCha, DinhBien
-}
-entity HOPDONG {
-  * SoHopDong
-  --
-  MaNV, Loai, NgayHieuLuc
-  LuongCoBan, LuongDongBH, TrangThai
-}
-entity VANBANG {
-  * MaVanBang
-  --
-  MaNV, Loai, SoHieu, NoiCap
-  FileQuet, ViTriTu, CoDangMuon
-}
-entity PHIEU_MUONTRA {
-  * MaPhieu
-  --
-  MaVanBang, NgayMuon, HanTra
-  NgayTra, TrangThai
-}
-entity PHIEU_TUYENDUNG {
-  * MaPhieu
-  --
-  MaViTri, SoLuong, LyDo, TrangThai
-}
-entity UNGVIEN {
-  * MaUngVien
-  --
-  HoTen, NguonKenh, TrangThai
-}
-entity DEXUAT {
-  * MaDeXuat
-  --
-  Loai, NguoiTao, TrangThai
-}
-entity BUOC_DUYET {
-  * MaBuoc
-  --
-  MaDeXuat, ThuTu, VaiTroDuyet
-  NguoiXuLy, HanhDong
-}
-entity SUKIEN_DIEMDANH {
-  * MaSuKien
-  --
-  MaNV, ThoiDiem, Nguon, CoLech
-}
-entity BANGCONG_NGAY {
-  * MaNV, Ngay
-  --
-  CongHuuHieu, PhutDiMuon
-  GioOtDuyet, CoLech
-}
-entity DON_NGHIPHEP {
-  * MaDon
-  --
-  MaNV, LoaiPhep, TuNgay, DenNgay
-  TrangThai
-}
-entity SO_DU_PHEP {
-  * MaNV, Nam
-  --
-  SoDu, DaDatCho
-}
-entity KYLUONG {
-  * MaKy
-  --
-  Thang, NgayKhoaCong, TrangThai
-}
-entity PHIEU_LUONG {
-  * MaKy, MaNV
-  --
-  DuLieuThanhPhan, ThucLinh
-  TrangThai
-}
-entity THAMSO {
-  * MaThamSo, TuNgay
-  --
-  GiaTri
-}
-
-NHANVIEN }o--|| DONVI
-NHANVIEN ||--o{ HOPDONG
-NHANVIEN ||--o{ VANBANG
-VANBANG ||--o{ PHIEU_MUONTRA
-NHANVIEN ||--o{ SUKIEN_DIEMDANH
-NHANVIEN ||--o{ BANGCONG_NGAY
-NHANVIEN ||--o{ DON_NGHIPHEP
-NHANVIEN ||--o{ SO_DU_PHEP
-NHANVIEN ||--o{ PHIEU_LUONG
-KYLUONG ||--o{ PHIEU_LUONG
-PHIEU_TUYENDUNG ||--o{ UNGVIEN
-DEXUAT ||--o{ BUOC_DUYET
-@enduml
-```
+![Hình 2.21: Mô hình cơ sở dữ liệu vật lý của hệ thống](images/hinh_2_21_erd_database.png)
 
 _Hình 2.21. Mô hình cơ sở dữ liệu vật lý của hệ thống_ (sơ đồ thể hiện 16 bảng chính; 16 bảng còn lại — VAITRO, TAIKHOAN, TAIKHOAN_VAITRO, VITRIVIECLAM, VONG_PHONGVAN, THUMOI, CA_LAM_VIEC, DANGKY_OT, THANHPHAN_LUONG, CAUTRUC_LUONG, QUYETDINH, THONGBAO, NHATKY, NGUOI_PHU_THUOC, THIETBI_CHAMCONG, MAU_KHUONMAT — vẽ bổ sung theo cùng ký pháp)
 
@@ -1654,44 +972,8 @@ Thiết kế thành phần là bước tổ chức kiến trúc phần mềm, tr
 
 **Tầng lưu trữ dữ liệu:** Thành phần nằm sâu nhất, chịu trách nhiệm bảo quản toàn bộ thông tin: hệ quản trị cơ sở dữ liệu SQL Server cho 32 bảng nghiệp vụ và kho tập tin riêng cho bản quét hồ sơ. Tầng lưu trữ không trực tiếp giao tiếp với màn hình giao diện mà chỉ cung cấp hoặc nhận dữ liệu qua các lệnh truy xuất từ tầng xử lý nghiệp vụ.
 
-```plantuml
-@startuml
-package "TẦNG GIAO DIỆN" {
-  [Web quản trị + Kiosk QR\n(Next.js)] as Web
-  [Ứng dụng di động\ntự phục vụ (Flutter)] as Mobile
-}
-package "TẦNG XỬ LÝ NGHIỆP VỤ" {
-  [Khối Quản trị hệ thống] as K1
-  [Khối Tuyển dụng] as K2
-  [Khối Hồ sơ – Thử việc] as K3
-  [Khối Biến động nhân sự] as K4
-  [Khối Chấm công – Nghỉ phép] as K5
-  [Khối Lương – Báo cáo] as K6
-  [ApprovalEngine\n(Bộ máy phê duyệt)] as AE
-  [PayrollEngine\n(Bộ máy tính lương)] as PE
-  [NotificationService] as NS
-}
-database "TẦNG LƯU TRỮ" {
-  [SQL Server\n(32 bảng)] as DB
-  [Kho tập tin\nbản quét hồ sơ] as FS
-}
-Web --> K1
-Mobile --> K5
-K2 ..> AE
-K4 ..> AE
-K5 ..> AE
-K6 ..> PE
-K1 ..> NS
-K4 ..> NS
-K1 --> DB
-K3 --> DB
-K5 --> DB
-K6 --> DB
-K3 --> FS
-@enduml
-```
 
-_Hình 2.22. Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống_
+![Hình 2.22: Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống](images/hinh_2_22_arch_3tier.png)
 
 Sự phân chia kiến trúc thành các tầng và khối thành phần riêng biệt giúp hệ thống sở hữu nền tảng vận hành linh hoạt. Trong tương lai, nếu công ty muốn thay đổi giao diện hoặc bổ sung phân hệ mới (ví dụ tầng trí tuệ nhân tạo dự báo nhân sự), lập trình viên chỉ cần can thiệp vào một thành phần cụ thể mà không làm ảnh hưởng đến cấu trúc lưu trữ hay các quy trình đang diễn ra bình thường.
 
@@ -1707,70 +989,13 @@ Nguyên tắc thiết kế an toàn cho ba kênh mới:
 
 Biểu đồ trình tự kênh QR (đại diện cho ba kênh mới):
 
-```plantuml
-@startuml
-actor "Nhân viên" as NV
-boundary "Kiosk\n(màn hình xoay QR)" as K
-control "QrTokenService" as T
-control "AttendanceControl" as C
-entity "SUKIEN_DIEMDANH" as E
-entity "BANGCONG_NGAY" as B
 
-K -> T : xin token (mỗi 30 giây)
-T --> K : token HMAC {kiosk_id, iat, jti}
-K -> K : render mã QR mới
-NV -> K : quét mã bằng điện thoại, xác nhận
-K -> C : checkIn(token)
-C -> T : verify (chữ ký, TTL ≤ 60s, jti chưa dùng)
-alt [Token hợp lệ và chưa check-in ±2 phút]
-  C -> E : INSERT sự kiện (nguồn = QR, bất biến)
-  C -> B : tổng hợp lại công ngày (giờ vào, phút đi muộn)
-  C --> NV : "Chấm công 08:02 ✓"
-else [Token hết hạn / jti đã dùng / trùng lặp]
-  C --> NV : từ chối kèm lý do, ghi nhật ký
-end
-@enduml
-```
-
-_Hình 2.23. Biểu đồ trình tự Use case Điểm danh bằng mã QR (UC26)_
+![Hình 2.23: Biểu đồ trình tự Use case Điểm danh bằng mã QR (UC26)](images/hinh_2_23_seq_qr.png)
 
 Phần mô hình dữ liệu bổ sung cho ba kênh mới (hai bảng thêm vào mô hình 32 bảng):
 
-```plantuml
-@startuml
-hide circle
-skinparam linetype ortho
 
-entity THIETBI_CHAMCONG {
-  * MaThietBi
-  --
-  Loai : QR_KIOSK | MAY_WEBHOOK | MAY_CSV | MO_PHONG
-  ViTri
-  KhoaHMAC_hash
-  TrangThai, LanCuoiHoatDong
-}
-
-entity SUKIEN_DIEMDANH {
-  * MaSuKien
-  --
-  MaNV, ThoiDiem
-  Nguon : MAY | UNG_DUNG | QR | KHUON_MAT
-  MaThietBi, CoLech
-}
-
-entity MAU_KHUONMAT {
-  * MaMau
-  --
-  MaNV
-  VectorMaHoa_AES
-  SoDuongDo : 128
-  DongThuanLuc, TrangThai
-}
-
-THIETBI_CHAMCONG ||--o{ SUKIEN_DIEMDANH
-MAU_KHUONMAT ||--o{ SUKIEN_DIEMDANH
-@enduml
-```
+![Hình 2.24: Mô hình dữ liệu bổ sung cho chấm công đa nguồn](images/hinh_2_24_erd_multisource.png)
 
 _Hình 2.24. Mô hình dữ liệu bổ sung cho chấm công đa nguồn_ (SUKIEN_DIEMDANH giữ nguyên tính bất biến, chỉ mở rộng giá trị trường Nguon; token QR xác minh trạng thái nên không cần bảng lưu — jti kiểm tra bằng bộ nhớ đệm có hạn đời 60 giây)
 
@@ -1828,4 +1053,4 @@ Chương 3 đóng vai trò tổng kết và định hướng chiến lược sau
 
 ---
 
-**Hướng dẫn sử dụng bản tài liệu:** (1) Hoàn thiện trang bìa, Mục lục và đánh số trang theo mẫu trường; (2) các biểu đồ đã kèm mã PlantUML — dán vào plantuml.com hoặc plugin VS Code để xuất hình PNG rồi chèn vào đúng vị trí "Hình 2.x"; (3) các biểu đồ của 20 UC còn lại vẽ theo hai khuôn mẫu đã nêu ở mục 2.3.1 và khuôn lớp ba lớp ở mục 2.4.1; (4) phần giao diện (mục 2.4.3) chèn ảnh chụp màn hình demo khi xây dựng xong để thay thế mô tả, đánh số hình tiếp theo Hình 2.25.
+**Hướng dẫn sử dụng bản tài liệu:** (1) Hoàn thiện trang bìa, Mục lục và đánh số trang theo mẫu trường; (2) các biểu đồ đã kèm toàn bộ mã Mermaid chuẩn ký pháp UML nét thẳng — dán vào mermaid.live hoặc plugin Markdown để xuất hình PNG/SVG chất lượng cao chèn vào báo cáo; (3) các biểu đồ của 20 UC còn lại vẽ theo hai khuôn mẫu đã nêu ở mục 2.3.1 và khuôn lớp ba lớp ở mục 2.4.1; (4) phần giao diện (mục 2.4.3) chèn ảnh chụp màn hình demo khi xây dựng xong để thay thế mô tả, đánh số hình tiếp theo Hình 2.25.

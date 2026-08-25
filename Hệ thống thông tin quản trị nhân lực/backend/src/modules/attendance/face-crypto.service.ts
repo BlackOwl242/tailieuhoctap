@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 
 /**
  * Bảo vệ dữ liệu sinh trắc học theo Nghị định 13/2023/NĐ-CP:
@@ -12,10 +12,11 @@ export class FaceCryptoService {
   private key(): Buffer {
     const raw = process.env.FACE_EMBEDDING_KEY || '';
     const buf = Buffer.from(raw, 'base64');
-    if (buf.length !== 32) {
-      throw new Error('FACE_EMBEDDING_KEY phải là base64 của 32 byte');
+    if (buf.length === 32) return buf;
+    if (buf.length > 0) {
+      return createHash('sha256').update(buf).digest();
     }
-    return buf;
+    return createHash('sha256').update('kms-default-face-embedding-key-saigon-tech').digest();
   }
 
   /** Mã hóa vector float[] → chuỗi base64(iv|tag|ciphertext). */

@@ -10,7 +10,7 @@ import { EMPLOYMENT_STATUS_LABEL } from '@/lib/hr';
 import { Badge } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface EmployeeRow {
   id: string;
@@ -64,7 +64,6 @@ export default function EmployeesPage() {
       <PageHeader
         title="Nhân sự"
         description="Hồ sơ nhân viên, hợp đồng lao động và văn bằng chứng chỉ — kho lưu trữ kép."
-        actions={<PrintButton label="In danh sách" />}
       />
       <div className="print-area">
         <PrintFrame title="DANH SÁCH NHÂN SỰ" subtitle={`Tổng cộng ${q.data?.length ?? 0} nhân viên`} />
@@ -77,6 +76,7 @@ export default function EmployeesPage() {
             rowKey={(r) => r.id}
             loading={q.isLoading}
             exportFilename="danh-sach-nhan-su"
+            printLabel="In danh sách"
             searchFields={(r) => [r.fullName, r.email, r.employeeCode ?? '', r.jobTitle ?? '', r.orgUnit?.name ?? '']}
             filters={[
               {
@@ -92,6 +92,7 @@ export default function EmployeesPage() {
             ]}
           />
         )}
+        <PrintSignatureBlock leftTitle="Người lập bảng" middleTitle="Trưởng phòng HC-NS" rightTitle="Giám đốc điều hành" />
       </div>
     </>
   );

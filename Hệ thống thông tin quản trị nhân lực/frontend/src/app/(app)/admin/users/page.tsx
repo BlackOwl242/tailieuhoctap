@@ -9,7 +9,7 @@ import { Button, Card, CardContent, Input, Label, Select, Badge } from '@/compon
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame } from '@/components/ui/print';
+import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface UserRow {
   id: string; email: string; fullName: string; jobTitle: string | null;
@@ -79,10 +79,9 @@ export default function AdminUsersPage() {
       <PageHeader
         title="Quản lý người dùng"
         actions={
-          <>
-            <Button size="sm" onClick={() => setShowCreate(true)}><Plus className="h-4 w-4" /> Thêm người dùng</Button>
-            <PrintButton label="In danh sách" />
-          </>
+          <Button size="sm" onClick={() => setShowCreate(true)}>
+            <Plus className="h-4 w-4" /> Thêm người dùng
+          </Button>
         }
       />
 
@@ -96,7 +95,8 @@ export default function AdminUsersPage() {
             rows={q.data ?? []}
             rowKey={(u) => u.id}
             loading={q.isLoading}
-            exportFilename="nguoi-dung"
+            exportFilename="danh-sach-nguoi-dung"
+            printLabel="In danh sách tài khoản"
             searchFields={(u) => [u.fullName, u.email, u.jobTitle ?? '', u.orgUnit?.name ?? '']}
             filters={[
               { key: 'status', label: 'Trạng thái', value: (u) => u.status, options: Object.entries(STATUS_LABEL).map(([value, label]) => ({ value, label })) },
@@ -110,6 +110,7 @@ export default function AdminUsersPage() {
             ]}
           />
         )}
+        <PrintSignatureBlock leftTitle="Quản trị viên lập bảng" middleTitle="Trưởng phòng CNTT" rightTitle="Giám đốc điều hành" />
       </div>
 
       <Modal open={showCreate} onOpenChange={setShowCreate} title="Thêm người dùng">
