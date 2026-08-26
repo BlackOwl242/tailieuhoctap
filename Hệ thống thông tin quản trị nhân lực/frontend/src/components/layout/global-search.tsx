@@ -126,7 +126,7 @@ export function GlobalSearch() {
             <div
               ref={panelRef}
               style={{ top: boxRef.current ? boxRef.current.getBoundingClientRect().bottom + 6 : 0, left: boxRef.current ? boxRef.current.getBoundingClientRect().left : 0, width: boxRef.current ? boxRef.current.getBoundingClientRect().width : 384 }}
-              className="fixed z-dropdown max-h-[24rem] overflow-y-auto rounded-lg border bg-card py-1 shadow-lg animate-fade-in"
+              className="fixed z-dropdown max-h-[24rem] overflow-y-auto rounded-lg border border-border bg-popover py-1 shadow-xl animate-fade-in"
               role="listbox"
             >
               {loading ? (

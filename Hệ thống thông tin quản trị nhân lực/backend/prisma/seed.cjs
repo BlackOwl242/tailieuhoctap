@@ -41,14 +41,14 @@ async function main() {
       for (const [i, name] of ['Tổ Tuyển dụng', 'Tổ Hồ sơ & Hợp đồng', 'Tổ Tiền lương – Bảo hiểm', 'Tổ Hành chính – Văn thư'].entries()) {
         await tx.orgUnit.create({ data: { name, code: `HR-${i + 1}`, parentId: hr.id, path: `/${bod.id}/${hr.id}/`, sortOrder: i } });
       }
-      const delivery = await tx.orgUnit.create({ data: { name: 'Khối Chuyển giao Dự án', code: 'DELIVERY' } });
+      const delivery = await tx.orgUnit.create({ data: { name: 'Khối Chuyển giao Dự án', code: 'DELIVERY', parentId: bod.id, path: `/${bod.id}/` } });
       let javaSquadId = null;
       for (const city of ['TP.HCM', 'Đà Nẵng']) {
-        const center = await tx.orgUnit.create({ data: { name: `Trung tâm ${city}`, code: `DEV-${city === 'TP.HCM' ? 'SGN' : 'DAD'}`, parentId: delivery.id, path: `/${delivery.id}/` } });
+        const center = await tx.orgUnit.create({ data: { name: `Trung tâm ${city}`, code: `DEV-${city === 'TP.HCM' ? 'SGN' : 'DAD'}`, parentId: delivery.id, path: `/${bod.id}/${delivery.id}/` } });
         let i = 0;
         for (const squad of ['Nhóm Java', 'Nhóm .NET', 'Nhóm PHP/NodeJS', 'Nhóm Ứng dụng di động', 'Nhóm Kiểm thử', 'Nhóm DevOps']) {
           i++;
-          const sq = await tx.orgUnit.create({ data: { name: `${squad} (${city})`, code: `SQ-${city === 'TP.HCM' ? 'S' : 'D'}${i}`, parentId: center.id, path: `/${delivery.id}/${center.id}/`, sortOrder: i } });
+          const sq = await tx.orgUnit.create({ data: { name: `${squad} (${city})`, code: `SQ-${city === 'TP.HCM' ? 'S' : 'D'}${i}`, parentId: center.id, path: `/${bod.id}/${delivery.id}/${center.id}/`, sortOrder: i } });
           if (city === 'TP.HCM' && squad === 'Nhóm Java') javaSquadId = sq.id;
         }
       }
@@ -379,6 +379,14 @@ main()
     const bcrypt = require('bcryptjs');
     const r = await seedEmployees(prisma, (pw) => bcrypt.hashSync(pw, 10));
     console.log(`[seed] nhân viên demo: tạo mới ${r.created}, bỏ qua ${r.skipped}`);
+
+    // Seed 184 Ngạch bậc lương tiêu chuẩn & Hồ sơ Toàn diện
+    const { seedPersonnelData } = require('./seed-personnel-ranks.cjs');
+    await seedPersonnelData();
+
+    // Seed Phân hệ Mở rộng Chuẩn mực Frappe HRMS
+    const { seedFrappeHrms } = require('./seed-frappe-hrms.cjs');
+    await seedFrappeHrms();
   })
   .catch((e) => {
     console.error('[seed] Failed:', e.message || e);

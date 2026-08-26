@@ -37,6 +37,7 @@ const config: Config = {
         muted: { DEFAULT: 'hsl(var(--muted))', foreground: 'hsl(var(--muted-foreground))' },
         accent: { DEFAULT: 'hsl(var(--accent))', foreground: 'hsl(var(--accent-foreground))' },
         card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
+        popover: { DEFAULT: 'hsl(var(--popover))', foreground: 'hsl(var(--popover-foreground))' },
         success: { DEFAULT: 'hsl(var(--success))', foreground: 'hsl(var(--success-foreground))' },
       },
       borderRadius: {
@@ -47,11 +48,12 @@ const config: Config = {
       // Token z-index dùng chung — KHÔNG dùng số trực tiếp trong component
       zIndex: {
         content: '0',
-        sticky: '10',
-        dropdown: '20',
-        overlay: '30',
-        modal: '40',
-        toast: '50',
+        sticky: '20',
+        sidebar: '30',
+        dropdown: '50',
+        overlay: '60',
+        modal: '70',
+        toast: '100',
       },
       fontFamily: {
         // Font hệ thống rõ ràng, đồng bộ mọi nền tảng (không tải font ngoài)

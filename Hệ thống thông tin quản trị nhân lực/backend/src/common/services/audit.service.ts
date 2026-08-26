@@ -4,8 +4,11 @@ import { PrismaService } from '../prisma.service';
 export interface AuditEntry {
   actorId?: string | null;
   action: string;
-  entityType: string;
+  entityType?: string;
   entityId?: string | null;
+  targetType?: string;
+  targetId?: string | null;
+  description?: string;
   before?: unknown;
   after?: unknown;
   ip?: string | null;
@@ -28,10 +31,10 @@ export class AuditService {
         data: {
           actorId: entry.actorId ?? null,
           action: entry.action,
-          entityType: entry.entityType,
-          entityId: entry.entityId ?? null,
+          entityType: entry.entityType ?? entry.targetType ?? 'UNKNOWN',
+          entityId: entry.entityId ?? entry.targetId ?? null,
           beforeData: entry.before === undefined ? undefined : (entry.before as object),
-          afterData: entry.after === undefined ? undefined : (entry.after as object),
+          afterData: entry.after !== undefined ? (entry.after as object) : (entry.description ? { description: entry.description } : undefined),
           ip: entry.ip ?? null,
           requestId: entry.requestId ?? null,
         },

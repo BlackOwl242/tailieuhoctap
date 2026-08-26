@@ -11,7 +11,8 @@ import { REQUEST_STATUS_LABEL, REQUEST_STATUS_TONE } from '@/lib/hr';
 import { Badge, Button, Input, Label, Skeleton, Textarea } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
-import { PageHeader, ErrorState } from '@/components/common/states';
+import { WorkspaceHeader } from '@/components/common/workspace-header';
+import { ErrorState } from '@/components/common/states';
 
 interface OvertimeRow {
   id: string; workDate: string; hours: number; reason: string;
@@ -75,11 +76,16 @@ export default function OvertimePage() {
   ];
 
   return (
-    <>
-      <PageHeader
-        title="Làm thêm giờ"
-        description="Giờ làm thêm phải được duyệt trước — giờ chưa duyệt không được tính tiền (Điều 98 BLĐ 2019)."
-        actions={<Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Đăng ký làm thêm</Button>}
+    <div className="space-y-6 pb-12">
+      <WorkspaceHeader
+        title="Làm thêm giờ (Overtime)"
+        description="Đăng ký và phê duyệt làm thêm giờ minh bạch — đảm bảo quyền lợi theo quy định và tự động kết nối bảng lương."
+        breadcrumbs={[{ label: 'Ca kíp & Chấm công' }, { label: 'Làm thêm giờ' }]}
+        actions={
+          <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5 shadow-2xs">
+            <Plus className="h-3.5 w-3.5" /> Đăng ký làm thêm
+          </Button>
+        }
       />
 
       {isHr ? (
@@ -154,6 +160,6 @@ export default function OvertimePage() {
           </div>
         </form>
       </Modal>
-    </>
+    </div>
   );
 }

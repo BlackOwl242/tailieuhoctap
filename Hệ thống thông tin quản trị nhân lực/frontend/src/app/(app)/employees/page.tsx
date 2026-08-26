@@ -9,7 +9,8 @@ import { formatDate } from '@/lib/utils';
 import { EMPLOYMENT_STATUS_LABEL } from '@/lib/hr';
 import { Badge } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
-import { PageHeader, ErrorState } from '@/components/common/states';
+import { WorkspaceHeader } from '@/components/common/workspace-header';
+import { ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface EmployeeRow {
@@ -35,23 +36,32 @@ export default function EmployeesPage() {
   const columns: DataColumn<EmployeeRow>[] = [
     {
       key: 'employeeCode', header: 'Mã NV', sortable: true,
+      className: 'w-[12%] text-center',
       render: (r) => r.employeeCode ?? '—',
     },
     {
-      key: 'fullName', header: 'Họ tên', sortable: true,
+      key: 'fullName',
+      header: 'Họ và tên',
+      sortable: true,
+      className: 'w-[22%]',
+      exportValue: (r) => r.fullName,
       render: (r) => (
-        <Link href={`/employees/${r.id}`} className="font-medium text-primary hover:underline">
-          {r.fullName}
-        </Link>
+        <>
+          <span className="font-semibold text-foreground hidden print:inline">{r.fullName}</span>
+          <Link href={`/employees/${r.id}`} className="font-semibold text-primary hover:underline block no-print">
+            {r.fullName}
+          </Link>
+        </>
       ),
     },
-    { key: 'jobTitle', header: 'Chức danh', sortable: true, render: (r) => r.jobTitle ?? '—' },
-    { key: 'orgUnit', header: 'Đơn vị', render: (r) => r.orgUnit?.name ?? '—', exportValue: (r) => r.orgUnit?.name ?? '' },
-    { key: 'hireDate', header: 'Ngày vào', sortable: true, render: (r) => (r.hireDate ? formatDate(r.hireDate) : '—'), exportValue: (r) => (r.hireDate ? formatDate(r.hireDate) : '') },
+    { key: 'jobTitle', header: 'Chức danh', sortable: true, className: 'w-[20%]', render: (r) => r.jobTitle ?? '—' },
+    { key: 'orgUnit', header: 'Đơn vị', className: 'w-[20%]', render: (r) => r.orgUnit?.name ?? '—', exportValue: (r) => r.orgUnit?.name ?? '' },
+    { key: 'hireDate', header: 'Ngày vào', sortable: true, className: 'w-[13%] text-center', render: (r) => (r.hireDate ? formatDate(r.hireDate) : '—'), exportValue: (r) => (r.hireDate ? formatDate(r.hireDate) : '') },
     {
       key: 'employmentStatus', header: 'Trạng thái', sortable: true,
+      className: 'w-[13%] text-center',
       render: (r) => (
-        <Badge className={r.employmentStatus === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : r.employmentStatus === 'PROBATION' ? 'bg-amber-100 text-amber-800' : 'bg-secondary'}>
+        <Badge variant={r.employmentStatus === 'ACTIVE' ? 'success' : r.employmentStatus === 'PROBATION' ? 'warning' : 'secondary'}>
           {EMPLOYMENT_STATUS_LABEL[r.employmentStatus] ?? r.employmentStatus}
         </Badge>
       ),
@@ -60,10 +70,11 @@ export default function EmployeesPage() {
   ];
 
   return (
-    <>
-      <PageHeader
-        title="Nhân sự"
-        description="Hồ sơ nhân viên, hợp đồng lao động và văn bằng chứng chỉ — kho lưu trữ kép."
+    <div className="space-y-6 pb-12">
+      <WorkspaceHeader
+        title="Danh sách Nhân sự"
+        description="Quản lý toàn bộ danh bạ cán bộ nhân viên, hợp đồng lao động, văn bằng chứng chỉ và quá trình công tác."
+        breadcrumbs={[{ label: 'Nhân sự' }, { label: 'Danh sách nhân viên' }]}
       />
       <div className="print-area">
         <PrintFrame title="DANH SÁCH NHÂN SỰ" subtitle={`Tổng cộng ${q.data?.length ?? 0} nhân viên`} />
@@ -92,8 +103,8 @@ export default function EmployeesPage() {
             ]}
           />
         )}
-        <PrintSignatureBlock leftTitle="Người lập bảng" middleTitle="Trưởng phòng HC-NS" rightTitle="Giám đốc điều hành" />
+        <PrintSignatureBlock leftTitle="Người lập bảng" middleTitle="Trưởng phòng Tổ chức - Nhân sự" rightTitle="Thủ trưởng đơn vị" />
       </div>
-    </>
+    </div>
   );
 }

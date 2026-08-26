@@ -68,41 +68,41 @@ function OrgChartBranch({
   const [collapsed, setCollapsed] = useState(false);
   const hasChildren = node.children && node.children.length > 0;
 
-  // Màu sắc phân cấp rõ ràng
-  const depthColors = [
-    'border-blue-600 bg-blue-50/80 dark:bg-blue-950/40 text-blue-950 dark:text-blue-100 shadow-md ring-2 ring-blue-500/20', // Ban Giám Đốc (Level 0)
-    'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/30 text-indigo-950 dark:text-indigo-100 shadow-sm', // Khối / Ban (Level 1)
-    'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-950 dark:text-emerald-100 shadow-sm', // Trung tâm / Phòng (Level 2)
-    'border-slate-300 dark:border-slate-700 bg-card text-foreground shadow-sm', // Nhóm / Tổ (Level 3+)
+  // Phân cấp viền và điểm nhấn thanh lịch
+  const depthStyles = [
+    'border-blue-600 bg-white text-slate-900 ring-2 ring-blue-500/20 shadow-md', // Ban Giám Đốc (Level 0)
+    'border-emerald-500 bg-white text-slate-900 shadow-md', // Khối / Ban (Level 1)
+    'border-amber-500 bg-white text-slate-900 shadow-sm', // Trung tâm / Phòng (Level 2)
+    'border-slate-300 bg-white text-slate-900 shadow-sm', // Nhóm / Tổ (Level 3+)
   ];
-  const cardStyle = depthColors[Math.min(depth, depthColors.length - 1)];
+  const cardStyle = depthStyles[Math.min(depth, depthStyles.length - 1)];
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center select-none">
       {/* Node Card */}
       <div
-        className={`group relative flex min-w-[210px] max-w-[260px] flex-col rounded-2xl border-2 p-3.5 text-center transition-all duration-200 hover:shadow-lg ${cardStyle}`}
+        className={`group relative flex min-w-[220px] max-w-[260px] flex-col rounded-2xl border-2 p-3.5 text-center transition-all duration-150 hover:shadow-lg ${cardStyle}`}
       >
-        <div className="flex items-center justify-between gap-1.5 pb-1 border-b border-current/10">
-          <span className="font-mono text-[11px] font-bold uppercase tracking-wider opacity-85">
+        <div className="flex items-center justify-between gap-1.5 pb-1.5 border-b border-slate-100">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-800">
             {node.code}
           </span>
-          <span className="rounded-full bg-current/10 px-2 py-0.5 text-[11px] font-semibold">
-            {node.memberCount} NV
+          <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 text-[10px] font-bold">
+            <Users className="h-3 w-3" /> {node.memberCount} NV
           </span>
         </div>
 
-        <h4 className="mt-1.5 font-bold text-sm leading-snug break-words">
+        <h4 className="mt-2 font-bold text-sm leading-snug break-words text-slate-900 min-h-[2.5rem] flex items-center justify-center">
           {node.name}
         </h4>
 
         {/* Nút thao tác (ẩn khi in) */}
         {!print ? (
-          <div className="mt-2.5 flex items-center justify-center gap-1 border-t border-current/10 pt-2 opacity-85 transition-opacity group-hover:opacity-100">
+          <div className="mt-2.5 flex items-center justify-center gap-1 border-t border-border/60 pt-2 transition-opacity">
             <button
               type="button"
               onClick={() => onAddChild(node)}
-              className="rounded-lg p-1.5 hover:bg-primary/20 text-primary transition-colors"
+              className="rounded-lg p-1.5 hover:bg-primary/10 text-primary transition-colors"
               title="Thêm đơn vị con"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -110,7 +110,7 @@ function OrgChartBranch({
             <button
               type="button"
               onClick={() => onEdit(node)}
-              className="rounded-lg p-1.5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              className="rounded-lg p-1.5 hover:bg-muted text-foreground transition-colors"
               title="Sửa tên / đơn vị cha"
             >
               <Pencil className="h-3.5 w-3.5" />
@@ -118,7 +118,7 @@ function OrgChartBranch({
             <button
               type="button"
               onClick={() => onDetail(node)}
-              className="rounded-lg p-1.5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              className="rounded-lg p-1.5 hover:bg-muted text-foreground transition-colors"
               title="Xem danh sách nhân viên"
             >
               <Eye className="h-3.5 w-3.5" />
@@ -126,7 +126,7 @@ function OrgChartBranch({
             <button
               type="button"
               onClick={() => onDelete(node)}
-              className="rounded-lg p-1.5 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors"
+              className="rounded-lg p-1.5 hover:bg-rose-50 text-rose-600 transition-colors"
               title="Xóa đơn vị"
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -139,7 +139,7 @@ function OrgChartBranch({
           <button
             type="button"
             onClick={() => setCollapsed(!collapsed)}
-            className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border bg-card px-2 py-0.5 text-[10px] font-bold shadow-sm hover:bg-accent transition-transform"
+            className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-border bg-card text-foreground px-2 py-0.5 text-[10px] font-bold shadow-xs hover:bg-accent transition-transform z-10"
             title={collapsed ? 'Mở rộng nhánh' : 'Thu gọn nhánh'}
           >
             {collapsed ? `+${node.children.length}` : '−'}
@@ -494,46 +494,39 @@ export default function AdminOrgUnitsPage() {
       />
 
       <div className="print-area">
-        <PrintFrame title="SƠ ĐỒ CƠ CẤU TỔ CHỨC" subtitle="Công ty Cổ phần Phần mềm Saigon Technology" />
+        <PrintFrame
+          title="DANH MỤC CƠ CẤU TỔ CHỨC CÔNG TY"
+          subtitle={`Công ty Cổ phần Phần mềm Saigon Technology · Tổng số ${flat.length} đơn vị`}
+        />
 
-        {/* Khung Sơ Đồ In Ấn Sạch */}
+        {/* Khung Bảng In Ấn Chuẩn Nghị định 30 (In dạng bảng cấu trúc thư mục phân cấp) */}
         <div className="print-only">
-          <div className="flex flex-col items-center gap-8 py-4">
-            {(q.data ?? []).map((n) => (
-              <OrgChartBranch
-                key={n.id}
-                node={n}
-                depth={0}
-                onAddChild={() => {}}
-                onEdit={() => {}}
-                onDetail={() => {}}
-                onDelete={() => {}}
-                print={true}
-              />
-            ))}
-          </div>
-
-          <table className="mt-8 w-full text-sm">
+          <table className="w-full text-sm">
             <thead>
               <tr>
-                <th>Đơn vị</th>
-                <th>Mã</th>
-                <th>Đơn vị cha</th>
-                <th>Số nhân viên</th>
+                <th style={{ width: '12%' }}>MÃ ĐƠN VỊ</th>
+                <th style={{ width: '45%' }}>TÊN ĐƠN VỊ / PHÒNG BAN (CẤU TRÚC PHÂN CẤP)</th>
+                <th style={{ width: '28%' }}>ĐƠN VỊ CẤP TRÊN</th>
+                <th style={{ width: '15%' }}>NHÂN SỰ (NS)</th>
               </tr>
             </thead>
             <tbody>
               {flat.map(({ node, depth }) => (
                 <tr key={node.id}>
-                  <td>{depth > 0 ? `${'— '.repeat(depth)}${node.name}` : node.name}</td>
-                  <td>{node.code}</td>
-                  <td>{flat.find((f) => f.node.id === node.parentId)?.node.name ?? '—'}</td>
-                  <td>{node.memberCount}</td>
+                  <td className="text-center font-mono">{node.code}</td>
+                  <td>
+                    <span style={{ paddingLeft: `${depth * 18}px` }} className="inline-block">
+                      {depth > 0 ? '├─ ' : '★ '}
+                      {node.name}
+                    </span>
+                  </td>
+                  <td>{flat.find((f) => f.node.id === node.parentId)?.node.name ?? '— (Cấp cao nhất)'}</td>
+                  <td className="text-center font-semibold">{node.memberCount} người</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <PrintSignatureBlock leftTitle="Người lập sơ đồ" middleTitle="Trưởng phòng HC-NS" rightTitle="Tổng Giám đốc" />
+          <PrintSignatureBlock leftTitle="Người lập bảng" middleTitle="Trưởng phòng Tổ chức - Nhân sự" rightTitle="Thủ trưởng đơn vị" />
         </div>
 
         {/* Giao diện tương tác Web */}
@@ -710,7 +703,7 @@ export default function AdminOrgUnitsPage() {
               </div>
               <div className="p-3 rounded-xl bg-muted/40 border">
                 <p className="text-xs uppercase text-muted-foreground font-semibold">Nhân sự hiện hữu</p>
-                <p className="font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                <p className="font-bold text-emerald-700 mt-0.5">
                   {detail.memberCount} NV
                 </p>
               </div>

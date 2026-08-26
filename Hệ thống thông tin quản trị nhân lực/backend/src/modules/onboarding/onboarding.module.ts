@@ -205,6 +205,21 @@ export class OnboardingService {
       throw new BusinessException(ErrorCodes.FORBIDDEN, 'Không có quyền cập nhật mục này', HttpStatus.FORBIDDEN);
     }
     const done = dto.done ?? true;
+
+    // Ràng buộc UC17: Nếu là mục Thu hồi tài sản, kiểm tra xem nhân viên còn tài sản chưa trả không
+    if (done && checklist?.ownerUserId && (item.title.toLowerCase().includes('tài sản') || item.title.toLowerCase().includes('máy tính'))) {
+      const activeAsset = await this.prisma.hrmsAssetAllocation.findFirst({
+        where: { assignedUserId: checklist.ownerUserId, status: 'ALLOCATED' },
+      });
+      if (activeAsset) {
+        throw new BusinessException(
+          ErrorCodes.VALIDATION_ERROR,
+          `Nhân viên còn tài sản [${activeAsset.assetCode} - ${activeAsset.name}] chưa được thu hồi về kho!`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
     return this.prisma.handoverItem.update({
       where: { id: itemId },
       data: {

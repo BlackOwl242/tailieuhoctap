@@ -4,12 +4,23 @@ import { AlertTriangle, Inbox, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/primitives';
 
 /** Trạng thái rỗng thống nhất (danh sách trống, không kết quả…). */
-export function EmptyState({ title, hint, icon: Icon = Inbox }: { title: string; hint?: string; icon?: typeof Inbox }) {
+export function EmptyState({
+  title,
+  hint,
+  description,
+  icon: Icon = Inbox,
+}: {
+  title: string;
+  hint?: string;
+  description?: string;
+  icon?: typeof Inbox;
+}) {
+  const text = hint ?? description;
   return (
     <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-6 py-12 text-center">
       <Icon className="h-10 w-10 text-muted-foreground/60" aria-hidden />
       <p className="font-medium">{title}</p>
-      {hint ? <p className="max-w-sm text-sm text-muted-foreground">{hint}</p> : null}
+      {text ? <p className="max-w-sm text-sm text-muted-foreground">{text}</p> : null}
     </div>
   );
 }
@@ -30,14 +41,16 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
 }
 
 /** Spinner giữa khối — dùng cho loading từng vùng nội dung. */
-export function LoadingBlock({ label = 'Đang tải…' }: { label?: string }) {
+export function LoadingBlock({ label = 'Đang tải…', text }: { label?: string; text?: string }) {
   return (
     <div className="flex items-center justify-center gap-2 py-12 text-muted-foreground" role="status" aria-live="polite">
       <Loader2 className="h-5 w-5 animate-spin" />
-      <span className="text-sm">{label}</span>
+      <span className="text-sm">{text ?? label}</span>
     </div>
   );
 }
+
+export const LoadingState = LoadingBlock;
 
 /**
  * Topcard tiêu đề trang — chuẩn khoảng cách toàn hệ thống (Mục 1):

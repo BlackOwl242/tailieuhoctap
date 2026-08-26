@@ -7,7 +7,8 @@ import { api, errorMessage } from '@/lib/api';
 import { cn, formatDateTime, DAY_STATUS_LABEL } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Skeleton } from '@/components/ui/primitives';
-import { PageHeader, ErrorState } from '@/components/common/states';
+import { WorkspaceHeader } from '@/components/common/workspace-header';
+import { ErrorState } from '@/components/common/states';
 import { PrintExportDropdown, PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 import type { AttendanceDayRow, AttendanceEventRow } from '@/lib/types';
 
@@ -36,10 +37,11 @@ export default function AttendancePage() {
   const nextPunch = todayEvents.length % 2 === 0 ? 'IN' : 'OUT';
 
   return (
-    <>
-      <PageHeader
-        title="Chấm công"
-        description="Điểm danh đa nguồn: web, mã QR tại kiosk hoặc khuôn mặt."
+    <div className="space-y-6 pb-12">
+      <WorkspaceHeader
+        title="Bảng Chấm Công"
+        description="Điểm danh đa nguồn: trực tiếp web, quét mã QR tại Kiosk hoặc nhận diện khuôn mặt."
+        breadcrumbs={[{ label: 'Chấm công' }, { label: 'Bảng công cá nhân' }]}
         actions={
           <div className="flex items-center gap-2">
             <Link href="/kiosk"><Button variant="outline" size="sm"><QrCode className="h-4 w-4" /> Kiosk QR</Button></Link>
@@ -161,6 +163,6 @@ export default function AttendancePage() {
           </div>
         ) : null}
       </div>
-    </>
+    </div>
   );
 }

@@ -142,7 +142,7 @@ function ActionsCell({ items, rowLabel }: { items: RowActionItem[]; rowLabel: st
               ref={menuRef}
               role="menu"
               style={{ top: pos.top, left: pos.left }}
-              className="fixed z-dropdown min-w-[13rem] overflow-hidden rounded-lg border bg-card py-1 shadow-lg animate-fade-in"
+              className="fixed z-dropdown min-w-[13rem] overflow-hidden rounded-lg border border-border bg-popover py-1 shadow-xl animate-fade-in"
             >
               {items.map((it, i) =>
                 it === 'separator' ? (
@@ -314,15 +314,17 @@ export function DataTable<T>({
           <thead>
             <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
               {columns.map((c) => (
-                <th key={c.key} className={cn('whitespace-nowrap px-3 py-2.5 font-semibold first:pl-4 last:pr-4 sm:first:pl-5 sm:last:pr-5', c.noPrint && 'no-print', c.className)}>
+                <th key={c.key} className={cn('whitespace-nowrap print:whitespace-normal px-3 py-2.5 font-semibold first:pl-4 last:pr-4 sm:first:pl-5 sm:last:pr-5', c.noPrint && 'no-print', c.className)}>
                   {c.sortable ? (
-                    <button type="button" onClick={() => toggleSort(c)} className="inline-flex items-center gap-1 hover:text-foreground">
-                      {c.header}
-                      {sort?.key === c.key ? (
-                        sort.dir === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
-                      ) : (
-                        <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />
-                      )}
+                    <button type="button" onClick={() => toggleSort(c)} className="inline-flex items-center gap-1 hover:text-foreground print:inline print:p-0">
+                      <span>{c.header}</span>
+                      <span className="no-print inline-flex">
+                        {sort?.key === c.key ? (
+                          sort.dir === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
+                        ) : (
+                          <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />
+                        )}
+                      </span>
                     </button>
                   ) : (
                     c.header

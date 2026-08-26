@@ -98,10 +98,10 @@ export const CONTRACT_STATUS_LABEL: Record<string, string> = {
 
 /** Badge màu theo trạng thái đơn (PENDING/APPROVED/REJECTED/CANCELLED). */
 export const REQUEST_STATUS_TONE: Record<string, string> = {
-  PENDING: 'bg-amber-100 text-amber-800',
-  APPROVED: 'bg-emerald-100 text-emerald-800',
-  REJECTED: 'bg-red-100 text-red-800',
-  CANCELLED: 'bg-secondary text-secondary-foreground',
+  PENDING: 'bg-amber-50 text-amber-800 border-amber-200 border',
+  APPROVED: 'bg-emerald-50 text-emerald-700 border-emerald-200 border',
+  REJECTED: 'bg-rose-50 text-rose-700 border-rose-200 border',
+  CANCELLED: 'bg-slate-100 text-slate-700 border-slate-200 border',
 };
 
 /** Định dạng tiền Việt Nam đồng gọn gàng. */

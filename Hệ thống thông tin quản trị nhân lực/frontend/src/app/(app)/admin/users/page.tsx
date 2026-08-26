@@ -67,8 +67,7 @@ export default function AdminUsersPage() {
       </span>
     ) },
     { key: 'status', header: 'Trạng thái', sortable: true, render: (u) => (
-      <Badge className={u.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800'
-        : u.status === 'LOCKED' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'}>
+      <Badge variant={u.status === 'ACTIVE' ? 'success' : u.status === 'LOCKED' ? 'warning' : 'destructive'}>
         {STATUS_LABEL[u.status] ?? u.status}
       </Badge>
     ) },

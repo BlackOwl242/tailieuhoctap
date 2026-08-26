@@ -103,6 +103,7 @@ model User {
   requisitions         JobRequisition[]            @relation("RequisitionRequester")
   requisitionsDecided  JobRequisition[]            @relation("RequisitionDecider")
   documentsUploaded    HrDocument[]                @relation("DocumentUploader")
+  comprehensiveProfile PersonnelComprehensiveProfile?
 
   @@index([orgUnitId])
   @@index([status])
@@ -1097,3 +1098,869 @@ model HrDocument {
   @@map("hr_documents")
 }
 
+// ---------------------------------------------------------------------------
+// Domain 9 — Quản trị Hồ sơ Nhân sự Toàn diện & Ngạch bậc Lương
+// Áp dụng linh hoạt cho cả khối Doanh nghiệp Tư nhân lẫn Cơ quan, Đơn vị Sự nghiệp
+// ---------------------------------------------------------------------------
+
+model PersonnelRank {
+  code         String   @id // Mã ngạch (ví dụ: "01.003", "01.002", "01.001", "06.031"...)
+  name         String   // Tên ngạch (Chuyên viên cao cấp, Chuyên viên chính, Chuyên viên, Kỹ sư, Bác sĩ...)
+  groupCode    String   // Phân loại nhóm ngạch: A3, A2, A1, B, C
+  field        String?  // Lĩnh vực chuyên môn (Hành chính, Y tế, Giáo dục, Kỹ thuật...)
+  totalSteps   Int      @default(9) // Số bậc tối đa trong ngạch (6 đến 16 bậc)
+  stepMonths   Int      @default(36) // Thời gian giữ bậc nâng lương thường xuyên (24 hoặc 36 tháng)
+  coefficients Json     // Mảng các hệ số lương từ bậc 1..N: [2.34, 2.67, 3.00, ...]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profiles        PersonnelComprehensiveProfile[]
+  salaryHistories PersonnelSalaryHistory[]
+
+  @@index([groupCode])
+  @@map("personnel_ranks")
+}
+
+model PersonnelComprehensiveProfile {
+  id                  String    @id @default(uuid())
+  userId              String    @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 1. Thông tin cá nhân & Lý lịch
+  aliasName           String?   // Tên gọi khác
+  gender              String?   // Nam / Nữ
+  birthPlace          String?   // Nơi sinh
+  hometown            String?   // Quê quán
+  permanentAddress    String?   // Hộ khẩu thường trú
+  currentAddress      String?   // Nơi ở hiện nay
+  idCardNo            String?   // Số CMND / CCCD
+  idCardIssueDate     DateTime? // Ngày cấp
+  idCardIssuePlace    String?   // Nơi cấp
+  ethnicity           String?   @default("Kinh") // Dân tộc
+  religion            String?   @default("Không") // Tôn giáo
+  familyOrigin        String?   // Thành phần gia đình xuất thân
+  priorJob            String?   // Nghề nghiệp trước khi được tuyển dụng
+
+  // 2. Tuyển dụng & Chức danh
+  recruitDate         DateTime? // Ngày tuyển dụng
+  recruitOrg          String?   // Cơ quan tuyển dụng
+  currentOrgDate      DateTime? // Ngày vào cơ quan/đơn vị hiện tại
+  officialDate        DateTime? // Ngày vào biên chế / chính thức
+  govPosition         String?   // Chức vụ chính quyền / Chức danh quản lý
+  mainDuty            String?   // Công việc chính đảm nhiệm
+
+  // 3. Ngạch bậc, Tiền lương & Phụ cấp
+  rankCode            String?
+  rank                PersonnelRank? @relation(fields: [rankCode], references: [code])
+  salaryStep          Int?      // Bậc lương hiện hưởng (1..16)
+  salaryCoefficient   Float?    // Hệ số lương
+  salaryStepDate      DateTime? // Ngày hưởng bậc lương
+  overGradePercent    Float?    @default(0) // % Phụ cấp thâm niên vượt khung
+  positionAllowance   Float?    @default(0) // Hệ số phụ cấp chức vụ
+  otherAllowance      Float?    @default(0) // Hệ số phụ cấp khác
+  socialInsuranceNo   String?   // Mã số BHXH
+  socialInsuranceDate DateTime? // Ngày bắt đầu đóng BHXH
+
+  // 4. Trình độ học vấn, chuyên môn & lý luận
+  generalEducation    String?   @default("12/12") // Giáo dục phổ thông
+  highestDegree       String?   // Học vị/Trình độ chuyên môn cao nhất
+  majorCode           String?   // Mã ngành đào tạo
+  majorName           String?   // Tên ngành đào tạo
+  academicTitle       String?   // Học hàm (Giáo sư, Phó Giáo sư)
+  academicTitleDate   DateTime? // Ngày phong học hàm
+  politicalTheory     String?   // Lý luận chính trị (Cử nhân, Cao cấp, Trung cấp, Sơ cấp)
+  stateManagement     String?   // Quản lý nhà nước (CVCC, CVC, Chuyên viên...)
+  foreignLanguage     String?   // Ngoại ngữ chính
+  informaticsLevel    String?   // Tin học
+  ethnicLanguage      String?   // Tiếng dân tộc thiểu số
+
+  // 5. Tổ chức Đoàn - Đảng - Quân ngũ
+  unionJoinDate       DateTime? // Ngày vào Đoàn TNCS HCM
+  partyJoinDate       DateTime? // Ngày vào Đảng CSVN (dự bị)
+  partyOfficialDate   DateTime? // Ngày chính thức vào Đảng
+  partyPosition       String?   // Chức vụ Đảng hiện giữ
+  partyJoinPlace      String?   // Nơi kết nạp Đảng
+  enlistmentDate      DateTime? // Ngày nhập ngũ
+  dischargeDate       DateTime? // Ngày xuất ngũ
+  militaryRank        String?   // Quân hàm / cấp bậc cao nhất
+  honorTitle          String?   // Danh hiệu được phong tặng cao nhất
+
+  // 6. Sức khỏe & Diện chính sách
+  healthStatus        String?   @default("Tốt") // Tình trạng sức khỏe
+  heightCm            Float?    // Chiều cao (cm)
+  weightKg            Float?    // Cân nặng (kg)
+  bloodType           String?   // Nhóm máu (A, B, AB, O)
+  woundedClass        String?   // Hạng thương binh / bệnh binh
+  policyFamily        String?   // Gia đình diện chính sách
+
+  // 7. Sở trường & Lịch sử bản thân
+  strengths           String?   // Sở trường công tác
+  longestJob          String?   // Công việc làm lâu nhất
+  historyNotes        Json?     // Ghi chú lịch sử bản thân (JSON)
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // 8 Quá trình lịch sử con
+  salaryHistories     PersonnelSalaryHistory[]
+  appointments        PersonnelAppointment[]
+  educations          PersonnelEducation[]
+  workHistories       PersonnelWorkHistory[]
+  rewardDisciplines   PersonnelRewardDiscipline[]
+  familyRelations     PersonnelFamilyRelation[]
+  appraisals          PersonnelAppraisal[]
+  socialActivities    PersonnelSocialActivity[]
+
+  @@index([rankCode])
+  @@map("personnel_comprehensive_profiles")
+}
+
+model PersonnelSalaryHistory {
+  id            String   @id @default(uuid())
+  profileId     String
+  profile       PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  rankCode      String?
+  rank          PersonnelRank? @relation(fields: [rankCode], references: [code])
+  step          Int      // Bậc lương
+  coefficient   Float    // Hệ số
+  overGradeRate Float?   @default(0) // % Vượt khung
+  fromDate      DateTime // Từ ngày
+  toDate        DateTime? // Đến ngày
+  decisionNo    String?  // Số quyết định
+  decisionDate  DateTime? // Ngày ký quyết định
+  signer        String?  // Người ký
+  createdAt     DateTime @default(now())
+
+  @@index([profileId])
+  @@map("personnel_salary_histories")
+}
+
+model PersonnelAppointment {
+  id             String    @id @default(uuid())
+  profileId      String
+  profile        PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  positionTitle  String    // Chức danh bổ nhiệm
+  orgUnitName    String    // Đơn vị
+  departmentName String?   // Phòng ban / Tổ
+  effectiveDate  DateTime  // Ngày có hiệu lực
+  expirationDate DateTime? // Ngày hết hiệu lực
+  decisionNo     String?   // Số quyết định
+  decisionDate   DateTime?
+  signer         String?
+  isCurrent      Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+
+  @@index([profileId])
+  @@map("personnel_appointments")
+}
+
+model PersonnelEducation {
+  id             String    @id @default(uuid())
+  profileId      String
+  profile        PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  schoolName     String    // Cơ sở đào tạo
+  majorName      String    // Chuyên ngành
+  degreeName     String    // Văn bằng / Chứng chỉ
+  studyForm      String    @default("Chính quy") // Hình thức đào tạo
+  fromDate       DateTime?
+  toDate         DateTime?
+  graduationYear Int?
+  ranking        String?   // Xếp loại
+  createdAt      DateTime  @default(now())
+
+  @@index([profileId])
+  @@map("personnel_educations")
+}
+
+model PersonnelWorkHistory {
+  id             String    @id @default(uuid())
+  profileId      String
+  profile        PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  fromDate       DateTime  // Từ tháng/năm
+  toDate         DateTime? // Đến tháng/năm
+  position       String    // Chức vụ / Công việc
+  unitName       String    // Cơ quan / Đơn vị
+  departmentName String?   // Bộ phận
+  referencePerson String?  // Người xác nhận
+  createdAt      DateTime  @default(now())
+
+  @@index([profileId])
+  @@map("personnel_work_histories")
+}
+
+enum RewardDisciplineType {
+  REWARD
+  DISCIPLINE
+}
+
+model PersonnelRewardDiscipline {
+  id               String               @id @default(uuid())
+  profileId        String
+  profile          PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  type             RewardDisciplineType
+  title            String               // Tên hình thức khen thưởng / kỷ luật
+  eventDate        DateTime             // Ngày quyết định / sự kiện
+  decisionNo       String?              // Số quyết định
+  issuingAuthority String?              // Cơ quan ký
+  reason           String?              // Lý do
+  createdAt        DateTime             @default(now())
+
+  @@index([profileId, type])
+  @@map("personnel_reward_disciplines")
+}
+
+enum FamilyCategory {
+  SELF   // Gia đình bản thân (Bố, Mẹ, Vợ/Chồng, Con, Anh/Chị/Em ruột)
+  SPOUSE // Gia đình bên Vợ / Chồng (Bố mẹ vợ/chồng...)
+}
+
+model PersonnelFamilyRelation {
+  id           String         @id @default(uuid())
+  profileId    String
+  profile      PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  category     FamilyCategory @default(SELF)
+  relationType String         // Mối quan hệ: Bố, Mẹ, Vợ, Chồng, Con, Anh, Chị, Em
+  fullName     String         // Họ và tên
+  birthYear    Int?           // Năm sinh
+  details      String?        // Quê quán, nghề nghiệp, nơi cư trú...
+  createdAt    DateTime       @default(now())
+
+  @@index([profileId, category])
+  @@map("personnel_family_relations")
+}
+
+enum AppraisalClassification {
+  EXCELLENT    // Hoàn thành xuất sắc nhiệm vụ
+  GOOD         // Hoàn thành tốt nhiệm vụ
+  SATISFACTORY // Hoàn thành nhiệm vụ
+  UNSATISFACTORY // Không hoàn thành nhiệm vụ
+}
+
+model PersonnelAppraisal {
+  id             String                  @id @default(uuid())
+  profileId      String
+  profile        PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  year           Int                     // Năm đánh giá
+  classification AppraisalClassification
+  comment        String?                 // Nhận xét / Đánh giá
+  decisionNo     String?                 // Quyết định công nhận
+  createdAt      DateTime                @default(now())
+
+  @@index([profileId, year])
+  @@map("personnel_appraisals")
+}
+
+model PersonnelSocialActivity {
+  id               String    @id @default(uuid())
+  profileId        String
+  profile          PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  fromDate         DateTime  // Từ ngày
+  toDate           DateTime? // Đến ngày
+  organizationName String    // Tên tổ chức chính trị - xã hội / đoàn thể
+  positionTitle    String?   // Chức danh tham gia
+  createdAt        DateTime  @default(now())
+
+  @@index([profileId])
+  @@map("personnel_social_activities")
+}
+
+// ============================================================================
+// Domain 10 to 16: FRAPPE HRMS ENTERPRISE EXTENSIONS
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// Domain 10: Shifts & Advanced Attendance Matrix
+// ---------------------------------------------------------------------------
+
+model HrmsShiftType {
+  id                        String                @id @default(uuid())
+  name                      String                // Ca hành chính, Ca sáng, Ca chiều, Ca đêm
+  startTime                 String                // "08:00"
+  endTime                   String                // "17:00"
+  lateToleranceMinutes      Int                   @default(15)
+  earlyExitToleranceMinutes Int                   @default(15)
+  color                     String                @default("#3b82f6")
+  enableAutoAttendance      Boolean               @default(true)
+  description               String?
+  createdAt                 DateTime              @default(now())
+  updatedAt                 DateTime              @updatedAt
+  assignments               HrmsShiftAssignment[]
+
+  @@map("hrms_shift_types")
+}
+
+enum ShiftAssignmentStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+}
+
+model HrmsShiftAssignment {
+  id          String                @id @default(uuid())
+  userId      String
+  shiftTypeId String
+  startDate   DateTime
+  endDate     DateTime?
+  status      ShiftAssignmentStatus @default(ACTIVE)
+  assignedBy  String?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  shiftType   HrmsShiftType         @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startDate])
+  @@map("hrms_shift_assignments")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 11: Dynamic Payroll & Salary Structure Engine
+// ---------------------------------------------------------------------------
+
+enum SalaryComponentType {
+  EARNING
+  DEDUCTION
+}
+
+model HrmsSalaryComponent {
+  id              String                    @id @default(uuid())
+  code            String                    @unique // BASIC, LUNCH_ALLOW, POSITION_ALLOW, BHXH, PIT
+  name            String                    // Lương cơ bản, Phụ cấp ăn trưa, Trừ BHXH...
+  type            SalaryComponentType
+  isTaxApplicable Boolean                   @default(true)
+  isFormulaBased  Boolean                   @default(false)
+  formula         String?                   // VD: "baseSalary * 0.08"
+  defaultAmount   Float                     @default(0)
+  description     String?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  structureItems  HrmsSalaryStructureItem[]
+
+  @@map("hrms_salary_components")
+}
+
+model HrmsSalaryStructure {
+  id               String                          @id @default(uuid())
+  name             String                          // Cấu trúc lương Cán sự, Cấu trúc lương Quản lý...
+  payrollFrequency String                          @default("MONTHLY")
+  isActive         Boolean                         @default(true)
+  description      String?
+  createdAt        DateTime                        @default(now())
+  updatedAt        DateTime                        @updatedAt
+  items            HrmsSalaryStructureItem[]
+  assignments      HrmsSalaryStructureAssignment[]
+
+  @@map("hrms_salary_structures")
+}
+
+model HrmsSalaryStructureItem {
+  id          String              @id @default(uuid())
+  structureId String
+  componentId String
+  amount      Float               @default(0)
+  formula     String?
+  createdAt   DateTime            @default(now())
+
+  structure   HrmsSalaryStructure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  component   HrmsSalaryComponent @relation(fields: [componentId], references: [id], onDelete: Cascade)
+
+  @@index([structureId])
+  @@map("hrms_salary_structure_items")
+}
+
+model HrmsSalaryStructureAssignment {
+  id          String              @id @default(uuid())
+  userId      String
+  structureId String
+  fromDate    DateTime
+  baseSalary  Float
+  isActive    Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+
+  structure   HrmsSalaryStructure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+  @@map("hrms_salary_structure_assignments")
+}
+
+enum PayrollRunStatus {
+  DRAFT
+  PROCESSED
+  APPROVED
+  PAID
+  CANCELLED
+}
+
+model HrmsPayrollRun {
+  id              String            @id @default(uuid())
+  periodName      String            // Lương Tháng 08/2026
+  fromDate        DateTime
+  toDate          DateTime
+  status          PayrollRunStatus  @default(DRAFT)
+  totalEmployees  Int               @default(0)
+  totalGrossPay   Float             @default(0)
+  totalDeduction  Float             @default(0)
+  totalNetPay     Float             @default(0)
+  processedBy     String?
+  processedAt     DateTime?
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  slips           HrmsPayrollSlip[]
+
+  @@map("hrms_payroll_runs")
+}
+
+model HrmsPayrollSlip {
+  id             String          @id @default(uuid())
+  payrollRunId   String
+  userId         String
+  employeeName   String
+  employeeCode   String?
+  department     String?
+  jobTitle       String?
+  workingDays    Float           @default(22)
+  actualWorkDays Float           @default(22)
+  baseSalary     Float           @default(0)
+  grossPay       Float           @default(0)
+  totalDeduction Float           @default(0)
+  netPay         Float           @default(0)
+  breakdown      Json            @default("{}") // Mảng chi tiết từng khoản cộng/trừ
+  status         String          @default("DRAFT") // DRAFT, APPROVED, PAID
+  createdAt      DateTime        @default(now())
+
+  payrollRun     HrmsPayrollRun  @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+
+  @@index([payrollRunId, userId])
+  @@map("hrms_payroll_slips")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 12: Recruitment & ATS Candidate Pipeline
+// ---------------------------------------------------------------------------
+
+enum JobOpeningStatus {
+  DRAFT
+  OPEN
+  IN_PROGRESS
+  CLOSED
+  CANCELLED
+}
+
+model HrmsJobOpening {
+  id            String             @id @default(uuid())
+  title         String             // Tuyển dụng Kỹ sư Phần mềm Senior, Chuyên viên Nhân sự...
+  department    String?
+  designation   String?
+  vacancies     Int                @default(1)
+  minExperience Int                @default(1) // Năm kinh nghiệm
+  salaryRange   String?            // VD: 15.000.000 - 25.000.000 VND
+  description   String             @db.Text
+  requirements  String?            @db.Text
+  closingDate   DateTime?
+  status        JobOpeningStatus   @default(OPEN)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  applicants    HrmsJobApplicant[]
+
+  @@map("hrms_job_openings")
+}
+
+enum ApplicantStage {
+  APPLIED
+  SCREENING
+  INTERVIEW_ROUND_1
+  INTERVIEW_ROUND_2
+  OFFER_SENT
+  HIRED
+  REJECTED
+}
+
+model HrmsJobApplicant {
+  id             String               @id @default(uuid())
+  jobOpeningId   String
+  candidateName  String
+  email          String
+  phone          String?
+  stage          ApplicantStage       @default(APPLIED)
+  rating         Int                  @default(0) // 1-5 sao
+  resumeUrl      String?
+  coverLetter    String?              @db.Text
+  notes          String?              @db.Text
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  jobOpening     HrmsJobOpening       @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
+  interviews     HrmsInterviewRound[]
+  offers         HrmsJobOffer[]
+
+  @@index([jobOpeningId, stage])
+  @@map("hrms_job_applicants")
+}
+
+enum InterviewRecommendation {
+  STRONG_HIRE
+  HIRE
+  HOLD
+  REJECT
+}
+
+model HrmsInterviewRound {
+  id              String                  @id @default(uuid())
+  applicantId     String
+  roundName       String                  // Phỏng vấn Kỹ thuật, Phỏng vấn Văn hóa
+  interviewerName String                  // Người phỏng vấn
+  scheduledAt     DateTime
+  status          String                  @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  score           Float?                  // Thang điểm 100
+  recommendation  InterviewRecommendation @default(HOLD)
+  feedback        String?                 @db.Text
+  createdAt       DateTime                @default(now())
+
+  applicant       HrmsJobApplicant        @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+
+  @@index([applicantId])
+  @@map("hrms_interview_rounds")
+}
+
+enum OfferStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+model HrmsJobOffer {
+  id            String           @id @default(uuid())
+  applicantId   String
+  offerDate     DateTime         @default(now())
+  designation   String
+  offeredSalary Float
+  joiningDate   DateTime
+  status        OfferStatus      @default(DRAFT)
+  terms         String?          @db.Text
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  applicant     HrmsJobApplicant @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+
+  @@index([applicantId])
+  @@map("hrms_job_offers")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 13: Employee Lifecycle Workflows
+// ---------------------------------------------------------------------------
+
+enum LifecycleEventType {
+  ONBOARDING
+  PROMOTION
+  TRANSFER
+  SEPARATION
+  DISCIPLINARY
+}
+
+enum LifecycleEventStatus {
+  PENDING
+  IN_PROGRESS
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model HrmsLifecycleEvent {
+  id            String               @id @default(uuid())
+  userId        String
+  employeeName  String
+  type          LifecycleEventType
+  status        LifecycleEventStatus @default(PENDING)
+  title         String               // Quyết định điều chuyển công tác, Tiếp nhận thử việc...
+  decisionNo    String?
+  effectiveDate DateTime
+  details       Json                 @default("{}") // Chi tiết công việc bàn giao, phòng ban mới...
+  notes         String?              @db.Text
+  createdBy     String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@index([userId, type])
+  @@map("hrms_lifecycle_events")
+}
+
+model HrmsOnboardingTask {
+  id          String   @id @default(uuid())
+  title       String   // Cấp email & tài khoản, Bàn giao máy tính, Ký hợp đồng lao động...
+  category    String   @default("IT") // IT, HR, ADMIN, DEPARTMENT
+  assignee    String?
+  isCompleted Boolean  @default(false)
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@map("hrms_onboarding_tasks")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 14: Performance & 360 Appraisals
+// ---------------------------------------------------------------------------
+
+model HrmsAppraisalCycle {
+  id          String               @id @default(uuid())
+  name        String               // Đánh giá Hiệu suất Q3/2026, Đánh giá Thường niên 2026
+  year        Int
+  startDate   DateTime
+  endDate     DateTime
+  status      String               @default("ACTIVE") // PLANNED, ACTIVE, COMPLETED
+  description String?
+  createdAt   DateTime             @default(now())
+  goals       HrmsAppraisalGoal[]
+  reviews     HrmsAppraisalReview[]
+
+  @@map("hrms_appraisal_cycles")
+}
+
+model HrmsAppraisalGoal {
+  id            String             @id @default(uuid())
+  cycleId       String
+  userId        String
+  employeeName  String
+  kraTitle      String             // Vùng kết quả then chốt (KRA)
+  description   String             @db.Text
+  weightage     Float              @default(20) // Trọng số %
+  targetMetric  String             // KPI mục tiêu: "Hoàn thành 100% sprint đúng hạn"
+  selfScore     Float?             // Tự chấm (thang 100)
+  managerScore  Float?             // Quản lý chấm
+  finalScore    Float?
+  status        String             @default("DRAFT") // DRAFT, SUBMITTED, APPROVED
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  cycle         HrmsAppraisalCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+
+  @@index([cycleId, userId])
+  @@map("hrms_appraisal_goals")
+}
+
+model HrmsAppraisalReview {
+  id           String             @id @default(uuid())
+  cycleId      String
+  userId       String
+  reviewerName String
+  relationship String             @default("MANAGER") // SELF, MANAGER, PEER, SUBORDINATE
+  rating       Float              @default(0) // 1-5 sao hoặc thang 100
+  feedback     String             @db.Text
+  submittedAt  DateTime           @default(now())
+
+  cycle        HrmsAppraisalCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+
+  @@index([cycleId, userId])
+  @@map("hrms_appraisal_reviews")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 15: Expense Claims & Travel Advances
+// ---------------------------------------------------------------------------
+
+enum ClaimStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model HrmsTravelRequest {
+  id              String              @id @default(uuid())
+  userId          String
+  employeeName    String
+  purpose         String              // Công tác triển khai dự án chi nhánh Đà Nẵng
+  fromLocation    String
+  toLocation      String
+  departureDate   DateTime
+  returnDate      DateTime
+  estimatedBudget Float               @default(0)
+  status          ClaimStatus         @default(DRAFT)
+  notes           String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  advances        HrmsEmployeeAdvance[]
+  claims          HrmsExpenseClaim[]
+
+  @@index([userId])
+  @@map("hrms_travel_requests")
+}
+
+model HrmsEmployeeAdvance {
+  id              String             @id @default(uuid())
+  userId          String
+  employeeName    String
+  travelRequestId String?
+  amount          Float
+  purpose         String
+  status          ClaimStatus        @default(DRAFT)
+  disbursedAt     DateTime?
+  createdAt       DateTime           @default(now())
+
+  travelRequest   HrmsTravelRequest? @relation(fields: [travelRequestId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("hrms_employee_advances")
+}
+
+model HrmsExpenseClaim {
+  id              String             @id @default(uuid())
+  userId          String
+  employeeName    String
+  travelRequestId String?
+  title           String             // Thanh toán vé máy bay, hóa đơn tiếp khách...
+  category        String             @default("TRAVEL") // TRAVEL, MEAL, LODGING, EQUIPMENT, OTHER
+  totalAmount     Float
+  approvedAmount  Float?
+  status          ClaimStatus        @default(DRAFT)
+  items           Json               @default("[]") // Chi tiết từng khoản chi
+  receiptUrls     String[]           @default([])
+  submittedAt     DateTime?
+  approvedBy      String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  travelRequest   HrmsTravelRequest? @relation(fields: [travelRequestId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@map("hrms_expense_claims")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 16: Training Programs & Grievance Handling
+// ---------------------------------------------------------------------------
+
+model HrmsTrainingProgram {
+  id              String                 @id @default(uuid())
+  name            String                 // Đào tạo Quy chuẩn Bảo mật, Nâng cao Nghiệp vụ Quản trị...
+  trainerName     String
+  location        String?
+  startDate       DateTime
+  endDate         DateTime
+  maxParticipants Int                    @default(30)
+  status          String                 @default("UPCOMING") // UPCOMING, ONGOING, COMPLETED
+  description     String?                @db.Text
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  feedbacks       HrmsTrainingFeedback[]
+
+  @@map("hrms_training_programs")
+}
+
+model HrmsTrainingFeedback {
+  id                String              @id @default(uuid())
+  programId         String
+  userId            String
+  employeeName      String
+  rating            Int                 @default(5) // 1-5 sao
+  comments          String?             @db.Text
+  certificateIssued Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+
+  program           HrmsTrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@index([programId])
+  @@map("hrms_training_feedbacks")
+}
+
+enum GrievanceStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+}
+
+model HrmsGrievance {
+  id           String          @id @default(uuid())
+  userId       String
+  employeeName String
+  subject      String          // Kiến nghị về điều kiện làm việc / Môi trường công sở
+  category     String          @default("WORK_ENVIRONMENT") // WORK_ENVIRONMENT, HARASSMENT, COMPENSATION, DISPUTE
+  description  String          @db.Text
+  status       GrievanceStatus @default(OPEN)
+  resolution   String?         @db.Text
+  resolvedBy   String?
+  resolvedAt   DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([userId, status])
+  @@map("hrms_grievances")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 17: Employee Loan Management & Salary Deductions
+// ---------------------------------------------------------------------------
+
+model HrmsEmployeeLoan {
+  id              String    @id @default(uuid())
+  userId          String
+  employeeName    String
+  loanType        String    // Tạm ứng khẩn cấp, Vay mua thiết bị/nhà, Vay đào tạo
+  principalAmount Float     // Số tiền vay gốc (VND)
+  interestRate    Float     @default(0) // % Lãi suất hàng năm
+  termMonths      Int       @default(12) // Thời hạn vay (tháng)
+  monthlyEmi      Float     // Số tiền trả góp gốc + lãi mỗi tháng
+  totalRepaid     Float     @default(0) // Số tiền đã hoàn trả
+  remainingAmount Float     // Dư nợ còn lại
+  status          String    @default("PENDING") // PENDING, APPROVED, DISBURSED, COMPLETED, REJECTED
+  disbursedAt     DateTime?
+  reason          String?   @db.Text
+  approvedBy      String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId, status])
+  @@map("hrms_employee_loans")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 18: Asset Custody & Allocation Management
+// ---------------------------------------------------------------------------
+
+model HrmsAssetAllocation {
+  id                   String    @id @default(uuid())
+  assetCode            String    @unique // AST-001, AST-002...
+  name                 String    // MacBook Pro 16" M3 Max, Dell UltraSharp 27", Ghế Ergonomic...
+  category             String    @default("IT_EQUIPMENT") // IT_EQUIPMENT, VEHICLE, FURNITURE, OFFICE_DEVICE
+  serialNumber         String?
+  assignedUserId       String?
+  assignedEmployeeName String?
+  allocatedDate        DateTime?
+  returnedDate         DateTime?
+  status               String    @default("AVAILABLE") // AVAILABLE, ALLOCATED, MAINTENANCE, DISPOSED
+  condition            String    @default("EXCELLENT") // NEW, EXCELLENT, GOOD, DAMAGED
+  value                Float     @default(0)
+  notes                String?   @db.Text
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([assignedUserId, status])
+  @@map("hrms_asset_allocations")
+}
+
+// ---------------------------------------------------------------------------
+// Domain 19: Attendance Regularization & Shift Requests
+// ---------------------------------------------------------------------------
+
+model HrmsAttendanceRegularization {
+  id                String    @id @default(uuid())
+  userId            String
+  employeeName      String
+  workDate          DateTime  @db.Date
+  requestedCheckIn  String?   // "08:30"
+  requestedCheckOut String?   // "17:30"
+  reason            String    @db.Text // Quên quẹt thẻ, Đi gặp khách hàng, Lỗi thiết bị kiosk
+  status            String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  approvedBy        String?
+  decisionNote      String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([userId, status])
+  @@map("hrms_attendance_regularizations")
+}

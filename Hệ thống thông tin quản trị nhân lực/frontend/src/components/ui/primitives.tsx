@@ -120,12 +120,17 @@ export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDiv
   return <div className={cn('flex items-center gap-2 p-card pt-0', className)} {...props} />;
 }
 
-const badgeVariants = cva('inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium', {
+const badgeVariants = cva('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors border shadow-2xs', {
   variants: {
     variant: {
-      default: 'bg-primary/10 text-primary',
-      secondary: 'bg-secondary text-secondary-foreground',
-      outline: 'border border-input text-foreground',
+      default: 'bg-primary/10 text-primary border-primary/20',
+      secondary: 'bg-slate-100 text-slate-700 border-slate-200',
+      outline: 'border-slate-300 text-slate-700 bg-white',
+      success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      warning: 'bg-amber-50 text-amber-800 border-amber-200',
+      destructive: 'bg-rose-50 text-rose-700 border-rose-200',
+      info: 'bg-blue-50 text-blue-700 border-blue-200',
+      purple: 'bg-purple-50 text-purple-700 border-purple-200',
     },
   },
   defaultVariants: { variant: 'default' },

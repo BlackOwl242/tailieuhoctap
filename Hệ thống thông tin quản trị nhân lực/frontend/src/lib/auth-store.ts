@@ -7,7 +7,7 @@ import type { AuthUser } from './types';
 /** Khóa localStorage của phiên đăng nhập — dùng khi xóa sạch phiên. */
 const STORAGE_KEY = 'kms-auth';
 
-interface AuthState {
+export interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   user: AuthUser | null;

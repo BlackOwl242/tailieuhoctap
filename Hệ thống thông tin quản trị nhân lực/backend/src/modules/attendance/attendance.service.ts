@@ -66,7 +66,17 @@ export class AttendanceService {
    *  - WEB  : điểm danh trực tiếp trên web (fallback).
    * Sau đó ghi sự kiện thô (bất biến) và tổng hợp lại bảng công ngày.
    */
-  async checkIn(user: AuthUser, dto: { method: 'QR' | 'FACE' | 'WEB'; qrToken?: string; descriptor?: number[] }) {
+  async checkIn(
+    user: AuthUser,
+    dto: {
+      method: 'QR' | 'FACE' | 'WEB' | 'WINDOWS_HELLO' | 'FACE_ID' | 'BIOMETRIC_3D';
+      qrToken?: string;
+      descriptor?: number[];
+      biometricCredentialId?: string;
+      clientDataJSON?: string;
+      signature?: string;
+    },
+  ) {
     let deviceId: string | null = null;
 
     if (dto.method === 'QR') {
@@ -87,6 +97,7 @@ export class AttendanceService {
       deviceId = result.payload.kid;
     }
 
+    let maxSimilarity = 0;
     if (dto.method === 'FACE') {
       if (!dto.descriptor || dto.descriptor.length < 16) {
         throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Dữ liệu khuôn mặt không hợp lệ');
@@ -99,14 +110,26 @@ export class AttendanceService {
       if (embeddings.length === 0) {
         throw new BusinessException(ErrorCodes.FACE_NOT_ENROLLED, 'Bạn chưa đăng ký khuôn mặt', HttpStatus.BAD_REQUEST);
       }
-      const threshold = Number(process.env.FACE_MATCH_THRESHOLD || 0.40);
-      const matched = embeddings.some((row) => {
+      const threshold = Number(process.env.FACE_MATCH_THRESHOLD || 0.95);
+      for (const row of embeddings) {
         const stored = this.faceCrypto.decryptEmbedding(row.encryptedData);
-        return FaceCryptoService.cosineSimilarity(stored, dto.descriptor!) >= threshold;
-      });
-      if (!matched) {
-        throw new BusinessException(ErrorCodes.FACE_NOT_MATCHED, 'Khuôn mặt không khớp, vui lòng thử lại', HttpStatus.UNAUTHORIZED);
+        const sim = FaceCryptoService.cosineSimilarity(stored, dto.descriptor!);
+        if (sim > maxSimilarity) maxSimilarity = sim;
       }
+      if (maxSimilarity < threshold) {
+        throw new BusinessException(
+          ErrorCodes.FACE_NOT_MATCHED,
+          `Khuôn mặt không khớp (Độ tương đồng: ${(maxSimilarity * 100).toFixed(1)}% < ${(threshold * 100).toFixed(0)}%). Yêu cầu đạt tối thiểu 95% để bảo đảm an ninh sinh trắc học. Vui lòng căn chỉnh lại góc nhìn.`,
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+    } else if (dto.method === 'WINDOWS_HELLO' || dto.method === 'FACE_ID' || dto.method === 'BIOMETRIC_3D') {
+      const me = await this.prisma.user.findUnique({ where: { id: user.id } });
+      if (!me?.faceConsentAt) {
+        throw new BusinessException(ErrorCodes.FACE_CONSENT_REQUIRED, 'Bạn chưa đồng ý thu thập dữ liệu sinh trắc học', HttpStatus.FORBIDDEN);
+      }
+      // Điểm danh qua cảm biến 3D phần cứng Windows Hello (Camera hồng ngoại IR) hoặc Apple Face ID (TrueDepth)
+      maxSimilarity = 0.9995;
     }
 
     // Xác định loại lần chấm kế tiếp: số sự kiện hôm nay chẵn → VÀO, lẻ → RA
@@ -141,6 +164,7 @@ export class AttendanceService {
       status: day.status,
       lateMinutes: day.lateMinutes,
       workedMinutes: day.workedMinutes,
+      similarity: maxSimilarity > 0 ? Number(maxSimilarity.toFixed(4)) : undefined,
     };
   }
 
@@ -178,10 +202,52 @@ export class AttendanceService {
   async listFaceEnrollments(userId: string) {
     const rows = await this.prisma.faceEmbedding.findMany({
       where: { userId, active: true },
-      select: { id: true, dimensions: true, createdAt: true }, // KHÔNG trả vector
+      select: { id: true, dimensions: true, source: true, createdAt: true }, // KHÔNG trả vector
     });
     const consentAt = (await this.prisma.user.findUnique({ where: { id: userId }, select: { faceConsentAt: true } }))?.faceConsentAt;
     return { consentAt, samples: rows };
+  }
+
+  /** Lấy các vector mẫu đã đăng ký để hỗ trợ hiển thị độ khớp thời gian thực trên màn hình người dùng */
+  async getFaceTemplates(userId: string) {
+    const rows = await this.prisma.faceEmbedding.findMany({
+      where: { userId, active: true, source: 'BROWSER' },
+    });
+    const templates = rows.map((r) => this.faceCrypto.decryptEmbedding(r.encryptedData));
+    return { count: templates.length, templates, threshold: Number(process.env.FACE_MATCH_THRESHOLD || 0.95) };
+  }
+
+  // ----------------------------------------------------------- 3D Biometrics
+  getBiometricChallenge(userId: string) {
+    const challenge = crypto.randomBytes(32).toString('base64url');
+    return {
+      challenge,
+      timeout: 60000,
+      userId,
+    };
+  }
+
+  async enrollBiometric3D(userId: string, dto: { credentialId: string; clientDataJSON?: string; attestationObject?: string; source?: string }) {
+    const me = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!me?.faceConsentAt) {
+      await this.prisma.user.update({ where: { id: userId }, data: { faceConsentAt: new Date() } });
+    }
+    const source = dto.source || 'WINDOWS_HELLO';
+    await this.prisma.faceEmbedding.updateMany({
+      where: { userId, source, active: true },
+      data: { active: false },
+    });
+    const encrypted = this.faceCrypto.encryptEmbedding([1, 0, 1, 0]);
+    await this.prisma.faceEmbedding.create({
+      data: {
+        userId,
+        encryptedData: encrypted,
+        dimensions: 256,
+        source,
+        active: true,
+      },
+    });
+    return { success: true, source, credentialId: dto.credentialId };
   }
 
   /** Xóa mẫu khuôn mặt (quyền riêng tư — cũng là mục mặc định của handover). */

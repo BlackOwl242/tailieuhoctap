@@ -14,13 +14,25 @@ import type { AuthUser, AuthedRequest } from '../../common/types/auth-user';
 // ---------------------------------------------------------------------------
 
 class CheckInDto {
-  @IsIn(['QR', 'FACE', 'WEB']) method!: 'QR' | 'FACE' | 'WEB';
+  @IsIn(['QR', 'FACE', 'WEB', 'WINDOWS_HELLO', 'FACE_ID', 'BIOMETRIC_3D'])
+  method!: 'QR' | 'FACE' | 'WEB' | 'WINDOWS_HELLO' | 'FACE_ID' | 'BIOMETRIC_3D';
+
   @IsOptional() @IsString() qrToken?: string;
   @IsOptional() @IsArray() descriptor?: number[];
+  @IsOptional() @IsString() biometricCredentialId?: string;
+  @IsOptional() @IsString() clientDataJSON?: string;
+  @IsOptional() @IsString() signature?: string;
 }
 
 class EnrollFaceDto {
   @IsArray() descriptors!: number[][];
+}
+
+class EnrollBiometric3DDto {
+  @IsString() credentialId!: string;
+  @IsOptional() @IsString() clientDataJSON?: string;
+  @IsOptional() @IsString() attestationObject?: string;
+  @IsOptional() @IsString() source?: string;
 }
 
 class CreateDeviceDto {
@@ -81,6 +93,12 @@ export class AttendanceController {
     return this.service.listFaceEnrollments(user.id);
   }
 
+  @Get('face/templates')
+  @ApiOperation({ summary: 'Lấy vector mẫu đăng ký phục vụ tính toán độ khớp thời gian thực trên UI' })
+  faceTemplates(@CurrentUser() user: AuthUser) {
+    return this.service.getFaceTemplates(user.id);
+  }
+
   @Post('face/enroll')
   enroll(@CurrentUser() user: AuthUser, @Body() dto: EnrollFaceDto) {
     return this.service.enrollFace(user.id, dto.descriptors);
@@ -89,6 +107,19 @@ export class AttendanceController {
   @Delete('face/enrollments')
   deleteEnrollment(@CurrentUser() user: AuthUser, @Query('id') id?: string) {
     return this.service.deleteFaceEnrollment(user.id, id);
+  }
+
+  // --------------------------------------------- 3D Biometrics / Windows Hello / FaceID
+  @Get('biometric/challenge')
+  @ApiOperation({ summary: 'Lấy cryptographic challenge cho WebAuthn Windows Hello 3D / Face ID' })
+  biometricChallenge(@CurrentUser() user: AuthUser) {
+    return this.service.getBiometricChallenge(user.id);
+  }
+
+  @Post('biometric/enroll')
+  @ApiOperation({ summary: 'Đăng ký phần cứng sinh trắc học 3D (Windows Hello / Apple Face ID)' })
+  enrollBiometric(@CurrentUser() user: AuthUser, @Body() dto: EnrollBiometric3DDto) {
+    return this.service.enrollBiometric3D(user.id, dto);
   }
 
   // ------------------------------------------------------------------ my data

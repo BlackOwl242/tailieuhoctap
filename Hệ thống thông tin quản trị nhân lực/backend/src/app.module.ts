@@ -27,6 +27,19 @@ import { PerformanceModule } from './modules/performance/performance.module';
 import { TrainingModule } from './modules/training/training.module';
 import { PersonnelActionsModule } from './modules/personnel-actions/personnel-actions.module';
 import { DocumentsModule } from './modules/documents/documents.module';
+import { PersonnelProfilesModule } from './modules/personnel-profiles/personnel-profiles.module';
+import { PersonnelRanksModule } from './modules/personnel-ranks/personnel-ranks.module';
+import { PersonnelReportsModule } from './modules/personnel-reports/personnel-reports.module';
+import { HrmsShiftsModule } from './modules/hrms-shifts/hrms-shifts.module';
+import { HrmsPayrollModule } from './modules/hrms-payroll/hrms-payroll.module';
+import { HrmsRecruitmentModule } from './modules/hrms-recruitment/hrms-recruitment.module';
+import { HrmsLifecycleModule } from './modules/hrms-lifecycle/hrms-lifecycle.module';
+import { HrmsPerformanceModule } from './modules/hrms-performance/hrms-performance.module';
+import { HrmsExpensesModule } from './modules/hrms-expenses/hrms-expenses.module';
+import { HrmsTrainingModule } from './modules/hrms-training/hrms-training.module';
+import { HrmsLoansModule } from './modules/hrms-loans/hrms-loans.module';
+import { HrmsAssetsModule } from './modules/hrms-assets/hrms-assets.module';
+import { HrmsRegularizationModule } from './modules/hrms-regularization/hrms-regularization.module';
 
 @Module({
   imports: [
@@ -57,6 +70,20 @@ import { DocumentsModule } from './modules/documents/documents.module';
     TrainingModule,
     PersonnelActionsModule,
     DocumentsModule,
+    PersonnelProfilesModule,
+    PersonnelRanksModule,
+    PersonnelReportsModule,
+    HrmsShiftsModule,
+    HrmsPayrollModule,
+    HrmsRecruitmentModule,
+    HrmsLifecycleModule,
+    HrmsPerformanceModule,
+    HrmsExpensesModule,
+    HrmsTrainingModule,
+    HrmsLoansModule,
+    HrmsAssetsModule,
+    HrmsRegularizationModule,
   ],
 })
 export class AppModule {}
+

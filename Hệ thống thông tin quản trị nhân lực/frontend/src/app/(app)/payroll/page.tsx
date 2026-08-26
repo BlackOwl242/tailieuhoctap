@@ -28,10 +28,10 @@ interface PayslipRow {
 }
 
 const STATUS_TONE: Record<string, string> = {
-  OPEN: 'bg-secondary',
-  CALCULATED: 'bg-blue-100 text-blue-800',
-  REVIEWED: 'bg-amber-100 text-amber-800',
-  LOCKED: 'bg-emerald-100 text-emerald-800',
+  OPEN: 'bg-slate-100 text-slate-700 border-slate-200 border',
+  CALCULATED: 'bg-blue-50 text-blue-700 border-blue-200 border',
+  REVIEWED: 'bg-amber-50 text-amber-800 border-amber-200 border',
+  LOCKED: 'bg-emerald-50 text-emerald-700 border-emerald-200 border',
 };
 
 /** UC22–UC25 — Kỳ lương: Khóa công → Tính → Đối chiếu → Duyệt/Khóa → Phiếu lương. */

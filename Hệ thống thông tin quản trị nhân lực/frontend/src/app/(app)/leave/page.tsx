@@ -11,7 +11,8 @@ import { LEAVE_TYPE_LABEL, REQUEST_STATUS_LABEL, REQUEST_STATUS_TONE } from '@/l
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton, Textarea } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
-import { PageHeader, ErrorState } from '@/components/common/states';
+import { WorkspaceHeader } from '@/components/common/workspace-header';
+import { ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface LeaveRow {
@@ -101,13 +102,14 @@ export default function LeavePage() {
   const rows = tab === 'all' ? (allQ.data ?? []) : (mineQ.data ?? []);
 
   return (
-    <>
-      <PageHeader
-        title="Nghỉ phép"
-        description="Quỹ phép minh bạch — duyệt là trừ quỹ ngay, tự ghi công phép vào bảng công."
+    <div className="space-y-6 pb-12">
+      <WorkspaceHeader
+        title="Quản trị Nghỉ phép"
+        description="Quỹ phép minh bạch — phê duyệt là tự động trừ quỹ ngày và ghi nhận công phép vào bảng chấm công."
+        breadcrumbs={[{ label: 'Ca kíp & Chấm công' }, { label: 'Nghỉ phép' }]}
         actions={
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <Plus className="h-4 w-4" /> Tạo đơn nghỉ phép
+          <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5 shadow-2xs">
+            <Plus className="h-3.5 w-3.5" /> Tạo đơn nghỉ phép
           </Button>
         }
       />
@@ -222,7 +224,7 @@ export default function LeavePage() {
           </div>
         </form>
       </Modal>
-    </>
+    </div>
   );
 }
 

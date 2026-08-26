@@ -34,3 +34,8 @@ Thumbs.db
 # Misc
 .turbo/
 next-env.d.ts.bak
+scratch/
+.agents/
+.skills/
+*.scratch.*
+

@@ -64,7 +64,7 @@ export function PrintExportDropdown({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-dropdown mt-1.5 w-48 rounded-lg border bg-popover p-1 shadow-lg animate-in fade-in-0 zoom-in-95"
+          className="absolute right-0 z-dropdown mt-1.5 w-48 rounded-lg border border-border bg-popover p-1 shadow-xl animate-in fade-in-0 zoom-in-95"
         >
           <button
             type="button"
@@ -121,35 +121,58 @@ export function PrintFrame({
   docNumber?: string;
 }) {
   const [printedAt, setPrintedAt] = React.useState<string>('');
-  React.useEffect(() => setPrintedAt(new Date().toLocaleString('vi-VN')), []);
+  React.useEffect(() => {
+    const d = new Date();
+    setPrintedAt(`ngày ${d.getDate()} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`);
+  }, []);
 
   return (
-    <div className="print-only mb-6 text-black">
-      {/* Header 2 cột chuẩn văn bản hành chính */}
-      <div className="flex items-start justify-between border-b-2 border-black pb-3">
-        <div className="text-left leading-snug">
-          <p className="text-xs font-bold uppercase tracking-wide">CÔNG TY CỔ PHẦN PHẦN MỀM SAIGON TECHNOLOGY</p>
-          <p className="text-[11px] text-gray-700">Hệ thống Thông tin Quản trị Nhân lực (HRMIS)</p>
-          {docNumber ? <p className="mt-0.5 text-[11px] italic">Số: {docNumber}</p> : null}
+    <div className="print-only font-times text-black mb-5">
+      {/* Header 2 cột chuẩn văn bản hành chính Việt Nam (Nghị định 30/2020/NĐ-CP) */}
+      <div className="grid grid-cols-2 gap-6 items-start pb-2">
+        {/* Bên trái: Tên cơ quan, tổ chức ban hành văn bản (12-13pt) */}
+        <div className="text-center flex flex-col items-center">
+          <p className="text-[12pt] font-bold uppercase tracking-tight text-black leading-tight">
+            CÔNG TY CP PHẦN MỀM SAIGON TECHNOLOGY
+          </p>
+          <p className="text-[11.5pt] font-bold text-black uppercase mt-1 leading-tight">
+            HỆ THỐNG QUẢN TRỊ NHÂN LỰC (HRMIS)
+          </p>
+          {/* Nét kẻ ngang dưới tên cơ quan: nét liền 1px, dài 1/3 đến 1/2 độ dài dòng chữ */}
+          <div className="w-28 border-b border-black mt-1.5 mb-1.5" />
+          {docNumber ? <p className="text-[11pt] italic text-black">Số: {docNumber}</p> : null}
         </div>
-        <div className="text-right leading-snug">
-          <p className="text-xs font-bold uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-          <p className="text-[11px] font-semibold underline underline-offset-2">Độc lập – Tự do – Hạnh phúc</p>
-          <p className="mt-1 text-[10px] text-gray-600">Thời điểm in: {printedAt}</p>
+
+        {/* Bên phải: Quốc hiệu và Tiêu ngữ (12-14pt) */}
+        <div className="flex flex-col items-end">
+          <div className="text-center flex flex-col items-center w-full">
+            <p className="text-[12.5pt] font-bold uppercase tracking-tight text-black leading-tight">
+              CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+            </p>
+            <p className="text-[13pt] font-bold text-black mt-1 leading-tight">
+              Độc lập – Tự do – Hạnh phúc
+            </p>
+            {/* Nét kẻ ngang dưới Tiêu ngữ: nét liền 1px, dài bằng độ dài dòng chữ */}
+            <div className="w-40 border-b border-black mt-1.5 mb-1.5" />
+          </div>
+          {/* Địa danh và Ngày tháng năm: Căn sát lề phải (13-14pt nghiêng) */}
+          <p className="text-[12.5pt] italic text-black text-right w-full mt-1">
+            TP. Hồ Chí Minh, {printedAt || 'ngày … tháng … năm 2026'}
+          </p>
         </div>
       </div>
 
-      {/* Tiêu đề văn bản */}
+      {/* Tiêu đề văn bản (15-16pt đậm) */}
       <div className="my-5 text-center">
-        <h1 className="text-xl font-bold uppercase tracking-wide text-black">{title}</h1>
-        {subtitle ? <p className="mt-1 text-sm font-medium text-gray-800">{subtitle}</p> : null}
+        <h1 className="text-[16pt] font-bold uppercase tracking-wide text-black leading-snug">{title}</h1>
+        {subtitle ? <p className="mt-1 text-[12pt] italic text-black">{subtitle}</p> : null}
       </div>
     </div>
   );
 }
 
 /**
- * Khung chữ ký cuối trang văn bản in
+ * Khung chữ ký cuối trang văn bản in chuẩn Nghị định 30 (12-13pt)
  */
 export function PrintSignatureBlock({
   leftTitle = 'Người lập biểu',
@@ -161,22 +184,22 @@ export function PrintSignatureBlock({
   rightTitle?: string;
 }) {
   return (
-    <div className="print-only mt-8 break-inside-avoid pt-4 text-xs text-black">
+    <div className="font-times print-only mt-8 break-inside-avoid pt-4 text-black">
       <div className="grid grid-cols-3 gap-4 text-center">
         <div>
-          <p className="font-bold uppercase">{leftTitle}</p>
-          <p className="text-[10px] italic text-gray-600">(Ký và ghi rõ họ tên)</p>
-          <div className="h-16" />
+          <p className="text-[12pt] font-bold uppercase text-black leading-snug">{leftTitle}</p>
+          <p className="text-[11pt] italic text-black mt-0.5">(Ký và ghi rõ họ tên)</p>
+          <div className="h-20" />
         </div>
         <div>
-          <p className="font-bold uppercase">{middleTitle}</p>
-          <p className="text-[10px] italic text-gray-600">(Ký và ghi rõ họ tên)</p>
-          <div className="h-16" />
+          <p className="text-[12pt] font-bold uppercase text-black leading-snug">{middleTitle}</p>
+          <p className="text-[11pt] italic text-black mt-0.5">(Ký và ghi rõ họ tên)</p>
+          <div className="h-20" />
         </div>
         <div>
-          <p className="font-bold uppercase">{rightTitle}</p>
-          <p className="text-[10px] italic text-gray-600">(Ký, đóng dấu)</p>
-          <div className="h-16" />
+          <p className="text-[12pt] font-bold uppercase text-black leading-snug">{rightTitle}</p>
+          <p className="text-[11pt] italic text-black mt-0.5">(Ký, đóng dấu)</p>
+          <div className="h-20" />
         </div>
       </div>
     </div>
