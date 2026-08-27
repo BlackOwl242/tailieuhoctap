@@ -259,8 +259,9 @@ export default function Performance360Page() {
                     Quan hệ: {r.relationship}
                   </span>
                 </div>
-                <div className="flex items-center text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md font-bold text-xs">
-                  ★ {r.rating} / 5.0
+                <div className="flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md font-bold text-xs">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-500 shrink-0" />
+                  <span>{r.rating} / 5.0</span>
                 </div>
               </div>
 

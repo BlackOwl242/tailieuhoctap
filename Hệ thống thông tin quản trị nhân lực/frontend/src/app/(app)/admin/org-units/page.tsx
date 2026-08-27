@@ -516,7 +516,7 @@ export default function AdminOrgUnitsPage() {
                   <td className="text-center font-mono">{node.code}</td>
                   <td>
                     <span style={{ paddingLeft: `${depth * 18}px` }} className="inline-block">
-                      {depth > 0 ? '├─ ' : '★ '}
+                      {depth > 0 ? '├─ ' : '• '}
                       {node.name}
                     </span>
                   </td>

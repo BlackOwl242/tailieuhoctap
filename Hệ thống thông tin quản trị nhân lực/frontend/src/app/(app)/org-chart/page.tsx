@@ -50,90 +50,65 @@ export default function OrgChartPage() {
 
   const { data: rawEmployees } = useQuery<any>({
     queryKey: ['employees-list'],
-    queryFn: async () => (await api.get('/employees?limit=100')).data,
+    queryFn: async () => (await api.get('/employees?limit=200')).data,
   });
 
-  const employeeList: { id: string; fullName: string; employeeCode: string; jobTitle: string; email: string; phone?: string; orgUnitId?: string }[] =
-    useMemo(() => (Array.isArray(rawEmployees) ? rawEmployees : rawEmployees?.items ?? []), [rawEmployees]);
+  const employeeList: {
+    id: string;
+    fullName: string;
+    employeeCode: string;
+    jobTitle: string;
+    email: string;
+    phone?: string;
+    orgUnitId?: string;
+    orgUnit?: { id: string; name: string; code: string };
+  }[] = useMemo(() => {
+    const list: any[] = Array.isArray(rawEmployees) ? rawEmployees : rawEmployees?.items ?? [];
+    return list.map((e) => ({
+      ...e,
+      orgUnitId: e.orgUnitId || e.orgUnit?.id,
+    }));
+  }, [rawEmployees]);
 
   // Enrich tree with accurate headcount from employee list & manager names
   const enrichedTree: OrgNode[] = useMemo(() => {
-    if (!orgTree || orgTree.length === 0) {
-      return [
-        {
-          id: 'root-company',
-          name: 'Ban Giám đốc & Điều hành',
-          code: 'BGD',
-          headName: 'Trần Minh Hoàng',
-          headTitle: 'Tổng Giám đốc (CEO)',
-          headcount: 5,
-          children: [
-            {
-              id: 'dept-hr',
-              name: 'Ban Tổ chức – Hành chính – Nhân sự',
-              code: 'TC-HC-NS',
-              headName: 'Hoàng Kim Dung',
-              headTitle: 'Giám đốc Nhân sự',
-              headcount: 12,
-              children: [
-                { id: 'sub-hr1', name: 'Tổ Tuyển dụng & Thu hút', code: 'HR-1', headName: 'Nguyễn Thị Mai', headTitle: 'Tổ trưởng', headcount: 3 },
-                { id: 'sub-hr2', name: 'Tổ Hồ sơ & Hợp đồng', code: 'HR-2', headName: 'Vũ Thu Trang', headTitle: 'Tổ trưởng', headcount: 3 },
-                { id: 'sub-hr3', name: 'Tổ Tiền lương & Bảo hiểm (C&B)', code: 'HR-3', headName: 'Phạm Minh Đức', headTitle: 'Chuyên viên Chính C&B', headcount: 3 },
-                { id: 'sub-hr4', name: 'Tổ Hành chính – Văn thư', code: 'HR-4', headName: 'Đỗ Văn Thành', headTitle: 'Phụ trách Văn thư', headcount: 3 },
-              ],
-            },
-            {
-              id: 'dept-dev',
-              name: 'Khối Chuyển giao Dự án (Delivery)',
-              code: 'DELIVERY',
-              headName: 'Lê Quốc Tuấn',
-              headTitle: 'Giám đốc Kỹ thuật (CTO)',
-              headcount: 31,
-              children: [
-                {
-                  id: 'cnt-sgn',
-                  name: 'Trung tâm Phát triển Phần mềm TP.HCM',
-                  code: 'DEV-SGN',
-                  headName: 'Nguyễn Hoàng Nam',
-                  headTitle: 'Giám đốc Trung tâm',
-                  headcount: 22,
-                  children: [
-                    { id: 'team-java', name: 'Nhóm Phát triển Java (TP.HCM)', code: 'SQ-S1', headName: 'Lê Minh Tuấn', headTitle: 'Tech Lead', headcount: 8 },
-                    { id: 'team-net', name: 'Nhóm Phát triển .NET (TP.HCM)', code: 'SQ-S2', headName: 'Trần Văn Hải', headTitle: 'Tech Lead', headcount: 6 },
-                    { id: 'team-qa', name: 'Nhóm Đảm bảo Chất lượng QA/QC', code: 'SQ-S5', headName: 'Nguyễn Thị Bích', headTitle: 'QA Lead', headcount: 8 },
-                  ],
-                },
-                {
-                  id: 'cnt-dad',
-                  name: 'Trung tâm Phát triển Phần mềm Đà Nẵng',
-                  code: 'DEV-DAD',
-                  headName: 'Phan Thanh Hải',
-                  headTitle: 'Giám đốc Chi nhánh',
-                  headcount: 9,
-                },
-              ],
-            },
-          ],
-        },
-      ];
-    }
+    if (!orgTree || orgTree.length === 0) return [];
 
     const enrichNode = (node: any, level = 1): OrgNode => {
       const unitEmps = employeeList.filter((e) => e.orgUnitId === node.id);
-      const manager = unitEmps.find((e) =>
-        e.jobTitle.toLowerCase().includes('giám đốc') ||
-        e.jobTitle.toLowerCase().includes('trưởng') ||
-        e.jobTitle.toLowerCase().includes('lead')
-      ) || unitEmps[0];
+      const manager =
+        unitEmps.find((e) => {
+          const t = e.jobTitle.toLowerCase();
+          return t.includes('tổng giám đốc') || t.includes('giám đốc') || t.includes('trưởng') || t.includes('lead');
+        }) || unitEmps[0];
+
+      const children =
+        node.children && node.children.length > 0
+          ? node.children.map((c: any) => enrichNode(c, level + 1))
+          : undefined;
+
+      const childrenHeadcount = children
+        ? children.reduce((acc: number, c: OrgNode) => acc + (c.headcount || 0), 0)
+        : 0;
+
+      const totalHeadcount = unitEmps.length + childrenHeadcount;
 
       return {
         id: node.id,
         name: node.name,
         code: node.code,
-        headTitle: node.headTitle || (manager ? manager.jobTitle : (level === 1 ? 'Tổng Giám đốc' : level === 2 ? 'Trưởng Ban' : 'Trưởng bộ phận')),
-        headName: node.headName || (manager ? manager.fullName : (level === 1 ? 'Ban Giám đốc' : 'Chưa bổ nhiệm')),
-        headcount: unitEmps.length || node.memberCount || 0,
-        children: node.children && node.children.length > 0 ? node.children.map((c: any) => enrichNode(c, level + 1)) : undefined,
+        headTitle:
+          node.headTitle ||
+          (manager
+            ? manager.jobTitle
+            : level === 1
+            ? 'Tổng Giám đốc (CEO)'
+            : level === 2
+            ? 'Trưởng Ban'
+            : 'Trưởng bộ phận'),
+        headName: node.headName || (manager ? manager.fullName : level === 1 ? 'Ban Giám đốc' : 'Chưa bổ nhiệm'),
+        headcount: totalHeadcount || unitEmps.length || node.memberCount || 0,
+        children,
       };
     };
 
@@ -145,7 +120,8 @@ export default function OrgChartPage() {
     const rows: UnitTableRow[] = [];
 
     const traverse = (node: OrgNode, level = 1, parentName = 'Ban Lãnh đạo') => {
-      const current = node.headcount || 0;
+      const directCount = employeeList.filter((e) => e.orgUnitId === node.id).length;
+      const current = directCount || node.headcount || 0;
       const target = current > 0 ? current + 2 : 5;
       const fill = Math.min(100, Math.round((current / target) * 100));
 
@@ -174,22 +150,43 @@ export default function OrgChartPage() {
 
     enrichedTree.forEach((r) => traverse(r, 1, 'Tổng Công ty'));
     return rows;
-  }, [enrichedTree]);
+  }, [enrichedTree, employeeList]);
 
   // Active selected node or default first root
-  const activeNode = selectedNode ?? enrichedTree[0] ?? {
-    id: 'root-company',
-    name: 'Ban Giám đốc & Điều hành',
-    code: 'BGD',
-    headName: 'Trần Minh Hoàng',
-    headTitle: 'Tổng Giám đốc (CEO)',
-    headcount: 5,
-  };
+  const activeNode: OrgNode = useMemo(() => {
+    if (selectedNode) return selectedNode;
+    return (
+      enrichedTree[0] ?? {
+        id: 'root-company',
+        name: 'Ban Giám đốc & Điều hành',
+        code: 'BGD',
+        headName: 'Trần Minh Hoàng',
+        headTitle: 'Tổng Giám đốc (CEO)',
+        headcount: 5,
+      }
+    );
+  }, [selectedNode, enrichedTree]);
 
   const deptEmployees = useMemo(() => {
-    return employeeList.filter(
-      (e) => e.orgUnitId === activeNode.id || activeNode.id === 'root-company' || activeNode.id === 'company-root'
-    );
+    if (!activeNode) return [];
+    const getSubtreeUnitIds = (node: OrgNode | null): string[] => {
+      if (!node) return [];
+      const ids = [node.id];
+      if (node.children) {
+        node.children.forEach((c) => ids.push(...getSubtreeUnitIds(c)));
+      }
+      return ids;
+    };
+    const targetUnitIds = new Set(getSubtreeUnitIds(activeNode));
+
+    const matching = employeeList.filter((e) => {
+      const uId = e.orgUnitId || e.orgUnit?.id;
+      return uId ? targetUnitIds.has(uId) : false;
+    });
+
+    if (matching.length > 0) return matching;
+    if (activeNode.id === 'root-company' || activeNode.code === 'BGD') return employeeList;
+    return [];
   }, [employeeList, activeNode]);
 
   const activeCurrentCount = deptEmployees.length || activeNode.headcount || 0;
@@ -438,9 +435,9 @@ export default function OrgChartPage() {
                 </Link>
               </div>
 
-              <div className="space-y-2 max-h-72 overflow-y-auto pr-1 [scrollbar-width:thin]">
+              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1 [scrollbar-width:thin]">
                 {deptEmployees.length > 0 ? (
-                  deptEmployees.slice(0, 8).map((emp, i) => (
+                  deptEmployees.map((emp, i) => (
                     <div key={emp.id || i} className="flex items-center justify-between p-2.5 rounded-xl border border-border/50 bg-muted/20 hover:bg-muted/50 transition-colors">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
@@ -448,7 +445,15 @@ export default function OrgChartPage() {
                         </div>
                         <div className="min-w-0 truncate">
                           <p className="text-xs font-semibold text-foreground truncate">{emp.fullName}</p>
-                          <p className="text-[10px] text-muted-foreground truncate">{emp.jobTitle}</p>
+                          <div className="flex items-center gap-1 text-[10px] text-muted-foreground truncate">
+                            <span className="truncate">{emp.jobTitle}</span>
+                            {emp.orgUnit?.name && emp.orgUnit.id !== activeNode.id && (
+                              <>
+                                <span>•</span>
+                                <span className="font-medium text-primary/80 truncate">{emp.orgUnit.name}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <span className="text-[10px] font-mono text-muted-foreground px-1.5 py-0.5 rounded bg-muted shrink-0">
@@ -457,7 +462,7 @@ export default function OrgChartPage() {
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-6 border border-dashed rounded-xl text-muted-foreground text-xs">
+                  <div className="text-center py-8 border border-dashed rounded-xl text-muted-foreground text-xs">
                     Chưa có nhân viên nào được phân bổ về đơn vị này.
                   </div>
                 )}

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plane, Receipt, CreditCard, Plus, CheckCircle2,
-  Calendar, Layers, Clock, DollarSign, ArrowRight,
+  Calendar, Layers, Clock, DollarSign, ArrowRight, Check,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
@@ -244,7 +244,10 @@ export default function ExpenseClaimsPage() {
 
               <div className="pt-2 border-t flex justify-between text-[11px] text-muted-foreground">
                 <span>Nộp ngày: {new Date(c.submittedAt).toLocaleDateString('vi-VN')}</span>
-                <span className="font-semibold text-primary">Chứng từ hợp lệ ✓</span>
+                <span className="flex items-center gap-1 font-semibold text-primary">
+                  <Check className="h-3.5 w-3.5" />
+                  Chứng từ hợp lệ
+                </span>
               </div>
             </div>
           ))}

@@ -515,7 +515,7 @@ function CheckInInner() {
         similarity: sim,
         sensorType: isIRFeed ? 'Camera Hồng ngoại IR (Chống giả mạo quang học)' : 'Camera RGB 2D AI Matching',
         status: res.data?.status,
-        message: `Xác thực khuôn mặt thành công ✓ (${punch}) lúc ${time}`,
+        message: `Xác thực khuôn mặt thành công (${punch}) lúc ${time}`,
       });
     } catch (e) {
       if (soundEnabled) playChime('error');
@@ -846,9 +846,8 @@ function CheckInInner() {
                           <div className={`absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 rounded-bl-xl ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
                           <div className={`absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 rounded-br-xl ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
 
-                          {/* Nhãn hướng dẫn */}
                           <div className="absolute -bottom-8 rounded-full bg-slate-900/75 border border-white/10 px-3.5 py-1 text-[11px] font-medium text-white backdrop-blur-xs">
-                            {isLiveMatch ? '✓ Khuôn mặt hợp lệ' : 'Giữ khuôn mặt trong khung hình'}
+                            {isLiveMatch ? 'Khuôn mặt hợp lệ' : 'Giữ khuôn mặt trong khung hình'}
                           </div>
                         </div>
                       </div>
@@ -925,7 +924,7 @@ function CheckInInner() {
                               const isIR = /IR|Infrared|Hello|RealSense|Depth|SunplusIT/i.test(d.label);
                               return (
                                 <option key={d.deviceId} value={d.deviceId}>
-                                  {isIR ? `🔴 [Cam Hồng ngoại IR] ${d.label || 'Infrared Sensor'}` : `📸 [Cam RGB] ${d.label || `Camera ${i + 1}`}`}
+                                  {isIR ? `[Camera Hồng ngoại IR] ${d.label || 'Infrared Sensor'}` : `[Camera RGB] ${d.label || `Camera ${i + 1}`}`}
                                 </option>
                               );
                             })}
@@ -1210,7 +1209,7 @@ function CheckInInner() {
                                   : 'border-slate-200 bg-slate-50 text-slate-400'
                               }`}
                             >
-                              <span className="text-xs font-bold">{done ? `${item.title} ✓` : item.title}</span>
+                              <span className="text-xs font-bold">{item.title}</span>
                               <span className="text-[10px] mt-0.5">{item.sub}</span>
                             </div>
                           );

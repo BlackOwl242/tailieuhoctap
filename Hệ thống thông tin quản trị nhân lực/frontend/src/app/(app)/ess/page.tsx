@@ -68,7 +68,7 @@ export default function EssPage() {
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title={`Xin chào, ${user?.fullName ?? 'Nhân viên'} 👋`}
+        title={`Xin chào, ${user?.fullName ?? 'Nhân viên'}`}
         description="Cổng Tự Phục Vụ Nhân Viên (ESS): Chấm công định vị, gửi đơn giải trình bổ sung công, tra cứu phép năm (Điều 113 BLLĐ), phiếu lương điện tử, tài sản được bàn giao và khoản vay phúc lợi."
         breadcrumbs={[{ label: 'Cổng Cá nhân' }, { label: 'Tự phục vụ ESS' }]}
         actions={

@@ -6,7 +6,7 @@ import {
   Briefcase, UserPlus, Star, ChevronRight, CheckCircle2,
   Calendar, Layers, Search, Mail, Phone, ArrowRight, Award, Plus, Sparkles,
   X, Clock, DollarSign, Users, Building2, FileText, Check, ShieldCheck,
-  GripVertical, UserCheck, MoveRight,
+  GripVertical, UserCheck, MoveRight, Info,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
@@ -77,9 +77,11 @@ export default function RecruitmentAtsPage() {
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [filterOpeningId, setFilterOpeningId] = useState<string>('ALL');
 
-  // Drag and Drop States
+  // Drag and Drop States & Refs
   const [draggedAppId, setDraggedAppId] = useState<string | null>(null);
   const [dragOverCol, setDragOverCol] = useState<JobApplicant['stage'] | null>(null);
+  const draggedApplicantIdRef = React.useRef<string | null>(null);
+  const isDraggingActiveRef = React.useRef(false);
 
   // Form phỏng vấn
   const [roundName, setRoundName] = useState('Phỏng vấn Kỹ thuật Chuyên sâu');
@@ -105,7 +107,21 @@ export default function RecruitmentAtsPage() {
     mutationFn: async ({ id, stage }: { id: string; stage: JobApplicant['stage'] }) => {
       return (await api.patch(`/hrms/recruitment/applicants/${id}/stage`, { stage })).data;
     },
-    onSuccess: () => {
+    onMutate: async ({ id, stage }) => {
+      await queryClient.cancelQueries({ queryKey: ['hrms-job-applicants'] });
+      const previous = queryClient.getQueryData<JobApplicant[]>(['hrms-job-applicants']);
+      queryClient.setQueryData<JobApplicant[]>(['hrms-job-applicants'], (old) => {
+        if (!old) return old;
+        return old.map((a) => (a.id === id ? { ...a, stage } : a));
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['hrms-job-applicants'], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['hrms-job-applicants'] });
     },
   });
@@ -241,8 +257,8 @@ export default function RecruitmentAtsPage() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs text-slate-500 px-1">
             <span className="flex items-center gap-1.5 font-medium">
-              <GripVertical className="h-3.5 w-3.5 text-blue-600" />
-              💡 <strong>Mẹo:</strong> Bạn có thể <strong>kéo thả thẻ ứng viên</strong> sang bất kỳ cột giai đoạn nào để cập nhật tiến độ tức thì.
+              <Info className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+              <span>Kéo thả thẻ ứng viên giữa các cột để chuyển giai đoạn tuyển dụng.</span>
             </span>
             {draggedAppId && (
               <span className="text-blue-600 font-bold animate-pulse">
@@ -271,36 +287,37 @@ export default function RecruitmentAtsPage() {
                     }}
                     onDrop={(e) => {
                       e.preventDefault();
-                      const appId = e.dataTransfer.getData('text/plain') || draggedAppId;
+                      e.stopPropagation();
+                      const appId = e.dataTransfer.getData('text/plain') || draggedApplicantIdRef.current || draggedAppId;
                       if (appId) {
                         updateStageMutation.mutate({ id: appId, stage: col.key });
                       }
                       setDragOverCol(null);
                       setDraggedAppId(null);
+                      draggedApplicantIdRef.current = null;
                     }}
-                    className={`flex-1 rounded-2xl border p-3.5 min-w-[210px] space-y-3 transition-all ${
+                    className={`flex-1 rounded-2xl border p-3 min-w-[210px] space-y-3 transition-colors ${
                       isOver
-                        ? 'border-blue-500 bg-blue-50/80 shadow-md ring-2 ring-blue-400/50 scale-[1.01]'
+                        ? 'border-blue-500 bg-blue-50/60 ring-2 ring-blue-400/40 shadow-sm'
                         : 'border-slate-200 bg-slate-50/70 shadow-2xs'
                     }`}
                   >
                     {/* Header Cột */}
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs font-bold text-slate-900 truncate">{col.label}</span>
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold border ${col.bgClass} ${col.textClass} ${col.borderClass}`}>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold border transition-colors ${
+                          isOver
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : `${col.bgClass} ${col.textClass} ${col.borderClass}`
+                        }`}
+                      >
                         {colApps.length}
                       </span>
                     </div>
 
-                    {/* Vùng Drop Target Placeholder khi kéo thả */}
-                    {isOver && (
-                      <div className="rounded-xl border-2 border-dashed border-blue-500 bg-blue-100/50 p-3 text-center text-xs font-bold text-blue-700 animate-pulse">
-                        + Thả vào {col.label}
-                      </div>
-                    )}
-
                     {/* Danh sách thẻ ứng viên */}
-                    <div className="space-y-2.5 min-h-[120px]">
+                    <div className="space-y-2.5 min-h-[140px]">
                       {colApps.map((app) => {
                         const isDragging = draggedAppId === app.id;
 
@@ -311,38 +328,46 @@ export default function RecruitmentAtsPage() {
                             onDragStart={(e) => {
                               e.dataTransfer.setData('text/plain', app.id);
                               e.dataTransfer.effectAllowed = 'move';
+                              draggedApplicantIdRef.current = app.id;
+                              isDraggingActiveRef.current = true;
                               setDraggedAppId(app.id);
                             }}
                             onDragEnd={() => {
                               setDraggedAppId(null);
                               setDragOverCol(null);
+                              draggedApplicantIdRef.current = null;
+                              setTimeout(() => {
+                                isDraggingActiveRef.current = false;
+                              }, 150);
                             }}
                             onClick={() => {
+                              if (isDraggingActiveRef.current) return;
                               setSelectedApplicant(app);
                               setIsApplicantDetailModalOpen(true);
                             }}
-                            className={`group relative rounded-xl border bg-white p-3.5 shadow-2xs space-y-2.5 transition-all cursor-grab active:cursor-grabbing hover:shadow-md hover:border-blue-400 ${
+                            className={`group rounded-xl border bg-white p-3.5 shadow-2xs space-y-2.5 transition-all select-none cursor-grab active:cursor-grabbing hover:shadow-md hover:border-blue-400 ${
                               isDragging
-                                ? 'opacity-40 border-dashed border-blue-500 bg-blue-50/40 scale-95'
+                                ? 'opacity-40 border-blue-400 bg-blue-50/30'
                                 : 'border-slate-200'
                             }`}
                           >
                             {/* Grip Icon & Name */}
                             <div className="flex items-start justify-between gap-1">
-                              <div className="flex items-center gap-1.5">
-                                <GripVertical className="h-3.5 w-3.5 text-slate-300 group-hover:text-blue-500 transition-colors" />
-                                <h4 className="font-bold text-slate-900 text-xs">{app.candidateName}</h4>
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <GripVertical className="h-3.5 w-3.5 text-slate-300 group-hover:text-blue-500 transition-colors shrink-0" />
+                                <h4 className="font-bold text-slate-900 text-xs truncate">{app.candidateName}</h4>
                               </div>
-                              <span className="flex items-center text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold text-[10px]">
-                                ★ {app.rating}
+                              <span className="flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold text-[10px] shrink-0">
+                                <Star className="h-3 w-3 fill-amber-400 text-amber-500 shrink-0" />
+                                <span>{app.rating}</span>
                               </span>
                             </div>
 
                             <p className="text-[11px] font-semibold text-blue-700 line-clamp-1">{app.jobOpening?.title}</p>
 
                             <div className="space-y-0.5 text-[10px] text-slate-500">
-                              <p className="flex items-center gap-1 truncate"><Mail className="h-3 w-3 text-slate-400" /> {app.email}</p>
-                              {app.phone && <p className="flex items-center gap-1"><Phone className="h-3 w-3 text-slate-400" /> {app.phone}</p>}
+                              <p className="flex items-center gap-1 truncate"><Mail className="h-3 w-3 text-slate-400 shrink-0" /> <span className="truncate">{app.email}</span></p>
+                              {app.phone && <p className="flex items-center gap-1"><Phone className="h-3 w-3 text-slate-400 shrink-0" /> <span>{app.phone}</span></p>}
                             </div>
 
                             {/* Quick action buttons */}
@@ -404,9 +429,27 @@ export default function RecruitmentAtsPage() {
                         );
                       })}
 
-                      {colApps.length === 0 && !isOver && (
-                        <div className="rounded-xl border border-dashed border-slate-200 bg-white/60 p-6 text-center text-[11px] text-slate-400">
-                          Kéo thả ứng viên vào đây
+                      {/* Dropzone khi cột trống */}
+                      {colApps.length === 0 && (
+                        <div
+                          className={`rounded-xl border-2 border-dashed p-6 text-center text-xs transition-colors flex flex-col items-center justify-center gap-1 min-h-[140px] ${
+                            isOver
+                              ? 'border-blue-500 bg-blue-100/50 text-blue-700 font-bold'
+                              : 'border-slate-200 bg-white/40 text-slate-400'
+                          }`}
+                        >
+                          {isOver ? (
+                            <span>+ Thả vào {col.label}</span>
+                          ) : (
+                            <span>Kéo thả ứng viên vào đây</span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Drop indicator dưới cùng khi cột đã có thẻ */}
+                      {isOver && colApps.length > 0 && (
+                        <div className="rounded-xl border-2 border-dashed border-blue-400 bg-blue-100/40 p-2.5 text-center text-[11px] font-bold text-blue-700">
+                          + Thả vào {col.label}
                         </div>
                       )}
                     </div>
@@ -514,7 +557,10 @@ export default function RecruitmentAtsPage() {
               <div className="col-span-2 p-3 rounded-xl bg-amber-50/70 border border-amber-200 flex items-center justify-between">
                 <div>
                   <span className="text-amber-800 text-[11px] font-semibold">Điểm đánh giá ứng viên:</span>
-                  <p className="text-sm font-extrabold text-amber-900 mt-0.5">★ {selectedApplicant.rating} / 5.0</p>
+                  <p className="text-sm font-extrabold text-amber-900 mt-0.5 flex items-center gap-1">
+                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
+                    <span>{selectedApplicant.rating} / 5.0</span>
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-slate-600 text-xs font-medium">Giai đoạn hiện tại:</span>
@@ -659,8 +705,9 @@ export default function RecruitmentAtsPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-slate-900">{app.candidateName}</span>
-                        <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
-                          ★ {app.rating}
+                        <span className="flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
+                          <Star className="h-3 w-3 fill-amber-400 text-amber-500" />
+                          <span>{app.rating}</span>
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 mt-0.5">{app.email} {app.phone ? `· ${app.phone}` : ''}</p>

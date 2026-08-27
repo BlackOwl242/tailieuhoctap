@@ -69,7 +69,7 @@ class CreateCertificateDto {
 const EMPLOYEE_SELECT = {
   id: true, email: true, fullName: true, employeeCode: true, hireDate: true,
   employmentStatus: true, baseSalary: true, birthDate: true, phone: true,
-  address: true, jobTitle: true, status: true,
+  address: true, jobTitle: true, status: true, orgUnitId: true,
   orgUnit: { select: { id: true, name: true, code: true } },
 } as const;
 
@@ -78,7 +78,7 @@ const EMPLOYEE_SELECT = {
 const EMPLOYEE_SELECT_PUBLIC = {
   id: true, email: true, fullName: true, employeeCode: true, hireDate: true,
   employmentStatus: true, birthDate: true, phone: true,
-  address: true, jobTitle: true, status: true,
+  address: true, jobTitle: true, status: true, orgUnitId: true,
   orgUnit: { select: { id: true, name: true, code: true } },
 } as const;
 

@@ -246,6 +246,96 @@ async function seedFrappeHrms() {
     });
   }
 
+  // 10. Asset Allocations
+  const sampleAssets = [
+    {
+      assetCode: 'AST-IT-001',
+      name: 'MacBook Pro 16" M3 Max (36GB/1TB)',
+      category: 'IT_EQUIPMENT',
+      serialNumber: 'C02G8901MD6R',
+      assignedUserId: users[0]?.id || null,
+      assignedEmployeeName: users[0]?.fullName || 'Nguyễn Hoàng Nam',
+      allocatedDate: new Date('2026-01-15'),
+      status: 'ALLOCATED',
+      condition: 'EXCELLENT',
+      value: 68500000,
+      notes: 'Cấp phát cho Lãnh đạo Khối Công nghệ - Full VAT bảo hành Apple Care 3 năm',
+    },
+    {
+      assetCode: 'AST-IT-002',
+      name: 'Màn hình Dell UltraSharp 27" 4K U2723QE',
+      category: 'IT_EQUIPMENT',
+      serialNumber: 'CN-0V4R3K-74261',
+      assignedUserId: users[0]?.id || null,
+      assignedEmployeeName: users[0]?.fullName || 'Nguyễn Hoàng Nam',
+      allocatedDate: new Date('2026-01-15'),
+      status: 'ALLOCATED',
+      condition: 'EXCELLENT',
+      value: 14200000,
+      notes: 'Màn hình mở rộng đồ họa & lập trình',
+    },
+    {
+      assetCode: 'AST-IT-003',
+      name: 'Laptop ThinkPad X1 Carbon Gen 11 (Core i7/32GB)',
+      category: 'IT_EQUIPMENT',
+      serialNumber: 'PF-2K90LM',
+      assignedUserId: users[1]?.id || null,
+      assignedEmployeeName: users[1]?.fullName || 'Trần Thị Mai Anh',
+      allocatedDate: new Date('2026-02-01'),
+      status: 'ALLOCATED',
+      condition: 'GOOD',
+      value: 42000000,
+      notes: 'Cấp phát cho Trưởng phòng Nhân sự C&B',
+    },
+    {
+      assetCode: 'AST-FUR-004',
+      name: 'Ghế Công thái học Herman Miller Aeron (Size B)',
+      category: 'FURNITURE',
+      serialNumber: 'HM-AER-99120',
+      assignedUserId: users[1]?.id || null,
+      assignedEmployeeName: users[1]?.fullName || 'Trần Thị Mai Anh',
+      allocatedDate: new Date('2026-02-01'),
+      status: 'ALLOCATED',
+      condition: 'EXCELLENT',
+      value: 28900000,
+      notes: 'Trang thiết bị văn phòng chuẩn công thái học',
+    },
+    {
+      assetCode: 'AST-DEV-005',
+      name: 'Máy in Đa năng Laser Màu HP LaserJet Pro MFP M479fdw',
+      category: 'OFFICE_DEVICE',
+      serialNumber: 'VNB3K01928',
+      assignedUserId: null,
+      assignedEmployeeName: null,
+      allocatedDate: null,
+      status: 'AVAILABLE',
+      condition: 'NEW',
+      value: 18500000,
+      notes: 'Đặt tại Khu vực In ấn Trung tâm Tầng 3',
+    },
+    {
+      assetCode: 'AST-VEH-006',
+      name: 'Xe ô tô 7 chỗ phục vụ công tác Toyota Fortuner Legender',
+      category: 'VEHICLE',
+      serialNumber: '51K-892.45',
+      assignedUserId: null,
+      assignedEmployeeName: null,
+      allocatedDate: null,
+      status: 'AVAILABLE',
+      condition: 'EXCELLENT',
+      value: 1250000000,
+      notes: 'Đội xe hành chính quản lý, phục vụ đoàn công tác các tỉnh',
+    },
+  ];
+
+  for (const ast of sampleAssets) {
+    await prisma.hrmsAssetAllocation.upsert({
+      where: { assetCode: ast.assetCode },
+      update: ast,
+      create: ast,
+    });
+  }
+
   console.log('Frappe HRMS Enterprise Modules seeded successfully!');
 }
 
