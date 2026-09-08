@@ -6,7 +6,7 @@ import { CheckCircle2, Circle } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
-import { Card, CardContent, Badge, Button, Skeleton } from '@/components/ui/primitives';
+import { Card, CardContent, Button, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState, EmptyState } from '@/components/common/states';
 import type { OnboardingAssignmentView } from '@/lib/types';
 
@@ -47,10 +47,10 @@ export default function OnboardingPage() {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-semibold">{a.path.title}</p>
                   <div className="flex items-center gap-2">
-                    {a.dueDate ? <Badge variant="secondary">Hạn {formatDate(a.dueDate)}</Badge> : null}
-                    <Badge className={a.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}>
+                    {a.dueDate ? <span className="text-xs text-muted-foreground">Hạn {formatDate(a.dueDate)}</span> : null}
+                    <span className="font-mono text-xs font-semibold tabular-nums text-foreground">
                       {a.progressPercent}%
-                    </Badge>
+                    </span>
                   </div>
                 </div>
                 {/* Thanh tiến độ */}

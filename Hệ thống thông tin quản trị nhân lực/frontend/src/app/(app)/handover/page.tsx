@@ -6,7 +6,7 @@ import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
-import { Card, CardContent, Badge, Button, Skeleton } from '@/components/ui/primitives';
+import { Card, CardContent, Button, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState, EmptyState } from '@/components/common/states';
 import type { HandoverView } from '@/lib/types';
 
@@ -63,11 +63,12 @@ export default function HandoverPage() {
                       <p className="font-semibold">{h.owner.fullName}</p>
                       <p className="text-xs text-muted-foreground">Ngày nghỉ dự kiến: {formatDate(h.leavingDate)}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">{h.done}/{h.total} hoàn thành</Badge>
-                      <Badge className={h.status === 'CLOSED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground font-medium">{h.done}/{h.total} hoàn thành</span>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
+                        <span className={`h-1.5 w-1.5 rounded-full ${h.status === 'CLOSED' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                         {h.status === 'CLOSED' ? 'Đã đóng' : 'Đang mở'}
-                      </Badge>
+                      </span>
                     </div>
                   </div>
 

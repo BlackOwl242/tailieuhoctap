@@ -10,7 +10,6 @@ import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Badge } from '@/components/ui/primitives';
 
 interface SalaryComponent {
   id: string;
@@ -234,9 +233,10 @@ export default function PayrollEnginePage() {
                     <div>
                       <div className="flex items-center gap-2.5">
                         <h3 className="text-base font-bold text-foreground">{run.periodName}</h3>
-                        <Badge variant="success">
-                          {run.status === 'PROCESSED' ? 'ĐÃ XỬ LÝ' : run.status}
-                        </Badge>
+                        <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 font-medium">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                          {run.status === 'PROCESSED' ? 'Đã xử lý' : run.status}
+                        </span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         Thời gian tính: {new Date(run.fromDate).toLocaleDateString('vi-VN')} - {new Date(run.toDate).toLocaleDateString('vi-VN')}
@@ -377,9 +377,9 @@ export default function PayrollEnginePage() {
             <div key={s.id} className="rounded-xl border bg-card p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-foreground text-sm">{s.name}</h3>
-                <Badge variant="info">
+                <span className="text-xs text-muted-foreground font-medium">
                   {s.payrollFrequency}
-                </Badge>
+                </span>
               </div>
               <p className="text-xs text-muted-foreground">{s.description}</p>
 

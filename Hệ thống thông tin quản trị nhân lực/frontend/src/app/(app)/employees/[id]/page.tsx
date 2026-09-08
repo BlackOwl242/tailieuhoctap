@@ -10,7 +10,7 @@ import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { CONTRACT_STATUS_LABEL, CONTRACT_TYPE_LABEL, EMPLOYMENT_STATUS_LABEL, vnd } from '@/lib/hr';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton, Textarea } from '@/components/ui/primitives';
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton, Textarea } from '@/components/ui/primitives';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
 import { PrintButton, PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
@@ -200,9 +200,14 @@ export default function EmployeeDetailPage() {
                         <td className="px-3 py-2">{formatDate(c.startDate)}{c.endDate ? ` → ${formatDate(c.endDate)}` : ''}</td>
                         <td className="px-3 py-2">{vnd(c.baseSalary)}</td>
                         <td className="px-3 py-2">
-                          <Badge className={c.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : 'bg-secondary'}>
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                c.status === 'ACTIVE' ? 'bg-emerald-600' : 'bg-slate-400'
+                              }`}
+                            />
                             {CONTRACT_STATUS_LABEL[c.status] ?? c.status}
-                          </Badge>
+                          </span>
                         </td>
                         <td className="px-3 py-2">
                           {c.fileUrl ? (

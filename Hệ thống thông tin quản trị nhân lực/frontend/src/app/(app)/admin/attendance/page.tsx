@@ -6,7 +6,7 @@ import { Play, Plus, RefreshCw } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate, DAY_STATUS_LABEL } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Badge, Skeleton } from '@/components/ui/primitives';
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState } from '@/components/common/states';
 
 interface DeviceRow { id: string; name: string; type: string; location: string | null; status: string; lastSeenAt: string | null }
@@ -91,7 +91,10 @@ export default function AdminAttendancePage() {
                   <span className="font-medium">{d.name}</span>
                   <span className="block text-xs text-muted-foreground">{d.type}{d.location ? ` · ${d.location}` : ''}</span>
                 </span>
-                <Badge variant="secondary">{d.status}</Badge>
+                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  {d.status}
+                </span>
               </div>
             ))}
 

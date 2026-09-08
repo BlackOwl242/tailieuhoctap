@@ -82,6 +82,7 @@ const NAV_GROUPS: { label: string; items: { href: string; label: string; icon: t
 const ADMIN_NAV = [
   { href: '/admin/users', label: 'Người dùng' },
   { href: '/admin/org-units', label: 'Cơ cấu tổ chức' },
+  { href: '/admin/catalogs', label: 'Hệ thống danh mục (Master Data)' },
   { href: '/admin/attendance', label: 'Thiết bị chấm công' },
   { href: '/admin/settings', label: 'Cấu hình' },
   { href: '/admin/audit', label: 'Nhật ký kiểm toán' },
@@ -234,7 +235,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold tracking-tight text-foreground leading-tight">HRMIS Pro</span>
-              <span className="text-[10px] text-muted-foreground font-medium leading-tight">Quản trị Nhân lực VN</span>
+              <span className="text-[10px] text-muted-foreground font-medium leading-tight">Quản trị Nhân lực Toàn diện</span>
             </div>
           </Link>
           <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">
@@ -245,15 +246,6 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
         {/* Danh sách Menu cuộn mượt */}
         <div className="flex-1 overflow-y-auto px-3 py-3 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30">
           {navLinks}
-        </div>
-
-        {/* Footer Sidebar */}
-        <div className="border-t border-border/50 px-4 py-2.5 flex items-center justify-between text-[11px] text-muted-foreground bg-muted/10">
-          <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span className="font-medium text-foreground/80">Trực tuyến</span>
-          </div>
-          <span className="font-mono text-[10px] text-muted-foreground/70">BLLĐ 2019</span>
         </div>
       </aside>
 

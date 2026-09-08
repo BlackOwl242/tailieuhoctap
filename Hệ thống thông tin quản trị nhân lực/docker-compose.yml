@@ -62,7 +62,7 @@ services:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-KMS Saigon Technology}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-HRMIS Pro}
     restart: unless-stopped
     depends_on:
       api:

@@ -81,8 +81,8 @@ function LoginInner() {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <BookOpenText className="h-6 w-6" />
           </div>
-          <h1 className="text-xl font-bold tracking-tight">HRMIS Saigon Technology</h1>
-          <p className="text-sm text-muted-foreground">Hệ thống thông tin quản trị nhân lực</p>
+          <h1 className="text-xl font-bold tracking-tight">HRMIS Pro</h1>
+          <p className="text-sm text-muted-foreground">Hệ thống Thông tin Quản trị Nhân lực Toàn diện</p>
         </div>
 
         {/* Còn phiên đăng nhập cũ → cho đăng xuất ngay để đổi tài khoản (Mục 3) */}

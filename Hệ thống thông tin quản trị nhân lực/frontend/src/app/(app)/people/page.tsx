@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api, errorMessage } from '@/lib/api';
-import { Avatar, AvatarFallback, Badge, Card, CardContent, Input, Skeleton } from '@/components/ui/primitives';
+import { Avatar, AvatarFallback, Card, CardContent, Input, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState, EmptyState } from '@/components/common/states';
 
 interface PersonRow {
@@ -47,9 +47,12 @@ export default function PeoplePage() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold">{p.fullName}</p>
                     <p className="truncate text-xs text-muted-foreground">{p.jobTitle}{p.orgUnit ? ` · ${p.orgUnit.name}` : ''}</p>
-                    <div className="mt-1.5 flex flex-wrap gap-1">
-                      {(p.expertise ?? []).slice(0, 3).map((t) => <Badge key={t} variant="secondary">{t}</Badge>)}
-                      <Badge>{p.publishedCount} bài</Badge>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                      {(p.expertise ?? []).length > 0 && (
+                        <span className="truncate max-w-[14rem]">{(p.expertise ?? []).slice(0, 2).join(' · ')}</span>
+                      )}
+                      <span>·</span>
+                      <span>{p.publishedCount} bài viết</span>
                     </div>
                   </div>
                 </CardContent>

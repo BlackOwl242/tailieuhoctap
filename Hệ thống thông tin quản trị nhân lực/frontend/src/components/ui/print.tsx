@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { ChevronDown, FileSpreadsheet, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/primitives';
+import { useOrgConfig } from '@/lib/org-config';
 
 export interface PrintExportDropdownProps {
   printLabel?: string;
@@ -108,56 +109,88 @@ export function PrintButton({ label = 'In phiếu', className }: { label?: strin
   );
 }
 
+export interface PrintFrameProps {
+  title: string;
+  subtitle?: string;
+  docNumber?: string;
+  orgName?: string;
+  parentOrgName?: string;
+  deptName?: string;
+  location?: string;
+  showDept?: boolean;
+}
+
 /**
- * Khung tiêu đề báo cáo in chuẩn văn bản hành chính
+ * Khung tiêu đề báo cáo in chuẩn văn bản hành chính (Nghị định 30/2020/NĐ-CP)
  */
 export function PrintFrame({
   title,
   subtitle,
   docNumber,
-}: {
-  title: string;
-  subtitle?: string;
-  docNumber?: string;
-}) {
+  orgName,
+  parentOrgName,
+  deptName,
+  location,
+}: PrintFrameProps) {
+  const [config] = useOrgConfig();
   const [printedAt, setPrintedAt] = React.useState<string>('');
+
   React.useEffect(() => {
     const d = new Date();
     setPrintedAt(`ngày ${d.getDate()} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`);
   }, []);
 
+  const displayParentOrg = (parentOrgName !== undefined ? parentOrgName : config.parentOrgName) || '';
+  const displayOrg = (orgName !== undefined ? orgName : config.orgName) || 'CƠ QUAN / ĐƠN VỊ';
+  const displayDept = (deptName !== undefined ? deptName : config.deptName) || '';
+  const displayLocation = location || config.location || 'TP. Hồ Chí Minh';
+  const displayDocNumber = docNumber || '.../BC-TCCB';
+
   return (
     <div className="print-only font-times text-black mb-5">
       {/* Header 2 cột chuẩn văn bản hành chính Việt Nam (Nghị định 30/2020/NĐ-CP) */}
-      <div className="grid grid-cols-2 gap-6 items-start pb-2">
+      <div className="flex justify-between items-start gap-6 pb-2">
         {/* Bên trái: Tên cơ quan, tổ chức ban hành văn bản (12-13pt) */}
-        <div className="text-center flex flex-col items-center">
-          <p className="text-[12pt] font-bold uppercase tracking-tight text-black leading-tight">
-            CÔNG TY CP PHẦN MỀM SAIGON TECHNOLOGY
+        <div className="text-center flex flex-col items-center shrink-0 max-w-[48%] leading-normal">
+          {displayParentOrg ? (
+            <p className="text-[11pt] sm:text-[11.5pt] font-normal uppercase tracking-tight text-black leading-tight">
+              {displayParentOrg}
+            </p>
+          ) : null}
+          <p className="text-[11.5pt] sm:text-[12pt] font-bold uppercase tracking-tight text-black mt-0.5 leading-tight">
+            {displayOrg}
           </p>
-          <p className="text-[11.5pt] font-bold text-black uppercase mt-1 leading-tight">
-            HỆ THỐNG QUẢN TRỊ NHÂN LỰC (HRMIS)
+          {displayDept ? (
+            <p className="text-[10.5pt] sm:text-[11pt] font-semibold text-black uppercase mt-0.5 leading-tight">
+              {displayDept}
+            </p>
+          ) : null}
+          {/* Nét kẻ ngang dưới tên cơ quan/đơn vị: nét liền 1px, dài 1/3 đến 1/2 độ dài dòng chữ */}
+          <div
+            className="print-divider-line mt-1.5 mb-1.5"
+            style={{ width: '45%', minWidth: '80px', maxWidth: '140px', borderTop: '1px solid #000000' }}
+          />
+          <p className="text-[10.5pt] sm:text-[11pt] italic text-black">
+            Số: {displayDocNumber}
           </p>
-          {/* Nét kẻ ngang dưới tên cơ quan: nét liền 1px, dài 1/3 đến 1/2 độ dài dòng chữ */}
-          <div className="w-28 border-b border-black mt-1.5 mb-1.5" />
-          {docNumber ? <p className="text-[11pt] italic text-black">Số: {docNumber}</p> : null}
         </div>
 
         {/* Bên phải: Quốc hiệu và Tiêu ngữ (12-14pt) */}
-        <div className="flex flex-col items-end">
-          <div className="text-center flex flex-col items-center w-full">
-            <p className="text-[12.5pt] font-bold uppercase tracking-tight text-black leading-tight">
-              CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
-            </p>
-            <p className="text-[13pt] font-bold text-black mt-1 leading-tight">
-              Độc lập – Tự do – Hạnh phúc
-            </p>
-            {/* Nét kẻ ngang dưới Tiêu ngữ: nét liền 1px, dài bằng độ dài dòng chữ */}
-            <div className="w-40 border-b border-black mt-1.5 mb-1.5" />
-          </div>
+        <div className="flex flex-col items-center text-center shrink-0 max-w-[48%] leading-normal">
+          <p className="text-[11.5pt] sm:text-[12pt] font-bold uppercase tracking-tight text-black leading-tight whitespace-nowrap">
+            CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT&nbsp;NAM
+          </p>
+          <p className="text-[12pt] sm:text-[12.5pt] font-bold text-black mt-0.5 leading-tight whitespace-nowrap">
+            Độc lập – Tự do – Hạnh phúc
+          </p>
+          {/* Nét kẻ ngang dưới Tiêu ngữ: nét liền 1px, dài bằng độ dài dòng chữ */}
+          <div
+            className="print-divider-line mt-1.5 mb-1.5"
+            style={{ width: '60%', minWidth: '120px', maxWidth: '180px', borderTop: '1px solid #000000' }}
+          />
           {/* Địa danh và Ngày tháng năm: Căn sát lề phải (13-14pt nghiêng) */}
-          <p className="text-[12.5pt] italic text-black text-right w-full mt-1">
-            TP. Hồ Chí Minh, {printedAt || 'ngày … tháng … năm 2026'}
+          <p className="text-[11.5pt] sm:text-[12pt] italic text-black text-right w-full mt-0.5 whitespace-nowrap">
+            {displayLocation}, {printedAt || 'ngày … tháng … năm 2026'}
           </p>
         </div>
       </div>
@@ -174,32 +207,57 @@ export function PrintFrame({
 /**
  * Khung chữ ký cuối trang văn bản in chuẩn Nghị định 30 (12-13pt)
  */
-export function PrintSignatureBlock({
-  leftTitle = 'Người lập biểu',
-  middleTitle = 'Trưởng bộ phận',
-  rightTitle = 'Giám đốc phê duyệt',
-}: {
+export interface PrintSignatureBlockProps {
   leftTitle?: string;
   middleTitle?: string;
   rightTitle?: string;
-}) {
+  location?: string;
+  showDate?: boolean;
+}
+
+export function PrintSignatureBlock({
+  leftTitle,
+  middleTitle,
+  rightTitle,
+  location,
+  showDate = false,
+}: PrintSignatureBlockProps) {
+  const [config] = useOrgConfig();
+  const [printedAt, setPrintedAt] = React.useState<string>('');
+
+  React.useEffect(() => {
+    if (!showDate) return;
+    const d = new Date();
+    setPrintedAt(`ngày ${d.getDate()} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`);
+  }, [showDate]);
+
+  const title1 = leftTitle ?? config.signerTitle1 ?? 'Người lập biểu';
+  const title2 = middleTitle ?? config.signerTitle2 ?? 'Trưởng phòng Tổ chức - Cán bộ';
+  const title3 = rightTitle ?? config.signerTitle3 ?? 'Thủ trưởng Cơ quan / Đơn vị';
+  const displayLocation = location || config.location || 'TP. Hồ Chí Minh';
+
   return (
     <div className="font-times print-only mt-8 break-inside-avoid pt-4 text-black">
-      <div className="grid grid-cols-3 gap-4 text-center">
+      <div className="grid grid-cols-3 gap-4 text-center items-start">
         <div>
-          <p className="text-[12pt] font-bold uppercase text-black leading-snug">{leftTitle}</p>
-          <p className="text-[11pt] italic text-black mt-0.5">(Ký và ghi rõ họ tên)</p>
-          <div className="h-20" />
+          <p className="text-[12pt] font-bold uppercase text-black leading-snug">{title1}</p>
+          <p className="text-[11pt] italic text-black mt-1">(Ký, ghi rõ họ tên)</p>
+          <div className="h-24" />
         </div>
         <div>
-          <p className="text-[12pt] font-bold uppercase text-black leading-snug">{middleTitle}</p>
-          <p className="text-[11pt] italic text-black mt-0.5">(Ký và ghi rõ họ tên)</p>
-          <div className="h-20" />
+          <p className="text-[12pt] font-bold uppercase text-black leading-snug">{title2}</p>
+          <p className="text-[11pt] italic text-black mt-1">(Ký, ghi rõ họ tên)</p>
+          <div className="h-24" />
         </div>
         <div>
-          <p className="text-[12pt] font-bold uppercase text-black leading-snug">{rightTitle}</p>
-          <p className="text-[11pt] italic text-black mt-0.5">(Ký, đóng dấu)</p>
-          <div className="h-20" />
+          {showDate ? (
+            <p className="text-[11pt] italic text-black mb-1">
+              {displayLocation}, {printedAt || 'ngày … tháng … năm 2026'}
+            </p>
+          ) : null}
+          <p className="text-[12pt] font-bold uppercase text-black leading-snug">{title3}</p>
+          <p className="text-[11pt] italic text-black mt-1">(Ký, ghi rõ họ tên và đóng dấu)</p>
+          <div className="h-24" />
         </div>
       </div>
     </div>

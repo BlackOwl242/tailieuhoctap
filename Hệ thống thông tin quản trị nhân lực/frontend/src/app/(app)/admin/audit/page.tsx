@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api, errorMessage } from '@/lib/api';
 import { formatDateTime } from '@/lib/utils';
-import { Badge } from '@/components/ui/primitives';
 import { DataTable, type DataColumn } from '@/components/ui/data-table';
 import { PageHeader, ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
@@ -24,7 +23,7 @@ export default function AdminAuditPage() {
   const columns: DataColumn<AuditRow>[] = [
     { key: 'createdAt', header: 'Thời điểm', sortable: true, render: (r) => <span className="whitespace-nowrap">{formatDateTime(r.createdAt)}</span> },
     { key: 'actor', header: 'Người thực hiện', sortable: true, sortValue: (r) => r.actor?.fullName ?? '', render: (r) => r.actor?.fullName ?? 'Hệ thống' },
-    { key: 'action', header: 'Hành động', sortable: true, render: (r) => <Badge variant="secondary">{r.action}</Badge>, exportValue: (r) => r.action },
+    { key: 'action', header: 'Hành động', sortable: true, render: (r) => <code className="text-xs font-mono font-medium text-foreground">{r.action}</code>, exportValue: (r) => r.action },
     { key: 'entityType', header: 'Đối tượng', sortable: true, render: (r) => (
       <span className="text-xs text-muted-foreground">{r.entityType}{r.entityId ? ` · ${r.entityId.slice(0, 8)}…` : ''}</span>
     ), exportValue: (r) => `${r.entityType} (${r.entityId ?? ''})` },

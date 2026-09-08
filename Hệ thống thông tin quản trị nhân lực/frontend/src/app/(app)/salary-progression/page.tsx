@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import { Badge, Button, Card, Input } from '@/components/ui/primitives';
+import { Button, Card, Input } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { PageHeader, ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
@@ -96,10 +96,10 @@ export default function SalaryProgressionPage() {
       header: 'Ngạch hiện tại',
       render: (r) => (
         <div>
-          <Badge className="bg-blue-50 text-blue-700 border-blue-200">
+          <div className="text-xs font-semibold text-foreground">
             {r.rankName}
-          </Badge>
-          <div className="text-xs text-muted-foreground mt-0.5">
+          </div>
+          <div className="text-xs text-muted-foreground font-mono mt-0.5">
             Bậc {r.currentStep}/{r.totalSteps} (HS: {r.currentCoefficient.toFixed(2)})
           </div>
         </div>
@@ -124,16 +124,18 @@ export default function SalaryProgressionPage() {
       render: (r) => {
         if (r.progressionType === 'STEP_PROMOTION') {
           return (
-            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 font-semibold flex items-center gap-1 w-fit">
-              <ArrowUpRight className="w-3 h-3" /> Đủ điều kiện nâng Bậc {r.nextStep} (HS: {r.nextCoefficient.toFixed(2)})
-            </Badge>
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+              Đủ điều kiện nâng Bậc {r.nextStep} (HS: {r.nextCoefficient.toFixed(2)})
+            </span>
           );
         }
         if (r.progressionType === 'OVER_GRADE_ALLOWANCE') {
           return (
-            <Badge className="bg-purple-100 text-purple-800 border-purple-300 font-semibold flex items-center gap-1 w-fit">
-              <Award className="w-3 h-3" /> Đạt thâm niên vượt khung ({r.suggestedOverGradePercent}%)
-            </Badge>
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-purple-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-purple-600" />
+              Đạt thâm niên vượt khung ({r.suggestedOverGradePercent}%)
+            </span>
           );
         }
         return (

@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { DOCUMENT_CATEGORY_LABEL } from '@/lib/hr';
-import { Badge, Button, Input, Label, Select, Textarea } from '@/components/ui/primitives';
+import { Button, Input, Label, Select, Textarea } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
@@ -106,7 +106,7 @@ export default function DocumentsPage() {
       key: 'category',
       header: 'Danh mục',
       sortable: true,
-      render: (r) => <Badge variant="secondary">{DOCUMENT_CATEGORY_LABEL[r.category] ?? r.category}</Badge>,
+      render: (r) => <span className="text-xs font-semibold text-foreground">{DOCUMENT_CATEGORY_LABEL[r.category] ?? r.category}</span>,
       exportValue: (r) => DOCUMENT_CATEGORY_LABEL[r.category] ?? r.category,
     },
     { key: 'processArea', header: 'Quy trình', sortable: true, render: (r) => r.processArea ?? '—' },
@@ -115,10 +115,8 @@ export default function DocumentsPage() {
       header: 'Thẻ',
       noPrint: true,
       render: (r) => (
-        <span className="flex flex-wrap gap-1">
-          {r.tags.map((t) => (
-            <Badge key={t} variant="outline">{t}</Badge>
-          ))}
+        <span className="text-xs text-muted-foreground">
+          {r.tags.length > 0 ? r.tags.join(', ') : '—'}
         </span>
       ),
     },

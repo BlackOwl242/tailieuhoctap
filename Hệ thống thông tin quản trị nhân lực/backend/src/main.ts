@@ -55,8 +55,8 @@ async function bootstrap(): Promise<void> {
   app.enableShutdownHooks();
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('KMS Saigon Technology API')
-    .setDescription('Knowledge Management System — RESTful API (v1)')
+    .setTitle('HRMIS Pro & KMS Unified API')
+    .setDescription('Hệ thống Thông tin Quản trị Nhân lực Toàn diện — RESTful API (v1)')
     .setVersion('1.0')
     .addBearerAuth()
     .build();

@@ -6,7 +6,7 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDateTime } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
-import { Button, Card, CardContent, Badge, Skeleton } from '@/components/ui/primitives';
+import { Button, Card, CardContent, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState, EmptyState } from '@/components/common/states';
 
 interface PendingItem {
@@ -57,7 +57,10 @@ export default function ReviewPage() {
                       {item.reviewDueAt ? ` · Hạn ${formatDateTime(item.reviewDueAt)}` : ''}
                     </p>
                   </div>
-                  <Badge className="bg-amber-100 text-amber-800">Chờ duyệt</Badge>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-800">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-600" />
+                    Chờ duyệt
+                  </span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Button size="sm" variant="success" disabled={act.isPending}

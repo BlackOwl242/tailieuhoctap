@@ -14,6 +14,7 @@ import { LoadingState, ErrorState } from '@/components/common/states';
 import { InteractiveOrgChart, type OrgNode } from '@/components/ui/org-chart';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Badge } from '@/components/ui/primitives';
+import { Modal } from '@/components/ui/modal';
 import { PrintFrame, PrintSignatureBlock, PrintExportDropdown } from '@/components/ui/print';
 import { exportRowsToExcel } from '@/lib/export';
 import Link from 'next/link';
@@ -385,90 +386,14 @@ export default function OrgChartPage() {
         </span>
       </div>
 
-      {/* Main Tab Content */}
+      {/* Main Tab Content - Chiếm trọn 100% chiều rộng để sơ đồ cơ cấu mở rộng tối đa khoảng nhìn */}
       {activeTab === 'tree' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          {/* Left / Center: Interactive Org Chart */}
-          <div className="lg:col-span-2 space-y-3">
-            <InteractiveOrgChart
-              nodes={enrichedTree}
-              onSelectNode={(node) => setSelectedNode(node)}
-              selectedId={activeNode.id}
-            />
-          </div>
-
-          {/* Right: Selected Unit Detail Panel */}
-          <div className="rounded-2xl border border-border/80 bg-card p-5 shadow-2xs space-y-5">
-            <div className="border-b border-border/60 pb-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono font-bold text-primary uppercase bg-primary/10 px-2 py-0.5 rounded">
-                  {activeNode.code}
-                </span>
-                <span className="text-[11px] text-muted-foreground">Chi tiết đơn vị</span>
-              </div>
-              <h3 className="text-base font-bold text-foreground mt-1.5">{activeNode.name}</h3>
-              <p className="text-xs text-muted-foreground mt-1">
-                Phụ trách: <b className="text-foreground">{activeNode.headName ?? 'Chưa bổ nhiệm'}</b> ({activeNode.headTitle ?? 'Trưởng đơn vị'})
-              </p>
-            </div>
-
-            {/* Stats Metrics (Fixed NaN) */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-muted/40 p-3 border border-border/40">
-                <span className="text-[11px] font-medium text-muted-foreground">Nhân sự hiện hữu</span>
-                <p className="text-xl font-bold text-foreground mt-0.5">{activeCurrentCount} <span className="text-xs font-normal text-muted-foreground">NS</span></p>
-              </div>
-              <div className="rounded-xl bg-primary/5 p-3 border border-primary/20">
-                <span className="text-[11px] font-medium text-primary">Định biên kế hoạch</span>
-                <p className="text-xl font-bold text-primary mt-0.5">{activeTargetCount} <span className="text-xs font-normal text-primary/80">chỉ tiêu</span></p>
-              </div>
-            </div>
-
-            {/* Member List Preview */}
-            <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
-                  Nhân sự Trực thuộc ({deptEmployees.length})
-                </h4>
-                <Link href="/employees" className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-0.5">
-                  Xem tất cả <ChevronRight className="h-3 w-3" />
-                </Link>
-              </div>
-
-              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1 [scrollbar-width:thin]">
-                {deptEmployees.length > 0 ? (
-                  deptEmployees.map((emp, i) => (
-                    <div key={emp.id || i} className="flex items-center justify-between p-2.5 rounded-xl border border-border/50 bg-muted/20 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
-                          {emp.fullName.charAt(0)}
-                        </div>
-                        <div className="min-w-0 truncate">
-                          <p className="text-xs font-semibold text-foreground truncate">{emp.fullName}</p>
-                          <div className="flex items-center gap-1 text-[10px] text-muted-foreground truncate">
-                            <span className="truncate">{emp.jobTitle}</span>
-                            {emp.orgUnit?.name && emp.orgUnit.id !== activeNode.id && (
-                              <>
-                                <span>•</span>
-                                <span className="font-medium text-primary/80 truncate">{emp.orgUnit.name}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-mono text-muted-foreground px-1.5 py-0.5 rounded bg-muted shrink-0">
-                        {emp.employeeCode}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 border border-dashed rounded-xl text-muted-foreground text-xs">
-                    Chưa có nhân viên nào được phân bổ về đơn vị này.
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        <div className="w-full space-y-3">
+          <InteractiveOrgChart
+            nodes={enrichedTree}
+            onSelectNode={(node) => setSelectedNode(node)}
+            selectedId={selectedNode?.id}
+          />
         </div>
       ) : null}
 
@@ -523,6 +448,70 @@ export default function OrgChartPage() {
           />
         </div>
       </div>
+
+      {/* Modal Chi tiết đơn vị & Danh sách nhân sự khi click vào thẻ cây */}
+      <Modal
+        open={!!selectedNode}
+        onOpenChange={(o) => !o && setSelectedNode(null)}
+        title={selectedNode?.name ?? ''}
+        size="lg"
+        description={selectedNode ? `Mã đơn vị: ${selectedNode.code} · Quy mô: ${activeCurrentCount} nhân sự` : undefined}
+      >
+        {selectedNode && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              <div className="p-3 rounded-xl bg-muted/40 border">
+                <p className="text-xs uppercase text-muted-foreground font-semibold">Phụ trách đơn vị</p>
+                <p className="font-bold text-foreground mt-0.5">{selectedNode.headName ?? 'Chưa bổ nhiệm'}</p>
+                <p className="text-xs text-muted-foreground">{selectedNode.headTitle ?? 'Trưởng đơn vị'}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-muted/40 border">
+                <p className="text-xs uppercase text-muted-foreground font-semibold">Nhân sự hiện hữu</p>
+                <p className="font-bold text-primary font-mono mt-0.5">{activeCurrentCount} NS</p>
+              </div>
+              <div className="p-3 rounded-xl bg-muted/40 border">
+                <p className="text-xs uppercase text-muted-foreground font-semibold">Định biên kế hoạch</p>
+                <p className="font-bold text-emerald-700 font-mono mt-0.5">{activeTargetCount} chỉ tiêu</p>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Danh sách nhân sự trực thuộc ({deptEmployees.length})
+                </p>
+                <Link href="/employees" className="text-xs font-semibold text-primary hover:underline">
+                  Xem tất cả
+                </Link>
+              </div>
+              {deptEmployees.length === 0 ? (
+                <div className="p-6 rounded-2xl border border-dashed text-center text-sm text-muted-foreground">
+                  Chưa có nhân viên nào được phân bổ về đơn vị này.
+                </div>
+              ) : (
+                <ul className="divide-y rounded-xl border bg-card max-h-72 overflow-y-auto">
+                  {deptEmployees.map((emp, i) => (
+                    <li key={emp.id || i} className="flex items-center justify-between p-2.5 text-sm hover:bg-muted/30">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                          {emp.fullName.charAt(0)}
+                        </div>
+                        <div className="min-w-0 truncate">
+                          <p className="text-xs font-semibold text-foreground truncate">{emp.fullName}</p>
+                          <p className="text-[11px] text-muted-foreground truncate">{emp.jobTitle}</p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-mono text-muted-foreground px-1.5 py-0.5 rounded bg-muted shrink-0">
+                        {emp.employeeCode}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -10,7 +10,6 @@ import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Badge } from '@/components/ui/primitives';
 
 interface ShiftType {
   id: string;
@@ -199,10 +198,10 @@ export default function ShiftsPage() {
                 className="w-full rounded-lg border bg-background pl-9 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-hidden"
               />
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <Badge variant="info">Ca Hành chính</Badge>
-              <Badge variant="success">Ca Sáng</Badge>
-              <Badge variant="warning">Ca Chiều</Badge>
+            <div className="flex items-center gap-3 text-xs text-muted-foreground font-medium">
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-blue-600" />Ca Hành chính</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-600" />Ca Sáng</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-amber-600" />Ca Chiều</span>
             </div>
           </div>
 
@@ -242,11 +241,11 @@ export default function ShiftsPage() {
                         {['T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((day, dIdx) => (
                           <td key={dIdx} className="py-3 px-2 text-center">
                             {dIdx < 5 ? (
-                              <span className="inline-block rounded-md bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-700 border border-blue-200">
+                              <span className="font-mono text-xs text-foreground font-medium">
                                 08:00 - 17:00
                               </span>
                             ) : (
-                              <span className="inline-block rounded-md bg-slate-100 px-2 py-1 text-[10px] text-slate-500 border border-slate-200">
+                              <span className="text-[11px] text-muted-foreground">
                                 Nghỉ tuần
                               </span>
                             )}
@@ -277,9 +276,10 @@ export default function ShiftsPage() {
                 <div className="flex items-center gap-2.5">
                   <h3 className="font-bold text-foreground text-sm">{st.name}</h3>
                 </div>
-                <Badge variant="success">
+                <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 font-medium">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
                   Hoạt động
-                </Badge>
+                </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 bg-muted/30 p-3 rounded-lg text-xs">

@@ -232,17 +232,18 @@ export default function LoansPage() {
                           {loan.remainingAmount.toLocaleString('vi-VN')} đ
                         </td>
                         <td className="py-3 px-4 text-center">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                              loan.status === 'APPROVED' || loan.status === 'DISBURSED'
-                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                                : loan.status === 'PENDING'
-                                ? 'bg-amber-50 text-amber-900 border-amber-300'
-                                : loan.status === 'COMPLETED'
-                                ? 'bg-blue-50 text-blue-800 border-blue-200'
-                                : 'bg-rose-50 text-rose-800 border-rose-200'
-                            }`}
-                          >
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                loan.status === 'APPROVED' || loan.status === 'DISBURSED'
+                                  ? 'bg-emerald-600'
+                                  : loan.status === 'PENDING'
+                                  ? 'bg-amber-600'
+                                  : loan.status === 'COMPLETED'
+                                  ? 'bg-blue-600'
+                                  : 'bg-rose-600'
+                              }`}
+                            />
                             {loan.status === 'APPROVED'
                               ? 'Đang thu hồi'
                               : loan.status === 'PENDING'

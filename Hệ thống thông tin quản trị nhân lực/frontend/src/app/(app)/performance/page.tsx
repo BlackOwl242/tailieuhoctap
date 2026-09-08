@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { PERF_STATUS_LABEL } from '@/lib/hr';
-import { Badge, Button, Input, Label, Select, Textarea } from '@/components/ui/primitives';
+import { Button, Input, Label, Select, Textarea } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
@@ -93,7 +93,20 @@ export default function PerformancePage() {
     { key: 'score', header: 'Điểm (0–100)', sortable: true, render: (r) => (r.score != null ? <span className="font-semibold">{r.score}</span> : '—') },
     { key: 'strengths', header: 'Điểm mạnh', render: (r) => <span className="line-clamp-2 max-w-[16rem] text-sm">{r.strengths ?? '—'}</span> },
     { key: 'improvements', header: 'Cần cải thiện', render: (r) => <span className="line-clamp-2 max-w-[16rem] text-sm">{r.improvements ?? '—'}</span> },
-    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => <Badge className={TONE[r.status]}>{PERF_STATUS_LABEL[r.status] ?? r.status}</Badge> },
+    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${
+            r.status === 'COMPLETED'
+              ? 'bg-emerald-600'
+              : r.status === 'SUBMITTED'
+              ? 'bg-blue-600'
+              : 'bg-slate-400'
+          }`}
+        />
+        {PERF_STATUS_LABEL[r.status] ?? r.status}
+      </span>
+    ) },
   ];
 
   const rows = tab === 'team' ? (teamQ.data ?? []) : [...(mineQ.data?.received ?? []), ...(mineQ.data?.given ?? [])];

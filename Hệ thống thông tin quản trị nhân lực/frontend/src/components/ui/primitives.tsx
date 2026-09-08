@@ -120,7 +120,7 @@ export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDiv
   return <div className={cn('flex items-center gap-2 p-card pt-0', className)} {...props} />;
 }
 
-const badgeVariants = cva('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors border shadow-2xs', {
+const badgeVariants = cva('inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-medium transition-colors border', {
   variants: {
     variant: {
       default: 'bg-primary/10 text-primary border-primary/20',

@@ -8,7 +8,7 @@ import { Eye, ThumbsUp, MessageSquare, Plus, BookMarked } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDateTime, ARTICLE_STATUS_LABEL, ARTICLE_STATUS_TONE } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
-import { Button, Card, CardContent, Badge, Select, Skeleton } from '@/components/ui/primitives';
+import { Button, Card, CardContent, Select, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState, EmptyState } from '@/components/common/states';
 import type { ArticleListItem, SpaceSummary } from '@/lib/types';
 
@@ -100,7 +100,14 @@ export default function SpaceDetailPage() {
                       </p>
                     </Link>
                     <div className="flex shrink-0 items-center gap-2">
-                      <Badge className={ARTICLE_STATUS_TONE[a.status]}>{ARTICLE_STATUS_LABEL[a.status]}</Badge>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            a.status === 'PUBLISHED' ? 'bg-emerald-600' : 'bg-amber-600'
+                          }`}
+                        />
+                        {ARTICLE_STATUS_LABEL[a.status]}
+                      </span>
                       {mineOrEditor ? (
                         <Link href={`/articles/${a.id}/edit`} className="text-xs text-primary hover:underline">Sửa</Link>
                       ) : null}

@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { CANDIDATE_STAGE_LABEL, REQUISITION_STATUS_LABEL } from '@/lib/hr';
-import { Badge, Button, Input, Label, Select, Textarea } from '@/components/ui/primitives';
+import { Button, Input, Label, Select, Textarea } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { StarRating } from '@/components/ui/star-rating';
@@ -118,7 +118,20 @@ export default function RecruitmentPage() {
         <span className="block text-xs text-muted-foreground">{r.position} · {r.headcount} suất · {r.requester?.fullName ?? ''}</span>
       </span>
     ) },
-    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => <Badge className={REQ_TONE[r.status]}>{REQUISITION_STATUS_LABEL[r.status] ?? r.status}</Badge> },
+    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${
+            r.status === 'APPROVED'
+              ? 'bg-emerald-600'
+              : r.status === 'PENDING'
+              ? 'bg-amber-600'
+              : 'bg-slate-400'
+          }`}
+        />
+        {REQUISITION_STATUS_LABEL[r.status] ?? r.status}
+      </span>
+    ) },
     { key: 'candidates', header: 'Ứng viên', render: (r) => r._count?.candidates ?? 0 },
   ];
 

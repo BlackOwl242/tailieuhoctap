@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { COURSE_STATUS_LABEL, ENROLLMENT_STATUS_LABEL } from '@/lib/hr';
-import { Badge, Button, Input, Label, Textarea } from '@/components/ui/primitives';
+import { Button, Input, Label, Textarea } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
@@ -80,12 +80,25 @@ export default function TrainingPage() {
       </span>
     ) },
     { key: 'count', header: 'Ghi danh', render: (r) => `${r._count?.enrollments ?? 0}${r.capacity ? `/${r.capacity}` : ''}` },
-    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => <Badge className={TONE[r.status]}>{COURSE_STATUS_LABEL[r.status] ?? r.status}</Badge>, exportValue: (r) => COURSE_STATUS_LABEL[r.status] ?? r.status },
+    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${
+            r.status === 'PUBLISHED'
+              ? 'bg-emerald-600'
+              : r.status === 'DRAFT'
+              ? 'bg-slate-400'
+              : 'bg-blue-600'
+          }`}
+        />
+        {COURSE_STATUS_LABEL[r.status] ?? r.status}
+      </span>
+    ), exportValue: (r) => COURSE_STATUS_LABEL[r.status] ?? r.status },
     {
       key: 'mine',
       header: 'Của tôi',
       noPrint: true,
-      render: (r) => (r.enrollments?.[0] ? <Badge variant="secondary">{ENROLLMENT_STATUS_LABEL[r.enrollments[0].status] ?? r.enrollments[0].status}</Badge> : '—'),
+      render: (r) => (r.enrollments?.[0] ? <span className="text-xs font-medium text-foreground">{ENROLLMENT_STATUS_LABEL[r.enrollments[0].status] ?? r.enrollments[0].status}</span> : '—'),
     },
   ];
 

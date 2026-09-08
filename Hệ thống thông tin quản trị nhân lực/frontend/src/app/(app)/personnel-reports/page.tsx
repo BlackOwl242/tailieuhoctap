@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -14,13 +14,23 @@ import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock, PrintExportDropdown } from '@/components/ui/print';
 import { exportRowsToExcel } from '@/lib/export';
+import { useOrgConfig, isEnterpriseSector } from '@/lib/org-config';
+import { StateCivilServantProfile } from '@/components/personnel/StateCivilServantProfile';
+import { EnterprisePersonnelProfile } from '@/components/personnel/EnterprisePersonnelProfile';
 
 export default function PersonnelReportsPage() {
   const searchParams = useSearchParams();
   const initialUserId = searchParams.get('userId');
 
+  const [orgConfig] = useOrgConfig();
   const [activeReport, setActiveReport] = useState<'2c' | 'bieu01' | 'bieu02' | 'bieu03'>('2c');
   const [selectedUserId, setSelectedUserId] = useState<string>(initialUserId || '');
+  const [cvMode, setCvMode] = useState<'state' | 'enterprise'>(isEnterpriseSector(orgConfig) ? 'enterprise' : 'state');
+
+  // Tự động đồng bộ mẫu biểu khi cấu hình cơ quan thay đổi
+  useEffect(() => {
+    setCvMode(isEnterpriseSector(orgConfig) ? 'enterprise' : 'state');
+  }, [orgConfig]);
 
   // Lấy danh sách nhân viên để chọn in sơ yếu lý lịch 4 trang
   const qEmployees = useQuery({
@@ -88,7 +98,7 @@ export default function PersonnelReportsPage() {
       {/* Tabs Chọn Báo cáo */}
       <div className="flex border-b border-border/60 gap-2 mb-6 overflow-x-auto pb-1 no-print">
         {[
-          { id: '2c', label: '1. Sơ yếu Lý lịch Chuẩn 2C-BNV', icon: FileText },
+          { id: '2c', label: '1. Sơ yếu Lý lịch (2C-BNV & Doanh nghiệp)', icon: FileText },
           { id: 'bieu01', label: '2. Biểu 01: Độ tuổi × Ngạch bậc', icon: Award },
           { id: 'bieu02', label: '3. Biểu 02: Ngoại ngữ & Tin học', icon: Globe },
           { id: 'bieu03', label: '4. Biểu 03: Trình độ CM & LLCT × Đơn vị', icon: Building },
@@ -112,184 +122,67 @@ export default function PersonnelReportsPage() {
         })}
       </div>
 
-      {/* BÁO CÁO 1: SƠ YẾU LÝ LỊCH 4 TRANG CHUẨN 2C-BNV */}
+      {/* BÁO CÁO 1: SƠ YẾU LÝ LỊCH KÉP (NHÀ NƯỚC 2C-BNV / 2008 & DOANH NGHIỆP TƯ NHÂN) */}
       {activeReport === '2c' && (
         <div className="space-y-6">
-          {/* Bộ chọn nhân sự */}
-          <Card className="p-4 bg-card border border-border shadow-xs flex items-center justify-between gap-4 flex-wrap no-print">
-            <div className="flex items-center gap-3">
-              <Users className="w-5 h-5 text-primary" />
-              <div>
-                <div className="text-xs font-bold text-foreground">Chọn nhân sự để kết xuất Sơ yếu lý lịch:</div>
-                <div className="text-xs text-muted-foreground">Chuẩn Nghị định 30/2020/NĐ-CP & Mẫu 2C-BNV/2008 (Cỡ chữ 12pt - 14pt rõ nét)</div>
+          {/* Bộ điều khiển: Chọn nhân sự & Chọn Mẫu Sơ yếu lý lịch */}
+          <Card className="p-4 bg-card border border-border shadow-xs no-print">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground block">
+                  Nhân sự kết xuất Sơ yếu lý lịch:
+                </label>
+                <select
+                  value={currentUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
+                  className="w-full h-9 rounded-md border border-input bg-card px-3 py-1 text-xs font-medium shadow-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  {employees.map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.employeeCode ? `[${emp.employeeCode}] ` : ''}{emp.fullName} - {emp.jobTitle || emp.department || 'Chuyên viên'}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
-            <div className="flex items-center gap-2 min-w-[300px]">
-              <select
-                value={currentUserId}
-                onChange={(e) => setSelectedUserId(e.target.value)}
-                className="w-full h-9 rounded-md border border-input bg-card px-3 py-1 text-xs font-medium shadow-xs text-foreground"
-              >
-                {employees.map((emp) => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.employeeCode ? `[${emp.employeeCode}] ` : ''}{emp.fullName} - {emp.jobTitle || emp.department || 'Chuyên viên'}
-                  </option>
-                ))}
-              </select>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground block">
+                    Định dạng Mẫu biểu Sơ yếu lý lịch:
+                  </label>
+                  <span className="text-[11px] text-muted-foreground italic">
+                    (Mặc định: {isEnterpriseSector(orgConfig) ? 'Doanh nghiệp tư nhân' : 'Cơ quan Nhà nước'})
+                  </span>
+                </div>
+                <select
+                  value={cvMode}
+                  onChange={(e) => setCvMode(e.target.value as 'state' | 'enterprise')}
+                  className="w-full h-9 rounded-md border border-input bg-card px-3 py-1 text-xs font-medium shadow-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  <option value="state">Mẫu 2C-BNV/2008 (Cơ quan Nhà nước, Đơn vị sự nghiệp công lập)</option>
+                  <option value="enterprise">Mẫu Doanh nghiệp tư nhân (Hồ sơ trích ngang người lao động)</option>
+                </select>
+              </div>
             </div>
           </Card>
 
-          {/* Bản In Sơ Yếu Lý Lịch Chuẩn A4 */}
-          <div className="print-area font-times max-w-4xl mx-auto bg-white p-6 sm:p-10 border border-slate-200 rounded-2xl shadow-sm text-black space-y-6 leading-relaxed text-[12pt]">
-            {/* Header Quốc hiệu chuẩn Nghị định 30 */}
-            <PrintFrame
-              title="SƠ YẾU LÝ LỊCH CÁN BỘ, VIÊN CHỨC & NHÂN SỰ"
-              subtitle="(Mẫu chuẩn ban hành theo Quyết định số 02/2008/QĐ-BNV & Nghị định 30/2020/NĐ-CP)"
-            />
-
+          {/* Vùng Bản In Sơ Yếu Lý Lịch Chuẩn A4 */}
+          <div className="print-area font-times max-w-4xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-sm text-black">
             {q2c.isLoading ? (
-              <div className="text-center py-12 text-muted-foreground">Đang tải dữ liệu hồ sơ...</div>
-            ) : q2c.data ? (
-              <div className="space-y-6 text-[12pt] leading-normal text-black">
-                {/* PHẦN 1: THÔNG TIN BẢN THÂN VÀ LÝ LỊCH */}
-                <div className="space-y-3">
-                  <div className="font-bold text-[13pt] bg-slate-100 p-2 rounded uppercase text-black border border-slate-300">
-                    I. THÔNG TIN BẢN THÂN VÀ LÝ LỊCH
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 pt-1">
-                    <div>1) Họ và tên khai sinh: <span className="font-bold uppercase text-black">{q2c.data.page1.fullName}</span></div>
-                    <div>2) Tên gọi khác: <span>{q2c.data.page1.aliasName || 'Không'}</span></div>
-                    <div>3) Ngày sinh: <span className="font-semibold">{q2c.data.page1.birthDate ? formatDate(q2c.data.page1.birthDate) : '—'}</span></div>
-                    <div>4) Giới tính: <span className="font-semibold">{q2c.data.page1.gender || 'Nam'}</span></div>
-                    <div>5) Nơi sinh: <span>{q2c.data.page1.birthPlace || '—'}</span></div>
-                    <div>6) Quê quán: <span>{q2c.data.page1.hometown || '—'}</span></div>
-                    <div className="col-span-2">7) Hộ khẩu thường trú: <span>{q2c.data.page1.permanentAddress || '—'}</span></div>
-                    <div className="col-span-2">8) Nơi ở hiện nay: <span>{q2c.data.page1.currentAddress || '—'}</span></div>
-                    <div>9) Dân tộc: <span>{q2c.data.page1.ethnicity || 'Kinh'}</span></div>
-                    <div>10) Tôn giáo: <span>{q2c.data.page1.religion || 'Không'}</span></div>
-                    <div>11) Thành phần gia đình: <span>{q2c.data.page1.familyOrigin || 'Viên chức / Trí thức'}</span></div>
-                    <div>12) Nghề nghiệp trước tuyển dụng: <span>{q2c.data.page1.priorJob || 'Kỹ sư phần mềm'}</span></div>
-                  </div>
-                </div>
-
-                {/* PHẦN 2: TUYỂN DỤNG, NGẠCH BẬC & TRÌNH ĐỘ */}
-                <div className="space-y-3 pt-3">
-                  <div className="font-bold text-[13pt] bg-slate-100 p-2 rounded uppercase text-black border border-slate-300">
-                    II. TUYỂN DỤNG, NGẠCH BẬC & TRÌNH ĐỘ CHUYÊN MÔN
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 pt-1">
-                    <div>13) Ngày tuyển dụng: <span className="font-semibold">{q2c.data.page2.recruitDate ? formatDate(q2c.data.page2.recruitDate) : '—'}</span></div>
-                    <div>14) Cơ quan tuyển dụng: <span>{q2c.data.page2.recruitOrg || 'Công ty CP Phần mềm Saigon Technology'}</span></div>
-                    <div>15) Chức vụ / Vị trí hiện nay: <span className="font-bold">{q2c.data.page2.govPosition || '—'}</span></div>
-                    <div>16) Công việc chính: <span>{q2c.data.page2.mainDuty || 'Quản lý và phát triển hệ thống'}</span></div>
-                    <div>17) Ngạch bậc lương: <span className="font-bold">{q2c.data.page2.rankName || 'Chuyên viên chính'} ({q2c.data.page2.rankCode || '01.003'})</span></div>
-                    <div>18) Bậc lương: <span className="font-semibold">Bậc {q2c.data.page2.salaryStep || '3'}/{q2c.data.page2.totalSteps || 9} (Hệ số: {q2c.data.page2.salaryCoefficient || '3.00'})</span></div>
-                    <div>19) Phụ cấp thâm niên vượt khung: <span>{q2c.data.page2.overGradePercent || 0}%</span></div>
-                    <div>20) Phụ cấp chức vụ: <span>{q2c.data.page2.positionAllowance || 0}</span></div>
-                    <div>21) Trình độ văn hóa: <span>{q2c.data.page2.generalEducation || '12/12'}</span></div>
-                    <div>22) Học vị cao nhất: <span className="font-bold">{q2c.data.page2.highestDegree || 'Đại học'}</span> ({q2c.data.page2.majorName || 'Khoa học Máy tính'})</div>
-                    <div>23) Lý luận chính trị: <span>{q2c.data.page2.politicalTheory || 'Trung cấp'}</span></div>
-                    <div>24) Ngoại ngữ: <span>{q2c.data.page2.foreignLanguage || 'Tiếng Anh (B2 / IELTS 6.5)'}</span></div>
-                    <div>25) Tin học: <span>{q2c.data.page2.informaticsLevel || 'Chuẩn kỹ năng CNTT nâng cao'}</span></div>
-                    <div>26) Tình trạng sức khỏe: <span>{q2c.data.page2.healthStatus || 'Tốt'}</span> (Cao: {q2c.data.page2.heightCm || 172}cm, Nặng: {q2c.data.page2.weightKg || 68}kg)</div>
-                  </div>
-                </div>
-
-                {/* PHẦN 3: QUÁ TRÌNH ĐÀO TẠO & CÔNG TÁC */}
-                <div className="space-y-3 pt-3">
-                  <div className="font-bold text-[13pt] bg-slate-100 p-2 rounded uppercase text-black border border-slate-300">
-                    III. QUÁ TRÌNH ĐÀO TẠO, BỒI DƯỠNG & CÔNG TÁC
-                  </div>
-                  <table className="w-full border-collapse border border-black text-[11pt]">
-                    <thead>
-                      <tr className="bg-slate-100 text-black font-bold">
-                        <th className="border border-black p-2 text-left">Cơ sở đào tạo</th>
-                        <th className="border border-black p-2 text-left">Chuyên ngành</th>
-                        <th className="border border-black p-2 text-left">Văn bằng</th>
-                        <th className="border border-black p-2 text-center">Năm TN</th>
-                        <th className="border border-black p-2 text-center">Xếp loại</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {q2c.data.page3.educations && q2c.data.page3.educations.length > 0 ? (
-                        q2c.data.page3.educations.map((edu: any, i: number) => (
-                          <tr key={i}>
-                            <td className="border border-black p-2 font-medium">{edu.schoolName}</td>
-                            <td className="border border-black p-2">{edu.majorName}</td>
-                            <td className="border border-black p-2">{edu.degreeName} ({edu.studyForm || 'Chính quy'})</td>
-                            <td className="border border-black p-2 text-center">{edu.graduationYear || '—'}</td>
-                            <td className="border border-black p-2 text-center">{edu.ranking || 'Khá / Giỏi'}</td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td className="border border-black p-2 font-medium">Đại học Quốc gia TP.HCM</td>
-                          <td className="border border-black p-2">Khoa học Máy tính & Kỹ thuật Phần mềm</td>
-                          <td className="border border-black p-2">Cử nhân (Chính quy)</td>
-                          <td className="border border-black p-2 text-center">2018</td>
-                          <td className="border border-black p-2 text-center">Giỏi</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* PHẦN 4: QUAN HỆ GIA ĐÌNH & CAM ĐOAN */}
-                <div className="space-y-3 pt-3">
-                  <div className="font-bold text-[13pt] bg-slate-100 p-2 rounded uppercase text-black border border-slate-300">
-                    IV. QUAN HỆ GIA ĐÌNH & THÂN NHÂN
-                  </div>
-                  <table className="w-full border-collapse border border-black text-[11pt]">
-                    <thead>
-                      <tr className="bg-slate-100 text-black font-bold">
-                        <th className="border border-black p-2 text-left w-[18%]">Mối quan hệ</th>
-                        <th className="border border-black p-2 text-left w-[25%]">Họ và tên</th>
-                        <th className="border border-black p-2 text-center w-[12%]">Năm sinh</th>
-                        <th className="border border-black p-2 text-left">Thông tin nghề nghiệp, nơi ở hiện nay</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {q2c.data.page4.selfRelations && q2c.data.page4.selfRelations.length > 0 ? (
-                        q2c.data.page4.selfRelations.map((rel: any, i: number) => (
-                          <tr key={i}>
-                            <td className="border border-black p-2 font-bold">{rel.relationType}</td>
-                            <td className="border border-black p-2 font-medium">{rel.fullName}</td>
-                            <td className="border border-black p-2 text-center">{rel.birthYear || '—'}</td>
-                            <td className="border border-black p-2">{rel.details || 'Cán bộ hưu trí / Cư trú tại TP.HCM'}</td>
-                          </tr>
-                        ))
-                      ) : (
-                        <>
-                          <tr>
-                            <td className="border border-black p-2 font-bold">Cha đẻ</td>
-                            <td className="border border-black p-2 font-medium">Nguyễn Văn An</td>
-                            <td className="border border-black p-2 text-center">1965</td>
-                            <td className="border border-black p-2">Cán bộ Hưu trí, cư trú tại Quận 1, TP. Hồ Chí Minh</td>
-                          </tr>
-                          <tr>
-                            <td className="border border-black p-2 font-bold">Mẹ đẻ</td>
-                            <td className="border border-black p-2 font-medium">Trần Thị Mai</td>
-                            <td className="border border-black p-2 text-center">1968</td>
-                            <td className="border border-black p-2">Giáo viên, cư trú tại Quận 1, TP. Hồ Chí Minh</td>
-                          </tr>
-                        </>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="pt-2 text-justify italic text-[11.5pt]">
-                  Tôi xin cam đoan những lời khai trên đây là hoàn toàn đúng sự thật và chịu trách nhiệm trước pháp luật về toàn bộ nội dung đã kê khai.
-                </div>
-
-                {/* Khung chữ ký 3 bên chuẩn Nghị định 30 */}
-                <PrintSignatureBlock
-                  leftTitle="Người khai ký tên"
-                  middleTitle="Cơ quan / Đơn vị xác nhận"
-                  rightTitle="Thủ trưởng đơn vị ký duyệt"
-                />
+              <div className="text-center py-16 text-muted-foreground font-sans">
+                Đang nạp dữ liệu hồ sơ lý lịch toàn diện...
               </div>
-            ) : null}
+            ) : q2c.data ? (
+              cvMode === 'state' ? (
+                <StateCivilServantProfile data={q2c.data} orgConfig={orgConfig} />
+              ) : (
+                <EnterprisePersonnelProfile data={q2c.data} orgConfig={orgConfig} />
+              )
+            ) : (
+              <div className="text-center py-16 text-muted-foreground font-sans">
+                Chưa có dữ liệu hồ sơ nhân sự được chọn.
+              </div>
+            )}
           </div>
         </div>
       )}

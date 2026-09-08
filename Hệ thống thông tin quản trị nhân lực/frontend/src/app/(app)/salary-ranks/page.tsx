@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Layers, Search, Eye, TrendingUp, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
-import { Badge, Button, Card, Input } from '@/components/ui/primitives';
+import { Button, Card, Input } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { PageHeader, ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
@@ -35,7 +35,7 @@ export default function SalaryRanksPage() {
       header: 'Mã ngạch',
       sortable: true,
       render: (r) => (
-        <span className="font-mono text-xs font-bold text-primary bg-primary/5 px-2.5 py-1 rounded border border-primary/10">
+        <span className="font-mono text-xs font-semibold text-primary">
           {r.code}
         </span>
       ),
@@ -60,16 +60,11 @@ export default function SalaryRanksPage() {
       key: 'groupCode',
       header: 'Nhóm ngạch',
       sortable: true,
-      render: (r) => {
-        let badgeColor = 'bg-slate-100 text-slate-700';
-        if (r.groupCode === 'A3') badgeColor = 'bg-purple-100 text-purple-800 border-purple-200';
-        else if (r.groupCode === 'A2') badgeColor = 'bg-indigo-100 text-indigo-800 border-indigo-200';
-        else if (r.groupCode === 'A1') badgeColor = 'bg-blue-100 text-blue-800 border-blue-200';
-        else if (r.groupCode === 'B') badgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
-        else if (r.groupCode === 'C') badgeColor = 'bg-amber-100 text-amber-800 border-amber-200';
-
-        return <Badge className={badgeColor}>Loại {r.groupCode}</Badge>;
-      },
+      render: (r) => (
+        <span className="font-mono text-xs font-semibold text-foreground">
+          Loại {r.groupCode}
+        </span>
+      ),
     },
     {
       key: 'totalSteps',

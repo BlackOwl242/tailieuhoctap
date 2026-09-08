@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import { Avatar, AvatarFallback, Badge, Card, CardContent, Skeleton } from '@/components/ui/primitives';
+import { Avatar, AvatarFallback, Card, CardContent, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState, EmptyState } from '@/components/common/states';
 
 interface ProfileView {
@@ -41,7 +41,11 @@ export default function PersonProfilePage() {
             <p className="text-sm text-muted-foreground">{p.jobTitle}{p.orgUnit ? ` · ${p.orgUnit.name}` : ''}</p>
             {p.bio ? <p className="mt-2 text-sm">{p.bio}</p> : null}
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {(p.expertise ?? []).map((t) => <Badge key={t} variant="secondary">{t}</Badge>)}
+              {(p.expertise ?? []).map((t) => (
+                <span key={t} className="text-xs bg-muted/60 text-muted-foreground px-2 py-0.5 rounded font-medium">
+                  {t}
+                </span>
+              ))}
             </div>
           </div>
         </CardContent>

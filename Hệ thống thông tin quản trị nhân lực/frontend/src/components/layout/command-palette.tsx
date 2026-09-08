@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   Search, Users, Calendar, Calculator, Briefcase, Target,
   Receipt, ShieldCheck, Clock4, FileSpreadsheet, Layers,
-  CreditCard, Laptop, Network, CornerDownLeft, Sparkles, X
+  CreditCard, Laptop, Network, CornerDownLeft, Sparkles, X, Database
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +20,7 @@ interface CommandItem {
 
 const COMMANDS: CommandItem[] = [
   { id: 'ess', title: 'Cổng Tự Phục Vụ (ESS) & Điểm danh', category: 'Cổng cá nhân ESS', href: '/ess', icon: Users, shortcut: 'G E' },
+  { id: 'catalogs', title: 'Hệ thống Danh mục Quản trị (Master Catalogs 32 bảng)', category: 'Thao tác nghiệp vụ', href: '/admin/catalogs', icon: Database, shortcut: 'G M' },
   { id: 'org-chart', title: 'Sơ đồ Tổ chức Động (Interactive Org Tree)', category: 'Điều hướng nhanh', href: '/org-chart', icon: Network, shortcut: 'G O' },
   { id: 'employees', title: 'Danh sách Nhân sự Toàn diện', category: 'Điều hướng nhanh', href: '/employees', icon: Users, shortcut: 'G N' },
   { id: 'shifts', title: 'Ca kíp & Bảng phân ca (Roster)', category: 'Điều hướng nhanh', href: '/shifts', icon: Clock4, shortcut: 'G S' },

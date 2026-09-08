@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { ACTION_TYPE_LABEL } from '@/lib/hr';
-import { Badge, Button, Input, Label, Select, Textarea } from '@/components/ui/primitives';
+import { Button, Input, Label, Select, Textarea } from '@/components/ui/primitives';
 import { Eye } from 'lucide-react';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
@@ -95,7 +95,7 @@ export default function PersonnelActionsPage() {
   });
 
   const columns: DataColumn<ActionRow>[] = [
-    { key: 'type', header: 'Loại', sortable: true, render: (r) => <Badge variant="outline">{ACTION_TYPE_LABEL[r.type] ?? r.type}</Badge> },
+    { key: 'type', header: 'Loại', sortable: true, render: (r) => <span className="text-xs font-semibold text-foreground">{ACTION_TYPE_LABEL[r.type] ?? r.type}</span> },
     { key: 'subject', header: 'Nhân viên', sortable: true, render: (r) => (
       <span>
         <span className="block font-medium">{r.subject?.fullName ?? '—'}</span>
@@ -110,7 +110,20 @@ export default function PersonnelActionsPage() {
       </span>
     ) },
     { key: 'effectiveDate', header: 'Hiệu lực', sortable: true, sortValue: (r) => r.payload?.effectiveDate ?? r.createdAt, render: (r) => formatDate(r.payload?.effectiveDate ?? r.createdAt) },
-    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => <Badge className={TONE[r.status]}>{r.status === 'PENDING' ? 'Chờ duyệt' : r.status === 'APPROVED' ? 'Đã duyệt' : 'Đã từ chối'}</Badge> },
+    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${
+            r.status === 'APPROVED'
+              ? 'bg-emerald-600'
+              : r.status === 'PENDING'
+              ? 'bg-amber-600'
+              : 'bg-rose-600'
+          }`}
+        />
+        {r.status === 'PENDING' ? 'Chờ duyệt' : r.status === 'APPROVED' ? 'Đã duyệt' : 'Đã từ chối'}
+      </span>
+    ) },
     { key: 'decider', header: 'Người duyệt', render: (r) => r.decider?.fullName ?? '—' },
   ];
 

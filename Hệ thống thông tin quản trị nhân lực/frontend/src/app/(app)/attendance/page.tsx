@@ -6,7 +6,7 @@ import { LogIn, LogOut, QrCode, Camera } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { cn, formatDateTime, DAY_STATUS_LABEL } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Skeleton } from '@/components/ui/primitives';
+import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/components/ui/primitives';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { ErrorState } from '@/components/common/states';
 import { PrintExportDropdown, PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
@@ -115,15 +115,19 @@ export default function AttendancePage() {
                         <td className="py-2 pr-3">{d.lastOutAt ? new Date(d.lastOutAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
                         <td className="py-2 pr-3">{d.workedMinutes > 0 ? `${Math.floor(d.workedMinutes / 60)}h${d.workedMinutes % 60}'` : '—'}</td>
                         <td className="py-2">
-                          <Badge className={cn(
-                            d.status === 'PRESENT' && 'bg-emerald-100 text-emerald-800',
-                            d.status === 'LATE' && 'bg-amber-100 text-amber-800',
-                            d.status === 'MISSING_PAIR' && 'bg-red-100 text-red-800',
-                            !['PRESENT', 'LATE', 'MISSING_PAIR'].includes(d.status) && 'bg-secondary',
-                          )}>
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+                            <span
+                              className={cn(
+                                'h-1.5 w-1.5 rounded-full',
+                                d.status === 'PRESENT' && 'bg-emerald-600',
+                                d.status === 'LATE' && 'bg-amber-600',
+                                d.status === 'MISSING_PAIR' && 'bg-rose-600',
+                                !['PRESENT', 'LATE', 'MISSING_PAIR'].includes(d.status) && 'bg-slate-400',
+                              )}
+                            />
                             {DAY_STATUS_LABEL[d.status] ?? d.status}
-                            {d.lateMinutes > 0 ? ` +${d.lateMinutes}'` : ''}
-                          </Badge>
+                            {d.lateMinutes > 0 ? ` (+${d.lateMinutes}')` : ''}
+                          </span>
                         </td>
                       </tr>
                     ))}

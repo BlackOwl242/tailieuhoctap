@@ -8,7 +8,7 @@ import { api, errorMessage } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import {
-  Button, Card, CardContent, Input, Label, Select, Textarea, Badge, Skeleton,
+  Button, Card, CardContent, Input, Label, Select, Textarea, Skeleton,
 } from '@/components/ui/primitives';
 import { PageHeader, ErrorState, EmptyState } from '@/components/common/states';
 import type { SpaceSummary } from '@/lib/types';
@@ -110,11 +110,18 @@ export default function SpacesPage() {
                         <p className="mt-0.5 line-clamp-2 min-h-[2rem] text-xs text-muted-foreground">{s.description}</p>
                       </div>
                     </div>
-                    <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                      <Badge variant="secondary" className="gap-1"><VisIcon className="h-3 w-3" />{VIS_LABEL[s.visibility]}</Badge>
-                      <Badge variant="secondary">{s.publishedCount} bài</Badge>
-                      <Badge variant="secondary">{s.memberCount} thành viên</Badge>
-                      {s.myRole ? <Badge>Vai: {s.myRole.toLowerCase()}</Badge> : null}
+                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1 font-medium text-foreground/80"><VisIcon className="h-3 w-3" />{VIS_LABEL[s.visibility]}</span>
+                      <span>·</span>
+                      <span>{s.publishedCount} bài</span>
+                      <span>·</span>
+                      <span>{s.memberCount} thành viên</span>
+                      {s.myRole ? (
+                        <>
+                          <span>·</span>
+                          <span className="font-medium text-primary">Vai: {s.myRole.toLowerCase()}</span>
+                        </>
+                      ) : null}
                     </div>
                   </CardContent>
                 </Card>

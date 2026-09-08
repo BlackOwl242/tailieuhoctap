@@ -7,7 +7,7 @@ import { api, errorMessage } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { PAYROLL_STATUS_LABEL, vnd } from '@/lib/hr';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Skeleton } from '@/components/ui/primitives';
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Skeleton } from '@/components/ui/primitives';
 import { DataTable, type DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
@@ -83,7 +83,20 @@ export default function PayrollPage() {
 
   const periodColumns: DataColumn<PeriodRow>[] = [
     { key: 'label', header: 'Kỳ lương', sortable: true, sortValue: (r) => r.year * 100 + r.month, render: (r) => <span className="font-medium">{String(r.month).padStart(2, '0')}/{r.year}</span> },
-    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => <Badge className={STATUS_TONE[r.status]}>{PAYROLL_STATUS_LABEL[r.status] ?? r.status}</Badge> },
+    { key: 'status', header: 'Trạng thái', sortable: true, render: (r) => (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${
+            r.status === 'LOCKED'
+              ? 'bg-emerald-600'
+              : r.status === 'REVIEWED'
+              ? 'bg-blue-600'
+              : 'bg-amber-600'
+          }`}
+        />
+        {PAYROLL_STATUS_LABEL[r.status] ?? r.status}
+      </span>
+    ) },
     { key: 'count', header: 'Số phiếu', render: (r) => r._count?.payslips ?? 0 },
     {
       key: 'actions2', header: 'Quy trình', noPrint: true,

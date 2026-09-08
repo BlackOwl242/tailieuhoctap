@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { LEAVE_TYPE_LABEL, REQUEST_STATUS_LABEL, REQUEST_STATUS_TONE } from '@/lib/hr';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton, Textarea } from '@/components/ui/primitives';
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton, Textarea } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
@@ -94,7 +94,20 @@ export default function LeavePage() {
     { key: 'reason', header: 'Lý do', render: (r) => <span className="line-clamp-2 max-w-[16rem]">{r.reason}</span> },
     {
       key: 'status', header: 'Trạng thái', sortable: true,
-      render: (r) => <Badge className={REQUEST_STATUS_TONE[r.status]}>{REQUEST_STATUS_LABEL[r.status] ?? r.status}</Badge>,
+      render: (r) => (
+        <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              r.status === 'APPROVED'
+                ? 'bg-emerald-600'
+                : r.status === 'PENDING'
+                ? 'bg-amber-600'
+                : 'bg-rose-600'
+            }`}
+          />
+          {REQUEST_STATUS_LABEL[r.status] ?? r.status}
+        </span>
+      ),
       exportValue: (r) => REQUEST_STATUS_LABEL[r.status] ?? r.status,
     },
   ];

@@ -37,6 +37,9 @@ interface TreeNode {
   parentId: string | null;
   sortOrder: number;
   memberCount: number;
+  totalMembers: number;
+  level: number;
+  levelLabel: string;
   children: TreeNode[];
 }
 
@@ -47,7 +50,7 @@ export class OrgUnitsService {
     private readonly audit: AuditService,
   ) {}
 
-  /** Trả về cây tổ chức dạng lồng nhau để frontend vẽ trực quan. */
+  /** Trả về cây tổ chức dạng lồng nhau để frontend vẽ trực quan kèm cấp bậc và tổng số nhân sự đệ quy. */
   async tree(): Promise<TreeNode[]> {
     const units = await this.prisma.orgUnit.findMany({
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
@@ -56,8 +59,16 @@ export class OrgUnitsService {
     const byId = new Map<string, TreeNode>();
     for (const u of units) {
       byId.set(u.id, {
-        id: u.id, name: u.name, code: u.code, parentId: u.parentId,
-        sortOrder: u.sortOrder, memberCount: u._count.users, children: [],
+        id: u.id,
+        name: u.name,
+        code: u.code,
+        parentId: u.parentId,
+        sortOrder: u.sortOrder,
+        memberCount: u._count.users,
+        totalMembers: u._count.users,
+        level: 1,
+        levelLabel: 'Cấp 1: Doanh nghiệp',
+        children: [],
       });
     }
     const roots: TreeNode[] = [];
@@ -65,6 +76,30 @@ export class OrgUnitsService {
       if (node.parentId && byId.has(node.parentId)) byId.get(node.parentId)!.children.push(node);
       else roots.push(node);
     }
+
+    const levelLabels = [
+      '',
+      'Cấp 1: Doanh nghiệp',
+      'Cấp 2: Khối / Ban Điều hành',
+      'Cấp 3: Phòng / Trung tâm',
+      'Cấp 4: Tổ / Nhóm chuyên môn',
+    ];
+
+    function computeTotals(node: TreeNode, lvl: number): number {
+      node.level = lvl;
+      node.levelLabel = levelLabels[lvl] || `Cấp ${lvl}: Đơn vị trực thuộc`;
+      let sum = node.memberCount;
+      for (const child of node.children) {
+        sum += computeTotals(child, lvl + 1);
+      }
+      node.totalMembers = sum;
+      return sum;
+    }
+
+    for (const root of roots) {
+      computeTotals(root, 1);
+    }
+
     return roots;
   }
 

@@ -7,7 +7,6 @@ import { Eye, PencilLine } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { EMPLOYMENT_STATUS_LABEL } from '@/lib/hr';
-import { Badge } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { ErrorState } from '@/components/common/states';
@@ -59,11 +58,20 @@ export default function EmployeesPage() {
     { key: 'hireDate', header: 'Ngày vào', sortable: true, className: 'w-[13%] text-center', render: (r) => (r.hireDate ? formatDate(r.hireDate) : '—'), exportValue: (r) => (r.hireDate ? formatDate(r.hireDate) : '') },
     {
       key: 'employmentStatus', header: 'Trạng thái', sortable: true,
-      className: 'w-[13%] text-center',
+      className: 'w-[13%]',
       render: (r) => (
-        <Badge variant={r.employmentStatus === 'ACTIVE' ? 'success' : r.employmentStatus === 'PROBATION' ? 'warning' : 'secondary'}>
+        <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              r.employmentStatus === 'ACTIVE'
+                ? 'bg-emerald-600'
+                : r.employmentStatus === 'PROBATION'
+                ? 'bg-amber-600'
+                : 'bg-slate-400'
+            }`}
+          />
           {EMPLOYMENT_STATUS_LABEL[r.employmentStatus] ?? r.employmentStatus}
-        </Badge>
+        </span>
       ),
       exportValue: (r) => EMPLOYMENT_STATUS_LABEL[r.employmentStatus] ?? r.employmentStatus,
     },

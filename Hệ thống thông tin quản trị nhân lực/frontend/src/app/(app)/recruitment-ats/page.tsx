@@ -12,7 +12,7 @@ import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Badge, Button } from '@/components/ui/primitives';
+import { Button } from '@/components/ui/primitives';
 
 interface JobOpening {
   id: string;
@@ -479,12 +479,10 @@ export default function RecruitmentAtsPage() {
                     <h3 className="font-bold text-slate-900 text-sm">{o.title}</h3>
                     <p className="text-xs text-slate-500 font-medium">{o.department ?? 'Phòng Kỹ thuật'} • {o.designation}</p>
                   </div>
-                  <Badge
-                    variant={o.status === 'OPEN' ? 'success' : 'secondary'}
-                    className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5"
-                  >
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
+                    <span className={`h-1.5 w-1.5 rounded-full ${o.status === 'OPEN' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                     {o.status === 'OPEN' ? 'Đang tuyển' : o.status}
-                  </Badge>
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
@@ -629,9 +627,10 @@ export default function RecruitmentAtsPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-slate-900">{selectedOpening.title}</h2>
-                  <Badge variant={selectedOpening.status === 'OPEN' ? 'success' : 'secondary'} className="text-[10px] font-bold">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
+                    <span className={`h-1.5 w-1.5 rounded-full ${selectedOpening.status === 'OPEN' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                     {selectedOpening.status === 'OPEN' ? 'Đang tuyển (OPEN)' : selectedOpening.status}
-                  </Badge>
+                  </span>
                 </div>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
                   {selectedOpening.department ?? 'Phòng Nhân sự'} • Chức danh: {selectedOpening.designation}
@@ -713,9 +712,9 @@ export default function RecruitmentAtsPage() {
                       <p className="text-[11px] text-slate-500 mt-0.5">{app.email} {app.phone ? `· ${app.phone}` : ''}</p>
                     </div>
 
-                    <Badge variant="secondary" className="text-[10px] font-semibold">
+                    <span className="text-xs font-medium text-muted-foreground">
                       {STAGES.find((s) => s.key === app.stage)?.label ?? app.stage}
-                    </Badge>
+                    </span>
                   </div>
                 ))}
 

@@ -21,10 +21,10 @@ export interface OrgNode {
 }
 
 const LEVEL_LABELS = [
-  { label: 'Cấp 1: Ban Lãnh đạo', color: 'bg-blue-50 text-blue-800 border-blue-200' },
-  { label: 'Cấp 2: Khối / Ban', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
-  { label: 'Cấp 3: Trung tâm / Phòng', color: 'bg-amber-50 text-amber-900 border-amber-200' },
-  { label: 'Cấp 4: Tổ / Nhóm chuyên môn', color: 'bg-purple-50 text-purple-900 border-purple-200' },
+  { label: 'Cấp 1: Ban Lãnh đạo', color: 'bg-slate-50 text-slate-700 border-slate-200' },
+  { label: 'Cấp 2: Khối / Ban', color: 'bg-slate-50 text-slate-700 border-slate-200' },
+  { label: 'Cấp 3: Trung tâm / Phòng', color: 'bg-slate-50 text-slate-600 border-slate-200' },
+  { label: 'Cấp 4: Tổ / Nhóm chuyên môn', color: 'bg-slate-50 text-slate-600 border-slate-200' },
 ];
 
 export function OrgChartNode({
@@ -78,13 +78,10 @@ export function OrgChartNode({
       <div
         onClick={() => onSelectNode(node)}
         className={cn(
-          'relative z-10 flex flex-col rounded-2xl border-2 bg-white p-4 shadow-sm transition-all duration-150 cursor-pointer w-[255px] text-left hover:shadow-lg hover:-translate-y-0.5 select-none',
+          'relative z-10 flex flex-col rounded-2xl border bg-white p-4 shadow-xs transition-all duration-150 cursor-pointer w-[255px] text-left hover:shadow-md hover:-translate-y-0.5 select-none',
           isSelected
-            ? 'border-blue-600 ring-4 ring-blue-500/20 shadow-md'
-            : 'border-slate-300 hover:border-slate-400',
-          level === 0 && !isSelected ? 'border-blue-500' : '',
-          level === 1 && !isSelected ? 'border-emerald-500' : '',
-          level === 2 && !isSelected ? 'border-amber-500' : ''
+            ? 'border-blue-600 ring-2 ring-blue-500/20 shadow-md'
+            : 'border-slate-200 hover:border-slate-400'
         )}
       >
         {/* Top Meta */}
@@ -187,10 +184,10 @@ export function InteractiveOrgChart({
       ? nodes[0]
       : {
           id: 'company-root',
-          name: 'CÔNG TY CP PHẦN MỀM SAIGON TECHNOLOGY',
-          code: 'SAIGON-TECH',
-          headName: 'Ban Tổng Giám Đốc',
-          headTitle: 'Hội đồng Quản trị & Điều hành',
+          name: 'CƠ QUAN / TỔ CHỨC / DOANH NGHIỆP',
+          code: 'ORGANIZATION',
+          headName: 'Ban Lãnh Đạo / Ban Giám Đốc',
+          headTitle: 'Cơ quan Quản lý & Điều hành',
           headcount: nodes.reduce((sum, n) => sum + (n.headcount || 0), 0),
           children: nodes,
         };
@@ -259,7 +256,7 @@ export function InteractiveOrgChart({
 
       {/* Chart Canvas Area - Pure White Background */}
       <div
-        className="w-full overflow-x-auto overflow-y-auto py-8 min-h-[420px] bg-white transition-transform duration-200 [scrollbar-width:thin]"
+        className="w-full overflow-x-auto overflow-y-auto py-8 min-h-[620px] bg-white transition-transform duration-200 [scrollbar-width:thin]"
       >
         <div
           style={{ transform: `scale(${zoom})`, transformOrigin: 'top center' }}

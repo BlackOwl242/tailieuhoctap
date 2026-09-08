@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Laptop, Plus, Search, Filter, Printer, CheckCircle2,
   Clock, ShieldAlert, ArrowRight, UserCheck, RotateCcw,
-  Tag, FileText, Check, X, ShieldCheck
+  FileText, Check, X, ShieldCheck
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
@@ -233,11 +233,8 @@ export default function AssetsPage() {
                         <p className="text-[10px] text-muted-foreground font-mono">S/N: {asset.serialNumber}</p>
                       )}
                     </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                        <Tag className="h-3 w-3" />
-                        {asset.category === 'IT_EQUIPMENT' ? 'Laptop & IT' : asset.category}
-                      </span>
+                    <td className="py-3 px-4 font-medium text-foreground text-xs">
+                      {asset.category === 'IT_EQUIPMENT' ? 'Laptop & IT' : asset.category}
                     </td>
                     <td className="py-3 px-4 text-right font-mono font-semibold">
                       {(asset.value || 0).toLocaleString('vi-VN')} đ
@@ -255,15 +252,16 @@ export default function AssetsPage() {
                       )}
                     </td>
                     <td className="py-3 px-4 text-center">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                          asset.status === 'ALLOCATED'
-                            ? 'bg-blue-50 text-blue-800 border-blue-200'
-                            : asset.status === 'AVAILABLE'
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                            : 'bg-amber-50 text-amber-900 border-amber-300'
-                        }`}
-                      >
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            asset.status === 'ALLOCATED'
+                              ? 'bg-blue-600'
+                              : asset.status === 'AVAILABLE'
+                              ? 'bg-emerald-600'
+                              : 'bg-amber-600'
+                          }`}
+                        />
                         {asset.status === 'ALLOCATED' ? 'Đang cấp phát' : asset.status === 'AVAILABLE' ? 'Sẵn sàng' : 'Bảo trì'}
                       </span>
                     </td>

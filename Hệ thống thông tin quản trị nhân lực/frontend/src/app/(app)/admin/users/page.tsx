@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, ShieldBan, ShieldCheck } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
-import { Button, Card, CardContent, Input, Label, Select, Badge } from '@/components/ui/primitives';
+import { Button, Card, CardContent, Input, Label, Select } from '@/components/ui/primitives';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
@@ -62,14 +62,23 @@ export default function AdminUsersPage() {
     ) },
     { key: 'orgUnit', header: 'Đơn vị', sortable: true, sortValue: (u) => u.orgUnit?.name ?? '', render: (u) => u.orgUnit?.name ?? '—' },
     { key: 'roles', header: 'Vai trò', render: (u) => (
-      <span className="flex flex-wrap gap-1">
-        {u.roles.map((r) => <Badge key={r} variant="secondary">{ROLE_LABEL[r] ?? r}</Badge>)}
+      <span className="text-xs text-muted-foreground">
+        {u.roles.map((r) => ROLE_LABEL[r] ?? r).join(', ')}
       </span>
     ) },
     { key: 'status', header: 'Trạng thái', sortable: true, render: (u) => (
-      <Badge variant={u.status === 'ACTIVE' ? 'success' : u.status === 'LOCKED' ? 'warning' : 'destructive'}>
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${
+            u.status === 'ACTIVE'
+              ? 'bg-emerald-600'
+              : u.status === 'LOCKED'
+              ? 'bg-amber-600'
+              : 'bg-rose-600'
+          }`}
+        />
         {STATUS_LABEL[u.status] ?? u.status}
-      </Badge>
+      </span>
     ) },
   ];
 

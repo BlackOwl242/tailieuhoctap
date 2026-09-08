@@ -8,7 +8,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import type { MeProfile } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
-import { Avatar, AvatarFallback, Badge, Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/components/ui/primitives';
+import { Avatar, AvatarFallback, Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState } from '@/components/common/states';
 
 interface FaceStatus {
@@ -66,9 +66,14 @@ export default function ProfilePage() {
               <p className="text-lg font-bold">{me.fullName}</p>
               <p className="text-sm text-muted-foreground">{me.jobTitle}{me.orgUnit ? ` · ${me.orgUnit.name}` : ''}</p>
               <p className="mt-1 text-sm">{me.email}</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {me.roles.map((r) => <Badge key={r} variant="secondary">{r}</Badge>)}
-                {(me.expertise ?? []).map((t) => <Badge key={t}>{t}</Badge>)}
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">{me.roles.join(', ')}</span>
+                {(me.expertise ?? []).length > 0 && (
+                  <>
+                    <span>·</span>
+                    <span>{(me.expertise ?? []).join(', ')}</span>
+                  </>
+                )}
               </div>
             </div>
           </CardContent>
@@ -84,11 +89,19 @@ export default function ProfilePage() {
               <ErrorState message={errorMessage(faceQ.error)} />
             ) : (
               <>
-                <p className="text-sm">
+                <p className="text-sm flex items-center gap-2">
                   Đồng thuận:{' '}
-                  {faceQ.data!.consentAt
-                    ? <Badge className="bg-emerald-100 text-emerald-800">Đã đồng ý lúc {formatDate(faceQ.data!.consentAt)}</Badge>
-                    : <Badge variant="secondary">Chưa đồng ý</Badge>}
+                  {faceQ.data!.consentAt ? (
+                    <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 font-medium">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                      Đã đồng ý lúc {formatDate(faceQ.data!.consentAt)}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                      Chưa đồng ý
+                    </span>
+                  )}
                 </p>
                 <p className="text-sm">Mẫu đã đăng ký: <strong>{faceQ.data!.samples.length}</strong> (vector mã hóa AES-256-GCM)</p>
                 <div className="flex flex-wrap gap-2">

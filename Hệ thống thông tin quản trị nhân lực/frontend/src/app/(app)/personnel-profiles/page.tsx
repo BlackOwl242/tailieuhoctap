@@ -93,7 +93,7 @@ export default function PersonnelProfilesPage() {
       className: 'w-[10%] text-center',
       exportValue: (r) => r.user.employeeCode || '',
       render: (r) => (
-        <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">
+        <span className="font-mono text-xs font-semibold text-foreground">
           {r.user.employeeCode || '—'}
         </span>
       ),
@@ -141,10 +141,10 @@ export default function PersonnelProfilesPage() {
       render: (r) =>
         r.rank ? (
           <div>
-            <Badge variant="info">
+            <div className="font-semibold text-foreground text-xs">
               {r.rank.name}
-            </Badge>
-            <div className="text-xs text-muted-foreground mt-0.5 no-print">
+            </div>
+            <div className="text-xs text-muted-foreground font-mono mt-0.5 no-print">
               Bậc {r.salaryStep}/{r.rank.totalSteps} (HS: {r.salaryCoefficient})
             </div>
           </div>
@@ -165,9 +165,9 @@ export default function PersonnelProfilesPage() {
       className: 'w-[12%] text-center',
       exportValue: (r) => r.politicalTheory || 'Không',
       render: (r) => (
-        <Badge variant={r.politicalTheory === 'Cao cấp' ? 'warning' : 'secondary'}>
-          {r.politicalTheory || 'Không'}
-        </Badge>
+        <span className="text-xs text-foreground">
+          {r.politicalTheory || '—'}
+        </span>
       ),
     },
   ];
@@ -578,9 +578,9 @@ export default function PersonnelProfilesPage() {
                                 <span className="text-muted-foreground ml-2">({rel.birthYear || '—'})</span>
                                 <div className="text-slate-600 mt-1">{rel.details || '—'}</div>
                               </div>
-                              <Badge variant="secondary">
+                              <span className="text-xs text-muted-foreground font-medium">
                                 {rel.category === 'SELF' ? 'Gia đình bản thân' : 'Bên Vợ/Chồng'}
-                              </Badge>
+                              </span>
                             </div>
                           ))
                         )}
