@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Get, Injectable, Module, NotFoundException, Post, Query,
+  Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { IsBoolean, IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
@@ -124,6 +124,57 @@ export class HrmsShiftsService {
     return res;
   }
 
+  async updateShiftType(actorId: string, id: string, dto: Partial<CreateShiftTypeDto>) {
+    const shift = await this.prisma.hrmsShiftType.findUnique({ where: { id } });
+    if (!shift) throw new NotFoundException('Không tìm thấy ca làm việc');
+
+    const res = await this.prisma.hrmsShiftType.update({
+      where: { id },
+      data: dto,
+    });
+
+    await this.audit.log({
+      actorId,
+      action: 'UPDATE',
+      targetType: 'HrmsShiftType',
+      targetId: id,
+      description: `Cập nhật ca làm việc: ${res.name}`,
+    });
+    return res;
+  }
+
+  async deleteShiftType(actorId: string, id: string) {
+    const shift = await this.prisma.hrmsShiftType.findUnique({ where: { id } });
+    if (!shift) throw new NotFoundException('Không tìm thấy ca làm việc');
+
+    await this.prisma.hrmsShiftType.delete({ where: { id } });
+
+    await this.audit.log({
+      actorId,
+      action: 'DELETE',
+      targetType: 'HrmsShiftType',
+      targetId: id,
+      description: `Xóa ca làm việc: ${shift.name}`,
+    });
+    return { success: true, message: 'Đã xóa ca làm việc thành công' };
+  }
+
+  async deleteAssignment(actorId: string, id: string) {
+    const assignment = await this.prisma.hrmsShiftAssignment.findUnique({ where: { id } });
+    if (!assignment) throw new NotFoundException('Không tìm thấy phân ca');
+
+    await this.prisma.hrmsShiftAssignment.delete({ where: { id } });
+
+    await this.audit.log({
+      actorId,
+      action: 'DELETE',
+      targetType: 'HrmsShiftAssignment',
+      targetId: id,
+      description: `Hủy phân ca cho nhân sự ${assignment.userId}`,
+    });
+    return { success: true, message: 'Đã hủy phân ca thành công' };
+  }
+
   async getRosterMatrix() {
     const shiftTypes = await this.prisma.hrmsShiftType.findMany();
     const assignments = await this.prisma.hrmsShiftAssignment.findMany({
@@ -156,6 +207,16 @@ export class HrmsShiftsController {
     return this.service.createShiftType('system', dto);
   }
 
+  @Patch('types/:id')
+  updateType(@Param('id') id: string, @Body() dto: Partial<CreateShiftTypeDto>) {
+    return this.service.updateShiftType('system', id, dto);
+  }
+
+  @Delete('types/:id')
+  deleteType(@Param('id') id: string) {
+    return this.service.deleteShiftType('system', id);
+  }
+
   @Get('assignments')
   listAssignments(@Query('userId') userId?: string, @Query('shiftTypeId') shiftTypeId?: string) {
     return this.service.listAssignments(userId, shiftTypeId);
@@ -164,6 +225,11 @@ export class HrmsShiftsController {
   @Post('assignments')
   assign(@Body() dto: CreateShiftAssignmentDto) {
     return this.service.assignShift('system', dto);
+  }
+
+  @Delete('assignments/:id')
+  deleteAssignment(@Param('id') id: string) {
+    return this.service.deleteAssignment('system', id);
   }
 
   @Get('roster')

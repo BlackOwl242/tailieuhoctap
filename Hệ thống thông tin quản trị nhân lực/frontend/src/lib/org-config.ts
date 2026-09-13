@@ -29,15 +29,15 @@ export const ORG_LEVEL_LABELS: Record<string, string> = {
 };
 
 export const DEFAULT_ORG_CONFIG: OrgPrintConfig = {
-  parentOrgName: 'ỦY BAN NHÂN DÂN TỈNH / BỘ CHỦ QUẢN',
-  orgName: 'CƠ QUAN / ĐƠN VỊ QUẢN LÝ NHÂN LỰC',
-  deptName: 'PHÒNG TỔ CHỨC - CÁN BỘ',
-  orgLevel: 'DV_TINH',
+  parentOrgName: '',
+  orgName: 'CÔNG TY CỔ PHẦN SAIGON TECHNOLOGY',
+  deptName: 'BAN TỔ CHỨC - HÀNH CHÍNH - NHÂN SỰ',
+  orgLevel: 'DV_DNTN',
   orgSector: 'state',
   location: 'TP. Hồ Chí Minh',
   signerTitle1: 'Người lập biểu',
-  signerTitle2: 'Trưởng phòng Tổ chức - Cán bộ',
-  signerTitle3: 'Thủ trưởng Cơ quan / Đơn vị',
+  signerTitle2: 'Trưởng phòng Nhân sự',
+  signerTitle3: 'Tổng Giám đốc',
 };
 
 /**
@@ -50,7 +50,7 @@ export function isEnterpriseSector(config?: OrgPrintConfig | null): boolean {
   return config.orgLevel === 'DV_DNTN';
 }
 
-const STORAGE_KEY = 'hrmis_org_print_config_v1';
+const STORAGE_KEY = 'hrmis_org_print_config_v2';
 const EVENT_NAME = 'hrmis:org-config-updated';
 
 /**
@@ -64,6 +64,9 @@ export function getOrgConfig(): OrgPrintConfig {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
+      if (parsed.orgName === 'CƠ QUAN / ĐƠN VỊ QUẢN LÝ NHÂN LỰC') {
+        parsed.orgName = DEFAULT_ORG_CONFIG.orgName;
+      }
       return { ...DEFAULT_ORG_CONFIG, ...parsed };
     }
   } catch {

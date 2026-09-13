@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
+  Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
@@ -120,6 +120,63 @@ export class HrmsPerformanceService {
     return res;
   }
 
+  async updateCycle(actorId: string, id: string, dto: { name?: string; status?: string; description?: string }) {
+    const res = await this.prisma.hrmsAppraisalCycle.update({
+      where: { id },
+      data: {
+        name: dto.name,
+        status: dto.status,
+        description: dto.description,
+      },
+    });
+    await this.audit.log({
+      actorId,
+      action: 'UPDATE_APPRAISAL_CYCLE',
+      targetType: 'HrmsAppraisalCycle',
+      targetId: id,
+      description: `Cập nhật kỳ đánh giá: ${res.name} (Trạng thái: ${res.status})`,
+    });
+    return res;
+  }
+
+  async deleteCycle(actorId: string, id: string) {
+    // Xóa reviews & goals liên quan trước
+    await this.prisma.hrmsAppraisalReview.deleteMany({ where: { cycleId: id } });
+    await this.prisma.hrmsAppraisalGoal.deleteMany({ where: { cycleId: id } });
+    const res = await this.prisma.hrmsAppraisalCycle.delete({ where: { id } });
+    await this.audit.log({
+      actorId,
+      action: 'DELETE_APPRAISAL_CYCLE',
+      targetType: 'HrmsAppraisalCycle',
+      targetId: id,
+      description: `Xóa kỳ đánh giá ${res.name}`,
+    });
+    return { success: true };
+  }
+
+  async deleteGoal(actorId: string, id: string) {
+    const res = await this.prisma.hrmsAppraisalGoal.delete({ where: { id } });
+    await this.audit.log({
+      actorId,
+      action: 'DELETE_GOAL',
+      targetType: 'HrmsAppraisalGoal',
+      targetId: id,
+      description: `Xóa mục tiêu KRA: ${res.kraTitle}`,
+    });
+    return { success: true };
+  }
+
+  async deleteReview(actorId: string, id: string) {
+    await this.prisma.hrmsAppraisalReview.delete({ where: { id } });
+    await this.audit.log({
+      actorId,
+      action: 'DELETE_REVIEW_360',
+      targetType: 'HrmsAppraisalReview',
+      targetId: id,
+      description: `Xóa phản hồi 360 độ ID: ${id}`,
+    });
+    return { success: true };
+  }
   async listGoals(cycleId?: string, userId?: string) {
     const where: Record<string, unknown> = {};
     if (cycleId) where.cycleId = cycleId;
@@ -214,6 +271,52 @@ export class HrmsPerformanceService {
     });
     return res;
   }
+
+  /** Đồng bộ kết quả đánh giá cuối kỳ vào hồ sơ cán bộ (QT ĐGCB - Mẫu 2C-BNV / Doanh nghiệp) */
+  async syncToPersonnelAppraisal(
+    actorId: string,
+    dto: {
+      userId: string;
+      year: number;
+      classification: 'EXCELLENT' | 'GOOD' | 'SATISFACTORY' | 'UNSATISFACTORY';
+      comment?: string;
+      decisionNo?: string;
+    },
+  ) {
+    // 1. Lấy hoặc tạo PersonnelComprehensiveProfile của nhân sự
+    let profile = await this.prisma.personnelComprehensiveProfile.findUnique({
+      where: { userId: dto.userId },
+    });
+    if (!profile) {
+      profile = await this.prisma.personnelComprehensiveProfile.create({
+        data: {
+          userId: dto.userId,
+          healthStatus: 'Tốt',
+        },
+      });
+    }
+
+    // 2. Tạo bản ghi quá trình đánh giá cán bộ
+    const appraisal = await this.prisma.personnelAppraisal.create({
+      data: {
+        profileId: profile.id,
+        year: dto.year,
+        classification: dto.classification,
+        comment: dto.comment ?? 'Đánh giá hoàn thành chu kỳ hiệu suất 360 độ',
+        decisionNo: dto.decisionNo,
+      },
+    });
+
+    await this.audit.log({
+      actorId,
+      action: 'SYNC_APPRAISAL_TO_PROFILE',
+      targetType: 'PersonnelAppraisal',
+      targetId: appraisal.id,
+      description: `Đồng bộ đánh giá năm ${dto.year} (${dto.classification}) vào Hồ sơ cán bộ ID ${dto.userId}`,
+    });
+
+    return appraisal;
+  }
 }
 
 @ApiTags('HRMS - Performance & 360 Appraisal')
@@ -230,6 +333,19 @@ export class HrmsPerformanceController {
   @Post('cycles')
   createCycle(@Body() dto: CreateCycleDto) {
     return this.service.createCycle('system', dto);
+  }
+
+  @Patch('cycles/:id')
+  updateCycle(
+    @Param('id') id: string,
+    @Body() dto: { name?: string; status?: string; description?: string },
+  ) {
+    return this.service.updateCycle('system', id, dto);
+  }
+
+  @Delete('cycles/:id')
+  deleteCycle(@Param('id') id: string) {
+    return this.service.deleteCycle('system', id);
   }
 
   @Get('goals')
@@ -251,6 +367,11 @@ export class HrmsPerformanceController {
     return this.service.scoreGoal('system', id, selfScore, managerScore);
   }
 
+  @Delete('goals/:id')
+  deleteGoal(@Param('id') id: string) {
+    return this.service.deleteGoal('system', id);
+  }
+
   @Get('reviews')
   listReviews(@Query('cycleId') cycleId?: string, @Query('userId') userId?: string) {
     return this.service.listReviews(cycleId, userId);
@@ -260,6 +381,25 @@ export class HrmsPerformanceController {
   addReview(@Body() dto: CreateReview360Dto) {
     return this.service.addReview360('system', dto);
   }
+
+  @Delete('reviews/:id')
+  deleteReview(@Param('id') id: string) {
+    return this.service.deleteReview('system', id);
+  }
+
+  @Post('sync-appraisal')
+  syncAppraisal(
+    @Body()
+    dto: {
+      userId: string;
+      year: number;
+      classification: 'EXCELLENT' | 'GOOD' | 'SATISFACTORY' | 'UNSATISFACTORY';
+      comment?: string;
+      decisionNo?: string;
+    },
+  ) {
+    return this.service.syncToPersonnelAppraisal('system', dto);
+  }
 }
 
 @Module({
@@ -268,3 +408,4 @@ export class HrmsPerformanceController {
   exports: [HrmsPerformanceService],
 })
 export class HrmsPerformanceModule {}
+

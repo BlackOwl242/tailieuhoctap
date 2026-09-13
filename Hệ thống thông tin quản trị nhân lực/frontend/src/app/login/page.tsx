@@ -157,8 +157,8 @@ function LoginInner() {
 
         {/* Mục 2 — mở màn hình điểm danh ngay từ trang đăng nhập (không cần đăng nhập) */}
         <div className="mt-6 flex items-center justify-center gap-4 text-center text-xs text-muted-foreground">
-          <Link href="/kiosk" className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-foreground">
-            <QrCode className="h-3.5 w-3.5" /> Mở màn hình Kiosk điểm danh
+          <Link href="/check-in?mode=qr" className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-foreground">
+            <QrCode className="h-3.5 w-3.5" /> Mở màn hình Kiosk điểm danh (QR)
           </Link>
           <span aria-hidden>·</span>
           <Link href="/check-in?mode=face" className="underline underline-offset-2 hover:text-foreground">

@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
  * - Điều hướng bàn phím: ↑/↓ di chuyển, Enter mở, Esc đóng.
  */
 interface SearchHit {
-  group: 'Nhân viên' | 'Tài liệu' | 'Bài viết';
+  group: 'Nhân viên' | 'Tài liệu';
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   subtitle: string;
@@ -42,10 +42,9 @@ export function GlobalSearch() {
     setLoading(true);
     const t = setTimeout(async () => {
       try {
-        const [emps, docs, arts] = await Promise.all([
+        const [emps, docs] = await Promise.all([
           api.get<Array<{ id: string; fullName: string; employeeCode: string | null; jobTitle: string | null }>>('/employees').then((r) => r.data).catch(() => []),
           api.get<Array<{ id: string; title: string; processArea: string | null }>>('/documents').then((r) => r.data).catch(() => []),
-          api.get<{ items: Array<{ id: string; title: string; space: { name: string } }> }>('/search', { params: { q } }).then((r) => r.data.items).catch(() => []),
         ]);
         const ql = q.toLowerCase();
         const out: SearchHit[] = [];
@@ -60,9 +59,6 @@ export function GlobalSearch() {
           if (`${d.title} ${d.processArea ?? ''}`.toLowerCase().includes(ql)) {
             out.push({ group: 'Tài liệu', icon: FolderOpen, title: d.title, subtitle: d.processArea ?? 'Tài liệu nội bộ', href: '/documents' });
           }
-        }
-        for (const a of (arts ?? []).slice(0, 5)) {
-          out.push({ group: 'Bài viết', icon: FileText, title: a.title, subtitle: a.space.name, href: `/articles/${a.id}` });
         }
         setHits(out);
         setActive(0);

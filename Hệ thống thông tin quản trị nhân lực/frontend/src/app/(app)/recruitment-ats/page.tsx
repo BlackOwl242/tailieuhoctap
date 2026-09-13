@@ -8,11 +8,12 @@ import {
   X, Clock, DollarSign, Users, Building2, FileText, Check, ShieldCheck,
   GripVertical, UserCheck, MoveRight, Info,
 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, errorMessage } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
 import { Button } from '@/components/ui/primitives';
+import { useToast } from '@/components/ui/toaster';
 
 interface JobOpening {
   id: string;
@@ -68,6 +69,7 @@ const STAGES: { key: JobApplicant['stage']; label: string; bgClass: string; text
 
 export default function RecruitmentAtsPage() {
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState<'kanban' | 'openings'>('kanban');
   const [selectedApplicant, setSelectedApplicant] = useState<JobApplicant | null>(null);
   const [selectedOpening, setSelectedOpening] = useState<JobOpening | null>(null);
@@ -152,8 +154,10 @@ export default function RecruitmentAtsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hrms-job-applicants'] });
-      alert('Đã 1-Click chuyển đổi thành công ứng viên thành Nhân viên chính thức!');
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+      toast('Đã tiếp nhận và chuyển đổi ứng viên thành Nhân sự chính thức thành công!', 'success');
     },
+    onError: (e) => toast(errorMessage(e), 'error'),
   });
 
   if (isLoadingOpenings || isLoadingApps) return <LoadingState text="Đang tải Đường ống Tuyển dụng ATS..." />;

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Database,
   Search,
@@ -18,7 +19,8 @@ import {
   ChevronRight,
   Filter,
   RefreshCw,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Loader2
 } from 'lucide-react';
 import {
   Button,
@@ -28,14 +30,18 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription
+  CardDescription,
+  Skeleton
 } from '@/components/ui/primitives';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
-import rawCatalogsData from '@/data/master-catalogs.json';
+import { api, errorMessage } from '@/lib/api';
+import { useToast } from '@/components/ui/toaster';
 
 interface CatalogItem {
+  id: string;
   code: string;
   name: string;
+  sortOrder: number;
   groupCode?: string;
   sector?: string;
   maxStep?: number;
@@ -60,51 +66,87 @@ interface CatalogGroup {
   catalogs: CatalogMeta[];
 }
 
-const STORAGE_KEY = 'hrmis_master_catalogs_v1';
+interface CatalogsResponse {
+  groups: CatalogGroup[];
+}
 
 export default function MasterCatalogsPage() {
-  // Load data from localStorage if user has made custom edits, otherwise use bundled JSON
-  const [catalogsData, setCatalogsData] = useState<{ groups: CatalogGroup[] }>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // fallback
-        }
-      }
-    }
-    return rawCatalogsData as any;
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
+  // =========== API: Lấy toàn bộ danh mục từ backend ===========
+  const { data: catalogsData, isLoading, isError, error } = useQuery<CatalogsResponse>({
+    queryKey: ['master-catalogs'],
+    queryFn: async () => (await api.get<CatalogsResponse>('/admin/catalogs')).data,
+  });
+
+  // =========== Mutations ===========
+  const createMutation = useMutation({
+    mutationFn: async (vars: { catalogId: string; code: string; name: string; extra?: Record<string, unknown> }) =>
+      api.post(`/admin/catalogs/${vars.catalogId}/items`, { code: vars.code, name: vars.name, extra: vars.extra }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['master-catalogs'] });
+      toast('Thêm mới mục danh mục thành công!', 'success');
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (vars: { itemId: string; code?: string; name?: string; extra?: Record<string, unknown> }) =>
+      api.patch(`/admin/catalogs/items/${vars.itemId}`, { code: vars.code, name: vars.name, extra: vars.extra }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['master-catalogs'] });
+      toast('Cập nhật thành công!', 'success');
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (itemId: string) => api.delete(`/admin/catalogs/items/${itemId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['master-catalogs'] });
+      toast('Đã xóa thành công', 'success');
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const resetMutation = useMutation({
+    mutationFn: async () => api.post('/admin/catalogs/reset'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['master-catalogs'] });
+      toast('Đã khôi phục toàn bộ danh mục về mặc định', 'success');
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
   });
 
   const [selectedGroupId, setSelectedGroupId] = useState<string>('all');
   const [selectedCatalogId, setSelectedCatalogId] = useState<string>('dan_toc');
   const [catalogSearch, setCatalogSearch] = useState<string>('');
   const [itemSearch, setItemSearch] = useState<string>('');
-  
+
   // Modal / Form state for Add/Edit
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CatalogItem | null>(null);
   const [formCode, setFormCode] = useState('');
   const [formName, setFormName] = useState('');
   const [formExtra, setFormExtra] = useState('');
-  const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
 
-  // Pagination for large catalogs (e.g. 515 majors, 184 civil servant cadres)
+  // Pagination for large catalogs
   const [page, setPage] = useState(1);
   const pageSize = 20;
+
+  const groups = catalogsData?.groups ?? [];
 
   // Flatten all catalogs with group reference
   const allCatalogs = useMemo(() => {
     const list: { groupTitle: string; groupId: string; catalog: CatalogMeta }[] = [];
-    catalogsData.groups.forEach(g => {
+    groups.forEach(g => {
       g.catalogs.forEach(c => {
         list.push({ groupTitle: g.title, groupId: g.id, catalog: c });
       });
     });
     return list;
-  }, [catalogsData]);
+  }, [groups]);
 
   // Filtered catalog list for the left panel
   const filteredCatalogs = useMemo(() => {
@@ -120,12 +162,12 @@ export default function MasterCatalogsPage() {
 
   // Currently active catalog
   const currentCatalog = useMemo(() => {
-    for (const g of catalogsData.groups) {
+    for (const g of groups) {
       const found = g.catalogs.find(c => c.id === selectedCatalogId);
       if (found) return { catalog: found, group: g };
     }
-    return { catalog: allCatalogs[0]?.catalog, group: catalogsData.groups[0] };
-  }, [catalogsData, selectedCatalogId, allCatalogs]);
+    return { catalog: allCatalogs[0]?.catalog, group: groups[0] };
+  }, [groups, selectedCatalogId, allCatalogs]);
 
   // Filtered items in active catalog
   const filteredItems = useMemo(() => {
@@ -151,14 +193,6 @@ export default function MasterCatalogsPage() {
     setPage(1);
   }, [selectedCatalogId, itemSearch]);
 
-  // Save to LocalStorage
-  const saveState = (updated: typeof catalogsData) => {
-    setCatalogsData(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    }
-  };
-
   const handleOpenAdd = () => {
     setEditingItem(null);
     setFormCode('');
@@ -175,21 +209,9 @@ export default function MasterCatalogsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteItem = (code: string) => {
-    if (!confirm(`Bạn có chắc muốn xóa mã danh mục "${code}" không?`)) return;
-    const newGroups = catalogsData.groups.map(g => ({
-      ...g,
-      catalogs: g.catalogs.map(c => {
-        if (c.id === selectedCatalogId) {
-          const newItems = c.items.filter(it => it.code !== code);
-          return { ...c, items: newItems, count: newItems.length };
-        }
-        return c;
-      })
-    }));
-    saveState({ groups: newGroups });
-    setFeedbackMsg(`Đã xóa thành công mã "${code}"`);
-    setTimeout(() => setFeedbackMsg(null), 3000);
+  const handleDeleteItem = (item: CatalogItem) => {
+    if (!confirm(`Bạn có chắc muốn xóa mã danh mục "${item.code}" không?`)) return;
+    deleteMutation.mutate(item.id);
   };
 
   const handleSaveModal = (e: React.FormEvent) => {
@@ -199,62 +221,31 @@ export default function MasterCatalogsPage() {
       return;
     }
 
-    const newGroups = catalogsData.groups.map(g => ({
-      ...g,
-      catalogs: g.catalogs.map(c => {
-        if (c.id === selectedCatalogId) {
-          let newItems = [...c.items];
-          if (editingItem) {
-            // Update existing
-            newItems = newItems.map(it =>
-              it.code === editingItem.code
-                ? { ...it, code: formCode.trim(), name: formName.trim(), sector: formExtra || it.sector }
-                : it
-            );
-          } else {
-            // Check code duplicate
-            if (newItems.some(it => it.code.toLowerCase() === formCode.trim().toLowerCase())) {
-              alert('Mã danh mục này đã tồn tại!');
-              return c;
-            }
-            newItems.unshift({
-              code: formCode.trim(),
-              name: formName.trim(),
-              sector: formExtra || undefined,
-            });
-          }
-          return { ...c, items: newItems, count: newItems.length };
-        }
-        return c;
-      })
-    }));
+    const extra: Record<string, unknown> = {};
+    if (formExtra) extra.sector = formExtra;
 
-    saveState({ groups: newGroups });
+    if (editingItem) {
+      updateMutation.mutate({
+        itemId: editingItem.id,
+        code: formCode.trim(),
+        name: formName.trim(),
+        extra: Object.keys(extra).length > 0 ? extra : undefined,
+      });
+    } else {
+      createMutation.mutate({
+        catalogId: selectedCatalogId,
+        code: formCode.trim(),
+        name: formName.trim(),
+        extra: Object.keys(extra).length > 0 ? extra : undefined,
+      });
+    }
     setIsModalOpen(false);
-    setFeedbackMsg(editingItem ? 'Cập nhật thành công!' : 'Thêm mới mục danh mục thành công!');
-    setTimeout(() => setFeedbackMsg(null), 3000);
   };
 
   const handleResetDefault = () => {
-    if (confirm('Khôi phục toàn bộ 32 danh mục về dữ liệu gốc chuẩn nhà nước?')) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-      setCatalogsData(rawCatalogsData as any);
-      setFeedbackMsg('Đã khôi phục toàn bộ danh mục về mặc định');
-      setTimeout(() => setFeedbackMsg(null), 3000);
+    if (confirm('Khôi phục toàn bộ 32 danh mục về dữ liệu gốc chuẩn nhà nước? Thao tác này sẽ xóa toàn bộ dữ liệu tùy chỉnh.')) {
+      resetMutation.mutate();
     }
-  };
-
-  const handleExportJson = () => {
-    const dataStr = JSON.stringify(currentCatalog?.catalog, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `DanhMuc_${currentCatalog?.catalog?.id}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
   };
 
   const handleExportCsv = () => {
@@ -309,16 +300,46 @@ export default function MasterCatalogsPage() {
     return allCatalogs.reduce((acc, curr) => acc + curr.catalog.count, 0);
   }, [allCatalogs]);
 
+  // =========== Loading State ===========
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Database className="h-5 w-5" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Hệ thống Danh mục Quản trị (Master Catalogs)
+          </h1>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)}
+        </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <Skeleton className="lg:col-span-4 h-96 rounded-xl" />
+          <Skeleton className="lg:col-span-8 h-96 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <Database className="h-12 w-12 text-muted-foreground mb-4" />
+        <h2 className="text-lg font-semibold text-foreground">Không thể tải danh mục</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{errorMessage(error)}</p>
+        <Button className="mt-4" onClick={() => queryClient.invalidateQueries({ queryKey: ['master-catalogs'] })}>
+          Thử lại
+        </Button>
+      </div>
+    );
+  }
+
+  const isMutating = createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || resetMutation.isPending;
+
   return (
     <div className="space-y-6">
-      {/* Toast thông báo */}
-      {feedbackMsg && (
-        <div className="fixed top-16 right-6 z-toast flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg animate-in slide-in-from-top-2">
-          <Check className="h-4 w-4" />
-          <span>{feedbackMsg}</span>
-        </div>
-      )}
-
       {/* ================= HEADER TRANG ================= */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -331,13 +352,13 @@ export default function MasterCatalogsPage() {
             </h1>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            32 danh mục nghiệp vụ chuẩn hóa toàn diện cho cả Cơ quan Nhà nước và Doanh nghiệp (Dân tộc, Ngạch công chức & Bậc lương, Ngành đào tạo, Chức vụ...)
+            {allCatalogs.length} danh mục nghiệp vụ chuẩn hóa · {totalAllRecords.toLocaleString('vi-VN')} bản ghi · Dữ liệu từ API backend
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 no-print">
-          <Button variant="outline" size="sm" onClick={handleResetDefault} title="Khôi phục danh mục gốc">
-            <RefreshCw className="h-4 w-4" /> Khôi phục gốc
+          <Button variant="outline" size="sm" onClick={handleResetDefault} disabled={isMutating} title="Khôi phục danh mục gốc">
+            <RefreshCw className={`h-4 w-4 ${resetMutation.isPending ? 'animate-spin' : ''}`} /> Khôi phục gốc
           </Button>
           <Button variant="outline" size="sm" onClick={handleExportCsv} title="Xuất CSV">
             <FileSpreadsheet className="h-4 w-4 text-emerald-600" /> Xuất CSV
@@ -345,7 +366,7 @@ export default function MasterCatalogsPage() {
           <Button variant="outline" size="sm" onClick={() => window.print()} title="In biểu danh mục chuẩn NĐ 30">
             <Printer className="h-4 w-4" /> In danh mục
           </Button>
-          <Button size="sm" onClick={handleOpenAdd} className="bg-primary text-primary-foreground shadow-xs">
+          <Button size="sm" onClick={handleOpenAdd} className="bg-primary text-primary-foreground shadow-xs" disabled={isMutating}>
             <Plus className="h-4 w-4" /> Thêm mục mới
           </Button>
         </div>
@@ -353,7 +374,7 @@ export default function MasterCatalogsPage() {
 
       {/* ================= THẺ THỐNG KÊ 4 NHÓM DANH MỤC ================= */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 no-print">
-        {catalogsData.groups.map(group => {
+        {groups.map(group => {
           const groupCount = group.catalogs.reduce((acc, c) => acc + c.count, 0);
           const isSelected = selectedGroupId === group.id;
           const Icon =
@@ -392,7 +413,7 @@ export default function MasterCatalogsPage() {
 
       {/* ================= KHUNG BỐ CỤC 2 CỘT ================= */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 no-print">
-        {/* CỘT TRÁI: DANH SÁCH 32 BẢNG DANH MỤC (4 cột) */}
+        {/* CỘT TRÁI: DANH SÁCH BẢNG DANH MỤC */}
         <div className="lg:col-span-4 space-y-3">
           <Card className="shadow-xs border-border/80">
             <CardHeader className="p-3.5 pb-2">
@@ -463,7 +484,7 @@ export default function MasterCatalogsPage() {
           </Card>
         </div>
 
-        {/* CỘT PHẢI: BẢNG CHI TIẾT BẢN GHI TRONG DANH MỤC (8 cột) */}
+        {/* CỘT PHẢI: BẢNG CHI TIẾT BẢN GHI TRONG DANH MỤC */}
         <div className="lg:col-span-8 space-y-4">
           <Card className="shadow-xs border-border/80">
             <CardHeader className="p-4 border-b border-border/60">
@@ -482,7 +503,6 @@ export default function MasterCatalogsPage() {
                   </CardDescription>
                 </div>
 
-                {/* Các thao tác: Tìm kiếm, In toàn bộ danh mục, Xuất Excel, Thêm mới */}
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="relative w-full sm:w-44">
                     <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
@@ -494,39 +514,14 @@ export default function MasterCatalogsPage() {
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setItemSearch(e.target.value)}
                     />
                   </div>
-
-                  {/* NÚT IN TOÀN BỘ DANH MỤC */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 text-xs gap-1.5 border-slate-300 bg-white hover:bg-slate-50 font-semibold text-slate-800 shadow-2xs"
-                    onClick={() => window.print()}
-                    title={`In toàn bộ ${currentCatalog?.catalog?.count} bản ghi của ${currentCatalog?.catalog?.name}`}
-                  >
-                    <Printer className="h-3.5 w-3.5 text-primary" />
-                    <span>In toàn bộ danh mục</span>
+                  <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={() => window.print()}>
+                    <Printer className="h-3.5 w-3.5 text-primary" /> In toàn bộ danh mục
                   </Button>
-
-                  {/* NÚT XUẤT EXCEL DANH MỤC */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 text-xs gap-1.5 border-slate-300 bg-white hover:bg-slate-50 font-medium text-slate-800 shadow-2xs"
-                    onClick={handleExportExcel}
-                    title="Xuất bảng tính Excel danh mục này"
-                  >
-                    <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" />
-                    <span>Xuất Excel</span>
+                  <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={handleExportExcel}>
+                    <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" /> Xuất Excel
                   </Button>
-
-                  {/* NÚT THÊM MỤC */}
-                  <Button
-                    size="sm"
-                    className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground font-medium shadow-2xs"
-                    onClick={handleOpenAdd}
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>Thêm mục</span>
+                  <Button size="sm" className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground" onClick={handleOpenAdd} disabled={isMutating}>
+                    <Plus className="h-3.5 w-3.5" /> Thêm mục
                   </Button>
                 </div>
               </div>
@@ -537,7 +532,7 @@ export default function MasterCatalogsPage() {
                 <div className="flex items-start gap-2.5">
                   <Building2 className="h-4 w-4 text-blue-700 shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-blue-900">Thiết lập Tên Cơ quan, Đơn vị & Cơ cấu các Phòng ban trực thuộc</p>
+                    <p className="font-semibold text-blue-900">Thiết lập Tên Cơ quan, Đơn vị &amp; Cơ cấu các Phòng ban trực thuộc</p>
                     <p className="text-[11px] text-blue-700 mt-0.5">
                       Danh mục này phân loại cấp quản lý. Để cấu hình Tên đơn vị chính thức, cơ quan chủ quản và sơ đồ phòng ban in ấn, vui lòng truy cập phân hệ Cơ cấu tổ chức.
                     </p>
@@ -560,7 +555,6 @@ export default function MasterCatalogsPage() {
                     <tr className="border-b border-border/60 bg-muted/30 text-muted-foreground">
                       <th className="py-2.5 px-4 font-semibold w-24">Mã</th>
                       <th className="py-2.5 px-4 font-semibold">Tên mục chuẩn</th>
-                      {/* Cột mở rộng tùy theo loại danh mục */}
                       {selectedCatalogId === 'ngach_cong_chuc' && (
                         <>
                           <th className="py-2.5 px-4 font-semibold w-36">Lĩnh vực</th>
@@ -582,7 +576,7 @@ export default function MasterCatalogsPage() {
                   </thead>
                   <tbody className="divide-y divide-border/40">
                     {pagedItems.map((item, idx) => (
-                      <tr key={item.code + idx} className="hover:bg-muted/40 transition-colors">
+                      <tr key={item.id || item.code + idx} className="hover:bg-muted/40 transition-colors">
                         <td className="py-2 px-4 font-mono font-bold text-foreground">
                           {item.code}
                         </td>
@@ -590,7 +584,6 @@ export default function MasterCatalogsPage() {
                           {item.name}
                         </td>
 
-                        {/* Chi tiết Ngạch công chức & Bậc lương */}
                         {selectedCatalogId === 'ngach_cong_chuc' && (
                           <>
                             <td className="py-2 px-4 text-muted-foreground">
@@ -607,7 +600,6 @@ export default function MasterCatalogsPage() {
                           </>
                         )}
 
-                        {/* Chi tiết Nhóm ngạch */}
                         {selectedCatalogId === 'nhom_ngach' && (
                           <>
                             <td className="py-2 px-4 font-medium text-muted-foreground">
@@ -619,7 +611,6 @@ export default function MasterCatalogsPage() {
                           </>
                         )}
 
-                        {/* Phân loại Khen thưởng / Kỷ luật */}
                         {selectedCatalogId === 'khen_thuong_ky_luat' && (
                           <td className="py-2 px-4">
                             <span className="inline-flex items-center gap-1.5 text-xs font-medium">
@@ -629,20 +620,21 @@ export default function MasterCatalogsPage() {
                           </td>
                         )}
 
-                        {/* Thao tác Sửa / Xóa */}
                         <td className="py-2 px-4 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => handleOpenEdit(item)}
                               className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-muted"
                               title="Sửa bản ghi"
+                              disabled={isMutating}
                             >
                               <Edit2 className="h-3.5 w-3.5" />
                             </button>
                             <button
-                              onClick={() => handleDeleteItem(item.code)}
+                              onClick={() => handleDeleteItem(item)}
                               className="p-1 text-muted-foreground hover:text-destructive rounded hover:bg-muted"
                               title="Xóa bản ghi"
+                              disabled={isMutating}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
@@ -671,25 +663,13 @@ export default function MasterCatalogsPage() {
                     <strong>{filteredItems.length}</strong> bản ghi
                   </span>
                   <div className="flex items-center gap-1.5">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page <= 1}
-                      onClick={() => setPage(p => p - 1)}
-                      className="h-7 text-xs px-2.5"
-                    >
+                    <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="h-7 text-xs px-2.5">
                       Trước
                     </Button>
                     <span className="px-2 font-mono text-muted-foreground">
                       {page} / {totalPages}
                     </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page >= totalPages}
-                      onClick={() => setPage(p => p + 1)}
-                      className="h-7 text-xs px-2.5"
-                    >
+                    <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="h-7 text-xs px-2.5">
                       Sau
                     </Button>
                   </div>
@@ -723,7 +703,7 @@ export default function MasterCatalogsPage() {
           </thead>
           <tbody>
             {currentCatalog?.catalog?.items?.map((it, i) => (
-              <tr key={it.code + i}>
+              <tr key={it.id || it.code + i}>
                 <td className="text-center font-mono">{i + 1}</td>
                 <td className="text-center font-bold font-mono">{it.code}</td>
                 <td className="font-semibold">{it.name}</td>
@@ -805,15 +785,11 @@ export default function MasterCatalogsPage() {
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-border/60">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsModalOpen(false)}
-                >
+                <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)} disabled={isMutating}>
                   Hủy
                 </Button>
-                <Button type="submit" size="sm" className="bg-primary text-primary-foreground">
+                <Button type="submit" size="sm" className="bg-primary text-primary-foreground" disabled={isMutating}>
+                  {isMutating && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />}
                   Lưu thay đổi
                 </Button>
               </div>

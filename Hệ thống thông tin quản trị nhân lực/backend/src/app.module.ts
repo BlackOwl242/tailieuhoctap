@@ -40,6 +40,7 @@ import { HrmsTrainingModule } from './modules/hrms-training/hrms-training.module
 import { HrmsLoansModule } from './modules/hrms-loans/hrms-loans.module';
 import { HrmsAssetsModule } from './modules/hrms-assets/hrms-assets.module';
 import { HrmsRegularizationModule } from './modules/hrms-regularization/hrms-regularization.module';
+import { CatalogsModule } from './modules/catalogs/catalogs.module';
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { HrmsRegularizationModule } from './modules/hrms-regularization/hrms-reg
     HrmsLoansModule,
     HrmsAssetsModule,
     HrmsRegularizationModule,
+    CatalogsModule,
   ],
 })
 export class AppModule {}

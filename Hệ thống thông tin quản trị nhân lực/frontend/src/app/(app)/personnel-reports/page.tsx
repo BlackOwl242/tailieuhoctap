@@ -25,12 +25,7 @@ export default function PersonnelReportsPage() {
   const [orgConfig] = useOrgConfig();
   const [activeReport, setActiveReport] = useState<'2c' | 'bieu01' | 'bieu02' | 'bieu03'>('2c');
   const [selectedUserId, setSelectedUserId] = useState<string>(initialUserId || '');
-  const [cvMode, setCvMode] = useState<'state' | 'enterprise'>(isEnterpriseSector(orgConfig) ? 'enterprise' : 'state');
-
-  // Tự động đồng bộ mẫu biểu khi cấu hình cơ quan thay đổi
-  useEffect(() => {
-    setCvMode(isEnterpriseSector(orgConfig) ? 'enterprise' : 'state');
-  }, [orgConfig]);
+  const [cvMode, setCvMode] = useState<'state' | 'enterprise'>('state');
 
   // Lấy danh sách nhân viên để chọn in sơ yếu lý lịch 4 trang
   const qEmployees = useQuery({
@@ -83,16 +78,6 @@ export default function PersonnelReportsPage() {
         title="Trung tâm Báo cáo & Thống kê"
         description="Mẫu biểu báo cáo nhân lực chuẩn hóa: Sơ yếu lý lịch Cán bộ/Nhân sự (Mẫu 2C-BNV), Thống kê Cơ cấu Độ tuổi theo Ngạch bậc (Biểu 01), Ngoại ngữ (Biểu 02), và Trình độ chuyên môn (Biểu 03)."
         breadcrumbs={[{ label: 'Báo cáo & Tri thức' }, { label: 'Trung tâm báo cáo' }]}
-        actions={
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => window.print()}
-              className="flex items-center gap-1.5 shadow-2xs text-xs font-semibold"
-            >
-              <Printer className="w-3.5 h-3.5" /> In Báo cáo / PDF
-            </Button>
-          </div>
-        }
       />
 
       {/* Tabs Chọn Báo cáo */}
@@ -125,61 +110,74 @@ export default function PersonnelReportsPage() {
       {/* BÁO CÁO 1: SƠ YẾU LÝ LỊCH KÉP (NHÀ NƯỚC 2C-BNV / 2008 & DOANH NGHIỆP TƯ NHÂN) */}
       {activeReport === '2c' && (
         <div className="space-y-6">
-          {/* Bộ điều khiển: Chọn nhân sự & Chọn Mẫu Sơ yếu lý lịch */}
-          <Card className="p-4 bg-card border border-border shadow-xs no-print">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground block">
-                  Nhân sự kết xuất Sơ yếu lý lịch:
-                </label>
-                <select
-                  value={currentUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                  className="w-full h-9 rounded-md border border-input bg-card px-3 py-1 text-xs font-medium shadow-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                >
-                  {employees.map((emp) => (
-                    <option key={emp.id} value={emp.id}>
-                      {emp.employeeCode ? `[${emp.employeeCode}] ` : ''}{emp.fullName} - {emp.jobTitle || emp.department || 'Chuyên viên'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground block">
-                    Định dạng Mẫu biểu Sơ yếu lý lịch:
-                  </label>
-                  <span className="text-[11px] text-muted-foreground italic">
-                    (Mặc định: {isEnterpriseSector(orgConfig) ? 'Doanh nghiệp tư nhân' : 'Cơ quan Nhà nước'})
-                  </span>
-                </div>
-                <select
-                  value={cvMode}
-                  onChange={(e) => setCvMode(e.target.value as 'state' | 'enterprise')}
-                  className="w-full h-9 rounded-md border border-input bg-card px-3 py-1 text-xs font-medium shadow-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                >
-                  <option value="state">Mẫu 2C-BNV/2008 (Cơ quan Nhà nước, Đơn vị sự nghiệp công lập)</option>
-                  <option value="enterprise">Mẫu Doanh nghiệp tư nhân (Hồ sơ trích ngang người lao động)</option>
-                </select>
-              </div>
-            </div>
-          </Card>
-
           {/* Vùng Bản In Sơ Yếu Lý Lịch Chuẩn A4 */}
-          <div className="print-area font-times max-w-4xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-sm text-black">
+          <div className="print-area font-times max-w-6xl mx-auto text-black">
             {q2c.isLoading ? (
-              <div className="text-center py-16 text-muted-foreground font-sans">
-                Đang nạp dữ liệu hồ sơ lý lịch toàn diện...
+              <div className="text-center py-20 text-muted-foreground font-sans bg-card border border-border rounded-2xl shadow-xs">
+                <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="font-semibold text-sm">Đang nạp dữ liệu hồ sơ lý lịch toàn diện...</p>
               </div>
             ) : q2c.data ? (
               cvMode === 'state' ? (
-                <StateCivilServantProfile data={q2c.data} orgConfig={orgConfig} />
+                <StateCivilServantProfile
+                  data={q2c.data}
+                  orgConfig={orgConfig}
+                  employees={employees}
+                  currentUserId={currentUserId}
+                  onSelectUser={setSelectedUserId}
+                  cvMode={cvMode}
+                  onSelectCvMode={setCvMode}
+                />
               ) : (
-                <EnterprisePersonnelProfile data={q2c.data} orgConfig={orgConfig} />
+                <div className="space-y-4">
+                  {/* Toolbar cho chế độ Doanh nghiệp */}
+                  <div className="no-print bg-card border border-border rounded-xl shadow-xs p-3.5 flex flex-wrap items-center justify-between gap-3 font-sans">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-foreground">Nhân sự:</span>
+                        <select
+                          value={currentUserId}
+                          onChange={(e) => setSelectedUserId(e.target.value)}
+                          className="h-8.5 rounded-lg border border-input bg-background px-2.5 py-1 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        >
+                          {employees.map((emp) => (
+                            <option key={emp.id} value={emp.id}>
+                              {emp.employeeCode ? `[${emp.employeeCode}] ` : ''}{emp.fullName} - {emp.jobTitle || emp.department || 'Chuyên viên'}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-foreground">Định dạng:</span>
+                        <select
+                          value={cvMode}
+                          onChange={(e) => setCvMode(e.target.value as 'state' | 'enterprise')}
+                          className="h-8.5 rounded-lg border border-input bg-background px-2.5 py-1 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        >
+                          <option value="state">Mẫu 2C-BNV/2008 (Cơ quan Nhà nước - Trọn bộ 5 trang)</option>
+                          <option value="enterprise">Mẫu Doanh nghiệp tư nhân (Hồ sơ trích ngang)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={() => window.print()}
+                      className="flex items-center gap-1.5 text-xs font-semibold shadow-xs"
+                    >
+                      <Printer className="w-3.5 h-3.5" /> In Bản Chuẩn (Ctrl + P)
+                    </Button>
+                  </div>
+
+                  <div className="bg-slate-900/90 dark:bg-slate-950 p-4 sm:p-10 rounded-2xl shadow-inner border border-slate-800 flex justify-center">
+                    <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-10 shadow-2xl w-full max-w-4xl">
+                      <EnterprisePersonnelProfile data={q2c.data} orgConfig={orgConfig} />
+                    </div>
+                  </div>
+                </div>
               )
             ) : (
-              <div className="text-center py-16 text-muted-foreground font-sans">
+              <div className="text-center py-20 text-muted-foreground font-sans bg-card border border-border rounded-2xl">
                 Chưa có dữ liệu hồ sơ nhân sự được chọn.
               </div>
             )}

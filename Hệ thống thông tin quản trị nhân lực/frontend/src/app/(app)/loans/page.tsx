@@ -440,8 +440,8 @@ export default function LoansPage() {
               <button
                 onClick={() => {
                   applyMutation.mutate({
-                    userId: user?.id ?? 'demo-user',
-                    employeeName: user?.fullName ?? 'Nhân viên Demo',
+                    userId: user?.id ?? '',
+                    employeeName: user?.fullName ?? '',
                     loanType,
                     principalAmount,
                     termMonths,

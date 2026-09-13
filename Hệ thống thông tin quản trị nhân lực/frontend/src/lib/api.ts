@@ -45,7 +45,7 @@ api.interceptors.response.use(
       // bị đá về login — trang tự hiển thị lời mời đăng nhập thân thiện
       // (trước đây bấm "Điểm danh khuôn mặt" khi chưa đăng nhập bị giật ngược).
       useAuthStore.getState().clear();
-      const PUBLIC_PATHS = ['/login', '/kiosk', '/check-in'];
+      const PUBLIC_PATHS = ['/login', '/check-in'];
       const onPublicPage = typeof window !== 'undefined'
         && PUBLIC_PATHS.some((p) => window.location.pathname.startsWith(p));
       if (typeof window !== 'undefined' && !onPublicPage) {

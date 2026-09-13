@@ -33,7 +33,7 @@ export default function EssPage() {
     queryFn: async () => (await api.get('/hrms/attendance-regularizations/my')).data,
   });
 
-  const { data: myAssets } = useQuery<{ id: string; assetCode: string; name: string; category: string }[]>({
+  const { data: myAssets } = useQuery<{ id: string; assetCode: string; name: string; category: string; assignedAt?: string }[]>({
     queryKey: ['my-assets'],
     queryFn: async () => (await api.get('/hrms/assets/my')).data,
   });
@@ -41,6 +41,27 @@ export default function EssPage() {
   const { data: myLoans } = useQuery<{ id: string; loanType: string; monthlyEmi: number; remainingAmount: number }[]>({
     queryKey: ['my-loans'],
     queryFn: async () => (await api.get('/hrms/loans/my')).data,
+  });
+
+  const { data: myLeaveBalance } = useQuery<{ total: number; used: number; remaining: number }>({
+    queryKey: ['my-leave-balance'],
+    queryFn: async () => (await api.get('/hrms/leave/my-balance')).data,
+  });
+
+  const checkInMutation = useMutation({
+    mutationFn: async () => (await api.post('/hrms/attendance/check-in')).data,
+    onSuccess: () => {
+      setIsCheckedIn(true);
+      setCheckInTime(new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }));
+    },
+  });
+
+  const checkOutMutation = useMutation({
+    mutationFn: async () => (await api.post('/hrms/attendance/check-out')).data,
+    onSuccess: () => {
+      setIsCheckedIn(false);
+      setCheckInTime(null);
+    },
   });
 
   const regularizeMutation = useMutation({
@@ -61,8 +82,11 @@ export default function EssPage() {
   });
 
   const handleCheckIn = () => {
-    setIsCheckedIn(!isCheckedIn);
-    setCheckInTime(new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }));
+    if (isCheckedIn) {
+      checkOutMutation.mutate();
+    } else {
+      checkInMutation.mutate();
+    }
   };
 
   return (
@@ -98,7 +122,7 @@ export default function EssPage() {
               {new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
             </p>
             <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-              <MapPin className="h-3.5 w-3.5 text-primary" /> Trụ sở chính (IP: 192.168.1.100 · GPS Valid)
+              <MapPin className="h-3.5 w-3.5 text-primary" /> Trụ sở chính · Chấm công qua hệ thống
             </p>
           </div>
 
@@ -128,7 +152,7 @@ export default function EssPage() {
         <div className="rounded-2xl border bg-card p-5 shadow-xs space-y-4 lg:col-span-2">
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div>
-              <h3 className="font-bold text-foreground text-sm">Hạn Mức Phép Năm 2026</h3>
+              <h3 className="font-bold text-foreground text-sm">Hạn Mức Phép Năm {new Date().getFullYear()}</h3>
               <p className="text-[11px] text-muted-foreground">Tuân thủ Điều 113, 114 Bộ luật Lao động 2019</p>
             </div>
             <span className="text-xs font-bold text-primary px-2.5 py-1 rounded-lg bg-primary/10">
@@ -139,20 +163,20 @@ export default function EssPage() {
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="bg-muted/20 p-3 rounded-xl">
               <span className="text-[11px] text-muted-foreground">Tổng ngày phép</span>
-              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">13.0</p>
+              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.total?.toFixed(1) ?? '—'}</p>
             </div>
             <div className="bg-muted/20 p-3 rounded-xl">
               <span className="text-[11px] text-muted-foreground">Đã sử dụng</span>
-              <p className="text-xl font-bold text-amber-700 mt-0.5 font-mono">2.5</p>
+              <p className="text-xl font-bold text-amber-700 mt-0.5 font-mono">{myLeaveBalance?.used?.toFixed(1) ?? '—'}</p>
             </div>
             <div className="bg-muted/20 p-3 rounded-xl">
               <span className="text-[11px] text-muted-foreground">Còn lại khả dụng</span>
-              <p className="text-xl font-bold text-emerald-700 mt-0.5 font-mono">10.5</p>
+              <p className="text-xl font-bold text-emerald-700 mt-0.5 font-mono">{myLeaveBalance?.remaining?.toFixed(1) ?? '—'}</p>
             </div>
           </div>
 
           <div className="flex items-center justify-between pt-1 text-xs border-t border-border/40">
-            <span className="text-muted-foreground">Phiếu lương gần nhất: <b>Tháng 08/2026</b></span>
+            <span className="text-muted-foreground">Phiếu lương gần nhất: <b>Tháng {String(new Date().getMonth() === 0 ? 12 : new Date().getMonth()).padStart(2, '0')}/{new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear()}</b></span>
             <Link href="/payroll-engine" className="font-semibold text-primary hover:underline flex items-center gap-1">
               Xem Chi Tiết Phiếu Lương <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -223,20 +247,21 @@ export default function EssPage() {
           </div>
 
           <div className="space-y-2">
-            {[
-              { code: 'AST-001', name: 'MacBook Pro 16" M3 Pro', date: '15/01/2026' },
-              { code: 'AST-004', name: 'Màn hình Dell UltraSharp 27" 4K', date: '15/01/2026' },
-            ].map((a, i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/40">
+            {(myAssets && myAssets.length > 0) ? myAssets.map((a, i) => (
+              <div key={a.id || i} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/40">
                 <div>
                   <p className="text-xs font-bold text-foreground">{a.name}</p>
-                  <p className="text-[10px] text-muted-foreground font-mono">Mã: {a.code} · Nhận ngày: {a.date}</p>
+                  <p className="text-[10px] text-muted-foreground font-mono">Mã: {a.assetCode} · Loại: {a.category}</p>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600">
                   Đang dùng
                 </span>
               </div>
-            ))}
+            )) : (
+              <div className="py-6 text-center text-xs text-muted-foreground">
+                Chưa có tài sản nào được cấp phát
+              </div>
+            )}
           </div>
         </div>
 
@@ -253,11 +278,8 @@ export default function EssPage() {
           </div>
 
           <div className="space-y-2">
-            {(myRegularizations ?? [
-              { id: '1', workDate: '2026-08-20', reason: 'Quên quẹt thẻ lúc vào ca do họp khẩn', status: 'APPROVED' },
-              { id: '2', workDate: '2026-08-25', reason: 'Đi công tác chi nhánh đối tác', status: 'PENDING' },
-            ]).map((reg, i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/40">
+            {(myRegularizations && myRegularizations.length > 0) ? myRegularizations.map((reg, i) => (
+              <div key={reg.id || i} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/40">
                 <div>
                   <p className="text-xs font-bold text-foreground">
                     Ngày công: {new Date(reg.workDate).toLocaleDateString('vi-VN')}
@@ -274,7 +296,11 @@ export default function EssPage() {
                   {reg.status === 'APPROVED' ? 'Đã duyệt bù công' : 'Chờ duyệt'}
                 </span>
               </div>
-            ))}
+            )) : (
+              <div className="py-6 text-center text-xs text-muted-foreground">
+                Chưa có đơn giải trình nào
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -340,8 +366,8 @@ export default function EssPage() {
               <button
                 onClick={() => {
                   regularizeMutation.mutate({
-                    userId: user?.id ?? 'demo-user',
-                    employeeName: user?.fullName ?? 'Nhân viên Demo',
+                    userId: user?.id ?? '',
+                    employeeName: user?.fullName ?? '',
                     workDate: regDate,
                     requestedCheckIn: regInTime,
                     requestedCheckOut: regOutTime,

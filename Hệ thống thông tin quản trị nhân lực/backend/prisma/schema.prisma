@@ -1964,3 +1964,48 @@ model HrmsAttendanceRegularization {
   @@index([userId, status])
   @@map("hrms_attendance_regularizations")
 }
+
+// ---------------------------------------------------------------------------
+// Domain 8 — Master Catalogs (Hệ thống Danh mục chuẩn Nhà nước)
+// ---------------------------------------------------------------------------
+
+model MasterCatalogGroup {
+  id          String               @id           // e.g. "personal_politics"
+  title       String                              // "Nhân thân & Chính trị"
+  description String               @db.Text
+  sortOrder   Int                  @default(0)
+  catalogs    MasterCatalog[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@map("master_catalog_groups")
+}
+
+model MasterCatalog {
+  id       String               @id           // e.g. "dan_toc"
+  name     String                              // "Danh mục Dân tộc"
+  groupId  String
+  group    MasterCatalogGroup   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  items    MasterCatalogItem[]
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@index([groupId])
+  @@map("master_catalogs")
+}
+
+model MasterCatalogItem {
+  id          String         @id @default(uuid())
+  catalogId   String
+  catalog     MasterCatalog  @relation(fields: [catalogId], references: [id], onDelete: Cascade)
+  code        String                              // "KH" (Kinh)
+  name        String                              // "Kinh"
+  extra       Json?                               // { sector, maxStep, salarySteps, payTable, ... }
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([catalogId, code])
+  @@index([catalogId])
+  @@map("master_catalog_items")
+}

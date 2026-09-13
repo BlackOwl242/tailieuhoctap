@@ -44,7 +44,7 @@ export default function AttendancePage() {
         breadcrumbs={[{ label: 'Chấm công' }, { label: 'Bảng công cá nhân' }]}
         actions={
           <div className="flex items-center gap-2">
-            <Link href="/kiosk"><Button variant="outline" size="sm"><QrCode className="h-4 w-4" /> Kiosk QR</Button></Link>
+            <Link href="/check-in?mode=qr"><Button variant="outline" size="sm"><QrCode className="h-4 w-4" /> Kiosk QR</Button></Link>
             <Link href="/check-in?mode=face"><Button variant="outline" size="sm"><Camera className="h-4 w-4" /> Khuôn mặt</Button></Link>
             <PrintExportDropdown
               printLabel="In bảng công"

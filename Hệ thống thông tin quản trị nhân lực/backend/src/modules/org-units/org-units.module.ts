@@ -180,6 +180,12 @@ export class OrgUnitsService {
     await this.audit.log({ actorId: actor.id, action: 'ORG_UNIT_DELETED', entityType: 'OrgUnit', entityId: id, requestId });
     return { success: true };
   }
+
+  async findAll() {
+    return this.prisma.orgUnit.findMany({
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+    });
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -191,6 +197,12 @@ export class OrgUnitsService {
 @Controller('org-units')
 export class OrgUnitsController {
   constructor(private readonly service: OrgUnitsService) {}
+
+  @Public()
+  @Get()
+  findAll() {
+    return this.service.findAll();
+  }
 
   @Public()
   @Get('tree')

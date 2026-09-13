@@ -2,7 +2,7 @@ import {
   Body, Controller, Delete, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsEmail, IsEnum, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsDateString, IsEmail, IsEnum, IsIn, IsInt, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../common/prisma.service';
@@ -28,9 +28,16 @@ class CreateUserDto {
   @ApiProperty() @IsString() @MaxLength(120) fullName!: string;
   @ApiPropertyOptional() @IsOptional() @IsString() jobTitle?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
-  @ApiProperty({ enum: ['ADMIN', 'KM_MANAGER', 'USER'], isArray: true })
-  @IsArray() @IsIn(['ADMIN', 'KM_MANAGER', 'USER'], { each: true, message: 'Vai trò không hợp lệ' })
-  roleCodes!: string[];
+  @ApiPropertyOptional() @IsOptional() @IsString() phone?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() employeeCode?: string;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() baseSalary?: number;
+  @ApiPropertyOptional() @IsOptional() @IsDateString() hireDate?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() employmentStatus?: string;
+  @ApiPropertyOptional({ enum: ['ADMIN', 'KM_MANAGER', 'USER'], isArray: true })
+  @IsOptional()
+  @IsArray()
+  @IsIn(['ADMIN', 'KM_MANAGER', 'USER'], { each: true, message: 'Vai trò không hợp lệ' })
+  roleCodes?: string[];
   @ApiPropertyOptional() @IsOptional() @IsArray() expertise?: string[];
 }
 
@@ -92,6 +99,8 @@ export class UsersService {
       throw new BusinessException(ErrorCodes.EMAIL_EXISTS, 'Email đã tồn tại trong hệ thống', HttpStatus.CONFLICT);
     }
     const passwordHash = await bcrypt.hash(dto.password, 12);
+    const code = dto.employeeCode || `NV${Math.floor(1000 + Math.random() * 9000)}`;
+    const roles = (dto.roleCodes && dto.roleCodes.length > 0) ? dto.roleCodes : ['USER'];
     const user = await this.prisma.user.create({
       data: {
         email: dto.email.toLowerCase(),
@@ -99,8 +108,13 @@ export class UsersService {
         fullName: dto.fullName,
         jobTitle: dto.jobTitle,
         orgUnitId: dto.orgUnitId,
+        phone: dto.phone,
+        employeeCode: code,
+        baseSalary: dto.baseSalary,
+        hireDate: dto.hireDate ? new Date(dto.hireDate) : new Date(),
+        employmentStatus: (dto.employmentStatus as never) || 'ACTIVE',
         expertise: dto.expertise ?? [],
-        roles: { create: dto.roleCodes.map((roleCode) => ({ roleCode })) },
+        roles: { create: roles.map((roleCode) => ({ roleCode })) },
       },
       include: { roles: true },
     });

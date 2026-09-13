@@ -676,7 +676,7 @@ function CheckInInner() {
                   <Link href="/ess" className="w-full">
                     <Button className="w-full py-5 font-semibold bg-blue-600 hover:bg-blue-700 text-white">Vào Bàn làm việc cá nhân (ESS)</Button>
                   </Link>
-                  <Link href="/kiosk" className="w-full">
+                  <Link href="/check-in?mode=qr" className="w-full">
                     <Button variant="outline" className="w-full border-slate-200 text-slate-700 hover:bg-slate-50">
                       Màn hình Kiosk quét QR
                     </Button>
@@ -697,7 +697,7 @@ function CheckInInner() {
                     <Button className="w-full py-5 font-semibold bg-blue-600 hover:bg-blue-700 text-white gap-2"><LogIn className="h-4 w-4" /> Đăng nhập ngay</Button>
                   </Link>
                 ) : (
-                  <Link href="/kiosk" className="w-full">
+                  <Link href="/check-in?mode=qr" className="w-full">
                     <Button variant="outline" className="w-full border-slate-200 text-slate-700 py-5">
                       <QrCode className="h-4 w-4 mr-2" /> Quét lại mã QR tại Kiosk
                     </Button>
@@ -718,7 +718,7 @@ function CheckInInner() {
                   <Camera className="h-4 w-4" /> Camera nhận diện khuôn mặt & Hồng ngoại IR
                 </div>
 
-                <Link href="/kiosk">
+                <Link href="/check-in?mode=qr">
                   <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">
                     <QrCode className="h-4 w-4" /> Kiosk quét QR
                   </div>

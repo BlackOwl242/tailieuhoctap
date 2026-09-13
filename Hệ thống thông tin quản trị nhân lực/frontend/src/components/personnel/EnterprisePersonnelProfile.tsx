@@ -127,7 +127,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
             <tr>
               <td style={{ ...labelCellStyle, width: '22%' }}>Họ và tên khai sinh</td>
               <td style={{ ...cellStyle, width: '40%' }} className="font-bold uppercase text-[10.5pt]">
-                {page1.fullName}
+                {page1.fullName ? page1.fullName.replace(/\s*\([^)]*\)/g, '').trim() : ''}
               </td>
               <td style={{ ...labelCellStyle, width: '18%' }}>Giới tính</td>
               <td style={{ ...cellStyle, width: '20%' }}>{page1.gender || 'Nam'}</td>

@@ -18,6 +18,7 @@ class CreateActionDto {
 
 class DecideActionDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(500) note?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() newOrgUnitId?: string;
 }
 
 /**
@@ -94,7 +95,7 @@ export class PersonnelActionsService {
     return action;
   }
 
-  async decide(id: string, approve: boolean, actor: AuthUser, note?: string, requestId?: string) {
+  async decide(id: string, approve: boolean, actor: AuthUser, note?: string, requestId?: string, newOrgUnitIdFromDto?: string) {
     const action = await this.prisma.personnelAction.findUnique({ where: { id } });
     if (!action) throw new NotFoundException('Không tìm thấy đề xuất');
     if (action.status !== 'PENDING') {
@@ -107,9 +108,15 @@ export class PersonnelActionsService {
 
       switch (action.type) {
         case 'TRANSFER': {
-          const newOrgUnitId = payload.newOrgUnitId ? String(payload.newOrgUnitId) : null;
+          const newOrgUnitId = (newOrgUnitIdFromDto ? String(newOrgUnitIdFromDto) : null) || (payload.newOrgUnitId ? String(payload.newOrgUnitId) : null);
           if (!newOrgUnitId) throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Thiếu đơn vị mới (newOrgUnitId)');
           await this.prisma.user.update({ where: { id: action.subjectId }, data: { orgUnitId: newOrgUnitId } });
+          if (!payload.newOrgUnitId) {
+            await this.prisma.personnelAction.update({
+              where: { id },
+              data: { payload: { ...payload, newOrgUnitId } },
+            });
+          }
           break;
         }
         case 'SALARY_ADJUST': {
@@ -195,7 +202,7 @@ export class PersonnelActionsController {
   @Roles('ADMIN')
   @Post(':id/approve')
   approve(@Param('id') id: string, @Body() dto: DecideActionDto, @CurrentUser() user: AuthUser) {
-    return this.service.decide(id, true, user, dto.note);
+    return this.service.decide(id, true, user, dto.note, undefined, dto.newOrgUnitId);
   }
 
   @Roles('ADMIN')

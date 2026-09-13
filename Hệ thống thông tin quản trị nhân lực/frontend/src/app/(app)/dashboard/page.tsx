@@ -47,14 +47,14 @@ export default function FrappeHrmsDeskDashboard() {
       title: 'Nhân sự & Cơ cấu',
       subtitle: 'Employee & Org Structure',
       icon: Users,
-      description: 'Sơ đồ tổ chức động, hồ sơ nhân sự 2C-TCTW, ngạch bậc lương, tài sản và bàn giao.',
+      description: 'Sơ đồ tổ chức động, hồ sơ nhân sự, ngạch bậc lương, tài sản và quyết định biến động.',
       links: [
         { label: 'Sơ đồ Tổ chức Động (Interactive Tree)', href: '/org-chart' },
-        { label: 'Danh sách Nhân sự Toàn diện', href: '/employees', count: hr?.totalEmployees ?? 48 },
-        { label: 'Hồ sơ Toàn diện (2C-TCTW)', href: '/personnel-profiles' },
-        { label: 'Quản lý Tài sản & Cấp phát', href: '/assets' },
-        { label: 'Vòng đời & Quyết định Nhân sự', href: '/lifecycle' },
-        { label: 'Ngạch bậc Lương Tiêu chuẩn', href: '/salary-ranks', count: 20 },
+        { label: 'Danh sách Nhân sự Toàn diện', href: '/employees', count: hr?.totalEmployees },
+        { label: 'Hồ sơ Nhân sự & Cán bộ', href: '/personnel-profiles' },
+        { label: 'Quản trị Tài sản & Thiết bị', href: '/assets' },
+        { label: 'Quyết định & Biến động Nhân sự', href: '/personnel' },
+        { label: 'Ngạch bậc & Thang bảng lương', href: '/salary-ranks' },
       ],
     },
     {
@@ -65,8 +65,8 @@ export default function FrappeHrmsDeskDashboard() {
       links: [
         { label: 'Ca làm việc & Ma trận Phân ca', href: '/shifts', count: shiftTypes?.length ?? 4 },
         { label: 'Bảng Chấm công Thực tế', href: '/attendance' },
-        { label: 'Đơn Xin Nghỉ phép (Điều 113)', href: '/leave', count: hr?.pendingLeave },
-        { label: 'Đăng ký Làm thêm giờ (OT 150-300%)', href: '/overtime', count: hr?.pendingOvertime },
+        { label: 'Quản lý Đơn Nghỉ phép', href: '/leave', count: hr?.pendingLeave },
+        { label: 'Đăng ký Làm thêm giờ / Trực ca', href: '/overtime', count: hr?.pendingOvertime },
         { label: 'Điểm danh Kiosk Trực tuyến', href: '/check-in' },
       ],
     },
@@ -76,11 +76,11 @@ export default function FrappeHrmsDeskDashboard() {
       icon: Calculator,
       description: 'Hệ thống tính lương tự động, thành phần thu nhập, cấu trúc lương và khoản vay phúc lợi.',
       links: [
-        { label: 'Bảng lương Tự động Đa thành phần', href: '/payroll-engine' },
+        { label: 'Tiền lương & Bảng lương Tự động', href: '/payroll-engine' },
         { label: 'Quản trị Khoản Vay & Tạm ứng', href: '/loans' },
         { label: 'Xuất File Chi Lương Ngân Hàng', href: '/payroll-engine' },
-        { label: 'Thành phần Lương (Thu nhập & Khấu trừ)', href: '/payroll-engine', count: 8 },
-        { label: 'Bảng lương Truyền thống', href: '/payroll' },
+        { label: 'Thành phần Lương (Thu nhập & Khấu trừ)', href: '/payroll-engine' },
+        { label: 'Phiếu lương & Lịch sử chi trả', href: '/payroll' },
       ],
     },
     {
@@ -90,8 +90,8 @@ export default function FrappeHrmsDeskDashboard() {
       description: 'Đăng tin tuyển dụng, pipeline Kanban 6 giai đoạn, scorecard và 1-Click Onboard.',
       links: [
         { label: 'Tuyển dụng ATS Kanban', href: '/recruitment-ats' },
-        { label: 'Tin Tuyển dụng Đang mở', href: '/recruitment-ats', count: 2 },
-        { label: 'Hồ sơ Ứng viên Tuyển chọn', href: '/recruitment-ats', count: applicants?.length ?? 2 },
+        { label: 'Tin Tuyển dụng Đang mở', href: '/recruitment-ats' },
+        { label: 'Hồ sơ Ứng viên Tuyển chọn', href: '/recruitment-ats', count: applicants?.length },
         { label: 'Bảng điểm Phỏng vấn (Scorecard)', href: '/recruitment-ats' },
         { label: 'Thư mời Nhận việc (Job Offer)', href: '/recruitment-ats' },
       ],
@@ -105,7 +105,7 @@ export default function FrappeHrmsDeskDashboard() {
         { label: 'Đánh giá 360 Độ Toàn diện', href: '/performance-360' },
         { label: 'Mục tiêu KPI Trọng số (KRA Goals)', href: '/performance-360' },
         { label: 'Phản hồi Đánh giá Đồng nghiệp', href: '/performance-360' },
-        { label: 'Chu kỳ Đánh giá Hiệu suất', href: '/performance-360', count: 1 },
+        { label: 'Chu kỳ Đánh giá Hiệu suất', href: '/performance-360' },
       ],
     },
     {
@@ -125,7 +125,7 @@ export default function FrappeHrmsDeskDashboard() {
       icon: GraduationCap,
       description: 'Kế hoạch đào tạo nâng cao kỹ năng và kênh tiếp nhận khiếu nại minh bạch.',
       links: [
-        { label: 'Chương trình Đào tạo Chuyên môn', href: '/training-grievance', count: 2 },
+        { label: 'Chương trình Đào tạo Chuyên môn', href: '/training-grievance' },
         { label: 'Kiến nghị & Khiếu nại Nhân viên', href: '/training-grievance' },
         { label: 'Khảo sát Đánh giá Sau Đào tạo', href: '/training-grievance' },
       ],
@@ -134,12 +134,12 @@ export default function FrappeHrmsDeskDashboard() {
       title: 'Báo cáo & Phê duyệt',
       subtitle: 'Reports & Governance',
       icon: FileSpreadsheet,
-      description: 'Trung tâm báo cáo thống kê nhân sự chuẩn 2C, biểu mẫu 01-03 và nhật ký kiểm toán.',
+      description: 'Trung tâm báo cáo thống kê nhân sự, tổng hợp biến động lao động và nhật ký kiểm toán.',
       links: [
-        { label: 'Trung tâm Báo cáo Thống kê', href: '/personnel-reports' },
-        { label: 'Hàng đợi Phê duyệt Tập trung', href: '/review', count: pendingTotal },
+        { label: 'Trung tâm Báo cáo & Thống kê', href: '/personnel-reports' },
+        { label: 'Quyết định & Biến động nhân sự', href: '/personnel', count: pendingTotal },
         { label: 'Tài liệu & Quy định Nội bộ', href: '/documents' },
-        { label: 'Không gian Tri thức (Knowledge Base)', href: '/spaces' },
+        { label: 'Cơ cấu Tổ chức & Phòng ban', href: '/admin/org-units' },
       ],
     },
   ];
@@ -174,21 +174,20 @@ export default function FrappeHrmsDeskDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         <NumberCard
           title="Tổng Nhân sự"
-          value={hr ? String(hr.totalEmployees) : '48'}
+          value={hr ? String(hr.totalEmployees) : '—'}
           subtitle="100% hồ sơ đã định danh"
           icon={Users}
-          trend={{ value: '+4', isPositive: true, label: 'tháng này' }}
         />
         <NumberCard
           title="Có mặt hôm nay"
-          value={hr ? String(hr.presentToday) : '45'}
+          value={hr ? String(hr.presentToday) : '—'}
           subtitle={hr && hr.onLeaveToday > 0 ? `${hr.onLeaveToday} người nghỉ phép` : 'Tất cả đúng giờ'}
           icon={ShieldCheck}
-          trend={{ value: '96.2%', isPositive: true, label: 'chuyên cần' }}
+          trend={hr ? { value: `${hr.totalEmployees > 0 ? ((hr.presentToday / hr.totalEmployees) * 100).toFixed(1) : 0}%`, isPositive: true, label: 'chuyên cần' } : undefined}
         />
         <NumberCard
           title="Quỹ lương chu kỳ"
-          value={latestRun ? `${(latestRun.totalNetPay / 1_000_000).toFixed(1)} Tr` : '1.28 Tỷ'}
+          value={latestRun ? `${(latestRun.totalNetPay / 1_000_000).toFixed(1)} Tr` : '—'}
           subtitle="Bảng lương chu kỳ gần nhất"
           icon={Wallet}
         />

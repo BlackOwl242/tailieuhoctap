@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
+  Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
@@ -132,6 +132,96 @@ export class HrmsTrainingService {
     return res;
   }
 
+  async updateProgram(actorId: string, id: string, dto: Partial<CreateTrainingProgramDto> & { status?: string }) {
+    const prog = await this.prisma.hrmsTrainingProgram.findUnique({ where: { id } });
+    if (!prog) throw new NotFoundException('Không tìm thấy khóa đào tạo');
+
+    const res = await this.prisma.hrmsTrainingProgram.update({
+      where: { id },
+      data: {
+        ...(dto.name && { name: dto.name }),
+        ...(dto.trainerName && { trainerName: dto.trainerName }),
+        ...(dto.location !== undefined && { location: dto.location }),
+        ...(dto.startDate && { startDate: new Date(dto.startDate) }),
+        ...(dto.endDate && { endDate: new Date(dto.endDate) }),
+        ...(dto.maxParticipants && { maxParticipants: dto.maxParticipants }),
+        ...(dto.description !== undefined && { description: dto.description }),
+        ...(dto.status && { status: dto.status }),
+      },
+    });
+
+    await this.audit.log({
+      actorId,
+      action: 'UPDATE_TRAINING_PROGRAM',
+      targetType: 'HrmsTrainingProgram',
+      targetId: id,
+      description: `Cập nhật khóa đào tạo: ${res.name}`,
+    });
+
+    return res;
+  }
+
+  async deleteProgram(actorId: string, id: string) {
+    const prog = await this.prisma.hrmsTrainingProgram.findUnique({ where: { id } });
+    if (!prog) throw new NotFoundException('Không tìm thấy khóa đào tạo');
+
+    await this.prisma.hrmsTrainingProgram.delete({ where: { id } });
+
+    await this.audit.log({
+      actorId,
+      action: 'DELETE_TRAINING_PROGRAM',
+      targetType: 'HrmsTrainingProgram',
+      targetId: id,
+      description: `Xóa khóa đào tạo: ${prog.name}`,
+    });
+
+    return { success: true, message: 'Đã xóa khóa đào tạo thành công' };
+  }
+
+  async updateGrievanceStatus(actorId: string, id: string, status: GrievanceStatus, resolution?: string) {
+    const gr = await this.prisma.hrmsGrievance.findUnique({ where: { id } });
+    if (!gr) throw new NotFoundException('Không tìm thấy kiến nghị');
+
+    const updateData: Record<string, unknown> = { status };
+    if (resolution !== undefined) updateData.resolution = resolution;
+    if (status === GrievanceStatus.RESOLVED || status === GrievanceStatus.DISMISSED) {
+      updateData.resolvedBy = actorId;
+      updateData.resolvedAt = new Date();
+    }
+
+    const res = await this.prisma.hrmsGrievance.update({
+      where: { id },
+      data: updateData,
+    });
+
+    await this.audit.log({
+      actorId,
+      action: 'UPDATE_GRIEVANCE_STATUS',
+      targetType: 'HrmsGrievance',
+      targetId: id,
+      description: `Cập nhật trạng thái kiến nghị ${gr.subject} -> ${status}`,
+    });
+
+    return res;
+  }
+
+  async deleteGrievance(actorId: string, id: string) {
+    const gr = await this.prisma.hrmsGrievance.findUnique({ where: { id } });
+    if (!gr) throw new NotFoundException('Không tìm thấy kiến nghị');
+
+    await this.prisma.hrmsGrievance.delete({ where: { id } });
+
+    await this.audit.log({
+      actorId,
+      action: 'DELETE_GRIEVANCE',
+      targetType: 'HrmsGrievance',
+      targetId: id,
+      description: `Xóa kiến nghị: ${gr.subject}`,
+    });
+
+    return { success: true, message: 'Đã xóa kiến nghị thành công' };
+  }
+
   async resolveGrievance(actorId: string, id: string, resolution: string) {
     const gr = await this.prisma.hrmsGrievance.findUnique({ where: { id } });
     if (!gr) throw new NotFoundException('Không tìm thấy khiếu nại');
@@ -174,6 +264,16 @@ export class HrmsTrainingController {
     return this.service.createProgram('system', dto);
   }
 
+  @Patch('programs/:id')
+  updateProgram(@Param('id') id: string, @Body() dto: Partial<CreateTrainingProgramDto> & { status?: string }) {
+    return this.service.updateProgram('system', id, dto);
+  }
+
+  @Delete('programs/:id')
+  deleteProgram(@Param('id') id: string) {
+    return this.service.deleteProgram('system', id);
+  }
+
   @Get('grievances')
   listGrievances(@Query('userId') userId?: string, @Query('status') status?: GrievanceStatus) {
     return this.service.listGrievances(userId, status);
@@ -184,9 +284,23 @@ export class HrmsTrainingController {
     return this.service.createGrievance('system', dto);
   }
 
+  @Patch('grievances/:id/status')
+  updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: GrievanceStatus,
+    @Body('resolution') resolution?: string,
+  ) {
+    return this.service.updateGrievanceStatus('system', id, status, resolution);
+  }
+
   @Patch('grievances/:id/resolve')
   resolve(@Param('id') id: string, @Body('resolution') resolution: string) {
     return this.service.resolveGrievance('system', id, resolution);
+  }
+
+  @Delete('grievances/:id')
+  deleteGrievance(@Param('id') id: string) {
+    return this.service.deleteGrievance('system', id);
   }
 }
 

@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
+  Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
@@ -239,6 +239,100 @@ export class HrmsExpensesService {
 
     return res;
   }
+
+  async deleteClaim(actorId: string, id: string) {
+    const claim = await this.prisma.hrmsExpenseClaim.findUnique({ where: { id } });
+    if (!claim) throw new NotFoundException('Không tìm thấy bảng kê chi phí');
+
+    const res = await this.prisma.hrmsExpenseClaim.delete({ where: { id } });
+
+    await this.audit.log({
+      actorId,
+      action: 'DELETE_EXPENSE_CLAIM',
+      targetType: 'HrmsExpenseClaim',
+      targetId: id,
+      description: `Xóa bảng kê chi phí: ${claim.title}`,
+    });
+
+    return res;
+  }
+
+  async updateTravelRequestStatus(actorId: string, id: string, status: ClaimStatus) {
+    const travel = await this.prisma.hrmsTravelRequest.findUnique({ where: { id } });
+    if (!travel) throw new NotFoundException('Không tìm thấy chuyến công tác');
+
+    const res = await this.prisma.hrmsTravelRequest.update({
+      where: { id },
+      data: { status },
+    });
+
+    await this.audit.log({
+      actorId,
+      action: 'UPDATE_TRAVEL_STATUS',
+      targetType: 'HrmsTravelRequest',
+      targetId: id,
+      description: `Cập nhật trạng thái công tác [${status}] cho ${travel.purpose}`,
+    });
+
+    return res;
+  }
+
+  async deleteTravelRequest(actorId: string, id: string) {
+    const travel = await this.prisma.hrmsTravelRequest.findUnique({ where: { id } });
+    if (!travel) throw new NotFoundException('Không tìm thấy chuyến công tác');
+
+    const res = await this.prisma.hrmsTravelRequest.delete({ where: { id } });
+
+    await this.audit.log({
+      actorId,
+      action: 'DELETE_TRAVEL_REQUEST',
+      targetType: 'HrmsTravelRequest',
+      targetId: id,
+      description: `Xóa đề xuất công tác: ${travel.purpose}`,
+    });
+
+    return res;
+  }
+
+  async updateAdvanceStatus(actorId: string, id: string, status: ClaimStatus) {
+    const adv = await this.prisma.hrmsEmployeeAdvance.findUnique({ where: { id } });
+    if (!adv) throw new NotFoundException('Không tìm thấy đề xuất tạm ứng');
+
+    const res = await this.prisma.hrmsEmployeeAdvance.update({
+      where: { id },
+      data: {
+        status,
+        disbursedAt: status === ClaimStatus.APPROVED || status === ClaimStatus.PAID ? new Date() : undefined,
+      },
+    });
+
+    await this.audit.log({
+      actorId,
+      action: 'UPDATE_ADVANCE_STATUS',
+      targetType: 'HrmsEmployeeAdvance',
+      targetId: id,
+      description: `Cập nhật trạng thái tạm ứng [${status}] cho ${adv.purpose}`,
+    });
+
+    return res;
+  }
+
+  async deleteAdvance(actorId: string, id: string) {
+    const adv = await this.prisma.hrmsEmployeeAdvance.findUnique({ where: { id } });
+    if (!adv) throw new NotFoundException('Không tìm thấy đề xuất tạm ứng');
+
+    const res = await this.prisma.hrmsEmployeeAdvance.delete({ where: { id } });
+
+    await this.audit.log({
+      actorId,
+      action: 'DELETE_ADVANCE',
+      targetType: 'HrmsEmployeeAdvance',
+      targetId: id,
+      description: `Xóa đề xuất tạm ứng: ${adv.purpose}`,
+    });
+
+    return res;
+  }
 }
 
 @ApiTags('HRMS - Expenses & Travel Claims')
@@ -257,6 +351,16 @@ export class HrmsExpensesController {
     return this.service.createTravelRequest('system', dto);
   }
 
+  @Patch('travel-requests/:id/status')
+  updateTravelRequestStatus(@Param('id') id: string, @Body('status') status: ClaimStatus) {
+    return this.service.updateTravelRequestStatus('system', id, status);
+  }
+
+  @Delete('travel-requests/:id')
+  deleteTravelRequest(@Param('id') id: string) {
+    return this.service.deleteTravelRequest('system', id);
+  }
+
   @Get('claims')
   listClaims(@Query('userId') userId?: string, @Query('status') status?: ClaimStatus) {
     return this.service.listClaims(userId, status);
@@ -272,6 +376,11 @@ export class HrmsExpensesController {
     return this.service.updateClaimStatus('system', id, status);
   }
 
+  @Delete('claims/:id')
+  deleteClaim(@Param('id') id: string) {
+    return this.service.deleteClaim('system', id);
+  }
+
   @Get('advances')
   listAdvances(@Query('userId') userId?: string) {
     return this.service.listAdvances(userId);
@@ -280,6 +389,16 @@ export class HrmsExpensesController {
   @Post('advances')
   createAdvance(@Body() dto: CreateAdvanceDto) {
     return this.service.createAdvance('system', dto);
+  }
+
+  @Patch('advances/:id/status')
+  updateAdvanceStatus(@Param('id') id: string, @Body('status') status: ClaimStatus) {
+    return this.service.updateAdvanceStatus('system', id, status);
+  }
+
+  @Delete('advances/:id')
+  deleteAdvance(@Param('id') id: string) {
+    return this.service.deleteAdvance('system', id);
   }
 }
 

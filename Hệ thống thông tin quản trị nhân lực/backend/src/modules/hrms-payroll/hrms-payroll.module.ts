@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Get, Injectable, Module, NotFoundException, Param, Post, Query,
+  Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsDateString, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
@@ -106,6 +106,41 @@ export class HrmsPayrollService {
     return res;
   }
 
+  async updateComponent(actorId: string, id: string, dto: Partial<CreateComponentDto>) {
+    const comp = await this.prisma.hrmsSalaryComponent.findUnique({ where: { id } });
+    if (!comp) throw new NotFoundException('Không tìm thấy thành phần lương');
+
+    const res = await this.prisma.hrmsSalaryComponent.update({
+      where: { id },
+      data: dto,
+    });
+
+    await this.audit.log({
+      actorId,
+      action: 'UPDATE',
+      targetType: 'HrmsSalaryComponent',
+      targetId: id,
+      description: `Cập nhật thành phần lương: [${res.code}] ${res.name}`,
+    });
+    return res;
+  }
+
+  async deleteComponent(actorId: string, id: string) {
+    const comp = await this.prisma.hrmsSalaryComponent.findUnique({ where: { id } });
+    if (!comp) throw new NotFoundException('Không tìm thấy thành phần lương');
+
+    await this.prisma.hrmsSalaryComponent.delete({ where: { id } });
+
+    await this.audit.log({
+      actorId,
+      action: 'DELETE',
+      targetType: 'HrmsSalaryComponent',
+      targetId: id,
+      description: `Xóa thành phần lương: [${comp.code}] ${comp.name}`,
+    });
+    return { success: true, message: 'Đã xóa thành phần lương thành công' };
+  }
+
   async listStructures() {
     return this.prisma.hrmsSalaryStructure.findMany({
       include: {
@@ -176,8 +211,42 @@ export class HrmsPayrollService {
   async listPayrollRuns() {
     return this.prisma.hrmsPayrollRun.findMany({
       orderBy: { createdAt: 'desc' },
-      include: { _count: { select: { slips: true } } },
+      include: {
+        slips: {
+          orderBy: { employeeName: 'asc' },
+        },
+        _count: { select: { slips: true } },
+      },
     });
+  }
+
+  async getPayrollRun(id: string) {
+    const run = await this.prisma.hrmsPayrollRun.findUnique({
+      where: { id },
+      include: {
+        slips: {
+          orderBy: { employeeName: 'asc' },
+        },
+      },
+    });
+    if (!run) throw new NotFoundException('Không tìm thấy bảng lương');
+    return run;
+  }
+
+  async deletePayrollRun(actorId: string, id: string) {
+    const run = await this.prisma.hrmsPayrollRun.findUnique({ where: { id } });
+    if (!run) throw new NotFoundException('Không tìm thấy bảng lương');
+
+    await this.prisma.hrmsPayrollRun.delete({ where: { id } });
+
+    await this.audit.log({
+      actorId,
+      action: 'DELETE',
+      targetType: 'HrmsPayrollRun',
+      targetId: id,
+      description: `Xóa bảng lương: ${run.periodName}`,
+    });
+    return { success: true, message: 'Đã xóa bảng lương thành công' };
   }
 
   async createPayrollRun(actorId: string, dto: CreatePayrollRunDto) {
@@ -306,6 +375,16 @@ export class HrmsPayrollController {
     return this.service.createComponent('system', dto);
   }
 
+  @Patch('components/:id')
+  updateComponent(@Param('id') id: string, @Body() dto: Partial<CreateComponentDto>) {
+    return this.service.updateComponent('system', id, dto);
+  }
+
+  @Delete('components/:id')
+  deleteComponent(@Param('id') id: string) {
+    return this.service.deleteComponent('system', id);
+  }
+
   @Get('structures')
   listStructures() {
     return this.service.listStructures();
@@ -324,6 +403,16 @@ export class HrmsPayrollController {
   @Get('runs')
   listRuns() {
     return this.service.listPayrollRuns();
+  }
+
+  @Get('runs/:id')
+  getRun(@Param('id') id: string) {
+    return this.service.getPayrollRun(id);
+  }
+
+  @Delete('runs/:id')
+  deleteRun(@Param('id') id: string) {
+    return this.service.deletePayrollRun('system', id);
   }
 
   @Post('runs')

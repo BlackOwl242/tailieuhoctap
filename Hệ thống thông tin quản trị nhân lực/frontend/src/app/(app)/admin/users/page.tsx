@@ -25,21 +25,34 @@ export default function AdminUsersPage() {
   const qc = useQueryClient();
   const toast = useToast();
   const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({ email: '', password: '', fullName: '', roleCode: 'USER' });
+  const [form, setForm] = useState({ email: '', password: '', fullName: '', roleCode: 'USER', jobTitle: '', orgUnitId: '' });
 
   const q = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => (await api.get<{ items: UserRow[] }>('/users')).data.items,
   });
 
+  const orgUnitsQ = useQuery({
+    queryKey: ['org-units'],
+    queryFn: async () => (await api.get<{ id: string; name: string; code: string }[]>('/org-units')).data,
+  });
+
   const create = useMutation({
     mutationFn: async () =>
-      api.post('/users', { email: form.email, password: form.password, fullName: form.fullName, roleCodes: [form.roleCode] }),
+      api.post('/users', {
+        email: form.email,
+        password: form.password,
+        fullName: form.fullName,
+        jobTitle: form.jobTitle || undefined,
+        orgUnitId: form.orgUnitId || undefined,
+        roleCodes: [form.roleCode],
+      }),
     onSuccess: () => {
       toast('Đã tạo người dùng', 'success');
       setShowCreate(false);
-      setForm({ email: '', password: '', fullName: '', roleCode: 'USER' });
+      setForm({ email: '', password: '', fullName: '', roleCode: 'USER', jobTitle: '', orgUnitId: '' });
       qc.invalidateQueries({ queryKey: ['admin-users'] });
+      qc.invalidateQueries({ queryKey: ['employees'] });
     },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
@@ -135,6 +148,15 @@ export default function AdminUsersPage() {
               <option value="KM_MANAGER">Quản lý nội dung</option>
               <option value="ADMIN">Quản trị viên</option>
             </Select></div>
+          <div className="space-y-1.5"><Label>Đơn vị công tác</Label>
+            <Select value={form.orgUnitId} onChange={(e) => setForm({ ...form, orgUnitId: e.target.value })}>
+              <option value="">— Chưa phân bổ —</option>
+              {(orgUnitsQ.data ?? []).map((u) => (
+                <option key={u.id} value={u.id}>{u.name} ({u.code})</option>
+              ))}
+            </Select></div>
+          <div className="space-y-1.5 sm:col-span-2"><Label>Chức danh / Vị trí</Label>
+            <Input placeholder="VD: Chuyên viên Phân tích nghiệp vụ" value={form.jobTitle} onChange={(e) => setForm({ ...form, jobTitle: e.target.value })} /></div>
           <div className="col-span-full flex justify-end gap-2">
             <ModalFooterActions onCancel={() => setShowCreate(false)} pending={create.isPending} confirmLabel="Tạo tài khoản" />
           </div>

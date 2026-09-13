@@ -321,11 +321,20 @@ export class PersonnelProfilesService {
     return this.getProfile(userId);
   }
 
+  private async getOrCreateProfile(userId: string) {
+    let profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
+    if (!profile) {
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (!user) throw new NotFoundException('Người dùng không tồn tại');
+      profile = await this.prisma.personnelComprehensiveProfile.create({ data: { userId } });
+    }
+    return profile;
+  }
+
   // --- Quản lý 8 Quá trình con ---
 
   async addSalaryHistory(userId: string, dto: CreateSalaryHistoryDto) {
-    const profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
-    if (!profile) throw new NotFoundException('Hồ sơ nhân sự chưa được khởi tạo');
+    const profile = await this.getOrCreateProfile(userId);
 
     return this.prisma.personnelSalaryHistory.create({
       data: {
@@ -349,8 +358,7 @@ export class PersonnelProfilesService {
   }
 
   async addAppointment(userId: string, dto: CreateAppointmentDto) {
-    const profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
-    if (!profile) throw new NotFoundException('Hồ sơ nhân sự chưa được khởi tạo');
+    const profile = await this.getOrCreateProfile(userId);
 
     return this.prisma.personnelAppointment.create({
       data: {
@@ -373,8 +381,7 @@ export class PersonnelProfilesService {
   }
 
   async addEducation(userId: string, dto: CreateEducationDto) {
-    const profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
-    if (!profile) throw new NotFoundException('Hồ sơ nhân sự chưa được khởi tạo');
+    const profile = await this.getOrCreateProfile(userId);
 
     return this.prisma.personnelEducation.create({
       data: {
@@ -396,8 +403,7 @@ export class PersonnelProfilesService {
   }
 
   async addWorkHistory(userId: string, dto: CreateWorkHistoryDto) {
-    const profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
-    if (!profile) throw new NotFoundException('Hồ sơ nhân sự chưa được khởi tạo');
+    const profile = await this.getOrCreateProfile(userId);
 
     return this.prisma.personnelWorkHistory.create({
       data: {
@@ -417,8 +423,7 @@ export class PersonnelProfilesService {
   }
 
   async addRewardDiscipline(userId: string, dto: CreateRewardDisciplineDto) {
-    const profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
-    if (!profile) throw new NotFoundException('Hồ sơ nhân sự chưa được khởi tạo');
+    const profile = await this.getOrCreateProfile(userId);
 
     return this.prisma.personnelRewardDiscipline.create({
       data: {
@@ -438,8 +443,7 @@ export class PersonnelProfilesService {
   }
 
   async addFamilyRelation(userId: string, dto: CreateFamilyRelationDto) {
-    const profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
-    if (!profile) throw new NotFoundException('Hồ sơ nhân sự chưa được khởi tạo');
+    const profile = await this.getOrCreateProfile(userId);
 
     return this.prisma.personnelFamilyRelation.create({
       data: {
@@ -458,8 +462,7 @@ export class PersonnelProfilesService {
   }
 
   async addAppraisal(userId: string, dto: CreateAppraisalDto) {
-    const profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
-    if (!profile) throw new NotFoundException('Hồ sơ nhân sự chưa được khởi tạo');
+    const profile = await this.getOrCreateProfile(userId);
 
     return this.prisma.personnelAppraisal.create({
       data: {
@@ -477,8 +480,7 @@ export class PersonnelProfilesService {
   }
 
   async addSocialActivity(userId: string, dto: CreateSocialActivityDto) {
-    const profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
-    if (!profile) throw new NotFoundException('Hồ sơ nhân sự chưa được khởi tạo');
+    const profile = await this.getOrCreateProfile(userId);
 
     return this.prisma.personnelSocialActivity.create({
       data: {
