@@ -15,6 +15,7 @@ import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/
 import { PageHeader, ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 import { useOrgConfig, isEnterpriseSector } from '@/lib/org-config';
+import { useToast } from '@/components/ui/toaster';
 
 interface PersonnelRankRow {
   code: string;
@@ -136,6 +137,7 @@ export default function SalaryRanksPage() {
   const [mainTab, setMainTab] = useState<'ranks' | 'progression'>(initialTab);
 
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [orgConfig] = useOrgConfig();
   const [viewMode, setViewMode] = useState<'state' | 'enterprise'>(() => {
     return isEnterpriseSector(orgConfig) ? 'enterprise' : 'state';
@@ -172,10 +174,10 @@ export default function SalaryRanksPage() {
       queryClient.invalidateQueries({ queryKey: ['personnel-profiles'] });
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       setSelectedPerson(null);
-      alert('Đã phê duyệt nâng bậc lương thành công!');
+      toast('Đã phê duyệt nâng bậc lương thành công!', 'success');
     },
     onError: (err) => {
-      alert('Lỗi phê duyệt: ' + errorMessage(err));
+      toast('Lỗi phê duyệt: ' + errorMessage(err), 'error');
     },
   });
 

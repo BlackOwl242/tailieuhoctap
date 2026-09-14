@@ -217,7 +217,7 @@ export default function MasterCatalogsPage() {
   const handleSaveModal = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formCode.trim() || !formName.trim()) {
-      alert('Vui lòng nhập đầy đủ Mã và Tên danh mục');
+      toast('Vui lòng nhập đầy đủ Mã và Tên danh mục', 'error');
       return;
     }
 

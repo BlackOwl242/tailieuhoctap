@@ -12,6 +12,7 @@ import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
 import { useAuthStore } from '@/lib/auth-store';
+import { useToast } from '@/components/ui/toaster';
 
 interface LoanItem {
   id: string;
@@ -32,6 +33,7 @@ interface LoanItem {
 
 export default function LoansPage() {
   const queryClient = useQueryClient();
+  const toast = useToast();
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState<'all' | 'calculator'>('all');
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
@@ -69,6 +71,10 @@ export default function LoansPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hrms-loans'] });
       setIsApplyModalOpen(false);
+      toast('Đã đăng ký khoản vay phúc lợi thành công', 'success');
+    },
+    onError: (err) => {
+      toast(errorMessage(err), 'error');
     },
   });
 
@@ -76,8 +82,12 @@ export default function LoansPage() {
     mutationFn: async ({ id, status, decisionNote }: { id: string; status: 'APPROVED' | 'REJECTED'; decisionNote?: string }) => {
       return (await api.patch(`/hrms/loans/${id}/decide`, { status, decisionNote })).data;
     },
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['hrms-loans'] });
+      toast(vars.status === 'APPROVED' ? 'Đã phê duyệt giải ngân khoản vay' : 'Đã từ chối khoản vay', 'success');
+    },
+    onError: (err) => {
+      toast(errorMessage(err), 'error');
     },
   });
 
@@ -147,23 +157,23 @@ export default function LoansPage() {
       </div>
 
       {/* Tabs Switcher */}
-      <div className="flex items-center gap-2 border-b border-border/60 pb-3">
+      <div className="flex items-center gap-1 border-b border-border">
         <button
           onClick={() => setActiveTab('all')}
-          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+          className={`px-3 py-2 text-xs font-semibold border-b-2 transition-colors ${
             activeTab === 'all'
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+              ? 'border-foreground text-foreground'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           Danh sách Khoản vay ({filteredLoans.length})
         </button>
         <button
           onClick={() => setActiveTab('calculator')}
-          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+          className={`px-3 py-2 text-xs font-semibold border-b-2 transition-colors flex items-center gap-1.5 ${
             activeTab === 'calculator'
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+              ? 'border-foreground text-foreground'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           <Calculator className="h-3.5 w-3.5" />
@@ -182,7 +192,7 @@ export default function LoansPage() {
                 placeholder="Tìm theo tên nhân viên, mục đích vay..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-border/80 bg-card text-xs text-foreground placeholder:text-muted-foreground outline-hidden focus:border-primary"
+                className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-border bg-card text-xs text-foreground placeholder:text-muted-foreground outline-hidden focus:border-primary"
               />
             </div>
           </div>
@@ -194,7 +204,7 @@ export default function LoansPage() {
               description="Hiện tại không có khoản vay hay đề xuất tạm ứng nào trong hệ thống."
             />
           ) : (
-            <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-xs">
+            <div className="rounded-lg border border-border bg-card overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
@@ -286,7 +296,7 @@ export default function LoansPage() {
       ) : (
         /* Loan Simulator Card */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
-          <div className="rounded-2xl border border-border/80 bg-card p-5 shadow-xs space-y-4">
+          <div className="rounded-lg border border-border bg-card p-5 space-y-4">
             <h3 className="font-bold text-sm text-foreground uppercase tracking-wider flex items-center gap-2">
               <Calculator className="h-4 w-4 text-primary" />
               Công Cụ Mô Phỏng Trả Góp
@@ -299,7 +309,7 @@ export default function LoansPage() {
                 step={1000000}
                 value={simAmount}
                 onChange={(e) => setSimAmount(Number(e.target.value))}
-                className="w-full p-2.5 rounded-xl border border-border bg-muted/20 text-sm font-bold text-foreground outline-hidden focus:border-primary"
+                className="w-full p-2.5 rounded-lg border border-border bg-background text-sm font-bold text-foreground outline-hidden focus:border-primary"
               />
             </div>
 
@@ -308,7 +318,7 @@ export default function LoansPage() {
               <select
                 value={simMonths}
                 onChange={(e) => setSimMonths(Number(e.target.value))}
-                className="w-full p-2.5 rounded-xl border border-border bg-muted/20 text-xs font-medium text-foreground outline-hidden focus:border-primary"
+                className="w-full p-2.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground outline-hidden focus:border-primary"
               >
                 <option value={3}>3 tháng</option>
                 <option value={6}>6 tháng</option>
@@ -325,12 +335,12 @@ export default function LoansPage() {
                 step={1000000}
                 value={simSalary}
                 onChange={(e) => setSimSalary(Number(e.target.value))}
-                className="w-full p-2.5 rounded-xl border border-border bg-muted/20 text-sm font-bold text-foreground outline-hidden focus:border-primary"
+                className="w-full p-2.5 rounded-lg border border-border bg-background text-sm font-bold text-foreground outline-hidden focus:border-primary"
               />
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border/80 bg-gradient-to-br from-card to-muted/30 p-5 shadow-xs flex flex-col justify-between space-y-4">
+          <div className="rounded-lg border border-border bg-card p-5 flex flex-col justify-between space-y-4">
             <div>
               <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Kết Quả Khấu Trừ Dự Kiến
@@ -344,7 +354,7 @@ export default function LoansPage() {
                 </div>
                 <div className="flex items-center justify-between border-b border-border/50 pb-2">
                   <span className="text-xs text-muted-foreground">Tỷ lệ trên lương thực lĩnh:</span>
-                  <span className={`text-sm font-bold ${isSafeDeduction ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  <span className={`text-sm font-bold ${isSafeDeduction ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                     {simDeductionPercent}%
                   </span>
                 </div>
@@ -352,10 +362,10 @@ export default function LoansPage() {
             </div>
 
             <div
-              className={`p-3.5 rounded-xl text-xs flex items-start gap-2.5 ${
+              className={`p-3.5 rounded-lg text-xs flex items-start gap-2.5 border ${
                 isSafeDeduction
-                  ? 'bg-emerald-50 text-emerald-900 border border-emerald-300'
-                  : 'bg-rose-50 text-rose-900 border border-rose-300'
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20'
+                  : 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20'
               }`}
             >
               <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5" />
@@ -378,8 +388,8 @@ export default function LoansPage() {
 
       {/* Modal Đăng Ký Vay */}
       {isApplyModalOpen && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4">
             <h3 className="text-base font-bold text-foreground">Đăng Ký Vay Vốn Phúc Lợi Nội Bộ</h3>
 
             <div>
@@ -387,7 +397,7 @@ export default function LoansPage() {
               <select
                 value={loanType}
                 onChange={(e) => setLoanType(e.target.value)}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs font-medium text-foreground outline-hidden focus:border-primary"
+                className="w-full p-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground outline-hidden focus:border-primary"
               >
                 <option value="Tạm ứng mua thiết bị làm việc">Tạm ứng mua thiết bị làm việc</option>
                 <option value="Vay hỗ trợ nhà ở / phương tiện">Vay hỗ trợ nhà ở / phương tiện</option>
@@ -403,7 +413,7 @@ export default function LoansPage() {
                 step={1000000}
                 value={principalAmount}
                 onChange={(e) => setPrincipalAmount(Number(e.target.value))}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs font-bold text-foreground outline-hidden focus:border-primary"
+                className="w-full p-2 rounded-lg border border-border bg-background text-xs font-bold text-foreground outline-hidden focus:border-primary"
               />
             </div>
 
@@ -412,7 +422,7 @@ export default function LoansPage() {
               <select
                 value={termMonths}
                 onChange={(e) => setTermMonths(Number(e.target.value))}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs font-medium text-foreground outline-hidden focus:border-primary"
+                className="w-full p-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground outline-hidden focus:border-primary"
               >
                 <option value={6}>6 tháng (Trừ {(principalAmount / 6).toLocaleString('vi-VN')} đ/tháng)</option>
                 <option value={12}>12 tháng (Trừ {(principalAmount / 12).toLocaleString('vi-VN')} đ/tháng)</option>
@@ -426,14 +436,14 @@ export default function LoansPage() {
                 rows={2}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs text-foreground outline-hidden focus:border-primary"
+                className="w-full p-2 rounded-lg border border-border bg-background text-xs text-foreground outline-hidden focus:border-primary"
               />
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setIsApplyModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted"
+                className="px-3.5 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:bg-muted"
               >
                 Hủy bỏ
               </button>
@@ -449,7 +459,7 @@ export default function LoansPage() {
                     reason,
                   });
                 }}
-                className="px-4 py-2 rounded-xl bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                className="px-3.5 py-1.5 rounded-lg bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Gửi Hồ Sơ Vay
               </button>

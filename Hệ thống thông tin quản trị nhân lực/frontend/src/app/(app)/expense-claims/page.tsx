@@ -84,14 +84,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   OTHER: 'Chi phí khác',
 };
 
-const STATUS_BADGES: Record<string, { label: string; bg: string; text: string; border: string }> = {
-  PENDING: { label: 'Chờ duyệt', bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-300' },
-  APPROVED: { label: 'Đã duyệt', bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300' },
-  PAID: { label: 'Đã giải ngân', bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-300' },
-  REJECTED: { label: 'Từ chối', bg: 'bg-rose-50', text: 'text-rose-800', border: 'border-rose-300' },
-  COMPLETED: { label: 'Hoàn tất', bg: 'bg-teal-50', text: 'text-teal-800', border: 'border-teal-300' },
-  DRAFT: { label: 'Bản nháp', bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-300' },
-  CANCELLED: { label: 'Đã hủy', bg: 'bg-zinc-50', text: 'text-zinc-600', border: 'border-zinc-300' },
+const STATUS_BADGES: Record<string, { label: string; dot: string; bg: string; text: string; border: string }> = {
+  PENDING: { label: 'Chờ duyệt', dot: 'bg-amber-500', bg: 'bg-amber-500/10', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-500/20' },
+  APPROVED: { label: 'Đã duyệt', dot: 'bg-emerald-500', bg: 'bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-500/20' },
+  PAID: { label: 'Đã giải ngân', dot: 'bg-blue-500', bg: 'bg-blue-500/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-500/20' },
+  REJECTED: { label: 'Từ chối', dot: 'bg-rose-500', bg: 'bg-rose-500/10', text: 'text-rose-700 dark:text-rose-400', border: 'border-rose-500/20' },
+  COMPLETED: { label: 'Hoàn tất', dot: 'bg-teal-500', bg: 'bg-teal-500/10', text: 'text-teal-700 dark:text-teal-400', border: 'border-teal-500/20' },
+  DRAFT: { label: 'Bản nháp', dot: 'bg-slate-400', bg: 'bg-slate-500/10', text: 'text-slate-700 dark:text-slate-400', border: 'border-slate-500/20' },
+  CANCELLED: { label: 'Đã hủy', dot: 'bg-zinc-400', bg: 'bg-zinc-500/10', text: 'text-zinc-600 dark:text-zinc-400', border: 'border-zinc-500/20' },
 };
 
 function formatSafeDate(dateStr?: string | Date | null): string {
@@ -426,9 +426,10 @@ export default function ExpenseClaimsPage() {
       header: 'Trạng thái',
       sortable: true,
       render: (r) => {
-        const badge = STATUS_BADGES[r.status] || { label: r.status, bg: 'bg-muted', text: 'text-foreground', border: 'border-border' };
+        const badge = STATUS_BADGES[r.status] || { label: r.status, dot: 'bg-muted-foreground' };
         return (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.bg} ${badge.text} ${badge.border}`}>
+          <span className="inline-flex items-center gap-1.5 text-xs text-foreground font-medium">
+            <span className={`h-1.5 w-1.5 rounded-full ${badge.dot || 'bg-muted-foreground'}`} />
             {badge.label}
           </span>
         );
@@ -494,9 +495,10 @@ export default function ExpenseClaimsPage() {
       header: 'Trạng thái',
       sortable: true,
       render: (r) => {
-        const badge = STATUS_BADGES[r.status] || { label: r.status, bg: 'bg-muted', text: 'text-foreground', border: 'border-border' };
+        const badge = STATUS_BADGES[r.status] || { label: r.status, dot: 'bg-muted-foreground' };
         return (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.bg} ${badge.text} ${badge.border}`}>
+          <span className="inline-flex items-center gap-1.5 text-xs text-foreground font-medium">
+            <span className={`h-1.5 w-1.5 rounded-full ${badge.dot || 'bg-muted-foreground'}`} />
             {badge.label}
           </span>
         );
@@ -550,9 +552,10 @@ export default function ExpenseClaimsPage() {
       header: 'Trạng thái',
       sortable: true,
       render: (r) => {
-        const badge = STATUS_BADGES[r.status] || { label: r.status, bg: 'bg-muted', text: 'text-foreground', border: 'border-border' };
+        const badge = STATUS_BADGES[r.status] || { label: r.status, dot: 'bg-muted-foreground' };
         return (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.bg} ${badge.text} ${badge.border}`}>
+          <span className="inline-flex items-center gap-1.5 text-xs text-foreground font-medium">
+            <span className={`h-1.5 w-1.5 rounded-full ${badge.dot || 'bg-muted-foreground'}`} />
             {badge.label}
           </span>
         );
