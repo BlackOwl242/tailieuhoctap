@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import { Badge, Button, Card, Input } from '@/components/ui/primitives';
+import { Badge, Button, Card, Input, Select } from '@/components/ui/primitives';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock, PrintExportDropdown } from '@/components/ui/print';
@@ -17,6 +17,7 @@ import { exportRowsToExcel } from '@/lib/export';
 import { useOrgConfig, isEnterpriseSector } from '@/lib/org-config';
 import { StateCivilServantProfile } from '@/components/personnel/StateCivilServantProfile';
 import { EnterprisePersonnelProfile } from '@/components/personnel/EnterprisePersonnelProfile';
+import { SearchableEmployeeSelect } from '@/components/personnel/SearchableEmployeeSelect';
 
 export default function PersonnelReportsPage() {
   const searchParams = useSearchParams();
@@ -26,6 +27,13 @@ export default function PersonnelReportsPage() {
   const [activeReport, setActiveReport] = useState<'2c' | 'bieu01' | 'bieu02' | 'bieu03'>('2c');
   const [selectedUserId, setSelectedUserId] = useState<string>(initialUserId || '');
   const [cvMode, setCvMode] = useState<'state' | 'enterprise'>('state');
+
+  useEffect(() => {
+    if (initialUserId) {
+      setSelectedUserId(initialUserId);
+      setActiveReport('2c');
+    }
+  }, [initialUserId]);
 
   // Lấy danh sách nhân viên để chọn in sơ yếu lý lịch 4 trang
   const qEmployees = useQuery({
@@ -111,7 +119,7 @@ export default function PersonnelReportsPage() {
       {activeReport === '2c' && (
         <div className="space-y-6">
           {/* Vùng Bản In Sơ Yếu Lý Lịch Chuẩn A4 */}
-          <div className="print-area font-times max-w-6xl mx-auto text-black">
+          <div className="print-area max-w-6xl mx-auto text-black">
             {q2c.isLoading ? (
               <div className="text-center py-20 text-muted-foreground font-sans bg-card border border-border rounded-2xl shadow-xs">
                 <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
@@ -135,29 +143,24 @@ export default function PersonnelReportsPage() {
                     <div className="flex items-center gap-3 flex-wrap">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-foreground">Nhân sự:</span>
-                        <select
+                        <SearchableEmployeeSelect
+                          employees={employees}
                           value={currentUserId}
-                          onChange={(e) => setSelectedUserId(e.target.value)}
-                          className="h-8.5 rounded-lg border border-input bg-background px-2.5 py-1 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        >
-                          {employees.map((emp) => (
-                            <option key={emp.id} value={emp.id}>
-                              {emp.employeeCode ? `[${emp.employeeCode}] ` : ''}{emp.fullName} - {emp.jobTitle || emp.department || 'Chuyên viên'}
-                            </option>
-                          ))}
-                        </select>
+                          onChange={setSelectedUserId}
+                          className="min-w-[280px]"
+                        />
                       </div>
 
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-foreground">Định dạng:</span>
-                        <select
+                        <Select
                           value={cvMode}
                           onChange={(e) => setCvMode(e.target.value as 'state' | 'enterprise')}
-                          className="h-8.5 rounded-lg border border-input bg-background px-2.5 py-1 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                          className="w-[280px] text-xs"
                         >
                           <option value="state">Mẫu 2C-BNV/2008 (Cơ quan Nhà nước - Trọn bộ 5 trang)</option>
                           <option value="enterprise">Mẫu Doanh nghiệp tư nhân (Hồ sơ trích ngang)</option>
-                        </select>
+                        </Select>
                       </div>
                     </div>
 

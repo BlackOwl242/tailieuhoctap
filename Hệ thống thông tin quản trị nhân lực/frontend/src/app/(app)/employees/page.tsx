@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Eye, FileText, PencilLine, Plus, Sparkles, Users, Award, ShieldCheck,
-  Building2, GraduationCap, Printer,
+  Building2, GraduationCap, Printer, ArrowRightLeft,
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
@@ -397,6 +397,11 @@ export default function EmployeesPage() {
                     icon: Printer,
                     onSelect: () => router.push(`/personnel-reports?userId=${r.id}`),
                   },
+                  {
+                    label: 'Ban hành quyết định (Thuyên chuyển, Bãi nhiệm, Thôi việc...)',
+                    icon: ArrowRightLeft,
+                    onSelect: () => router.push(`/personnel?createFor=${r.id}`),
+                  },
                 ]}
               />
             )}
@@ -461,6 +466,11 @@ export default function EmployeesPage() {
                     label: 'Hồ sơ chi tiết hợp đồng',
                     icon: Eye,
                     onSelect: () => router.push(`/employees/${r.userId}`),
+                  },
+                  {
+                    label: 'Ban hành quyết định (Thuyên chuyển, Bãi nhiệm, Thôi việc...)',
+                    icon: ArrowRightLeft,
+                    onSelect: () => router.push(`/personnel?createFor=${r.userId}`),
                   },
                 ]}
               />

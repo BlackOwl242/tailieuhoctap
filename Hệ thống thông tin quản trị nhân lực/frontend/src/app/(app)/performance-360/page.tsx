@@ -13,7 +13,7 @@ import { formatDate } from '@/lib/utils';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Button, Badge, Input } from '@/components/ui/primitives';
+import { Button, Badge, Input, Select } from '@/components/ui/primitives';
 import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/components/ui/toaster';
 
@@ -326,7 +326,7 @@ export default function Performance360Page() {
               className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/70 transition-colors shadow-2xs"
             >
               <Calendar className="h-3.5 w-3.5 text-primary" />
-              + Khởi Tạo Chu Kỳ
+              Khởi tạo chu kỳ
             </button>
             <button
               onClick={() => {
@@ -340,7 +340,7 @@ export default function Performance360Page() {
               className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/70 transition-colors shadow-2xs"
             >
               <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
-              + Gửi Phản Hồi 360
+              Gửi phản hồi 360
             </button>
             <button
               onClick={() => {
@@ -354,7 +354,7 @@ export default function Performance360Page() {
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-2xs"
             >
               <Plus className="h-3.5 w-3.5" />
-              + Thiết Lập Mục Tiêu KRA
+              Thiết lập mục tiêu KRA
             </button>
           </div>
         }
@@ -434,16 +434,16 @@ export default function Performance360Page() {
         {/* Filters */}
         <div className="flex items-center gap-2 text-xs">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <select
+          <Select
             value={selectedCycleFilter}
             onChange={(e) => setSelectedCycleFilter(e.target.value)}
-            className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground focus:outline-hidden focus:ring-1 focus:ring-primary"
+            className="w-[180px] text-xs font-medium"
           >
             <option value="ALL">Tất cả chu kỳ</option>
             {cycles.map((c) => (
               <option key={c.id} value={c.id}>{c.name} ({c.year})</option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -611,7 +611,7 @@ export default function Performance360Page() {
               </Button>
               <Button size="sm" onClick={() => setIsCycleModalOpen(true)}>
                 <Plus className="w-4 h-4 mr-1.5" />
-                + Tạo Chu Kỳ Mới
+                Tạo chu kỳ mới
               </Button>
             </div>
           </div>
@@ -767,15 +767,15 @@ export default function Performance360Page() {
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="font-medium text-foreground block mb-1">Chu kỳ đánh giá:</label>
-                  <select
+                  <Select
                     value={goalForm.cycleId || cycles[0]?.id}
                     onChange={(e) => setGoalForm({ ...goalForm, cycleId: e.target.value })}
-                    className="w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground"
+                    className="w-full text-xs"
                   >
                     {cycles.map((c) => (
                       <option key={c.id} value={c.id}>{c.name} ({c.year})</option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
                 <div>
                   <label className="font-medium text-foreground block mb-1">Trọng số (%):</label>
@@ -792,7 +792,7 @@ export default function Performance360Page() {
 
               <div>
                 <label className="font-medium text-foreground block mb-1">Chọn Nhân sự thực hiện (Cơ sở dữ liệu):</label>
-                <select
+                <Select
                   value={goalForm.userId}
                   onChange={(e) => {
                     const found = employees.find((emp) => emp.id === e.target.value);
@@ -802,15 +802,17 @@ export default function Performance360Page() {
                       employeeName: found ? found.fullName : '',
                     });
                   }}
-                  className="w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground"
+                  searchable
+                  searchPlaceholder="Tìm mã NV, họ tên cán bộ, chức danh..."
+                  className="text-xs"
                 >
                   <option value="">-- Chọn nhân sự từ hệ thống --</option>
                   {employees.map((emp) => (
                     <option key={emp.id} value={emp.id}>
-                      {emp.fullName} [{emp.employeeCode}] {emp.jobTitle ? `- ${emp.jobTitle}` : ''}
+                      {emp.fullName} {emp.employeeCode ? `[${emp.employeeCode}]` : ''} {emp.jobTitle ? `- ${emp.jobTitle}` : ''}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
@@ -924,23 +926,23 @@ export default function Performance360Page() {
             <div className="space-y-3 text-xs">
               <div>
                 <label className="font-medium text-foreground block mb-1">Kỳ đánh giá:</label>
-                <select
+                <Select
                   value={reviewForm.cycleId || cycles[0]?.id}
                   onChange={(e) => setReviewForm({ ...reviewForm, cycleId: e.target.value })}
-                  className="w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground"
+                  className="w-full text-xs"
                 >
                   {cycles.map((c) => (
                     <option key={c.id} value={c.id}>{c.name} ({c.year})</option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
                 <label className="font-medium text-foreground block mb-1">Nhân sự được đánh giá:</label>
-                <select
+                <Select
                   value={reviewForm.userId}
                   onChange={(e) => setReviewForm({ ...reviewForm, userId: e.target.value })}
-                  className="w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground"
+                  className="w-full text-xs"
                 >
                   <option value="">-- Chọn nhân sự từ hệ thống --</option>
                   {employees.map((emp) => (
@@ -948,7 +950,7 @@ export default function Performance360Page() {
                       {emp.fullName} [{emp.employeeCode}]
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -961,16 +963,16 @@ export default function Performance360Page() {
                 </div>
                 <div>
                   <label className="font-medium text-foreground block mb-1">Mối quan hệ:</label>
-                  <select
+                  <Select
                     value={reviewForm.relationship}
                     onChange={(e) => setReviewForm({ ...reviewForm, relationship: e.target.value })}
-                    className="w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground"
+                    className="w-full text-xs"
                   >
                     <option value="MANAGER">Cấp Quản lý</option>
                     <option value="PEER">Đồng nghiệp</option>
                     <option value="SUBORDINATE">Cấp dưới</option>
                     <option value="SELF">Tự đánh giá</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 
@@ -1025,10 +1027,10 @@ export default function Performance360Page() {
             <div className="space-y-3 text-xs">
               <div>
                 <label className="font-medium text-foreground block mb-1">Chọn Nhân sự cần công nhận kết quả:</label>
-                <select
+                <Select
                   value={syncForm.userId}
                   onChange={(e) => setSyncForm({ ...syncForm, userId: e.target.value })}
-                  className="w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground"
+                  className="w-full text-xs"
                 >
                   <option value="">-- Chọn nhân sự từ hệ thống --</option>
                   {employees.map((emp) => (
@@ -1036,7 +1038,7 @@ export default function Performance360Page() {
                       {emp.fullName} [{emp.employeeCode}]
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -1050,16 +1052,16 @@ export default function Performance360Page() {
                 </div>
                 <div>
                   <label className="font-medium text-foreground block mb-1">Xếp loại chất lượng:</label>
-                  <select
+                  <Select
                     value={syncForm.classification}
                     onChange={(e: any) => setSyncForm({ ...syncForm, classification: e.target.value })}
-                    className="w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground font-bold"
+                    className="w-full text-xs font-bold"
                   >
                     <option value="EXCELLENT">Hoàn thành xuất sắc</option>
                     <option value="GOOD">Hoàn thành tốt</option>
                     <option value="SATISFACTORY">Hoàn thành nhiệm vụ</option>
                     <option value="UNSATISFACTORY">Không hoàn thành</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 

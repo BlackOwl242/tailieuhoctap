@@ -49,6 +49,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
         .enterprise-personnel-profile * {
           color: #000000 !important;
           border-color: #000000 !important;
+          font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
         }
         .enterprise-personnel-profile table {
           border-collapse: collapse !important;

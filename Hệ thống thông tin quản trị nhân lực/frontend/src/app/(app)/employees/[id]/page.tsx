@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, BadgeCheck, FileText, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, FileText, Plus, Printer, Trash2 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
@@ -13,7 +13,6 @@ import { CONTRACT_STATUS_LABEL, CONTRACT_TYPE_LABEL, EMPLOYMENT_STATUS_LABEL, vn
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton, Textarea } from '@/components/ui/primitives';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
-import { PrintButton, PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface ContractRow {
   id: string; contractNo: string; type: keyof typeof CONTRACT_TYPE_LABEL;
@@ -138,13 +137,16 @@ export default function EmployeeDetailPage() {
           <>
             <Link href="/employees"><Button variant="ghost" size="sm"><ArrowLeft className="h-4 w-4" /> Danh sách</Button></Link>
             {isHr ? <Button variant="outline" size="sm" onClick={() => { setProfileForm({}); setProfileOpen(true); }}>Sửa hồ sơ</Button> : null}
-            <PrintButton label="In hồ sơ" />
+            <Link href={`/personnel-reports?userId=${id}`}>
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <Printer className="h-4 w-4" /> In lý lịch cá nhân
+              </Button>
+            </Link>
           </>
         }
       />
 
-      <div className="print-area space-y-stack">
-        <PrintFrame title="PHIẾU HỒ SƠ NHÂN VIÊN" subtitle={`${emp.employeeCode ?? ''} — ${emp.fullName}`} />
+      <div className="space-y-stack">
 
         {/* Thông tin cá nhân */}
         <Card>
@@ -267,7 +269,6 @@ export default function EmployeeDetailPage() {
             ) : null}
           </CardContent>
         </Card>
-        <PrintSignatureBlock leftTitle="Nhân viên khai báo" middleTitle="Chuyên viên hồ sơ" rightTitle="Trưởng phòng HC-NS" />
       </div>
 
       {/* ------------------------------- Modals ------------------------------- */}

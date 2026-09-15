@@ -11,7 +11,7 @@ import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Badge, Button } from '@/components/ui/primitives';
+import { Badge, Button, Select } from '@/components/ui/primitives';
 import { DataTable, DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
@@ -801,10 +801,10 @@ export default function ShiftsPage() {
         <div className="space-y-4 text-xs">
           <div>
             <label className="font-semibold text-foreground">Chọn Cán bộ / Nhân viên *</label>
-            <select
+            <Select
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 w-full text-xs"
             >
               <option value="">-- Chọn nhân viên --</option>
               {rosterData?.users.map((u) => (
@@ -812,15 +812,15 @@ export default function ShiftsPage() {
                   {u.fullName} ({u.employeeCode || 'NV'}) - {u.orgUnit?.name || 'Phòng ban'}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
             <label className="font-semibold text-foreground">Loại ca phân công *</label>
-            <select
+            <Select
               value={selectedShiftId}
               onChange={(e) => setSelectedShiftId(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 w-full text-xs"
             >
               <option value="">-- Chọn loại ca --</option>
               {shiftTypes.map((st) => (
@@ -828,7 +828,7 @@ export default function ShiftsPage() {
                   {st.name} ({st.startTime} - {st.endTime})
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-3">

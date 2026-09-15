@@ -49,11 +49,11 @@ export const CANDIDATE_STAGE_LABEL: Record<string, string> = {
 };
 
 export const ACTION_TYPE_LABEL: Record<string, string> = {
-  TRANSFER: 'Thuyên chuyển',
-  SALARY_ADJUST: 'Điều chỉnh lương',
-  AWARD: 'Khen thưởng',
-  DISCIPLINE: 'Kỷ luật',
-  RESIGNATION: 'Thôi việc',
+  TRANSFER: 'Thuyên chuyển · Điều động · Luân chuyển',
+  SALARY_ADJUST: 'Điều chỉnh lương · Nâng ngạch bậc',
+  AWARD: 'Khen thưởng · Biểu dương',
+  DISCIPLINE: 'Kỷ luật · Bãi nhiệm · Cách chức',
+  RESIGNATION: 'Thôi việc · Nghỉ hưu · Miễn nhiệm',
 };
 
 export const PERF_STATUS_LABEL: Record<string, string> = {

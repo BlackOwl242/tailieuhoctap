@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { OrgPrintConfig } from '@/lib/org-config';
+import { SearchableEmployeeSelect } from './SearchableEmployeeSelect';
+import { Select } from '@/components/ui/primitives';
 
 interface StateCivilServantProfileProps {
   data: any;
@@ -200,7 +202,7 @@ export function StateCivilServantProfile({
   ];
 
   return (
-    <div className="huha-preview-wrapper font-times text-black">
+    <div className="huha-preview-wrapper">
       {/* ========================================================================= */}
       {/* THANH ĐIỀU KHIỂN XEM BẢN IN HIỆN ĐẠI & ĐỒNG BỘ VỚI TOÀN BỘ HỆ THỐNG */}
       {/* ========================================================================= */}
@@ -208,24 +210,18 @@ export function StateCivilServantProfile({
         {/* Dòng 1: Chọn nhân sự, Định dạng & Nút In */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pb-3 border-b border-border/60">
           <div className="flex flex-wrap items-center gap-3 flex-1">
-            {/* Chọn nhân viên */}
+            {/* Chọn nhân viên: Vừa tìm kiếm vừa chọn dropdown */}
             {employees.length > 0 && onSelectUser && (
               <div className="flex items-center gap-2 flex-1 min-w-[280px]">
                 <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
                   <User className="w-4 h-4" />
                 </div>
                 <div className="flex-1">
-                  <select
+                  <SearchableEmployeeSelect
+                    employees={employees}
                     value={currentUserId}
-                    onChange={(e) => onSelectUser(e.target.value)}
-                    className="w-full h-8.5 rounded-lg border border-input bg-background px-2.5 py-1 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-2xs"
-                  >
-                    {employees.map((emp) => (
-                      <option key={emp.id} value={emp.id}>
-                        {emp.employeeCode ? `[${emp.employeeCode}] ` : ''}{emp.fullName ? emp.fullName.replace(/\s*\([^)]*\)/g, '').trim() : ''} — {emp.jobTitle || emp.department || 'Chuyên viên'}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={onSelectUser}
+                  />
                 </div>
               </div>
             )}
@@ -236,14 +232,14 @@ export function StateCivilServantProfile({
                 <div className="p-1.5 rounded-lg bg-muted text-muted-foreground shrink-0">
                   <FileText className="w-4 h-4" />
                 </div>
-                <select
+                <Select
                   value={cvMode}
                   onChange={(e) => onSelectCvMode(e.target.value as 'state' | 'enterprise')}
-                  className="h-8.5 rounded-lg border border-input bg-background px-2.5 py-1 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-2xs"
+                  className="w-[280px] text-xs"
                 >
                   <option value="state">Mẫu 2C-BNV/2008 (Cơ quan Nhà nước - 5 Trang)</option>
                   <option value="enterprise">Mẫu Doanh nghiệp tư nhân (Hồ sơ trích ngang)</option>
-                </select>
+                </Select>
               </div>
             )}
           </div>
@@ -303,17 +299,17 @@ export function StateCivilServantProfile({
             {/* Thu phóng Zoom */}
             <div className="flex items-center gap-1.5 bg-muted/60 px-2.5 py-1.5 rounded-lg border border-border/40 text-xs font-medium text-muted-foreground">
               <ZoomIn className="w-3.5 h-3.5 text-muted-foreground" />
-              <select
+              <Select
                 value={zoomLevel}
                 onChange={(e) => setZoomLevel(Number(e.target.value))}
-                className="bg-transparent border-0 text-xs font-semibold text-foreground focus:outline-none cursor-pointer pr-1"
+                className="w-[125px] text-xs"
               >
                 <option value={75}>75%</option>
                 <option value={90}>90%</option>
                 <option value={100}>100% (A4 Chuẩn)</option>
                 <option value={115}>115%</option>
                 <option value={125}>125%</option>
-              </select>
+              </Select>
             </div>
           </div>
         </div>
@@ -323,16 +319,24 @@ export function StateCivilServantProfile({
       {/* VÙNG KHÔNG GIAN CANVAS XEM TRƯỚC BẢN IN HIỆN ĐẠI */}
       {/* ========================================================================= */}
       <div
-        className="huha-canvas bg-slate-900/90 dark:bg-slate-950 p-4 sm:p-10 overflow-x-auto min-h-[900px] flex flex-col items-center gap-10 rounded-2xl border border-slate-800 shadow-inner"
+        className="huha-canvas font-times text-black bg-slate-900/90 dark:bg-slate-950 p-4 sm:p-10 overflow-x-auto min-h-[900px] flex flex-col items-center gap-10 rounded-2xl border border-slate-800 shadow-inner"
         style={{
           transform: zoomLevel !== 100 ? `scale(${zoomLevel / 100})` : undefined,
           transformOrigin: 'top center',
         }}
       >
         <style jsx global>{`
+          .huha-canvas,
+          .huha-canvas *,
+          .huha-title,
+          .huha-title *,
+          .a4-sheet,
+          .a4-sheet * {
+            font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
+          }
+
           .huha-title {
             color: #000000 !important;
-            font-family: "Times New Roman", Times, serif;
           }
 
           .a4-sheet {
@@ -342,7 +346,6 @@ export function StateCivilServantProfile({
             max-height: 297mm;
             background: #ffffff;
             color: #000000;
-            font-family: "Times New Roman", Times, serif;
             box-sizing: border-box;
             box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1);
             margin: 0 auto;

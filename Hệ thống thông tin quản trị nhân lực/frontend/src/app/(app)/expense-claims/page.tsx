@@ -719,10 +719,10 @@ export default function ExpenseClaimsPage() {
 
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
           {activeTab === 'claims' && (
-            <select
+            <Select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="text-xs rounded-lg border bg-background px-2.5 py-1.5 text-foreground focus:border-primary focus:outline-hidden"
+              className="w-[180px] text-xs"
             >
               <option value="ALL">Tất cả danh mục</option>
               <option value="TRAVEL">Công tác & Đi lại</option>
@@ -730,13 +730,13 @@ export default function ExpenseClaimsPage() {
               <option value="EQUIPMENT">Mua sắm & Thiết bị</option>
               <option value="ACCOMMODATION">Khách sạn & Lưu trú</option>
               <option value="OTHER">Chi phí khác</option>
-            </select>
+            </Select>
           )}
 
-          <select
+          <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs rounded-lg border bg-background px-2.5 py-1.5 text-foreground focus:border-primary focus:outline-hidden"
+            className="w-[160px] text-xs"
           >
             <option value="ALL">Tất cả trạng thái</option>
             <option value="PENDING">Chờ phê duyệt</option>
@@ -744,7 +744,7 @@ export default function ExpenseClaimsPage() {
             <option value="PAID">Đã giải ngân</option>
             <option value="REJECTED">Từ chối</option>
             {activeTab === 'travel' && <option value="COMPLETED">Hoàn tất</option>}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -1327,10 +1327,10 @@ export default function ExpenseClaimsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label>Họ tên nhân sự đề nghị</Label>
-              <select
+              <Select
                 value={claimEmployee}
                 onChange={(e) => setClaimEmployee(e.target.value)}
-                className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-xs text-foreground focus:border-primary focus:outline-hidden"
+                className="mt-1 w-full text-xs"
               >
                 {employees.length > 0 ? (
                   employees.map((emp) => (
@@ -1346,22 +1346,22 @@ export default function ExpenseClaimsPage() {
                     <option value="Lê Hoàng Long">Lê Hoàng Long</option>
                   </>
                 )}
-              </select>
+              </Select>
             </div>
 
             <div>
               <Label>Danh mục chi phí</Label>
-              <select
+              <Select
                 value={claimCategory}
                 onChange={(e) => setClaimCategory(e.target.value)}
-                className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-xs text-foreground focus:border-primary focus:outline-hidden"
+                className="mt-1 w-full text-xs"
               >
                 <option value="TRAVEL">Công tác & Vé máy bay, Đi lại</option>
                 <option value="ACCOMMODATION">Khách sạn & Lưu trú</option>
                 <option value="MEALS">Tiếp khách & Ăn uống dự án</option>
                 <option value="EQUIPMENT">Mua sắm thiết bị & Văn phòng phẩm</option>
                 <option value="OTHER">Chi phí nghiệp vụ khác</option>
-              </select>
+              </Select>
             </div>
           </div>
 
@@ -1488,10 +1488,10 @@ export default function ExpenseClaimsPage() {
         <div className="space-y-3.5 py-1">
           <div>
             <Label>Họ tên nhân sự công tác</Label>
-            <select
+            <Select
               value={travelEmployee}
               onChange={(e) => setTravelEmployee(e.target.value)}
-              className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-xs text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 w-full text-xs"
             >
               {employees.length > 0 ? (
                 employees.map((emp) => (
@@ -1506,7 +1506,7 @@ export default function ExpenseClaimsPage() {
                   <option value="Trần Thị Mai">Trần Thị Mai</option>
                 </>
               )}
-            </select>
+            </Select>
           </div>
 
           <div>
@@ -1614,10 +1614,10 @@ export default function ExpenseClaimsPage() {
         <div className="space-y-3.5 py-1">
           <div>
             <Label>Nhân sự đề nghị tạm ứng</Label>
-            <select
+            <Select
               value={advEmployee}
               onChange={(e) => setAdvEmployee(e.target.value)}
-              className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-xs text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 w-full text-xs"
             >
               {employees.length > 0 ? (
                 employees.map((emp) => (
@@ -1632,7 +1632,7 @@ export default function ExpenseClaimsPage() {
                   <option value="Trần Thị Mai">Trần Thị Mai</option>
                 </>
               )}
-            </select>
+            </Select>
           </div>
 
           <div>

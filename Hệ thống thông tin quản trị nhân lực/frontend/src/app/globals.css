@@ -132,7 +132,17 @@
  * ========================================================================== */
 .font-times,
 .font-times * {
-  font-family: "Times New Roman", Times, "Liberation Serif", serif;
+  font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
+}
+
+/* Các thành phần điều khiển giao diện, nút bấm, dropdown (no-print) bên trong khung văn bản dùng font hệ thống */
+.font-times .no-print,
+.font-times .no-print *,
+.font-times [data-no-print],
+.font-times [data-no-print] *,
+.font-times .force-sans,
+.font-times .force-sans * {
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif) !important;
 }
 
 @media print {

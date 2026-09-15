@@ -12,7 +12,7 @@ import { api, errorMessage } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Button } from '@/components/ui/primitives';
+import { Button, Select } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toaster';
 
 interface JobOpening {
@@ -240,10 +240,10 @@ export default function RecruitmentAtsPage() {
         {activeTab === 'kanban' && openings && openings.length > 0 && (
           <div className="flex items-center gap-2 text-xs">
             <span className="text-muted-foreground font-medium">Lọc theo vị trí:</span>
-            <select
+            <Select
               value={filterOpeningId}
               onChange={(e) => setFilterOpeningId(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-slate-800 font-medium text-xs shadow-2xs focus:outline-hidden"
+              className="w-[240px] text-xs font-medium"
             >
               <option value="ALL">Tất cả vị trí ({applicants?.length ?? 0})</option>
               {openings.map((o) => (
@@ -251,7 +251,7 @@ export default function RecruitmentAtsPage() {
                   {o.title} ({o._count?.applicants ?? 0})
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         )}
       </div>
@@ -566,19 +566,19 @@ export default function RecruitmentAtsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-slate-600 text-xs font-medium">Giai đoạn hiện tại:</span>
-                  <select
+                  <Select
                     value={selectedApplicant.stage}
                     onChange={(e) => {
                       const newStage = e.target.value as JobApplicant['stage'];
                       updateStageMutation.mutate({ id: selectedApplicant.id, stage: newStage });
                       setSelectedApplicant({ ...selectedApplicant, stage: newStage });
                     }}
-                    className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-slate-800 font-bold text-xs shadow-2xs focus:outline-hidden"
+                    className="w-[200px] text-xs font-bold"
                   >
                     {STAGES.map((s) => (
                       <option key={s.key} value={s.key}>{s.label}</option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
               </div>
             </div>

@@ -13,7 +13,7 @@ import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Badge, Button } from '@/components/ui/primitives';
+import { Badge, Button, Select } from '@/components/ui/primitives';
 import { DataTable, DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
@@ -625,28 +625,28 @@ export default function TrainingGrievancePage() {
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Trạng thái:</span>
           {activeTab === 'training' ? (
-            <select
+            <Select
               value={trainingStatusFilter}
               onChange={(e) => setTrainingStatusFilter(e.target.value)}
-              className="rounded-md border border-border bg-background px-2.5 py-1 text-xs text-foreground focus:outline-hidden"
+              className="w-[160px] text-xs"
             >
               <option value="ALL">Tất cả ({programs.length})</option>
               <option value="UPCOMING">Sắp tổ chức</option>
               <option value="ONGOING">Đang diễn ra</option>
               <option value="COMPLETED">Đã hoàn thành</option>
-            </select>
+            </Select>
           ) : (
-            <select
+            <Select
               value={grievanceStatusFilter}
               onChange={(e) => setGrievanceStatusFilter(e.target.value)}
-              className="rounded-md border border-border bg-background px-2.5 py-1 text-xs text-foreground focus:outline-hidden"
+              className="w-[160px] text-xs"
             >
               <option value="ALL">Tất cả ({grievances.length})</option>
               <option value="OPEN">Mới tiếp nhận</option>
               <option value="INVESTIGATING">Đang xử lý</option>
               <option value="RESOLVED">Đã giải quyết</option>
               <option value="DISMISSED">Bác bỏ</option>
-            </select>
+            </Select>
           )}
         </div>
       </div>
@@ -991,15 +991,15 @@ export default function TrainingGrievancePage() {
           {editingProgram && (
             <div>
               <label className="font-semibold text-foreground">Trạng thái khóa học</label>
-              <select
+              <Select
                 value={progStatus}
                 onChange={(e) => setProgStatus(e.target.value as TrainingProgram['status'])}
-                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                className="mt-1 w-full text-xs"
               >
                 <option value="UPCOMING">Sắp tổ chức (Upcoming)</option>
                 <option value="ONGOING">Đang diễn ra (Ongoing)</option>
                 <option value="COMPLETED">Đã hoàn thành (Completed)</option>
-              </select>
+              </Select>
             </div>
           )}
 
@@ -1230,31 +1230,31 @@ export default function TrainingGrievancePage() {
         <div className="space-y-4 text-xs">
           <div>
             <label className="font-semibold text-foreground">Cán bộ / Nhân viên kiến nghị</label>
-            <select
+            <Select
               value={grievanceUserId}
               onChange={(e) => setGrievanceUserId(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 w-full text-xs"
             >
               {employees.map((e) => (
                 <option key={e.id} value={e.id}>
                   {e.fullName} ({e.employeeCode || 'NV'}) - {e.orgUnit?.name || 'Phòng ban'}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
             <label className="font-semibold text-foreground">Phân loại kiến nghị *</label>
-            <select
+            <Select
               value={grievanceCategory}
               onChange={(e) => setGrievanceCategory(e.target.value as Grievance['category'])}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 w-full text-xs"
             >
               <option value="WORK_ENVIRONMENT">Môi trường & Điều kiện làm việc</option>
               <option value="COMPENSATION">Chế độ đãi ngộ, tiền lương & bảo hiểm</option>
               <option value="DISPUTE">Tranh chấp phân công công tác & ca kíp</option>
               <option value="HARASSMENT">Văn hóa ứng xử & đạo đức công sở</option>
-            </select>
+            </Select>
           </div>
 
           <div>

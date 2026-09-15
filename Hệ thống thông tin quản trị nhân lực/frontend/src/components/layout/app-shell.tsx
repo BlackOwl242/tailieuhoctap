@@ -36,7 +36,7 @@ const NAV_GROUPS: { label: string; items: { href: string; label: string; icon: t
       { href: '/org-chart', label: 'Sơ đồ tổ chức động', icon: Network },
       { href: '/employees', label: 'Danh sách & Hồ sơ nhân sự', icon: Users },
       { href: '/assets', label: 'Tài sản & Thiết bị', icon: Laptop },
-      { href: '/personnel', label: 'Quyết định & Bàn giao', icon: ArrowRightLeft },
+      { href: '/personnel', label: 'Quyết định & Biến động', icon: ArrowRightLeft },
       { href: '/salary-ranks', label: 'Ngạch bậc & Nâng lương', icon: Layers },
     ],
   },

@@ -32,7 +32,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
-import { Badge, Button } from '@/components/ui/primitives';
+import { Badge, Button, Select } from '@/components/ui/primitives';
 
 /**
  * Âm thanh báo hiệu Web Audio API
@@ -912,13 +912,13 @@ function CheckInInner() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-semibold text-slate-700">Thiết bị:</span>
                         {availableDevices.length > 0 ? (
-                          <select
+                          <Select
                             value={selectedDeviceId}
                             onChange={(e) => {
                               setSelectedDeviceId(e.target.value);
                               void startCamera(e.target.value);
                             }}
-                            className="rounded-lg bg-slate-50 border border-slate-300 px-2 py-1 text-slate-800 text-xs focus:outline-hidden font-medium"
+                            className="w-[280px] text-xs font-medium"
                           >
                             {availableDevices.map((d, i) => {
                               const isIR = /IR|Infrared|Hello|RealSense|Depth|SunplusIT/i.test(d.label);
@@ -928,7 +928,7 @@ function CheckInInner() {
                                 </option>
                               );
                             })}
-                          </select>
+                          </Select>
                         ) : null}
                         <span className="text-slate-500 hidden sm:inline">Khoảng cách: 40–60cm</span>
                       </div>

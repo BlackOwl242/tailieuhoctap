@@ -591,7 +591,7 @@ export default function AdminOrgUnitsPage() {
                     Quyết định định dạng mẫu in (Mẫu Nhà nước 2C-BNV vs Mẫu Doanh nghiệp tư nhân)
                   </span>
                 </div>
-                <select
+                <Select
                   value={formOrgConfig.orgSector || 'state'}
                   onChange={(e) => {
                     const sector = e.target.value as any;
@@ -601,11 +601,11 @@ export default function AdminOrgUnitsPage() {
                       orgLevel: sector === 'enterprise' ? 'DV_DNTN' : (formOrgConfig.orgLevel === 'DV_DNTN' ? 'DV_TINH' : formOrgConfig.orgLevel),
                     });
                   }}
-                  className="h-9 w-full rounded-md border border-input bg-card px-3 py-1 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="h-9 w-full text-xs font-medium"
                 >
                   <option value="state">Cơ quan Nhà nước / Đơn vị sự nghiệp công lập (Mẫu 2C-BNV/2008 của Bộ Nội vụ)</option>
                   <option value="enterprise">Doanh nghiệp tư nhân / Tập đoàn kinh tế (Mẫu Trích ngang người lao động)</option>
-                </select>
+                </Select>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

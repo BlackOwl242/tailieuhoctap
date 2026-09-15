@@ -8,7 +8,7 @@ import {
 import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { EmptyState, LoadingState } from '@/components/common/states';
-import { Button } from '@/components/ui/primitives';
+import { Button, Select } from '@/components/ui/primitives';
 import { DataTable, DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
@@ -434,17 +434,17 @@ export default function PayrollEnginePage() {
                 <div className="flex items-center gap-3 flex-wrap">
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Kỳ lương:</span>
-                    <select
+                    <Select
                       value={currentRun?.id || ''}
                       onChange={(e) => setSelectedRunId(e.target.value)}
-                      className="rounded-md border border-border bg-background px-2.5 py-1 text-xs text-foreground font-medium focus:outline-hidden"
+                      className="w-[240px] text-xs font-medium"
                     >
                       {runs.map((r) => (
                         <option key={r.id} value={r.id}>
                           {r.periodName} ({r.totalEmployees} nhân viên)
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
 
                   {currentRun && (
@@ -741,14 +741,14 @@ export default function PayrollEnginePage() {
             </div>
             <div>
               <label className="text-muted-foreground">Phân loại *</label>
-              <select
+              <Select
                 value={compType}
                 onChange={(e) => setCompType(e.target.value as 'EARNING' | 'DEDUCTION')}
-                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-1.5 text-foreground focus:outline-hidden"
+                className="mt-1 w-full text-xs"
               >
                 <option value="EARNING">Thu nhập</option>
                 <option value="DEDUCTION">Khấu trừ</option>
-              </select>
+              </Select>
             </div>
           </div>
 
@@ -846,10 +846,10 @@ export default function PayrollEnginePage() {
         <div className="space-y-3 text-xs">
           <div>
             <label className="text-muted-foreground">Chọn nhân viên *</label>
-            <select
+            <Select
               value={assignUserId}
               onChange={(e) => setAssignUserId(e.target.value)}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-1.5 text-foreground focus:outline-hidden"
+              className="mt-1 w-full text-xs"
             >
               <option value="">-- Chọn nhân viên --</option>
               {employees.map((e) => (
@@ -857,7 +857,7 @@ export default function PayrollEnginePage() {
                   {e.fullName} ({e.employeeCode || 'NV'})
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>

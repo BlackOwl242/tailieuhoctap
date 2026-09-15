@@ -1,8 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import * as AvatarPrimitive from '@radix-ui/react-avatar';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { ChevronDown, Search, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /** Ảnh đại diện: fallback chữ cái đầu khi chưa có ảnh. */
@@ -148,17 +150,417 @@ export function Separator({ className }: { className?: string }) {
   return <div role="separator" className={cn('h-px w-full bg-border', className)} />;
 }
 
-/** Select bọc thẻ native — đủ dùng, mobile-friendly, không cần radix. */
-export function Select({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select
-      className={cn(
-        'flex h-10 w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        className,
-      )}
-      {...props}
+function getNodeText(node: React.ReactNode): string {
+  if (node === null || node === undefined) return '';
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(getNodeText).join('');
+  if (React.isValidElement(node) && (node.props as any)?.children) {
+    return getNodeText((node.props as any).children);
+  }
+  return '';
+}
+
+function removeAccents(str: string): string {
+  if (!str) return '';
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase();
+}
+
+export interface CustomSelectOption {
+  value: string | number;
+  label: string;
+  sublabel?: string;
+  badge?: string;
+  disabled?: boolean;
+}
+
+export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
+  options?: CustomSelectOption[];
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  placeholder?: string;
+  containerClassName?: string;
+}
+
+/**
+ * Select hiện đại toàn hệ thống:
+ * - Thay thế giao diện dropdown native bằng Popover Combobox bo góc sang trọng.
+ * - Tự động trích xuất các thẻ <option> truyền vào hoặc nhận mảng `options`.
+ * - Tự động kích hoạt thanh tìm kiếm tiếng Việt thông minh khi có từ 6 lựa chọn trở lên (hoặc khi searchable=true).
+ * - Tương thích ngược 100% với form React onChange={(e) => ...} và validation HTML.
+ * - Hỗ trợ phím mũi tên ↑ ↓, Enter để chọn, Escape để đóng.
+ * - Tự động mở lật ngược lên trên khi dropdown gần đáy viewport / modal.
+ */
+export function Select({
+  className,
+  containerClassName,
+  children,
+  options,
+  searchable,
+  searchPlaceholder = 'Tìm kiếm...',
+  placeholder = 'Chọn...',
+  value,
+  defaultValue,
+  onChange,
+  disabled,
+  name,
+  required,
+  ...props
+}: SelectProps) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [search, setSearch] = React.useState('');
+  const [highlightIndex, setHighlightIndex] = React.useState(0);
+  const [innerVal, setInnerVal] = React.useState<string | number>(
+    Array.isArray(defaultValue) ? defaultValue[0] : (defaultValue ?? '')
+  );
+  const [coords, setCoords] = React.useState<{ top: number; left: number; width: number; openUpwards: boolean } | null>(null);
+  const [mounted, setMounted] = React.useState(false);
+
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const popoverRef = React.useRef<HTMLDivElement>(null);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
+
+  const isControlled = value !== undefined;
+  const currentVal = isControlled ? (Array.isArray(value) ? value[0] : (value as string | number)) : innerVal;
+
+  // SSR guard
+  React.useEffect(() => { setMounted(true); }, []);
+
+  // Trích xuất danh sách options từ children hoặc props.options
+  const allOptions = React.useMemo<CustomSelectOption[]>(() => {
+    if (options && options.length > 0) return options;
+    const extracted: CustomSelectOption[] = [];
+
+    function processChildren(node: React.ReactNode) {
+      React.Children.forEach(node, (child) => {
+        if (!child) return;
+        if (React.isValidElement(child)) {
+          if (child.type === 'option') {
+            const val = child.props.value !== undefined ? child.props.value : '';
+            const lbl = child.props.children !== undefined ? getNodeText(child.props.children) : String(val);
+            extracted.push({
+              value: val,
+              label: lbl,
+              disabled: child.props.disabled,
+            });
+          } else if ((child.props as any)?.children) {
+            processChildren((child.props as any).children);
+          }
+        }
+      });
+    }
+
+    processChildren(children);
+    return extracted;
+  }, [children, options]);
+
+  // Quyết định có hiển thị ô search hay không: tự động nếu >= 6 options hoặc searchable === true
+  const isSearchActive = searchable ?? (allOptions.length >= 6);
+
+  // Lọc theo từ khóa tìm kiếm tiếng Việt (có dấu & không dấu)
+  const filteredOptions = React.useMemo(() => {
+    const q = search.trim();
+    if (!q) return allOptions;
+    const cleanQ = removeAccents(q);
+    return allOptions.filter((opt) => {
+      const lbl = removeAccents(String(opt.label || ''));
+      const val = removeAccents(String(opt.value || ''));
+      const sub = removeAccents(String(opt.sublabel || ''));
+      return lbl.includes(cleanQ) || val.includes(cleanQ) || sub.includes(cleanQ);
+    });
+  }, [allOptions, search]);
+
+  // Tính toạ độ fixed cho portal popover khi mở
+  const computeCoords = React.useCallback(() => {
+    if (!containerRef.current) return;
+    const r = containerRef.current.getBoundingClientRect();
+    const popoverWidth = Math.min(Math.max(r.width, 220), 500);
+    const spaceBelow = window.innerHeight - r.bottom;
+    const shouldOpenUp = spaceBelow < 280 && r.top > spaceBelow;
+    const leftPos = Math.min(r.left, window.innerWidth - popoverWidth - 12);
+    setCoords({
+      top: shouldOpenUp ? r.top - 6 : r.bottom + 6,
+      left: Math.max(4, leftPos),
+      width: popoverWidth,
+      openUpwards: shouldOpenUp,
+    });
+  }, []);
+
+  // Khi mở: tính toạ độ, focus ô tìm kiếm
+  React.useEffect(() => {
+    if (isOpen) {
+      computeCoords();
+      setSearch('');
+      setHighlightIndex(0);
+      if (isSearchActive) {
+        setTimeout(() => searchInputRef.current?.focus(), 50);
+      }
+    } else {
+      setCoords(null);
+    }
+  }, [isOpen, isSearchActive, computeCoords]);
+
+  // Cuộn tới mục đang highlight
+  React.useEffect(() => {
+    if (isOpen && listRef.current) {
+      const items = listRef.current.querySelectorAll('[data-select-item]');
+      if (items[highlightIndex]) {
+        (items[highlightIndex] as HTMLElement).scrollIntoView({ block: 'nearest' });
+      }
+    }
+  }, [highlightIndex, isOpen]);
+
+  // Bắt sự kiện click ra ngoài để đóng menu (kiểm tra cả portal popover)
+  React.useEffect(() => {
+    if (!isOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      const target = e.target as Node;
+      if (
+        containerRef.current && !containerRef.current.contains(target) &&
+        popoverRef.current && !popoverRef.current.contains(target)
+      ) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  // Đóng hoặc tái tính toạ độ khi cuộn/resize
+  React.useEffect(() => {
+    if (!isOpen) return;
+    function handleScrollOrResize() {
+      computeCoords();
+    }
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [isOpen, computeCoords]);
+
+  // Xử lý chọn phần tử
+  function handleSelect(optVal: string | number) {
+    if (disabled) return;
+    if (!isControlled) setInnerVal(optVal);
+    setIsOpen(false);
+
+    if (onChange) {
+      const syntheticEvent = {
+        target: { name, value: optVal },
+        currentTarget: { name, value: optVal },
+      } as unknown as React.ChangeEvent<HTMLSelectElement>;
+      onChange(syntheticEvent);
+    }
+  }
+
+  // Xử lý bàn phím
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (disabled) return;
+
+    if (!isOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightIndex((prev) => (prev < filteredOptions.length - 1 ? prev + 1 : 0));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightIndex((prev) => (prev > 0 ? prev - 1 : filteredOptions.length - 1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredOptions[highlightIndex] && !filteredOptions[highlightIndex].disabled) {
+        handleSelect(filteredOptions[highlightIndex].value);
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setIsOpen(false);
+    }
+  }
+
+  // Nhãn hiển thị của option đang chọn
+  const selectedOption = allOptions.find((o) => String(o.value) === String(currentVal));
+  const displayLabel = selectedOption?.label || (currentVal ? String(currentVal) : placeholder);
+
+  // Nhận diện kiểu inline và kích thước từ className
+  const isInline = className?.includes('w-auto') || className?.includes('inline');
+  const widthMatches = className?.match(/\b(w-\[\S+\]|w-\d+|min-w-\[\S+\]|max-w-\[\S+\]|flex-1)\b/g);
+
+  // Nội dung popover (render qua portal)
+  const popoverContent = isOpen && coords ? (
+    <div
+      ref={popoverRef}
+      className="bg-popover border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in-50 zoom-in-95 duration-100 flex flex-col font-sans"
+      style={{
+        position: 'fixed',
+        left: coords.left,
+        width: coords.width,
+        top: coords.openUpwards ? undefined : coords.top,
+        bottom: coords.openUpwards ? window.innerHeight - coords.top : undefined,
+        zIndex: 99999,
+      }}
     >
-      {children}
-    </select>
+      {/* Ô tìm kiếm nếu danh sách >= 6 mục hoặc có cờ searchable */}
+      {isSearchActive && (
+        <div className="p-2 border-b border-border/70 bg-muted/20 shrink-0">
+          <div className="relative flex items-center">
+            <Search className="absolute left-2.5 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setHighlightIndex(0);
+              }}
+              placeholder={searchPlaceholder}
+              className="w-full h-8 pl-8 pr-7 text-xs bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary font-medium"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch('');
+                  setHighlightIndex(0);
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute right-2 text-muted-foreground hover:text-foreground p-0.5 rounded-md"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-1.5 px-1 font-medium">
+            <span>{filteredOptions.length} / {allOptions.length} lựa chọn</span>
+            <span className="hidden sm:inline text-[10px] text-muted-foreground/80">Nhấn ↑ ↓ để chọn, Enter xác nhận</span>
+          </div>
+        </div>
+      )}
+
+      {/* Danh sách cuộn các lựa chọn */}
+      <div ref={listRef} className="max-h-64 overflow-y-auto py-1 divide-y divide-border/20">
+        {filteredOptions.length > 0 ? (
+          filteredOptions.map((opt, idx) => {
+            const isSelected = String(opt.value) === String(currentVal);
+            const isHighlighted = idx === highlightIndex;
+
+            return (
+              <button
+                key={`${opt.value}-${idx}`}
+                data-select-item
+                type="button"
+                disabled={opt.disabled}
+                onClick={() => handleSelect(opt.value)}
+                onMouseEnter={() => setHighlightIndex(idx)}
+                className={cn(
+                  'w-full px-3 py-2 text-left flex items-center justify-between gap-2.5 transition-colors cursor-pointer text-xs sm:text-sm',
+                  isHighlighted && 'bg-muted/70',
+                  isSelected && 'bg-primary/10 text-primary font-semibold',
+                  opt.disabled && 'opacity-40 cursor-not-allowed pointer-events-none'
+                )}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    {opt.badge && (
+                      <span className="font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded bg-muted text-foreground border border-border/60 shrink-0">
+                        {opt.badge}
+                      </span>
+                    )}
+                    <span className="truncate">{opt.label}</span>
+                  </div>
+                  {opt.sublabel && (
+                    <div className="text-[11px] text-muted-foreground truncate mt-0.5">{opt.sublabel}</div>
+                  )}
+                </div>
+
+                {isSelected && (
+                  <div className="p-0.5 rounded-full bg-primary/20 text-primary shrink-0">
+                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                  </div>
+                )}
+              </button>
+            );
+          })
+        ) : (
+          <div className="py-6 px-3 text-center text-xs text-muted-foreground">
+            <p className="font-semibold text-foreground">Không tìm thấy kết quả</p>
+            <p className="text-[11px] mt-1">Không có kết quả khớp với &ldquo;{search}&rdquo;</p>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : null;
+
+  return (
+    <div
+      ref={containerRef}
+      className={cn(
+        'relative font-sans',
+        isInline ? 'inline-block' : 'w-full',
+        widthMatches?.join(' '),
+        containerClassName
+      )}
+      onKeyDown={handleKeyDown}
+    >
+      {/* Nút trigger dropdown chuẩn hóa đồng bộ */}
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        className={cn(
+          'flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground',
+          'transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-2xs text-left cursor-pointer',
+          isOpen ? 'border-primary ring-2 ring-primary/20' : 'hover:border-primary/50',
+          disabled && 'cursor-not-allowed opacity-50 bg-muted',
+          className
+        )}
+      >
+        <span className={cn('truncate flex-1', !selectedOption && !currentVal && 'text-muted-foreground')}>
+          {displayLabel}
+        </span>
+        <ChevronDown
+          className={cn(
+            'w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-150',
+            isOpen && 'rotate-180 text-primary'
+          )}
+        />
+      </button>
+
+      {/* Popover menu qua portal - thoát khỏi modal overflow */}
+      {mounted && popoverContent ? createPortal(popoverContent, document.body) : null}
+
+      {/* Hidden native select để hỗ trợ HTML5 form submission và required check */}
+      <select
+        name={name}
+        value={currentVal}
+        required={required}
+        disabled={disabled}
+        tabIndex={-1}
+        aria-hidden="true"
+        className="sr-only"
+        onChange={() => {}}
+        {...props}
+      >
+        {allOptions.map((o) => (
+          <option key={o.value} value={o.value} disabled={o.disabled}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
+

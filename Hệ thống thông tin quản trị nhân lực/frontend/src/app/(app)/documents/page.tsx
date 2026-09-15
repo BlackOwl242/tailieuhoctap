@@ -1,8 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Download, Eye, FileDown, FileText, FolderOpen, Plus, Trash2 } from 'lucide-react';
+import { ArrowRightLeft, Download, Eye, FileDown, FileText, FolderOpen, Plus, Trash2 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
@@ -142,8 +143,8 @@ export default function DocumentsPage() {
   return (
     <>
       <PageHeader
-        title="Tài liệu"
-        description="Kho tài liệu các quy trình quản trị nhân sự: chính sách, biểu mẫu, quyết định, quy trình nghiệp vụ."
+        title="Kho Tài liệu Nhân sự"
+        description="Lưu trữ chính sách, quy chế, biểu mẫu và quy trình quản trị nhân sự toàn công ty."
         actions={
           isHr ? (
             <Button size="sm" onClick={() => setOpen(true)}>
@@ -152,6 +153,21 @@ export default function DocumentsPage() {
           ) : null
         }
       />
+
+      <div className="no-print mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs">
+        <div className="flex items-center gap-2">
+          <ArrowRightLeft className="h-4 w-4 text-primary shrink-0" />
+          <span>
+            Bạn cần tạo hoặc duyệt <strong>Quyết định biến động</strong> (Thuyên chuyển/Điều động, Bãi nhiệm/Kỷ luật, Thôi việc & Bàn giao)?
+          </span>
+        </div>
+        <Link
+          href="/personnel"
+          className="inline-flex items-center gap-1 font-semibold text-primary hover:underline shrink-0"
+        >
+          Đi tới Quyết định & Biến động →
+        </Link>
+      </div>
 
       <div className="print-area">
         <PrintFrame title="DANH MỤC TÀI LIỆU QUẢN TRỊ NHÂN LỰC" />

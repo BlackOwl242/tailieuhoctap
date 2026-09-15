@@ -13,6 +13,7 @@ import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
+import { Select } from '@/components/ui/primitives';
 
 interface LoanItem {
   id: string;
@@ -315,17 +316,17 @@ export default function LoansPage() {
 
             <div>
               <label className="block text-xs font-semibold text-foreground mb-1">Kỳ hạn trả góp (Tháng)</label>
-              <select
+              <Select
                 value={simMonths}
                 onChange={(e) => setSimMonths(Number(e.target.value))}
-                className="w-full p-2.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground outline-hidden focus:border-primary"
+                className="w-full text-xs"
               >
                 <option value={3}>3 tháng</option>
                 <option value={6}>6 tháng</option>
                 <option value={12}>12 tháng (1 năm)</option>
                 <option value={24}>24 tháng (2 năm)</option>
                 <option value={36}>36 tháng (3 năm)</option>
-              </select>
+              </Select>
             </div>
 
             <div>
@@ -394,16 +395,16 @@ export default function LoansPage() {
 
             <div>
               <label className="block text-xs font-semibold text-foreground mb-1">Mục đích / Loại khoản vay</label>
-              <select
+              <Select
                 value={loanType}
                 onChange={(e) => setLoanType(e.target.value)}
-                className="w-full p-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground outline-hidden focus:border-primary"
+                className="w-full text-xs"
               >
                 <option value="Tạm ứng mua thiết bị làm việc">Tạm ứng mua thiết bị làm việc</option>
                 <option value="Vay hỗ trợ nhà ở / phương tiện">Vay hỗ trợ nhà ở / phương tiện</option>
                 <option value="Vay học tập & nâng cao nghiệp vụ">Vay học tập & nâng cao nghiệp vụ</option>
                 <option value="Tạm ứng khẩn cấp gia đình">Tạm ứng khẩn cấp gia đình</option>
-              </select>
+              </Select>
             </div>
 
             <div>
@@ -419,15 +420,15 @@ export default function LoansPage() {
 
             <div>
               <label className="block text-xs font-semibold text-foreground mb-1">Thời hạn trả góp</label>
-              <select
+              <Select
                 value={termMonths}
                 onChange={(e) => setTermMonths(Number(e.target.value))}
-                className="w-full p-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground outline-hidden focus:border-primary"
+                className="w-full text-xs"
               >
                 <option value={6}>6 tháng (Trừ {(principalAmount / 6).toLocaleString('vi-VN')} đ/tháng)</option>
                 <option value={12}>12 tháng (Trừ {(principalAmount / 12).toLocaleString('vi-VN')} đ/tháng)</option>
                 <option value={24}>24 tháng (Trừ {(principalAmount / 24).toLocaleString('vi-VN')} đ/tháng)</option>
-              </select>
+              </Select>
             </div>
 
             <div>

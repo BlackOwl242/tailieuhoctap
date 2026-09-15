@@ -11,6 +11,7 @@ import { api, errorMessage } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
+import { Select } from '@/components/ui/primitives';
 
 interface AssetItem {
   id: string;
@@ -239,17 +240,17 @@ export default function AssetsPage() {
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-          <select
+          <Select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-1.5 rounded-lg border border-border/80 bg-card text-xs font-medium text-foreground outline-hidden focus:border-primary w-full sm:w-auto cursor-pointer"
+            className="w-full sm:w-[180px] text-xs"
           >
             {ASSET_CATEGORIES.map((cat) => (
               <option key={cat.key} value={cat.key}>
                 {cat.label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -390,17 +391,17 @@ export default function AssetsPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-foreground mb-1">Phân loại tài sản</label>
-                <select
+                <Select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full p-2 rounded-xl border border-border bg-card text-xs text-foreground outline-hidden focus:border-primary font-medium"
+                  className="w-full text-xs"
                 >
                   {ASSET_CATEGORIES.filter((c) => c.key !== 'ALL').map((cat) => (
                     <option key={cat.key} value={cat.key}>
                       {cat.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-foreground mb-1">Nguyên giá (VND)</label>
@@ -489,14 +490,14 @@ export default function AssetsPage() {
               <label className="block text-xs font-semibold text-foreground mb-1">
                 Nhân sự tiếp nhận bàn giao <span className="text-destructive">*</span>
               </label>
-              <select
+              <Select
                 value={assigneeId}
                 onChange={(e) => {
                   const emp = employeeList?.find((u) => u.id === e.target.value);
                   setAssigneeId(e.target.value);
                   setAssigneeName(emp?.fullName || '');
                 }}
-                className="w-full p-2.5 rounded-xl border border-border bg-card text-xs text-foreground outline-hidden focus:border-primary font-medium"
+                className="w-full text-xs"
               >
                 <option value="">-- Chọn nhân sự trong danh sách hệ thống --</option>
                 {employeeList?.map((emp) => (
@@ -504,7 +505,7 @@ export default function AssetsPage() {
                     {emp.fullName} {emp.employeeCode ? `(${emp.employeeCode})` : ''} {emp.orgUnit?.name ? `— ${emp.orgUnit.name}` : ''}
                   </option>
                 ))}
-              </select>
+              </Select>
               {!assigneeId && (
                 <p className="text-[11px] text-amber-600 mt-1">
                   * Bắt buộc chọn nhân viên thực tế từ cơ sở dữ liệu để liên kết trách nhiệm quản lý tài sản.

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   X, Check, Save, User, Briefcase, GraduationCap, ShieldCheck, HeartHandshake,
@@ -9,7 +10,7 @@ import {
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import { Button, Badge, Card, Input } from '@/components/ui/primitives';
+import { Button, Badge, Card, Input, Select } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toaster';
 
 interface Props {
@@ -414,9 +415,11 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="bg-card text-card-foreground w-full max-w-6xl max-h-[92vh] rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden">
+  const modalContent = (
+    <div className="fixed inset-0 z-modal flex items-center justify-center p-3 sm:p-6">
+      {/* Backdrop phủ toàn màn hình */}
+      <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-150" onClick={onClose} />
+      <div className="relative bg-card text-card-foreground w-full max-w-6xl max-h-[92vh] rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden">
         
         {/* ================= HEADER ================= */}
         <div className="px-6 py-4 border-b border-border bg-muted/40 flex flex-wrap items-center justify-between gap-4">
@@ -547,14 +550,14 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                   </div>
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Giới tính</label>
-                    <select
+                    <Select
                       value={form.gender}
                       onChange={(e) => setForm({ ...form, gender: e.target.value })}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-medium"
+                      className="text-xs"
                     >
                       <option value="Nam">Nam</option>
                       <option value="Nữ">Nữ</option>
-                    </select>
+                    </Select>
                   </div>
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Ngày sinh (dd/mm/yyyy)</label>
@@ -695,15 +698,15 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                   </div>
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Tình trạng hôn nhân</label>
-                    <select
+                    <Select
                       value={form.maritalStatus}
                       onChange={(e) => setForm({ ...form, maritalStatus: e.target.value })}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-medium"
+                      className="text-xs"
                     >
                       <option value="Đã kết hôn">Đã kết hôn</option>
                       <option value="Độc thân">Độc thân</option>
                       <option value="Ly hôn">Ly hôn</option>
-                    </select>
+                    </Select>
                   </div>
                 </div>
               </div>
@@ -716,10 +719,10 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Đơn vị / Phòng ban công tác *</label>
-                    <select
+                    <Select
                       value={form.orgUnitId}
                       onChange={(e) => setForm({ ...form, orgUnitId: e.target.value })}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-medium"
+                      className="text-xs"
                       required
                     >
                       <option value="">-- Chọn đơn vị trực thuộc --</option>
@@ -728,7 +731,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                           {u.name} ({u.code})
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Chức danh / Vị trí chuyên môn *</label>
@@ -776,17 +779,17 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                   </div>
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Hình thức tuyển dụng</label>
-                    <select
+                    <Select
                       value={form.recruitType}
                       onChange={(e) => setForm({ ...form, recruitType: e.target.value })}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-medium"
+                      className="text-xs"
                     >
                       <option value="Thi tuyển">Thi tuyển</option>
                       <option value="Xét tuyển">Xét tuyển</option>
                       <option value="Tiếp nhận từ nơi khác">Tiếp nhận từ nơi khác</option>
                       <option value="Phân công công tác">Phân công công tác</option>
                       <option value="Tuyển dụng trực tiếp">Tuyển dụng trực tiếp</option>
-                    </select>
+                    </Select>
                   </div>
                 </div>
               </div>
@@ -806,31 +809,31 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
                     <div className="space-y-1 md:col-span-2">
                       <label className="font-semibold text-foreground">Ngạch công chức / viên chức</label>
-                      <select
+                      <Select
                         value={form.rankCode}
                         onChange={(e) => handleRankChange(e.target.value)}
-                        className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-semibold"
+                        className="text-xs font-semibold"
                       >
                         {ranksQ.data?.map((r: any) => (
                           <option key={r.code} value={r.code}>
                             {r.code} - {r.name} ({r.totalSteps} bậc)
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     </div>
                     <div className="space-y-1">
                       <label className="font-semibold text-foreground">Bậc lương hiện nay</label>
-                      <select
-                        value={form.salaryStep}
+                      <Select
+                        value={String(form.salaryStep)}
                         onChange={(e) => handleStepChange(Number(e.target.value))}
-                        className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-semibold"
+                        className="text-xs font-semibold"
                       >
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((s) => (
                           <option key={s} value={s}>
                             Bậc {s}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     </div>
                     <div className="space-y-1">
                       <label className="font-semibold text-foreground">Hệ số lương</label>
@@ -864,10 +867,10 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                     </div>
                     <div className="space-y-1">
                       <label className="font-semibold text-foreground">Hình thức trả lương</label>
-                      <select className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-medium">
+                      <Select className="text-xs">
                         <option value="BANK">Chuyển khoản qua ngân hàng</option>
                         <option value="CASH">Tiền mặt</option>
-                      </select>
+                      </Select>
                     </div>
                   </div>
                 )}
@@ -939,10 +942,10 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                   </div>
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Trình độ chuyên môn cao nhất</label>
-                    <select
+                    <Select
                       value={form.highestDegree}
                       onChange={(e) => setForm({ ...form, highestDegree: e.target.value })}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-medium"
+                      className="text-xs"
                     >
                       <option value="Tiến sĩ">Tiến sĩ</option>
                       <option value="Thạc sĩ">Thạc sĩ</option>
@@ -950,7 +953,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                       <option value="Cao đẳng">Cao đẳng</option>
                       <option value="Trung cấp">Trung cấp</option>
                       <option value="Sơ cấp">Sơ cấp</option>
-                    </select>
+                    </Select>
                   </div>
                   <div className="space-y-1 md:col-span-2">
                     <label className="font-semibold text-foreground">Chuyên ngành đào tạo</label>
@@ -1111,16 +1114,16 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                   </div>
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Nhóm máu</label>
-                    <select
+                    <Select
                       value={form.bloodType}
                       onChange={(e) => setForm({ ...form, bloodType: e.target.value })}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-medium"
+                      className="text-xs"
                     >
                       <option value="O">Nhóm O</option>
                       <option value="A">Nhóm A</option>
                       <option value="B">Nhóm B</option>
                       <option value="AB">Nhóm AB</option>
-                    </select>
+                    </Select>
                   </div>
                 </div>
               </div>
@@ -1607,14 +1610,14 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               <div className="space-y-3">
                 <div className="space-y-1">
                   <label className="font-semibold">Hình thức</label>
-                  <select
+                  <Select
                     value={subForm.type || 'REWARD'}
                     onChange={(e) => setSubForm({ ...subForm, type: e.target.value })}
-                    className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs"
+                    className="text-xs"
                   >
                     <option value="REWARD">Khen thưởng</option>
                     <option value="DISCIPLINE">Kỷ luật</option>
-                  </select>
+                  </Select>
                 </div>
                 <div className="space-y-1">
                   <label className="font-semibold">Nội dung / Danh hiệu</label>
@@ -1642,16 +1645,16 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                   </div>
                   <div className="space-y-1">
                     <label className="font-semibold">Xếp loại</label>
-                    <select
+                    <Select
                       value={subForm.classification || 'EXCELLENT'}
                       onChange={(e) => setSubForm({ ...subForm, classification: e.target.value })}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-card text-xs font-semibold"
+                      className="text-xs font-semibold"
                     >
                       <option value="EXCELLENT">Hoàn thành xuất sắc nhiệm vụ</option>
                       <option value="GOOD">Hoàn thành tốt nhiệm vụ</option>
                       <option value="SATISFACTORY">Hoàn thành nhiệm vụ</option>
                       <option value="UNSATISFACTORY">Không hoàn thành nhiệm vụ</option>
-                    </select>
+                    </Select>
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -1691,4 +1694,6 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
       )}
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : modalContent;
 }

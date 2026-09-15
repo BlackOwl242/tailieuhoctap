@@ -60,7 +60,6 @@ export function Modal({
   );
 }
 
-/** Cụm nút chuẩn cho footer modal: Hủy + xác nhận (loading sẵn). */
 export function ModalFooterActions({
   onCancel,
   confirmLabel = 'Lưu',
@@ -69,6 +68,7 @@ export function ModalFooterActions({
   disabled,
   onConfirm,
   confirmVariant = 'default',
+  className,
 }: {
   onCancel: () => void;
   onConfirm?: () => void;
@@ -77,13 +77,14 @@ export function ModalFooterActions({
   pending?: boolean;
   disabled?: boolean;
   confirmVariant?: 'default' | 'destructive' | 'success';
+  className?: string;
 }) {
   return (
-    <>
+    <div className={cn('mt-6 flex items-center justify-end gap-3 pt-3 border-t border-border/50', className)}>
       <Button type="button" variant="outline" onClick={onCancel}>{cancelLabel}</Button>
       <Button type={onConfirm ? 'button' : 'submit'} variant={confirmVariant} disabled={disabled || pending} onClick={onConfirm}>
         {pending ? 'Đang lưu…' : confirmLabel}
       </Button>
-    </>
+    </div>
   );
 }

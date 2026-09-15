@@ -57,7 +57,7 @@ export class PersonnelActionsService {
       where: { OR: [{ subjectId: actor.id }, { requestedById: actor.id }] },
       orderBy: { createdAt: 'desc' },
       include: {
-        subject: { select: { fullName: true } },
+        subject: { select: { id: true, fullName: true, employeeCode: true, orgUnit: { select: { name: true } } } },
         requester: { select: { fullName: true } },
         decider: { select: { fullName: true } },
       },
