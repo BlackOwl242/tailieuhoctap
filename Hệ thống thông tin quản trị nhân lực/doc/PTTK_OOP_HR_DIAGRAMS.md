@@ -1,18 +1,18 @@
-> Tổng cộng **146 biểu đồ PlantUML**.
+> Tổng cộng **148 biểu đồ PlantUML**.
 
 
-# BỘ BIỂU ĐỒ UML ĐẦY ĐỦ 46 USE CASE - HRMIS SAIGON TECHNOLOGY
+# BỘ BIỂU ĐỒ UML ĐẦY ĐỦ 47 USE CASE - HRMIS SAIGON TECHNOLOGY
 
-> Tài liệu kèm theo `doc/PTTK_OOP_HR.md`, sinh thống nhất cho **46 use case chia 12 nhóm**.
+> Tài liệu kèm theo `doc/PTTK_OOP_HR.md`, sinh thống nhất cho **47 use case chia 12 nhóm**.
 > **Mọi biểu đồ đều khai báo `skinparam linetype ortho` nên các đường nối được kẻ THẲNG VUÔNG GÓC.**
 > Cách dùng: sao chép từng khối ```plantuml``` dán vào plantuml.com (hoặc plugin IDE) để xuất ảnh PNG/SVG chèn vào báo cáo.
 
-**Cấu trúc:** A. Use case (tổng quát + 12 nhóm) | B. Trình tự (46 UC) | C. Hoạt động (46 UC) | D. Trạng thái (theo đối tượng) | E. Luồng dữ liệu đầu-cuối | F. Gói (tổng quan + theo nhóm) | G. Lớp (theo nhóm, gán rõ use case)
+**Cấu trúc:** A. Use case (tổng quát + 12 nhóm) | B. Trình tự (47 UC) | C. Hoạt động (47 UC) | D. Trạng thái (theo đối tượng) | E. Luồng dữ liệu đầu-cuối | F. Gói (tổng quan + theo nhóm) | G. Lớp (theo nhóm, gán rõ use case)
 
 
 ## A. BIỂU ĐỒ USE CASE
 
-### A.0. Tổng quan hệ thống (46 use case, 12 nhóm)
+### A.0. Tổng quan hệ thống (47 use case, 12 nhóm)
 
 ```plantuml
 @startuml
@@ -26,7 +26,7 @@ actor "Nhân viên hành chính" as A3
 actor "Kế toán" as A4
 actor "Nhân viên IT" as A5
 actor "Giám đốc" as A6
-rectangle "HRMIS - 46 use case / 12 nhóm" {
+rectangle "HRMIS - 47 use case / 12 nhóm" {
   (UC01 Đăng nhập) as UC01
   (UC02 Quản lý tài khoản) as UC02
   (UC03 Quản lý cây tổ chức) as UC03
@@ -73,6 +73,7 @@ rectangle "HRMIS - 46 use case / 12 nhóm" {
   (UC44 Lộ trình hội nhập - bàn giao công việc) as UC44
   (UC45 Xem bảng điều khiển điều hành) as UC45
   (UC46 Tra cứu nhật ký kiểm toán - cấu hình tham số) as UC46
+  (UC47 Thẩm định đề xuất điều chỉnh hồ sơ Mức 2) as UC47
   A0 -- UC01
   A5 -- UC02
   A5 -- UC03
@@ -119,11 +120,12 @@ rectangle "HRMIS - 46 use case / 12 nhóm" {
   A0 -- UC44
   A0 -- UC45
   A5 -- UC46
+  A2 -- UC47
 }
 
 @enduml
 ```
-_Hình D.1. Biểu đồ Use case tổng quan 46 use case._
+_Hình D.1. Biểu đồ Use case tổng quan 47 use case._
 
 ### A.A. Nhóm A - Quản trị hệ thống
 
@@ -410,16 +412,19 @@ skinparam shadowing false
 left to right direction
 actor "Toàn bộ vai" as A0
 actor "Nhân viên IT" as A1
+actor "Chuyên viên nhân sự" as A2
 rectangle "Nhóm L: Điều hành - Quản trị" {
   (UC45 Xem bảng điều khiển điều hành) as UC45
   (UC46 Tra cứu nhật ký kiểm toán - cấu hình tham số) as UC46
+  (UC47 Thẩm định đề xuất điều chỉnh hồ sơ Mức 2) as UC47
 }
 A0 -- UC45
 A1 -- UC46
+A2 -- UC47
 
 @enduml
 ```
-_Hình D.13. Nhóm L - Điều hành - Quản trị (UC45, UC46)._
+_Hình D.13. Nhóm L - Điều hành - Quản trị (UC45, UC46, UC47)._
 
 
 ## B. BIỂU ĐỒ TRÌNH TỰ THEO TỪNG USE CASE
@@ -1452,6 +1457,31 @@ C -> E : ghi AuditLog thay đổi
 ```
 _Hình D.59. Trình tự UC46 - Tra cứu nhật ký kiểm toán - cấu hình tham số._
 
+### B.UC47. Thẩm định đề xuất điều chỉnh hồ sơ Mức 2
+
+```plantuml
+@startuml
+skinparam linetype ortho
+skinparam shadowing false
+actor "Chuyên viên nhân sự (HR-OPS)" as HR
+boundary "Trang /profile (ReviewQueue)" as B
+control "ProfileChangeRequestsService" as C
+entity "ProfileChangeRequest / User / AuditLog" as E
+HR -> B : mở hàng đợi thẩm định
+B -> C : lấy danh sách chờ duyệt (listPending)
+C -> E : truy vấn ProfileChangeRequest (PENDING)
+E --> B : danh sách đề xuất kèm minh chứng
+HR -> B : đối chiếu thông tin cũ/mới & xem tệp minh chứng
+HR -> B : bấm Chấp thuận (hoặc Từ chối kèm lý do)
+B -> C : approveRequest() / rejectRequest()
+C -> E : atomic transaction: cập nhật User/ComprehensiveProfile
+C -> E : đổi trạng thái APPROVED / REJECTED
+C -> E : ghi AuditLog truy vết bất biến
+C --> B : kết quả thẩm định thành công
+@enduml
+```
+_Hình D.59b. Trình tự UC47 - Thẩm định đề xuất điều chỉnh hồ sơ Mức 2._
+
 
 ## C. BIỂU ĐỒ HOẠT ĐỘNG THEO TỪNG USE CASE
 
@@ -2341,6 +2371,32 @@ stop
 ```
 _Hình D.105. Hoạt động UC46 - Tra cứu nhật ký kiểm toán - cấu hình tham số._
 
+### C.UC47. Thẩm định đề xuất điều chỉnh hồ sơ Mức 2
+
+```plantuml
+@startuml
+skinparam linetype ortho
+skinparam shadowing false
+start
+:Mở hàng đợi thẩm định hồ sơ (/profile);
+:Tải danh sách đề xuất Mức 2 (PENDING);
+:Đối chiếu thông tin hiện tại với giá trị mới đề xuất;
+:Mở xem tài liệu minh chứng pháp lý (CCCD, bằng cấp...);
+if (Hồ sơ minh chứng hợp lệ?) then (Đạt)
+  :Bấm Chấp thuận (Approve);
+  :Cập nhật User và ComprehensiveProfile;
+  :Chuyển trạng thái APPROVED;
+  :Ghi nhật ký kiểm toán AuditLog;
+else (Không đạt)
+  :Nhập lý do từ chối;
+  :Chuyển trạng thái REJECTED;
+  :Gửi phản hồi cho nhân viên;
+endif
+stop
+@enduml
+```
+_Hình D.105b. Hoạt động UC47 - Thẩm định đề xuất điều chỉnh hồ sơ Mức 2._
+
 
 ## D. BIỂU ĐỒ TRẠNG THÁI THEO ĐỐI TƯỢNG
 
@@ -3069,6 +3125,11 @@ package "Nhóm L: Điều hành - Quản trị" {
     [Control: AuditService, SettingsService]
     [Entity: AuditLog, Setting]
   }
+  package "UC47 - Thẩm định đề xuất điều chỉnh hồ sơ Mức 2" {
+    [Boundary: /profile, ProfileChangeReviewQueue]
+    [Control: ProfileChangeRequestsService]
+    [Entity: ProfileChangeRequest, User, ComprehensiveProfile, AuditLog]
+  }
 }
 
 @enduml
@@ -3460,26 +3521,31 @@ skinparam shadowing false
 package "Boundary (Next.js)" {
   class "<<Boundary>> DashboardPage" as B0
   class "<<Boundary>> AdminAuditPage - AdminSettingsPage" as B1
+  class "<<Boundary>> ProfilePage - ProfileChangeReviewQueue" as B2
 }
 package "Control (NestJS Service)" {
   class "<<Control>> DashboardService" as C0
   class "<<Control>> AuditService" as C1
   class "<<Control>> SettingsService" as C2
+  class "<<Control>> ProfileChangeRequestsService" as C3
 }
 package "Entity (Prisma Model)" {
   class "<<Entity>> User - PayrollRun - PersonnelAction" as E0
   class "<<Entity>> AuditLog" as E1
   class "<<Entity>> Setting" as E2
+  class "<<Entity>> ProfileChangeRequest" as E3
 }
 B0 ..> C0
 B1 ..> C0
+B2 ..> C3
 C0 ..> E0
 C1 ..> E0
 C2 ..> E0
+C3 ..> E3
 note bottom of C0
-  Phục vụ use case: UC45=Xem bảng điều khiển điều hành; UC46=Tra cứu nhật ký kiểm toán - cấu hình tham số
+  Phục vụ use case: UC45=Xem bảng điều khiển điều hành; UC46=Tra cứu nhật ký kiểm toán - cấu hình tham số; UC47=Thẩm định đề xuất điều chỉnh hồ sơ Mức 2
 end note
 
 @enduml
 ```
-_Hình D.146. Lớp nhóm L - gán use case: UC45=Xem bảng điều khiển điều hành; UC46=Tra cứu nhật ký kiểm toán - cấu hình tham số._
+_Hình D.146. Lớp nhóm L - gán use case: UC45=Xem bảng điều khiển điều hành; UC46=Tra cứu nhật ký kiểm toán - cấu hình tham số; UC47=Thẩm định đề xuất điều chỉnh hồ sơ Mức 2._

@@ -527,8 +527,10 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
             <div className="space-y-6 animate-in fade-in duration-100">
               {/* Khối 1: Định danh & Tài khoản */}
               <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
-                  <User className="w-4 h-4 text-primary" /> Khối 1: Định danh cá nhân & Tài khoản làm việc
+                <div className="flex items-center justify-between text-xs font-bold text-foreground uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-primary" /> Khối 1: Định danh cá nhân & Tài khoản làm việc
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
                   <div className="space-y-1">

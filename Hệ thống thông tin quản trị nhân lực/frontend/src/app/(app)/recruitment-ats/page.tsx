@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Briefcase, UserPlus, Star, ChevronRight, CheckCircle2,
@@ -70,6 +71,11 @@ const STAGES: { key: JobApplicant['stage']; label: string; bgClass: string; text
 export default function RecruitmentAtsPage() {
   const queryClient = useQueryClient();
   const toast = useToast();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [activeTab, setActiveTab] = useState<'kanban' | 'openings'>('kanban');
   const [selectedApplicant, setSelectedApplicant] = useState<JobApplicant | null>(null);
   const [selectedOpening, setSelectedOpening] = useState<JobOpening | null>(null);
@@ -78,6 +84,29 @@ export default function RecruitmentAtsPage() {
   const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [filterOpeningId, setFilterOpeningId] = useState<string>('ALL');
+
+  // Modal tạo tin tuyển dụng & tiếp nhận ứng viên
+  const [isCreateOpeningModalOpen, setIsCreateOpeningModalOpen] = useState(false);
+  const [isCreateApplicantModalOpen, setIsCreateApplicantModalOpen] = useState(false);
+
+  // Form tạo tin tuyển dụng
+  const [openingTitle, setOpeningTitle] = useState('');
+  const [openingDept, setOpeningDept] = useState('Phòng Phát triển Phần mềm');
+  const [openingDesignation, setOpeningDesignation] = useState('');
+  const [openingVacancies, setOpeningVacancies] = useState(1);
+  const [openingMinExp, setOpeningMinExp] = useState(1);
+  const [openingSalary, setOpeningSalary] = useState('20.000.000 - 35.000.000 VND');
+  const [openingClosingDate, setOpeningClosingDate] = useState('');
+  const [openingDesc, setOpeningDesc] = useState('');
+  const [openingReqs, setOpeningReqs] = useState('');
+
+  // Form tiếp nhận ứng viên
+  const [appJobOpeningId, setAppJobOpeningId] = useState('');
+  const [appCandidateName, setAppCandidateName] = useState('');
+  const [appEmail, setAppEmail] = useState('');
+  const [appPhone, setAppPhone] = useState('');
+  const [appResumeUrl, setAppResumeUrl] = useState('');
+  const [appNotes, setAppNotes] = useState('');
 
   // Drag and Drop States & Refs
   const [draggedAppId, setDraggedAppId] = useState<string | null>(null);
@@ -103,6 +132,57 @@ export default function RecruitmentAtsPage() {
   const { data: applicants, isLoading: isLoadingApps } = useQuery<JobApplicant[]>({
     queryKey: ['hrms-job-applicants'],
     queryFn: async () => (await api.get('/hrms/recruitment/applicants')).data,
+  });
+
+  const createOpeningMutation = useMutation({
+    mutationFn: async (payload: {
+      title: string;
+      department?: string;
+      designation?: string;
+      vacancies: number;
+      minExperience: number;
+      salaryRange?: string;
+      description: string;
+      requirements?: string;
+      closingDate?: string;
+    }) => {
+      return (await api.post('/hrms/recruitment/openings', payload)).data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hrms-job-openings'] });
+      setIsCreateOpeningModalOpen(false);
+      setOpeningTitle('');
+      setOpeningDesignation('');
+      setOpeningDesc('');
+      setOpeningReqs('');
+      toast('Đã đăng tin tuyển dụng mới thành công!', 'success');
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const createApplicantMutation = useMutation({
+    mutationFn: async (payload: {
+      jobOpeningId: string;
+      candidateName: string;
+      email: string;
+      phone?: string;
+      resumeUrl?: string;
+      notes?: string;
+    }) => {
+      return (await api.post('/hrms/recruitment/applicants', payload)).data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hrms-job-applicants'] });
+      queryClient.invalidateQueries({ queryKey: ['hrms-job-openings'] });
+      setIsCreateApplicantModalOpen(false);
+      setAppCandidateName('');
+      setAppEmail('');
+      setAppPhone('');
+      setAppResumeUrl('');
+      setAppNotes('');
+      toast('Đã tiếp nhận hồ sơ ứng viên mới vào quy trình ATS!', 'success');
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
   });
 
   const updateStageMutation = useMutation({
@@ -175,7 +255,59 @@ export default function RecruitmentAtsPage() {
         title="Quản trị Tuyển dụng ATS"
         description="Đăng tin tuyển dụng, trực quan hóa tiến độ ứng viên bằng bảng Kanban kéo thả, quản lý bảng điểm phỏng vấn và chuyển đổi ứng viên trúng tuyển thành nhân viên chính thức."
         breadcrumbs={[{ label: 'Tuyển dụng' }, { label: 'ATS Pipeline' }]}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                if (openings && openings.length > 0 && !appJobOpeningId) {
+                  setAppJobOpeningId(openings[0].id);
+                }
+                setIsCreateApplicantModalOpen(true);
+              }}
+              className="text-xs flex items-center gap-1.5"
+            >
+              <UserPlus className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>Tiếp nhận ứng viên</span>
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setIsCreateOpeningModalOpen(true)}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs flex items-center gap-1.5 font-semibold shadow-xs"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Đăng tin tuyển dụng</span>
+            </Button>
+          </div>
+        }
       />
+
+      {/* Card Hướng dẫn luồng tuyển dụng cho người dùng */}
+      <div className="rounded-xl border border-border/70 bg-card p-3 text-xs text-muted-foreground flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold">
+            <Briefcase className="h-4 w-4" />
+          </div>
+          <div>
+            <span className="font-semibold text-foreground">Luồng tạo & quản trị tin tuyển dụng:</span>
+            <span className="ml-1 text-muted-foreground">
+              Bấm nút <b className="text-foreground">Đăng tin tuyển dụng</b> ở góc phải để tạo vị trí mới, hoặc chuyển sang tab <b className="text-foreground">Tin Tuyển Dụng</b> để quản lý danh sách và chỉ tiêu tuyển dụng.
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setIsCreateOpeningModalOpen(true)}
+            className="text-xs h-7 px-2.5 flex items-center gap-1"
+          >
+            <Plus className="h-3 w-3" />
+            <span>Đăng tin mới</span>
+          </Button>
+        </div>
+      </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -308,16 +440,35 @@ export default function RecruitmentAtsPage() {
                   >
                     {/* Header Cột */}
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs font-bold text-slate-900 truncate">{col.label}</span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold border transition-colors ${
-                          isOver
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : `${col.bgClass} ${col.textClass} ${col.borderClass}`
-                        }`}
-                      >
-                        {colApps.length}
-                      </span>
+                      <span className="text-xs font-bold text-foreground truncate">{col.label}</span>
+                      <div className="flex items-center gap-1.5">
+                        {col.key === 'APPLIED' && (
+                          <button
+                            type="button"
+                            title="Tiếp nhận ứng viên mới"
+                            onClick={() => {
+                              if (filterOpeningId !== 'ALL') {
+                                setAppJobOpeningId(filterOpeningId);
+                              } else if (openings && openings.length > 0 && !appJobOpeningId) {
+                                setAppJobOpeningId(openings[0].id);
+                              }
+                              setIsCreateApplicantModalOpen(true);
+                            }}
+                            className="p-1 rounded-md text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold border transition-colors ${
+                            isOver
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : `${col.bgClass} ${col.textClass} ${col.borderClass}`
+                          }`}
+                        >
+                          {colApps.length}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Danh sách thẻ ứng viên */}
@@ -436,14 +587,34 @@ export default function RecruitmentAtsPage() {
                       {/* Dropzone khi cột trống */}
                       {colApps.length === 0 && (
                         <div
-                          className={`rounded-xl border-2 border-dashed p-6 text-center text-xs transition-colors flex flex-col items-center justify-center gap-1 min-h-[140px] ${
+                          className={`rounded-xl border-2 border-dashed p-6 text-center text-xs transition-colors flex flex-col items-center justify-center gap-2 min-h-[140px] ${
                             isOver
                               ? 'border-blue-500 bg-blue-100/50 text-blue-700 font-bold'
                               : 'border-slate-200 bg-white/40 text-slate-400'
                           }`}
                         >
                           {isOver ? (
-                            <span>+ Thả vào {col.label}</span>
+                            <span>Thả vào {col.label}</span>
+                          ) : col.key === 'APPLIED' ? (
+                            <div className="space-y-2 text-center">
+                              <p className="text-muted-foreground text-xs font-medium">Chưa có ứng viên mới</p>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  if (filterOpeningId !== 'ALL') {
+                                    setAppJobOpeningId(filterOpeningId);
+                                  } else if (openings && openings.length > 0 && !appJobOpeningId) {
+                                    setAppJobOpeningId(openings[0].id);
+                                  }
+                                  setIsCreateApplicantModalOpen(true);
+                                }}
+                                className="text-xs h-7 px-2.5 flex items-center gap-1"
+                              >
+                                <UserPlus className="h-3 w-3" />
+                                <span>Tiếp nhận hồ sơ</span>
+                              </Button>
+                            </div>
                           ) : (
                             <span>Kéo thả ứng viên vào đây</span>
                           )}
@@ -453,7 +624,7 @@ export default function RecruitmentAtsPage() {
                       {/* Drop indicator dưới cùng khi cột đã có thẻ */}
                       {isOver && colApps.length > 0 && (
                         <div className="rounded-xl border-2 border-dashed border-blue-400 bg-blue-100/40 p-2.5 text-center text-[11px] font-bold text-blue-700">
-                          + Thả vào {col.label}
+                          Thả vào {col.label}
                         </div>
                       )}
                     </div>
@@ -467,80 +638,410 @@ export default function RecruitmentAtsPage() {
 
       {/* Tab 2: Tin tuyển dụng (Job Openings) */}
       {activeTab === 'openings' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {openings?.map((o) => (
-            <div
-              key={o.id}
-              onClick={() => {
-                setSelectedOpening(o);
-                setIsOpeningDetailModalOpen(true);
-              }}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-3 hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex flex-col justify-between"
-            >
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-bold text-slate-900 text-sm">{o.title}</h3>
-                    <p className="text-xs text-slate-500 font-medium">{o.department ?? 'Phòng Kỹ thuật'} • {o.designation}</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
-                    <span className={`h-1.5 w-1.5 rounded-full ${o.status === 'OPEN' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                    {o.status === 'OPEN' ? 'Đang tuyển' : o.status}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
-                  <div>
-                    <span className="text-slate-500 text-[11px]">Chỉ tiêu:</span> <b className="text-slate-800">{o.vacancies} người</b>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 text-[11px]">Kinh nghiệm:</span> <b className="text-slate-800">{o.minExperience}+ năm</b>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-slate-500 text-[11px]">Mức lương:</span> <b className="text-emerald-700">{o.salaryRange ?? 'Thỏa thuận'}</b>
-                  </div>
-                </div>
-
-                <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">{o.description}</p>
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Hồ sơ đã tiếp nhận: <b className="text-slate-900">{o._count?.applicants ?? 0}</b></span>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedOpening(o);
-                    setIsOpeningDetailModalOpen(true);
-                  }}
-                  className="font-bold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
-                >
-                  Xem chi tiết →
-                </button>
-              </div>
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-card border border-border/70 shadow-2xs">
+            <div>
+              <h3 className="text-sm font-bold text-foreground">Danh Sách Vị Trí Tuyển Dụng ({openings?.length ?? 0})</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Quản lý các vị trí việc làm đang mở, số lượng chỉ tiêu định biên và xem danh sách ứng viên theo từng đợt tuyển.
+              </p>
             </div>
-          ))}
+            <Button
+              size="sm"
+              onClick={() => setIsCreateOpeningModalOpen(true)}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs flex items-center gap-1.5 font-semibold self-start sm:self-auto shadow-xs"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Đăng tin tuyển dụng mới</span>
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {openings?.map((o) => (
+              <div
+                key={o.id}
+                onClick={() => {
+                  setSelectedOpening(o);
+                  setIsOpeningDetailModalOpen(true);
+                }}
+                className="rounded-2xl border border-border/70 bg-card p-5 shadow-2xs space-y-3 hover:shadow-md hover:border-primary/50 transition-all cursor-pointer flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-bold text-foreground text-sm">{o.title}</h3>
+                      <p className="text-xs text-muted-foreground font-medium">{o.department ?? 'Phòng Kỹ thuật'} • {o.designation}</p>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
+                      <span className={`h-1.5 w-1.5 rounded-full ${o.status === 'OPEN' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                      {o.status === 'OPEN' ? 'Đang tuyển' : o.status}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs bg-muted/40 border border-border/50 p-2.5 rounded-xl">
+                    <div>
+                      <span className="text-muted-foreground text-[11px]">Chỉ tiêu:</span> <b className="text-foreground">{o.vacancies} người</b>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground text-[11px]">Kinh nghiệm:</span> <b className="text-foreground">{o.minExperience}+ năm</b>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-muted-foreground text-[11px]">Mức lương:</span> <b className="text-emerald-600">{o.salaryRange ?? 'Thỏa thuận'}</b>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{o.description}</p>
+                </div>
+
+                <div className="pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Hồ sơ đã tiếp nhận: <b className="text-foreground">{o._count?.applicants ?? 0}</b></span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedOpening(o);
+                      setIsOpeningDetailModalOpen(true);
+                    }}
+                    className="font-bold text-primary hover:underline flex items-center gap-1"
+                  >
+                    Xem chi tiết →
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {(!openings || openings.length === 0) && (
+              <div className="col-span-2 p-8 rounded-2xl border border-dashed border-border/70 bg-card text-center space-y-3">
+                <Briefcase className="h-8 w-8 text-muted-foreground/50 mx-auto" />
+                <p className="text-sm font-semibold text-foreground">Chưa có tin tuyển dụng nào</p>
+                <p className="text-xs text-muted-foreground">Bấm nút bên dưới để tạo vị trí tuyển dụng đầu tiên của công ty.</p>
+                <Button
+                  size="sm"
+                  onClick={() => setIsCreateOpeningModalOpen(true)}
+                  className="text-xs"
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Tạo tin tuyển dụng ngay
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {/* ================= MODAL XEM CHI TIẾT ỨNG VIÊN ================= */}
-      {isApplicantDetailModalOpen && selectedApplicant && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+      {/* ================= MODAL TẠO TIN TUYỂN DỤNG MỚI (PORTAL) ================= */}
+      {mounted && isCreateOpeningModalOpen && createPortal(
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+            onClick={() => setIsCreateOpeningModalOpen(false)}
+          />
+          <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/80 bg-card p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 text-foreground">
+            <div className="flex items-start justify-between border-b border-border/50 pb-3">
+              <div>
+                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+                  <Briefcase className="h-4 w-4 text-primary" /> Đăng tin tuyển dụng mới
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Tạo vị trí tuyển dụng để công bố chỉ tiêu và tiếp nhận hồ sơ ứng viên vào quy trình ATS.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsCreateOpeningModalOpen(false)}
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="font-semibold text-foreground">Tiêu đề tin tuyển dụng <span className="text-rose-500">*</span></label>
+                <input
+                  type="text"
+                  placeholder="VD: Kỹ sư Phần mềm Senior Full-Stack..."
+                  value={openingTitle}
+                  onChange={(e) => setOpeningTitle(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-semibold text-foreground">Phòng ban / Đơn vị</label>
+                  <input
+                    type="text"
+                    placeholder="VD: Phòng Phát triển Phần mềm..."
+                    value={openingDept}
+                    onChange={(e) => setOpeningDept(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-foreground">Chức danh tuyển dụng</label>
+                  <input
+                    type="text"
+                    placeholder="VD: Senior Software Engineer..."
+                    value={openingDesignation}
+                    onChange={(e) => setOpeningDesignation(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="font-semibold text-foreground">Chỉ tiêu (Người)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={openingVacancies}
+                    onChange={(e) => setOpeningVacancies(Math.max(1, Number(e.target.value)))}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-foreground">Kinh nghiệm tối thiểu (Năm)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={openingMinExp}
+                    onChange={(e) => setOpeningMinExp(Math.max(0, Number(e.target.value)))}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-foreground">Hạn nhận hồ sơ</label>
+                  <input
+                    type="date"
+                    value={openingClosingDate}
+                    onChange={(e) => setOpeningClosingDate(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-semibold text-foreground">Khung lương công bố</label>
+                <input
+                  type="text"
+                  placeholder="VD: 25.000.000 - 45.000.000 VND hoặc Thỏa thuận"
+                  value={openingSalary}
+                  onChange={(e) => setOpeningSalary(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold text-foreground">Mô tả chi tiết công việc <span className="text-rose-500">*</span></label>
+                <textarea
+                  rows={3}
+                  placeholder="Nêu trách nhiệm chính, phạm vi dự án, công nghệ sử dụng..."
+                  value={openingDesc}
+                  onChange={(e) => setOpeningDesc(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden leading-relaxed"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold text-foreground">Yêu cầu đối với ứng viên</label>
+                <textarea
+                  rows={2}
+                  placeholder="Kỹ năng bắt buộc, trình độ học vấn, ngoại ngữ..."
+                  value={openingReqs}
+                  onChange={(e) => setOpeningReqs(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden leading-relaxed"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-border/50">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCreateOpeningModalOpen(false)}
+                className="text-xs"
+              >
+                Hủy
+              </Button>
+              <Button
+                size="sm"
+                disabled={!openingTitle.trim() || !openingDesc.trim() || createOpeningMutation.isPending}
+                onClick={() =>
+                  createOpeningMutation.mutate({
+                    title: openingTitle.trim(),
+                    department: openingDept.trim() || undefined,
+                    designation: openingDesignation.trim() || undefined,
+                    vacancies: Number(openingVacancies) || 1,
+                    minExperience: Number(openingMinExp) || 0,
+                    salaryRange: openingSalary.trim() || undefined,
+                    description: openingDesc.trim(),
+                    requirements: openingReqs.trim() || undefined,
+                    closingDate: openingClosingDate ? new Date(openingClosingDate).toISOString() : undefined,
+                  })
+                }
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold disabled:opacity-50"
+              >
+                {createOpeningMutation.isPending ? 'Đang tạo...' : 'Đăng tin tuyển dụng'}
+              </Button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ================= MODAL TIẾP NHẬN ỨNG VIÊN MỚI (PORTAL) ================= */}
+      {mounted && isCreateApplicantModalOpen && createPortal(
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+            onClick={() => setIsCreateApplicantModalOpen(false)}
+          />
+          <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-border/80 bg-card p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 text-foreground">
+            <div className="flex items-start justify-between border-b border-border/50 pb-3">
+              <div>
+                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+                  <UserPlus className="h-4 w-4 text-primary" /> Tiếp nhận hồ sơ ứng viên
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Thêm ứng viên trực tiếp vào giai đoạn Ứng tuyển mới (APPLIED) của bảng Kanban ATS.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsCreateApplicantModalOpen(false)}
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="font-semibold text-foreground">Vị trí tuyển dụng ứng tuyển <span className="text-rose-500">*</span></label>
+                <select
+                  value={appJobOpeningId}
+                  onChange={(e) => setAppJobOpeningId(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                >
+                  <option value="">-- Chọn vị trí tuyển dụng --</option>
+                  {openings?.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.title} ({o.department ?? 'Chung'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="font-semibold text-foreground">Họ và tên ứng viên <span className="text-rose-500">*</span></label>
+                <input
+                  type="text"
+                  placeholder="VD: Nguyễn Văn An"
+                  value={appCandidateName}
+                  onChange={(e) => setAppCandidateName(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-semibold text-foreground">Địa chỉ Email <span className="text-rose-500">*</span></label>
+                  <input
+                    type="email"
+                    placeholder="candidate@example.com"
+                    value={appEmail}
+                    onChange={(e) => setAppEmail(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-foreground">Số điện thoại liên hệ</label>
+                  <input
+                    type="tel"
+                    placeholder="0912345678"
+                    value={appPhone}
+                    onChange={(e) => setAppPhone(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-semibold text-foreground">Đường dẫn CV / Hồ sơ năng lực</label>
+                <input
+                  type="url"
+                  placeholder="https://drive.google.com/..."
+                  value={appResumeUrl}
+                  onChange={(e) => setAppResumeUrl(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold text-foreground">Ghi chú ban đầu (Nguồn kênh, điểm nhấn...)</label>
+                <textarea
+                  rows={2}
+                  placeholder="VD: Ứng viên nộp qua LinkedIn, có chứng chỉ AWS Solution Architect..."
+                  value={appNotes}
+                  onChange={(e) => setAppNotes(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden leading-relaxed"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-border/50">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCreateApplicantModalOpen(false)}
+                className="text-xs"
+              >
+                Hủy
+              </Button>
+              <Button
+                size="sm"
+                disabled={!appJobOpeningId || !appCandidateName.trim() || !appEmail.trim() || createApplicantMutation.isPending}
+                onClick={() =>
+                  createApplicantMutation.mutate({
+                    jobOpeningId: appJobOpeningId,
+                    candidateName: appCandidateName.trim(),
+                    email: appEmail.trim(),
+                    phone: appPhone.trim() || undefined,
+                    resumeUrl: appResumeUrl.trim() || undefined,
+                    notes: appNotes.trim() || undefined,
+                  })
+                }
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold disabled:opacity-50"
+              >
+                {createApplicantMutation.isPending ? 'Đang tiếp nhận...' : 'Tiếp nhận ứng viên'}
+              </Button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ================= MODAL XEM CHI TIẾT ỨNG VIÊN (PORTAL) ================= */}
+      {mounted && isApplicantDetailModalOpen && selectedApplicant && createPortal(
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+            onClick={() => setIsApplicantDetailModalOpen(false)}
+          />
+          <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/80 bg-card p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 text-foreground">
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-start justify-between border-b border-border/50 pb-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white font-bold text-lg shadow-sm">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-bold text-lg shadow-sm">
                   {selectedApplicant.candidateName.charAt(0)}
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">{selectedApplicant.candidateName}</h3>
-                  <p className="text-xs text-blue-700 font-semibold">{selectedApplicant.jobOpening?.title}</p>
+                  <h3 className="text-base font-bold text-foreground">{selectedApplicant.candidateName}</h3>
+                  <p className="text-xs text-primary font-semibold">{selectedApplicant.jobOpening?.title}</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsApplicantDetailModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -548,24 +1049,24 @@ export default function RecruitmentAtsPage() {
 
             {/* Quick Contact & Rating */}
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                <span className="text-slate-500">Email:</span>
-                <p className="font-bold text-slate-900">{selectedApplicant.email}</p>
+              <div className="p-3 rounded-xl bg-muted/40 border border-border/60 space-y-1">
+                <span className="text-muted-foreground">Email:</span>
+                <p className="font-bold text-foreground">{selectedApplicant.email}</p>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                <span className="text-slate-500">Điện thoại:</span>
-                <p className="font-bold text-slate-900">{selectedApplicant.phone || 'Chưa cập nhật'}</p>
+              <div className="p-3 rounded-xl bg-muted/40 border border-border/60 space-y-1">
+                <span className="text-muted-foreground">Điện thoại:</span>
+                <p className="font-bold text-foreground">{selectedApplicant.phone || 'Chưa cập nhật'}</p>
               </div>
-              <div className="col-span-2 p-3 rounded-xl bg-amber-50/70 border border-amber-200 flex items-center justify-between">
+              <div className="col-span-2 p-3 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
                 <div>
-                  <span className="text-amber-800 text-[11px] font-semibold">Điểm đánh giá ứng viên:</span>
-                  <p className="text-sm font-extrabold text-amber-900 mt-0.5 flex items-center gap-1">
+                  <span className="text-muted-foreground text-[11px] font-semibold">Điểm đánh giá ứng viên:</span>
+                  <p className="text-sm font-extrabold text-foreground mt-0.5 flex items-center gap-1">
                     <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
                     <span>{selectedApplicant.rating} / 5.0</span>
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-600 text-xs font-medium">Giai đoạn hiện tại:</span>
+                  <span className="text-muted-foreground text-xs font-medium">Giai đoạn hiện tại:</span>
                   <Select
                     value={selectedApplicant.stage}
                     onChange={(e) => {
@@ -584,7 +1085,7 @@ export default function RecruitmentAtsPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100 justify-end">
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50 justify-end">
               <Button
                 variant="outline"
                 size="sm"
@@ -592,7 +1093,7 @@ export default function RecruitmentAtsPage() {
                   setIsInterviewModalOpen(true);
                   setIsApplicantDetailModalOpen(false);
                 }}
-                className="border-purple-300 text-purple-700 hover:bg-purple-50 text-xs"
+                className="text-xs"
               >
                 Chấm điểm phỏng vấn
               </Button>
@@ -603,7 +1104,7 @@ export default function RecruitmentAtsPage() {
                   setIsOfferModalOpen(true);
                   setIsApplicantDetailModalOpen(false);
                 }}
-                className="border-cyan-300 text-cyan-700 hover:bg-cyan-50 text-xs"
+                className="text-xs"
               >
                 Tạo Thư Mời (Offer)
               </Button>
@@ -619,31 +1120,36 @@ export default function RecruitmentAtsPage() {
               </Button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* ================= MODAL XEM CHI TIẾT TIN TUYỂN DỤNG ================= */}
-      {isOpeningDetailModalOpen && selectedOpening && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+      {/* ================= MODAL XEM CHI TIẾT TIN TUYỂN DỤNG (PORTAL) ================= */}
+      {mounted && isOpeningDetailModalOpen && selectedOpening && createPortal(
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+            onClick={() => setIsOpeningDetailModalOpen(false)}
+          />
+          <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/80 bg-card p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 text-foreground">
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+            <div className="flex items-start justify-between border-b border-border/50 pb-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-900">{selectedOpening.title}</h2>
+                  <h2 className="text-lg font-bold text-foreground">{selectedOpening.title}</h2>
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
                     <span className={`h-1.5 w-1.5 rounded-full ${selectedOpening.status === 'OPEN' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                     {selectedOpening.status === 'OPEN' ? 'Đang tuyển (OPEN)' : selectedOpening.status}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                <p className="text-xs text-muted-foreground font-medium mt-0.5">
                   {selectedOpening.department ?? 'Phòng Nhân sự'} • Chức danh: {selectedOpening.designation}
                 </p>
               </div>
 
               <button
                 onClick={() => setIsOpeningDetailModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -651,34 +1157,34 @@ export default function RecruitmentAtsPage() {
 
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200">
-                <span className="text-[11px] text-blue-600 font-medium flex items-center gap-1">
-                  <Users className="h-3.5 w-3.5" /> Chỉ tiêu tuyển dụng
+              <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
+                <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
+                  <Users className="h-3.5 w-3.5 text-primary" /> Chỉ tiêu tuyển dụng
                 </span>
-                <p className="text-base font-bold text-blue-950 mt-1">{selectedOpening.vacancies} nhân sự</p>
+                <p className="text-base font-bold text-foreground mt-1">{selectedOpening.vacancies} nhân sự</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200">
-                <span className="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
-                  <DollarSign className="h-3.5 w-3.5" /> Mức lương công bố
+              <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
+                <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
+                  <DollarSign className="h-3.5 w-3.5 text-emerald-600" /> Mức lương công bố
                 </span>
-                <p className="text-base font-bold text-emerald-950 mt-1">{selectedOpening.salaryRange ?? 'Thỏa thuận'}</p>
+                <p className="text-base font-bold text-foreground mt-1">{selectedOpening.salaryRange ?? 'Thỏa thuận'}</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-200">
-                <span className="text-[11px] text-purple-600 font-medium flex items-center gap-1">
-                  <Award className="h-3.5 w-3.5" /> Yêu cầu kinh nghiệm
+              <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
+                <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
+                  <Award className="h-3.5 w-3.5 text-purple-600" /> Yêu cầu kinh nghiệm
                 </span>
-                <p className="text-base font-bold text-purple-950 mt-1">{selectedOpening.minExperience}+ năm</p>
+                <p className="text-base font-bold text-foreground mt-1">{selectedOpening.minExperience}+ năm</p>
               </div>
             </div>
 
             {/* Job Description */}
             <div className="space-y-2 text-xs">
-              <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <FileText className="h-3.5 w-3.5 text-blue-600" /> Mô tả chi tiết công việc
+              <h4 className="font-bold text-foreground uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <FileText className="h-3.5 w-3.5 text-primary" /> Mô tả chi tiết công việc
               </h4>
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line">
+              <div className="p-4 rounded-xl bg-muted/30 border border-border/60 text-foreground leading-relaxed whitespace-pre-line">
                 {selectedOpening.description}
               </div>
             </div>
@@ -686,8 +1192,8 @@ export default function RecruitmentAtsPage() {
             {/* Applicants applied */}
             <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between">
-                <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <Users className="h-3.5 w-3.5 text-blue-600" /> Hồ sơ ứng viên ứng tuyển ({applicants?.filter((a) => a.jobOpeningId === selectedOpening.id).length ?? 0})
+                <h4 className="font-bold text-foreground uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Users className="h-3.5 w-3.5 text-primary" /> Hồ sơ ứng viên ứng tuyển ({applicants?.filter((a) => a.jobOpeningId === selectedOpening.id).length ?? 0})
                 </h4>
                 <button
                   type="button"
@@ -696,7 +1202,7 @@ export default function RecruitmentAtsPage() {
                     setActiveTab('kanban');
                     setIsOpeningDetailModalOpen(false);
                   }}
-                  className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1"
+                  className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
                 >
                   Xem trên Bảng Kanban →
                 </button>
@@ -704,16 +1210,16 @@ export default function RecruitmentAtsPage() {
 
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {(applicants?.filter((a) => a.jobOpeningId === selectedOpening.id) ?? []).map((app) => (
-                  <div key={app.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white shadow-2xs">
+                  <div key={app.id} className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-card shadow-2xs">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-900">{app.candidateName}</span>
+                        <span className="font-bold text-foreground">{app.candidateName}</span>
                         <span className="flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
                           <Star className="h-3 w-3 fill-amber-400 text-amber-500" />
                           <span>{app.rating}</span>
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{app.email} {app.phone ? `· ${app.phone}` : ''}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{app.email} {app.phone ? `· ${app.phone}` : ''}</p>
                     </div>
 
                     <span className="text-xs font-medium text-muted-foreground">
@@ -723,7 +1229,7 @@ export default function RecruitmentAtsPage() {
                 ))}
 
                 {(applicants?.filter((a) => a.jobOpeningId === selectedOpening.id).length ?? 0) === 0 && (
-                  <div className="p-4 rounded-xl border border-dashed border-slate-200 text-center text-slate-400">
+                  <div className="p-4 rounded-xl border border-dashed border-border/60 text-center text-muted-foreground">
                     Chưa có ứng viên nộp hồ sơ cho vị trí này.
                   </div>
                 )}
@@ -731,12 +1237,12 @@ export default function RecruitmentAtsPage() {
             </div>
 
             {/* Modal Actions */}
-            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <div className="flex justify-end gap-2 pt-3 border-t border-border/50">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsOpeningDetailModalOpen(false)}
-                className="border-slate-300 text-slate-700 text-xs"
+                className="text-xs"
               >
                 Đóng
               </Button>
@@ -747,69 +1253,84 @@ export default function RecruitmentAtsPage() {
                   setActiveTab('kanban');
                   setIsOpeningDetailModalOpen(false);
                 }}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold"
+                className="text-xs font-semibold"
               >
                 Lọc trên Bảng Kanban
               </Button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* Modal Chấm Điểm Phỏng Vấn */}
-      {isInterviewModalOpen && selectedApplicant && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl space-y-4 animate-in fade-in zoom-in-95">
-            <h2 className="text-lg font-bold text-slate-900">Chấm Điểm Phỏng Vấn (Scorecard)</h2>
-            <p className="text-xs text-slate-500">
-              Ứng viên: <b className="text-slate-900">{selectedApplicant.candidateName}</b> — Vị trí: <b className="text-blue-700">{selectedApplicant.jobOpening?.title}</b>
-            </p>
+      {/* ================= MODAL CHẤM ĐIỂM PHỎNG VẤN (PORTAL) ================= */}
+      {mounted && isInterviewModalOpen && selectedApplicant && createPortal(
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+            onClick={() => setIsInterviewModalOpen(false)}
+          />
+          <div className="relative z-10 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-border/80 bg-card p-6 shadow-xl space-y-4 animate-in fade-in zoom-in-95 text-foreground">
+            <div className="flex items-start justify-between border-b border-border/50 pb-2">
+              <div>
+                <h2 className="text-base font-bold text-foreground">Chấm Điểm Phỏng Vấn (Scorecard)</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Ứng viên: <b className="text-foreground">{selectedApplicant.candidateName}</b>
+                </p>
+              </div>
+              <button
+                onClick={() => setIsInterviewModalOpen(false)}
+                className="p-1 rounded-lg text-muted-foreground hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-semibold text-slate-800">Vòng phỏng vấn</label>
+                <label className="font-semibold text-foreground">Vòng phỏng vấn</label>
                 <input
                   type="text"
                   value={roundName}
                   onChange={(e) => setRoundName(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-600 focus:outline-hidden"
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
                 />
               </div>
               <div>
-                <label className="font-semibold text-slate-800">Người phỏng vấn</label>
+                <label className="font-semibold text-foreground">Người phỏng vấn</label>
                 <input
                   type="text"
                   value={interviewerName}
                   onChange={(e) => setInterviewerName(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-600 focus:outline-hidden"
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
                 />
               </div>
               <div>
-                <label className="font-semibold text-slate-800">Điểm số đánh giá (Thang 100)</label>
+                <label className="font-semibold text-foreground">Điểm số đánh giá (Thang 100)</label>
                 <input
                   type="number"
                   value={score}
                   onChange={(e) => setScore(Number(e.target.value))}
-                  className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-600 focus:outline-hidden font-bold"
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden font-bold"
                 />
               </div>
               <div>
-                <label className="font-semibold text-slate-800">Nhận xét chi tiết & Đánh giá năng lực</label>
+                <label className="font-semibold text-foreground">Nhận xét chi tiết & Đánh giá năng lực</label>
                 <textarea
                   rows={3}
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-600 focus:outline-hidden"
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden leading-relaxed"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex justify-end gap-2 pt-2 border-t border-border/50">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsInterviewModalOpen(false)}
-                className="border-slate-300 text-slate-700 text-xs"
+                className="text-xs"
               >
                 Hủy
               </Button>
@@ -826,51 +1347,66 @@ export default function RecruitmentAtsPage() {
                     scheduledAt: new Date().toISOString(),
                   })
                 }
-                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold disabled:opacity-50"
+                className="text-xs font-semibold disabled:opacity-50"
               >
                 {addInterviewMutation.isPending ? 'Đang lưu...' : 'Lưu Đánh Giá Phỏng Vấn'}
               </Button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* Modal Gửi Offer */}
-      {isOfferModalOpen && selectedApplicant && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl space-y-4 animate-in fade-in zoom-in-95">
-            <h2 className="text-lg font-bold text-slate-900">Tạo Thư Mời Nhận Việc (Job Offer)</h2>
-            <p className="text-xs text-slate-500">
-              Ứng viên: <b className="text-slate-900">{selectedApplicant.candidateName}</b>
-            </p>
+      {/* ================= MODAL GỬI OFFER (PORTAL) ================= */}
+      {mounted && isOfferModalOpen && selectedApplicant && createPortal(
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+            onClick={() => setIsOfferModalOpen(false)}
+          />
+          <div className="relative z-10 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-border/80 bg-card p-6 shadow-xl space-y-4 animate-in fade-in zoom-in-95 text-foreground">
+            <div className="flex items-start justify-between border-b border-border/50 pb-2">
+              <div>
+                <h2 className="text-base font-bold text-foreground">Tạo Thư Mời Nhận Việc (Job Offer)</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Ứng viên: <b className="text-foreground">{selectedApplicant.candidateName}</b>
+                </p>
+              </div>
+              <button
+                onClick={() => setIsOfferModalOpen(false)}
+                className="p-1 rounded-lg text-muted-foreground hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-semibold text-slate-800">Chức danh công việc</label>
+                <label className="font-semibold text-foreground">Chức danh công việc</label>
                 <input
                   type="text"
                   value={designation}
                   onChange={(e) => setDesignation(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-600 focus:outline-hidden"
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
                 />
               </div>
               <div>
-                <label className="font-semibold text-slate-800">Mức lương đề xuất (VND/tháng)</label>
+                <label className="font-semibold text-foreground">Mức lương đề xuất (VND/tháng)</label>
                 <input
                   type="number"
                   value={offeredSalary}
                   onChange={(e) => setOfferedSalary(Number(e.target.value))}
-                  className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-600 focus:outline-hidden font-bold text-emerald-600"
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden font-bold text-emerald-600"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex justify-end gap-2 pt-2 border-t border-border/50">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsOfferModalOpen(false)}
-                className="border-slate-300 text-slate-700 text-xs"
+                className="text-xs"
               >
                 Hủy
               </Button>
@@ -885,13 +1421,14 @@ export default function RecruitmentAtsPage() {
                     joiningDate: new Date().toISOString(),
                   })
                 }
-                className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold disabled:opacity-50"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold disabled:opacity-50"
               >
                 {createOfferMutation.isPending ? 'Đang gửi...' : 'Gửi Thư Mời Nhận Việc'}
               </Button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -189,7 +189,17 @@ export default function EssPage() {
         <h3 className="text-sm font-bold text-foreground mb-3 uppercase tracking-wider">
           Hành Động & Đơn Từ Trực Tuyến
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <Link
+            href="/profile"
+            className="flex flex-col items-center justify-center p-4 rounded-xl border bg-card hover:border-amber-500/50 hover:shadow-md transition-all text-center space-y-2 group"
+          >
+            <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Shield className="h-5 w-5" />
+            </div>
+            <span className="font-bold text-xs text-foreground">Hồ Sơ & Phân Cấp</span>
+          </Link>
+
           <Link
             href="/leave"
             className="flex flex-col items-center justify-center p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-md transition-all text-center space-y-2 group"

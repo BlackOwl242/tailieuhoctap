@@ -19,6 +19,7 @@ import { Button, Input, Label, Select } from '@/components/ui/primitives';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
 import { ComprehensivePersonnelModal } from '@/components/personnel/ComprehensivePersonnelModal';
+import { ProfileChangeReviewQueue } from '@/components/personnel/ProfileChangeReviewQueue';
 
 interface EmployeeRow {
   id: string;
@@ -60,11 +61,20 @@ interface ComprehensiveProfileRow {
 export default function EmployeesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialTab = searchParams.get('tab') === 'civil-servant' ? 'civil-servant' : 'standard';
-  const [activeTab, setActiveTab] = useState<'standard' | 'civil-servant'>(initialTab);
+  const initialTab = searchParams.get('tab') === 'civil-servant' ? 'civil-servant' : searchParams.get('tab') === 'approvals' ? 'approvals' : 'standard';
+  const [activeTab, setActiveTab] = useState<'standard' | 'civil-servant' | 'approvals'>(initialTab);
 
   const qc = useQueryClient();
   const toast = useToast();
+
+  const qPendingApprovals = useQuery({
+    queryKey: ['profile-change-requests-count'],
+    queryFn: async () => {
+      const res = await api.get('/profile-change-requests?status=PENDING&limit=1');
+      return (res.data?.pendingCount ?? 0) as number;
+    },
+  });
+  const pendingCount = qPendingApprovals.data ?? 0;
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isComprehensiveOpen, setIsComprehensiveOpen] = useState(false);
@@ -353,6 +363,23 @@ export default function EmployeesPage() {
             </span>
           ) : null}
         </button>
+
+        <button
+          onClick={() => setActiveTab('approvals')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+            activeTab === 'approvals'
+              ? 'bg-primary text-primary-foreground shadow-2xs'
+              : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
+          }`}
+        >
+          <ShieldCheck className="h-3.5 w-3.5 text-amber-500" />
+          Xét duyệt Hồ sơ Cá nhân
+          {pendingCount > 0 && (
+            <span className="ml-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-mono text-[10px] font-bold">
+              {pendingCount}
+            </span>
+          )}
+        </button>
       </div>
 
       <div className="print-area">
@@ -407,7 +434,7 @@ export default function EmployeesPage() {
             )}
             <PrintSignatureBlock leftTitle="Người lập bảng" middleTitle="Trưởng phòng Tổ chức - Nhân sự" rightTitle="Thủ trưởng đơn vị" />
           </>
-        ) : (
+        ) : activeTab === 'civil-servant' ? (
           <>
             <PrintFrame
               title="DANH SÁCH HỒ SƠ NHÂN SỰ TOÀN DIỆN (MẪU 2C-BNV)"
@@ -477,6 +504,10 @@ export default function EmployeesPage() {
             )}
             <PrintSignatureBlock leftTitle="Người lập bảng" middleTitle="Trưởng phòng Tổ chức - Cán bộ" rightTitle="Thủ trưởng đơn vị" />
           </>
+        ) : (
+          <div className="no-print">
+            <ProfileChangeReviewQueue />
+          </div>
         )}
       </div>
 

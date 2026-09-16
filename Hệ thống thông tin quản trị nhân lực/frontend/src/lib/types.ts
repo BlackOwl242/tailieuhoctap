@@ -17,6 +17,10 @@ export interface MeProfile extends Omit<AuthUser, 'roles'> {
   status: string;
   roles: string[];
   isAdminOrKm: boolean;
+  phone?: string | null;
+  employeeCode?: string | null;
+  birthDate?: string | null;
+  hireDate?: string | null;
 }
 
 export interface SpaceSummary {

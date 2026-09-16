@@ -3,7 +3,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import {
-  IsBoolean, IsDateString, IsEnum, IsNumber, IsObject, IsOptional, IsString,
+  IsArray, IsBoolean, IsDateString, IsEnum, IsNumber, IsObject, IsOptional, IsString,
 } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
@@ -78,6 +78,38 @@ export class UpdateComprehensiveProfileDto {
   @ApiPropertyOptional() @IsOptional() @IsString() strengths?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() longestJob?: string;
   @ApiPropertyOptional() @IsOptional() @IsObject() historyNotes?: Record<string, any>;
+}
+
+export class SelfUpdateProfileDto {
+  @ApiPropertyOptional({ description: 'Số điện thoại cá nhân (Mức 1)' })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiPropertyOptional({ description: 'Nơi ở hiện nay / Tạm trú (Mức 1)' })
+  @IsOptional()
+  @IsString()
+  currentAddress?: string;
+
+  @ApiPropertyOptional({ description: 'Giới thiệu bản thân (Mức 1)' })
+  @IsOptional()
+  @IsString()
+  bio?: string;
+
+  @ApiPropertyOptional({ description: 'Ảnh đại diện URL (Mức 1)' })
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
+
+  @ApiPropertyOptional({ description: 'Kỹ năng & Chuyên môn tự khai (Mức 1)', type: [String] })
+  @IsOptional()
+  @IsArray()
+  expertise?: string[];
+
+  @ApiPropertyOptional({ description: 'Sở trường công tác (Mức 1)' })
+  @IsOptional()
+  @IsString()
+  strengths?: string;
 }
 
 export class CreateSalaryHistoryDto {
@@ -321,6 +353,120 @@ export class PersonnelProfilesService {
     return this.getProfile(userId);
   }
 
+  /** Cán bộ / Nhân viên tự cập nhật thông tin Mức 1 (Tier 1 - Self-Service). */
+  async selfUpdateTier1(userId: string, dto: SelfUpdateProfileDto) {
+    const userUpdates: Record<string, any> = {};
+    if (dto.phone !== undefined) userUpdates.phone = dto.phone;
+    if (dto.currentAddress !== undefined) userUpdates.address = dto.currentAddress;
+    if (dto.bio !== undefined) userUpdates.bio = dto.bio;
+    if (dto.avatarUrl !== undefined) userUpdates.avatarUrl = dto.avatarUrl;
+    if (dto.expertise !== undefined) userUpdates.expertise = dto.expertise;
+
+    const profileUpdates: Record<string, any> = {};
+    if (dto.currentAddress !== undefined) profileUpdates.currentAddress = dto.currentAddress;
+    if (dto.strengths !== undefined) profileUpdates.strengths = dto.strengths;
+
+    await this.prisma.$transaction(async (tx) => {
+      if (Object.keys(userUpdates).length > 0) {
+        await tx.user.update({ where: { id: userId }, data: userUpdates });
+      }
+      if (Object.keys(profileUpdates).length > 0) {
+        await tx.personnelComprehensiveProfile.upsert({
+          where: { userId },
+          create: { userId, ...profileUpdates },
+          update: profileUpdates,
+        });
+      }
+    });
+
+    await this.audit.log({
+      actorId: userId,
+      action: 'SELF_UPDATE_TIER1_PROFILE',
+      entityType: 'User',
+      entityId: userId,
+      after: { ...dto },
+    });
+
+    return this.getProfile(userId);
+  }
+
+  /** Trả về siêu dữ liệu phân cấp 3 Mức độ dữ liệu nhân sự */
+  getFieldTiers() {
+    return {
+      tier1: {
+        code: 'TIER_1_SELF_SERVICE',
+        name: 'Mức 1: Tự phục vụ (Self-Service)',
+        description: 'Thông tin liên hệ & cá nhân linh hoạt. Cán bộ/nhân viên tự do cập nhật trực tiếp bất kỳ lúc nào.',
+        badgeColor: 'emerald',
+        canSelfEdit: true,
+        requiresApproval: false,
+        fields: [
+          { key: 'phone', label: 'Số điện thoại cá nhân' },
+          { key: 'currentAddress', label: 'Nơi ở hiện nay / Tạm trú' },
+          { key: 'avatarUrl', label: 'Ảnh đại diện' },
+          { key: 'bio', label: 'Giới thiệu bản thân' },
+          { key: 'expertise', label: 'Kỹ năng & Chuyên môn tự khai' },
+          { key: 'strengths', label: 'Sở trường công tác' },
+        ],
+      },
+      tier2: {
+        code: 'TIER_2_ORG_VERIFIED',
+        name: 'Mức 2: Định danh & Nhân thân pháp lý (Org-Verified)',
+        description: 'Thông tin nhân thân pháp lý & học vấn. Khóa sửa đè; nhân viên gửi đề xuất kèm tài liệu minh chứng để Phòng Nhân sự / Ban Tổ chức thẩm định và phê duyệt.',
+        badgeColor: 'amber',
+        canSelfEdit: false,
+        requiresApproval: true,
+        fields: [
+          { key: 'fullName', label: 'Họ và tên khai sinh' },
+          { key: 'aliasName', label: 'Tên gọi khác' },
+          { key: 'gender', label: 'Giới tính' },
+          { key: 'birthDate', label: 'Ngày tháng năm sinh' },
+          { key: 'birthPlace', label: 'Nơi sinh' },
+          { key: 'hometown', label: 'Quê quán' },
+          { key: 'permanentAddress', label: 'Hộ khẩu thường trú' },
+          { key: 'idCardNo', label: 'Số CCCD / CMND' },
+          { key: 'idCardIssueDate', label: 'Ngày cấp CCCD' },
+          { key: 'idCardIssuePlace', label: 'Nơi cấp CCCD' },
+          { key: 'ethnicity', label: 'Dân tộc' },
+          { key: 'religion', label: 'Tôn giáo' },
+          { key: 'familyOrigin', label: 'Thành phần gia đình' },
+          { key: 'generalEducation', label: 'Giáo dục phổ thông' },
+          { key: 'highestDegree', label: 'Học vị / Bằng cấp cao nhất' },
+          { key: 'majorName', label: 'Chuyên ngành đào tạo' },
+          { key: 'foreignLanguage', label: 'Ngoại ngữ' },
+          { key: 'informaticsLevel', label: 'Tin học' },
+          { key: 'socialInsuranceNo', label: 'Mã số BHXH' },
+        ],
+      },
+      tier3: {
+        code: 'TIER_3_ORG_CONTROLLED',
+        name: 'Mức 3: Tổ chức - Tiền lương - Chức vụ - Chính trị (Org-Controlled)',
+        description: 'Dữ liệu tổ chức quản lý định biên và ngân sách. Nhân viên chỉ xem (Read-only); Quyền quyết định thuộc Ban Lãnh đạo & Tổ chức qua Quyết định hành chính.',
+        badgeColor: 'rose',
+        canSelfEdit: false,
+        requiresApproval: false,
+        isOrgOnly: true,
+        fields: [
+          { key: 'employeeCode', label: 'Mã nhân viên / cán bộ' },
+          { key: 'orgUnitId', label: 'Đơn vị / Phòng ban công tác' },
+          { key: 'jobTitle', label: 'Chức danh vị trí việc làm' },
+          { key: 'govPosition', label: 'Chức vụ lãnh đạo / quản lý' },
+          { key: 'rankCode', label: 'Ngạch công chức / viên chức' },
+          { key: 'salaryStep', label: 'Bậc lương' },
+          { key: 'salaryCoefficient', label: 'Hệ số lương' },
+          { key: 'baseSalary', label: 'Lương cơ bản' },
+          { key: 'positionAllowance', label: 'Hệ số phụ cấp chức vụ' },
+          { key: 'overGradePercent', label: '% Vượt khung' },
+          { key: 'recruitDate', label: 'Ngày tuyển dụng' },
+          { key: 'officialDate', label: 'Ngày vào biên chế / chính thức' },
+          { key: 'partyJoinDate', label: 'Ngày vào Đảng CSVN' },
+          { key: 'unionJoinDate', label: 'Ngày vào Đoàn TNCS HCM' },
+          { key: 'enlistmentDate', label: 'Ngày nhập ngũ' },
+        ],
+      },
+    };
+  }
+
   private async getOrCreateProfile(userId: string) {
     let profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
     if (!profile) {
@@ -512,6 +658,21 @@ export class PersonnelProfilesController {
   @Roles('ADMIN', 'KM_MANAGER', 'USER')
   list(@Query() query: { q?: string; orgUnitId?: string; rankCode?: string; page?: number; limit?: number }) {
     return this.service.listProfiles(query);
+  }
+
+  @Get('field-tiers')
+  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  getFieldTiers() {
+    return this.service.getFieldTiers();
+  }
+
+  @Patch('me/self-update')
+  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  selfUpdateTier1(
+    @CurrentUser() user: AuthUser,
+    @Body() dto: SelfUpdateProfileDto,
+  ) {
+    return this.service.selfUpdateTier1(user.id, dto);
   }
 
   @Get(':userId')

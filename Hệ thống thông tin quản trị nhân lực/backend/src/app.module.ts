@@ -28,6 +28,7 @@ import { TrainingModule } from './modules/training/training.module';
 import { PersonnelActionsModule } from './modules/personnel-actions/personnel-actions.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { PersonnelProfilesModule } from './modules/personnel-profiles/personnel-profiles.module';
+import { ProfileChangeRequestsModule } from './modules/profile-change-requests/profile-change-requests.module';
 import { PersonnelRanksModule } from './modules/personnel-ranks/personnel-ranks.module';
 import { PersonnelReportsModule } from './modules/personnel-reports/personnel-reports.module';
 import { HrmsShiftsModule } from './modules/hrms-shifts/hrms-shifts.module';
@@ -72,6 +73,7 @@ import { CatalogsModule } from './modules/catalogs/catalogs.module';
     PersonnelActionsModule,
     DocumentsModule,
     PersonnelProfilesModule,
+    ProfileChangeRequestsModule,
     PersonnelRanksModule,
     PersonnelReportsModule,
     HrmsShiftsModule,

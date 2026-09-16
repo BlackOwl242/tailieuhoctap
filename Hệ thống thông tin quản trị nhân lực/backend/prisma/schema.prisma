@@ -104,6 +104,8 @@ model User {
   requisitionsDecided  JobRequisition[]            @relation("RequisitionDecider")
   documentsUploaded    HrDocument[]                @relation("DocumentUploader")
   comprehensiveProfile PersonnelComprehensiveProfile?
+  profileChangeRequests ProfileChangeRequest[]     @relation("UserChangeRequests")
+  reviewedProfileChanges ProfileChangeRequest[]    @relation("ReviewerChangeRequests")
 
   @@index([orgUnitId])
   @@index([status])
@@ -1064,6 +1066,38 @@ model PersonnelAction {
   @@index([status, type])
   @@index([subjectId])
   @@map("personnel_actions")
+}
+
+// ---------------------------------------------------------------------------
+// Phân cấp thông tin nhân sự & Quy trình xét duyệt thay đổi hồ sơ cá nhân
+// ---------------------------------------------------------------------------
+
+enum ProfileChangeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model ProfileChangeRequest {
+  id             String              @id @default(uuid())
+  userId         String              // Cán bộ / Nhân viên đề xuất
+  changes        Json                // Bản ghi các trường xin sửa: { fieldKey: { label, oldValue, newValue, tier } }
+  reason         String              // Lý do đề xuất điều chỉnh
+  attachmentUrls String[]            @default([]) // Minh chứng (ảnh CCCD, bằng cấp, giấy xác nhận...)
+  status         ProfileChangeStatus @default(PENDING)
+  reviewerId     String?             // Cán bộ Nhân sự / Ban Tổ chức thẩm định
+  reviewerNote   String?             // Ý kiến phê duyệt / Lý do từ chối
+  reviewedAt     DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  user     User  @relation("UserChangeRequests", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer User? @relation("ReviewerChangeRequests", fields: [reviewerId], references: [id])
+
+  @@index([userId, status])
+  @@index([status])
+  @@map("profile_change_requests")
 }
 
 // Mục 8 — kho tài liệu quy trình nhân sự (chính sách, biểu mẫu, quyết định…)
