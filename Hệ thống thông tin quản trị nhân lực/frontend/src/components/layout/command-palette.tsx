@@ -88,9 +88,9 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
 
   return (
     <div className="fixed inset-0 z-modal flex items-start justify-center pt-20 sm:pt-28 px-4">
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-150" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-150" onClick={onClose} />
 
-      <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-border/80 bg-card shadow-2xl animate-in zoom-in-95 duration-150 glass-card">
+      <div className="relative w-full max-w-xl overflow-hidden rounded-lg border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-150">
         {/* Search Input Bar */}
         <div className="flex items-center gap-3 border-b border-border/60 px-4 py-3.5">
           <Search className="h-4 w-4 text-primary shrink-0" />
@@ -107,7 +107,7 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
               <X className="h-4 w-4" />
             </button>
           )}
-          <kbd className="hidden sm:inline-flex items-center rounded border border-border/70 bg-muted/60 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
+          <kbd className="hidden sm:inline-flex items-center rounded-md border border-border bg-muted/60 px-1.5 py-0.5 text-xs font-mono text-muted-foreground">
             ESC
           </kbd>
         </div>
@@ -132,7 +132,7 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
                     }}
                     onMouseEnter={() => setSelectedIndex(idx)}
                     className={cn(
-                      'flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs transition-all',
+                      'flex w-full items-center justify-between rounded-md px-3 py-2.5 text-left text-xs transition-all',
                       isSelected
                         ? 'bg-primary text-primary-foreground shadow-xs font-semibold'
                         : 'text-foreground hover:bg-muted/60'
@@ -141,7 +141,7 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
                     <div className="flex items-center gap-3 min-w-0">
                       <div
                         className={cn(
-                          'flex h-7 w-7 items-center justify-center rounded-lg',
+                          'flex h-7 w-7 items-center justify-center rounded-md',
                           isSelected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground'
                         )}
                       >
@@ -149,7 +149,7 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
                       </div>
                       <div className="truncate">
                         <span className="block truncate">{cmd.title}</span>
-                        <span className={cn('text-[10px] block', isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground')}>
+                        <span className={cn('text-xs block', isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground')}>
                           {cmd.category}
                         </span>
                       </div>
@@ -159,7 +159,7 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
                       {cmd.shortcut && (
                         <span
                           className={cn(
-                            'text-[10px] font-mono px-1.5 py-0.5 rounded',
+                            'text-xs font-mono px-1.5 py-0.5 rounded-md',
                             isSelected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted/80 text-muted-foreground'
                           )}
                         >
@@ -176,7 +176,7 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
         </div>
 
         {/* Footer Hint */}
-        <div className="border-t border-border/50 bg-muted/20 px-4 py-2 flex items-center justify-between text-[11px] text-muted-foreground">
+        <div className="border-t border-border/50 bg-muted/20 px-4 py-2 flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-3">
             <span><b>↑↓</b> Chọn</span>
             <span><b>Enter</b> Mở</span>

@@ -197,7 +197,7 @@ export function SearchableEmployeeSelect({
   const popoverContent = isOpen && coords ? (
     <div
       ref={popoverRef}
-      className="bg-popover border border-border rounded-xl shadow-xl overflow-hidden font-sans animate-in fade-in-50 zoom-in-95 duration-100"
+      className="bg-popover border border-border rounded-md shadow-xl overflow-hidden font-sans animate-in fade-in-50 zoom-in-95 duration-100"
       style={{
         position: 'fixed',
         left: coords.left,
@@ -237,9 +237,9 @@ export function SearchableEmployeeSelect({
           )}
         </div>
 
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-1.5 px-1 font-medium font-sans">
+        <div className="flex items-center justify-between text-xs text-muted-foreground mt-1.5 px-1 font-medium font-sans">
           <span>{filteredEmployees.length} / {employees.length} cán bộ</span>
-          <span className="hidden sm:inline text-[10px] text-muted-foreground/80">Nhấn ↑ ↓ để chọn, Enter xác nhận</span>
+          <span className="hidden sm:inline text-xs text-muted-foreground/80">Nhấn ↑ ↓ để chọn, Enter xác nhận</span>
         </div>
       </div>
 
@@ -271,7 +271,7 @@ export function SearchableEmployeeSelect({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     {emp.employeeCode && (
-                      <span className="font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded bg-muted text-foreground border border-border/60 shrink-0">
+                      <span className="font-mono text-xs font-semibold px-1.5 py-0.5 rounded-md bg-muted text-foreground border border-border shrink-0">
                         [{emp.employeeCode}]
                       </span>
                     )}
@@ -279,7 +279,7 @@ export function SearchableEmployeeSelect({
                       {cleanName}
                     </span>
                   </div>
-                  <div className="text-[11px] text-muted-foreground truncate mt-0.5">
+                  <div className="text-xs text-muted-foreground truncate mt-0.5">
                     {role} {emp.email ? `· ${emp.email}` : ''}
                   </div>
                 </div>
@@ -295,7 +295,7 @@ export function SearchableEmployeeSelect({
         ) : (
           <div className="py-8 px-4 text-center text-xs text-muted-foreground">
             <p className="font-semibold text-foreground">Không tìm thấy cán bộ nào</p>
-            <p className="text-[11px] mt-1">Không có kết quả khớp với từ khóa &ldquo;{search}&rdquo;</p>
+            <p className="text-xs mt-1">Không có kết quả khớp với từ khóa &ldquo;{search}&rdquo;</p>
           </div>
         )}
       </div>

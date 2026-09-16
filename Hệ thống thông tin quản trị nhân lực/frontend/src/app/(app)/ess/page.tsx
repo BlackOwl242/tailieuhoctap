@@ -13,6 +13,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { LoadingState } from '@/components/common/states';
+import { Badge, Button, Input, Textarea } from '@/components/ui/primitives';
 import Link from 'next/link';
 
 export default function EssPage() {
@@ -109,11 +110,11 @@ export default function EssPage() {
       {/* Quick Punch In / Out Card & Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Attendance Widget */}
-        <div className="rounded-2xl border bg-gradient-to-br from-card to-muted/30 p-5 shadow-xs flex flex-col justify-between space-y-4">
+        <div className="rounded-lg border border-border bg-card p-5 shadow-xs flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Chấm Công Hôm Nay</span>
-            <span className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /> Trực tuyến
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Chấm Công Hôm Nay</span>
+            <span className="flex items-center gap-1.5 text-xs text-foreground font-medium">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Trực tuyến
             </span>
           </div>
 
@@ -122,16 +123,16 @@ export default function EssPage() {
               {new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
             </p>
             <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-              <MapPin className="h-3.5 w-3.5 text-primary" /> Trụ sở chính · Chấm công qua hệ thống
+              <MapPin className="h-3.5 w-3.5 text-muted-foreground" /> Trụ sở chính · Chấm công qua hệ thống
             </p>
           </div>
 
           <button
             onClick={handleCheckIn}
-            className={`w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all ${
+            className={`w-full py-2.5 rounded-md font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all ${
               isCheckedIn
-                ? 'bg-rose-600 hover:bg-rose-700 text-white'
-                : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground'
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground'
             }`}
           >
             {isCheckedIn ? (
@@ -149,29 +150,29 @@ export default function EssPage() {
         </div>
 
         {/* Leave Balance & Seniority Breakdown */}
-        <div className="rounded-2xl border bg-card p-5 shadow-xs space-y-4 lg:col-span-2">
-          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+        <div className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-4 lg:col-span-2">
+          <div className="flex items-center justify-between border-b border-border pb-3">
             <div>
-              <h3 className="font-bold text-foreground text-sm">Hạn Mức Phép Năm {new Date().getFullYear()}</h3>
-              <p className="text-[11px] text-muted-foreground">Tuân thủ Điều 113, 114 Bộ luật Lao động 2019</p>
+              <h3 className="font-semibold text-foreground text-sm">Hạn Mức Phép Năm {new Date().getFullYear()}</h3>
+              <p className="text-xs text-muted-foreground">Tuân thủ Điều 113, 114 Bộ luật Lao động 2019</p>
             </div>
-            <span className="text-xs font-bold text-primary px-2.5 py-1 rounded-lg bg-primary/10">
+            <Badge variant="outline" className="text-xs font-normal">
               12 ngày cơ bản + 1 ngày thâm niên
-            </span>
+            </Badge>
           </div>
 
           <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="bg-muted/20 p-3 rounded-xl">
-              <span className="text-[11px] text-muted-foreground">Tổng ngày phép</span>
+            <div className="bg-muted/20 p-3 rounded-md border border-border">
+              <span className="text-xs text-muted-foreground">Tổng ngày phép</span>
               <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.total?.toFixed(1) ?? '—'}</p>
             </div>
-            <div className="bg-muted/20 p-3 rounded-xl">
-              <span className="text-[11px] text-muted-foreground">Đã sử dụng</span>
-              <p className="text-xl font-bold text-amber-700 mt-0.5 font-mono">{myLeaveBalance?.used?.toFixed(1) ?? '—'}</p>
+            <div className="bg-muted/20 p-3 rounded-md border border-border">
+              <span className="text-xs text-muted-foreground">Đã sử dụng</span>
+              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.used?.toFixed(1) ?? '—'}</p>
             </div>
-            <div className="bg-muted/20 p-3 rounded-xl">
-              <span className="text-[11px] text-muted-foreground">Còn lại khả dụng</span>
-              <p className="text-xl font-bold text-emerald-700 mt-0.5 font-mono">{myLeaveBalance?.remaining?.toFixed(1) ?? '—'}</p>
+            <div className="bg-muted/20 p-3 rounded-md border border-border">
+              <span className="text-xs text-muted-foreground">Còn lại khả dụng</span>
+              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.remaining?.toFixed(1) ?? '—'}</p>
             </div>
           </div>
 
@@ -192,52 +193,52 @@ export default function EssPage() {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           <Link
             href="/profile"
-            className="flex flex-col items-center justify-center p-4 rounded-xl border bg-card hover:border-amber-500/50 hover:shadow-md transition-all text-center space-y-2 group"
+            className="flex flex-col items-center justify-center p-4 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-xs transition-all text-center space-y-2 group"
           >
-            <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="h-10 w-10 rounded-md bg-muted text-foreground flex items-center justify-center group-hover:scale-105 transition-transform">
               <Shield className="h-5 w-5" />
             </div>
-            <span className="font-bold text-xs text-foreground">Hồ Sơ & Phân Cấp</span>
+            <span className="font-semibold text-xs text-foreground">Hồ Sơ & Phân Cấp</span>
           </Link>
 
           <Link
             href="/leave"
-            className="flex flex-col items-center justify-center p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-md transition-all text-center space-y-2 group"
+            className="flex flex-col items-center justify-center p-4 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-xs transition-all text-center space-y-2 group"
           >
-            <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="h-10 w-10 rounded-md bg-muted text-foreground flex items-center justify-center group-hover:scale-105 transition-transform">
               <Calendar className="h-5 w-5" />
             </div>
-            <span className="font-bold text-xs text-foreground">Xin Nghỉ Phép</span>
+            <span className="font-semibold text-xs text-foreground">Xin Nghỉ Phép</span>
           </Link>
 
           <button
             onClick={() => setIsRegularizeModalOpen(true)}
-            className="flex flex-col items-center justify-center p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-md transition-all text-center space-y-2 group"
+            className="flex flex-col items-center justify-center p-4 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-xs transition-all text-center space-y-2 group"
           >
-            <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="h-10 w-10 rounded-md bg-muted text-foreground flex items-center justify-center group-hover:scale-105 transition-transform">
               <Clock className="h-5 w-5" />
             </div>
-            <span className="font-bold text-xs text-foreground">Giải Trình Chấm Công</span>
+            <span className="font-semibold text-xs text-foreground">Giải Trình Chấm Công</span>
           </button>
 
           <Link
             href="/loans"
-            className="flex flex-col items-center justify-center p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-md transition-all text-center space-y-2 group"
+            className="flex flex-col items-center justify-center p-4 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-xs transition-all text-center space-y-2 group"
           >
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="h-10 w-10 rounded-md bg-muted text-foreground flex items-center justify-center group-hover:scale-105 transition-transform">
               <CreditCard className="h-5 w-5" />
             </div>
-            <span className="font-bold text-xs text-foreground">Vay Vốn Phúc Lợi</span>
+            <span className="font-semibold text-xs text-foreground">Vay Vốn Phúc Lợi</span>
           </Link>
 
           <Link
             href="/org-chart"
-            className="flex flex-col items-center justify-center p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-md transition-all text-center space-y-2 group"
+            className="flex flex-col items-center justify-center p-4 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-xs transition-all text-center space-y-2 group"
           >
-            <div className="h-10 w-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="h-10 w-10 rounded-md bg-muted text-foreground flex items-center justify-center group-hover:scale-105 transition-transform">
               <Users className="h-5 w-5" />
             </div>
-            <span className="font-bold text-xs text-foreground">Sơ Đồ Đồng Nghiệp</span>
+            <span className="font-semibold text-xs text-foreground">Sơ Đồ Đồng Nghiệp</span>
           </Link>
         </div>
       </div>
@@ -245,9 +246,9 @@ export default function EssPage() {
       {/* Two Column Grid: My Assets & My Loans / Regularization History */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* My Assets */}
-        <div className="rounded-2xl border border-border/80 bg-card p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
-            <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+        <div className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-border pb-2.5">
+            <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
               <Laptop className="h-4 w-4 text-primary" />
               Tài Sản & Thiết Bị Được Cấp Phát
             </h3>
@@ -258,14 +259,15 @@ export default function EssPage() {
 
           <div className="space-y-2">
             {(myAssets && myAssets.length > 0) ? myAssets.map((a, i) => (
-              <div key={a.id || i} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/40">
+              <div key={a.id || i} className="flex items-center justify-between p-3 rounded-md bg-muted/20 border border-border">
                 <div>
-                  <p className="text-xs font-bold text-foreground">{a.name}</p>
-                  <p className="text-[10px] text-muted-foreground font-mono">Mã: {a.assetCode} · Loại: {a.category}</p>
+                  <p className="text-xs font-semibold text-foreground">{a.name}</p>
+                  <p className="text-xs text-muted-foreground font-mono">Mã: {a.assetCode} · Loại: {a.category}</p>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600">
+                <Badge variant="outline" className="text-xs font-normal gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   Đang dùng
-                </span>
+                </Badge>
               </div>
             )) : (
               <div className="py-6 text-center text-xs text-muted-foreground">
@@ -276,9 +278,9 @@ export default function EssPage() {
         </div>
 
         {/* My Regularization History */}
-        <div className="rounded-2xl border border-border/80 bg-card p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
-            <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+        <div className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-border pb-2.5">
+            <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
               <Clock className="h-4 w-4 text-primary" />
               Lịch Sử Giải Trình Chấm Công Gần Đây
             </h3>
@@ -289,22 +291,17 @@ export default function EssPage() {
 
           <div className="space-y-2">
             {(myRegularizations && myRegularizations.length > 0) ? myRegularizations.map((reg, i) => (
-              <div key={reg.id || i} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/40">
+              <div key={reg.id || i} className="flex items-center justify-between p-3 rounded-md bg-muted/20 border border-border">
                 <div>
-                  <p className="text-xs font-bold text-foreground">
+                  <p className="text-xs font-semibold text-foreground">
                     Ngày công: {new Date(reg.workDate).toLocaleDateString('vi-VN')}
                   </p>
-                  <p className="text-[10px] text-muted-foreground line-clamp-1">{reg.reason}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-1">{reg.reason}</p>
                 </div>
-                <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    reg.status === 'APPROVED'
-                      ? 'bg-emerald-500/10 text-emerald-600'
-                      : 'bg-amber-500/10 text-amber-600'
-                  }`}
-                >
+                <Badge variant="outline" className="text-xs font-normal gap-1.5">
+                  <span className={`h-1.5 w-1.5 rounded-full ${reg.status === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                   {reg.status === 'APPROVED' ? 'Đã duyệt bù công' : 'Chờ duyệt'}
-                </span>
+                </Badge>
               </div>
             )) : (
               <div className="py-6 text-center text-xs text-muted-foreground">
@@ -317,63 +314,65 @@ export default function EssPage() {
 
       {/* Modal Giải Trình Bổ Sung Công */}
       {isRegularizeModalOpen && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-2xl space-y-4">
-            <h3 className="text-base font-bold text-foreground">Đơn Giải Trình Bổ Sung Giờ Công</h3>
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4">
+            <h3 className="text-base font-semibold text-foreground">Đơn Giải Trình Bổ Sung Giờ Công</h3>
             <p className="text-xs text-muted-foreground">
               Giải trình lý do không thể chấm công đúng giờ để được quản lý duyệt bù công vào hệ thống.
             </p>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">Ngày làm việc cần giải trình</label>
-              <input
+              <label className="block text-xs font-medium text-foreground mb-1">Ngày làm việc cần giải trình</label>
+              <Input
                 type="date"
                 value={regDate}
                 onChange={(e) => setRegDate(e.target.value)}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs font-semibold text-foreground outline-hidden focus:border-primary"
+                className="h-9 text-xs"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Giờ vào thực tế</label>
-                <input
+                <label className="block text-xs font-medium text-foreground mb-1">Giờ vào thực tế</label>
+                <Input
                   type="time"
                   value={regInTime}
                   onChange={(e) => setRegInTime(e.target.value)}
-                  className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs font-mono text-foreground outline-hidden focus:border-primary"
+                  className="h-9 text-xs font-mono"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Giờ ra thực tế</label>
-                <input
+                <label className="block text-xs font-medium text-foreground mb-1">Giờ ra thực tế</label>
+                <Input
                   type="time"
                   value={regOutTime}
                   onChange={(e) => setRegOutTime(e.target.value)}
-                  className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs font-mono text-foreground outline-hidden focus:border-primary"
+                  className="h-9 text-xs font-mono"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">Lý do giải trình</label>
-              <textarea
+              <label className="block text-xs font-medium text-foreground mb-1">Lý do giải trình</label>
+              <Textarea
                 rows={3}
                 placeholder="VD: Quên quẹt thẻ do đi gặp khách hàng, lỗi thiết bị kiosk..."
                 value={regReason}
                 onChange={(e) => setRegReason(e.target.value)}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs text-foreground outline-hidden focus:border-primary"
+                className="text-xs resize-none"
               />
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setIsRegularizeModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted"
               >
                 Hủy bỏ
-              </button>
-              <button
+              </Button>
+              <Button
+                size="sm"
                 onClick={() => {
                   regularizeMutation.mutate({
                     userId: user?.id ?? '',
@@ -385,10 +384,9 @@ export default function EssPage() {
                   });
                 }}
                 disabled={!regReason}
-                className="px-4 py-2 rounded-xl bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               >
                 Gửi Đơn Giải Trình
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -206,14 +206,14 @@ export function StateCivilServantProfile({
       {/* ========================================================================= */}
       {/* THANH ĐIỀU KHIỂN XEM BẢN IN HIỆN ĐẠI & ĐỒNG BỘ VỚI TOÀN BỘ HỆ THỐNG */}
       {/* ========================================================================= */}
-      <div className="no-print bg-card border border-border/80 rounded-2xl shadow-sm p-4 mb-6 font-sans space-y-3">
+      <div className="no-print bg-card border border-border rounded-lg shadow-sm p-4 mb-6 font-sans space-y-3">
         {/* Dòng 1: Chọn nhân sự, Định dạng & Nút In */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pb-3 border-b border-border/60">
           <div className="flex flex-wrap items-center gap-3 flex-1">
             {/* Chọn nhân viên: Vừa tìm kiếm vừa chọn dropdown */}
             {employees.length > 0 && onSelectUser && (
               <div className="flex items-center gap-2 flex-1 min-w-[280px]">
-                <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
+                <div className="p-1.5 rounded-md bg-primary/10 text-primary shrink-0">
                   <User className="w-4 h-4" />
                 </div>
                 <div className="flex-1">
@@ -258,12 +258,12 @@ export function StateCivilServantProfile({
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
           {/* Nhóm chọn trang */}
           <div className="flex items-center flex-wrap gap-2">
-            <div className="flex items-center bg-muted/60 p-1 rounded-xl gap-1 border border-border/40">
+            <div className="flex items-center bg-muted/60 p-1 rounded-md gap-1 border border-border/40">
               {pageTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setCurrentPage(tab.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                     currentPage === tab.id
                       ? 'bg-card text-foreground shadow-xs border border-border/50'
                       : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
@@ -319,7 +319,7 @@ export function StateCivilServantProfile({
       {/* VÙNG KHÔNG GIAN CANVAS XEM TRƯỚC BẢN IN HIỆN ĐẠI */}
       {/* ========================================================================= */}
       <div
-        className="huha-canvas font-times text-black bg-slate-900/90 dark:bg-slate-950 p-4 sm:p-10 overflow-x-auto min-h-[900px] flex flex-col items-center gap-10 rounded-2xl border border-slate-800 shadow-inner"
+        className="huha-canvas font-times text-black bg-slate-900/90 dark:bg-slate-950 p-4 sm:p-10 overflow-x-auto min-h-[900px] flex flex-col items-center gap-10 rounded-lg border border-slate-800 shadow-inner"
         style={{
           transform: zoomLevel !== 100 ? `scale(${zoomLevel / 100})` : undefined,
           transformOrigin: 'top center',

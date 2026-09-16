@@ -451,7 +451,7 @@ export default function Performance360Page() {
       {activeTab === 'goals' && (
         <div className="space-y-4">
           {goals.length === 0 ? (
-            <div className="text-center py-12 border border-dashed rounded-2xl bg-card/40 space-y-3">
+            <div className="text-center py-12 border border-dashed rounded-lg bg-card space-y-3">
               <Target className="w-10 h-10 text-muted-foreground/40 mx-auto" />
               <div className="text-sm font-bold text-foreground">Chưa có mục tiêu KRA/KPI nào trong chu kỳ này</div>
               <p className="text-xs text-muted-foreground max-w-md mx-auto">
@@ -464,7 +464,7 @@ export default function Performance360Page() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {goals.map((g) => (
-                <div key={g.id} className="rounded-xl border bg-card p-5 shadow-xs space-y-3 relative group">
+                <div key={g.id} className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-3 relative group">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
@@ -476,7 +476,7 @@ export default function Performance360Page() {
                       </p>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="rounded-full bg-purple-50 px-2.5 py-0.5 text-[10px] font-bold text-purple-800 border border-purple-200">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border border-border bg-muted/40 text-foreground">
                         Trọng số: {g.weightage}%
                       </span>
                       <button
@@ -496,7 +496,7 @@ export default function Performance360Page() {
                   <p className="text-xs text-muted-foreground leading-relaxed">{g.description || 'Không có mô tả chi tiết'}</p>
 
                   <div className="bg-muted/20 p-2.5 rounded-lg text-xs space-y-1 border border-border/40">
-                    <span className="text-muted-foreground text-[11px] font-medium">Chỉ số đo lường mục tiêu (Target Metric):</span>
+                    <span className="text-muted-foreground text-xs font-medium">Chỉ số đo lường mục tiêu (Target Metric):</span>
                     <p className="font-bold text-foreground">{g.targetMetric || 'Chưa thiết lập'}</p>
                   </div>
 
@@ -530,7 +530,7 @@ export default function Performance360Page() {
       {activeTab === 'reviews' && (
         <div className="space-y-4">
           {reviews.length === 0 ? (
-            <div className="text-center py-12 border border-dashed rounded-2xl bg-card/40 space-y-3">
+            <div className="text-center py-12 border border-dashed rounded-lg bg-card space-y-3">
               <MessageSquare className="w-10 h-10 text-muted-foreground/40 mx-auto" />
               <div className="text-sm font-bold text-foreground">Chưa có phản hồi đánh giá 360 độ nào</div>
               <p className="text-xs text-muted-foreground max-w-md mx-auto">
@@ -543,23 +543,24 @@ export default function Performance360Page() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {reviews.map((r) => {
-                const relationMap: Record<string, { label: string; color: string }> = {
-                  MANAGER: { label: 'Cấp Quản lý', color: 'bg-blue-50 text-blue-800 border-blue-200' },
-                  PEER: { label: 'Đồng nghiệp', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
-                  SUBORDINATE: { label: 'Cấp dưới', color: 'bg-purple-50 text-purple-800 border-purple-200' },
-                  SELF: { label: 'Tự đánh giá', color: 'bg-amber-50 text-amber-900 border-amber-200' },
+                const relationMap: Record<string, { label: string; dot: string }> = {
+                  MANAGER: { label: 'Cấp Quản lý', dot: 'bg-blue-600' },
+                  PEER: { label: 'Đồng nghiệp', dot: 'bg-emerald-600' },
+                  SUBORDINATE: { label: 'Cấp dưới', dot: 'bg-purple-600' },
+                  SELF: { label: 'Tự đánh giá', dot: 'bg-amber-600' },
                 };
-                const rel = relationMap[r.relationship] || { label: r.relationship, color: 'bg-slate-100 text-slate-800 border-slate-200' };
+                const rel = relationMap[r.relationship] || { label: r.relationship, dot: 'bg-muted-foreground' };
 
                 return (
-                  <div key={r.id} className="rounded-xl border bg-card p-5 shadow-xs space-y-3">
+                  <div key={r.id} className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
                           {r.reviewerName}
                         </h4>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${rel.color}`}>
+                          <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/40 px-2 py-0.5 text-xs font-medium text-foreground">
+                            <span className={`h-1.5 w-1.5 rounded-full ${rel.dot}`} />
                             {rel.label}
                           </span>
                         </div>
@@ -572,7 +573,7 @@ export default function Performance360Page() {
                               deleteReviewMutation.mutate(r.id);
                             }
                           }}
-                          className="text-muted-foreground hover:text-destructive p-1 rounded-md hover:bg-muted"
+                          className="text-muted-foreground hover:text-destructive p-1 rounded-md hover:bg-muted transition-colors"
                           title="Xóa đánh giá"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -584,7 +585,7 @@ export default function Performance360Page() {
                       <p className="text-xs text-muted-foreground italic leading-relaxed">&ldquo;{r.feedback}&rdquo;</p>
                     </div>
 
-                    <div className="pt-2 border-t text-[11px] text-muted-foreground flex justify-between items-center">
+                    <div className="pt-2 border-t border-border/50 text-xs text-muted-foreground flex justify-between items-center">
                       <span>Thời điểm gửi: {new Date(r.submittedAt).toLocaleDateString('vi-VN')}</span>
                       <span className="font-semibold text-primary font-mono">{r.rating} / 5.0</span>
                     </div>
@@ -618,7 +619,7 @@ export default function Performance360Page() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {cycles.map((c) => (
-              <div key={c.id} className="rounded-xl border bg-card p-5 shadow-xs space-y-3 relative">
+              <div key={c.id} className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-3 relative">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-bold text-foreground text-sm">{c.name}</h3>
@@ -626,11 +627,8 @@ export default function Performance360Page() {
                       Năm đánh giá: <b className="text-foreground">{c.year}</b> • Từ {new Date(c.startDate).toLocaleDateString('vi-VN')} đến {new Date(c.endDate).toLocaleDateString('vi-VN')}
                     </div>
                   </div>
-                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                    c.status === 'ACTIVE'
-                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                      : 'bg-slate-100 text-slate-700 border-slate-200'
-                  }`}>
+                  <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/40 px-2.5 py-0.5 text-xs font-normal text-foreground">
+                    <span className={`h-1.5 w-1.5 rounded-full ${c.status === 'ACTIVE' ? 'bg-emerald-600' : 'bg-muted-foreground'}`} />
                     {c.status === 'ACTIVE' ? 'Đang Mở (ACTIVE)' : 'Đã Đóng (CLOSED)'}
                   </span>
                 </div>
@@ -679,7 +677,7 @@ export default function Performance360Page() {
       {/* MODAL 1: KHỞI TẠO CHU KỲ MỚI */}
       {isCycleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border space-y-4">
+          <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl border border-border space-y-4">
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
@@ -752,7 +750,7 @@ export default function Performance360Page() {
       {/* MODAL 2: THIẾT LẬP MỤC TIÊU KRA */}
       {isGoalModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-card p-6 shadow-2xl border border-border space-y-4">
+          <div className="w-full max-w-lg rounded-lg bg-card p-6 shadow-xl border border-border space-y-4">
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                 <Target className="w-4 h-4 text-primary" />
@@ -858,7 +856,7 @@ export default function Performance360Page() {
       {/* MODAL 3: CHẤM ĐIỂM KRA */}
       {isScoreModalOpen && selectedGoal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border space-y-4">
+          <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl border border-border space-y-4">
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -873,7 +871,7 @@ export default function Performance360Page() {
               <div className="bg-muted/30 p-3 rounded-lg">
                 <div className="font-bold text-foreground text-sm">{selectedGoal.kraTitle}</div>
                 <div className="text-muted-foreground mt-0.5">Nhân sự: <b>{selectedGoal.employeeName}</b></div>
-                <div className="text-[11px] text-primary font-bold mt-1">Trọng số: {selectedGoal.weightage}%</div>
+                <div className="text-xs text-primary font-bold mt-1">Trọng số: {selectedGoal.weightage}%</div>
               </div>
 
               <div>
@@ -912,7 +910,7 @@ export default function Performance360Page() {
       {/* MODAL 4: GỬI PHẢN HỒI ĐÁNH GIÁ 360 */}
       {isReviewModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border space-y-4">
+          <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl border border-border space-y-4">
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-emerald-600" />
@@ -1013,7 +1011,7 @@ export default function Performance360Page() {
       {/* MODAL 5: ĐỒNG BỘ KẾT QUẢ VÀO HỒ SƠ CÁN BỘ (QT ĐGCB) */}
       {isSyncModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border space-y-4">
+          <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl border border-border space-y-4">
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                 <Medal className="w-4 h-4 text-amber-500" />

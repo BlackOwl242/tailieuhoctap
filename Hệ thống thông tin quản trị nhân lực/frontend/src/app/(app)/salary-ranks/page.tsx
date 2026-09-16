@@ -201,7 +201,7 @@ export default function SalaryRanksPage() {
         <div>
           <button
             onClick={() => setSelectedRank(r)}
-            className="font-semibold text-slate-900 hover:text-primary text-left block"
+            className="font-semibold text-foreground hover:text-primary text-left block"
           >
             {r.name}
           </button>
@@ -214,7 +214,7 @@ export default function SalaryRanksPage() {
       header: 'Nhóm ngạch',
       sortable: true,
       render: (r) => (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
           Nhóm {r.groupCode}
         </span>
       ),
@@ -224,7 +224,7 @@ export default function SalaryRanksPage() {
       header: 'Tổng số bậc',
       sortable: true,
       render: (r) => (
-        <span className="text-xs font-semibold text-slate-700">
+        <span className="text-xs font-semibold text-foreground">
           {r.totalSteps} bậc
         </span>
       ),
@@ -234,7 +234,7 @@ export default function SalaryRanksPage() {
       header: 'Thời gian nâng bậc',
       sortable: true,
       render: (r) => (
-        <span className="text-xs text-slate-600 font-medium">
+        <span className="text-xs text-muted-foreground font-medium">
           {r.stepMonths} tháng ({r.stepMonths / 12} năm)
         </span>
       ),
@@ -244,8 +244,8 @@ export default function SalaryRanksPage() {
       header: 'Dải hệ số (Khởi điểm - Trần)',
       render: (r) => (
         <div className="text-xs font-mono">
-          <span className="text-slate-600">{r.coefficients[0]?.toFixed(2) || '—'}</span>
-          <span className="text-slate-400 mx-1.5">➔</span>
+          <span className="text-muted-foreground">{r.coefficients[0]?.toFixed(2) || '—'}</span>
+          <span className="text-muted-foreground/60 mx-1.5">➔</span>
           <span className="font-semibold text-emerald-700">
             {r.coefficients[r.coefficients.length - 1]?.toFixed(2) || '—'}
           </span>
@@ -261,7 +261,7 @@ export default function SalaryRanksPage() {
       header: 'Mã bậc',
       sortable: true,
       render: (r) => (
-        <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">
+        <span className="font-mono text-xs font-semibold text-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
           {r.bandCode}
         </span>
       ),
@@ -274,7 +274,7 @@ export default function SalaryRanksPage() {
         <div>
           <button
             onClick={() => setSelectedBand(r)}
-            className="font-semibold text-slate-900 hover:text-primary text-left block"
+            className="font-semibold text-foreground hover:text-primary text-left block"
           >
             {r.bandName}
           </button>
@@ -287,7 +287,7 @@ export default function SalaryRanksPage() {
       header: 'Lương sàn (Min)',
       sortable: true,
       render: (r) => (
-        <span className="font-mono text-xs text-slate-700">
+        <span className="font-mono text-xs text-foreground">
           {r.minSalary.toLocaleString('vi-VN')} đ
         </span>
       ),
@@ -307,7 +307,7 @@ export default function SalaryRanksPage() {
       header: 'Lương trần (Max)',
       sortable: true,
       render: (r) => (
-        <span className="font-mono text-xs text-slate-700">
+        <span className="font-mono text-xs text-foreground">
           {r.maxSalary.toLocaleString('vi-VN')} đ
         </span>
       ),
@@ -316,7 +316,7 @@ export default function SalaryRanksPage() {
       key: 'reviewCycleMonths',
       header: 'Chu kỳ xét lương',
       render: (r) => (
-        <span className="text-xs font-medium text-slate-700">
+        <span className="text-xs font-medium text-foreground">
           {r.reviewCycleMonths} tháng / lần
         </span>
       ),
@@ -335,7 +335,7 @@ export default function SalaryRanksPage() {
       header: 'Mã NV',
       sortable: true,
       render: (r) => (
-        <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">
+        <span className="font-mono text-xs font-semibold text-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
           {r.employeeCode || '—'}
         </span>
       ),
@@ -346,7 +346,7 @@ export default function SalaryRanksPage() {
       sortable: true,
       render: (r) => (
         <div>
-          <div className="font-bold text-slate-900">{r.fullName}</div>
+          <div className="font-bold text-foreground">{r.fullName}</div>
           <div className="text-xs text-muted-foreground">{r.jobTitle} • {r.orgUnitName}</div>
         </div>
       ),
@@ -370,9 +370,9 @@ export default function SalaryRanksPage() {
       header: 'Ngày hưởng bậc',
       render: (r) => (
         <div>
-          <div className="text-xs font-medium text-slate-800">{formatDate(r.salaryStepDate)}</div>
-          <div className="text-[11px] text-muted-foreground">
-            Đã giữ: <span className="font-semibold text-slate-700">{r.monthsHeld} tháng</span> / {r.requiredMonths} th
+          <div className="text-xs font-medium text-foreground">{formatDate(r.salaryStepDate)}</div>
+          <div className="text-xs text-muted-foreground">
+            Đã giữ: <span className="font-semibold text-foreground">{r.monthsHeld} tháng</span> / {r.requiredMonths} th
           </div>
         </div>
       ),
@@ -427,10 +427,10 @@ export default function SalaryRanksPage() {
       />
 
       {/* Main Tab Switcher */}
-      <div className="flex items-center gap-2 border-b border-border/80 pb-3 mb-4">
+      <div className="flex items-center gap-2 border-b border-border pb-3 mb-4">
         <button
           onClick={() => setMainTab('ranks')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
             mainTab === 'ranks'
               ? 'bg-primary text-primary-foreground shadow-2xs'
               : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -441,7 +441,7 @@ export default function SalaryRanksPage() {
         </button>
         <button
           onClick={() => setMainTab('progression')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
             mainTab === 'progression'
               ? 'bg-primary text-primary-foreground shadow-2xs'
               : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -450,7 +450,7 @@ export default function SalaryRanksPage() {
           <TrendingUp className="h-3.5 w-3.5" />
           Xét & Phê duyệt nâng bậc lương
           {qScan.data?.eligibleCount ? (
-            <span className="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-500 text-white text-[10px]">
+            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold">
               {qScan.data.eligibleCount}
             </span>
           ) : null}
@@ -463,9 +463,9 @@ export default function SalaryRanksPage() {
           <div className="flex items-center gap-2 pb-3 mb-4">
             <button
               onClick={() => setViewMode('state')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                 viewMode === 'state'
-                  ? 'bg-slate-900 text-white shadow-2xs'
+                  ? 'bg-primary text-primary-foreground shadow-2xs'
                   : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
@@ -474,9 +474,9 @@ export default function SalaryRanksPage() {
             </button>
             <button
               onClick={() => setViewMode('enterprise')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                 viewMode === 'enterprise'
-                  ? 'bg-slate-900 text-white shadow-2xs'
+                  ? 'bg-primary text-primary-foreground shadow-2xs'
                   : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
@@ -563,27 +563,27 @@ export default function SalaryRanksPage() {
         <>
           {/* KPI Cards Thống kê kết quả quét */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
-            <Card className="p-4 bg-white border-slate-200 shadow-sm">
+            <Card className="p-4 bg-card border-border shadow-xs">
               <div className="text-xs font-semibold text-muted-foreground uppercase">Tổng hồ sơ quét</div>
-              <div className="text-2xl font-bold text-slate-900 mt-1">{qScan.data?.totalScanned || 0}</div>
+              <div className="text-2xl font-bold text-foreground mt-1">{qScan.data?.totalScanned || 0}</div>
               <div className="text-xs text-muted-foreground mt-1">Đã cấu hình ngạch bậc</div>
             </Card>
-            <Card className="p-4 bg-emerald-50 border-emerald-200 shadow-sm">
+            <Card className="p-4 bg-emerald-500/10 border-emerald-500/20 shadow-xs">
               <div className="text-xs font-semibold text-emerald-700 uppercase">Đủ điều kiện nâng bậc</div>
               <div className="text-2xl font-bold text-emerald-800 mt-1">{qScan.data?.eligibleCount || 0}</div>
               <div className="text-xs text-emerald-600 mt-1">Đạt đủ 24/36 tháng giữ bậc</div>
             </Card>
-            <Card className="p-4 bg-amber-50 border-amber-200 shadow-sm">
+            <Card className="p-4 bg-amber-500/10 border-amber-500/20 shadow-xs">
               <div className="text-xs font-semibold text-amber-700 uppercase">Quá hạn chưa duyệt</div>
               <div className="text-2xl font-bold text-amber-800 mt-1">{qScan.data?.overdueCount || 0}</div>
               <div className="text-xs text-amber-600 mt-1">Quá hạn &gt; 3 tháng</div>
             </Card>
-            <Card className="p-4 bg-purple-50 border-purple-200 shadow-sm">
-              <div className="text-xs font-semibold text-purple-700 uppercase">Kịch trần ngạch</div>
-              <div className="text-2xl font-bold text-purple-800 mt-1">
+            <Card className="p-4 bg-primary/10 border-primary/20 shadow-xs">
+              <div className="text-xs font-semibold text-primary uppercase">Kịch trần ngạch</div>
+              <div className="text-2xl font-bold text-primary mt-1">
                 {allProgressionItems.filter((i) => i.currentStep >= i.totalSteps).length}
               </div>
-              <div className="text-xs text-purple-600 mt-1">Hưởng thâm niên vượt khung</div>
+              <div className="text-xs text-muted-foreground mt-1">Hưởng thâm niên vượt khung</div>
             </Card>
           </div>
 
@@ -634,30 +634,30 @@ export default function SalaryRanksPage() {
 
       {/* Modal Xem chi tiết ngạch lương Nhà nước */}
       {selectedRank && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <Card className="w-full max-w-2xl bg-white shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between border-b pb-3">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <Card className="w-full max-w-2xl bg-card border border-border shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <h3 className="font-bold text-lg text-slate-900">{selectedRank.name}</h3>
+                <h3 className="font-bold text-lg text-foreground">{selectedRank.name}</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Mã ngạch: <span className="font-mono font-semibold text-primary">{selectedRank.code}</span> • Nhóm: <span className="font-semibold">{selectedRank.groupCode}</span> • Lĩnh vực: <span className="font-semibold">{selectedRank.field || 'Hành chính'}</span>
                 </p>
               </div>
               <button
                 onClick={() => setSelectedRank(null)}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-md hover:bg-slate-100"
+                className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="text-xs text-slate-600">
-              Thời gian nâng bậc tiêu chuẩn: <span className="font-bold text-slate-900">{selectedRank.stepMonths} tháng</span> ({selectedRank.stepMonths / 12} năm/bậc).
+            <div className="text-xs text-muted-foreground">
+              Thời gian nâng bậc tiêu chuẩn: <span className="font-bold text-foreground">{selectedRank.stepMonths} tháng</span> ({selectedRank.stepMonths / 12} năm/bậc).
             </div>
 
-            <div className="border rounded-lg overflow-hidden">
+            <div className="border border-border rounded-lg overflow-hidden">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 font-semibold border-b">
+                <thead className="bg-muted/40 text-muted-foreground font-semibold border-b border-border">
                   <tr>
                     <th className="p-2.5 text-center">Bậc lương</th>
                     {selectedRank.coefficients.map((_, idx) => (
@@ -666,18 +666,18 @@ export default function SalaryRanksPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b">
-                    <td className="p-2.5 font-semibold text-slate-700 bg-slate-50 text-center">Hệ số</td>
+                  <tr className="border-b border-border">
+                    <td className="p-2.5 font-semibold text-foreground bg-muted/40 text-center">Hệ số</td>
                     {selectedRank.coefficients.map((coef, idx) => (
-                      <td key={idx} className="p-2.5 text-center font-mono font-bold text-slate-900">
+                      <td key={idx} className="p-2.5 text-center font-mono font-bold text-foreground">
                         {coef.toFixed(2)}
                       </td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="p-2.5 font-semibold text-slate-700 bg-slate-50 text-center">Mức lương (2.340.000đ)</td>
+                    <td className="p-2.5 font-semibold text-foreground bg-muted/40 text-center">Mức lương (2.340.000đ)</td>
                     {selectedRank.coefficients.map((coef, idx) => (
-                      <td key={idx} className="p-2.5 text-center font-mono text-[11px] text-emerald-700 font-medium">
+                      <td key={idx} className="p-2.5 text-center font-mono text-xs text-primary font-medium">
                         {(coef * 2340000).toLocaleString('vi-VN')} đ
                       </td>
                     ))}
@@ -695,50 +695,50 @@ export default function SalaryRanksPage() {
 
       {/* Modal Xem chi tiết Band Doanh nghiệp */}
       {selectedBand && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <Card className="w-full max-w-lg bg-white shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between border-b pb-3">
+        <div className="fixed inset-0 z-modal bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <Card className="w-full max-w-lg bg-card border border-border shadow-xl p-6 space-y-4 rounded-lg">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <h3 className="font-bold text-lg text-slate-900">{selectedBand.bandName}</h3>
+                <h3 className="font-bold text-base text-foreground">{selectedBand.bandName}</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Chức danh: <span className="font-semibold text-slate-800">{selectedBand.levelTitle}</span>
+                  Chức danh: <span className="font-semibold text-foreground">{selectedBand.levelTitle}</span>
                 </p>
               </div>
               <button
                 onClick={() => setSelectedBand(null)}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-md hover:bg-slate-100"
+                className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 text-center p-3 rounded-lg bg-slate-50 border">
+            <div className="grid grid-cols-3 gap-2 text-center p-3 rounded-lg bg-muted/30 border border-border">
               <div>
-                <div className="text-[11px] text-muted-foreground">Min (Sàn)</div>
-                <div className="text-xs font-bold text-slate-800 mt-0.5">{selectedBand.minSalary.toLocaleString('vi-VN')} đ</div>
+                <div className="text-xs text-muted-foreground">Min (Sàn)</div>
+                <div className="text-xs font-bold text-foreground mt-0.5">{selectedBand.minSalary.toLocaleString('vi-VN')} đ</div>
               </div>
-              <div className="border-x">
-                <div className="text-[11px] text-emerald-700 font-semibold">Mid (Chuẩn)</div>
-                <div className="text-xs font-bold text-emerald-700 mt-0.5">{selectedBand.midSalary.toLocaleString('vi-VN')} đ</div>
+              <div className="border-x border-border">
+                <div className="text-xs text-primary font-semibold">Mid (Chuẩn)</div>
+                <div className="text-xs font-bold text-primary mt-0.5">{selectedBand.midSalary.toLocaleString('vi-VN')} đ</div>
               </div>
               <div>
-                <div className="text-[11px] text-muted-foreground">Max (Trần)</div>
-                <div className="text-xs font-bold text-slate-800 mt-0.5">{selectedBand.maxSalary.toLocaleString('vi-VN')} đ</div>
+                <div className="text-xs text-muted-foreground">Max (Trần)</div>
+                <div className="text-xs font-bold text-foreground mt-0.5">{selectedBand.maxSalary.toLocaleString('vi-VN')} đ</div>
               </div>
             </div>
 
             <div className="space-y-2 text-xs">
               <div>
-                <span className="font-semibold text-slate-700">Vị trí áp dụng điển hình:</span>
-                <p className="text-slate-600 mt-0.5">{selectedBand.roles}</p>
+                <span className="font-semibold text-foreground">Vị trí áp dụng điển hình:</span>
+                <p className="text-muted-foreground mt-0.5">{selectedBand.roles}</p>
               </div>
               <div>
-                <span className="font-semibold text-slate-700">Tiêu chuẩn năng lực & đầu ra:</span>
-                <p className="text-slate-600 mt-0.5">{selectedBand.criteria}</p>
+                <span className="font-semibold text-foreground">Tiêu chuẩn năng lực & đầu ra:</span>
+                <p className="text-muted-foreground mt-0.5">{selectedBand.criteria}</p>
               </div>
               <div>
-                <span className="font-semibold text-slate-700">Chu kỳ rà soát điều chỉnh:</span>
-                <p className="text-slate-600 mt-0.5">{selectedBand.reviewCycleMonths} tháng / lần</p>
+                <span className="font-semibold text-foreground">Chu kỳ rà soát điều chỉnh:</span>
+                <p className="text-muted-foreground mt-0.5">{selectedBand.reviewCycleMonths} tháng / lần</p>
               </div>
             </div>
 
@@ -751,34 +751,34 @@ export default function SalaryRanksPage() {
 
       {/* Modal Phê duyệt Nâng bậc Lương */}
       {selectedPerson && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <Card className="w-full max-w-lg bg-white shadow-2xl p-6 space-y-5">
-            <div className="flex items-center justify-between border-b pb-3">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="w-full max-w-lg rounded-lg border border-border bg-card shadow-xl p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <h3 className="font-bold text-lg text-slate-900">Phê duyệt Nâng bậc Lương</h3>
+                <h3 className="font-semibold text-base text-foreground">Phê duyệt Nâng bậc Lương</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Nhân sự: <span className="font-semibold text-slate-800">{selectedPerson.fullName}</span> ({selectedPerson.employeeCode})
+                  Nhân sự: <span className="font-semibold text-foreground">{selectedPerson.fullName}</span> ({selectedPerson.employeeCode})
                 </p>
               </div>
               <button
                 onClick={() => setSelectedPerson(null)}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-md hover:bg-slate-100"
+                className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+            <div className="p-4 rounded-md bg-muted/20 border border-border space-y-3 text-xs">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Ngạch lương:</span>
-                <span className="font-bold text-slate-800">{selectedPerson.rankName} ({selectedPerson.rankCode})</span>
+                <span className="font-semibold text-foreground">{selectedPerson.rankName} ({selectedPerson.rankCode})</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Bậc lương:</span>
-                <span className="font-semibold">
+                <span className="font-medium">
                   Bậc {selectedPerson.currentStep} (HS {selectedPerson.currentCoefficient.toFixed(2)}) 
-                  <span className="text-primary font-bold mx-1.5">➔</span> 
-                  <span className="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                  <span className="text-muted-foreground font-bold mx-1.5">➔</span> 
+                  <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
                     Bậc {selectedPerson.nextStep} (HS {selectedPerson.nextCoefficient.toFixed(2)})
                   </span>
                 </span>
@@ -786,33 +786,35 @@ export default function SalaryRanksPage() {
               {selectedPerson.progressionType === 'OVER_GRADE_ALLOWANCE' && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Phụ cấp thâm niên vượt khung:</span>
-                  <span className="font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
+                  <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
                     {selectedPerson.suggestedOverGradePercent}%
                   </span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Thời gian đã giữ bậc:</span>
-                <span className="font-semibold text-slate-700">{selectedPerson.monthsHeld} tháng / {selectedPerson.requiredMonths} tháng</span>
+                <span className="font-medium text-foreground">{selectedPerson.monthsHeld} tháng / {selectedPerson.requiredMonths} tháng</span>
               </div>
             </div>
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-medium text-slate-700 mb-1 block">Số Quyết định nâng lương</label>
+                <label className="font-medium text-foreground mb-1 block">Số Quyết định nâng lương</label>
                 <Input
                   value={approvalDecisionNo}
                   onChange={(e) => setApprovalDecisionNo(e.target.value)}
                   placeholder="Ví dụ: QĐ-NL/2026"
+                  className="h-9 text-xs"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t">
-              <Button variant="outline" onClick={() => setSelectedPerson(null)}>
+            <div className="flex justify-end gap-2 pt-3 border-t border-border">
+              <Button variant="outline" size="sm" onClick={() => setSelectedPerson(null)}>
                 Hủy
               </Button>
               <Button
+                size="sm"
                 onClick={() =>
                   applyMutation.mutate({
                     userId: selectedPerson.userId,
@@ -829,7 +831,7 @@ export default function SalaryRanksPage() {
                 {applyMutation.isPending ? 'Đang duyệt...' : 'Xác nhận Nâng bậc'}
               </Button>
             </div>
-          </Card>
+          </div>
         </div>
       )}
     </>

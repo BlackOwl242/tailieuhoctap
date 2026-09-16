@@ -313,11 +313,11 @@ export default function MasterCatalogsPage() {
           </h1>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)}
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 rounded-lg" />)}
         </div>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <Skeleton className="lg:col-span-4 h-96 rounded-xl" />
-          <Skeleton className="lg:col-span-8 h-96 rounded-xl" />
+          <Skeleton className="lg:col-span-4 h-96 rounded-lg" />
+          <Skeleton className="lg:col-span-8 h-96 rounded-lg" />
         </div>
       </div>
     );
@@ -386,7 +386,7 @@ export default function MasterCatalogsPage() {
             <button
               key={group.id}
               onClick={() => setSelectedGroupId(isSelected ? 'all' : group.id)}
-              className={`flex flex-col text-left rounded-xl border p-4 transition-all duration-150 ${
+              className={`flex flex-col text-left rounded-lg border p-4 transition-all duration-150 ${
                 isSelected
                   ? 'border-primary bg-primary/5 ring-1 ring-primary shadow-xs'
                   : 'border-border bg-card hover:border-primary/40 hover:bg-muted/30'
@@ -403,9 +403,9 @@ export default function MasterCatalogsPage() {
               </div>
               <div className="mt-3 flex items-baseline justify-between">
                 <span className="text-xl font-extrabold text-foreground">{groupCount.toLocaleString('vi-VN')}</span>
-                <span className="text-[11px] text-muted-foreground">bản ghi chuẩn</span>
+                <span className="text-xs text-muted-foreground">bản ghi chuẩn</span>
               </div>
-              <p className="mt-1 line-clamp-1 text-[11px] text-muted-foreground">{group.description}</p>
+              <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{group.description}</p>
             </button>
           );
         })}
@@ -424,7 +424,7 @@ export default function MasterCatalogsPage() {
                 {selectedGroupId !== 'all' && (
                   <button
                     onClick={() => setSelectedGroupId('all')}
-                    className="text-[11px] text-primary hover:underline font-medium"
+                    className="text-xs text-primary hover:underline font-medium"
                   >
                     Xem tất cả
                   </button>
@@ -449,7 +449,7 @@ export default function MasterCatalogsPage() {
                     <button
                       key={catalog.id}
                       onClick={() => setSelectedCatalogId(catalog.id)}
-                      className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors ${
+                      className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-xs transition-colors ${
                         active
                           ? 'bg-primary text-primary-foreground font-semibold shadow-2xs'
                           : 'hover:bg-muted text-foreground/80'
@@ -457,15 +457,15 @@ export default function MasterCatalogsPage() {
                     >
                       <div className="flex flex-col min-w-0 pr-2">
                         <span className="truncate">{catalog.name}</span>
-                        <span className={`text-[10px] truncate ${active ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
+                        <span className={`text-xs truncate ${active ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
                           {groupTitle}
                         </span>
                       </div>
                       <span
-                        className={`inline-flex items-center justify-center min-w-[28px] h-5 px-1.5 rounded-full text-[11px] font-mono font-extrabold shrink-0 shadow-2xs transition-colors ${
+                        className={`inline-flex items-center justify-center min-w-[24px] h-5 px-1.5 rounded-md text-xs font-mono font-medium shrink-0 transition-colors ${
                           active
-                            ? 'bg-white text-blue-700 ring-1 ring-blue-300'
-                            : 'bg-slate-100 text-slate-700 border border-slate-200/80 dark:bg-slate-800 dark:text-slate-300'
+                            ? 'bg-primary-foreground/20 text-primary-foreground'
+                            : 'bg-muted text-muted-foreground border border-border'
                         }`}
                       >
                         {catalog.count}
@@ -528,19 +528,19 @@ export default function MasterCatalogsPage() {
             </CardHeader>
 
             {selectedCatalogId === 'don_vi_quan_ly' && (
-              <div className="mx-4 my-3 rounded-xl border border-blue-200 bg-blue-50/80 p-3 text-xs text-blue-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-2xs">
+              <div className="mx-4 my-3 rounded-lg border border-border bg-muted/40 p-3 text-xs text-foreground flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-2xs">
                 <div className="flex items-start gap-2.5">
-                  <Building2 className="h-4 w-4 text-blue-700 shrink-0 mt-0.5" />
+                  <Building2 className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-blue-900">Thiết lập Tên Cơ quan, Đơn vị &amp; Cơ cấu các Phòng ban trực thuộc</p>
-                    <p className="text-[11px] text-blue-700 mt-0.5">
+                    <p className="font-semibold text-foreground">Thiết lập Tên Cơ quan, Đơn vị &amp; Cơ cấu các Phòng ban trực thuộc</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       Danh mục này phân loại cấp quản lý. Để cấu hình Tên đơn vị chính thức, cơ quan chủ quản và sơ đồ phòng ban in ấn, vui lòng truy cập phân hệ Cơ cấu tổ chức.
                     </p>
                   </div>
                 </div>
                 <a
                   href="/admin/org-units"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shrink-0 shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shrink-0 shadow-2xs text-xs"
                 >
                   <span>Cấu hình tại /org-units</span>
                   <ChevronRight className="h-3.5 w-3.5" />
@@ -592,7 +592,7 @@ export default function MasterCatalogsPage() {
                             <td className="py-2 px-4 font-semibold text-primary">
                               Bậc {item.maxStep || 9}
                             </td>
-                            <td className="py-2 px-4 font-mono text-[11px] text-muted-foreground">
+                            <td className="py-2 px-4 font-mono text-xs text-muted-foreground">
                               {item.salarySteps && item.salarySteps.length > 0
                                 ? item.salarySteps.slice(0, 6).join(' · ') + (item.salarySteps.length > 6 ? '...' : '')
                                 : '—'}
@@ -739,9 +739,9 @@ export default function MasterCatalogsPage() {
       {/* ================= MODAL THÊM / SỬA BẢN GHI ================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-modal flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border/60 pb-3">
-              <h3 className="text-base font-bold text-foreground">
+          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-base font-semibold text-foreground">
                 {editingItem ? 'Chỉnh sửa mục danh mục' : 'Thêm mới mục danh mục'}
               </h3>
               <Badge variant="outline" className="text-xs">
@@ -760,7 +760,7 @@ export default function MasterCatalogsPage() {
                   className="font-mono text-xs uppercase"
                   disabled={!!editingItem}
                 />
-                <span className="text-[11px] text-muted-foreground">Mã định danh duy nhất trong hệ thống</span>
+                <span className="text-xs text-muted-foreground">Mã định danh duy nhất trong hệ thống</span>
               </div>
 
               <div className="space-y-1">

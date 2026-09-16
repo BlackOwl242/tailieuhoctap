@@ -202,7 +202,7 @@ export default function OrgChartPage() {
       className: 'w-[10%] text-center',
       exportValue: (r) => r.code,
       render: (r) => (
-        <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+        <span className="font-mono text-xs font-semibold text-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
           {r.code}
         </span>
       ),
@@ -215,12 +215,12 @@ export default function OrgChartPage() {
       exportValue: (r) => r.name,
       render: (r) => (
         <div className="flex items-center gap-2">
-          <div className="p-1 rounded bg-primary/10 text-primary shrink-0 no-print">
+          <div className="p-1 rounded-md bg-primary/10 text-primary shrink-0 no-print">
             <Building2 className="h-3.5 w-3.5" />
           </div>
           <div>
             <span className="font-semibold text-foreground">{r.name}</span>
-            <span className="text-[11px] text-muted-foreground block no-print">{r.levelLabel}</span>
+            <span className="text-xs text-muted-foreground block no-print">{r.levelLabel}</span>
           </div>
         </div>
       ),
@@ -241,7 +241,7 @@ export default function OrgChartPage() {
       render: (r) => (
         <div>
           <p className="font-semibold text-foreground text-xs">{r.headName}</p>
-          <p className="text-[11px] text-muted-foreground">{r.headTitle}</p>
+          <p className="text-xs text-muted-foreground">{r.headTitle}</p>
         </div>
       ),
     },
@@ -276,7 +276,7 @@ export default function OrgChartPage() {
           <Badge variant={r.fillRate >= 80 ? 'success' : r.fillRate >= 50 ? 'warning' : 'destructive'}>
             {r.fillRate}%
           </Badge>
-          <span className="text-[10px] text-muted-foreground no-print">
+          <span className="text-xs text-muted-foreground no-print">
             {r.currentCount >= r.targetCount ? 'Đủ biên chế' : `Thiếu ${r.targetCount - r.currentCount} NS`}
           </span>
         </div>
@@ -354,11 +354,11 @@ export default function OrgChartPage() {
 
       {/* View Switcher Tabs */}
       <div className="flex items-center justify-between border-b border-border/80 pb-2">
-        <div className="flex items-center gap-2 bg-muted/40 p-1 rounded-xl border border-border/60">
+        <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-lg border border-border/60">
           <button
             type="button"
             onClick={() => setActiveTab('tree')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${
               activeTab === 'tree'
                 ? 'bg-card text-foreground shadow-2xs'
                 : 'text-muted-foreground hover:text-foreground'
@@ -370,7 +370,7 @@ export default function OrgChartPage() {
           <button
             type="button"
             onClick={() => setActiveTab('table')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${
               activeTab === 'table'
                 ? 'bg-card text-foreground shadow-2xs'
                 : 'text-muted-foreground hover:text-foreground'
@@ -460,16 +460,16 @@ export default function OrgChartPage() {
         {selectedNode && (
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-              <div className="p-3 rounded-xl bg-muted/40 border">
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
                 <p className="text-xs uppercase text-muted-foreground font-semibold">Phụ trách đơn vị</p>
                 <p className="font-bold text-foreground mt-0.5">{selectedNode.headName ?? 'Chưa bổ nhiệm'}</p>
                 <p className="text-xs text-muted-foreground">{selectedNode.headTitle ?? 'Trưởng đơn vị'}</p>
               </div>
-              <div className="p-3 rounded-xl bg-muted/40 border">
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
                 <p className="text-xs uppercase text-muted-foreground font-semibold">Nhân sự hiện hữu</p>
                 <p className="font-bold text-primary font-mono mt-0.5">{activeCurrentCount} NS</p>
               </div>
-              <div className="p-3 rounded-xl bg-muted/40 border">
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
                 <p className="text-xs uppercase text-muted-foreground font-semibold">Định biên kế hoạch</p>
                 <p className="font-bold text-emerald-700 font-mono mt-0.5">{activeTargetCount} chỉ tiêu</p>
               </div>
@@ -485,23 +485,23 @@ export default function OrgChartPage() {
                 </Link>
               </div>
               {deptEmployees.length === 0 ? (
-                <div className="p-6 rounded-2xl border border-dashed text-center text-sm text-muted-foreground">
+                <div className="p-6 rounded-lg border border-dashed border-border text-center text-xs text-muted-foreground">
                   Chưa có nhân viên nào được phân bổ về đơn vị này.
                 </div>
               ) : (
-                <ul className="divide-y rounded-xl border bg-card max-h-72 overflow-y-auto">
+                <ul className="divide-y divide-border rounded-lg border border-border bg-card max-h-72 overflow-y-auto">
                   {deptEmployees.map((emp, i) => (
-                    <li key={emp.id || i} className="flex items-center justify-between p-2.5 text-sm hover:bg-muted/30">
+                    <li key={emp.id || i} className="flex items-center justify-between p-2.5 text-xs hover:bg-muted/30">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
                           {emp.fullName.charAt(0)}
                         </div>
                         <div className="min-w-0 truncate">
                           <p className="text-xs font-semibold text-foreground truncate">{emp.fullName}</p>
-                          <p className="text-[11px] text-muted-foreground truncate">{emp.jobTitle}</p>
+                          <p className="text-xs text-muted-foreground truncate">{emp.jobTitle}</p>
                         </div>
                       </div>
-                      <span className="text-xs font-mono text-muted-foreground px-1.5 py-0.5 rounded bg-muted shrink-0">
+                      <span className="text-xs font-mono text-muted-foreground px-1.5 py-0.5 rounded-md bg-muted shrink-0">
                         {emp.employeeCode}
                       </span>
                     </li>

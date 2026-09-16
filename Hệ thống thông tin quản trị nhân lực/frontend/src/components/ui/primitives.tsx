@@ -33,21 +33,22 @@ export function AvatarImage({ src, alt }: { src: string; alt: string }) {
  * ========================================================================== */
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        outline: 'border border-input bg-card hover:bg-accent hover:text-accent-foreground',
+        default: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',
+        secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
+        outline: 'border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        success: 'bg-success text-success-foreground hover:bg-success/90',
+        destructive: 'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90',
+        success: 'bg-emerald-600 text-white shadow-xs hover:bg-emerald-700 dark:bg-emerald-600',
+        link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        default: 'h-10 px-4 py-2',
+        default: 'h-9 px-4 py-2',
         sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-11 rounded-md px-6',
+        lg: 'h-10 rounded-md px-8',
         icon: 'h-9 w-9',
       },
     },
@@ -68,7 +69,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        'flex h-10 w-full rounded-md border border-input bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50',
+        'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}
       {...props}
@@ -82,7 +83,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
     <textarea
       ref={ref}
       className={cn(
-        'flex min-h-[100px] w-full rounded-md border border-input bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}
       {...props}
@@ -92,51 +93,54 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
 Textarea.displayName = 'Textarea';
 
 export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
-  return <label className={cn('text-sm font-medium leading-none', className)} {...props} />;
+  return <label className={cn('text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70', className)} {...props} />;
 }
 
 /**
- * Họ Card — chuẩn khoảng cách toàn hệ thống (Mục 1):
- * - CardHeader (topcard): p-card, đáy giảm còn pb-2/sm:pb-3 để tạo nhịp với nội dung;
- * - CardContent: p-card đầy đủ (đứng một mình vẫn có padding đủ), pt-2/sm:pt-3
- *   khi nằm dưới header → tổng khe hở header↔nội dung luôn 16/24px, không bao giờ "sát";
- * - CardFooter: p-card, không padding trên (nội dung đã có đáy).
- * KHÔNG override p-2/p-3 trong trang — nếu cần thẻ gọn dùng size="sm".
+ * Shadcn UI Card — chuẩn hóa Padding và Phân cấp:
+ * Card: rounded-lg border bg-card text-card-foreground shadow-xs
+ * CardHeader: p-6 pb-3 space-y-1.5
+ * CardTitle: text-base font-semibold leading-none tracking-tight
+ * CardDescription: text-sm text-muted-foreground
+ * CardContent: p-6 pt-0
+ * CardFooter: p-6 pt-0 flex items-center justify-end gap-2
  */
-export function Card({ className, size = 'md', ...props }: React.HTMLAttributes<HTMLDivElement> & { size?: 'md' | 'sm' }) {
-  return <div className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', size === 'sm' && 'text-sm', className)} {...props} />;
+export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('rounded-lg border border-border bg-card text-card-foreground shadow-xs', className)} {...props} />;
 }
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex flex-col gap-1.5 p-card pb-2 sm:pb-3', className)} {...props} />;
+  return <div className={cn('flex flex-col space-y-1.5 p-6 pb-3', className)} {...props} />;
 }
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn('font-semibold leading-tight tracking-tight', className)} {...props} />;
+  return <h3 className={cn('text-base font-semibold leading-none tracking-tight text-foreground', className)} {...props} />;
 }
 export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
   return <p className={cn('text-sm text-muted-foreground', className)} {...props} />;
 }
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('p-card pt-2 sm:pt-3', className)} {...props} />;
+  return <div className={cn('p-6 pt-0', className)} {...props} />;
 }
 export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex items-center gap-2 p-card pt-0', className)} {...props} />;
+  return <div className={cn('flex items-center p-6 pt-0', className)} {...props} />;
 }
 
-const badgeVariants = cva('inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-medium transition-colors border', {
-  variants: {
-    variant: {
-      default: 'bg-primary/10 text-primary border-primary/20',
-      secondary: 'bg-slate-100 text-slate-700 border-slate-200',
-      outline: 'border-slate-300 text-slate-700 bg-white',
-      success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      warning: 'bg-amber-50 text-amber-800 border-amber-200',
-      destructive: 'bg-rose-50 text-rose-700 border-rose-200',
-      info: 'bg-blue-50 text-blue-700 border-blue-200',
-      purple: 'bg-purple-50 text-purple-700 border-purple-200',
+const badgeVariants = cva(
+  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  {
+    variants: {
+      variant: {
+        default: 'border-transparent bg-primary text-primary-foreground shadow-xs hover:bg-primary/80',
+        secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        outline: 'text-foreground border-border',
+        destructive: 'border-transparent bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/80',
+        success: 'border-transparent bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',
+        warning: 'border-transparent bg-amber-500/15 text-amber-700 dark:text-amber-400',
+        info: 'border-transparent bg-blue-500/15 text-blue-700 dark:text-blue-400',
+      },
     },
+    defaultVariants: { variant: 'default' },
   },
-  defaultVariants: { variant: 'default' },
-});
+);
 
 export function Badge({ className, variant, ...props }: React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof badgeVariants>) {
   return <span className={cn(badgeVariants({ variant }), className)} {...props} />;
@@ -401,7 +405,7 @@ export function Select({
   const popoverContent = isOpen && coords ? (
     <div
       ref={popoverRef}
-      className="bg-popover border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in-50 zoom-in-95 duration-100 flex flex-col font-sans"
+      className="bg-popover border border-border rounded-md shadow-xl overflow-hidden animate-in fade-in-50 zoom-in-95 duration-100 flex flex-col font-sans"
       style={{
         position: 'fixed',
         left: coords.left,
@@ -441,9 +445,9 @@ export function Select({
               </button>
             )}
           </div>
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-1.5 px-1 font-medium">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mt-1.5 px-1 font-medium">
             <span>{filteredOptions.length} / {allOptions.length} lựa chọn</span>
-            <span className="hidden sm:inline text-[10px] text-muted-foreground/80">Nhấn ↑ ↓ để chọn, Enter xác nhận</span>
+            <span className="hidden sm:inline text-xs text-muted-foreground/80">Nhấn ↑ ↓ để chọn, Enter xác nhận</span>
           </div>
         </div>
       )}
@@ -473,14 +477,14 @@ export function Select({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     {opt.badge && (
-                      <span className="font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded bg-muted text-foreground border border-border/60 shrink-0">
+                      <span className="font-mono text-xs font-semibold px-1.5 py-0.5 rounded-md bg-muted text-foreground border border-border shrink-0">
                         {opt.badge}
                       </span>
                     )}
                     <span className="truncate">{opt.label}</span>
                   </div>
                   {opt.sublabel && (
-                    <div className="text-[11px] text-muted-foreground truncate mt-0.5">{opt.sublabel}</div>
+                    <div className="text-xs text-muted-foreground truncate mt-0.5">{opt.sublabel}</div>
                   )}
                 </div>
 
@@ -495,7 +499,7 @@ export function Select({
         ) : (
           <div className="py-6 px-3 text-center text-xs text-muted-foreground">
             <p className="font-semibold text-foreground">Không tìm thấy kết quả</p>
-            <p className="text-[11px] mt-1">Không có kết quả khớp với &ldquo;{search}&rdquo;</p>
+            <p className="text-xs mt-1">Không có kết quả khớp với &ldquo;{search}&rdquo;</p>
           </div>
         )}
       </div>

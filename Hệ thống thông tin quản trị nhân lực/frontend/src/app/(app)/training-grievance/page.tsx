@@ -13,7 +13,7 @@ import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Badge, Button, Select } from '@/components/ui/primitives';
+import { Badge, Button, Input, Select, Textarea } from '@/components/ui/primitives';
 import { DataTable, DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
@@ -293,7 +293,7 @@ export default function TrainingGrievancePage() {
       render: (p: TrainingProgram) => (
         <div>
           <span className="font-medium text-xs text-foreground">{p.name}</span>
-          <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
+          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
             <MapPin className="h-3 w-3" />
             {p.location || 'Trực tuyến / Hội trường'}
           </p>
@@ -394,7 +394,7 @@ export default function TrainingGrievancePage() {
       render: (g: Grievance) => (
         <div className="max-w-md">
           <p className="font-medium text-foreground text-xs leading-snug">{g.subject}</p>
-          <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">{g.description}</p>
+          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{g.description}</p>
         </div>
       ),
     },
@@ -527,24 +527,32 @@ export default function TrainingGrievancePage() {
         }
       />
 
-      {/* Minimalist Metrics Toolbar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3 rounded-lg border border-border bg-card text-xs">
-        <div>
-          <span className="text-muted-foreground block text-[11px]">Chương trình đào tạo</span>
-          <span className="text-base font-semibold text-foreground">{activeProgramsCount}</span>
-        </div>
-        <div>
-          <span className="text-muted-foreground block text-[11px]">Kiến nghị cần xử lý</span>
-          <span className="text-base font-semibold text-foreground">{pendingGrievancesCount}</span>
-        </div>
-        <div>
-          <span className="text-muted-foreground block text-[11px]">Tỷ lệ tham gia</span>
-          <span className="text-base font-semibold text-foreground">94.2%</span>
-        </div>
-        <div>
-          <span className="text-muted-foreground block text-[11px]">Đánh giá hài lòng</span>
-          <span className="text-base font-semibold text-foreground">4.9 / 5.0</span>
-        </div>
+      {/* Standard KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <NumberCard
+          title="Chương trình đào tạo"
+          value={activeProgramsCount}
+          subtitle="Khóa học đang & sắp tổ chức"
+          icon={GraduationCap}
+        />
+        <NumberCard
+          title="Kiến nghị cần xử lý"
+          value={pendingGrievancesCount}
+          subtitle="Chờ xác minh & thẩm định"
+          icon={MessageSquareWarning}
+        />
+        <NumberCard
+          title="Tỷ lệ tham gia"
+          value="94.2%"
+          subtitle="Chỉ tiêu hoàn thành mục tiêu"
+          icon={Users}
+        />
+        <NumberCard
+          title="Đánh giá hài lòng"
+          value="4.9 / 5.0"
+          subtitle="Khảo sát chất lượng đào tạo"
+          icon={Star}
+        />
       </div>
 
       {/* Main Tabs Header */}
@@ -608,9 +616,8 @@ export default function TrainingGrievancePage() {
       {/* Search & Filter Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-lg border border-border bg-card text-xs">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
-          <input
-            type="text"
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
             placeholder={
               activeTab === 'training'
                 ? 'Lọc khóa học, giảng viên, địa điểm...'
@@ -618,7 +625,7 @@ export default function TrainingGrievancePage() {
             }
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-md border border-border bg-background pl-8 pr-3 py-1 text-xs text-foreground placeholder:text-muted-foreground focus:outline-hidden"
+            className="pl-8 h-9 text-xs"
           />
         </div>
 
@@ -628,7 +635,7 @@ export default function TrainingGrievancePage() {
             <Select
               value={trainingStatusFilter}
               onChange={(e) => setTrainingStatusFilter(e.target.value)}
-              className="w-[160px] text-xs"
+              className="w-[160px] text-xs h-9"
             >
               <option value="ALL">Tất cả ({programs.length})</option>
               <option value="UPCOMING">Sắp tổ chức</option>
@@ -639,7 +646,7 @@ export default function TrainingGrievancePage() {
             <Select
               value={grievanceStatusFilter}
               onChange={(e) => setGrievanceStatusFilter(e.target.value)}
-              className="w-[160px] text-xs"
+              className="w-[160px] text-xs h-9"
             >
               <option value="ALL">Tất cả ({grievances.length})</option>
               <option value="OPEN">Mới tiếp nhận</option>
@@ -679,30 +686,30 @@ export default function TrainingGrievancePage() {
                 return (
                   <div
                     key={p.id}
-                    className="rounded-lg border border-border bg-card p-3.5 space-y-3 flex flex-col justify-between"
+                    className="rounded-lg border border-border bg-card p-4 space-y-3 flex flex-col justify-between shadow-xs hover:border-foreground/20 transition-colors"
                   >
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                             <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
                             {statusLabel}
                           </span>
                           <h3 className="font-medium text-foreground text-xs mt-0.5 leading-snug">{p.name}</h3>
-                          <p className="text-[11px] text-muted-foreground">GV: {p.trainerName}</p>
+                          <p className="text-xs text-muted-foreground">GV: {p.trainerName}</p>
                         </div>
-                        <span className="text-[11px] text-muted-foreground font-mono shrink-0">
+                        <span className="text-xs text-muted-foreground font-mono shrink-0">
                           {p.maxParticipants} HV
                         </span>
                       </div>
 
                       <div className="space-y-1 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1.5 text-[11px]">
-                          <MapPin className="h-3 w-3 text-muted-foreground" />
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                           <span>{p.location || 'Trực tuyến'}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-[11px] font-mono">
-                          <Calendar className="h-3 w-3 text-muted-foreground" />
+                        <div className="flex items-center gap-1.5 text-xs font-mono">
+                          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                           <span>
                             {new Date(p.startDate).toLocaleDateString('vi-VN')} - {new Date(p.endDate).toLocaleDateString('vi-VN')}
                           </span>
@@ -710,14 +717,14 @@ export default function TrainingGrievancePage() {
                       </div>
 
                       {p.description && (
-                        <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                           {p.description}
                         </p>
                       )}
                     </div>
 
                     <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground text-[11px]">
+                      <span className="text-muted-foreground text-xs">
                         Khảo sát: <b className="text-foreground">{p._count?.feedbacks ?? 0}</b>
                       </span>
                       <div className="flex items-center gap-1">
@@ -728,7 +735,7 @@ export default function TrainingGrievancePage() {
                             setSelectedProgram(p);
                             setIsProgramDetailOpen(true);
                           }}
-                          className="h-6 px-2 text-xs font-normal text-muted-foreground hover:text-foreground"
+                          className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-foreground"
                         >
                           Chi tiết
                         </Button>
@@ -736,7 +743,7 @@ export default function TrainingGrievancePage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => openEditProgramModal(p)}
-                          className="h-6 px-2 text-xs font-normal text-muted-foreground hover:text-foreground"
+                          className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-foreground"
                         >
                           Sửa
                         </Button>
@@ -748,7 +755,7 @@ export default function TrainingGrievancePage() {
                               deleteProgramMutation.mutate(p.id);
                             }
                           }}
-                          className="h-6 px-2 text-xs font-normal text-muted-foreground hover:text-rose-600"
+                          className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-rose-600"
                         >
                           Xóa
                         </Button>
@@ -796,24 +803,24 @@ export default function TrainingGrievancePage() {
                 return (
                   <div
                     key={g.id}
-                    className="rounded-lg border border-border bg-card p-3.5 space-y-3 flex flex-col justify-between"
+                    className="rounded-lg border border-border bg-card p-4 space-y-3 flex flex-col justify-between shadow-xs hover:border-foreground/20 transition-colors"
                   >
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[11px] text-muted-foreground">
+                            <span className="text-xs text-muted-foreground">
                               {cat.label}
                             </span>
-                            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                               <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
                               {statusLabel}
                             </span>
                           </div>
                           <h3 className="font-medium text-foreground text-xs mt-1 leading-snug">{g.subject}</h3>
-                          <p className="text-[11px] text-muted-foreground">Người gửi: {g.employeeName}</p>
+                          <p className="text-xs text-muted-foreground">Người gửi: {g.employeeName}</p>
                         </div>
-                        <span className="text-[11px] text-muted-foreground font-mono shrink-0">
+                        <span className="text-xs text-muted-foreground font-mono shrink-0">
                           {new Date(g.createdAt).toLocaleDateString('vi-VN')}
                         </span>
                       </div>
@@ -824,7 +831,7 @@ export default function TrainingGrievancePage() {
 
                       {g.resolution && (
                         <div className="bg-muted/30 border border-border p-2.5 rounded-md text-xs space-y-1">
-                          <span className="font-medium text-foreground flex items-center gap-1.5 text-[11px]">
+                          <span className="font-medium text-foreground flex items-center gap-1.5 text-xs">
                             Kết quả xử lý:
                           </span>
                           <p className="text-muted-foreground leading-relaxed text-xs">{g.resolution}</p>
@@ -924,34 +931,31 @@ export default function TrainingGrievancePage() {
         <div className="space-y-4 text-xs">
           <div>
             <label className="font-semibold text-foreground">Tên khóa đào tạo *</label>
-            <input
-              type="text"
+            <Input
               placeholder="VD: Nâng Cao Năng Lực Bảo Mật & Tiêu Chuẩn ISO 27001"
               value={progName}
               onChange={(e) => setProgName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 h-9 text-xs"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="font-semibold text-foreground">Giảng viên / Đơn vị đào tạo *</label>
-              <input
-                type="text"
+              <Input
                 placeholder="VD: TS. Nguyễn Hoàng Nam / Trung tâm Đào tạo Quốc tế"
                 value={trainerName}
                 onChange={(e) => setTrainerName(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                className="mt-1 h-9 text-xs"
               />
             </div>
             <div>
               <label className="font-semibold text-foreground">Địa điểm tổ chức</label>
-              <input
-                type="text"
+              <Input
                 placeholder="VD: Phòng Đào tạo A1 / Microsoft Teams"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                className="mt-1 h-9 text-xs"
               />
             </div>
           </div>
@@ -959,31 +963,31 @@ export default function TrainingGrievancePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="font-semibold text-foreground">Ngày bắt đầu *</label>
-              <input
+              <Input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                className="mt-1 h-9 text-xs"
               />
             </div>
             <div>
               <label className="font-semibold text-foreground">Ngày kết thúc *</label>
-              <input
+              <Input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                className="mt-1 h-9 text-xs"
               />
             </div>
             <div>
               <label className="font-semibold text-foreground">Chỉ tiêu tối đa (Học viên)</label>
-              <input
+              <Input
                 type="number"
                 min={5}
                 max={200}
                 value={maxParticipants}
                 onChange={(e) => setMaxParticipants(Number(e.target.value))}
-                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                className="mt-1 h-9 text-xs"
               />
             </div>
           </div>
@@ -994,7 +998,7 @@ export default function TrainingGrievancePage() {
               <Select
                 value={progStatus}
                 onChange={(e) => setProgStatus(e.target.value as TrainingProgram['status'])}
-                className="mt-1 w-full text-xs"
+                className="mt-1 w-full text-xs h-9"
               >
                 <option value="UPCOMING">Sắp tổ chức (Upcoming)</option>
                 <option value="ONGOING">Đang diễn ra (Ongoing)</option>
@@ -1005,12 +1009,12 @@ export default function TrainingGrievancePage() {
 
           <div>
             <label className="font-semibold text-foreground">Nội dung chi tiết & Mục tiêu đào tạo</label>
-            <textarea
+            <Textarea
               rows={4}
               placeholder="Mô tả mục tiêu khóa học, đề cương chuyên đề, quyền lợi chứng nhận sau khóa học..."
               value={progDesc}
               onChange={(e) => setProgDesc(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 text-xs"
             />
           </div>
         </div>
@@ -1066,28 +1070,28 @@ export default function TrainingGrievancePage() {
         {selectedProgram && (
           <div className="space-y-4 text-xs">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3 rounded-xl bg-muted/40 border border-border">
-                <span className="text-muted-foreground text-[11px]">Giảng viên:</span>
+              <div className="p-3 rounded-lg bg-muted/40 border border-border">
+                <span className="text-muted-foreground text-xs">Giảng viên:</span>
                 <p className="font-bold text-foreground mt-0.5">{selectedProgram.trainerName}</p>
               </div>
-              <div className="p-3 rounded-xl bg-muted/40 border border-border">
-                <span className="text-muted-foreground text-[11px]">Địa điểm:</span>
+              <div className="p-3 rounded-lg bg-muted/40 border border-border">
+                <span className="text-muted-foreground text-xs">Địa điểm:</span>
                 <p className="font-bold text-foreground mt-0.5">{selectedProgram.location || 'Trực tuyến'}</p>
               </div>
-              <div className="p-3 rounded-xl bg-muted/40 border border-border">
-                <span className="text-muted-foreground text-[11px]">Quy mô:</span>
+              <div className="p-3 rounded-lg bg-muted/40 border border-border">
+                <span className="text-muted-foreground text-xs">Quy mô:</span>
                 <p className="font-bold text-foreground mt-0.5">{selectedProgram.maxParticipants} học viên</p>
               </div>
-              <div className="p-3 rounded-xl bg-muted/40 border border-border">
-                <span className="text-muted-foreground text-[11px]">Trạng thái:</span>
+              <div className="p-3 rounded-lg bg-muted/40 border border-border">
+                <span className="text-muted-foreground text-xs">Trạng thái:</span>
                 <p className="font-bold text-primary mt-0.5">
                   {selectedProgram.status === 'COMPLETED' ? 'Đã hoàn thành' : selectedProgram.status === 'ONGOING' ? 'Đang diễn ra' : 'Sắp tổ chức'}
                 </p>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl bg-muted/20 border border-border space-y-1">
-              <span className="font-bold text-foreground uppercase text-[11px]">Thời gian diễn ra:</span>
+            <div className="p-3 rounded-lg bg-muted/20 border border-border space-y-1">
+              <span className="font-bold text-foreground uppercase text-xs">Thời gian diễn ra:</span>
               <p className="text-foreground">
                 Từ ngày <b>{new Date(selectedProgram.startDate).toLocaleDateString('vi-VN')}</b> đến ngày{' '}
                 <b>{new Date(selectedProgram.endDate).toLocaleDateString('vi-VN')}</b>
@@ -1095,8 +1099,8 @@ export default function TrainingGrievancePage() {
             </div>
 
             <div className="space-y-1.5">
-              <span className="font-bold text-foreground uppercase text-[11px]">Đề cương & Mục tiêu đào tạo:</span>
-              <p className="p-3 rounded-xl bg-muted/30 border border-border text-foreground leading-relaxed">
+              <span className="font-bold text-foreground uppercase text-xs">Đề cương & Mục tiêu đào tạo:</span>
+              <p className="p-3 rounded-lg bg-muted/30 border border-border text-foreground leading-relaxed">
                 {selectedProgram.description || 'Chương trình đào tạo nâng cao chuyên môn, quy chuẩn vận hành và bảo mật số theo kế hoạch phát triển nhân tài nội bộ.'}
               </p>
             </div>
@@ -1104,7 +1108,7 @@ export default function TrainingGrievancePage() {
             {/* Roster & Participant Survey Preview */}
             <div className="space-y-2 border-t border-border pt-3">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-foreground uppercase text-[11px]">
+                <span className="font-bold text-foreground uppercase text-xs">
                   Danh sách Học viên & Điểm danh mẫu ({Math.min(selectedProgram.maxParticipants, 5)} / {selectedProgram.maxParticipants})
                 </span>
                 <Button
@@ -1118,9 +1122,9 @@ export default function TrainingGrievancePage() {
                 </Button>
               </div>
 
-              <div className="border border-border rounded-xl overflow-hidden">
+              <div className="border border-border rounded-lg overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-muted/40 border-b border-border text-muted-foreground uppercase text-[10px]">
+                  <thead className="bg-muted/40 border-b border-border text-muted-foreground uppercase text-xs">
                     <tr>
                       <th className="p-2.5">Học viên</th>
                       <th className="p-2.5">Mã NV</th>
@@ -1143,7 +1147,7 @@ export default function TrainingGrievancePage() {
                           </span>
                         </td>
                         <td className="p-2.5 text-center">
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                             <Check className="h-3 w-3" /> Đã cấp
                           </span>
                         </td>
@@ -1180,22 +1184,22 @@ export default function TrainingGrievancePage() {
       >
         {resolvingGrievance && (
           <div className="space-y-4 text-xs">
-            <div className="p-3 rounded-xl bg-muted/40 border border-border space-y-1">
+            <div className="p-3 rounded-lg bg-muted/40 border border-border space-y-1">
               <span className="font-bold text-foreground">Người gửi: {resolvingGrievance.employeeName}</span>
               <p className="text-muted-foreground font-medium">Chủ đề: {resolvingGrievance.subject}</p>
-              <p className="text-[11px] text-muted-foreground mt-1">{resolvingGrievance.description}</p>
+              <p className="text-xs text-muted-foreground mt-1">{resolvingGrievance.description}</p>
             </div>
 
             <div className="space-y-1.5">
               <label className="font-bold text-foreground">
                 Kết quả xử lý & Căn cứ pháp lý (Bộ luật Lao động / Thỏa ước LĐTT) *
               </label>
-              <textarea
+              <Textarea
                 rows={5}
                 placeholder="Ghi nhận phương án khắc phục, thỏa thuận giữa người lao động và người sử dụng lao động, thời hạn hoàn thành các biện pháp cải thiện điều kiện làm việc..."
                 value={resolutionText}
                 onChange={(e) => setResolutionText(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+                className="mt-1 text-xs"
               />
             </div>
           </div>
@@ -1233,7 +1237,7 @@ export default function TrainingGrievancePage() {
             <Select
               value={grievanceUserId}
               onChange={(e) => setGrievanceUserId(e.target.value)}
-              className="mt-1 w-full text-xs"
+              className="mt-1 w-full text-xs h-9"
             >
               {employees.map((e) => (
                 <option key={e.id} value={e.id}>
@@ -1248,7 +1252,7 @@ export default function TrainingGrievancePage() {
             <Select
               value={grievanceCategory}
               onChange={(e) => setGrievanceCategory(e.target.value as Grievance['category'])}
-              className="mt-1 w-full text-xs"
+              className="mt-1 w-full text-xs h-9"
             >
               <option value="WORK_ENVIRONMENT">Môi trường & Điều kiện làm việc</option>
               <option value="COMPENSATION">Chế độ đãi ngộ, tiền lương & bảo hiểm</option>
@@ -1259,23 +1263,22 @@ export default function TrainingGrievancePage() {
 
           <div>
             <label className="font-semibold text-foreground">Chủ đề kiến nghị tóm tắt *</label>
-            <input
-              type="text"
+            <Input
               placeholder="VD: Đề xuất nâng cấp màn hình làm việc và cải thiện ánh sáng văn phòng"
               value={grievanceSubject}
               onChange={(e) => setGrievanceSubject(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 h-9 text-xs"
             />
           </div>
 
           <div>
             <label className="font-semibold text-foreground">Nội dung chi tiết khiếu nại *</label>
-            <textarea
+            <Textarea
               rows={4}
               placeholder="Trình bày cụ thể sự việc, thời điểm phát sinh, các bằng chứng liên quan và nguyện vọng giải quyết..."
               value={grievanceDesc}
               onChange={(e) => setGrievanceDesc(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-hidden"
+              className="mt-1 text-xs"
             />
           </div>
         </div>
@@ -1307,15 +1310,15 @@ export default function TrainingGrievancePage() {
         size="lg"
       >
         {selectedProgram && (
-          <div className="space-y-6 bg-white text-slate-900 p-6 rounded-xl border border-slate-200 font-serif">
-            <div className="text-center border-b border-slate-300 pb-4 space-y-1">
+          <div className="space-y-6 bg-card text-foreground p-6 rounded-lg border border-border font-serif">
+            <div className="text-center border-b border-border pb-4 space-y-1">
               <p className="text-xs uppercase tracking-widest font-bold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-              <p className="text-[11px] italic">Độc lập - Tự do - Hạnh phúc</p>
-              <div className="w-24 h-0.5 bg-slate-800 mx-auto my-1.5" />
-              <h2 className="text-base font-bold uppercase tracking-wider text-slate-900 pt-2">
+              <p className="text-xs italic">Độc lập - Tự do - Hạnh phúc</p>
+              <div className="w-24 h-0.5 bg-foreground mx-auto my-1.5" />
+              <h2 className="text-base font-bold uppercase tracking-wider text-foreground pt-2">
                 DANH SÁCH HỌC VIÊN HOÀN THÀNH CHƯƠNG TRÌNH ĐÀO TẠO
               </h2>
-              <p className="text-xs font-sans font-semibold text-blue-800">{selectedProgram.name}</p>
+              <p className="text-xs font-sans font-semibold text-primary">{selectedProgram.name}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs font-sans">
@@ -1332,26 +1335,26 @@ export default function TrainingGrievancePage() {
               </div>
             </div>
 
-            <table className="w-full text-left text-xs border border-slate-400 font-sans border-collapse">
-              <thead className="bg-slate-100 border-b border-slate-400 font-bold text-slate-800">
+            <table className="w-full text-left text-xs border border-border font-sans border-collapse">
+              <thead className="bg-muted/40 border-b border-border font-bold text-foreground">
                 <tr>
-                  <th className="border border-slate-400 p-2 text-center">STT</th>
-                  <th className="border border-slate-400 p-2">Mã NV</th>
-                  <th className="border border-slate-400 p-2">Họ và Tên Học Viên</th>
-                  <th className="border border-slate-400 p-2">Đơn Vị Công Tác</th>
-                  <th className="border border-slate-400 p-2 text-center">Chuyên Cần</th>
-                  <th className="border border-slate-400 p-2 text-center">Kết Quả Đạt</th>
+                  <th className="border border-border p-2 text-center">STT</th>
+                  <th className="border border-border p-2">Mã NV</th>
+                  <th className="border border-border p-2">Họ và Tên Học Viên</th>
+                  <th className="border border-border p-2">Đơn Vị Công Tác</th>
+                  <th className="border border-border p-2 text-center">Chuyên Cần</th>
+                  <th className="border border-border p-2 text-center">Kết Quả Đạt</th>
                 </tr>
               </thead>
               <tbody>
                 {employees.slice(0, 5).map((e, idx) => (
                   <tr key={e.id}>
-                    <td className="border border-slate-400 p-2 text-center">{idx + 1}</td>
-                    <td className="border border-slate-400 p-2 font-mono">{e.employeeCode || `NV000${idx + 1}`}</td>
-                    <td className="border border-slate-400 p-2 font-semibold">{e.fullName}</td>
-                    <td className="border border-slate-400 p-2">{e.orgUnit?.name || 'Phòng Kỹ thuật'}</td>
-                    <td className="border border-slate-400 p-2 text-center">100%</td>
-                    <td className="border border-slate-400 p-2 text-center font-bold text-emerald-800">Đạt (Cấp CC)</td>
+                    <td className="border border-border p-2 text-center">{idx + 1}</td>
+                    <td className="border border-border p-2 font-mono">{e.employeeCode || `NV000${idx + 1}`}</td>
+                    <td className="border border-border p-2 font-semibold">{e.fullName}</td>
+                    <td className="border border-border p-2">{e.orgUnit?.name || 'Phòng Kỹ thuật'}</td>
+                    <td className="border border-border p-2 text-center">100%</td>
+                    <td className="border border-border p-2 text-center font-bold text-emerald-700">Đạt (Cấp CC)</td>
                   </tr>
                 ))}
               </tbody>
@@ -1360,13 +1363,13 @@ export default function TrainingGrievancePage() {
             <div className="grid grid-cols-2 gap-8 text-center text-xs font-sans pt-4">
               <div>
                 <p className="font-bold">GIẢNG VIÊN ĐÀO TẠO</p>
-                <p className="italic text-[10px] text-slate-500">(Ký và ghi rõ họ tên)</p>
+                <p className="italic text-xs text-muted-foreground">(Ký và ghi rõ họ tên)</p>
                 <div className="h-16" />
                 <p className="font-bold">{selectedProgram.trainerName}</p>
               </div>
               <div>
                 <p className="font-bold">TRƯỞNG PHÒNG TỔ CHỨC CÁN BỘ</p>
-                <p className="italic text-[10px] text-slate-500">(Ký tên và đóng dấu)</p>
+                <p className="italic text-xs text-muted-foreground">(Ký tên và đóng dấu)</p>
                 <div className="h-16" />
                 <p className="font-bold">Ban Giám Đốc HRMIS</p>
               </div>
@@ -1390,15 +1393,15 @@ export default function TrainingGrievancePage() {
         size="lg"
       >
         {selectedGrievance && (
-          <div className="space-y-6 bg-white text-slate-900 p-6 rounded-xl border border-slate-200 font-serif">
-            <div className="text-center border-b border-slate-300 pb-4 space-y-1">
+          <div className="space-y-6 bg-card text-foreground p-6 rounded-lg border border-border font-serif">
+            <div className="text-center border-b border-border pb-4 space-y-1">
               <p className="text-xs uppercase tracking-widest font-bold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-              <p className="text-[11px] italic">Độc lập - Tự do - Hạnh phúc</p>
-              <div className="w-24 h-0.5 bg-slate-800 mx-auto my-1.5" />
-              <h2 className="text-base font-bold uppercase tracking-wider text-slate-900 pt-2">
+              <p className="text-xs italic">Độc lập - Tự do - Hạnh phúc</p>
+              <div className="w-24 h-0.5 bg-foreground mx-auto my-1.5" />
+              <h2 className="text-base font-bold uppercase tracking-wider text-foreground pt-2">
                 BIÊN BẢN HỌP XỬ LÝ & GIẢI QUYẾT KHIẾU NẠI LAO ĐỘNG
               </h2>
-              <p className="text-[11px] italic font-sans text-slate-600">
+              <p className="text-xs italic font-sans text-muted-foreground">
                 (Theo quy định của Bộ luật Lao động 2019 và Thỏa ước Lao động Tập thể)
               </p>
             </div>
@@ -1406,37 +1409,37 @@ export default function TrainingGrievancePage() {
             <div className="space-y-3 text-xs font-sans">
               <p><b>Hôm nay, ngày:</b> {new Date().toLocaleDateString('vi-VN')}, tại Văn phòng Tổng công ty.</p>
               <div>
-                <p className="font-bold uppercase text-[11px] text-slate-700">I. THÔNG TIN BÊN KHIẾU NẠI:</p>
+                <p className="font-bold uppercase text-xs text-foreground">I. THÔNG TIN BÊN KHIẾU NẠI:</p>
                 <p>Họ và tên người kiến nghị: <b>{selectedGrievance.employeeName}</b></p>
                 <p>Nội dung kiến nghị: {selectedGrievance.subject}</p>
                 <p>Ngày tiếp nhận đơn: {new Date(selectedGrievance.createdAt).toLocaleDateString('vi-VN')}</p>
               </div>
 
               <div>
-                <p className="font-bold uppercase text-[11px] text-slate-700">II. NỘI DUNG VÀ YÊU CẦU CỤ THỂ:</p>
-                <p className="p-3 bg-slate-50 border border-slate-200 rounded-md text-slate-700 leading-relaxed">
+                <p className="font-bold uppercase text-xs text-foreground">II. NỘI DUNG VÀ YÊU CẦU CỤ THỂ:</p>
+                <p className="p-3 bg-muted/40 border border-border rounded-md text-foreground leading-relaxed">
                   {selectedGrievance.description}
                 </p>
               </div>
 
               <div>
-                <p className="font-bold uppercase text-[11px] text-slate-700">III. KẾT LUẬN & BIỆN PHÁP GIẢI QUYẾT:</p>
-                <p className="p-3 bg-slate-50 border border-slate-200 rounded-md text-slate-800 font-medium leading-relaxed">
+                <p className="font-bold uppercase text-xs text-foreground">III. KẾT LUẬN & BIỆN PHÁP GIẢI QUYẾT:</p>
+                <p className="p-3 bg-muted/40 border border-border rounded-md text-foreground font-medium leading-relaxed">
                   {selectedGrievance.resolution || 'Hội đồng hòa giải cơ sở đã tiếp nhận, đối thoại trực tiếp và thống nhất phương án xử lý theo quy chế nội bộ.'}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 text-center text-xs font-sans pt-4 border-t border-slate-300">
+            <div className="grid grid-cols-2 gap-8 text-center text-xs font-sans pt-4 border-t border-border">
               <div>
                 <p className="font-bold">ĐẠI DIỆN CÔNG ĐOÀN CƠ SỞ</p>
-                <p className="italic text-[10px] text-slate-500">(Ký và ghi rõ họ tên)</p>
+                <p className="italic text-xs text-muted-foreground">(Ký và ghi rõ họ tên)</p>
                 <div className="h-16" />
                 <p className="font-bold">Chủ tịch Công đoàn</p>
               </div>
               <div>
                 <p className="font-bold">NGƯỜI SỬ DỤNG LAO ĐỘNG</p>
-                <p className="italic text-[10px] text-slate-500">(Ký tên và đóng dấu)</p>
+                <p className="italic text-xs text-muted-foreground">(Ký tên và đóng dấu)</p>
                 <div className="h-16" />
                 <p className="font-bold">Giám Đốc Nhân Sự</p>
               </div>

@@ -30,10 +30,10 @@ export const ARTICLE_STATUS_LABEL: Record<string, string> = {
 
 /** Màu badge theo trạng thái bài viết. */
 export const ARTICLE_STATUS_TONE: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-700 border-slate-200 border',
-  PENDING_REVIEW: 'bg-amber-50 text-amber-800 border-amber-200 border',
-  PUBLISHED: 'bg-emerald-50 text-emerald-700 border-emerald-200 border',
-  ARCHIVED: 'bg-slate-100 text-slate-600 border-slate-200 border',
+  DRAFT: 'bg-muted text-muted-foreground border-border border',
+  PENDING_REVIEW: 'bg-amber-500/10 text-amber-700 border-amber-500/20 border',
+  PUBLISHED: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20 border',
+  ARCHIVED: 'bg-muted text-muted-foreground border-border border',
 };
 
 /** Nhãn trạng thái chấm công trong ngày. */

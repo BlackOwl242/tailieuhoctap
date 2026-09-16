@@ -580,55 +580,55 @@ function CheckInInner() {
   const isLiveMatch = liveSimilarity !== null && liveSimilarity >= MATCH_THRESHOLD;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-primary/20">
+    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/20">
       {/* ================= TOPBAR ĐIỀU HÀNH ================= */}
-      <header className="border-b border-slate-200 bg-white shadow-xs sticky top-0 z-30">
+      <header className="border-b border-border bg-card shadow-xs sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link href="/dashboard" className="flex items-center gap-2.5 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-xs transition-transform group-hover:scale-105">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs transition-transform group-hover:scale-105">
                 <Building2 className="h-5 w-5" />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <span className="text-base font-bold tracking-tight text-slate-900">HRMIS Pro</span>
-                  <Badge variant="outline" className="text-[10px] font-medium border-slate-200 text-slate-700 bg-slate-50">
+                  <span className="text-base font-bold tracking-tight text-foreground">HRMIS Pro</span>
+                  <Badge variant="outline" className="text-xs font-medium border-border text-foreground bg-muted/40">
                     Điểm danh khuôn mặt 2D & Cảm biến IR
                   </Badge>
                 </div>
-                <span className="text-[11px] text-slate-500 font-medium">Hỗ trợ Cảm biến Hồng ngoại IR · Camera RGB · Kiosk QR</span>
+                <span className="text-xs text-muted-foreground font-medium">Hỗ trợ Cảm biến Hồng ngoại IR · Camera RGB · Kiosk QR</span>
               </div>
             </Link>
           </div>
 
           {/* Center: Live Clock */}
-          <div className="hidden md:flex flex-col items-center justify-center px-4 py-1 rounded-xl bg-slate-100 border border-slate-200">
-            <span className="text-base font-bold font-mono text-slate-900 tracking-wider">
+          <div className="hidden md:flex flex-col items-center justify-center px-4 py-1 rounded-lg bg-muted border border-border">
+            <span className="text-base font-bold font-mono text-foreground tracking-wider">
               {currentTime || '--:--:--'}
             </span>
-            <span className="text-[10px] text-slate-500 capitalize">{currentDate}</span>
+            <span className="text-xs text-muted-foreground capitalize">{currentDate}</span>
           </div>
 
           {/* Right actions */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 transition-colors"
+              className="p-2 rounded-md border border-border bg-card hover:bg-muted text-foreground transition-colors"
               title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
             >
-              {soundEnabled ? <Volume2 className="h-4 w-4 text-blue-600" /> : <VolumeX className="h-4 w-4 text-slate-400" />}
+              {soundEnabled ? <Volume2 className="h-4 w-4 text-primary" /> : <VolumeX className="h-4 w-4 text-muted-foreground" />}
             </button>
 
             <button
               onClick={toggleFullscreen}
-              className="hidden sm:inline-flex p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 transition-colors"
+              className="hidden sm:inline-flex p-2 rounded-md border border-border bg-card hover:bg-muted text-foreground transition-colors"
               title="Toàn màn hình Kiosk"
             >
               {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
             </button>
 
             <Link href="/dashboard">
-              <Button variant="outline" size="sm" className="gap-1.5 border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs">
+              <Button variant="outline" size="sm" className="gap-1.5 border-border bg-card text-foreground hover:bg-muted text-xs">
                 <ArrowLeft className="h-4 w-4" /> Về ứng dụng
               </Button>
             </Link>
@@ -640,44 +640,44 @@ function CheckInInner() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
         {/* 1. Trang QR Scan Handler (/check-in?token=...) */}
         {token ? (
-          <div className="w-full max-w-md mx-auto my-auto flex flex-col items-center gap-5 rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-md">
+          <div className="w-full max-w-md mx-auto my-auto flex flex-col items-center gap-5 rounded-lg border border-border bg-card p-8 text-center shadow-md">
             {qrStatus === 'loading' ? (
               <>
-                <Loader2 className="h-14 w-14 animate-spin text-blue-600" />
-                <h2 className="text-xl font-bold text-slate-900">Đang xác thực mã QR…</h2>
-                <p className="text-xs text-slate-500">Đang đối soát mã bảo mật với hệ thống</p>
+                <Loader2 className="h-14 w-14 animate-spin text-primary" />
+                <h2 className="text-xl font-bold text-foreground">Đang xác thực mã QR…</h2>
+                <p className="text-xs text-muted-foreground">Đang đối soát mã bảo mật với hệ thống</p>
               </>
             ) : qrStatus === 'ok' ? (
               <>
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-xs">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shadow-xs">
                   <CheckCircle2 className="h-10 w-10" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-emerald-700">Điểm danh thành công!</h2>
-                  <p className="mt-1 text-xs text-slate-600">{qrMessage}</p>
+                  <h2 className="text-xl font-bold text-foreground">Điểm danh thành công!</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">{qrMessage}</p>
                 </div>
                 {qrPunchInfo ? (
-                  <div className="w-full rounded-xl border border-slate-200 bg-slate-50 p-4 text-left space-y-1.5 text-xs">
-                    <div className="flex justify-between py-1 border-b border-slate-200">
-                      <span className="text-slate-500">Hình thức ghi nhận:</span>
-                      <span className="font-bold text-emerald-700">{qrPunchInfo.punch}</span>
+                  <div className="w-full rounded-md border border-border bg-muted/20 p-4 text-left space-y-1.5 text-xs">
+                    <div className="flex justify-between py-1 border-b border-border">
+                      <span className="text-muted-foreground">Hình thức ghi nhận:</span>
+                      <span className="font-bold text-foreground">{qrPunchInfo.punch}</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-slate-200">
-                      <span className="text-slate-500">Thời gian điểm danh:</span>
-                      <span className="font-semibold text-slate-900 font-mono">{qrPunchInfo.time}</span>
+                    <div className="flex justify-between py-1 border-b border-border">
+                      <span className="text-muted-foreground">Thời gian điểm danh:</span>
+                      <span className="font-semibold text-foreground font-mono">{qrPunchInfo.time}</span>
                     </div>
                     <div className="flex justify-between py-1">
-                      <span className="text-slate-500">Trạng thái ca:</span>
-                      <span className="font-medium text-slate-700">{qrPunchInfo.status ?? 'HỢP LỆ'}</span>
+                      <span className="text-muted-foreground">Trạng thái ca:</span>
+                      <span className="font-medium text-foreground">{qrPunchInfo.status ?? 'HỢP LỆ'}</span>
                     </div>
                   </div>
                 ) : null}
                 <div className="flex flex-col gap-2 w-full mt-2">
                   <Link href="/ess" className="w-full">
-                    <Button className="w-full py-5 font-semibold bg-blue-600 hover:bg-blue-700 text-white">Vào Bàn làm việc cá nhân (ESS)</Button>
+                    <Button className="w-full py-5 font-semibold">Vào Bàn làm việc cá nhân (ESS)</Button>
                   </Link>
                   <Link href="/check-in?mode=qr" className="w-full">
-                    <Button variant="outline" className="w-full border-slate-200 text-slate-700 hover:bg-slate-50">
+                    <Button variant="outline" className="w-full border-border">
                       Màn hình Kiosk quét QR
                     </Button>
                   </Link>
@@ -685,20 +685,20 @@ function CheckInInner() {
               </>
             ) : (
               <>
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-50 text-rose-600 border border-rose-200">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive border border-destructive/20">
                   <AlertCircle className="h-10 w-10" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-rose-700">Không thể điểm danh</h2>
-                  <p className="mt-1 text-xs text-slate-600">{qrMessage}</p>
+                  <h2 className="text-xl font-bold text-destructive">Không thể điểm danh</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">{qrMessage}</p>
                 </div>
                 {needLogin ? (
                   <Link href={`/login?next=${encodeURIComponent(`/check-in?token=${token}`)}`} className="w-full">
-                    <Button className="w-full py-5 font-semibold bg-blue-600 hover:bg-blue-700 text-white gap-2"><LogIn className="h-4 w-4" /> Đăng nhập ngay</Button>
+                    <Button className="w-full py-5 font-semibold gap-2"><LogIn className="h-4 w-4" /> Đăng nhập ngay</Button>
                   </Link>
                 ) : (
                   <Link href="/check-in?mode=qr" className="w-full">
-                    <Button variant="outline" className="w-full border-slate-200 text-slate-700 py-5">
+                    <Button variant="outline" className="w-full border-border py-5">
                       <QrCode className="h-4 w-4 mr-2" /> Quét lại mã QR tại Kiosk
                     </Button>
                   </Link>
@@ -712,14 +712,14 @@ function CheckInInner() {
         {!token && (
           <div className="flex flex-col gap-6">
             {/* Thanh công cụ phương thức */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl border border-slate-200 bg-white shadow-xs">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-lg border border-border bg-card shadow-xs">
               <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-xs">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold bg-primary text-primary-foreground shadow-xs">
                   <Camera className="h-4 w-4" /> Camera nhận diện khuôn mặt & Hồng ngoại IR
                 </div>
 
                 <Link href="/check-in?mode=qr">
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold bg-muted text-foreground hover:bg-muted/80 transition-all border border-border">
                     <QrCode className="h-4 w-4" /> Kiosk quét QR
                   </div>
                 </Link>
@@ -748,13 +748,13 @@ function CheckInInner() {
                         }
                       });
                   }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold bg-muted text-foreground hover:bg-muted/80 transition-all border border-border"
                 >
                   <Laptop className="h-4 w-4" /> Chấm công 1 chạm
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Ngưỡng chuẩn an toàn: <strong>≥ 95.0%</strong></span>
               </div>
@@ -762,34 +762,34 @@ function CheckInInner() {
 
             {/* Need Login Prompt */}
             {needLogin ? (
-              <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm flex flex-col items-center gap-4 max-w-md mx-auto my-8">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 border border-blue-200">
+              <div className="rounded-lg border border-border bg-card p-8 text-center shadow-sm flex flex-col items-center gap-4 max-w-md mx-auto my-8">
+                <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20">
                   <LogIn className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Yêu cầu đăng nhập</h3>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <h3 className="text-lg font-bold text-foreground">Yêu cầu đăng nhập</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
                     Bạn cần đăng nhập tài khoản nhân viên để kích hoạt điểm danh khuôn mặt và đối soát sinh trắc học.
                   </p>
                 </div>
                 <Link href={`/login?next=${encodeURIComponent('/check-in')}`} className="w-full mt-2">
-                  <Button className="w-full py-5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white gap-2"><LogIn className="h-4 w-4" /> Đăng nhập ngay</Button>
+                  <Button className="w-full py-5 text-sm font-semibold gap-2"><LogIn className="h-4 w-4" /> Đăng nhập ngay</Button>
                 </Link>
               </div>
             ) : consent === false ? (
               /* Privacy & Consent Banner */
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm max-w-2xl mx-auto space-y-5">
-                <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                  <div className="p-3 rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
+              <div className="rounded-lg border border-border bg-card p-6 sm:p-8 shadow-sm max-w-2xl mx-auto space-y-5">
+                <div className="flex items-center gap-3 border-b border-border pb-4">
+                  <div className="p-3 rounded-md bg-primary/10 text-primary border border-primary/20">
                     <ShieldCheck className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">Đồng thuận xử lý dữ liệu sinh trắc học khuôn mặt</h3>
-                    <p className="text-xs text-slate-500">Bảo vệ quyền riêng tư theo Nghị định 13/2023/NĐ-CP & Tiêu chuẩn ISO/IEC 27001</p>
+                    <h3 className="text-base font-bold text-foreground">Đồng thuận xử lý dữ liệu sinh trắc học khuôn mặt</h3>
+                    <p className="text-xs text-muted-foreground">Bảo vệ quyền riêng tư theo Nghị định 13/2023/NĐ-CP & Tiêu chuẩn ISO/IEC 27001</p>
                   </div>
                 </div>
 
-                <div className="space-y-2.5 text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div className="space-y-2.5 text-xs text-muted-foreground leading-relaxed bg-muted/20 p-4 rounded-md border border-border">
                   <p className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                     <span><strong>1. Không lưu trữ ảnh gốc:</strong> Hệ thống chỉ trích xuất các thông số vector 256 chiều đã mã hóa trong cơ sở dữ liệu.</span>
@@ -808,7 +808,7 @@ function CheckInInner() {
                   size="lg"
                   onClick={handleGiveConsent}
                   disabled={faceSubmitting}
-                  className="w-full py-5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-xs"
+                  className="w-full py-5 text-sm font-semibold gap-2 shadow-xs"
                 >
                   {faceSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                   Tôi đồng ý và kích hoạt sinh trắc học
@@ -819,7 +819,7 @@ function CheckInInner() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 {/* CỘT TRÁI: CAMERA VIEWPORT (7 CỘT) */}
                 <div className="lg:col-span-7 flex flex-col gap-3">
-                  <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-slate-300 bg-slate-950 shadow-sm flex items-center justify-center">
+                  <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-border bg-slate-950 shadow-sm flex items-center justify-center">
                     {/* Live Video Feed */}
                     <video
                       ref={videoRef}
@@ -834,19 +834,19 @@ function CheckInInner() {
                     {camOn ? (
                       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                         <div
-                          className={`relative w-52 h-64 sm:w-60 sm:h-76 rounded-3xl border transition-all duration-300 flex items-center justify-center ${
+                          className={`relative w-52 h-64 sm:w-60 sm:h-76 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
                             isLiveMatch
                               ? 'border-emerald-400/90 bg-emerald-500/5'
                               : 'border-white/40'
                           }`}
                         >
                           {/* 4 góc Focus Marks */}
-                          <div className={`absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 rounded-tl-xl ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
-                          <div className={`absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 rounded-tr-xl ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
-                          <div className={`absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 rounded-bl-xl ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
-                          <div className={`absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 rounded-br-xl ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
+                          <div className={`absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 rounded-tl-md ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
+                          <div className={`absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 rounded-tr-md ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
+                          <div className={`absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 rounded-bl-md ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
+                          <div className={`absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 rounded-br-md ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
 
-                          <div className="absolute -bottom-8 rounded-full bg-slate-900/75 border border-white/10 px-3.5 py-1 text-[11px] font-medium text-white backdrop-blur-xs">
+                          <div className="absolute -bottom-8 rounded-full bg-slate-900/80 border border-white/10 px-3.5 py-1 text-xs font-medium text-white backdrop-blur-xs">
                             {isLiveMatch ? 'Khuôn mặt hợp lệ' : 'Giữ khuôn mặt trong khung hình'}
                           </div>
                         </div>
@@ -857,24 +857,24 @@ function CheckInInner() {
                     <div className="absolute top-3 left-3 z-10 flex items-center gap-2 flex-wrap">
                       {camOn ? (
                         <>
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/75 border border-white/10 px-3 py-1 text-[11px] font-medium text-emerald-300 backdrop-blur-xs">
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/80 border border-white/10 px-3 py-1 text-xs font-medium text-emerald-300 backdrop-blur-xs">
                             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                             Live Camera
                           </span>
                           {isIRDetected ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-950/80 border border-rose-500/30 px-3 py-1 text-[11px] font-bold text-rose-300 backdrop-blur-xs">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-950/80 border border-rose-500/30 px-3 py-1 text-xs font-bold text-rose-300 backdrop-blur-xs">
                               <Radio className="h-3 w-3 text-rose-400 animate-pulse" />
                               Cảm biến Hồng ngoại (IR)
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-950/80 border border-blue-500/30 px-3 py-1 text-[11px] font-medium text-blue-300 backdrop-blur-xs">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-950/80 border border-blue-500/30 px-3 py-1 text-xs font-medium text-blue-300 backdrop-blur-xs">
                               <Sun className="h-3 w-3 text-amber-400" />
                               Camera RGB
                             </span>
                           )}
                         </>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/75 border border-white/10 px-3 py-1 text-[11px] font-medium text-slate-300 backdrop-blur-xs">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/80 border border-white/10 px-3 py-1 text-xs font-medium text-slate-300 backdrop-blur-xs">
                           <span className="h-2 w-2 rounded-full bg-rose-500" />
                           Camera chưa bật
                         </span>
@@ -884,8 +884,8 @@ function CheckInInner() {
                     {/* Khi camera chưa bật */}
                     {!camOn ? (
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center text-slate-200 bg-slate-900/90 backdrop-blur-xs">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 border border-white/20 text-white shadow-inner">
-                          <Camera className="h-8 w-8 text-blue-400" />
+                        <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-white/10 border border-white/20 text-white shadow-inner">
+                          <Camera className="h-8 w-8 text-primary" />
                         </div>
                         <div className="max-w-xs">
                           <h3 className="text-base font-bold text-white">Yêu cầu bật Camera</h3>
@@ -897,7 +897,7 @@ function CheckInInner() {
                           size="lg"
                           onClick={() => startCamera(selectedDeviceId)}
                           disabled={camLoading}
-                          className="gap-2 px-6 py-5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                          className="gap-2 px-6 py-5 text-sm font-semibold shadow-sm"
                         >
                           {camLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
                           Bật Camera ngay
@@ -908,7 +908,7 @@ function CheckInInner() {
 
                   {/* Thanh điều khiển Camera & Chọn thiết bị / Cảm biến IR */}
                   {camOn ? (
-                    <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl border border-slate-200 bg-white text-xs shadow-xs">
+                    <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg border border-border bg-card text-xs shadow-xs">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-semibold text-slate-700">Thiết bị:</span>
                         {availableDevices.length > 0 ? (
@@ -933,10 +933,10 @@ function CheckInInner() {
                         <span className="text-slate-500 hidden sm:inline">Khoảng cách: 40–60cm</span>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => startCamera(selectedDeviceId)} className="gap-1 text-xs h-7 border-slate-200 bg-slate-50 text-slate-700">
+                        <Button size="sm" variant="outline" onClick={() => startCamera(selectedDeviceId)} className="gap-1 text-xs h-7 border-border bg-muted/40 text-foreground">
                           <RefreshCw className="h-3 w-3" /> Đổi camera
                         </Button>
-                        <Button size="sm" variant="ghost" onClick={stopCamera} className="gap-1 text-xs h-7 text-rose-600 hover:bg-rose-50">
+                        <Button size="sm" variant="ghost" onClick={stopCamera} className="gap-1 text-xs h-7 text-destructive hover:bg-destructive/10">
                           <CameraOff className="h-3 w-3" /> Tắt Camera
                         </Button>
                       </div>
@@ -947,7 +947,7 @@ function CheckInInner() {
                 {/* CỘT PHẢI: BẢNG THAO TÁC & KẾT QUẢ (5 CỘT) */}
                 <div className="lg:col-span-5 flex flex-col gap-4">
                   {/* Tab Selector */}
-                  <div className="grid grid-cols-4 gap-1 rounded-xl bg-slate-100 p-1 text-xs font-semibold border border-slate-200">
+                  <div className="grid grid-cols-4 gap-1 rounded-md bg-muted/60 p-1 text-xs font-semibold border border-border">
                     <button
                       type="button"
                       onClick={() => {
@@ -955,10 +955,10 @@ function CheckInInner() {
                         setFaceResult(null);
                         setSamples([]);
                       }}
-                      className={`flex items-center justify-center gap-1 rounded-lg py-2 transition-all ${
+                      className={`flex items-center justify-center gap-1 rounded-md py-2 transition-all ${
                         activeTab === 'VERIFY'
-                          ? 'bg-white text-slate-900 shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900'
+                          ? 'bg-card text-foreground shadow-xs border border-border/50'
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       <UserCheck className="h-3.5 w-3.5 text-emerald-600" /> Điểm danh
@@ -971,13 +971,13 @@ function CheckInInner() {
                         setFaceResult(null);
                         setSamples([]);
                       }}
-                      className={`flex items-center justify-center gap-1 rounded-lg py-2 transition-all ${
+                      className={`flex items-center justify-center gap-1 rounded-md py-2 transition-all ${
                         activeTab === 'ENROLL'
-                          ? 'bg-white text-slate-900 shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900'
+                          ? 'bg-card text-foreground shadow-xs border border-border/50'
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      <Camera className="h-3.5 w-3.5 text-blue-600" /> {enrolledCount > 0 ? 'Đăng ký lại' : 'Đăng ký'}
+                      <Camera className="h-3.5 w-3.5 text-primary" /> {enrolledCount > 0 ? 'Đăng ký lại' : 'Đăng ký'}
                     </button>
 
                     <button
@@ -986,10 +986,10 @@ function CheckInInner() {
                         setActiveTab('IR_TECH');
                         setFaceResult(null);
                       }}
-                      className={`flex items-center justify-center gap-1 rounded-lg py-2 transition-all ${
+                      className={`flex items-center justify-center gap-1 rounded-md py-2 transition-all ${
                         activeTab === 'IR_TECH'
-                          ? 'bg-white text-slate-900 shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900'
+                          ? 'bg-card text-foreground shadow-xs border border-border/50'
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       <Radio className="h-3.5 w-3.5 text-rose-600" /> Công nghệ IR
@@ -1001,33 +1001,33 @@ function CheckInInner() {
                         setActiveTab('SECURITY');
                         setFaceResult(null);
                       }}
-                      className={`flex items-center justify-center gap-1 rounded-lg py-2 transition-all ${
+                      className={`flex items-center justify-center gap-1 rounded-md py-2 transition-all ${
                         activeTab === 'SECURITY'
-                          ? 'bg-white text-slate-900 shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900'
+                          ? 'bg-card text-foreground shadow-xs border border-border/50'
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      <ShieldCheck className="h-3.5 w-3.5 text-blue-600" /> Bảo mật
+                      <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Bảo mật
                     </button>
                   </div>
 
                   {/* THƯỚC ĐO ĐỘ KHỚP KHUÔN MẶT TRỰC TIẾP TRÊN PANEL PHẢI */}
                   {camOn && enrolledCount > 0 && activeTab === 'VERIFY' ? (
                     <div
-                      className={`rounded-2xl border p-4 shadow-xs transition-all ${
+                      className={`rounded-lg border p-4 shadow-xs transition-all ${
                         isLiveMatch
-                          ? 'border-emerald-200 bg-emerald-50/70 text-emerald-950'
-                          : 'border-slate-200 bg-white text-slate-900'
+                          ? 'border-emerald-500/30 bg-emerald-500/5 text-foreground'
+                          : 'border-border bg-card text-foreground'
                       }`}
                     >
                       <div className="flex items-center justify-between text-xs mb-2">
                         <span className="font-bold flex items-center gap-1.5">
-                          <Zap className={`h-4 w-4 ${isLiveMatch ? 'text-emerald-600' : 'text-slate-500'}`} />
+                          <Zap className={`h-4 w-4 ${isLiveMatch ? 'text-emerald-600' : 'text-muted-foreground'}`} />
                           Độ khớp khuôn mặt trực tiếp:
                         </span>
                         <span
                           className={`font-mono text-sm font-extrabold ${
-                            isLiveMatch ? 'text-emerald-700' : 'text-slate-700'
+                            isLiveMatch ? 'text-emerald-600' : 'text-foreground'
                           }`}
                         >
                           {liveSimilarity !== null ? `${(liveSimilarity * 100).toFixed(1)}%` : '0.0%'}
@@ -1035,7 +1035,7 @@ function CheckInInner() {
                       </div>
 
                       {/* Thanh phần trăm tiến trình */}
-                      <div className="relative w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="relative w-full h-3 bg-muted rounded-full overflow-hidden border border-border">
                         <div
                           className={`h-full transition-all duration-150 rounded-full ${
                             isLiveMatch
@@ -1048,15 +1048,15 @@ function CheckInInner() {
                         />
                         {/* Vạch ngưỡng 95% */}
                         <div
-                          className="absolute top-0 bottom-0 w-0.5 bg-slate-900 z-10"
+                          className="absolute top-0 bottom-0 w-0.5 bg-foreground z-10"
                           style={{ left: '95%' }}
                           title="Ngưỡng đạt: 95%"
                         />
                       </div>
 
-                      <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1.5 font-medium">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mt-1.5 font-medium">
                         <span>0%</span>
-                        <span className="font-bold text-slate-700">| Ngưỡng tối thiểu: 95.0%</span>
+                        <span className="font-bold text-foreground">| Ngưỡng tối thiểu: 95.0%</span>
                         <span>100%</span>
                       </div>
                     </div>
@@ -1065,38 +1065,38 @@ function CheckInInner() {
                   {/* Kết quả phản hồi sau khi bấm điểm danh */}
                   {faceResult ? (
                     <div
-                      className={`rounded-xl border p-4 text-left transition-all ${
+                      className={`rounded-lg border p-4 text-left transition-all ${
                         faceResult.ok
-                          ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-                          : 'border-rose-200 bg-rose-50 text-rose-900'
+                          ? 'border-emerald-500/30 bg-emerald-500/10 text-foreground'
+                          : 'border-destructive/30 bg-destructive/10 text-foreground'
                       }`}
                     >
                       <div className="flex items-start gap-3">
                         {faceResult.ok ? (
                           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
                         ) : (
-                          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
+                          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
                         )}
                         <div className="flex-1 text-xs">
                           <p className="font-bold text-sm">{faceResult.message}</p>
                           {faceResult.punch ? (
-                            <div className="mt-2 rounded-lg bg-white p-2.5 border border-slate-200 space-y-1.5">
+                            <div className="mt-2 rounded-md bg-card p-2.5 border border-border space-y-1.5">
                               <div className="flex justify-between">
-                                <span className="text-slate-500">Hình thức:</span>
-                                <span className="font-bold text-emerald-700">{faceResult.punch}</span>
+                                <span className="text-muted-foreground">Hình thức:</span>
+                                <span className="font-bold text-emerald-600">{faceResult.punch}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-slate-500">Thời gian:</span>
-                                <span className="font-mono text-slate-900 font-semibold">{faceResult.time}</span>
+                                <span className="text-muted-foreground">Thời gian:</span>
+                                <span className="font-mono text-foreground font-semibold">{faceResult.time}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-slate-500">Cảm biến ghi nhận:</span>
-                                <span className="font-semibold text-blue-700">{faceResult.sensorType}</span>
+                                <span className="text-muted-foreground">Cảm biến ghi nhận:</span>
+                                <span className="font-semibold text-primary">{faceResult.sensorType}</span>
                               </div>
                               {faceResult.similarity ? (
-                                <div className="pt-1.5 border-t border-slate-100 flex justify-between items-center">
-                                  <span className="text-slate-500">Độ khớp:</span>
-                                  <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-700 font-mono font-bold text-[11px]">
+                                <div className="pt-1.5 border-t border-border flex justify-between items-center">
+                                  <span className="text-muted-foreground">Độ khớp:</span>
+                                  <Badge variant="outline" className="border-border bg-muted/40 text-foreground font-mono font-bold text-xs">
                                     {(faceResult.similarity * 100).toFixed(1)}% (Đạt ≥ 95.0%)
                                   </Badge>
                                 </div>
@@ -1110,36 +1110,36 @@ function CheckInInner() {
 
                   {/* TAB 1: ĐIỂM DANH KHUÔN MẶT */}
                   {activeTab === 'VERIFY' ? (
-                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs flex flex-col gap-4">
-                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="rounded-lg border border-border bg-card p-5 shadow-xs flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b border-border pb-3">
                         <div className="flex items-center gap-2">
                           <UserCheck className="h-4 w-4 text-emerald-600" />
-                          <span className="text-sm font-bold text-slate-900">Điểm danh khuôn mặt 2D</span>
+                          <span className="text-sm font-bold text-foreground">Điểm danh khuôn mặt 2D</span>
                         </div>
-                        <span className="text-xs font-mono font-bold text-slate-600">{currentTime}</span>
+                        <span className="text-xs font-mono font-bold text-muted-foreground">{currentTime}</span>
                       </div>
 
                       {enrolledCount === 0 ? (
-                        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-xs text-amber-900">
+                        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-foreground">
                           <p className="font-bold mb-1">Chưa có dữ liệu mẫu khuôn mặt</p>
                           Bạn chưa đăng ký mẫu khuôn mặt trên hệ thống. Hãy chuyển sang tab <strong>Đăng ký</strong> để chụp 3 góc ảnh chuẩn hóa.
                         </div>
                       ) : !camOn ? (
-                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-xs text-slate-600 flex items-start gap-2.5">
-                          <Camera className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                        <div className="rounded-md border border-border bg-muted/20 p-3.5 text-xs text-muted-foreground flex items-start gap-2.5">
+                          <Camera className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                           <div>
-                            <p className="font-semibold text-slate-800">Camera chưa được kích hoạt</p>
-                            <p className="text-[11px] text-slate-500 mt-0.5">
+                            <p className="font-semibold text-foreground">Camera chưa được kích hoạt</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
                               Vui lòng nhấn nút <strong>&ldquo;Bật Camera ngay&rdquo;</strong> ở khung bên trái trước khi điểm danh.
                             </p>
                           </div>
                         </div>
                       ) : !isLiveMatch ? (
-                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-xs text-slate-700 flex items-start gap-2.5">
-                          <Info className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                        <div className="rounded-md border border-border bg-muted/20 p-3.5 text-xs text-muted-foreground flex items-start gap-2.5">
+                          <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                           <div>
-                            <p className="font-semibold text-slate-800">Chưa đạt ngưỡng điểm danh (≥ 95%)</p>
-                            <p className="text-[11px] text-slate-500 mt-0.5">
+                            <p className="font-semibold text-foreground">Chưa đạt ngưỡng điểm danh (≥ 95%)</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
                               Độ khớp hiện tại:{' '}
                               <strong>{liveSimilarity !== null ? `${(liveSimilarity * 100).toFixed(1)}%` : '--.-%'}</strong>.
                               Vui lòng nhìn thẳng vào camera và căn chỉnh khuôn mặt vào giữa khung.
@@ -1147,7 +1147,7 @@ function CheckInInner() {
                           </div>
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-emerald-200 bg-emerald-50/80 p-3 text-xs text-emerald-900 flex items-center gap-2">
+                        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-foreground flex items-center gap-2">
                           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
                           <span>Khuôn mặt hợp lệ <strong>{(liveSimilarity! * 100).toFixed(1)}% ≥ 95%</strong>. Bạn có thể bấm điểm danh ngay!</span>
                         </div>
@@ -1160,7 +1160,7 @@ function CheckInInner() {
                         className={`w-full py-6 text-sm font-bold gap-2 text-white shadow-xs transition-all disabled:opacity-50 ${
                           isLiveMatch
                             ? 'bg-emerald-600 hover:bg-emerald-700'
-                            : 'bg-slate-400'
+                            : 'bg-muted-foreground/50'
                         }`}
                       >
                         {faceSubmitting ? (
@@ -1183,10 +1183,10 @@ function CheckInInner() {
 
                   {/* TAB 2: ĐĂNG KÝ MẪU (3 BƯỚC) */}
                   {activeTab === 'ENROLL' ? (
-                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs flex flex-col gap-4">
-                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <span className="text-sm font-bold text-slate-900">Chụp 3 mẫu nhận diện</span>
-                        <span className="text-xs font-mono font-bold text-blue-600">{samples.length}/3 mẫu</span>
+                    <div className="rounded-lg border border-border bg-card p-5 shadow-xs flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b border-border pb-3">
+                        <span className="text-sm font-bold text-foreground">Chụp 3 mẫu nhận diện</span>
+                        <span className="text-xs font-mono font-bold text-primary">{samples.length}/3 mẫu</span>
                       </div>
 
                       {/* 3 Step Cards */}
@@ -1201,24 +1201,24 @@ function CheckInInner() {
                           return (
                             <div
                               key={item.step}
-                              className={`flex flex-col items-center justify-center rounded-xl border p-2.5 text-center transition-all ${
+                              className={`flex flex-col items-center justify-center rounded-md border p-2.5 text-center transition-all ${
                                 done
-                                  ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                                  ? 'border-emerald-500/40 bg-emerald-500/10 text-foreground'
                                   : isCurrent
-                                  ? 'border-blue-300 bg-blue-50 text-blue-800 shadow-xs'
-                                  : 'border-slate-200 bg-slate-50 text-slate-400'
+                                  ? 'border-primary/40 bg-primary/10 text-primary font-medium shadow-xs'
+                                  : 'border-border bg-muted/20 text-muted-foreground'
                               }`}
                             >
                               <span className="text-xs font-bold">{item.title}</span>
-                              <span className="text-[10px] mt-0.5">{item.sub}</span>
+                              <span className="text-xs mt-0.5">{item.sub}</span>
                             </div>
                           );
                         })}
                       </div>
 
                       {!camOn ? (
-                        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 flex items-center gap-2">
-                          <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+                        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-foreground flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
                           <span>Vui lòng nhấn <strong>&ldquo;Bật Camera ngay&rdquo;</strong> bên trái để chụp mẫu thật.</span>
                         </div>
                       ) : null}
@@ -1227,7 +1227,7 @@ function CheckInInner() {
                         size="lg"
                         disabled={faceSubmitting || !camOn}
                         onClick={handleCaptureSample}
-                        className="w-full py-6 text-sm font-bold gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-xs disabled:opacity-50"
+                        className="w-full py-6 text-sm font-bold gap-2 shadow-xs disabled:opacity-50"
                       >
                         {faceSubmitting ? (
                           <Loader2 className="h-5 w-5 animate-spin" />
@@ -1248,7 +1248,7 @@ function CheckInInner() {
                           size="sm"
                           variant="ghost"
                           onClick={() => setSamples([])}
-                          className="text-xs text-slate-500 hover:text-rose-600 self-center"
+                          className="text-xs text-muted-foreground hover:text-destructive self-center"
                         >
                           Hủy & Chụp lại từ đầu
                         </Button>
@@ -1258,41 +1258,41 @@ function CheckInInner() {
 
                   {/* TAB 3: GIẢI PHÁP & CÔNG NGHỆ CAMERA HỒNG NGOẠI IR */}
                   {activeTab === 'IR_TECH' ? (
-                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs flex flex-col gap-3 text-xs">
-                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="rounded-lg border border-border bg-card p-5 shadow-xs flex flex-col gap-3 text-xs">
+                      <div className="flex items-center justify-between border-b border-border pb-3">
                         <div className="flex items-center gap-2">
-                          <Radio className="h-4 w-4 text-rose-600" />
-                          <span className="text-sm font-bold text-slate-900">Phương án Camera Hồng ngoại (IR) 2D</span>
+                          <Radio className="h-4 w-4 text-rose-500" />
+                          <span className="text-sm font-bold text-foreground">Phương án Camera Hồng ngoại (IR) 2D</span>
                         </div>
-                        <Badge variant="outline" className="border-rose-300 text-rose-700 bg-rose-50 text-[10px]">
+                        <Badge variant="outline" className="border-border bg-muted/40 text-foreground text-xs">
                           Anti-Spoofing
                         </Badge>
                       </div>
 
-                      <div className="space-y-2.5 text-slate-600 leading-relaxed">
-                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                          <p className="font-bold text-slate-900 flex items-center gap-1.5">
-                            <Zap className="h-3.5 w-3.5 text-blue-600" /> 1. Truy cập trực tiếp qua WebRTC MediaDevices
+                      <div className="space-y-2.5 text-muted-foreground leading-relaxed">
+                        <div className="p-3 rounded-md bg-muted/20 border border-border space-y-1">
+                          <p className="font-bold text-foreground flex items-center gap-1.5">
+                            <Zap className="h-3.5 w-3.5 text-primary" /> 1. Truy cập trực tiếp qua WebRTC MediaDevices
                           </p>
-                          <p className="text-[11px] text-slate-600">
+                          <p className="text-xs text-muted-foreground">
                             Hệ thống tự động phát hiện luồng cảm biến hồng ngoại phần cứng (videoinput device có nhãn IR / Infrared) và kích hoạt trực tiếp không cần plugin.
                           </p>
                         </div>
 
-                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                          <p className="font-bold text-slate-900 flex items-center gap-1.5">
+                        <div className="p-3 rounded-md bg-muted/20 border border-border space-y-1">
+                          <p className="font-bold text-foreground flex items-center gap-1.5">
                             <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> 2. Chống giả mạo quang học (Optical Liveness)
                           </p>
-                          <p className="text-[11px] text-slate-600">
+                          <p className="text-xs text-muted-foreground">
                             Cảm biến IR phát quang phổ 850nm/940nm đo độ phản xạ nhiệt của da người thật. Màn hình điện thoại/iPad và ảnh in trên giấy sẽ bị triệt tiêu phản xạ, ngăn chặn 100% việc gian lận.
                           </p>
                         </div>
 
-                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                          <p className="font-bold text-slate-900 flex items-center gap-1.5">
+                        <div className="p-3 rounded-md bg-muted/20 border border-border space-y-1">
+                          <p className="font-bold text-foreground flex items-center gap-1.5">
                             <Eye className="h-3.5 w-3.5 text-purple-600" /> 3. Vector 256 chiều HOG + LBP Đơn sắc
                           </p>
-                          <p className="text-[11px] text-slate-600">
+                          <p className="text-xs text-muted-foreground">
                             Trích xuất đặc trưng hình thái học trên quang phổ IR, hoạt động ổn định trong mọi điều kiện ánh sáng (kể cả ban đêm hoặc ngược sáng).
                           </p>
                         </div>
@@ -1302,15 +1302,15 @@ function CheckInInner() {
 
                   {/* TAB 4: BẢO MẬT & QUẢN LÝ MẪU */}
                   {activeTab === 'SECURITY' ? (
-                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs flex flex-col gap-3 text-xs">
-                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <span className="text-sm font-bold text-slate-900">Quản lý mẫu sinh trắc học</span>
-                        <Badge variant="outline" className="border-emerald-300 text-emerald-700 bg-emerald-50 text-[10px]">
+                    <div className="rounded-lg border border-border bg-card p-5 shadow-xs flex flex-col gap-3 text-xs">
+                      <div className="flex items-center justify-between border-b border-border pb-3">
+                        <span className="text-sm font-bold text-foreground">Quản lý mẫu sinh trắc học</span>
+                        <Badge variant="outline" className="border-border bg-muted/40 text-foreground text-xs">
                           Bảo mật CSDL
                         </Badge>
                       </div>
 
-                      <div className="space-y-2 text-slate-600 leading-relaxed">
+                      <div className="space-y-2 text-muted-foreground leading-relaxed">
                         <p>
                           • <strong>Số mẫu đang lưu:</strong> {enrolledCount} mẫu nhận diện đã đăng ký.
                         </p>
@@ -1323,13 +1323,13 @@ function CheckInInner() {
                       </div>
 
                       {enrolledCount > 0 ? (
-                        <div className="pt-2 border-t border-slate-100 flex justify-between items-center">
-                          <span className="text-slate-500 text-[11px]">Xóa dữ liệu khuôn mặt:</span>
+                        <div className="pt-2 border-t border-border flex justify-between items-center">
+                          <span className="text-muted-foreground text-xs">Xóa dữ liệu khuôn mặt:</span>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={handleDeleteEnrollment}
-                            className="border-rose-200 text-rose-700 hover:bg-rose-50 text-xs"
+                            className="border-destructive/30 text-destructive hover:bg-destructive/10 text-xs"
                           >
                             Xóa toàn bộ mẫu
                           </Button>
@@ -1339,11 +1339,11 @@ function CheckInInner() {
                   ) : null}
 
                   {/* Quick Nav Links */}
-                  <div className="rounded-xl border border-slate-200 bg-white p-3.5 flex items-center justify-between text-xs text-slate-500 shadow-xs">
-                    <Link href="/profile" className="text-blue-600 hover:underline font-medium">
+                  <div className="rounded-lg border border-border bg-card p-3.5 flex items-center justify-between text-xs text-muted-foreground shadow-xs">
+                    <Link href="/profile" className="text-primary hover:underline font-medium">
                       Hồ sơ cá nhân & Sinh trắc học
                     </Link>
-                    <Link href="/attendance" className="text-blue-600 hover:underline font-medium">
+                    <Link href="/attendance" className="text-primary hover:underline font-medium">
                       Lịch sử chấm công & Bảng công
                     </Link>
                   </div>
@@ -1361,8 +1361,8 @@ export default function CheckInPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-screen bg-slate-50 items-center justify-center p-10 text-center text-slate-600">
-          <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+        <main className="flex min-h-screen bg-background items-center justify-center p-10 text-center text-muted-foreground">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </main>
       }
     >

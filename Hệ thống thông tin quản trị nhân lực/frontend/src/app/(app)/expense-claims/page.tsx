@@ -90,8 +90,8 @@ const STATUS_BADGES: Record<string, { label: string; dot: string; bg: string; te
   PAID: { label: 'Đã giải ngân', dot: 'bg-blue-500', bg: 'bg-blue-500/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-500/20' },
   REJECTED: { label: 'Từ chối', dot: 'bg-rose-500', bg: 'bg-rose-500/10', text: 'text-rose-700 dark:text-rose-400', border: 'border-rose-500/20' },
   COMPLETED: { label: 'Hoàn tất', dot: 'bg-teal-500', bg: 'bg-teal-500/10', text: 'text-teal-700 dark:text-teal-400', border: 'border-teal-500/20' },
-  DRAFT: { label: 'Bản nháp', dot: 'bg-slate-400', bg: 'bg-slate-500/10', text: 'text-slate-700 dark:text-slate-400', border: 'border-slate-500/20' },
-  CANCELLED: { label: 'Đã hủy', dot: 'bg-zinc-400', bg: 'bg-zinc-500/10', text: 'text-zinc-600 dark:text-zinc-400', border: 'border-zinc-500/20' },
+  DRAFT: { label: 'Bản nháp', dot: 'bg-muted-foreground', bg: 'bg-muted', text: 'text-muted-foreground', border: 'border-border' },
+  CANCELLED: { label: 'Đã hủy', dot: 'bg-muted-foreground', bg: 'bg-muted', text: 'text-muted-foreground', border: 'border-border' },
 };
 
 function formatSafeDate(dateStr?: string | Date | null): string {
@@ -380,7 +380,7 @@ export default function ExpenseClaimsPage() {
           <p className="font-semibold text-foreground text-xs hover:text-primary cursor-pointer" onClick={() => setDetailClaim(r)}>
             {r.title}
           </p>
-          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
             <User className="h-3 w-3" /> {r.employeeName}
           </p>
         </div>
@@ -392,8 +392,8 @@ export default function ExpenseClaimsPage() {
       header: 'Danh mục',
       sortable: true,
       render: (r) => (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-muted text-foreground">
-          <Tag className="h-2.5 w-2.5" />
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-normal border border-border bg-muted/40 text-foreground">
+          <Tag className="h-3 w-3" />
           {CATEGORY_LABELS[r.category] || r.category}
         </span>
       ),
@@ -449,7 +449,7 @@ export default function ExpenseClaimsPage() {
           <p className="font-semibold text-foreground text-xs hover:text-primary cursor-pointer" onClick={() => setDetailTravel(r)}>
             {r.purpose}
           </p>
-          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
             <User className="h-3 w-3" /> {r.employeeName}
           </p>
         </div>
@@ -518,7 +518,7 @@ export default function ExpenseClaimsPage() {
           <p className="font-semibold text-foreground text-xs hover:text-primary cursor-pointer" onClick={() => setDetailAdvance(r)}>
             {r.purpose}
           </p>
-          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
             <User className="h-3 w-3" /> {r.employeeName}
           </p>
         </div>
@@ -699,7 +699,7 @@ export default function ExpenseClaimsPage() {
       </div>
 
       {/* Filter & Search Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-card p-3 rounded-xl border border-border/70 shadow-2xs">
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-card p-3 rounded-lg border border-border/70 shadow-2xs">
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
@@ -821,7 +821,7 @@ export default function ExpenseClaimsPage() {
                 return (
                   <div
                     key={c.id}
-                    className="rounded-xl border bg-card p-5 shadow-2xs hover:shadow-md transition-all space-y-3.5 border-border/80 flex flex-col justify-between"
+                    className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-3.5 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-2">
@@ -836,27 +836,28 @@ export default function ExpenseClaimsPage() {
                             <User className="h-3 w-3" /> {c.employeeName}
                           </p>
                         </div>
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${badge.bg} ${badge.text} ${badge.border}`}>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-normal border border-border bg-muted/40 text-foreground">
+                          <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} />
                           {badge.label}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 bg-muted/25 p-3 rounded-lg text-xs mt-3 border border-border/40">
+                      <div className="grid grid-cols-2 gap-2 bg-muted/25 p-3 rounded-md text-xs mt-3 border border-border">
                         <div>
-                          <span className="text-muted-foreground text-[11px] block">Danh mục chi phí:</span>
+                          <span className="text-muted-foreground text-xs block">Danh mục chi phí:</span>
                           <span className="font-semibold text-foreground">
                             {CATEGORY_LABELS[c.category] || c.category}
                           </span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground text-[11px] block">Số tiền quyết toán:</span>
+                          <span className="text-muted-foreground text-xs block">Số tiền quyết toán:</span>
                           <span className="font-extrabold text-emerald-700 text-sm">
                             {formatVND(c.totalAmount)}
                           </span>
                         </div>
                       </div>
 
-                      <div className="pt-2.5 flex justify-between items-center text-[11px] text-muted-foreground border-t border-border/40 mt-3">
+                      <div className="pt-2.5 flex justify-between items-center text-xs text-muted-foreground border-t border-border/40 mt-3">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           Nộp ngày: <strong className="text-foreground font-medium">{formatSafeDate(c.submittedAt || c.createdAt)}</strong>
@@ -1021,7 +1022,7 @@ export default function ExpenseClaimsPage() {
                 return (
                   <div
                     key={t.id}
-                    className="rounded-xl border bg-card p-5 shadow-2xs hover:shadow-md transition-all space-y-3.5 border-border/80 flex flex-col justify-between"
+                    className="rounded-lg border bg-card p-5 shadow-2xs hover:shadow-md transition-all space-y-3.5 border-border/80 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-2">
@@ -1036,27 +1037,28 @@ export default function ExpenseClaimsPage() {
                             <User className="h-3 w-3" /> {t.employeeName}
                           </p>
                         </div>
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${badge.bg} ${badge.text} ${badge.border}`}>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-normal border border-border bg-muted/40 text-foreground">
+                          <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} />
                           {badge.label}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs bg-muted/30 p-2.5 rounded-lg my-3 border border-border/40">
+                      <div className="flex items-center gap-2 text-xs bg-muted/30 p-2.5 rounded-md my-3 border border-border/40">
                         <MapPin className="h-3.5 w-3.5 text-purple-600 shrink-0" />
                         <span className="font-semibold text-foreground">{t.fromLocation}</span>
                         <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
                         <span className="font-semibold text-foreground">{t.toLocation}</span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 text-xs bg-card p-2 rounded-lg border border-border/40">
+                      <div className="grid grid-cols-2 gap-2 text-xs bg-card p-2 rounded-md border border-border/40">
                         <div>
-                          <span className="text-muted-foreground text-[11px] block">Lịch trình:</span>
+                          <span className="text-muted-foreground text-xs block">Lịch trình:</span>
                           <span className="font-medium text-foreground">
                             {formatSafeDate(t.departureDate)} - {formatSafeDate(t.returnDate)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground text-[11px] block">Dự toán kinh phí:</span>
+                          <span className="text-muted-foreground text-xs block">Dự toán kinh phí:</span>
                           <span className="font-extrabold text-foreground text-sm">
                             {formatVND(t.estimatedBudget)}
                           </span>
@@ -1206,7 +1208,7 @@ export default function ExpenseClaimsPage() {
                 return (
                   <div
                     key={a.id}
-                    className="rounded-xl border bg-card p-5 shadow-2xs hover:shadow-md transition-all space-y-3.5 border-border/80 flex flex-col justify-between"
+                    className="rounded-lg border bg-card p-5 shadow-2xs hover:shadow-md transition-all space-y-3.5 border-border/80 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-2">
@@ -1221,19 +1223,20 @@ export default function ExpenseClaimsPage() {
                             <User className="h-3 w-3" /> {a.employeeName}
                           </p>
                         </div>
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${badge.bg} ${badge.text} ${badge.border}`}>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-normal border border-border bg-muted/40 text-foreground">
+                          <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} />
                           {badge.label}
                         </span>
                       </div>
 
-                      <div className="bg-blue-50/40 dark:bg-blue-950/20 p-3 rounded-lg text-xs my-3 border border-blue-100 dark:border-blue-900/50">
-                        <span className="text-muted-foreground text-[11px] block">Số tiền tạm ứng kinh phí:</span>
-                        <p className="text-lg font-black text-blue-700 dark:text-blue-400">
+                      <div className="bg-muted/25 p-3 rounded-md text-xs my-3 border border-border">
+                        <span className="text-muted-foreground text-xs block">Số tiền tạm ứng kinh phí:</span>
+                        <p className="text-lg font-bold text-foreground font-mono">
                           {formatVND(a.amount)}
                         </p>
                       </div>
 
-                      <div className="pt-2 flex justify-between items-center text-[11px] text-muted-foreground border-t border-border/40">
+                      <div className="pt-2 flex justify-between items-center text-xs text-muted-foreground border-t border-border/40">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           Ngày tạo: {formatSafeDate(a.createdAt)}
@@ -1376,7 +1379,7 @@ export default function ExpenseClaimsPage() {
           </div>
 
           {/* Dynamic Itemized Expenses Builder */}
-          <div className="space-y-2 border rounded-xl p-3 bg-muted/20">
+          <div className="space-y-2 border rounded-md p-3 bg-muted/20">
             <div className="flex items-center justify-between">
               <Label className="font-bold flex items-center gap-1.5 text-xs text-foreground">
                 <Receipt className="h-3.5 w-3.5 text-primary" />
@@ -1392,7 +1395,7 @@ export default function ExpenseClaimsPage() {
                     { item: '', amount: 500000, date: new Date().toISOString().split('T')[0] },
                   ]);
                 }}
-                className="h-6 text-[11px] px-2 gap-1"
+                className="h-7 text-xs px-2 gap-1"
               >
                 <Plus className="h-3 w-3" /> Thêm khoản chi
               </Button>
@@ -1400,8 +1403,8 @@ export default function ExpenseClaimsPage() {
 
             <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
               {claimItems.map((it, idx) => (
-                <div key={idx} className="flex items-center gap-2 bg-card p-2 rounded-lg border border-border/60">
-                  <span className="text-[11px] font-bold text-muted-foreground w-4">{idx + 1}.</span>
+                <div key={idx} className="flex items-center gap-2 bg-card p-2 rounded-md border border-border/60">
+                  <span className="text-xs font-bold text-muted-foreground w-4">{idx + 1}.</span>
                   <input
                     type="text"
                     placeholder="Mô tả khoản chi (hóa đơn, vé...)"
@@ -1653,7 +1656,7 @@ export default function ExpenseClaimsPage() {
               onChange={(e) => setAdvAmount(Number(e.target.value))}
               className="mt-1 text-xs font-bold text-blue-700"
             />
-            <p className="text-[11px] text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Bằng chữ: <strong>{(advAmount || 0).toLocaleString('vi-VN')} đồng</strong>
             </p>
           </div>
@@ -1687,25 +1690,26 @@ export default function ExpenseClaimsPage() {
           size="lg"
         >
           <div className="space-y-4 py-2 text-xs">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-muted/20 p-3 rounded-xl border border-border/60">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-muted/20 p-3 rounded-md border border-border/60">
               <div>
-                <span className="text-muted-foreground block text-[11px]">Người đề nghị:</span>
+                <span className="text-muted-foreground block text-xs">Người đề nghị:</span>
                 <span className="font-bold text-foreground text-sm">{detailClaim.employeeName}</span>
               </div>
               <div>
-                <span className="text-muted-foreground block text-[11px]">Danh mục:</span>
+                <span className="text-muted-foreground block text-xs">Danh mục:</span>
                 <span className="font-semibold text-foreground">{CATEGORY_LABELS[detailClaim.category] || detailClaim.category}</span>
               </div>
               <div>
-                <span className="text-muted-foreground block text-[11px]">Tổng số tiền:</span>
-                <span className="font-extrabold text-emerald-700 text-sm">{formatVND(detailClaim.totalAmount)}</span>
+                <span className="text-muted-foreground block text-xs">Tổng số tiền:</span>
+                <span className="font-extrabold text-foreground text-sm font-mono">{formatVND(detailClaim.totalAmount)}</span>
               </div>
               <div>
-                <span className="text-muted-foreground block text-[11px]">Trạng thái:</span>
+                <span className="text-muted-foreground block text-xs">Trạng thái:</span>
                 {(() => {
-                  const b = STATUS_BADGES[detailClaim.status] || { label: detailClaim.status, bg: 'bg-muted', text: 'text-foreground', border: 'border-border' };
+                  const b = STATUS_BADGES[detailClaim.status] || { label: detailClaim.status, dot: 'bg-muted-foreground', bg: 'bg-muted', text: 'text-foreground', border: 'border-border' };
                   return (
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${b.bg} ${b.text} ${b.border}`}>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-normal border border-border bg-muted/40 text-foreground">
+                      <span className={`h-1.5 w-1.5 rounded-full ${b.dot}`} />
                       {b.label}
                     </span>
                   );
@@ -1718,9 +1722,9 @@ export default function ExpenseClaimsPage() {
                 <Receipt className="h-4 w-4 text-primary" />
                 Danh mục các khoản chi phí thanh quyết toán
               </h4>
-              <div className="border rounded-xl overflow-hidden bg-card">
+              <div className="border rounded-md overflow-hidden bg-card">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-muted/50 border-b text-[11px] text-muted-foreground font-semibold">
+                  <thead className="bg-muted/50 border-b text-xs text-muted-foreground font-semibold">
                     <tr>
                       <th className="py-2 px-3">STT</th>
                       <th className="py-2 px-3">Nội dung chi</th>
@@ -1826,13 +1830,14 @@ export default function ExpenseClaimsPage() {
           size="md"
         >
           <div className="space-y-4 py-2 text-xs">
-            <div className="space-y-2 bg-muted/20 p-3 rounded-xl border border-border/60">
+            <div className="space-y-2 bg-muted/20 p-3 rounded-md border border-border/60">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Trạng thái:</span>
                 {(() => {
-                  const b = STATUS_BADGES[detailTravel.status] || { label: detailTravel.status, bg: 'bg-muted', text: 'text-foreground', border: 'border-border' };
+                  const b = STATUS_BADGES[detailTravel.status] || { label: detailTravel.status, dot: 'bg-muted-foreground', bg: 'bg-muted', text: 'text-foreground', border: 'border-border' };
                   return (
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${b.bg} ${b.text} ${b.border}`}>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-normal border border-border bg-muted/40 text-foreground">
+                      <span className={`h-1.5 w-1.5 rounded-full ${b.dot}`} />
                       {b.label}
                     </span>
                   );
@@ -1918,13 +1923,14 @@ export default function ExpenseClaimsPage() {
           size="md"
         >
           <div className="space-y-4 py-2 text-xs">
-            <div className="space-y-2.5 bg-muted/20 p-3 rounded-xl border border-border/60">
+            <div className="space-y-2.5 bg-muted/20 p-3 rounded-md border border-border/60">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Trạng thái:</span>
                 {(() => {
-                  const b = STATUS_BADGES[detailAdvance.status] || { label: detailAdvance.status, bg: 'bg-muted', text: 'text-foreground', border: 'border-border' };
+                  const b = STATUS_BADGES[detailAdvance.status] || { label: detailAdvance.status, dot: 'bg-muted-foreground', bg: 'bg-muted', text: 'text-foreground', border: 'border-border' };
                   return (
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${b.bg} ${b.text} ${b.border}`}>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-normal border border-border bg-muted/40 text-foreground">
+                      <span className={`h-1.5 w-1.5 rounded-full ${b.dot}`} />
                       {b.label}
                     </span>
                   );
@@ -2011,14 +2017,14 @@ export default function ExpenseClaimsPage() {
             {/* Header Quốc Huy & Đơn Vị */}
             <div className="flex justify-between items-start border-b pb-4">
               <div className="text-left space-y-0.5">
-                <p className="font-bold uppercase text-[11px]">Cơ quan / Doanh nghiệp: TẬP ĐOÀN HRMIS PRO</p>
-                <p className="text-[10px] text-gray-600">Bộ phận: Phòng Tài chính - Kế toán</p>
-                <p className="text-[10px] text-gray-600">Mã hồ sơ: {printDocument.data.id?.slice(0, 10) || 'HD-2026'}</p>
+                <p className="font-bold uppercase text-xs">Cơ quan / Doanh nghiệp: TẬP ĐOÀN HRMIS PRO</p>
+                <p className="text-xs text-muted-foreground">Bộ phận: Phòng Tài chính - Kế toán</p>
+                <p className="text-xs text-muted-foreground">Mã hồ sơ: {printDocument.data.id?.slice(0, 10) || 'HD-2026'}</p>
               </div>
               <div className="text-center space-y-0.5">
-                <p className="font-bold text-[11px] uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-                <p className="text-[10px] italic">Độc lập - Tự do - Hạnh phúc</p>
-                <p className="text-[9px] text-gray-500">-------o0o-------</p>
+                <p className="font-bold text-xs uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                <p className="text-xs italic">Độc lập - Tự do - Hạnh phúc</p>
+                <p className="text-xs text-muted-foreground">-------o0o-------</p>
               </div>
             </div>
 
@@ -2027,7 +2033,7 @@ export default function ExpenseClaimsPage() {
               <div className="space-y-3">
                 <div className="text-center py-2">
                   <h2 className="text-base font-bold uppercase tracking-wide">GIẤY ĐỀ NGHỊ THANH TOÁN CHI PHÍ</h2>
-                  <p className="italic text-[10px] text-gray-600">
+                  <p className="italic text-xs text-muted-foreground">
                     Ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
                   </p>
                 </div>
@@ -2042,36 +2048,36 @@ export default function ExpenseClaimsPage() {
 
                 <div className="mt-3">
                   <p className="font-bold mb-1">Bảng kê chi tiết các chứng từ đính kèm:</p>
-                  <table className="w-full border-collapse border border-gray-300 text-[11px]">
+                  <table className="w-full border-collapse border border-border text-xs">
                     <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border border-gray-300 p-1.5 text-center">STT</th>
-                        <th className="border border-gray-300 p-1.5 text-left">Nội dung chi</th>
-                        <th className="border border-gray-300 p-1.5 text-center">Ngày chứng từ</th>
-                        <th className="border border-gray-300 p-1.5 text-right">Số tiền (VND)</th>
+                      <tr className="bg-muted/60">
+                        <th className="border border-border p-1.5 text-center">STT</th>
+                        <th className="border border-border p-1.5 text-left">Nội dung chi</th>
+                        <th className="border border-border p-1.5 text-center">Ngày chứng từ</th>
+                        <th className="border border-border p-1.5 text-right">Số tiền (VND)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {Array.isArray(printDocument.data.items) && printDocument.data.items.length > 0 ? (
                         printDocument.data.items.map((it: any, idx: number) => (
                           <tr key={idx}>
-                            <td className="border border-gray-300 p-1 text-center">{idx + 1}</td>
-                            <td className="border border-gray-300 p-1">{it.item}</td>
-                            <td className="border border-gray-300 p-1 text-center">{formatSafeDate(it.date)}</td>
-                            <td className="border border-gray-300 p-1 text-right">{formatVND(it.amount)}</td>
+                            <td className="border border-border p-1 text-center">{idx + 1}</td>
+                            <td className="border border-border p-1">{it.item}</td>
+                            <td className="border border-border p-1 text-center">{formatSafeDate(it.date)}</td>
+                            <td className="border border-border p-1 text-right">{formatVND(it.amount)}</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td className="border border-gray-300 p-1 text-center">1</td>
-                          <td className="border border-gray-300 p-1">{printDocument.data.title}</td>
-                          <td className="border border-gray-300 p-1 text-center">{formatSafeDate(printDocument.data.submittedAt)}</td>
-                          <td className="border border-gray-300 p-1 text-right">{formatVND(printDocument.data.totalAmount)}</td>
+                          <td className="border border-border p-1 text-center">1</td>
+                          <td className="border border-border p-1">{printDocument.data.title}</td>
+                          <td className="border border-border p-1 text-center">{formatSafeDate(printDocument.data.submittedAt)}</td>
+                          <td className="border border-border p-1 text-right">{formatVND(printDocument.data.totalAmount)}</td>
                         </tr>
                       )}
-                      <tr className="font-bold bg-gray-50">
-                        <td colSpan={3} className="border border-gray-300 p-1.5 text-right">Tổng cộng thanh quyết toán:</td>
-                        <td className="border border-gray-300 p-1.5 text-right text-black">{formatVND(printDocument.data.totalAmount)}</td>
+                      <tr className="font-bold bg-muted/40">
+                        <td colSpan={3} className="border border-border p-1.5 text-right">Tổng cộng thanh quyết toán:</td>
+                        <td className="border border-border p-1.5 text-right text-foreground">{formatVND(printDocument.data.totalAmount)}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -2083,7 +2089,7 @@ export default function ExpenseClaimsPage() {
               <div className="space-y-3">
                 <div className="text-center py-2">
                   <h2 className="text-base font-bold uppercase tracking-wide">GIẤY ĐI ĐƯỜNG / LỆNH ĐIỀU ĐỘNG CÔNG TÁC</h2>
-                  <p className="italic text-[10px] text-gray-600">
+                  <p className="italic text-xs text-gray-600">
                     Căn cứ kế hoạch công tác của Đơn vị năm {new Date().getFullYear()}
                   </p>
                 </div>
@@ -2103,7 +2109,7 @@ export default function ExpenseClaimsPage() {
               <div className="space-y-3">
                 <div className="text-center py-2">
                   <h2 className="text-base font-bold uppercase tracking-wide">PHIẾU CHI TẠM ỨNG KINH PHÍ</h2>
-                  <p className="italic text-[10px] text-gray-600">
+                  <p className="italic text-xs text-gray-600">
                     (Kèm theo Giấy đề nghị tạm ứng kinh phí)
                   </p>
                 </div>
@@ -2118,25 +2124,25 @@ export default function ExpenseClaimsPage() {
             )}
 
             {/* Signature Blocks */}
-            <div className="grid grid-cols-3 gap-2 text-center pt-8 pb-4 text-[11px]">
+            <div className="grid grid-cols-3 gap-2 text-center pt-8 pb-4 text-xs">
               <div>
                 <p className="font-bold">Người Đề Nghị</p>
-                <p className="italic text-[10px] text-gray-500">(Ký và ghi rõ họ tên)</p>
-                <div className="h-16 flex items-end justify-center font-semibold text-gray-800">
+                <p className="italic text-xs text-muted-foreground">(Ký và ghi rõ họ tên)</p>
+                <div className="h-16 flex items-end justify-center font-semibold text-foreground">
                   {printDocument.data.employeeName}
                 </div>
               </div>
               <div>
                 <p className="font-bold">Kế Toán Trưởng</p>
-                <p className="italic text-[10px] text-gray-500">(Ký và ghi rõ họ tên)</p>
-                <div className="h-16 flex items-end justify-center font-semibold text-gray-800">
+                <p className="italic text-xs text-muted-foreground">(Ký và ghi rõ họ tên)</p>
+                <div className="h-16 flex items-end justify-center font-semibold text-foreground">
                   (Đã kiểm soát)
                 </div>
               </div>
               <div>
                 <p className="font-bold">Thủ Trưởng Đơn Vị</p>
-                <p className="italic text-[10px] text-gray-500">(Ký, đóng dấu)</p>
-                <div className="h-16 flex items-end justify-center font-semibold text-gray-800">
+                <p className="italic text-xs text-muted-foreground">(Ký, đóng dấu)</p>
+                <div className="h-16 flex items-end justify-center font-semibold text-foreground">
                   (Đã duyệt chi)
                 </div>
               </div>

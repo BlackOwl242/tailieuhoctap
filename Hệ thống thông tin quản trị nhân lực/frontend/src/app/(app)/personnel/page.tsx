@@ -417,11 +417,11 @@ export default function PersonnelActionsPage() {
                           Thủ tục bàn giao công việc & Thu hồi tài sản
                         </span>
                         {handover ? (
-                          <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                          <span className="text-xs font-normal px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
                             {handover.status === 'CLOSED' ? 'Đã hoàn tất' : `${handover.done}/${handover.total} mục`}
                           </span>
                         ) : detail.type === 'RESIGNATION' && detail.status === 'PENDING' ? (
-                          <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                          <span className="text-xs font-normal px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
                             Chờ duyệt quyết định
                           </span>
                         ) : null}
@@ -438,7 +438,7 @@ export default function PersonnelActionsPage() {
 
                     {/* Nội dung checklist khi mở rộng */}
                     {isHandoverExpanded && (
-                      <div className="px-3.5 pb-3.5 pt-1 border-t border-border/60 space-y-2.5 bg-muted/10">
+                      <div className="px-3.5 pb-3.5 pt-1 border-t border-border space-y-2.5 bg-muted/10">
                         {handover ? (
                           <>
                             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground py-1">
@@ -458,7 +458,7 @@ export default function PersonnelActionsPage() {
                                 return (
                                   <li
                                     key={item.id}
-                                    className="flex items-center justify-between gap-2 rounded-md border border-border/60 bg-background px-3 py-2 text-xs"
+                                    className="flex items-center justify-between gap-2 rounded-md border border-border bg-background px-3 py-2 text-xs"
                                   >
                                     <div className="flex min-w-0 items-center gap-2">
                                       {done ? (
@@ -479,7 +479,7 @@ export default function PersonnelActionsPage() {
                                         <Link
                                           href="/assets"
                                           target="_blank"
-                                          className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground hover:text-foreground hover:underline shrink-0 ml-1.5"
+                                          className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground hover:underline shrink-0 ml-1.5"
                                         >
                                           Kho tài sản <ArrowUpRight className="h-3 w-3" />
                                         </Link>
@@ -496,7 +496,7 @@ export default function PersonnelActionsPage() {
                                             done: !done,
                                           })
                                         }
-                                        className="h-6 text-[11px] px-2 shrink-0"
+                                        className="h-7 text-xs px-2 shrink-0"
                                       >
                                         {done ? 'Hủy' : 'Xác nhận'}
                                       </Button>
@@ -592,7 +592,7 @@ export default function PersonnelActionsPage() {
           </div>
 
           {selectedSubject ? (
-            <div className="sm:col-span-2 text-xs bg-muted/40 p-2.5 rounded-xl border border-border/60 text-muted-foreground flex items-center justify-between">
+            <div className="sm:col-span-2 text-xs bg-muted/40 p-2.5 rounded-md border border-border/60 text-muted-foreground flex items-center justify-between">
               <span>Đơn vị công tác hiện tại:</span>
               <span className="font-bold text-foreground">{selectedSubject.orgUnit?.name ?? 'Chưa phân bổ phòng ban'}</span>
             </div>
@@ -611,7 +611,7 @@ export default function PersonnelActionsPage() {
           ) : null}
 
           {form.type === 'RESIGNATION' ? (
-            <div className="sm:col-span-2 text-xs bg-primary/5 text-foreground p-3 rounded-xl border border-primary/20">
+            <div className="sm:col-span-2 text-xs bg-muted/40 text-foreground p-3 rounded-md border border-border">
               💡 <strong>Lưu ý nghiệp vụ:</strong> Khi quyết định thôi việc được duyệt, hệ thống sẽ <strong>tự động kích hoạt Thủ tục bàn giao 5 bước</strong> (công việc, tài sản, tài khoản, quyết toán) và liên thông với phân hệ Thu hồi thiết bị.
             </div>
           ) : null}

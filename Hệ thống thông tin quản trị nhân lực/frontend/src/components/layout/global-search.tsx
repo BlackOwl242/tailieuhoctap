@@ -136,7 +136,7 @@ export function GlobalSearch() {
                   return (
                     <React.Fragment key={`${h.group}-${h.href}-${i}`}>
                       {header ? (
-                        <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{header}</p>
+                        <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{header}</p>
                       ) : null}
                       <button
                         role="option"

@@ -418,13 +418,13 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
   const modalContent = (
     <div className="fixed inset-0 z-modal flex items-center justify-center p-3 sm:p-6">
       {/* Backdrop phủ toàn màn hình */}
-      <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-150" onClick={onClose} />
-      <div className="relative bg-card text-card-foreground w-full max-w-6xl max-h-[92vh] rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150" onClick={onClose} />
+      <div className="relative bg-card text-card-foreground w-full max-w-6xl max-h-[92vh] rounded-lg shadow-2xl border border-border flex flex-col overflow-hidden">
         
         {/* ================= HEADER ================= */}
         <div className="px-6 py-4 border-b border-border bg-muted/40 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center font-bold">
               <FileText className="w-5 h-5" />
             </div>
             <div>
@@ -432,7 +432,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                 <h2 className="text-base font-bold text-foreground">
                   {userId ? 'Chỉnh sửa Hồ sơ Cán bộ Toàn diện' : 'Khai báo Hồ sơ Cán bộ Chuyên sâu'}
                 </h2>
-                <Badge variant={profileMode === 'STATE' ? 'default' : 'secondary'} className="text-[11px] font-medium">
+                <Badge variant={profileMode === 'STATE' ? 'default' : 'secondary'} className="text-xs font-medium">
                   {profileMode === 'STATE' ? '🏛️ Chuẩn 2C-BNV / NĐ 204' : '🏢 Doanh nghiệp Tư nhân'}
                 </Badge>
               </div>
@@ -526,7 +526,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
           {activeTab === 'p1' && (
             <div className="space-y-6 animate-in fade-in duration-100">
               {/* Khối 1: Định danh & Tài khoản */}
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-4">
                 <div className="flex items-center justify-between text-xs font-bold text-foreground uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-primary" /> Khối 1: Định danh cá nhân & Tài khoản làm việc
@@ -636,7 +636,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               </div>
 
               {/* Khối 2: Địa bàn hành chính & Dân tộc, Tôn giáo */}
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-4">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
                   <Building className="w-4 h-4 text-primary" /> Khối 2: Địa bàn hành chính & Đặc điểm nhân khẩu
                 </div>
@@ -714,7 +714,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               </div>
 
               {/* Khối 3: Tuyển dụng, Đơn vị & Chức danh */}
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-4">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
                   <Briefcase className="w-4 h-4 text-primary" /> Khối 3: Quá trình Tuyển dụng & Đơn vị công tác
                 </div>
@@ -797,12 +797,12 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               </div>
 
               {/* Khối 4: Ngạch - Bậc lương Nghị định 204 hoặc Thỏa thuận Doanh nghiệp */}
-              <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 space-y-4">
+              <div className="p-4 rounded-lg border border-primary/20 bg-primary/5 space-y-4">
                 <div className="flex items-center justify-between text-xs font-bold text-foreground uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <Award className="w-4 h-4 text-primary" /> Khối 4: Ngạch bậc Lương & Chế độ Đãi ngộ
                   </div>
-                  <Badge variant="outline" className="text-[10px]">
+                  <Badge variant="outline" className="text-xs">
                     {profileMode === 'STATE' ? 'Chuẩn Nghị định 204/2004/NĐ-CP' : 'Bảng lương thỏa thuận'}
                   </Badge>
                 </div>
@@ -884,7 +884,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
           {activeTab === 'p2' && (
             <div className="space-y-6 animate-in fade-in duration-100">
               {/* Khối 1: Phụ cấp & BHXH */}
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-4">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
                   <Award className="w-4 h-4 text-primary" /> Khối 1: Chế độ Phụ cấp & Bảo hiểm xã hội
                 </div>
@@ -929,7 +929,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               </div>
 
               {/* Khối 2: Học vấn, Chuyên môn & Chức danh khoa học */}
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-4">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
                   <GraduationCap className="w-4 h-4 text-primary" /> Khối 2: Trình độ Học vấn, Chuyên môn & Khoa học
                 </div>
@@ -1004,7 +1004,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               </div>
 
               {/* Khối 3: Tổ chức Chính trị & Lực lượng vũ trang */}
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-4">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
                   <ShieldCheck className="w-4 h-4 text-primary" /> Khối 3: Tổ chức Đoàn - Đảng & Lực lượng vũ trang
                 </div>
@@ -1085,7 +1085,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
           {activeTab === 'p3' && (
             <div className="space-y-6 animate-in fade-in duration-100">
               {/* Khối 1: Sức khỏe & Thể trạng */}
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-4">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
                   <HeartHandshake className="w-4 h-4 text-primary" /> Khối 1: Tình trạng Sức khỏe & Thể trạng
                 </div>
@@ -1131,7 +1131,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               </div>
 
               {/* Khối 2: Năng lực sở trường & Khen thưởng / Kỷ luật */}
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-4">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
                   <Award className="w-4 h-4 text-primary" /> Khối 2: Năng lực sở trường & Khen thưởng / Kỷ luật cao nhất
                 </div>
@@ -1175,12 +1175,12 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               </div>
 
               {/* Khối 3: Đặc điểm Lịch sử chính trị & Mối quan hệ nước ngoài */}
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-4">
                 <div className="flex items-center justify-between text-xs font-bold text-foreground uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-primary" /> Khối 3: Lịch sử chính trị & Yếu tố Nước ngoài
                   </div>
-                  <span className="text-[10px] text-muted-foreground font-normal">
+                  <span className="text-xs text-muted-foreground font-normal">
                     Quy định 58-QĐ/TW về Bảo vệ chính trị nội bộ
                   </span>
                 </div>
@@ -1255,53 +1255,53 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               </div>
 
               {/* Sub-tab Pills */}
-              <div className="flex flex-wrap gap-1.5 p-1 bg-muted/50 rounded-xl text-xs font-semibold">
+              <div className="flex flex-wrap gap-1.5 p-1 bg-muted/50 rounded-md text-xs font-semibold">
                 <button
                   onClick={() => setSubTab('work')}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${subTab === 'work' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`px-3 py-1.5 rounded-md transition-all ${subTab === 'work' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   1. QT Công tác ({profileQ.data?.workHistories?.length || 0})
                 </button>
                 <button
                   onClick={() => setSubTab('edu')}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${subTab === 'edu' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`px-3 py-1.5 rounded-md transition-all ${subTab === 'edu' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   2. QT Đào tạo ({profileQ.data?.educations?.length || 0})
                 </button>
                 <button
                   onClick={() => setSubTab('salary')}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${subTab === 'salary' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`px-3 py-1.5 rounded-md transition-all ${subTab === 'salary' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   3. QT Lương ({profileQ.data?.salaryHistories?.length || 0})
                 </button>
                 <button
                   onClick={() => setSubTab('family')}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${subTab === 'family' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`px-3 py-1.5 rounded-md transition-all ${subTab === 'family' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   4. QH Gia đình ({profileQ.data?.familyRelations?.length || 0})
                 </button>
                 <button
                   onClick={() => setSubTab('reward')}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${subTab === 'reward' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`px-3 py-1.5 rounded-md transition-all ${subTab === 'reward' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   5. QT Khen thưởng / Kỷ luật ({profileQ.data?.rewardDisciplines?.length || 0})
                 </button>
                 <button
                   onClick={() => setSubTab('appraisal')}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${subTab === 'appraisal' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`px-3 py-1.5 rounded-md transition-all ${subTab === 'appraisal' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   6. QT Đánh giá cán bộ ({profileQ.data?.appraisals?.length || 0})
                 </button>
                 <button
                   onClick={() => setSubTab('appointment')}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${subTab === 'appointment' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`px-3 py-1.5 rounded-md transition-all ${subTab === 'appointment' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   7. QT Bổ nhiệm ({profileQ.data?.appointments?.length || 0})
                 </button>
               </div>
 
               {!userId ? (
-                <div className="p-8 text-center rounded-xl border border-dashed border-border text-muted-foreground text-xs">
+                <div className="p-8 text-center rounded-lg border border-dashed border-border text-muted-foreground text-xs">
                   <Info className="w-8 h-8 mx-auto mb-2 text-primary opacity-60" />
                   Vui lòng bấm <strong>&quot;Lưu &amp; Khởi tạo Hồ sơ&quot;</strong> ở góc dưới để tạo nhân sự trước khi thêm các bảng quá trình lịch sử.
                 </div>
@@ -1314,13 +1314,13 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                         <div className="text-center py-8 text-xs text-muted-foreground">Chưa có quá trình công tác nào</div>
                       )}
                       {profileQ.data?.workHistories?.map((w: any) => (
-                        <div key={w.id} className="p-3.5 rounded-xl border border-border bg-card flex justify-between items-center text-xs">
+                        <div key={w.id} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center text-xs">
                           <div>
                             <div className="font-bold text-foreground text-sm">{w.position}</div>
                             <div className="text-muted-foreground mt-0.5">
                               Đơn vị: <span className="text-foreground font-medium">{w.unitName}</span> {w.departmentName && `• ${w.departmentName}`}
                             </div>
-                            <div className="text-muted-foreground text-[11px] mt-1 font-mono">
+                            <div className="text-muted-foreground text-xs mt-1 font-mono">
                               {formatDate(w.fromDate)} $\rightarrow$ {w.toDate ? formatDate(w.toDate) : 'Hiện nay'}
                             </div>
                           </div>
@@ -1338,13 +1338,13 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                         <div className="text-center py-8 text-xs text-muted-foreground">Chưa có quá trình đào tạo nào</div>
                       )}
                       {profileQ.data?.educations?.map((e: any) => (
-                        <div key={e.id} className="p-3.5 rounded-xl border border-border bg-card flex justify-between items-center text-xs">
+                        <div key={e.id} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center text-xs">
                           <div>
                             <div className="font-bold text-foreground text-sm">{e.schoolName}</div>
                             <div className="text-muted-foreground mt-0.5">
                               Chuyên ngành: <span className="text-foreground font-medium">{e.majorName}</span> • Văn bằng: <span className="text-primary font-bold">{e.degreeName}</span> ({e.studyForm})
                             </div>
-                            <div className="text-muted-foreground text-[11px] mt-1 font-mono">
+                            <div className="text-muted-foreground text-xs mt-1 font-mono">
                               Năm tốt nghiệp: {e.graduationYear || '—'}
                             </div>
                           </div>
@@ -1362,7 +1362,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                         <div className="text-center py-8 text-xs text-muted-foreground">Chưa có quá trình nâng lương nào</div>
                       )}
                       {profileQ.data?.salaryHistories?.map((s: any) => (
-                        <div key={s.id} className="p-3.5 rounded-xl border border-border bg-card flex justify-between items-center text-xs">
+                        <div key={s.id} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center text-xs">
                           <div>
                             <div className="font-bold text-foreground text-sm">
                               Ngạch: {s.rankCode || 'Tiêu chuẩn'} • Bậc {s.step} (Hệ số: {s.coefficient})
@@ -1385,13 +1385,13 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                         <div className="text-center py-8 text-xs text-muted-foreground">Chưa có quan hệ gia đình nào</div>
                       )}
                       {profileQ.data?.familyRelations?.map((f: any) => (
-                        <div key={f.id} className="p-3.5 rounded-xl border border-border bg-card flex justify-between items-center text-xs">
+                        <div key={f.id} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center text-xs">
                           <div>
                             <div className="font-bold text-foreground text-sm">
                               <span className="text-primary mr-2">[{f.relationType}]</span> {f.fullName} ({f.birthYear || '—'})
                             </div>
                             <div className="text-muted-foreground mt-0.5">{f.details || '—'}</div>
-                            <span className="text-[11px] text-muted-foreground font-medium">
+                            <span className="text-xs text-muted-foreground font-medium">
                               {f.category === 'SELF' ? 'Gia đình bản thân' : 'Bên Vợ/Chồng'}
                             </span>
                           </div>
@@ -1409,7 +1409,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                         <div className="text-center py-8 text-xs text-muted-foreground">Chưa có bản ghi khen thưởng / kỷ luật</div>
                       )}
                       {profileQ.data?.rewardDisciplines?.map((r: any) => (
-                        <div key={r.id} className="p-3.5 rounded-xl border border-border bg-card flex justify-between items-center text-xs">
+                        <div key={r.id} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center text-xs">
                           <div>
                             <div className="font-bold text-foreground text-sm flex items-center gap-2">
                               <Badge variant={r.type === 'REWARD' ? 'success' : 'destructive'}>
@@ -1435,7 +1435,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                         <div className="text-center py-8 text-xs text-muted-foreground">Chưa có đánh giá cán bộ nào</div>
                       )}
                       {profileQ.data?.appraisals?.map((a: any) => (
-                        <div key={a.id} className="p-3.5 rounded-xl border border-border bg-card flex justify-between items-center text-xs">
+                        <div key={a.id} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center text-xs">
                           <div>
                             <div className="font-bold text-foreground text-sm">
                               Năm {a.year}: Xếp loại <span className="text-primary font-bold">{a.classification}</span>
@@ -1456,7 +1456,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                         <div className="text-center py-8 text-xs text-muted-foreground">Chưa có quá trình bổ nhiệm nào</div>
                       )}
                       {profileQ.data?.appointments?.map((ap: any) => (
-                        <div key={ap.id} className="p-3.5 rounded-xl border border-border bg-card flex justify-between items-center text-xs">
+                        <div key={ap.id} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center text-xs">
                           <div>
                             <div className="font-bold text-foreground text-sm flex items-center gap-2">
                               {ap.positionTitle}
@@ -1506,7 +1506,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
       {/* MODAL CON THÊM QUÁ TRÌNH LỊCH SỬ */}
       {isAddSubOpen && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-card p-6 rounded-xl border border-border shadow-xl max-w-lg w-full space-y-4 text-xs">
+          <div className="bg-card p-6 rounded-lg border border-border shadow-xl max-w-lg w-full space-y-4 text-xs">
             <div className="flex items-center justify-between border-b pb-2">
               <span className="font-bold text-sm text-foreground">
                 Thêm mục: {subTab === 'work' ? 'Quá trình công tác' : subTab === 'edu' ? 'Quá trình đào tạo' : subTab === 'salary' ? 'Quá trình lương' : subTab === 'family' ? 'Quan hệ gia đình' : subTab === 'reward' ? 'Khen thưởng/Kỷ luật' : subTab === 'appraisal' ? 'Đánh giá cán bộ' : 'Bổ nhiệm chức vụ'}

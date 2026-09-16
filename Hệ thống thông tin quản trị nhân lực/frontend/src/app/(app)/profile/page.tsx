@@ -12,7 +12,7 @@ import type { MeProfile } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
 import {
-  Avatar, AvatarFallback, Button, Card, CardContent, CardHeader, CardTitle, Skeleton
+  Avatar, AvatarFallback, Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Textarea, Skeleton
 } from '@/components/ui/primitives';
 import { PageHeader, ErrorState } from '@/components/common/states';
 import { ProfileChangeRequestModal } from '@/components/personnel/ProfileChangeRequestModal';
@@ -203,7 +203,7 @@ export default function ProfilePage() {
         >
           Lịch sử đề xuất
           {pendingRequestsCount > 0 && (
-            <span className="ml-1.5 rounded-full bg-primary/20 text-primary text-[10px] px-1.5 py-0.2 font-mono font-bold">
+            <span className="ml-1.5 rounded-full bg-primary/20 text-primary text-xs px-1.5 py-0.5 font-mono font-semibold">
               {pendingRequestsCount}
             </span>
           )}
@@ -227,10 +227,10 @@ export default function ProfilePage() {
 
           {/* KHỐI MỨC 1: TỰ PHỤC VỤ */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/60">
+            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border">
               <div className="flex items-center gap-2">
                 <CardTitle className="text-sm font-semibold">1. Thông tin liên hệ & Giới thiệu</CardTitle>
-                <span className="text-[11px] px-2 py-0.5 rounded bg-muted text-muted-foreground border border-border">
+                <span className="text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
                   Mức 1: Tự cập nhật
                 </span>
               </div>
@@ -248,12 +248,11 @@ export default function ProfilePage() {
                   <label className="font-medium text-foreground block">
                     Số điện thoại cá nhân:
                   </label>
-                  <input
-                    type="text"
+                  <Input
                     value={tier1Form.phone}
                     onChange={(e) => setTier1Form({ ...tier1Form, phone: e.target.value })}
                     placeholder="0901234567"
-                    className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
+                    className="h-9 text-xs"
                   />
                 </div>
 
@@ -261,12 +260,11 @@ export default function ProfilePage() {
                   <label className="font-medium text-foreground block">
                     Nơi ở hiện nay / Tạm trú:
                   </label>
-                  <input
-                    type="text"
+                  <Input
                     value={tier1Form.currentAddress}
                     onChange={(e) => setTier1Form({ ...tier1Form, currentAddress: e.target.value })}
                     placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành"
-                    className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
+                    className="h-9 text-xs"
                   />
                 </div>
 
@@ -274,12 +272,11 @@ export default function ProfilePage() {
                   <label className="font-medium text-foreground block">
                     Kỹ năng & Chuyên môn (cách nhau bởi dấu phẩy):
                   </label>
-                  <input
-                    type="text"
+                  <Input
                     value={tier1Form.expertise}
                     onChange={(e) => setTier1Form({ ...tier1Form, expertise: e.target.value })}
                     placeholder="Ví dụ: Quản trị dự án, React, Phân tích dữ liệu..."
-                    className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
+                    className="h-9 text-xs"
                   />
                 </div>
 
@@ -287,12 +284,11 @@ export default function ProfilePage() {
                   <label className="font-medium text-foreground block">
                     Sở trường công tác:
                   </label>
-                  <input
-                    type="text"
+                  <Input
                     value={tier1Form.strengths}
                     onChange={(e) => setTier1Form({ ...tier1Form, strengths: e.target.value })}
                     placeholder="Ví dụ: Lãnh đạo đội ngũ, giao tiếp, xử lý vấn đề..."
-                    className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
+                    className="h-9 text-xs"
                   />
                 </div>
 
@@ -300,12 +296,12 @@ export default function ProfilePage() {
                   <label className="font-medium text-foreground block">
                     Giới thiệu bản thân (Bio):
                   </label>
-                  <textarea
+                  <Textarea
                     rows={2}
                     value={tier1Form.bio}
                     onChange={(e) => setTier1Form({ ...tier1Form, bio: e.target.value })}
                     placeholder="Tóm tắt ngắn gọn định hướng, kinh nghiệm cá nhân..."
-                    className="w-full rounded-md border border-input bg-background p-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden resize-none"
+                    className="text-xs resize-none"
                   />
                 </div>
               </div>
@@ -314,12 +310,12 @@ export default function ProfilePage() {
 
           {/* KHỐI MỨC 2: ĐỊNH DANH NHÂN THÂN & BẰNG CẤP */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/60">
+            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border">
               <div className="flex items-center gap-2">
                 <CardTitle className="text-sm font-semibold">2. Thông tin nhân thân & Bằng cấp</CardTitle>
-                <span className="text-[11px] px-2 py-0.5 rounded bg-muted text-muted-foreground border border-border">
+                <Badge variant="outline" className="text-xs font-normal">
                   Mức 2: Cần duyệt
-                </span>
+                </Badge>
               </div>
               <Button
                 variant="outline"
@@ -330,68 +326,68 @@ export default function ProfilePage() {
                 Đề xuất chỉnh sửa
               </Button>
             </CardHeader>
-            <CardContent className="p-5">
+            <CardContent className="p-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Họ và tên khai sinh:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Họ và tên khai sinh:</span>
                   <p className="font-semibold text-foreground uppercase">{me.fullName}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Ngày sinh:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Ngày sinh:</span>
                   <p className="font-medium text-foreground">
                     {profile?.user?.birthDate || me.birthDate ? formatDate(profile?.user?.birthDate || me.birthDate) : '—'}
                   </p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Giới tính:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Giới tính:</span>
                   <p className="font-medium text-foreground">{profile?.gender || 'Nam'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Số CCCD / Hộ chiếu:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Số CCCD / Hộ chiếu:</span>
                   <p className="font-mono font-medium text-foreground">{profile?.idCardNo || '—'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Ngày cấp & Nơi cấp:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Ngày cấp & Nơi cấp:</span>
                   <p className="font-medium text-foreground">
                     {profile?.idCardIssueDate ? formatDate(profile.idCardIssueDate) : '—'} · {profile?.idCardIssuePlace || 'Cục CSQLHC về TTXH'}
                   </p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Quê quán / Nơi sinh:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Quê quán / Nơi sinh:</span>
                   <p className="font-medium text-foreground">{profile?.hometown || profile?.birthPlace || '—'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1 sm:col-span-2">
-                  <span className="text-[11px] text-muted-foreground block">Hộ khẩu thường trú:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1 sm:col-span-2">
+                  <span className="text-xs text-muted-foreground block">Hộ khẩu thường trú:</span>
                   <p className="font-medium text-foreground">{profile?.permanentAddress || '—'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Mã số BHXH:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Mã số BHXH:</span>
                   <p className="font-mono font-medium text-foreground">{profile?.socialInsuranceNo || '—'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Trình độ học vấn cao nhất:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Trình độ học vấn cao nhất:</span>
                   <p className="font-medium text-foreground">
                     {profile?.highestDegree || 'Đại học'} · {profile?.majorName || 'Chuyên ngành'}
                   </p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Ngoại ngữ & Tin học:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Ngoại ngữ & Tin học:</span>
                   <p className="font-medium text-foreground">
                     {profile?.foreignLanguage || 'Tiếng Anh B2'} · {profile?.informaticsLevel || 'Chuẩn CNTT'}
                   </p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Dân tộc / Tôn giáo:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Dân tộc / Tôn giáo:</span>
                   <p className="font-medium text-foreground">
                     {profile?.ethnicity || 'Kinh'} · {profile?.religion || 'Không'}
                   </p>
@@ -402,57 +398,57 @@ export default function ProfilePage() {
 
           {/* KHỐI MỨC 3: TỔ CHỨC & TIỀN LƯƠNG */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/60">
+            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border">
               <div className="flex items-center gap-2">
                 <CardTitle className="text-sm font-semibold">3. Thông tin tổ chức & Tiền lương</CardTitle>
-                <span className="text-[11px] px-2 py-0.5 rounded bg-muted text-muted-foreground border border-border">
+                <Badge variant="outline" className="text-xs font-normal">
                   Mức 3: Tổ chức quản lý
-                </span>
+                </Badge>
               </div>
             </CardHeader>
-            <CardContent className="p-5">
+            <CardContent className="p-6">
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Mã nhân viên:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Mã nhân viên:</span>
                   <p className="font-mono font-medium text-foreground">{profile?.user?.employeeCode || me.employeeCode || '—'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Phòng ban / Đơn vị:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Phòng ban / Đơn vị:</span>
                   <p className="font-medium text-foreground">{me.orgUnit?.name || 'Văn phòng'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Chức vụ:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Chức vụ:</span>
                   <p className="font-medium text-foreground">{me.jobTitle || 'Chuyên viên'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Ngày tuyển dụng:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Ngày tuyển dụng:</span>
                   <p className="font-medium text-foreground">{me.hireDate ? formatDate(me.hireDate) : '—'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Ngạch bậc:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Ngạch bậc:</span>
                   <p className="font-medium text-foreground">{profile?.rank?.name || profile?.rankCode || 'Chuyên viên'}</p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Bậc & Hệ số lương:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Bậc & Hệ số lương:</span>
                   <p className="font-mono font-medium text-foreground">
                     Bậc {profile?.salaryStep || 1} · HS: {profile?.salaryCoefficient || 2.34}
                   </p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Phụ cấp chức vụ / VK:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Phụ cấp chức vụ / VK:</span>
                   <p className="font-medium text-foreground">
                     {profile?.positionAllowance || 0} · {profile?.overGradePercent || 0}%
                   </p>
                 </div>
 
-                <div className="p-2.5 rounded border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground block">Đoàn - Đảng - Quân ngũ:</span>
+                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                  <span className="text-xs text-muted-foreground block">Đoàn - Đảng - Quân ngũ:</span>
                   <p className="font-medium text-foreground">
                     {profile?.partyPosition || 'Đảng viên'} {profile?.militaryRank ? `· ${profile.militaryRank}` : ''}
                   </p>
@@ -489,7 +485,7 @@ export default function ProfilePage() {
               {myRequests.map((req) => (
                 <Card key={req.id}>
                   <CardContent className="p-4 space-y-3 text-xs">
-                    <div className="flex items-center justify-between flex-wrap gap-2 border-b border-border/60 pb-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2 border-b border-border pb-2">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-foreground">
                           Yêu cầu #{req.id.slice(0, 8)}
@@ -501,24 +497,28 @@ export default function ProfilePage() {
 
                       <div className="flex items-center gap-2">
                         {req.status === 'PENDING' && (
-                          <span className="px-2 py-0.5 rounded text-[11px] bg-muted text-foreground border border-border">
+                          <Badge variant="outline" className="text-xs font-normal gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                             Chờ thẩm định
-                          </span>
+                          </Badge>
                         )}
                         {req.status === 'APPROVED' && (
-                          <span className="px-2 py-0.5 rounded text-[11px] bg-muted text-foreground border border-border font-medium">
+                          <Badge variant="outline" className="text-xs font-normal gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                             Đã duyệt
-                          </span>
+                          </Badge>
                         )}
                         {req.status === 'REJECTED' && (
-                          <span className="px-2 py-0.5 rounded text-[11px] bg-muted text-destructive border border-border font-medium">
+                          <Badge variant="outline" className="text-xs font-normal gap-1.5 text-destructive border-destructive/30">
+                            <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
                             Từ chối
-                          </span>
+                          </Badge>
                         )}
                         {req.status === 'CANCELLED' && (
-                          <span className="px-2 py-0.5 rounded text-[11px] bg-muted text-muted-foreground border border-border">
+                          <Badge variant="outline" className="text-xs font-normal gap-1.5 text-muted-foreground">
+                            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
                             Đã hủy
-                          </span>
+                          </Badge>
                         )}
 
                         {req.status === 'PENDING' && (
@@ -537,8 +537,8 @@ export default function ProfilePage() {
                     {/* Chi tiết các trường thay đổi */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                       {Object.entries(req.changes || {}).map(([k, c]: [string, any]) => (
-                        <div key={k} className="p-2 rounded border border-border/60 bg-muted/20 space-y-0.5">
-                          <span className="text-[11px] text-muted-foreground block">{c.label}</span>
+                        <div key={k} className="p-2 rounded-md border border-border bg-muted/20 space-y-0.5">
+                          <span className="text-xs text-muted-foreground block">{c.label}</span>
                           <div className="flex items-center gap-1.5 text-xs font-medium">
                             <span className="text-muted-foreground truncate">{c.oldValue ? String(c.oldValue) : '(Trống)'}</span>
                             <span className="text-muted-foreground">➡️</span>

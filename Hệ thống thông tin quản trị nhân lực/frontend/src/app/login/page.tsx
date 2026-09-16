@@ -78,7 +78,7 @@ function LoginInner() {
       <div className="w-full max-w-sm">
         {/* Logo + tên hệ thống */}
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <BookOpenText className="h-6 w-6" />
           </div>
           <h1 className="text-xl font-bold tracking-tight">HRMIS Pro</h1>

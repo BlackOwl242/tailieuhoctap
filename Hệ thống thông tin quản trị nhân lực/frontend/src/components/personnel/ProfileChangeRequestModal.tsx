@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Trash2, FileText, Send, Plus } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
-import { Button, Select } from '@/components/ui/primitives';
+import { Button, Input, Select, Textarea } from '@/components/ui/primitives';
 import { getTier2EditableFields, type FieldDefinition } from '@/lib/personnel-tiers';
 import { formatDate } from '@/lib/utils';
 
@@ -223,10 +223,10 @@ export function ProfileChangeRequestModal({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <span className="text-[11px] text-muted-foreground block mb-1">
+                          <span className="text-xs text-muted-foreground block mb-1">
                             Giá trị hiện tại:
                           </span>
-                          <div className="px-2.5 py-1.5 rounded border border-border/60 bg-muted/40 font-medium text-muted-foreground text-xs truncate">
+                          <div className="px-3 py-2 rounded-md border border-border bg-muted/40 font-medium text-muted-foreground text-xs truncate">
                             {item.oldValue ? (
                               fieldDef?.type === 'date' ? formatDate(item.oldValue) : String(item.oldValue)
                             ) : (
@@ -236,12 +236,12 @@ export function ProfileChangeRequestModal({
                         </div>
 
                         <div>
-                          <span className="text-[11px] font-semibold text-foreground block mb-1">
+                          <span className="text-xs font-semibold text-foreground block mb-1">
                             Giá trị mới (*):
                           </span>
                           {fieldDef?.type === 'select' && fieldDef.options ? (
                             <Select
-                              className="h-8 text-xs"
+                              className="h-9 text-xs"
                               placeholder="-- Chọn giá trị --"
                               value={item.newValue || ''}
                               onChange={(e) => handleNewValueChange(item.fieldKey, e.target.value)}
@@ -251,19 +251,19 @@ export function ProfileChangeRequestModal({
                               }))}
                             />
                           ) : fieldDef?.type === 'date' ? (
-                            <input
+                            <Input
                               type="date"
                               value={item.newValue || ''}
                               onChange={(e) => handleNewValueChange(item.fieldKey, e.target.value)}
-                              className="w-full rounded border border-input bg-background px-2.5 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
+                              className="h-9 text-xs"
                             />
                           ) : (
-                            <input
+                            <Input
                               type="text"
                               value={item.newValue || ''}
                               onChange={(e) => handleNewValueChange(item.fieldKey, e.target.value)}
                               placeholder={fieldDef?.placeholder || 'Nhập giá trị mới...'}
-                              className="w-full rounded border border-input bg-background px-2.5 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
+                              className="h-9 text-xs"
                             />
                           )}
                         </div>
@@ -280,12 +280,12 @@ export function ProfileChangeRequestModal({
             <label className="font-semibold text-foreground block">
               2. Lý do đề xuất (*):
             </label>
-            <textarea
+            <Textarea
               rows={2}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Nêu rõ lý do (ví dụ: Đổi thẻ CCCD gắn chip mới, Cập nhật bằng tốt nghiệp đại học...)"
-              className="w-full rounded-md border border-input bg-background p-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden resize-none"
+              className="text-xs resize-none"
             />
           </div>
 
@@ -296,7 +296,7 @@ export function ProfileChangeRequestModal({
             </label>
 
             <div className="flex gap-2">
-              <input
+              <Input
                 type="text"
                 value={attachmentInput}
                 onChange={(e) => setAttachmentInput(e.target.value)}
@@ -307,7 +307,7 @@ export function ProfileChangeRequestModal({
                   }
                 }}
                 placeholder="Ví dụ: /uploads/cccd_scan.pdf hoặc link tài liệu..."
-                className="flex-1 rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
+                className="flex-1 h-9 text-xs"
               />
               <Button
                 type="button"
@@ -324,10 +324,10 @@ export function ProfileChangeRequestModal({
                 {attachmentUrls.map((url, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between rounded bg-muted/40 px-2.5 py-1 text-xs text-foreground border border-border/50"
+                    className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-xs text-foreground border border-border"
                   >
-                    <span className="flex items-center gap-1.5 font-mono text-[11px] truncate max-w-[85%]">
-                      <FileText className="h-3 w-3 text-muted-foreground shrink-0" />
+                    <span className="flex items-center gap-1.5 font-mono text-xs truncate max-w-[85%]">
+                      <FileText className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                       {url}
                     </span>
                     <button
@@ -335,7 +335,7 @@ export function ProfileChangeRequestModal({
                       onClick={() => handleRemoveAttachment(idx)}
                       className="text-muted-foreground hover:text-destructive"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 ))}

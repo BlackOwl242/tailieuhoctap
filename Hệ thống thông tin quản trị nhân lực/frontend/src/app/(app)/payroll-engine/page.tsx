@@ -257,7 +257,7 @@ export default function PayrollEnginePage() {
       render: (s: PayrollSlip) => (
         <div>
           <span className="font-medium text-xs text-foreground">{s.employeeName}</span>
-          <p className="text-[11px] text-muted-foreground">{s.jobTitle || 'Chuyên viên'}</p>
+          <p className="text-xs text-muted-foreground">{s.jobTitle || 'Chuyên viên'}</p>
         </div>
       ),
     },
@@ -519,9 +519,9 @@ export default function PayrollEnginePage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-foreground">{c.name}</span>
-                        <span className="font-mono text-[10px] text-muted-foreground">{c.code}</span>
+                        <span className="font-mono text-xs text-muted-foreground">{c.code}</span>
                       </div>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {c.isTaxApplicable ? 'Tính thuế TNCN' : 'Miễn thuế'} · {c.description || 'Cố định'}
                       </p>
                     </div>
@@ -575,9 +575,9 @@ export default function PayrollEnginePage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-foreground">{c.name}</span>
-                        <span className="font-mono text-[10px] text-muted-foreground">{c.code}</span>
+                        <span className="font-mono text-xs text-muted-foreground">{c.code}</span>
                       </div>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {c.description || 'Khấu trừ theo quy định'}
                       </p>
                     </div>
@@ -625,12 +625,12 @@ export default function PayrollEnginePage() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="font-medium text-foreground">{s.name}</h3>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{s.description || 'Cấu trúc tiêu chuẩn'}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{s.description || 'Cấu trúc tiêu chuẩn'}</p>
                 </div>
-                <span className="text-muted-foreground text-[11px]">{s._count?.assignments ?? 0} nhân sự</span>
+                <span className="text-muted-foreground text-xs">{s._count?.assignments ?? 0} nhân sự</span>
               </div>
 
-              <div className="border-t border-border pt-2 space-y-1 text-[11px] text-muted-foreground">
+              <div className="border-t border-border pt-2 space-y-1 text-xs text-muted-foreground">
                 {s.items && s.items.length > 0 ? (
                   s.items.map((it) => (
                     <div key={it.id} className="flex justify-between">
@@ -934,7 +934,7 @@ export default function PayrollEnginePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs border-t border-border pt-3">
               {/* Cột Thu Nhập */}
               <div className="space-y-2">
-                <p className="font-semibold text-foreground uppercase text-[11px] pb-1 border-b border-border">
+                <p className="font-semibold text-foreground uppercase text-xs pb-1 border-b border-border">
                   I. Các khoản thu nhập
                 </p>
                 <div className="space-y-1.5">
@@ -963,7 +963,7 @@ export default function PayrollEnginePage() {
 
               {/* Cột Khấu Trừ */}
               <div className="space-y-2">
-                <p className="font-semibold text-foreground uppercase text-[11px] pb-1 border-b border-border">
+                <p className="font-semibold text-foreground uppercase text-xs pb-1 border-b border-border">
                   II. Khoản khấu trừ
                 </p>
                 <div className="space-y-1.5">

@@ -215,7 +215,7 @@ export default function ShiftsPage() {
           <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: st.color || '#3b82f6' }} />
           <div>
             <span className="font-semibold text-foreground text-xs">{st.name}</span>
-            <p className="text-[10px] text-muted-foreground">{st.description || 'Ca làm việc tiêu chuẩn'}</p>
+            <p className="text-xs text-muted-foreground">{st.description || 'Ca làm việc tiêu chuẩn'}</p>
           </div>
         </div>
       ),
@@ -242,9 +242,9 @@ export default function ShiftsPage() {
       key: 'enableAutoAttendance',
       header: 'Tự Động Chấm Công',
       render: (st: ShiftType) => (
-        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+        <span className={`text-xs font-normal px-2 py-0.5 rounded-md border ${
           st.enableAutoAttendance
-            ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-300'
+            ? 'bg-muted text-foreground border-border'
             : 'bg-muted text-muted-foreground border-border'
         }`}>
           {st.enableAutoAttendance ? 'Bật' : 'Tắt'}
@@ -302,7 +302,7 @@ export default function ShiftsPage() {
         return (
           <div>
             <span className="font-medium text-xs text-foreground">{user?.fullName || a.userId}</span>
-            <p className="text-[11px] text-muted-foreground">{user?.jobTitle || 'Cán bộ'} · {user?.orgUnit?.name || 'Phòng ban'}</p>
+            <p className="text-xs text-muted-foreground">{user?.jobTitle || 'Cán bộ'} · {user?.orgUnit?.name || 'Phòng ban'}</p>
           </div>
         );
       },
@@ -391,19 +391,19 @@ export default function ShiftsPage() {
       {/* Minimalist Metrics Toolbar */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3 rounded-lg border border-border bg-card text-xs">
         <div>
-          <span className="text-muted-foreground block text-[11px]">Loại ca hoạt động</span>
+          <span className="text-muted-foreground block text-xs">Loại ca hoạt động</span>
           <span className="text-base font-semibold text-foreground">{shiftTypes.length}</span>
         </div>
         <div>
-          <span className="text-muted-foreground block text-[11px]">Nhân sự đã phân ca</span>
+          <span className="text-muted-foreground block text-xs">Nhân sự đã phân ca</span>
           <span className="text-base font-semibold text-foreground">{rosterData?.assignments.length ?? 0}</span>
         </div>
         <div>
-          <span className="text-muted-foreground block text-[11px]">Dung sai đi trễ</span>
+          <span className="text-muted-foreground block text-xs">Dung sai đi trễ</span>
           <span className="text-base font-semibold text-foreground">15 phút</span>
         </div>
         <div>
-          <span className="text-muted-foreground block text-[11px]">Tỷ lệ đúng giờ</span>
+          <span className="text-muted-foreground block text-xs">Tỷ lệ đúng giờ</span>
           <span className="text-base font-semibold text-foreground">96.4%</span>
         </div>
       </div>
@@ -499,7 +499,7 @@ export default function ShiftsPage() {
           <div className="rounded-lg border border-border bg-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-muted/40 border-b border-border text-muted-foreground text-[11px] font-medium">
+                <thead className="bg-muted/40 border-b border-border text-muted-foreground text-xs font-medium">
                   <tr>
                     <th className="py-2.5 px-3 min-w-[200px]">Cán bộ / Nhân sự</th>
                     <th className="py-2.5 px-3 min-w-[130px]">Phòng ban</th>
@@ -516,7 +516,7 @@ export default function ShiftsPage() {
                       <tr key={u.id} className="hover:bg-muted/30 transition-colors">
                         <td className="py-2.5 px-3">
                           <span className="font-medium text-xs text-foreground">{u.fullName}</span>
-                          <p className="text-[11px] text-muted-foreground font-mono">{u.employeeCode || 'NV'} · {u.jobTitle || 'Chuyên viên'}</p>
+                          <p className="text-xs text-muted-foreground font-mono">{u.employeeCode || 'NV'} · {u.jobTitle || 'Chuyên viên'}</p>
                         </td>
                         <td className="py-2.5 px-3 text-muted-foreground">{u.orgUnit?.name || 'Ban Tổ chức'}</td>
 
@@ -539,11 +539,11 @@ export default function ShiftsPage() {
                               title={`Bấm để đổi ca: ${day} cho ${u.fullName}`}
                             >
                               {isWeekend ? (
-                                <span className="text-[11px] text-muted-foreground">
+                                <span className="text-xs text-muted-foreground">
                                   Nghỉ
                                 </span>
                               ) : (
-                                <span className="font-mono text-[11px] text-foreground hover:underline">
+                                <span className="font-mono text-xs text-foreground hover:underline">
                                   08:00 - 17:00
                                 </span>
                               )}
@@ -577,7 +577,7 @@ export default function ShiftsPage() {
                     <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: st.color || '#64748b' }} />
                     <h3 className="font-medium text-foreground text-xs">{st.name}</h3>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     Hoạt động
                   </span>
@@ -585,19 +585,19 @@ export default function ShiftsPage() {
 
                 <div className="grid grid-cols-2 gap-2 text-xs border-t border-b border-border py-2">
                   <div>
-                    <span className="text-[10px] text-muted-foreground block">Giờ làm việc</span>
+                    <span className="text-xs text-muted-foreground block">Giờ làm việc</span>
                     <span className="font-mono text-xs text-foreground">{st.startTime} - {st.endTime}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-muted-foreground block">Dung sai trễ/sớm</span>
+                    <span className="text-xs text-muted-foreground block">Dung sai trễ/sớm</span>
                     <span className="text-xs text-foreground">{st.lateToleranceMinutes}p / {st.earlyExitToleranceMinutes}p</span>
                   </div>
                 </div>
 
-                {st.description && <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{st.description}</p>}
+                {st.description && <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{st.description}</p>}
 
                 <div className="pt-1 flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground text-[11px]">{st._count?.assignments ?? 0} nhân sự áp dụng</span>
+                  <span className="text-muted-foreground text-xs">{st._count?.assignments ?? 0} nhân sự áp dụng</span>
                   <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
@@ -883,7 +883,7 @@ export default function ShiftsPage() {
       >
         {cellAssignmentTarget && (
           <div className="space-y-4 text-xs">
-            <div className="p-3 rounded-xl bg-muted/40 border border-border space-y-1">
+            <div className="p-3 rounded-md bg-muted/40 border border-border space-y-1">
               <p className="font-bold text-foreground text-sm">{cellAssignmentTarget.userName}</p>
               <p className="text-muted-foreground">
                 Ngày: <b>{cellAssignmentTarget.dayLabel}</b> ({cellAssignmentTarget.dateStr})
@@ -898,7 +898,7 @@ export default function ShiftsPage() {
                     key={st.id}
                     type="button"
                     onClick={() => setCellSelectedShiftId(st.id)}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border transition-all text-left ${
+                    className={`flex items-center justify-between p-2.5 rounded-md border transition-all text-left ${
                       cellSelectedShiftId === st.id
                         ? 'border-primary bg-primary/10 font-bold text-primary'
                         : 'border-border bg-card hover:bg-muted/40 text-foreground'
@@ -908,7 +908,7 @@ export default function ShiftsPage() {
                       <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: st.color || '#3b82f6' }} />
                       <span>{st.name}</span>
                     </div>
-                    <span className="font-mono text-[11px] text-muted-foreground">{st.startTime} - {st.endTime}</span>
+                    <span className="font-mono text-xs text-muted-foreground">{st.startTime} - {st.endTime}</span>
                   </button>
                 ))}
               </div>

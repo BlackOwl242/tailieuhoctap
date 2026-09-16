@@ -121,7 +121,7 @@ export default function PersonnelReportsPage() {
           {/* Vùng Bản In Sơ Yếu Lý Lịch Chuẩn A4 */}
           <div className="print-area max-w-6xl mx-auto text-black">
             {q2c.isLoading ? (
-              <div className="text-center py-20 text-muted-foreground font-sans bg-card border border-border rounded-2xl shadow-xs">
+              <div className="text-center py-20 text-muted-foreground font-sans bg-card border border-border rounded-lg shadow-xs">
                 <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                 <p className="font-semibold text-sm">Đang nạp dữ liệu hồ sơ lý lịch toàn diện...</p>
               </div>
@@ -139,7 +139,7 @@ export default function PersonnelReportsPage() {
               ) : (
                 <div className="space-y-4">
                   {/* Toolbar cho chế độ Doanh nghiệp */}
-                  <div className="no-print bg-card border border-border rounded-xl shadow-xs p-3.5 flex flex-wrap items-center justify-between gap-3 font-sans">
+                  <div className="no-print bg-card border border-border rounded-lg shadow-xs p-3.5 flex flex-wrap items-center justify-between gap-3 font-sans">
                     <div className="flex items-center gap-3 flex-wrap">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-foreground">Nhân sự:</span>
@@ -172,15 +172,15 @@ export default function PersonnelReportsPage() {
                     </Button>
                   </div>
 
-                  <div className="bg-slate-900/90 dark:bg-slate-950 p-4 sm:p-10 rounded-2xl shadow-inner border border-slate-800 flex justify-center">
-                    <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-10 shadow-2xl w-full max-w-4xl">
+                  <div className="bg-muted/80 p-4 sm:p-10 rounded-lg shadow-inner border border-border flex justify-center">
+                    <div className="bg-card border border-border rounded-lg p-6 sm:p-10 shadow-xl w-full max-w-4xl">
                       <EnterprisePersonnelProfile data={q2c.data} orgConfig={orgConfig} />
                     </div>
                   </div>
                 </div>
               )
             ) : (
-              <div className="text-center py-20 text-muted-foreground font-sans bg-card border border-border rounded-2xl">
+              <div className="text-center py-20 text-muted-foreground font-sans bg-card border border-border rounded-lg">
                 Chưa có dữ liệu hồ sơ nhân sự được chọn.
               </div>
             )}
@@ -198,30 +198,30 @@ export default function PersonnelReportsPage() {
           <Card className="p-5 bg-card border border-border shadow-xs overflow-x-auto">
             <table className="w-full border-collapse border border-black text-[11pt]">
               <thead>
-                <tr className="bg-slate-100 text-black text-center font-bold">
-                  <th className="border border-black p-2 text-left" rowSpan={2}>Tên ngạch lương</th>
-                  <th className="border border-black p-2" rowSpan={2}>Mã ngạch</th>
-                  <th className="border border-black p-2" rowSpan={2}>Tổng số</th>
-                  <th className="border border-black p-1.5" colSpan={2}>Dưới 30 tuổi</th>
-                  <th className="border border-black p-1.5" colSpan={2}>30 - 39 tuổi</th>
-                  <th className="border border-black p-1.5" colSpan={2}>40 - 49 tuổi</th>
-                  <th className="border border-black p-1.5" colSpan={2}>50 - 54 tuổi</th>
-                  <th className="border border-black p-1.5" colSpan={2}>55 - 59 tuổi</th>
-                  <th className="border border-black p-1.5" colSpan={2}>Từ 60 tuổi</th>
+                <tr className="bg-muted/60 text-foreground text-center font-bold">
+                  <th className="border border-border p-2 text-left" rowSpan={2}>Tên ngạch lương</th>
+                  <th className="border border-border p-2" rowSpan={2}>Mã ngạch</th>
+                  <th className="border border-border p-2" rowSpan={2}>Tổng số</th>
+                  <th className="border border-border p-1.5" colSpan={2}>Dưới 30 tuổi</th>
+                  <th className="border border-border p-1.5" colSpan={2}>30 - 39 tuổi</th>
+                  <th className="border border-border p-1.5" colSpan={2}>40 - 49 tuổi</th>
+                  <th className="border border-border p-1.5" colSpan={2}>50 - 54 tuổi</th>
+                  <th className="border border-border p-1.5" colSpan={2}>55 - 59 tuổi</th>
+                  <th className="border border-border p-1.5" colSpan={2}>Từ 60 tuổi</th>
                 </tr>
-                <tr className="bg-slate-50 text-black text-[10pt]">
-                  <th className="border border-black p-1">Nam</th>
-                  <th className="border border-black p-1">Nữ</th>
-                  <th className="border border-black p-1">Nam</th>
-                  <th className="border border-black p-1">Nữ</th>
-                  <th className="border border-black p-1">Nam</th>
-                  <th className="border border-black p-1">Nữ</th>
-                  <th className="border border-black p-1">Nam</th>
-                  <th className="border border-black p-1">Nữ</th>
-                  <th className="border border-black p-1">Nam</th>
-                  <th className="border border-black p-1">Nữ</th>
-                  <th className="border border-black p-1">Nam</th>
-                  <th className="border border-black p-1">Nữ</th>
+                <tr className="bg-muted/40 text-foreground text-[10pt]">
+                  <th className="border border-border p-1">Nam</th>
+                  <th className="border border-border p-1">Nữ</th>
+                  <th className="border border-border p-1">Nam</th>
+                  <th className="border border-border p-1">Nữ</th>
+                  <th className="border border-border p-1">Nam</th>
+                  <th className="border border-border p-1">Nữ</th>
+                  <th className="border border-border p-1">Nam</th>
+                  <th className="border border-border p-1">Nữ</th>
+                  <th className="border border-border p-1">Nam</th>
+                  <th className="border border-border p-1">Nữ</th>
+                  <th className="border border-border p-1">Nam</th>
+                  <th className="border border-border p-1">Nữ</th>
                 </tr>
               </thead>
               <tbody>
@@ -229,10 +229,10 @@ export default function PersonnelReportsPage() {
                   <tr><td colSpan={15} className="text-center py-6 text-muted-foreground">Đang tổng hợp số liệu...</td></tr>
                 ) : (
                   qBieu01.data?.rows?.map((row: any, idx: number) => (
-                    <tr key={idx} className="hover:bg-slate-50/80 text-center">
-                      <td className="border border-black p-2 text-left font-medium text-black">{row.rank.name}</td>
-                      <td className="border border-black p-2 font-bold">{row.rank.code}</td>
-                      <td className="border border-black p-2 font-bold bg-slate-50">{row.total}</td>
+                    <tr key={idx} className="hover:bg-muted/30 text-center">
+                      <td className="border border-border p-2 text-left font-medium text-foreground">{row.rank.name}</td>
+                      <td className="border border-border p-2 font-bold">{row.rank.code}</td>
+                      <td className="border border-border p-2 font-bold bg-muted/30">{row.total}</td>
                       <td className="border border-black p-1">{row.ageGroups.under30.male || '—'}</td>
                       <td className="border border-black p-1">{row.ageGroups.under30.female || '—'}</td>
                       <td className="border border-black p-1 font-semibold">{row.ageGroups.age30to39.male || '—'}</td>
@@ -265,14 +265,14 @@ export default function PersonnelReportsPage() {
           <Card className="p-5 bg-card border border-border shadow-xs overflow-x-auto">
             <table className="w-full border-collapse border border-black text-[11pt]">
               <thead>
-                <tr className="bg-slate-100 text-black font-bold">
-                  <th className="border border-black p-2 text-center w-12">STT</th>
-                  <th className="border border-black p-2 text-left w-24">Mã NV</th>
-                  <th className="border border-black p-2 text-left">Họ và tên</th>
-                  <th className="border border-black p-2 text-left">Đơn vị / Phòng ban</th>
-                  <th className="border border-black p-2 text-left">Ngạch lương</th>
-                  <th className="border border-black p-2 text-left">Trình độ Ngoại ngữ</th>
-                  <th className="border border-black p-2 text-left">Trình độ Tin học</th>
+                <tr className="bg-muted/60 text-foreground font-bold">
+                  <th className="border border-border p-2 text-center w-12">STT</th>
+                  <th className="border border-border p-2 text-left w-24">Mã NV</th>
+                  <th className="border border-border p-2 text-left">Họ và tên</th>
+                  <th className="border border-border p-2 text-left">Đơn vị / Phòng ban</th>
+                  <th className="border border-border p-2 text-left">Ngạch lương</th>
+                  <th className="border border-border p-2 text-left">Trình độ Ngoại ngữ</th>
+                  <th className="border border-border p-2 text-left">Trình độ Tin học</th>
                 </tr>
               </thead>
               <tbody>
@@ -280,9 +280,9 @@ export default function PersonnelReportsPage() {
                   <tr><td colSpan={7} className="text-center py-6 text-muted-foreground">Đang tổng hợp số liệu...</td></tr>
                 ) : (
                   qBieu02.data?.items?.map((item: any, idx: number) => (
-                    <tr key={idx} className="hover:bg-slate-50/80">
-                      <td className="border border-black p-2 text-center">{idx + 1}</td>
-                      <td className="border border-black p-2 font-bold">{item.employeeCode || '—'}</td>
+                    <tr key={idx} className="hover:bg-muted/30">
+                      <td className="border border-border p-2 text-center">{idx + 1}</td>
+                      <td className="border border-border p-2 font-bold">{item.employeeCode || '—'}</td>
                       <td className="border border-black p-2 font-bold">{item.fullName}</td>
                       <td className="border border-black p-2">{item.orgUnitName || '—'}</td>
                       <td className="border border-black p-2">{item.rankName || 'Theo HĐLĐ'}</td>
@@ -308,20 +308,20 @@ export default function PersonnelReportsPage() {
           <Card className="p-5 bg-card border border-border shadow-xs overflow-x-auto">
             <table className="w-full border-collapse border border-black text-[11pt]">
               <thead>
-                <tr className="bg-slate-100 text-black text-center font-bold">
-                  <th className="border border-black p-2 text-left" rowSpan={2}>Đơn vị / Phòng ban</th>
-                  <th className="border border-black p-2" rowSpan={2}>Tổng số</th>
-                  <th className="border border-black p-1.5" colSpan={4}>Trình độ Chuyên môn</th>
-                  <th className="border border-black p-1.5" colSpan={3}>Lý luận Chính trị</th>
+                <tr className="bg-muted/60 text-foreground text-center font-bold">
+                  <th className="border border-border p-2 text-left" rowSpan={2}>Đơn vị / Phòng ban</th>
+                  <th className="border border-border p-2" rowSpan={2}>Tổng số</th>
+                  <th className="border border-border p-1.5" colSpan={4}>Trình độ Chuyên môn</th>
+                  <th className="border border-border p-1.5" colSpan={3}>Lý luận Chính trị</th>
                 </tr>
-                <tr className="bg-slate-50 text-black text-[10pt]">
-                  <th className="border border-black p-1">Tiến sĩ</th>
-                  <th className="border border-black p-1">Thạc sĩ</th>
-                  <th className="border border-black p-1">Đại học</th>
-                  <th className="border border-black p-1">Cao đẳng/TC</th>
-                  <th className="border border-black p-1">Cao cấp</th>
-                  <th className="border border-black p-1">Trung cấp</th>
-                  <th className="border border-black p-1">Sơ cấp/Không</th>
+                <tr className="bg-muted/40 text-foreground text-[10pt]">
+                  <th className="border border-border p-1">Tiến sĩ</th>
+                  <th className="border border-border p-1">Thạc sĩ</th>
+                  <th className="border border-border p-1">Đại học</th>
+                  <th className="border border-border p-1">Cao đẳng/TC</th>
+                  <th className="border border-border p-1">Cao cấp</th>
+                  <th className="border border-border p-1">Trung cấp</th>
+                  <th className="border border-border p-1">Sơ cấp/Không</th>
                 </tr>
               </thead>
               <tbody>
@@ -329,9 +329,9 @@ export default function PersonnelReportsPage() {
                   <tr><td colSpan={9} className="text-center py-6 text-muted-foreground">Đang tổng hợp số liệu...</td></tr>
                 ) : (
                   qBieu03.data?.rows?.map((row: any, idx: number) => (
-                    <tr key={idx} className="hover:bg-slate-50/80 text-center">
-                      <td className="border border-black p-2 text-left font-bold text-black">{row.orgUnitName}</td>
-                      <td className="border border-black p-2 font-bold bg-slate-50">{row.total}</td>
+                    <tr key={idx} className="hover:bg-muted/30 text-center">
+                      <td className="border border-border p-2 text-left font-bold text-foreground">{row.orgUnitName}</td>
+                      <td className="border border-border p-2 font-bold bg-muted/30">{row.total}</td>
                       <td className="border border-black p-1 font-semibold">{row.doctorate || '—'}</td>
                       <td className="border border-black p-1 font-semibold">{row.master || '—'}</td>
                       <td className="border border-black p-1 font-semibold">{row.bachelor || '—'}</td>

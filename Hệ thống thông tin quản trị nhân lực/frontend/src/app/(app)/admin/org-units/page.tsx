@@ -263,7 +263,7 @@ export default function AdminOrgUnitsPage() {
     return (
       <span className="flex items-center gap-0.5">
         <button
-          className="rounded p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-200/60 transition-colors"
+          className="rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           title={`Thêm đơn vị con vào ${node.name}`}
           aria-label={`Thêm đơn vị con vào ${node.name}`}
           onClick={(e) => {
@@ -275,7 +275,7 @@ export default function AdminOrgUnitsPage() {
           <Plus className="h-3.5 w-3.5" />
         </button>
         <button
-          className="rounded p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-200/60 transition-colors"
+          className="rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           title={`Sửa ${node.name}`}
           aria-label={`Sửa ${node.name}`}
           onClick={(e) => {
@@ -287,7 +287,7 @@ export default function AdminOrgUnitsPage() {
           <Pencil className="h-3.5 w-3.5" />
         </button>
         <button
-          className="rounded p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-200/60 transition-colors"
+          className="rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           title={`Xem chi tiết ${node.name}`}
           aria-label={`Xem chi tiết ${node.name}`}
           onClick={(e) => {
@@ -315,7 +315,7 @@ export default function AdminOrgUnitsPage() {
   /** Form thêm đơn vị con (inline). */
   function addFormInline(parentId: string) {
     return (
-      <div className="mb-2 ml-8 flex flex-wrap items-end gap-2 rounded-xl border bg-muted/40 p-3">
+      <div className="mb-2 ml-8 flex flex-wrap items-end gap-2 rounded-md border border-border bg-muted/40 p-3">
         <div className="space-y-1">
           <Label>Tên đơn vị</Label>
           <Input
@@ -356,36 +356,36 @@ export default function AdminOrgUnitsPage() {
     // Phân cấp kiểu chữ chuẩn mực, rõ ràng trên dưới
     const nameClass =
       nodeLevel === 1
-        ? 'text-[14.5px] font-semibold text-slate-900 tracking-tight'
+        ? 'text-sm font-semibold text-foreground tracking-tight'
         : nodeLevel === 2
-        ? 'text-[14px] font-medium text-slate-800'
+        ? 'text-sm font-medium text-foreground/90'
         : nodeLevel === 3
-        ? 'text-[13.5px] text-slate-700'
-        : 'text-[13px] text-slate-600';
+        ? 'text-xs font-medium text-muted-foreground'
+        : 'text-xs text-muted-foreground';
 
     return (
       <div key={node.id} className="relative">
         {/* Đường nhánh chỉ báo phân cấp thanh mảnh 1px */}
         {depth > 0 && (
           <div
-            className="absolute top-0 bottom-0 border-l border-slate-200/90 pointer-events-none"
+            className="absolute top-0 bottom-0 border-l border-border pointer-events-none"
             style={{ left: (depth - 1) * 20 + 17 }}
           />
         )}
         <div
-          className={`group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-slate-100/80 transition-colors duration-100 ${
-            nodeLevel === 1 ? 'bg-slate-50/70 font-semibold mb-0.5' : ''
+          className={`group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/60 transition-colors duration-100 ${
+            nodeLevel === 1 ? 'bg-muted/40 font-semibold mb-0.5' : ''
           }`}
           style={{ paddingLeft: depth * 20 + 6 }}
         >
           <button
             onClick={() => toggle(node.id)}
-            className="rounded p-0.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 shrink-0 transition-transform"
+            className="rounded-md p-0.5 text-muted-foreground hover:text-foreground hover:bg-muted shrink-0 transition-transform"
             aria-label="Mở/đóng nhánh"
           >
             <ChevronRight
               className={`h-3.5 w-3.5 transition-transform duration-150 ${
-                hasChildren && isOpen ? 'rotate-90 text-slate-700' : ''
+                hasChildren && isOpen ? 'rotate-90 text-foreground' : ''
               } ${hasChildren ? '' : 'opacity-0 pointer-events-none'}`}
             />
           </button>
@@ -394,14 +394,14 @@ export default function AdminOrgUnitsPage() {
           <span className={nameClass}>{node.name}</span>
 
           {/* Mã đơn vị - Tối giản */}
-          <span className="text-[11px] font-mono text-slate-400 font-normal shrink-0">
+          <span className="text-xs font-mono text-muted-foreground font-normal shrink-0">
             {node.code}
           </span>
 
           {/* Quy mô nhân sự - Căn phải, số monospace nhẹ nhàng, không badge cồng kềnh */}
-          <span className="ml-auto mr-3 text-xs font-mono text-slate-400 tabular-nums shrink-0">
+          <span className="ml-auto mr-3 text-xs font-mono text-muted-foreground tabular-nums shrink-0">
             {node.totalMembers ?? node.memberCount}{' '}
-            <span className="text-[11px] font-sans text-slate-400 font-normal">NV</span>
+            <span className="text-xs font-sans text-muted-foreground font-normal">NV</span>
           </span>
 
           {/* Hành động: Chỉ hiện khi hover để màn hình luôn tĩnh lặng, sạch sẽ */}
@@ -447,7 +447,7 @@ export default function AdminOrgUnitsPage() {
       sortable: true,
       sortValue: (r) => r.node.level || r.depth + 1,
       render: (r) => (
-        <span className="text-xs text-slate-500 font-medium">
+        <span className="text-xs text-muted-foreground font-medium">
           {r.node.levelLabel || getLevelLabel(r.node.level, r.depth)}
         </span>
       ),
@@ -457,7 +457,7 @@ export default function AdminOrgUnitsPage() {
       key: 'code',
       header: 'Mã',
       sortable: true,
-      render: (r) => <span className="font-mono text-xs text-slate-500">{r.node.code}</span>,
+      render: (r) => <span className="font-mono text-xs text-muted-foreground">{r.node.code}</span>,
     },
     {
       key: 'memberCount',
@@ -465,8 +465,8 @@ export default function AdminOrgUnitsPage() {
       sortable: true,
       sortValue: (r) => r.node.totalMembers ?? r.node.memberCount,
       render: (r) => (
-        <span className="text-xs font-mono text-slate-700 tabular-nums">
-          {r.node.totalMembers ?? r.node.memberCount} <span className="font-sans text-slate-400">NV</span>
+        <span className="text-xs font-mono text-foreground tabular-nums">
+          {r.node.totalMembers ?? r.node.memberCount} <span className="font-sans text-muted-foreground">NV</span>
         </span>
       ),
       exportValue: (r) => `${r.node.totalMembers ?? r.node.memberCount} NV`,
@@ -475,7 +475,7 @@ export default function AdminOrgUnitsPage() {
       key: 'parent',
       header: 'Đơn vị trực thuộc',
       render: (r) => (
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-muted-foreground">
           {flat.find((f) => f.node.id === r.node.parentId)?.node.name ?? '— (Gốc Doanh nghiệp)'}
         </span>
       ),
@@ -503,7 +503,7 @@ export default function AdminOrgUnitsPage() {
               <Building2 className="h-4 w-4" />
               <span>Cơ quan & In ấn</span>
             </Button>
-            <div className="flex gap-1 rounded-xl border bg-card p-1 shadow-sm">
+            <div className="flex gap-1 rounded-md border border-border bg-card p-1 shadow-xs">
               <Button
                 size="sm"
                 variant={view === 'tree' ? 'secondary' : 'ghost'}
@@ -553,7 +553,7 @@ export default function AdminOrgUnitsPage() {
               <div>
                 <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
                   <span>Thông tin Cơ quan, Đơn vị & Tiêu đề Văn bản In ấn</span>
-                  <Badge variant="outline" className="text-[11px] font-normal bg-white">
+                  <Badge variant="outline" className="text-xs font-normal">
                     Nghị định 30/2020/NĐ-CP
                   </Badge>
                 </CardTitle>
@@ -581,13 +581,12 @@ export default function AdminOrgUnitsPage() {
             {/* Form nhập thông tin cấu hình - Bố cục rộng rãi toàn thẻ */}
             <div className="space-y-4">
               {/* 0. Lựa chọn Phân hệ Tổ chức & Chuẩn Sơ yếu lý lịch */}
-              {/* 0. Lựa chọn Phân hệ Tổ chức & Chuẩn Sơ yếu lý lịch */}
               <div className="space-y-1.5 pb-2">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                   <Label className="text-xs font-semibold text-foreground">
                     Mô hình Tổ chức & Chuẩn Sơ yếu lý lịch mặc định
                   </Label>
-                  <span className="text-[11px] text-muted-foreground italic">
+                  <span className="text-xs text-muted-foreground italic">
                     Quyết định định dạng mẫu in (Mẫu Nhà nước 2C-BNV vs Mẫu Doanh nghiệp tư nhân)
                   </span>
                 </div>
@@ -619,7 +618,7 @@ export default function AdminOrgUnitsPage() {
                     placeholder="Ví dụ: BỘ NỘI VỤ, TẬP ĐOÀN..."
                     className="text-xs"
                   />
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     Dòng 1 góc trái (in hoa, chữ đứng)
                   </p>
                 </div>
@@ -635,7 +634,7 @@ export default function AdminOrgUnitsPage() {
                     className="text-xs font-semibold"
                     required
                   />
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     Dòng 2 góc trái (in hoa, chữ đứng, <strong>đậm</strong>)
                   </p>
                 </div>
@@ -655,7 +654,7 @@ export default function AdminOrgUnitsPage() {
                       </option>
                     ))}
                   </Select>
-                  <p className="text-[11px] text-muted-foreground">Phân cấp theo danh mục quản lý</p>
+                  <p className="text-xs text-muted-foreground">Phân cấp theo danh mục quản lý</p>
                 </div>
 
                 <div className="space-y-1.5">
@@ -668,7 +667,7 @@ export default function AdminOrgUnitsPage() {
                     placeholder="Ví dụ: PHÒNG TỔ CHỨC - CÁN BỘ..."
                     className="text-xs"
                   />
-                  <p className="text-[11px] text-muted-foreground">Phòng ban lập biểu hoặc phụ trách</p>
+                  <p className="text-xs text-muted-foreground">Phòng ban lập biểu hoặc phụ trách</p>
                 </div>
 
                 <div className="space-y-1.5">
@@ -681,7 +680,7 @@ export default function AdminOrgUnitsPage() {
                     placeholder="Ví dụ: Hà Nội, TP. Hồ Chí Minh..."
                     className="text-xs"
                   />
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     Dòng ngày tháng năm góc phải
                   </p>
                 </div>
@@ -701,11 +700,11 @@ export default function AdminOrgUnitsPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="gap-1.5 text-xs text-slate-700 hover:bg-slate-50 border-slate-300"
+                  className="gap-1.5 text-xs text-foreground hover:bg-muted border-border"
                   onClick={handleSyncRootName}
                   title="Cập nhật tên Đơn vị cơ quan vào Node gốc của Sơ đồ tổ chức"
                 >
-                  <FolderTree className="h-3.5 w-3.5 text-blue-600" />
+                  <FolderTree className="h-3.5 w-3.5 text-primary" />
                   <span>Đồng bộ tên Đơn vị vào Gốc sơ đồ</span>
                 </Button>
               </div>
@@ -714,15 +713,15 @@ export default function AdminOrgUnitsPage() {
             {/* Live Preview góc in văn bản chuẩn Nghị định 30 - Đặt bên dưới với chiều rộng rộng rãi, không đè chữ */}
             <div className="pt-6 border-t border-border/70 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                <Label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
                   Xem trước góc văn bản in toàn hệ thống (Nghị định 30/2020/NĐ-CP)
                 </Label>
-                <span className="text-[11px] text-muted-foreground italic">
+                <span className="text-xs text-muted-foreground italic">
                   Tự động hiển thị tại phần đầu của mọi trang in, báo cáo, danh mục
                 </span>
               </div>
 
-              <div className="w-full max-w-3xl mx-auto rounded-2xl border border-slate-300 bg-white p-6 sm:p-8 font-times text-black shadow-xs select-none">
+              <div className="w-full max-w-3xl mx-auto rounded-lg border border-border bg-card p-6 sm:p-8 font-times text-foreground shadow-xs select-none">
                 {/* Header 2 cột cân xứng và rộng rãi */}
                 <div className="grid grid-cols-2 gap-8 items-start text-center">
                   {/* Góc trái: Tên cơ quan */}
@@ -759,11 +758,11 @@ export default function AdminOrgUnitsPage() {
                   </div>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-dashed border-slate-200 text-center">
-                  <p className="text-[12pt] font-bold uppercase text-black tracking-wide">
+                <div className="mt-5 pt-3 border-t border-dashed border-border text-center">
+                  <p className="text-[12pt] font-bold uppercase text-foreground tracking-wide">
                     BÁO CÁO / DANH MỤC THAM CHIẾU
                   </p>
-                  <p className="text-[10pt] italic text-slate-600 mt-0.5">
+                  <p className="text-[10pt] italic text-muted-foreground mt-0.5">
                     Tiêu đề biểu mẫu theo chuẩn hành chính
                   </p>
                 </div>
@@ -847,14 +846,14 @@ export default function AdminOrgUnitsPage() {
         {/* Giao diện tương tác Web */}
         <div className="no-print space-y-4">
           {view === 'tree' ? (
-            <Card className="rounded-2xl border-border/80 shadow-xs overflow-hidden">
+            <Card className="rounded-lg border-border shadow-xs overflow-hidden">
               <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-muted/20">
                 <div className="flex items-center gap-2">
-                  <FolderTree className="h-4 w-4 text-slate-500" />
-                  <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                  <FolderTree className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
                     Sơ đồ phân cấp đơn vị
                   </span>
-                  <span className="text-xs text-slate-400 font-mono">
+                  <span className="text-xs text-muted-foreground font-mono">
                     ({flat.length} đơn vị · {q.data?.reduce((sum, n) => sum + (n.totalMembers ?? n.memberCount ?? 0), 0) ?? 0} nhân sự)
                   </span>
                 </div>
@@ -863,7 +862,7 @@ export default function AdminOrgUnitsPage() {
                     size="sm"
                     variant="ghost"
                     onClick={expandAll}
-                    className="h-7 text-xs text-slate-600 hover:text-slate-900 px-2"
+                    className="h-7 text-xs text-muted-foreground hover:text-foreground px-2"
                   >
                     Mở rộng tất cả
                   </Button>
@@ -1008,21 +1007,21 @@ export default function AdminOrgUnitsPage() {
         {detail ? (
           <div className="space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-              <div className="p-3 rounded-xl bg-muted/40 border">
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
                 <p className="text-xs uppercase text-muted-foreground font-semibold">Mã đơn vị</p>
                 <p className="font-bold text-primary font-mono mt-0.5">{detail.code}</p>
               </div>
-              <div className="p-3 rounded-xl bg-muted/40 border">
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
                 <p className="text-xs uppercase text-muted-foreground font-semibold">Đơn vị cấp trên</p>
                 <p className="font-medium mt-0.5">
                   {flat.find((f) => f.node.id === detail.parentId)?.node.name ?? '— (Gốc)'}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-muted/40 border">
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
                 <p className="text-xs uppercase text-muted-foreground font-semibold">Đơn vị con</p>
                 <p className="font-bold mt-0.5">{detail.children.length}</p>
               </div>
-              <div className="p-3 rounded-xl bg-muted/40 border">
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
                 <p className="text-xs uppercase text-muted-foreground font-semibold">Nhân sự hiện hữu</p>
                 <p className="font-bold text-emerald-700 mt-0.5">
                   {detail.memberCount} NV
@@ -1035,13 +1034,13 @@ export default function AdminOrgUnitsPage() {
                 Danh sách nhân sự thuộc đơn vị ({detailMembers.length})
               </p>
               {detailMembers.length === 0 ? (
-                <div className="p-6 rounded-2xl border border-dashed text-center text-sm text-muted-foreground">
+                <div className="p-6 rounded-lg border border-dashed border-border text-center text-xs text-muted-foreground">
                   Chưa có nhân viên nào được phân bổ vào đơn vị này.
                 </div>
               ) : (
-                <ul className="divide-y rounded-2xl border bg-card max-h-64 overflow-y-auto">
+                <ul className="divide-y divide-border rounded-lg border border-border bg-card max-h-64 overflow-y-auto">
                   {detailMembers.map((m) => (
-                    <li key={m.id} className="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-muted/30">
+                    <li key={m.id} className="flex items-center justify-between px-4 py-2.5 text-xs hover:bg-muted/30">
                       <span className="font-medium text-foreground">{m.fullName}</span>
                       <span className="text-xs text-muted-foreground">
                         {m.employeeCode ? <span className="font-mono">{m.employeeCode} · </span> : ''}

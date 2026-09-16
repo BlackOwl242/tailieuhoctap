@@ -201,12 +201,12 @@ export default function FrappeHrmsDeskDashboard() {
       </div>
 
       {/* Lối tắt nhanh */}
-      <div className="rounded-xl border border-border/60 bg-card p-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-        <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-border/40">
+      <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
+        <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-border">
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Lối tắt Thao tác Nhanh
           </span>
-          <span className="text-[11px] text-muted-foreground/70">Truy cập tức thì</span>
+          <span className="text-xs text-muted-foreground">Truy cập tức thì</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
           {[
@@ -248,17 +248,17 @@ export default function FrappeHrmsDeskDashboard() {
             return (
               <div
                 key={idx}
-                className="flex flex-col justify-between rounded-xl border border-border/60 bg-card p-4 transition-all duration-150 ease-out hover:border-border hover:shadow-xs space-y-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
+                className="flex flex-col justify-between rounded-lg border border-border bg-card p-4 transition-all duration-150 ease-out hover:border-foreground/30 shadow-xs space-y-3.5"
               >
                 <div>
                   {/* Card Header */}
-                  <div className="flex items-start gap-2.5 pb-2.5 border-b border-border/40">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted/60 text-muted-foreground mt-0.5">
+                  <div className="flex items-start gap-2.5 pb-2.5 border-b border-border">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground mt-0.5">
                       <Icon className="h-3.5 w-3.5" />
                     </div>
                     <div className="min-w-0">
                       <h3 className="font-semibold text-foreground text-xs leading-tight">{card.title}</h3>
-                      <p className="text-[10px] text-muted-foreground/70 font-mono leading-tight">{card.subtitle}</p>
+                      <p className="text-xs text-muted-foreground font-mono leading-tight">{card.subtitle}</p>
                     </div>
                   </div>
 
@@ -277,7 +277,7 @@ export default function FrappeHrmsDeskDashboard() {
 
                         <div className="flex items-center gap-1 shrink-0 ml-1.5">
                           {link.count !== undefined && link.count > 0 && (
-                            <span className="rounded bg-muted px-1.5 py-0.2 text-[10px] font-medium text-muted-foreground">
+                            <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
                               {link.count}
                             </span>
                           )}
@@ -288,8 +288,8 @@ export default function FrappeHrmsDeskDashboard() {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-border/30 flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span className="text-[10px]">{card.links.length} chứng từ</span>
+                <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                  <span className="text-xs">{card.links.length} chứng từ</span>
                   <Link
                     href={card.links[0].href}
                     className="font-medium text-foreground hover:text-primary hover:underline flex items-center gap-0.5 transition-colors"

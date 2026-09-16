@@ -154,7 +154,7 @@ export default function DocumentsPage() {
         }
       />
 
-      <div className="no-print mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs">
+      <div className="no-print mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 p-3 text-xs">
         <div className="flex items-center gap-2">
           <ArrowRightLeft className="h-4 w-4 text-primary shrink-0" />
           <span>

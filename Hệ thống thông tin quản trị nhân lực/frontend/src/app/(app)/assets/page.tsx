@@ -11,7 +11,7 @@ import { api, errorMessage } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Select } from '@/components/ui/primitives';
+import { Button, Input, Select } from '@/components/ui/primitives';
 
 interface AssetItem {
   id: string;
@@ -261,11 +261,11 @@ export default function AssetsPage() {
           description="Hãy thêm mới tài sản hoặc điều chỉnh bộ lọc tìm kiếm."
         />
       ) : (
-        <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-xs">
+        <div className="rounded-lg border border-border bg-card overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-border/60 bg-muted/40 text-muted-foreground font-semibold uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-border bg-muted/40 text-muted-foreground font-semibold uppercase tracking-wider text-xs">
                   <th className="py-3 px-4">Mã Tài Sản</th>
                   <th className="py-3 px-4">Tên Tài Sản / Thiết Bị</th>
                   <th className="py-3 px-4">Phân Loại</th>
@@ -284,7 +284,7 @@ export default function AssetsPage() {
                     <td className="py-3 px-4">
                       <p className="font-semibold text-foreground">{asset.name}</p>
                       {asset.serialNumber && (
-                        <p className="text-[10px] text-muted-foreground font-mono">Số hiệu / S/N: {asset.serialNumber}</p>
+                        <p className="text-xs text-muted-foreground font-mono">Số hiệu / S/N: {asset.serialNumber}</p>
                       )}
                     </td>
                     <td className="py-3 px-4 font-medium text-foreground text-xs">
@@ -297,7 +297,7 @@ export default function AssetsPage() {
                       {asset.assignedEmployeeName ? (
                         <div>
                           <p className="font-semibold text-foreground">{asset.assignedEmployeeName}</p>
-                          <p className="text-[10px] text-muted-foreground">
+                          <p className="text-xs text-muted-foreground">
                             Cấp ngày: {asset.allocatedDate ? new Date(asset.allocatedDate).toLocaleDateString('vi-VN') : 'Gần đây'}
                           </p>
                         </div>
@@ -328,7 +328,7 @@ export default function AssetsPage() {
                             setAssigneeName('');
                             setIsAllocateModalOpen(true);
                           }}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/10 text-primary font-semibold hover:bg-primary/20 transition-colors text-[11px]"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/10 text-primary font-semibold hover:bg-primary/20 transition-colors text-xs"
                         >
                           <UserCheck className="h-3 w-3" />
                           Cấp phát
@@ -336,7 +336,7 @@ export default function AssetsPage() {
                       ) : (
                         <button
                           onClick={() => returnMutation.mutate(asset.id)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-600 font-semibold hover:bg-rose-500/20 transition-colors text-[11px]"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-600 font-semibold hover:bg-rose-500/20 transition-colors text-xs"
                           title="Thu hồi về kho"
                         >
                           <RotateCcw className="h-3 w-3" />
@@ -354,47 +354,47 @@ export default function AssetsPage() {
 
       {/* Modal Khai Báo Tài Sản Mới */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border/60 pb-3">
-              <h3 className="text-base font-bold text-foreground">Khai Báo Tài Sản / Thiết Bị Mới</h3>
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-base font-semibold text-foreground">Khai Báo Tài Sản / Thiết Bị Mới</h3>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">Mã tài sản <span className="text-destructive">*</span></label>
-              <input
+              <label className="block text-xs font-medium text-foreground mb-1">Mã tài sản <span className="text-destructive">*</span></label>
+              <Input
                 type="text"
                 placeholder="VD: AST-010"
                 value={assetCode}
                 onChange={(e) => setAssetCode(e.target.value)}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs font-mono font-bold text-foreground outline-hidden focus:border-primary"
+                className="h-9 text-xs font-mono font-bold"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">Tên tài sản / Thông số kỹ thuật <span className="text-destructive">*</span></label>
-              <input
+              <label className="block text-xs font-medium text-foreground mb-1">Tên tài sản / Thông số kỹ thuật <span className="text-destructive">*</span></label>
+              <Input
                 type="text"
                 placeholder="VD: Máy in Laser Đa năng / Bàn làm việc chữ L / Máy chiếu hội trường"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs text-foreground outline-hidden focus:border-primary"
+                className="h-9 text-xs"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Phân loại tài sản</label>
+                <label className="block text-xs font-medium text-foreground mb-1">Phân loại tài sản</label>
                 <Select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full text-xs"
+                  className="w-full h-9 text-xs"
                 >
                   {ASSET_CATEGORIES.filter((c) => c.key !== 'ALL').map((cat) => (
                     <option key={cat.key} value={cat.key}>
@@ -404,47 +404,49 @@ export default function AssetsPage() {
                 </Select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Nguyên giá (VND)</label>
-                <input
+                <label className="block text-xs font-medium text-foreground mb-1">Nguyên giá (VND)</label>
+                <Input
                   type="number"
                   step={500000}
                   value={value}
                   onChange={(e) => setValue(Number(e.target.value))}
-                  className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs font-bold text-foreground outline-hidden focus:border-primary"
+                  className="h-9 text-xs font-bold"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">Số hiệu / Số Serial / Biển số</label>
-              <input
+              <label className="block text-xs font-medium text-foreground mb-1">Số hiệu / Số Serial / Biển số</label>
+              <Input
                 type="text"
                 placeholder="VD: SN-2026-X88 hoặc 51K-892.45"
                 value={serialNumber}
                 onChange={(e) => setSerialNumber(e.target.value)}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs font-mono text-foreground outline-hidden focus:border-primary"
+                className="h-9 text-xs font-mono"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">Ghi chú xuất xứ / Tình trạng</label>
-              <input
+              <label className="block text-xs font-medium text-foreground mb-1">Ghi chú xuất xứ / Tình trạng</label>
+              <Input
                 type="text"
                 placeholder="VD: Mua sắm theo gói thầu 2026 / Mới 100%"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full p-2 rounded-xl border border-border bg-muted/20 text-xs text-foreground outline-hidden focus:border-primary"
+                className="h-9 text-xs"
               />
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted"
               >
                 Hủy bỏ
-              </button>
-              <button
+              </Button>
+              <Button
+                size="sm"
                 onClick={() => {
                   createMutation.mutate({
                     assetCode,
@@ -456,10 +458,9 @@ export default function AssetsPage() {
                   });
                 }}
                 disabled={!name || !assetCode}
-                className="px-4 py-2 rounded-xl bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               >
                 Lưu Khai Báo
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -467,11 +468,11 @@ export default function AssetsPage() {
 
       {/* Modal Cấp Phát — Liên kết trực tiếp với Nhân sự thực tế trong hệ thống */}
       {isAllocateModalOpen && selectedAsset && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border/60 pb-3">
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <h3 className="text-base font-bold text-foreground">
+                <h3 className="text-base font-semibold text-foreground">
                   Lập Biên Bản Cấp Phát & Bàn Giao
                 </h3>
                 <p className="text-xs text-muted-foreground font-mono mt-0.5">
@@ -480,7 +481,7 @@ export default function AssetsPage() {
               </div>
               <button
                 onClick={() => setIsAllocateModalOpen(false)}
-                className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -507,29 +508,31 @@ export default function AssetsPage() {
                 ))}
               </Select>
               {!assigneeId && (
-                <p className="text-[11px] text-amber-600 mt-1">
+                <p className="text-xs text-amber-600 mt-1">
                   * Bắt buộc chọn nhân viên thực tế từ cơ sở dữ liệu để liên kết trách nhiệm quản lý tài sản.
                 </p>
               )}
             </div>
 
-            <div className="p-3 rounded-xl bg-muted/30 text-xs space-y-1 text-muted-foreground">
+            <div className="p-3 rounded-lg bg-muted/30 text-xs space-y-1 text-muted-foreground">
               <p>Mã tài sản: <b className="text-foreground">{selectedAsset.assetCode}</b></p>
               <p>Phân loại: <b className="text-foreground">{ASSET_CATEGORY_LABEL[selectedAsset.category] || selectedAsset.category}</b></p>
               <p>Nguyên giá: <b className="text-foreground">{selectedAsset.value.toLocaleString('vi-VN')} đ</b></p>
-              <p className="text-[11px] text-primary pt-1">
+              <p className="text-xs text-primary pt-1">
                 * Kèm cam kết bảo quản tài sản cơ quan/doanh nghiệp, chịu trách nhiệm bồi hoàn khi làm mất mát hoặc hư hỏng.
               </p>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setIsAllocateModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted"
               >
                 Hủy bỏ
-              </button>
-              <button
+              </Button>
+              <Button
+                size="sm"
                 onClick={() => {
                   if (!assigneeId || !assigneeName) return;
                   allocateMutation.mutate({
@@ -539,10 +542,10 @@ export default function AssetsPage() {
                   });
                 }}
                 disabled={!assigneeId}
-                className="px-4 py-2 rounded-xl bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                className="px-4 py-2 rounded-md bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               >
                 Xác Nhận Bàn Giao
-              </button>
+              </Button>
             </div>
           </div>
         </div>

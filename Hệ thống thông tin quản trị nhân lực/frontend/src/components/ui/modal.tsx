@@ -31,11 +31,11 @@ export function Modal({
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-overlay bg-black/50" />
+        <DialogPrimitive.Overlay className="fixed inset-0 z-modal bg-black/60 backdrop-blur-xs animate-in fade-in duration-150" />
         <DialogPrimitive.Content
           className={cn(
             'fixed left-1/2 top-1/2 z-modal w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2',
-            'max-h-[85dvh] overflow-y-auto rounded-lg border bg-card p-card shadow-xl focus:outline-none',
+            'max-h-[85dvh] overflow-y-auto rounded-lg border border-border bg-card p-6 shadow-xl focus:outline-none animate-in zoom-in-95 duration-150 text-foreground',
             width,
           )}
         >

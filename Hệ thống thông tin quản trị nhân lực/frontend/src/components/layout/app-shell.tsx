@@ -128,7 +128,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
         <button
           type="button"
           onClick={() => toggleGroup(group.label)}
-          className="flex w-full items-center justify-between px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80 hover:text-foreground hover:bg-muted/40 rounded-md transition-colors"
+          className="flex w-full items-center justify-between px-2 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 hover:text-foreground hover:bg-muted/40 rounded-md transition-colors"
         >
           <span className="flex items-center gap-1.5">
             {isCollapsed ? (
@@ -138,7 +138,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
             )}
             {group.label}
           </span>
-          <span className="rounded bg-muted px-1.5 py-0.2 text-[10px] font-medium text-muted-foreground">
+          <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
             {group.items.length}
           </span>
         </button>
@@ -176,7 +176,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
           <button
             type="button"
             onClick={() => toggleGroup('Quản trị')}
-            className="flex w-full items-center justify-between px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80 hover:text-foreground hover:bg-muted/40 rounded-md transition-colors"
+            className="flex w-full items-center justify-between px-2 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 hover:text-foreground hover:bg-muted/40 rounded-md transition-colors"
           >
             <span className="flex items-center gap-1.5">
               {collapsedGroups['Quản trị'] ? (
@@ -186,7 +186,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
               )}
               Quản trị hệ thống
             </span>
-            <span className="rounded bg-muted px-1.5 py-0.2 text-[10px] font-medium text-muted-foreground">
+            <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
               {ADMIN_NAV.length}
             </span>
           </button>
@@ -230,10 +230,10 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold tracking-tight text-foreground leading-tight">HRMIS Pro</span>
-              <span className="text-[10px] text-muted-foreground font-medium leading-tight">Quản trị Nhân lực Toàn diện</span>
+              <span className="text-xs text-muted-foreground font-medium leading-tight">Quản trị Nhân lực Toàn diện</span>
             </div>
           </Link>
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">
+          <span className="text-xs font-mono px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-bold">
             v16.0
           </span>
         </div>
@@ -259,13 +259,13 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
           <div className="hidden md:flex items-center max-w-md w-full mr-auto">
             <button
               onClick={() => setCommandPaletteOpen(true)}
-              className="flex w-full items-center justify-between rounded-xl border border-border/70 bg-muted/30 px-3.5 py-1.5 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all"
+              className="flex w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3.5 py-1.5 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all"
             >
               <span className="flex items-center gap-2">
                 <Search className="h-3.5 w-3.5 text-muted-foreground" />
                 <span>Tìm kiếm nhân viên, chức năng, tạo đơn từ...</span>
               </span>
-              <kbd className="inline-flex items-center rounded border border-border/80 bg-card px-1.5 py-0.5 text-[10px] font-mono font-bold text-muted-foreground">
+              <kbd className="inline-flex items-center rounded-md border border-border bg-card px-1.5 py-0.5 text-xs font-mono font-bold text-muted-foreground">
                 Ctrl K
               </kbd>
             </button>
@@ -276,7 +276,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
             <Link
               href="/notifications"
               className={cn(
-                'rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors',
+                'rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors',
                 isActive('/notifications') && 'text-primary bg-primary/10',
               )}
               aria-label="Thông báo"
@@ -284,23 +284,23 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
               <Bell className="h-4 w-4" />
             </Link>
 
-            <div className="h-4 w-px bg-border/60 mx-1" />
+            <div className="h-4 w-px bg-border mx-1" />
 
             <Link
               href="/profile"
-              className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-muted/60 transition-colors"
+              className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/60 transition-colors"
               aria-label="Hồ sơ cá nhân"
             >
               <UserCircle2 className="h-6 w-6 text-muted-foreground/80" />
               <span className="hidden min-w-0 lg:block text-left">
                 <span className="block max-w-[9rem] truncate text-xs font-semibold text-foreground leading-tight">{profile.fullName}</span>
-                <span className="block text-[10px] leading-tight text-muted-foreground">{profile.jobTitle ?? profile.email}</span>
+                <span className="block text-xs leading-tight text-muted-foreground">{profile.jobTitle ?? profile.email}</span>
               </span>
             </Link>
 
             <button
               onClick={logout}
-              className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+              className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
               aria-label="Đăng xuất"
             >
               <LogOut className="h-3.5 w-3.5" />
@@ -330,10 +330,10 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                   setMobileNavOpen(false);
                   setCommandPaletteOpen(true);
                 }}
-                className="flex w-full items-center justify-between rounded-xl border border-border/70 bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
+                className="flex w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
               >
                 <span>Tìm kiếm nhanh...</span>
-                <kbd className="text-[10px] font-mono">⌘K</kbd>
+                <kbd className="text-xs font-mono">⌘K</kbd>
               </button>
             </div>
             {navLinks}
@@ -361,7 +361,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
           { href: '/payroll-engine', label: 'Lương', icon: Calculator },
         ].map(({ href, label, icon: Icon }) => (
           <Link key={href} href={href}
-            className={cn('flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium', isActive(href) ? 'text-primary' : 'text-muted-foreground')}>
+            className={cn('flex flex-col items-center gap-0.5 py-2 text-xs font-medium', isActive(href) ? 'text-primary' : 'text-muted-foreground')}>
             <Icon className="h-4 w-4" />
             {label}
           </Link>

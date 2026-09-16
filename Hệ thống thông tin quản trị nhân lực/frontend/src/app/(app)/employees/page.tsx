@@ -160,7 +160,7 @@ export default function EmployeesPage() {
       sortable: true,
       className: 'w-[12%] text-center font-mono',
       render: (r) => (
-        <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">
+        <span className="font-mono text-xs font-medium text-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
           {r.employeeCode ?? '—'}
         </span>
       ),
@@ -329,10 +329,10 @@ export default function EmployeesPage() {
       />
 
       {/* Chế độ xem: Danh sách Doanh nghiệp vs Hồ sơ Cán bộ Nhà nước */}
-      <div className="flex items-center gap-2 border-b border-border/80 pb-3">
+      <div className="flex items-center gap-2 border-b border-border pb-3">
         <button
           onClick={() => setActiveTab('standard')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
             activeTab === 'standard'
               ? 'bg-primary text-primary-foreground shadow-2xs'
               : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -341,7 +341,7 @@ export default function EmployeesPage() {
           <Users className="h-3.5 w-3.5" />
           Danh sách Nhân sự (Chuẩn Doanh nghiệp)
           {qEmployees.data ? (
-            <span className="ml-1 px-1.5 py-0.2 rounded-full bg-primary/20 text-foreground text-[10px]">
+            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-primary/20 text-foreground text-xs font-mono">
               {qEmployees.data.length}
             </span>
           ) : null}
@@ -349,7 +349,7 @@ export default function EmployeesPage() {
 
         <button
           onClick={() => setActiveTab('civil-servant')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
             activeTab === 'civil-servant'
               ? 'bg-primary text-primary-foreground shadow-2xs'
               : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -358,7 +358,7 @@ export default function EmployeesPage() {
           <Building2 className="h-3.5 w-3.5" />
           Hồ sơ Cán bộ, Công chức, Viên chức (Mẫu 2C-BNV)
           {qProfiles.data ? (
-            <span className="ml-1 px-1.5 py-0.2 rounded-full bg-primary/20 text-foreground text-[10px]">
+            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-primary/20 text-foreground text-xs font-mono">
               {qProfiles.data.length}
             </span>
           ) : null}
@@ -366,7 +366,7 @@ export default function EmployeesPage() {
 
         <button
           onClick={() => setActiveTab('approvals')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
             activeTab === 'approvals'
               ? 'bg-primary text-primary-foreground shadow-2xs'
               : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -375,7 +375,7 @@ export default function EmployeesPage() {
           <ShieldCheck className="h-3.5 w-3.5 text-amber-500" />
           Xét duyệt Hồ sơ Cá nhân
           {pendingCount > 0 && (
-            <span className="ml-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-mono text-[10px] font-bold">
+            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-600 dark:text-amber-400 font-mono text-xs font-bold">
               {pendingCount}
             </span>
           )}
