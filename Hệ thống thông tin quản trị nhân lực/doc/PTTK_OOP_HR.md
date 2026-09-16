@@ -724,14 +724,16 @@ Hệ thống được tổ chức thành **47 Use case chia 12 nhóm** nhằm b�
 | 2   | Nhân viên chọn "Điểm danh khuôn mặt" trên trình duyệt tại văn phòng | Trích vector thời gian thực, so khớp cosine similarity với các mẫu đã mã hóa; vượt ngưỡng → ghi sự kiện (nguồn = khuôn mặt) |
 | 3   | -                                                                   | Không khớp / chưa đăng ký → từ chối rõ ràng; giới hạn số lần thử để chống dò; nhật ký chỉ ghi kết quả, không ghi vector     |
 
-**UC32 - Quản lý khoản vay & tạm ứng** *(use case bổ sung khi cài đặt)*
+**UC32 - Quản lý khoản vay & tạm ứng phúc lợi** *(use case chuẩn hóa - Trung tâm Quản trị Tài chính Nhân sự Financial Wellness Hub)*
 
-| #   | Người dùng                                        | Hệ thống                                                                                     |
+| #   | Tác nhân (Người dùng)                             | Hệ thống (HRMIS)                                                                             |
 | --- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| 1   | Nhân viên tạo đơn (loại vay/tạm ứng, số tiền, kỳ hạn 1-24 tháng) | Hệ thống tính EMI hàng tháng và **kiểm tra EMI ≤ 30% lương thực lĩnh** (Điều 102 BLĐ 2019) |
-| 2   | -                                                 | Vượt trần → chặn kèm thông báo; đạt → chuyển "Chờ thẩm định"                                  |
-| 3   | KM_MANAGER duyệt giải ngân                        | Trạng thái APPROVED; EMI **tự nạp vào bảng lương** hàng tháng (LOAN_EMI)                       |
-| 4   | Nhân viên xem tiến độ                             | Hiển thị dư nợ còn lại, số kỳ đã trả trên `/loans` và `/ess`                                   |
+| 1   | Nhân viên mở Cổng phúc lợi hoặc HR mở `/loans`     | Hệ thống hiển thị thanh trạng thái Quỹ phúc lợi (2 tỷ VNĐ), dòng tiền hoàn nợ dự kiến và cung cấp 4 chế độ làm việc: Smart Cards, Smart Ledger, Pipeline Kanban và Financial Studio |
+| 2   | Nhân viên khởi tạo đơn vay/tạm ứng (qua Wizard 3 bước hoặc chọn 4 Gói phúc lợi chuẩn hóa) | Bước 1: Chọn gói phúc lợi (Thiết bị 0%, Y tế 24h, Học tập 2%, An cư thâm niên) hoặc tự định nghĩa.<br>Bước 2: Nhập số tiền vay, thời hạn (1-36 tháng), mục đích sử dụng. |
+| 3   | Hệ thống kích hoạt **Bộ Thẩm Định Tự Động & Tuân Thủ Điều 102 BLLĐ (Rule Engine)** | Tự động tính toán số tiền trừ nợ hàng tháng (EMI) và tỷ lệ khấu trừ: $\text{Tỷ lệ} = (\text{EMI} / \text{Lương thực lĩnh}) \times 100\%$.<br>- **Nếu $\le 30\%$:** Xác nhận đạt chuẩn Điều 102 BLLĐ 2019, dán nhãn xanh an toàn.<br>- **Nếu $> 30\%$:** Cảnh báo vượt trần luật định, kích hoạt thuật toán khuyến nghị kéo dài số tháng tối thiểu để giảm EMI về ngưỡng cho phép. |
+| 4   | HR / KM_MANAGER thẩm định và phê duyệt            | Cho phép phê duyệt thủ công từng hồ sơ trên Kanban/Drawer hoặc bấm nút **"Phê duyệt nhanh các hồ sơ đạt chuẩn"** (1-chạm) với các hồ sơ đã được Rule Engine xác thực an toàn. |
+| 5   | Kế toán giải ngân và Cỗ máy tính lương tự động     | Hồ sơ chuyển trạng thái `DISBURSED`; hệ thống tự động sinh lịch trình trả nợ định kỳ; hàng tháng cỗ máy tính lương (`/payroll-engine`) tự động trích nợ `LOAN_EMI` vào bảng lương. |
+| 6   | Nhân viên và HR theo dõi tiến độ & Tất toán sớm    | Hiển thị thanh đo tiến độ phân đoạn (`Đã thu X% - Còn Y đ`), chi tiết các kỳ khấu trừ trên Drawer; hỗ trợ nhân viên tất toán sớm 1-chạm (`Trả 1 kỳ`, `Trả 50%`, `Tất toán 100%`) không phạt phí. |
 
 **UC40 - Quét & phê duyệt nâng bậc lương tự động** *(use case bổ sung - chuẩn NĐ 204)*
 
@@ -952,17 +954,28 @@ Dưới đây là đặc tả chi tiết **18 quy trình nghiệp vụ cốt lõ
 ---
 
 #### 8. Quy trình Tạm ứng Lương & Khoản vay phúc lợi (Advance & Welfare Loans)
-- **Bối cảnh & Căn cứ:** Căn cứ Điều 101 Bộ luật Lao động 2019 về tạm ứng tiền lương và chính sách Quỹ phúc lợi nội bộ của Saigon Technology nhằm hỗ trợ kỹ sư giải quyết khó khăn tài chính đột xuất, mua sắm trang thiết bị làm việc cá nhân hoặc vay ưu đãi dài hạn.
+- **Bối cảnh & Căn cứ:** Căn cứ Điều 101 và Điều 102 Bộ luật Lao động 2019 về tạm ứng tiền lương, giới hạn khấu trừ tiền lương người lao động (không quá 30% lương thực lĩnh hàng tháng) và Quy chế Quỹ phúc lợi nội bộ của Saigon Technology (quy mô hạn mức luân chuyển 2.000.000.000 VNĐ). Mục tiêu nhằm hỗ trợ cán bộ nhân viên giải quyết nhu cầu tài chính cấp bách, trang bị laptop/thiết bị làm việc kỹ thuật cao, đào tạo nâng cao trình độ hoặc an cư gắn bó lâu dài.
 - **Phối hợp thực tế (Tam giác 3 mắt xích):**
-  - *Bridge (Người lao động):* Kỹ sư nộp đơn đề nghị vay/tạm ứng nêu rõ lý do và kế hoạch trả góp trên ESS.
-  - *Hub (Ban TC-HC-NS & Kế toán):* Chuyên viên rà soát điều kiện thâm niên, lịch sử cống hiến, kiểm tra hạn mức vay cho phép; Kế toán kiểm soát khả năng giải ngân tiền mặt.
-  - *Decision (Ban Giám đốc):* Phê duyệt quyết định cho vay phúc lợi.
-- **Chuỗi tác nghiệp chi tiết & Kiểm soát:**
-  1. *Nộp đơn đề nghị:* Nhân viên mở giao diện Khoản vay trên ESS, nhập số tiền vay, mục đích sử dụng, số kỳ hạn mong muốn trả góp (ví dụ 3, 6 hoặc 12 tháng).
-  2. *Kiểm soát ngưỡng an toàn tài chính (Hard stop):* Hệ thống tự động tính toán số tiền gốc và lãi trả góp hàng tháng (EMI). Nếu số tiền khấu trừ dự kiến vượt quá **30% mức lương thực lĩnh (Net income)** trung bình 3 tháng gần nhất của nhân viên, hệ thống sẽ từ chối tạo đơn để tránh rủi ro vỡ nợ cá nhân và vi phạm quy định bảo vệ người lao động.
-  3. *Thẩm định & Phê duyệt:* Đơn được gửi qua Chuyên viên nhân sự để xác nhận hợp đồng lao động còn hiệu lực dài hơn thời hạn trả nợ. Giám đốc duyệt cho vay; Bộ phận Kế toán thực hiện chuyển khoản giải ngân.
-  4. *Tự động nạp vào kỳ lương:* Sau khi giải ngân, hệ thống tự động sinh lịch trả nợ gắn với mã nhân viên. Hàng tháng, khi cỗ máy tính lương chạy, số tiền khấu trừ trả nợ sẽ tự động trích từ lương của nhân viên cho đến khi tất toán khoản vay.
-- **Ánh xạ Use Case & Màn hình:** UC32. Giao diện: Quản lý Khoản vay & Phúc lợi (`/loans`), Cổng thông tin nhân viên (`/ess`).
+  - *Bridge (Người lao động):* Nhân viên trực tiếp tra cứu hạn mức, mô phỏng tài chính hoặc nộp đơn qua Wizard 3 bước trên `/loans` hoặc Cổng `/ess`.
+  - *Hub (Ban TC-HC-NS & Tổ C&B):* Chuyên viên vận hành Trung tâm Quản trị Tài chính Nhân sự (Financial Wellness Hub), theo dõi hạn mức khả dụng của Quỹ phúc lợi, kiểm soát dòng tiền hoàn nợ (Run-rate) và thẩm định hồ sơ theo quy tắc tự động.
+  - *Decision (Ban Giám đốc / Trưởng phòng C&B):* Phê duyệt hồ sơ theo thẩm quyền (phê duyệt đơn lẻ trên Kanban hoặc phê duyệt hỏa tốc hàng loạt qua Rule Engine).
+- **Chuỗi tác nghiệp chi tiết & Kiểm soát 5 giai đoạn:**
+  1. *Khám phá & Mô phỏng phương án (Financial Studio):* Người lao động hoặc HR sử dụng bộ thanh trượt động (Range Sliders) kéo thả số tiền (10M - 80M), thời hạn (6 - 36 tháng) và thu nhập thực lĩnh (Net Pay) để hệ thống tự động tính toán số tiền khấu trừ mỗi kỳ (EMI), lãi suất và kiểm tra ngay ngưỡng an toàn thu nhập theo Điều 102.
+  2. *Khởi tạo đơn theo gói chuẩn hóa hoặc tự chọn (Wizard 3 bước):*
+     - *Gói 1: Tạm ứng thiết bị làm việc & Laptop (Lãi suất 0%, 12 tháng).*
+     - *Gói 2: Hỗ trợ khẩn cấp y tế & viện phí gia đình (Lãi suất 0%, giải ngân trong 24h, 10 tháng).*
+     - *Gói 3: Vay học tập & nâng cao nghiệp vụ/chứng chỉ quốc tế (Lãi suất ưu đãi 2%/năm, 20 tháng).*
+     - *Gói 4: Phúc lợi an cư & thâm niên (Hạn mức đến 100Tr, thời hạn đến 36 tháng).*
+  3. *Thẩm định tự động & Kiểm soát tuân thủ (Rule Engine):*
+     - Thuật toán tự động đối chiếu số tiền khấu trừ dự kiến (EMI) với mức lương thực lĩnh bình quân. Nếu $\text{Tỷ lệ} \le 30\%$, hệ thống gắn nhãn an toàn màu xanh.
+     - Nếu $\text{Tỷ lệ} > 30\%$, hệ thống tự động chặn và đưa ra khuyến nghị tăng thời hạn trả nợ tối thiểu để giảm EMI về mức an toàn theo luật định.
+     - Hỗ trợ HR tính năng **"Phê duyệt nhanh các hồ sơ đạt chuẩn"** (1-chạm) đối với toàn bộ các đơn thỏa mãn quy tắc an toàn.
+  4. *Quản trị vòng đời giải ngân trên Pipeline Kanban 4 bước:*
+     - Luân chuyển minh bạch qua 4 cột: *1. Chờ Thẩm Định* ➔ *2. Đang Trích Lương* ➔ *3. Đã Hoàn Tất* ➔ *4. Đã Từ Chối*.
+  5. *Tự động nạp vào kỳ lương & Cơ chế tất toán sớm:*
+     - Sau khi giải ngân, hệ thống tự động sinh bảng kế hoạch khấu trừ chi tiết từng kỳ. Khi cỗ máy tính lương (`/payroll-engine`) vận hành, khoản khấu trừ sẽ tự động trừ vào phiếu lương điện tử của nhân viên.
+     - Hỗ trợ nhân viên tất toán sớm linh hoạt trực tiếp trên Drawer chi tiết (`[Trả 1 kỳ lương]`, `[Trả 50% dư nợ]`, `[Tất toán 100%]`) hoàn toàn miễn phí phạt trước hạn.
+- **Ánh xạ Use Case & Màn hình:** UC32. Giao diện: Quản lý Khoản vay & Phúc lợi (`/loans`), Cổng thông tin nhân viên (`/ess`), Cỗ máy tính lương (`/payroll-engine`).
 
 ---
 
@@ -1563,7 +1576,7 @@ Cấu trúc 6 nhóm giao diện nghiệp vụ và nhóm Quản trị bao gồm:
 
 4. **Nhóm Tiền lương & Chi phí (Compensation & Expenses):**
    - `/payroll-engine`: Cỗ máy tính lương tự động thế hệ mới, hỗ trợ cấu hình thành phần lương Gross-Net, tính thuế TNCN, BHXH và thực thi cơ chế khóa bất biến (LOCKED).
-   - `/loans`: Phân hệ quản lý các khoản vay phúc lợi nhân viên, tự động tính lịch trả nợ trả góp EMI bảo đảm trần an toàn khấu trừ ≤ 30% lương thực lĩnh.
+   - `/loans`: Trung tâm Quản trị Tài chính Nhân sự Đa chế độ (Financial Wellness Hub) - quản lý hạn mức Quỹ phúc lợi 2 tỷ VNĐ với thanh đo tỷ lệ giải ngân và dòng tiền quay vòng (Run-rate); tích hợp **Bộ Thẩm Định Tự Động & Tuân Thủ Điều 102 BLLĐ (Rule Engine)** hỗ trợ phê duyệt nhanh 1-chạm các hồ sơ đạt chuẩn trích nợ không quá 30% lương thực lĩnh; cung cấp **4 chế độ làm việc trực quan** (Smart Cards với thanh đo tiến độ phân đoạn, Smart Ledger sổ cái lọc đa tiêu chí, Pipeline Kanban 4 giai đoạn, Financial Studio mô phỏng tài chính thanh trượt Range Sliders); hỗ trợ Wizard đăng ký 3 bước tích hợp 4 gói phúc lợi chuẩn hóa và Drawer chi tiết lịch trình trả nợ kèm công cụ tất toán sớm linh hoạt (miễn phí phạt).
    - `/expense-claims`: Phân hệ đề xuất lệnh công tác và thanh quyết toán chi phí công tác phí kèm hóa đơn tài chính điện tử.
 
 5. **Nhóm Tuyển dụng & Đánh giá hiệu suất (Recruitment & Performance):**
