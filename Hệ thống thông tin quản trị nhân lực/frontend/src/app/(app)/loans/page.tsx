@@ -19,6 +19,8 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/common/states
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { Button, Input, Select, Textarea } from '@/components/ui/primitives';
+import { Modal, ModalFooterActions } from '@/components/ui/modal';
+import { printDocumentElement } from '@/components/ui/print';
 import { formatDate } from '@/lib/utils';
 
 export interface LoanItem {
@@ -55,7 +57,7 @@ const PRESET_PACKAGES = [
     category: 'Tạm ứng mua thiết bị làm việc & Laptop',
     icon: Laptop,
     badge: 'Lãi suất 0%',
-    badgeColor: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20',
+    badgeColor: 'bg-muted text-foreground border-border',
     amount: 28000000,
     term: 12,
     rate: 0,
@@ -69,7 +71,7 @@ const PRESET_PACKAGES = [
     category: 'Hỗ trợ khẩn cấp y tế gia đình',
     icon: HeartPulse,
     badge: 'Giải ngân 24h',
-    badgeColor: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
+    badgeColor: 'bg-muted text-foreground border-border',
     amount: 25000000,
     term: 10,
     rate: 0,
@@ -83,7 +85,7 @@ const PRESET_PACKAGES = [
     category: 'Vay học tập & nâng cao nghiệp vụ',
     icon: GraduationCap,
     badge: 'Ưu đãi 2%/năm',
-    badgeColor: 'bg-blue-500/10 text-blue-700 border-blue-500/20',
+    badgeColor: 'bg-muted text-foreground border-border',
     amount: 40000000,
     term: 20,
     rate: 2,
@@ -97,7 +99,7 @@ const PRESET_PACKAGES = [
     category: 'Phúc lợi an cư & Gắn bó thâm niên',
     icon: Home,
     badge: 'Hạn mức đến 100Tr',
-    badgeColor: 'bg-purple-500/10 text-purple-700 border-purple-500/20',
+    badgeColor: 'bg-muted text-foreground border-border',
     amount: 80000000,
     term: 36,
     rate: 3.5,
@@ -124,6 +126,7 @@ export default function LoansPage() {
   const [isApplyWizardOpen, setIsApplyWizardOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
   const [selectedDetailLoan, setSelectedDetailLoan] = useState<LoanItem | null>(null);
+  const [isPrintLoanOpen, setIsPrintLoanOpen] = useState(false);
   const [repayLoanTarget, setRepayLoanTarget] = useState<LoanItem | null>(null);
   const [repayAmount, setRepayAmount] = useState<number>(0);
 
@@ -329,7 +332,7 @@ export default function LoansPage() {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="flex h-2 w-2 rounded-full bg-primary/70" />
               <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Tình Trạng Quỹ Phúc Lợi Nhân Sự Doanh Nghiệp (Năm 2026)
               </span>
@@ -346,7 +349,7 @@ export default function LoansPage() {
 
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/40 border border-border">
-              <ShieldCheck className="h-4 w-4 text-emerald-600" />
+              <ShieldCheck className="h-4 w-4 text-foreground" />
               <div className="text-xs">
                 <p className="font-semibold text-foreground">Tuân thủ BLLĐ Điều 102</p>
                 <p className="text-muted-foreground">Khấu trừ lương tự động ≤ 30%</p>
@@ -354,7 +357,7 @@ export default function LoansPage() {
             </div>
 
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/40 border border-border">
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <Calendar className="h-4 w-4 text-foreground" />
               <div className="text-xs">
                 <p className="font-semibold text-foreground">Kỳ hoàn nợ kế tiếp</p>
                 <p className="text-muted-foreground">Kỳ lương ngày 05 tháng tới</p>
@@ -371,7 +374,7 @@ export default function LoansPage() {
           </div>
           <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
             <div
-              className="h-full bg-emerald-600 rounded-full transition-all duration-500"
+              className="h-full bg-primary rounded-full transition-all duration-500"
               style={{ width: `${fundUtilization}%` }}
             />
           </div>
@@ -380,24 +383,24 @@ export default function LoansPage() {
 
       {/* Automated Compliance & Rule Engine Box */}
       {showAiAdvisor && (
-        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 shadow-xs relative overflow-hidden transition-all">
+        <div className="rounded-lg border border-border bg-card p-4 shadow-xs relative overflow-hidden transition-all">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-md bg-primary/10 text-primary shrink-0 mt-0.5">
+              <div className="p-2 rounded-md bg-muted text-foreground shrink-0 mt-0.5">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <h4 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
                     <span>Bộ Thẩm Định Tự Động & Tuân Thủ Điều 102 BLLĐ</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/15 text-primary font-bold">Rule Engine</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border font-medium">Rule Engine</span>
                   </h4>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {pendingLoans.length > 0 ? (
                     <>
                       Hệ thống tự động phát hiện <strong className="text-foreground">{pendingLoans.length} hồ sơ chờ duyệt</strong>.
-                      Mức trích nợ bình quân chiếm <strong className="text-emerald-600 font-semibold">9.8% - 11.2%</strong> mức lương thực lĩnh,
+                      Mức trích nợ bình quân chiếm <strong className="text-foreground font-semibold">9.8% - 11.2%</strong> mức lương thực lĩnh,
                       hoàn toàn thỏa mãn ngưỡng an toàn của <strong>Điều 102 Bộ luật Lao động</strong> (≤ 30% lương).
                     </>
                   ) : (
@@ -414,7 +417,7 @@ export default function LoansPage() {
                     <Button
                       size="sm"
                       onClick={handleBatchApprovePending}
-                      className="h-8 text-xs font-semibold gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                      className="h-8 text-xs font-medium gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
                     >
                       <Zap className="h-3.5 w-3.5" />
                       <span>Phê Duyệt Nhanh {pendingLoans.length} Hồ Sơ Đạt Chuẩn</span>
@@ -503,7 +506,7 @@ export default function LoansPage() {
             <Sliders className="h-3.5 w-3.5" />
             <span>Pipeline Thẩm Định</span>
             {pendingLoans.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-white font-bold">
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-muted text-muted-foreground border border-border font-medium">
                 {pendingLoans.length}
               </span>
             )}
@@ -642,12 +645,12 @@ export default function LoansPage() {
                           <span
                             className={`h-1.5 w-1.5 rounded-full ${
                               loan.status === 'APPROVED' || loan.status === 'DISBURSED'
-                                ? 'bg-emerald-600'
+                                ? 'bg-primary'
                                 : loan.status === 'PENDING'
-                                ? 'bg-amber-600'
+                                ? 'bg-muted-foreground'
                                 : loan.status === 'COMPLETED'
-                                ? 'bg-blue-600'
-                                : 'bg-rose-600'
+                                ? 'bg-muted-foreground/60'
+                                : 'bg-destructive'
                             }`}
                           />
                           {loan.status === 'APPROVED'
@@ -693,13 +696,7 @@ export default function LoansPage() {
                           </div>
                           <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                             <div
-                              className={`h-full rounded-full transition-all ${
-                                loan.status === 'COMPLETED'
-                                  ? 'bg-blue-600'
-                                  : repaidRatio > 50
-                                  ? 'bg-emerald-600'
-                                  : 'bg-primary'
-                              }`}
+                              className="h-full rounded-full bg-primary transition-all"
                               style={{ width: `${repaidRatio}%` }}
                             />
                           </div>
@@ -732,7 +729,7 @@ export default function LoansPage() {
                               size="sm"
                               onClick={() => decideMutation.mutate({ id: loan.id, status: 'APPROVED' })}
                               disabled={decideMutation.isPending}
-                              className="h-8 text-xs font-semibold gap-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                              className="h-8 text-xs font-medium gap-1 bg-primary text-primary-foreground hover:bg-primary/90"
                             >
                               <Check className="h-3.5 w-3.5" />
                               <span>Duyệt</span>
@@ -742,7 +739,7 @@ export default function LoansPage() {
                               size="sm"
                               onClick={() => decideMutation.mutate({ id: loan.id, status: 'REJECTED' })}
                               disabled={decideMutation.isPending}
-                              className="h-8 text-xs text-rose-600 hover:bg-rose-50"
+                              className="h-8 text-xs text-muted-foreground hover:text-destructive hover:border-destructive/30"
                             >
                               <X className="h-3.5 w-3.5" />
                             </Button>
@@ -756,21 +753,21 @@ export default function LoansPage() {
                               className="h-8 text-xs gap-1 font-medium"
                               title="Thu hồi 1 kỳ lương"
                             >
-                              <DollarSign className="h-3.5 w-3.5 text-emerald-600" />
+                              <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
                               <span>Trích 1 kỳ</span>
                             </Button>
                             <Button
                               size="sm"
                               onClick={() => openRepayDialog(loan, 'full')}
-                              className="h-8 text-xs gap-1 font-semibold bg-primary text-primary-foreground"
+                              className="h-8 text-xs gap-1 font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border"
                               title="Tất toán toàn bộ nợ"
                             >
                               <span>Tất toán</span>
                             </Button>
                           </>
                         ) : (
-                          <span className="text-[11px] font-semibold text-blue-600 flex items-center gap-1">
-                            <BadgeCheck className="h-3.5 w-3.5" />
+                          <span className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
+                            <BadgeCheck className="h-3.5 w-3.5 text-primary" />
                             <span>Đã hoàn tất</span>
                           </span>
                         )}
@@ -856,9 +853,7 @@ export default function LoansPage() {
                               </div>
                               <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                                 <div
-                                  className={`h-full rounded-full ${
-                                    loan.status === 'COMPLETED' ? 'bg-blue-600' : 'bg-emerald-600'
-                                  }`}
+                                  className="h-full rounded-full bg-primary transition-all"
                                   style={{ width: `${repaidRatio}%` }}
                                 />
                               </div>
@@ -869,12 +864,12 @@ export default function LoansPage() {
                               <span
                                 className={`h-1.5 w-1.5 rounded-full ${
                                   loan.status === 'APPROVED' || loan.status === 'DISBURSED'
-                                    ? 'bg-emerald-600'
+                                    ? 'bg-primary'
                                     : loan.status === 'PENDING'
-                                    ? 'bg-amber-600'
+                                    ? 'bg-muted-foreground'
                                     : loan.status === 'COMPLETED'
-                                    ? 'bg-blue-600'
-                                    : 'bg-rose-600'
+                                    ? 'bg-muted-foreground/60'
+                                    : 'bg-destructive'
                                 }`}
                               />
                               {loan.status === 'APPROVED'
@@ -898,12 +893,25 @@ export default function LoansPage() {
                                 <Eye className="h-3 w-3" />
                               </Button>
 
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedDetailLoan(loan);
+                                  setIsPrintLoanOpen(true);
+                                }}
+                                className="h-7 text-xs px-2"
+                                title="In biểu mẫu hợp đồng / phụ lục vay vốn chuẩn NĐ 30"
+                              >
+                                <Printer className="h-3 w-3" />
+                              </Button>
+
                               {loan.status === 'PENDING' && (
                                 <>
                                   <Button
                                     size="sm"
                                     onClick={() => decideMutation.mutate({ id: loan.id, status: 'APPROVED' })}
-                                    className="h-7 text-xs px-2 bg-emerald-600 text-white hover:bg-emerald-700"
+                                    className="h-7 text-xs px-2.5 font-medium bg-primary text-primary-foreground hover:bg-primary/90"
                                   >
                                     <Check className="h-3 w-3" />
                                     <span>Duyệt</span>
@@ -912,7 +920,7 @@ export default function LoansPage() {
                                     variant="outline"
                                     size="sm"
                                     onClick={() => decideMutation.mutate({ id: loan.id, status: 'REJECTED' })}
-                                    className="h-7 text-xs px-2 text-rose-600"
+                                    className="h-7 text-xs px-2 text-muted-foreground hover:text-destructive"
                                   >
                                     <X className="h-3 w-3" />
                                   </Button>
@@ -926,7 +934,7 @@ export default function LoansPage() {
                                   onClick={() => openRepayDialog(loan, 'emi')}
                                   className="h-7 text-xs px-2 gap-1 font-medium"
                                 >
-                                  <DollarSign className="h-3 w-3 text-emerald-600" />
+                                  <DollarSign className="h-3 w-3 text-muted-foreground" />
                                   <span>Thu nợ</span>
                                 </Button>
                               )}
@@ -952,29 +960,29 @@ export default function LoansPage() {
             {
               id: 'PENDING',
               title: '1. Chờ Thẩm Định',
-              color: 'border-amber-500/30 bg-amber-500/5 text-amber-700',
-              badge: 'bg-amber-500',
+              color: 'border-border bg-card',
+              badge: 'bg-muted-foreground',
               items: (loans ?? []).filter((l) => l.status === 'PENDING'),
             },
             {
               id: 'APPROVED',
               title: '2. Đang Trích Lương',
-              color: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-700',
-              badge: 'bg-emerald-500',
+              color: 'border-border bg-card',
+              badge: 'bg-primary',
               items: (loans ?? []).filter((l) => l.status === 'APPROVED' || l.status === 'DISBURSED'),
             },
             {
               id: 'COMPLETED',
               title: '3. Đã Hoàn Tất',
-              color: 'border-blue-500/30 bg-blue-500/5 text-blue-700',
-              badge: 'bg-blue-500',
+              color: 'border-border bg-card',
+              badge: 'bg-muted-foreground',
               items: (loans ?? []).filter((l) => l.status === 'COMPLETED'),
             },
             {
               id: 'REJECTED',
               title: '4. Đã Từ Chối',
-              color: 'border-rose-500/30 bg-rose-500/5 text-rose-700',
-              badge: 'bg-rose-500',
+              color: 'border-border bg-card',
+              badge: 'bg-destructive',
               items: (loans ?? []).filter((l) => l.status === 'REJECTED'),
             },
           ].map((column) => (
@@ -985,11 +993,11 @@ export default function LoansPage() {
               <div className="flex items-center justify-between pb-2 border-b border-border">
                 <div className="flex items-center gap-2">
                   <span className={`h-2 w-2 rounded-full ${column.badge}`} />
-                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
+                  <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
                     {column.title}
                   </h4>
                 </div>
-                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-foreground">
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
                   {column.items.length}
                 </span>
               </div>
@@ -1029,7 +1037,7 @@ export default function LoansPage() {
                             e.stopPropagation();
                             decideMutation.mutate({ id: loan.id, status: 'APPROVED' });
                           }}
-                          className="w-full h-7 text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
+                          className="w-full h-7 text-[11px] font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
                         >
                           Phê duyệt
                         </Button>
@@ -1040,7 +1048,7 @@ export default function LoansPage() {
                             e.stopPropagation();
                             decideMutation.mutate({ id: loan.id, status: 'REJECTED' });
                           }}
-                          className="h-7 text-[11px] text-rose-600"
+                          className="h-7 text-[11px] text-muted-foreground hover:text-destructive"
                         >
                           Từ chối
                         </Button>
@@ -1217,7 +1225,7 @@ export default function LoansPage() {
 
                 <div className="p-3 rounded-md bg-muted/40 border border-border">
                   <p className="text-[11px] text-muted-foreground">Tỷ lệ chiếm trên thực lĩnh:</p>
-                  <p className={`text-lg font-bold mt-0.5 ${isSafeDeduction ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  <p className="text-lg font-bold mt-0.5 text-foreground">
                     {simDeductionPercent}%
                   </p>
                   <p className="text-[10px] text-muted-foreground">Trần tối đa luật định: 30.0%</p>
@@ -1228,14 +1236,14 @@ export default function LoansPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-foreground">Thước đo an toàn thu nhập:</span>
-                  <span className={isSafeDeduction ? 'text-emerald-600' : 'text-rose-600'}>
+                  <span className={isSafeDeduction ? 'text-foreground' : 'text-destructive'}>
                     {isSafeDeduction ? '✓ Trong ngưỡng an toàn' : '⚠️ Vượt trần 30% lương'}
                   </span>
                 </div>
                 <div className="h-3 w-full rounded-full bg-muted overflow-hidden relative">
                   <div
                     className={`h-full rounded-full transition-all duration-300 ${
-                      isSafeDeduction ? 'bg-emerald-600' : 'bg-rose-600'
+                      isSafeDeduction ? 'bg-primary' : 'bg-destructive'
                     }`}
                     style={{ width: `${Math.min(100, (simDeductionPercent / 30) * 100)}%` }}
                   />
@@ -1246,13 +1254,13 @@ export default function LoansPage() {
               <div
                 className={`p-3 rounded-md border text-xs leading-relaxed ${
                   isSafeDeduction
-                    ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-800'
-                    : 'border-rose-500/20 bg-rose-500/5 text-rose-800'
+                    ? 'border-border bg-muted/40 text-foreground'
+                    : 'border-destructive/30 bg-destructive/5 text-destructive'
                 }`}
               >
                 {isSafeDeduction ? (
                   <div className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <CheckCircle className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                     <div>
                       <strong className="block font-semibold">Phương án tài chính đạt chuẩn Điều 102 BLLĐ 2019</strong>
                       Mức trích trừ {simMonthly.toLocaleString('vi-VN')} đ/tháng chiếm {simDeductionPercent}% lương thực lĩnh, đảm bảo người lao động giữ lại ít nhất 70% thu nhập để ổn định đời sống gia đình.
@@ -1260,7 +1268,7 @@ export default function LoansPage() {
                   </div>
                 ) : (
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
+                    <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
                     <div>
                       <strong className="block font-semibold">Cảnh báo vi phạm trần khấu trừ tiền lương</strong>
                       Mức trích trừ {simDeductionPercent}% vượt quá hạn mức tối đa 30% lương thực lĩnh theo Điều 102. Khuyến nghị kéo dài kỳ hạn lên ít nhất {Math.ceil((simTotalPayable / (simSalary * 0.3)))} tháng để giảm EMI.
@@ -1348,7 +1356,7 @@ export default function LoansPage() {
                     </div>
                     <div>
                       <p className="text-[11px] text-muted-foreground">Lãi suất</p>
-                      <p className="text-xs font-bold text-emerald-600 mt-0.5">{pkg.rate}%/năm</p>
+                      <p className="text-xs font-semibold text-foreground mt-0.5">{pkg.rate}%/năm</p>
                     </div>
                   </div>
 
@@ -1381,165 +1389,254 @@ export default function LoansPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* DRAWER CHI TIẾT KHOẢN VAY & LỊCH TRÌNH KHẤU TRỪ                          */}
+      {/* MODAL CHI TIẾT HỒ SƠ KHOẢN VAY & LỊCH TRÌNH KHẤU TRỪ                     */}
       {/* ========================================================================= */}
-      {selectedDetailLoan && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex justify-end transition-opacity">
-          <div className="w-full max-w-lg bg-card h-full shadow-2xl border-l border-border p-6 flex flex-col justify-between overflow-y-auto">
-            <div className="space-y-6">
-              {/* Header Drawer */}
-              <div className="flex items-start justify-between pb-4 border-b border-border">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                    Hồ Sơ Khoản Vay Phúc Lợi
-                  </span>
-                  <h3 className="text-lg font-bold text-foreground mt-0.5">
-                    {selectedDetailLoan.employeeName}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">Mã ID: {selectedDetailLoan.id}</p>
-                </div>
-                <button
-                  onClick={() => setSelectedDetailLoan(null)}
-                  className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
+      <Modal
+        open={Boolean(selectedDetailLoan && !isPrintLoanOpen)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedDetailLoan(null);
+        }}
+        title={`Hồ Sơ Khoản Vay Phúc Lợi — ${selectedDetailLoan?.employeeName || ''}`}
+        description={`Mã hồ sơ: ${selectedDetailLoan?.id || ''}`}
+        size="lg"
+        footer={
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsPrintLoanOpen(true)}
+              className="gap-1.5 text-xs font-medium"
+            >
+              <Printer className="h-3.5 w-3.5" />
+              <span>Xem & In Phụ Lục Hợp Đồng (NĐ 30)</span>
+            </Button>
 
-              {/* Thông tin cốt lõi */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-md bg-muted/40 border border-border">
-                  <p className="text-[11px] text-muted-foreground">Số tiền gốc:</p>
-                  <p className="text-base font-bold text-foreground mt-0.5">
-                    {selectedDetailLoan.principalAmount.toLocaleString('vi-VN')} đ
-                  </p>
-                </div>
-
-                <div className="p-3 rounded-md bg-muted/40 border border-border">
-                  <p className="text-[11px] text-muted-foreground">Dư nợ còn lại:</p>
-                  <p className="text-base font-bold text-emerald-600 mt-0.5">
-                    {selectedDetailLoan.remainingAmount.toLocaleString('vi-VN')} đ
-                  </p>
-                </div>
-
-                <div className="p-3 rounded-md bg-muted/40 border border-border">
-                  <p className="text-[11px] text-muted-foreground">Trừ lương hàng tháng (EMI):</p>
-                  <p className="text-sm font-bold text-foreground mt-0.5">
-                    {selectedDetailLoan.monthlyEmi.toLocaleString('vi-VN')} đ
-                  </p>
-                </div>
-
-                <div className="p-3 rounded-md bg-muted/40 border border-border">
-                  <p className="text-[11px] text-muted-foreground">Kỳ hạn & Lãi suất:</p>
-                  <p className="text-sm font-bold text-foreground mt-0.5">
-                    {selectedDetailLoan.termMonths} tháng ({selectedDetailLoan.interestRate}%/năm)
-                  </p>
-                </div>
-              </div>
-
-              {/* Mục đích & Lý do */}
-              <div className="p-3.5 rounded-md bg-muted/40 border border-border space-y-1.5 text-xs">
-                <p className="font-semibold text-foreground">Gói vay & Mục đích:</p>
-                <p className="text-muted-foreground">{selectedDetailLoan.loanType}</p>
-                {selectedDetailLoan.reason && (
-                  <p className="text-muted-foreground pt-1 border-t border-border/60 italic">
-                    &quot;{selectedDetailLoan.reason}&quot;
-                  </p>
-                )}
-              </div>
-
-              {/* Bảng Lịch Trình Khấu Trừ Từng Kỳ */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Lịch Trình Khấu Trừ Lương ({selectedDetailLoan.termMonths} Kỳ)
-                  </h4>
-                  <span className="text-[11px] text-muted-foreground">Tự động trừ ngày 05 hàng tháng</span>
-                </div>
-
-                <div className="rounded-md border border-border overflow-hidden max-h-56 overflow-y-auto">
-                  <table className="w-full text-xs text-left">
-                    <thead className="bg-muted/40 text-muted-foreground sticky top-0">
-                      <tr className="border-b border-border font-medium">
-                        <th className="py-2 px-3">Kỳ</th>
-                        <th className="py-2 px-3 text-right">Số tiền</th>
-                        <th className="py-2 px-3 text-center">Trạng thái</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {Array.from({ length: selectedDetailLoan.termMonths }).map((_, index) => {
-                        const periodNumber = index + 1;
-                        const repaidMonths = Math.round(
-                          (selectedDetailLoan.principalAmount - selectedDetailLoan.remainingAmount) /
-                          (selectedDetailLoan.monthlyEmi || 1)
-                        );
-                        const isRepaid = periodNumber <= repaidMonths;
-
-                        return (
-                          <tr key={index} className="hover:bg-muted/30">
-                            <td className="py-2 px-3 font-medium text-foreground">Kỳ {periodNumber}</td>
-                            <td className="py-2 px-3 text-right font-semibold">
-                              {selectedDetailLoan.monthlyEmi.toLocaleString('vi-VN')} đ
-                            </td>
-                            <td className="py-2 px-3 text-center">
-                              {isRepaid ? (
-                                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-semibold">
-                                  <Check className="h-3 w-3" />
-                                  <span>Đã trừ lương</span>
-                                </span>
-                              ) : periodNumber === repaidMonths + 1 ? (
-                                <span className="inline-flex items-center gap-1 text-[11px] text-blue-600 font-semibold">
-                                  <Clock className="h-3 w-3" />
-                                  <span>Kỳ tới (05/10)</span>
-                                </span>
-                              ) : (
-                                <span className="text-[11px] text-muted-foreground">Chưa đến hạn</span>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer Action Bar */}
-            <div className="pt-4 border-t border-border space-y-2">
-              {(selectedDetailLoan.status === 'APPROVED' || selectedDetailLoan.status === 'DISBURSED') && (
-                <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              {(selectedDetailLoan?.status === 'APPROVED' || selectedDetailLoan?.status === 'DISBURSED') && (
+                <>
                   <Button
-                    onClick={() => openRepayDialog(selectedDetailLoan, 'emi')}
-                    className="w-full text-xs h-9 font-semibold gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+                    size="sm"
+                    onClick={() => selectedDetailLoan && openRepayDialog(selectedDetailLoan, 'emi')}
+                    className="text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <DollarSign className="h-3.5 w-3.5" />
-                    <span>Trích Thu Hồi 1 Kỳ Lương</span>
+                    <span>Trích thu hồi 1 kỳ</span>
                   </Button>
                   <Button
-                    onClick={() => openRepayDialog(selectedDetailLoan, 'full')}
                     variant="outline"
-                    className="w-full text-xs h-9 font-semibold gap-1.5 border-primary text-primary hover:bg-primary/5"
+                    size="sm"
+                    onClick={() => selectedDetailLoan && openRepayDialog(selectedDetailLoan, 'full')}
+                    className="text-xs"
                   >
-                    <span>Tất Toán Sớm Toàn Bộ</span>
+                    <span>Tất toán toàn bộ</span>
                   </Button>
-                </div>
+                </>
               )}
-
               <Button
                 variant="outline"
-                onClick={() => {
-                  window.print();
-                }}
-                className="w-full text-xs h-8 gap-1.5 text-muted-foreground"
+                size="sm"
+                onClick={() => setSelectedDetailLoan(null)}
+                className="text-xs"
               >
-                <Printer className="h-3.5 w-3.5" />
-                <span>In Hợp Đồng / Phụ Lục Vay Vốn</span>
+                Đóng
               </Button>
             </div>
           </div>
-        </div>
-      )}
+        }
+      >
+        {selectedDetailLoan && (
+          <div className="space-y-4 text-xs">
+            {/* 4 Chỉ số cốt lõi */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
+                <p className="text-[11px] text-muted-foreground">Số tiền gốc:</p>
+                <p className="text-base font-bold text-foreground mt-0.5">
+                  {selectedDetailLoan.principalAmount.toLocaleString('vi-VN')} đ
+                </p>
+              </div>
+
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
+                <p className="text-[11px] text-muted-foreground">Dư nợ còn lại:</p>
+                <p className="text-base font-bold text-foreground mt-0.5">
+                  {selectedDetailLoan.remainingAmount.toLocaleString('vi-VN')} đ
+                </p>
+              </div>
+
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
+                <p className="text-[11px] text-muted-foreground">Trừ lương hàng tháng (EMI):</p>
+                <p className="text-sm font-bold text-foreground mt-0.5">
+                  {selectedDetailLoan.monthlyEmi.toLocaleString('vi-VN')} đ
+                </p>
+              </div>
+
+              <div className="p-3 rounded-md bg-muted/40 border border-border">
+                <p className="text-[11px] text-muted-foreground">Kỳ hạn & Lãi suất:</p>
+                <p className="text-sm font-bold text-foreground mt-0.5">
+                  {selectedDetailLoan.termMonths} tháng ({selectedDetailLoan.interestRate}%/năm)
+                </p>
+              </div>
+            </div>
+
+            {/* Mục đích & Lý do */}
+            <div className="p-3 rounded-md bg-muted/40 border border-border space-y-1">
+              <p className="font-semibold text-foreground">Gói vay & Mục đích:</p>
+              <p className="text-muted-foreground">{selectedDetailLoan.loanType}</p>
+              {selectedDetailLoan.reason && (
+                <p className="text-muted-foreground pt-1 border-t border-border/60 italic">
+                  &quot;{selectedDetailLoan.reason}&quot;
+                </p>
+              )}
+            </div>
+
+            {/* Bảng Lịch Trình Khấu Trừ Từng Kỳ */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Lịch Trình Khấu Trừ Lương ({selectedDetailLoan.termMonths} Kỳ)
+                </h4>
+                <span className="text-[11px] text-muted-foreground">Tự động trừ ngày 05 hàng tháng</span>
+              </div>
+
+              <div className="rounded-md border border-border overflow-hidden max-h-60 overflow-y-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-muted/40 text-muted-foreground sticky top-0">
+                    <tr className="border-b border-border font-medium">
+                      <th className="py-2 px-3">Kỳ</th>
+                      <th className="py-2 px-3 text-right">Số tiền</th>
+                      <th className="py-2 px-3 text-center">Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {Array.from({ length: selectedDetailLoan.termMonths }).map((_, index) => {
+                      const periodNumber = index + 1;
+                      const repaidMonths = Math.round(
+                        (selectedDetailLoan.principalAmount - selectedDetailLoan.remainingAmount) /
+                        (selectedDetailLoan.monthlyEmi || 1)
+                      );
+                      const isRepaid = periodNumber <= repaidMonths;
+
+                      return (
+                        <tr key={index} className="hover:bg-muted/30">
+                          <td className="py-2 px-3 font-medium text-foreground">Kỳ {periodNumber}</td>
+                          <td className="py-2 px-3 text-right font-semibold">
+                            {selectedDetailLoan.monthlyEmi.toLocaleString('vi-VN')} đ
+                          </td>
+                          <td className="py-2 px-3 text-center">
+                            {isRepaid ? (
+                              <span className="inline-flex items-center gap-1 text-[11px] text-foreground font-medium">
+                                <Check className="h-3 w-3 text-muted-foreground" />
+                                <span>Đã trừ lương</span>
+                              </span>
+                            ) : periodNumber === repaidMonths + 1 ? (
+                              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground font-medium">
+                                <Clock className="h-3 w-3" />
+                                <span>Kỳ tới (05/10)</span>
+                              </span>
+                            ) : (
+                              <span className="text-[11px] text-muted-foreground">Chưa đến hạn</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* ================= MODAL IN: HỢP ĐỒNG / PHỤ LỤC VAY VỐN (CHUẨN NĐ 30/2020/NĐ-CP) ================= */}
+      <Modal
+        open={isPrintLoanOpen}
+        onOpenChange={(open) => setIsPrintLoanOpen(open)}
+        title="Biểu Mẫu Hợp Đồng / Phụ Lục Vay Vốn (Chuẩn Nghị định 30/2020/NĐ-CP)"
+        size="lg"
+      >
+        {selectedDetailLoan && (
+          <div
+            id="print-loan-contract-doc"
+            className="print-area font-times bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[13pt] print:p-0 print:border-0 print:shadow-none print:m-0 print:max-w-none"
+            style={{ fontFamily: "'Times New Roman', Times, serif" }}
+          >
+            {/* Header Thể thức Văn bản Hành chính theo NĐ 30/2020/NĐ-CP */}
+            <div className="flex justify-between items-start pb-4 border-b border-black">
+              <div className="w-[48%] text-center leading-tight">
+                <p className="font-normal text-[11.5pt] uppercase text-black">TỔNG CÔNG TY CÔNG NGHỆ HRMIS</p>
+                <p className="font-bold text-[12pt] uppercase text-black">HỘI ĐỒNG PHÚC LỢI & CÔNG ĐOÀN</p>
+                <div className="w-32 border-b border-black mx-auto mt-1 mb-1.5" />
+                <p className="text-[11pt] text-black">Số: {selectedDetailLoan.id?.slice(0, 6).toUpperCase() || '01'}/HĐ-VVNB</p>
+              </div>
+              <div className="w-[52%] text-center leading-tight">
+                <p className="font-bold text-[12pt] uppercase text-black">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                <p className="font-bold text-[12.5pt] text-black">Độc lập - Tự do - Hạnh phúc</p>
+                <div className="w-40 border-b-[1.5px] border-black mx-auto mt-1 mb-1.5" />
+                <p className="text-[11.5pt] italic text-black">
+                  Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center my-6 space-y-1">
+              <h1 className="text-[15pt] font-bold uppercase tracking-wide text-black">
+                PHỤ LỤC HỢP ĐỒNG VAY VỐN PHÚC LỢI CÁN BỘ NHÂN VIÊN
+              </h1>
+              <p className="text-[12pt] italic text-black">
+                (Ban hành kèm theo Quy chế Quản trị Phúc lợi Doanh nghiệp số 24/QC-HRMIS)
+              </p>
+            </div>
+
+            <div className="space-y-3 text-[12pt] leading-relaxed my-4 text-black">
+              <p><strong>Căn cứ:</strong> Bộ luật Lao động số 45/2019/QH14 và Thỏa ước Lao động Tập thể doanh nghiệp;</p>
+              <p><strong>Căn cứ:</strong> Đơn đề nghị vay vốn phúc lợi nội bộ của cán bộ, nhân viên ngày {new Date(selectedDetailLoan.disbursedAt || selectedDetailLoan.createdAt).toLocaleDateString('vi-VN')}.</p>
+              
+              <p className="font-bold uppercase pt-2">I. THÔNG TIN BÊN VAY VÀ KHOẢN VAY:</p>
+              <ul className="list-disc pl-6 space-y-1 text-black">
+                <li><strong>Họ và tên nhân sự:</strong> {selectedDetailLoan.employeeName} (Mã nhân sự: {selectedDetailLoan.userId})</li>
+                <li><strong>Chức danh / Đơn vị:</strong> Cán bộ nhân viên — Khối Vận hành Doanh nghiệp HRMIS</li>
+                <li><strong>Gói chương trình vay:</strong> {selectedDetailLoan.loanType}</li>
+                <li><strong>Số tiền vay gốc giải ngân:</strong> {selectedDetailLoan.principalAmount.toLocaleString('vi-VN')} VNĐ</li>
+                <li><strong>Lãi suất ưu đãi phúc lợi:</strong> {selectedDetailLoan.interestRate}%/năm</li>
+                <li><strong>Thời hạn hoàn trả:</strong> {selectedDetailLoan.termMonths} tháng (Kỳ khấu trừ hàng tháng: ~{selectedDetailLoan.monthlyEmi.toLocaleString('vi-VN')} VNĐ)</li>
+                <li><strong>Dư nợ thực tế hiện hành:</strong> {selectedDetailLoan.remainingAmount.toLocaleString('vi-VN')} VNĐ</li>
+              </ul>
+
+              <p className="font-bold uppercase pt-2">II. CAM KẾT VÀ PHƯƠNG THỨC KHẤU TRỪ:</p>
+              <p className="text-justify text-black">
+                Bên vay cam kết tuân thủ đúng tiến độ trả nợ hàng tháng qua hình thức tự động trích trừ vào bảng lương định kỳ. Trong trường hợp chấm dứt hợp đồng lao động trước thời hạn hoàn vốn, người lao động có trách nhiệm quyết toán toàn bộ số dư nợ còn lại trước khi nhận bàn giao thủ tục nghỉ việc.
+              </p>
+            </div>
+
+            {/* Chữ ký & Nơi nhận theo Nghị định 30 */}
+            <div className="grid grid-cols-2 gap-8 items-start pt-6 text-[12pt] text-black break-inside-avoid">
+              <div className="text-left space-y-1">
+                <p className="font-bold italic text-[11pt]">Nơi nhận:</p>
+                <ul className="text-[10pt] leading-tight space-y-0.5 list-none pl-2 text-black">
+                  <li>- Ban Tổng Giám đốc;</li>
+                  <li>- Phòng Tài chính - Kế toán;</li>
+                  <li>- Cán bộ vay vốn;</li>
+                  <li>- Lưu: VT, BQL-VV.</li>
+                </ul>
+              </div>
+              <div className="text-center space-y-1">
+                <p className="font-bold uppercase text-[12pt]">TM. HỘI ĐỒNG PHÚC LỢI NỘI BỘ</p>
+                <p className="font-bold uppercase text-[12pt]">CHỦ TỊCH HỘI ĐỒNG</p>
+                <p className="italic text-[10.5pt] text-neutral-600">(Ký, ghi rõ họ tên và đóng dấu)</p>
+                <div className="h-16" />
+                <p className="font-bold text-[12pt] uppercase">Trần Minh Hoàng</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <ModalFooterActions
+          onCancel={() => setIsPrintLoanOpen(false)}
+          cancelLabel="Đóng"
+          confirmLabel="In Hợp Đồng & Phụ Lục"
+          onConfirm={() => printDocumentElement('print-loan-contract-doc')}
+        />
+      </Modal>
 
       {/* ========================================================================= */}
       {/* MODAL TRÍCH NỢ NHANH & TẤT TOÁN SỚM                                       */}
@@ -1550,7 +1647,7 @@ export default function LoansPage() {
             <div className="flex items-start justify-between pb-3 border-b border-border">
               <div>
                 <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-emerald-600" />
+                  <DollarSign className="h-4 w-4 text-primary" />
                   <span>Xác Nhận Thu Hồi Nợ / Tất Toán Sớm</span>
                 </h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -1648,7 +1745,7 @@ export default function LoansPage() {
                     amount: repayAmount,
                   });
                 }}
-                className="text-xs h-9 font-semibold gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="text-xs h-9 font-medium gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <Check className="h-3.5 w-3.5" />
                 <span>{repayMutation.isPending ? 'Đang cập nhật...' : 'Xác Nhận Thu Nợ'}</span>
@@ -1693,11 +1790,11 @@ export default function LoansPage() {
                 ].map((s) => (
                   <div
                     key={s.step}
-                    className={`text-center py-1.5 rounded-md text-[11px] font-semibold border ${
+                    className={`text-center py-1.5 rounded-md text-[11px] font-medium border ${
                       wizardStep === s.step
                         ? 'border-primary bg-primary text-primary-foreground'
                         : wizardStep > s.step
-                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700'
+                        ? 'border-border bg-muted text-foreground'
                         : 'border-border bg-muted/40 text-muted-foreground'
                     }`}
                   >
@@ -1734,8 +1831,8 @@ export default function LoansPage() {
 
                 {/* Card Thẩm định Nhanh Hồ Sơ Nhân Sự */}
                 <div className="p-3.5 rounded-md bg-muted/40 border border-border space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-foreground">
-                    <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                  <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                    <ShieldCheck className="h-4 w-4 text-foreground" />
                     <span>Hạn ngạch tín dụng & Kiểm tra sơ bộ:</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs">
@@ -1745,7 +1842,7 @@ export default function LoansPage() {
                     </div>
                     <div>
                       <span className="text-muted-foreground">Trần khấu trừ (30% Net):</span>
-                      <p className="font-semibold text-emerald-600">
+                      <p className="font-semibold text-foreground">
                         {(targetEstimatedSalary * 0.3).toLocaleString('vi-VN')} đ/tháng
                       </p>
                     </div>
@@ -1828,7 +1925,7 @@ export default function LoansPage() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Tỷ lệ chiếm lương thực lĩnh:</span>
-                        <span className={`font-bold ${isSafe ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        <span className={`font-semibold ${isSafe ? 'text-foreground' : 'text-destructive'}`}>
                           {deductionRatio}% {isSafe ? '(Đạt chuẩn Điều 102)' : '(Vượt trần 30% BLLĐ)'}
                         </span>
                       </div>

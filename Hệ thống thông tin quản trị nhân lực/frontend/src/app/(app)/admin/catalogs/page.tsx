@@ -361,7 +361,7 @@ export default function MasterCatalogsPage() {
             <RefreshCw className={`h-4 w-4 ${resetMutation.isPending ? 'animate-spin' : ''}`} /> Khôi phục gốc
           </Button>
           <Button variant="outline" size="sm" onClick={handleExportCsv} title="Xuất CSV">
-            <FileSpreadsheet className="h-4 w-4 text-emerald-600" /> Xuất CSV
+            <FileSpreadsheet className="h-4 w-4" /> Xuất CSV
           </Button>
           <Button variant="outline" size="sm" onClick={() => window.print()} title="In biểu danh mục chuẩn NĐ 30">
             <Printer className="h-4 w-4" /> In danh mục
@@ -518,7 +518,7 @@ export default function MasterCatalogsPage() {
                     <Printer className="h-3.5 w-3.5 text-primary" /> In toàn bộ danh mục
                   </Button>
                   <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={handleExportExcel}>
-                    <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" /> Xuất Excel
+                    <FileSpreadsheet className="h-3.5 w-3.5" /> Xuất Excel
                   </Button>
                   <Button size="sm" className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground" onClick={handleOpenAdd} disabled={isMutating}>
                     <Plus className="h-3.5 w-3.5" /> Thêm mục

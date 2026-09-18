@@ -12,6 +12,7 @@ import { Button, Select } from '@/components/ui/primitives';
 import { DataTable, DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
+import { printDocumentElement } from '@/components/ui/print';
 
 interface SalaryComponent {
   id: string;
@@ -898,7 +899,7 @@ export default function PayrollEnginePage() {
         size="lg"
       >
         {selectedSlip && (
-          <div className="space-y-4 text-xs font-sans">
+          <div id="print-payslip-doc" className="print-area space-y-4 text-xs font-sans print:font-serif print:text-black print:p-0 print:border-0 print:m-0">
             {/* Header thông tin */}
             <div className="border-b border-border pb-3 flex justify-between items-start">
               <div>
@@ -1007,7 +1008,7 @@ export default function PayrollEnginePage() {
           onCancel={() => setIsPayslipModalOpen(false)}
           cancelLabel="Đóng"
           confirmLabel="In phiếu lương"
-          onConfirm={() => window.print()}
+          onConfirm={() => printDocumentElement('print-payslip-doc')}
         />
       </Modal>
     </div>

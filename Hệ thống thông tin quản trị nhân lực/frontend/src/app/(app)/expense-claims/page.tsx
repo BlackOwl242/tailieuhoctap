@@ -862,8 +862,8 @@ export default function ExpenseClaimsPage() {
                           <Calendar className="h-3 w-3" />
                           Nộp ngày: <strong className="text-foreground font-medium">{formatSafeDate(c.submittedAt || c.createdAt)}</strong>
                         </span>
-                        <span className="flex items-center gap-1 font-semibold text-primary">
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
+                        <span className="flex items-center gap-1 font-medium text-foreground">
+                          <Check className="h-3.5 w-3.5 text-muted-foreground" />
                           Chứng từ hợp lệ
                         </span>
                       </div>
@@ -1434,7 +1434,7 @@ export default function ExpenseClaimsPage() {
                       newItems[idx].amount = Number(e.target.value);
                       setClaimItems(newItems);
                     }}
-                    className="w-32 rounded border bg-background px-2 py-1 text-xs font-bold text-emerald-600 focus:border-primary focus:outline-hidden text-right"
+                    className="w-32 rounded border bg-background px-2 py-1 text-xs font-semibold text-foreground focus:border-primary focus:outline-hidden text-right"
                   />
                   <button
                     type="button"
@@ -2013,71 +2013,91 @@ export default function ExpenseClaimsPage() {
           description="Biểu mẫu kế toán chuẩn hóa theo quy định tài chính doanh nghiệp và cơ quan nhà nước."
           size="lg"
         >
-          <div className="bg-white text-black p-6 rounded-lg border shadow-xs space-y-4 font-serif text-xs">
-            {/* Header Quốc Huy & Đơn Vị */}
-            <div className="flex justify-between items-start border-b pb-4">
-              <div className="text-left space-y-0.5">
-                <p className="font-bold uppercase text-xs">Cơ quan / Doanh nghiệp: TẬP ĐOÀN HRMIS PRO</p>
-                <p className="text-xs text-muted-foreground">Bộ phận: Phòng Tài chính - Kế toán</p>
-                <p className="text-xs text-muted-foreground">Mã hồ sơ: {printDocument.data.id?.slice(0, 10) || 'HD-2026'}</p>
+          <div
+            className="bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[12.5pt] print:p-0 print:border-0 print:shadow-none"
+            style={{ fontFamily: "'Times New Roman', Times, serif" }}
+          >
+            {/* Header Thể thức Văn bản Hành chính theo NĐ 30/2020/NĐ-CP */}
+            <div className="flex justify-between items-start pb-4 border-b border-black">
+              <div className="w-[45%] text-center leading-tight">
+                <p className="font-normal text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
+                  TỔNG CÔNG TY CÔNG NGHỆ HRMIS
+                </p>
+                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
+                  PHÒNG TÀI CHÍNH - KẾ TOÁN
+                </p>
+                <div className="w-28 border-b border-black mx-auto mt-1 mb-1.5" />
+                <p className="text-[11pt] text-black">
+                  Mã hồ sơ: {printDocument.data.id?.slice(0, 10).toUpperCase() || 'HD-2026'}
+                </p>
               </div>
-              <div className="text-center space-y-0.5">
-                <p className="font-bold text-xs uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-                <p className="text-xs italic">Độc lập - Tự do - Hạnh phúc</p>
-                <p className="text-xs text-muted-foreground">-------o0o-------</p>
+
+              <div className="w-[55%] text-center leading-tight">
+                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
+                  CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+                </p>
+                <p className="font-bold text-[12pt] sm:text-[13pt] text-black">
+                  Độc lập - Tự do - Hạnh phúc
+                </p>
+                <div className="w-40 border-b-[1.5px] border-black mx-auto mt-1 mb-1.5" />
+                <p className="text-[11.5pt] sm:text-[12pt] italic text-black">
+                  Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+                </p>
               </div>
             </div>
 
             {/* Document Content */}
             {printDocument.type === 'CLAIM' && (
-              <div className="space-y-3">
-                <div className="text-center py-2">
-                  <h2 className="text-base font-bold uppercase tracking-wide">GIẤY ĐỀ NGHỊ THANH TOÁN CHI PHÍ</h2>
-                  <p className="italic text-xs text-muted-foreground">
-                    Ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+              <div className="space-y-4 my-6">
+                <div className="text-center py-2 space-y-1">
+                  <h2 className="text-[14pt] sm:text-[15pt] font-bold uppercase tracking-wide text-black">
+                    GIẤY ĐỀ NGHỊ THANH TOÁN TIỀN
+                  </h2>
+                  <p className="italic text-[11.5pt] text-neutral-800">
+                    (Căn cứ Thông tư 200/2014/TT-BTC & Quy chế Tài chính nội bộ)
                   </p>
                 </div>
 
-                <div className="space-y-1.5 leading-relaxed">
+                <div className="space-y-2 leading-relaxed text-[12pt] sm:text-[12.5pt] text-black">
                   <p>Kính gửi: <strong>Ban Giám đốc & Phòng Kế toán - Tài chính</strong></p>
                   <p>Họ và tên người đề nghị: <strong>{printDocument.data.employeeName}</strong></p>
                   <p>Nội dung thanh toán: <strong>{printDocument.data.title}</strong></p>
                   <p>Phân loại chi phí: <strong>{CATEGORY_LABELS[printDocument.data.category] || printDocument.data.category}</strong></p>
-                  <p>Tổng số tiền đề nghị thanh toán: <strong className="text-sm font-bold">{formatVND(printDocument.data.totalAmount)}</strong></p>
+                  <p>Tổng số tiền đề nghị thanh toán: <strong className="text-[13pt]">{formatVND(printDocument.data.totalAmount)}</strong></p>
                 </div>
 
-                <div className="mt-3">
-                  <p className="font-bold mb-1">Bảng kê chi tiết các chứng từ đính kèm:</p>
-                  <table className="w-full border-collapse border border-border text-xs">
+                <div className="mt-4">
+                  <p className="font-bold mb-2 text-[12pt]">Bảng kê chi tiết các chứng từ đính kèm:</p>
+                  <table className="w-full border-collapse border border-black text-[11pt] sm:text-[11.5pt] text-black">
                     <thead>
-                      <tr className="bg-muted/60">
-                        <th className="border border-border p-1.5 text-center">STT</th>
-                        <th className="border border-border p-1.5 text-left">Nội dung chi</th>
-                        <th className="border border-border p-1.5 text-center">Ngày chứng từ</th>
-                        <th className="border border-border p-1.5 text-right">Số tiền (VND)</th>
+                      <tr className="bg-neutral-100/70 border-b border-black">
+                        <th className="border border-black p-2 text-center font-bold w-12">STT</th>
+                        <th className="border border-black p-2 text-left font-bold">Nội dung chi</th>
+                        <th className="border border-black p-2 text-center font-bold w-32">Ngày chứng từ</th>
+                        <th className="border border-black p-2 text-right font-bold w-36">Số tiền (VNĐ)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {Array.isArray(printDocument.data.items) && printDocument.data.items.length > 0 ? (
                         printDocument.data.items.map((it: any, idx: number) => (
                           <tr key={idx}>
-                            <td className="border border-border p-1 text-center">{idx + 1}</td>
-                            <td className="border border-border p-1">{it.item}</td>
-                            <td className="border border-border p-1 text-center">{formatSafeDate(it.date)}</td>
-                            <td className="border border-border p-1 text-right">{formatVND(it.amount)}</td>
+                            <td className="border border-black p-2 text-center">{idx + 1}</td>
+                            <td className="border border-black p-2">{it.item}</td>
+                            <td className="border border-black p-2 text-center">{formatSafeDate(it.date)}</td>
+                            <td className="border border-black p-2 text-right">{formatVND(it.amount)}</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td className="border border-border p-1 text-center">1</td>
-                          <td className="border border-border p-1">{printDocument.data.title}</td>
-                          <td className="border border-border p-1 text-center">{formatSafeDate(printDocument.data.submittedAt)}</td>
-                          <td className="border border-border p-1 text-right">{formatVND(printDocument.data.totalAmount)}</td>
+                          <td className="border border-black p-2 text-center">1</td>
+                          <td className="border border-black p-2">{printDocument.data.title}</td>
+                          <td className="border border-black p-2 text-center">{formatSafeDate(printDocument.data.submittedAt)}</td>
+                          <td className="border border-black p-2 text-right">{formatVND(printDocument.data.totalAmount)}</td>
                         </tr>
                       )}
-                      <tr className="font-bold bg-muted/40">
-                        <td colSpan={3} className="border border-border p-1.5 text-right">Tổng cộng thanh quyết toán:</td>
-                        <td className="border border-border p-1.5 text-right text-foreground">{formatVND(printDocument.data.totalAmount)}</td>
+                      <tr className="font-bold bg-neutral-100/70 border-t-2 border-black">
+                        <td colSpan={3} className="border border-black p-2 text-right">Tổng cộng thanh toán:</td>
+                        <td className="border border-black p-2 text-right">{formatVND(printDocument.data.totalAmount)}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -2086,15 +2106,17 @@ export default function ExpenseClaimsPage() {
             )}
 
             {printDocument.type === 'TRAVEL' && (
-              <div className="space-y-3">
-                <div className="text-center py-2">
-                  <h2 className="text-base font-bold uppercase tracking-wide">GIẤY ĐI ĐƯỜNG / LỆNH ĐIỀU ĐỘNG CÔNG TÁC</h2>
-                  <p className="italic text-xs text-gray-600">
+              <div className="space-y-4 my-6">
+                <div className="text-center py-2 space-y-1">
+                  <h2 className="text-[14pt] sm:text-[15pt] font-bold uppercase tracking-wide text-black">
+                    GIẤY ĐI ĐƯỜNG / LỆNH CÔNG TÁC
+                  </h2>
+                  <p className="italic text-[11.5pt] text-neutral-800">
                     Căn cứ kế hoạch công tác của Đơn vị năm {new Date().getFullYear()}
                   </p>
                 </div>
 
-                <div className="space-y-1.5 leading-relaxed">
+                <div className="space-y-2 leading-relaxed text-[12pt] sm:text-[12.5pt] text-black">
                   <p>Cấp cho Ông/Bà: <strong>{printDocument.data.employeeName}</strong></p>
                   <p>Mục đích chuyến công tác: <strong>{printDocument.data.purpose}</strong></p>
                   <p>Lộ trình di chuyển: <strong>{printDocument.data.fromLocation} ➔ {printDocument.data.toLocation}</strong></p>
@@ -2106,43 +2128,45 @@ export default function ExpenseClaimsPage() {
             )}
 
             {printDocument.type === 'ADVANCE' && (
-              <div className="space-y-3">
-                <div className="text-center py-2">
-                  <h2 className="text-base font-bold uppercase tracking-wide">PHIẾU CHI TẠM ỨNG KINH PHÍ</h2>
-                  <p className="italic text-xs text-gray-600">
-                    (Kèm theo Giấy đề nghị tạm ứng kinh phí)
+              <div className="space-y-4 my-6">
+                <div className="text-center py-2 space-y-1">
+                  <h2 className="text-[14pt] sm:text-[15pt] font-bold uppercase tracking-wide text-black">
+                    GIẤY ĐỀ NGHỊ TẠM ỨNG KINH PHÍ
+                  </h2>
+                  <p className="italic text-[11.5pt] text-neutral-800">
+                    (Ban hành theo Thông tư số 200/2014/TT-BTC)
                   </p>
                 </div>
 
-                <div className="space-y-1.5 leading-relaxed">
+                <div className="space-y-2 leading-relaxed text-[12pt] sm:text-[12.5pt] text-black">
                   <p>Họ tên người nhận tạm ứng: <strong>{printDocument.data.employeeName}</strong></p>
                   <p>Lý do tạm ứng: <strong>{printDocument.data.purpose}</strong></p>
-                  <p>Số tiền tạm ứng: <strong className="text-sm">{formatVND(printDocument.data.amount)}</strong></p>
+                  <p>Số tiền tạm ứng: <strong className="text-[13pt]">{formatVND(printDocument.data.amount)}</strong></p>
                   <p>Thời hạn thanh toán quyết toán: <strong>Trong vòng 07 ngày kể từ khi kết thúc công việc</strong></p>
                 </div>
               </div>
             )}
 
-            {/* Signature Blocks */}
-            <div className="grid grid-cols-3 gap-2 text-center pt-8 pb-4 text-xs">
+            {/* Chữ ký 3 bên theo Nghị định 30 */}
+            <div className="grid grid-cols-3 gap-4 text-center pt-8 pb-4 text-[11.5pt] sm:text-[12pt] text-black">
               <div>
-                <p className="font-bold">Người Đề Nghị</p>
-                <p className="italic text-xs text-muted-foreground">(Ký và ghi rõ họ tên)</p>
-                <div className="h-16 flex items-end justify-center font-semibold text-foreground">
+                <p className="font-bold uppercase text-[11pt] sm:text-[11.5pt]">NGƯỜI ĐỀ NGHỊ</p>
+                <p className="italic text-[10pt] text-neutral-600">(Ký và ghi rõ họ tên)</p>
+                <div className="h-16 flex items-end justify-center font-bold text-black">
                   {printDocument.data.employeeName}
                 </div>
               </div>
               <div>
-                <p className="font-bold">Kế Toán Trưởng</p>
-                <p className="italic text-xs text-muted-foreground">(Ký và ghi rõ họ tên)</p>
-                <div className="h-16 flex items-end justify-center font-semibold text-foreground">
+                <p className="font-bold uppercase text-[11pt] sm:text-[11.5pt]">KẾ TOÁN TRƯỞNG</p>
+                <p className="italic text-[10pt] text-neutral-600">(Ký và ghi rõ họ tên)</p>
+                <div className="h-16 flex items-end justify-center font-bold text-black">
                   (Đã kiểm soát)
                 </div>
               </div>
               <div>
-                <p className="font-bold">Thủ Trưởng Đơn Vị</p>
-                <p className="italic text-xs text-muted-foreground">(Ký, đóng dấu)</p>
-                <div className="h-16 flex items-end justify-center font-semibold text-foreground">
+                <p className="font-bold uppercase text-[11pt] sm:text-[11.5pt]">THỦ TRƯỞNG ĐƠN VỊ</p>
+                <p className="italic text-[10pt] text-neutral-600">(Ký, đóng dấu)</p>
+                <div className="h-16 flex items-end justify-center font-bold text-black">
                   (Đã duyệt chi)
                 </div>
               </div>

@@ -31,15 +31,16 @@ export function Modal({
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-modal bg-black/60 backdrop-blur-xs animate-in fade-in duration-150" />
+        <DialogPrimitive.Overlay className="fixed inset-0 z-modal bg-black/60 backdrop-blur-xs animate-in fade-in duration-150 no-print" />
         <DialogPrimitive.Content
           className={cn(
             'fixed left-1/2 top-1/2 z-modal w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2',
             'max-h-[85dvh] overflow-y-auto rounded-lg border border-border bg-card p-6 shadow-xl focus:outline-none animate-in zoom-in-95 duration-150 text-foreground',
+            'print:static print:transform-none print:max-h-none print:w-full print:max-w-none print:overflow-visible print:border-0 print:shadow-none print:p-0 print:bg-transparent',
             width,
           )}
         >
-          <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="mb-4 flex items-start justify-between gap-3 no-print">
             <div>
               <DialogPrimitive.Title className="text-lg font-semibold leading-tight">{title}</DialogPrimitive.Title>
               {description ? (
@@ -53,7 +54,7 @@ export function Modal({
             </DialogPrimitive.Close>
           </div>
           {children}
-          {footer ? <div className="mt-5 flex justify-end gap-2">{footer}</div> : null}
+          {footer ? <div className="mt-5 flex justify-end gap-2 no-print">{footer}</div> : null}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

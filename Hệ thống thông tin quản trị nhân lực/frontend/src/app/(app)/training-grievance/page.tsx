@@ -17,6 +17,7 @@ import { Badge, Button, Input, Select, Textarea } from '@/components/ui/primitiv
 import { DataTable, DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
+import { printDocumentElement } from '@/components/ui/print';
 
 interface TrainingFeedback {
   id: string;
@@ -56,10 +57,10 @@ interface Grievance {
 }
 
 const CATEGORY_MAP: Record<string, { label: string; badgeColor: string }> = {
-  WORK_ENVIRONMENT: { label: 'Môi trường làm việc', badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200' },
-  COMPENSATION: { label: 'Chế độ đãi ngộ & Lương', badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200' },
-  DISPUTE: { label: 'Tranh chấp nội bộ', badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200' },
-  HARASSMENT: { label: 'Quy tắc ứng xử', badgeColor: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200' },
+  WORK_ENVIRONMENT: { label: 'Môi trường làm việc', badgeColor: 'bg-muted text-muted-foreground border-border' },
+  COMPENSATION: { label: 'Chế độ đãi ngộ & Lương', badgeColor: 'bg-muted text-muted-foreground border-border' },
+  DISPUTE: { label: 'Tranh chấp nội bộ', badgeColor: 'bg-muted text-muted-foreground border-border' },
+  HARASSMENT: { label: 'Quy tắc ứng xử', badgeColor: 'bg-muted text-muted-foreground border-border' },
 };
 
 export default function TrainingGrievancePage() {
@@ -332,9 +333,9 @@ export default function TrainingGrievancePage() {
       render: (p: TrainingProgram) => {
         const st = p.status || 'UPCOMING';
         const dotColor =
-          st === 'COMPLETED' ? 'bg-emerald-500' :
-          st === 'ONGOING' ? 'bg-blue-500' :
-          'bg-amber-500';
+          st === 'COMPLETED' ? 'bg-primary' :
+          st === 'ONGOING' ? 'bg-muted-foreground' :
+          'bg-muted-foreground/60';
         const label = st === 'COMPLETED' ? 'Đã hoàn thành' : st === 'ONGOING' ? 'Đang diễn ra' : 'Sắp diễn ra';
         return (
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -423,10 +424,10 @@ export default function TrainingGrievancePage() {
       sortable: true,
       render: (g: Grievance) => {
         const dotColor =
-          g.status === 'RESOLVED' ? 'bg-emerald-500' :
-          g.status === 'INVESTIGATING' ? 'bg-blue-500' :
-          g.status === 'DISMISSED' ? 'bg-muted-foreground' :
-          'bg-amber-500';
+          g.status === 'RESOLVED' ? 'bg-primary' :
+          g.status === 'INVESTIGATING' ? 'bg-muted-foreground' :
+          g.status === 'DISMISSED' ? 'bg-destructive' :
+          'bg-muted-foreground/60';
         const labels: Record<string, string> = {
           OPEN: 'Mới tiếp nhận',
           INVESTIGATING: 'Đang xử lý',
@@ -460,7 +461,7 @@ export default function TrainingGrievancePage() {
                 setResolvingGrievance(g);
                 setResolutionText(g.resolution || '');
               }}
-              className="text-xs px-2 h-7 text-emerald-600 hover:text-emerald-700"
+              className="text-xs px-2 h-7"
             >
               Giải quyết
             </Button>
@@ -678,9 +679,9 @@ export default function TrainingGrievancePage() {
               {filteredPrograms.map((p) => {
                 const st = p.status || 'UPCOMING';
                 const dotColor =
-                  st === 'COMPLETED' ? 'bg-emerald-500' :
-                  st === 'ONGOING' ? 'bg-blue-500' :
-                  'bg-amber-500';
+                  st === 'COMPLETED' ? 'bg-primary' :
+                  st === 'ONGOING' ? 'bg-muted-foreground' :
+                  'bg-muted-foreground/60';
                 const statusLabel = st === 'COMPLETED' ? 'Đã hoàn thành' : st === 'ONGOING' ? 'Đang diễn ra' : 'Sắp diễn ra';
 
                 return (
@@ -790,10 +791,10 @@ export default function TrainingGrievancePage() {
                 const cat = CATEGORY_MAP[g.category] || { label: g.category };
                 const isPending = g.status === 'OPEN' || g.status === 'INVESTIGATING';
                 const dotColor =
-                  g.status === 'RESOLVED' ? 'bg-emerald-500' :
-                  g.status === 'INVESTIGATING' ? 'bg-blue-500' :
-                  g.status === 'DISMISSED' ? 'bg-muted-foreground' :
-                  'bg-amber-500';
+                  g.status === 'RESOLVED' ? 'bg-primary' :
+                  g.status === 'INVESTIGATING' ? 'bg-muted-foreground' :
+                  g.status === 'DISMISSED' ? 'bg-destructive' :
+                  'bg-muted-foreground/60';
                 const statusLabel =
                   g.status === 'RESOLVED' ? 'Đã giải quyết' :
                   g.status === 'INVESTIGATING' ? 'Đang xử lý' :
@@ -860,7 +861,7 @@ export default function TrainingGrievancePage() {
                               setResolvingGrievance(g);
                               setResolutionText(g.resolution || '');
                             }}
-                            className="text-xs px-2 h-7 text-emerald-600 hover:text-emerald-700"
+                            className="text-xs px-2 h-7"
                           >
                             Giải quyết
                           </Button>
@@ -1115,7 +1116,7 @@ export default function TrainingGrievancePage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setIsPrintCertOpen(true)}
-                  className="gap-1.5 text-xs h-7 text-primary border-primary/40 hover:bg-primary/10"
+                  className="gap-1.5 text-xs h-7"
                 >
                   <Printer className="h-3 w-3" />
                   In Danh Sách & Chứng Chỉ
@@ -1140,15 +1141,15 @@ export default function TrainingGrievancePage() {
                         <td className="p-2.5 font-medium text-foreground">{e.fullName}</td>
                         <td className="p-2.5 text-muted-foreground font-mono">{e.employeeCode || `NV000${idx + 1}`}</td>
                         <td className="p-2.5 text-muted-foreground">{e.orgUnit?.name || 'Phòng Kỹ thuật'}</td>
-                        <td className="p-2.5 text-center text-emerald-600 font-bold">100%</td>
+                        <td className="p-2.5 text-center font-medium text-foreground">100%</td>
                         <td className="p-2.5 text-center">
-                          <span className="inline-flex items-center text-amber-500 font-bold gap-0.5">
-                            <Star className="h-3 w-3 fill-amber-400" /> 5.0
+                          <span className="inline-flex items-center text-foreground font-medium gap-0.5">
+                            <Star className="h-3 w-3 fill-foreground/70 text-foreground/70" /> 5.0
                           </span>
                         </td>
                         <td className="p-2.5 text-center">
-                          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                            <Check className="h-3 w-3" /> Đã cấp
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
+                            <Check className="h-3 w-3 text-muted-foreground" /> Đã cấp
                           </span>
                         </td>
                       </tr>
@@ -1302,76 +1303,132 @@ export default function TrainingGrievancePage() {
         />
       </Modal>
 
-      {/* ================= MODAL IN: DANH SÁCH ĐÀO TẠO & CHỨNG CHỈ ================= */}
+      {/* ================= MODAL IN: DANH SÁCH ĐÀO TẠO & CHỨNG CHỈ (CHUẨN NĐ 30/2020/NĐ-CP) ================= */}
       <Modal
         open={isPrintCertOpen}
         onOpenChange={(open) => setIsPrintCertOpen(open)}
-        title="Biểu Mẫu In Chứng Nhận Đào Tạo"
+        title="Biểu Mẫu In Chứng Nhận Đào Tạo (Chuẩn Nghị định 30/2020/NĐ-CP)"
         size="lg"
       >
         {selectedProgram && (
-          <div className="space-y-6 bg-card text-foreground p-6 rounded-lg border border-border font-serif">
-            <div className="text-center border-b border-border pb-4 space-y-1">
-              <p className="text-xs uppercase tracking-widest font-bold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-              <p className="text-xs italic">Độc lập - Tự do - Hạnh phúc</p>
-              <div className="w-24 h-0.5 bg-foreground mx-auto my-1.5" />
-              <h2 className="text-base font-bold uppercase tracking-wider text-foreground pt-2">
-                DANH SÁCH HỌC VIÊN HOÀN THÀNH CHƯƠNG TRÌNH ĐÀO TẠO
-              </h2>
-              <p className="text-xs font-sans font-semibold text-primary">{selectedProgram.name}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 text-xs font-sans">
-              <div>
-                <p><b>Giảng viên phụ trách:</b> {selectedProgram.trainerName}</p>
-                <p><b>Địa điểm tổ chức:</b> {selectedProgram.location || 'Hội trường Tổng công ty'}</p>
-              </div>
-              <div className="text-right">
-                <p>
-                  <b>Thời gian:</b> {new Date(selectedProgram.startDate).toLocaleDateString('vi-VN')} -{' '}
-                  {new Date(selectedProgram.endDate).toLocaleDateString('vi-VN')}
+          <div
+            id="print-training-cert-doc"
+            className="print-area font-times bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[13pt] print:p-0 print:border-0 print:shadow-none print:m-0 print:max-w-none"
+            style={{ fontFamily: "'Times New Roman', Times, serif" }}
+          >
+            {/* Header Thể thức Văn bản Hành chính theo NĐ 30/2020/NĐ-CP */}
+            <div className="flex justify-between items-start pb-4 border-b border-black">
+              {/* Bên trái: Tên cơ quan, tổ chức ban hành & Số văn bản */}
+              <div className="w-[45%] text-center leading-tight">
+                <p className="font-normal text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
+                  TỔNG CÔNG TY CÔNG NGHỆ HRMIS
                 </p>
-                <p><b>Tổng số học viên đạt chuẩn:</b> {Math.min(selectedProgram.maxParticipants, 5)} cán bộ</p>
+                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
+                  HỘI ĐỒNG ĐÀO TẠO & PHÁT TRIỂN
+                </p>
+                <div className="w-28 border-b border-black mx-auto mt-1 mb-1.5" />
+                <p className="text-[11pt] text-black">
+                  Số: {selectedProgram.id?.slice(0, 4).toUpperCase() || '01'}/DS-HĐĐT
+                </p>
+              </div>
+
+              {/* Bên phải: Quốc hiệu, Tiêu ngữ & Địa danh, ngày tháng năm */}
+              <div className="w-[55%] text-center leading-tight">
+                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
+                  CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+                </p>
+                <p className="font-bold text-[12pt] sm:text-[13pt] text-black">
+                  Độc lập - Tự do - Hạnh phúc
+                </p>
+                <div className="w-40 border-b-[1.5px] border-black mx-auto mt-1 mb-1.5" />
+                <p className="text-[11.5pt] sm:text-[12pt] italic text-black">
+                  Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+                </p>
               </div>
             </div>
 
-            <table className="w-full text-left text-xs border border-border font-sans border-collapse">
-              <thead className="bg-muted/40 border-b border-border font-bold text-foreground">
-                <tr>
-                  <th className="border border-border p-2 text-center">STT</th>
-                  <th className="border border-border p-2">Mã NV</th>
-                  <th className="border border-border p-2">Họ và Tên Học Viên</th>
-                  <th className="border border-border p-2">Đơn Vị Công Tác</th>
-                  <th className="border border-border p-2 text-center">Chuyên Cần</th>
-                  <th className="border border-border p-2 text-center">Kết Quả Đạt</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employees.slice(0, 5).map((e, idx) => (
-                  <tr key={e.id}>
-                    <td className="border border-border p-2 text-center">{idx + 1}</td>
-                    <td className="border border-border p-2 font-mono">{e.employeeCode || `NV000${idx + 1}`}</td>
-                    <td className="border border-border p-2 font-semibold">{e.fullName}</td>
-                    <td className="border border-border p-2">{e.orgUnit?.name || 'Phòng Kỹ thuật'}</td>
-                    <td className="border border-border p-2 text-center">100%</td>
-                    <td className="border border-border p-2 text-center font-bold text-emerald-700">Đạt (Cấp CC)</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* Tiêu đề văn bản */}
+            <div className="text-center my-6 space-y-1">
+              <h1 className="text-[14pt] sm:text-[15pt] font-bold uppercase tracking-wide text-black">
+                DANH SÁCH HỌC VIÊN HOÀN THÀNH CHƯƠNG TRÌNH ĐÀO TẠO
+              </h1>
+              <p className="text-[12.5pt] sm:text-[13pt] font-bold italic text-black">
+                Khóa đào tạo: {selectedProgram.name}
+              </p>
+              <p className="text-[11.5pt] sm:text-[12pt] italic text-neutral-800">
+                (Kèm theo Báo cáo nghiệm thu khóa học số 15/BC-HĐĐT ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()})
+              </p>
+            </div>
 
-            <div className="grid grid-cols-2 gap-8 text-center text-xs font-sans pt-4">
-              <div>
-                <p className="font-bold">GIẢNG VIÊN ĐÀO TẠO</p>
-                <p className="italic text-xs text-muted-foreground">(Ký và ghi rõ họ tên)</p>
-                <div className="h-16" />
-                <p className="font-bold">{selectedProgram.trainerName}</p>
+            {/* Thông tin chương trình đào tạo */}
+            <div className="space-y-1.5 text-[12pt] sm:text-[12.5pt] leading-relaxed my-4 text-black">
+              <p>
+                <strong>1. Giảng viên phụ trách:</strong> {selectedProgram.trainerName}
+              </p>
+              <p>
+                <strong>2. Địa điểm tổ chức:</strong> {selectedProgram.location || 'Hội trường Tầng 5 & Trực tuyến qua phòng học số'}
+              </p>
+              <p>
+                <strong>3. Thời gian đào tạo:</strong> Từ ngày{' '}
+                {new Date(selectedProgram.startDate).toLocaleDateString('vi-VN')} đến ngày{' '}
+                {new Date(selectedProgram.endDate).toLocaleDateString('vi-VN')}
+              </p>
+              <p>
+                <strong>4. Tổng số học viên tham gia và đạt chuẩn:</strong>{' '}
+                {Math.min(selectedProgram.maxParticipants, 5)}/{selectedProgram.maxParticipants} cán bộ, nhân viên (Tỷ lệ hoàn thành: 100%).
+              </p>
+            </div>
+
+            {/* Bảng danh sách học viên chuẩn Nghị định 30 */}
+            <div className="my-5 overflow-x-auto">
+              <table className="w-full border-collapse border border-black text-[11pt] sm:text-[11.5pt] text-black">
+                <thead>
+                  <tr className="bg-neutral-100/70 border-b border-black">
+                    <th className="border border-black p-2 text-center font-bold w-12">STT</th>
+                    <th className="border border-black p-2 text-center font-bold w-24">Mã NV</th>
+                    <th className="border border-black p-2 text-center font-bold">Họ và tên học viên</th>
+                    <th className="border border-black p-2 text-center font-bold">Đơn vị công tác</th>
+                    <th className="border border-black p-2 text-center font-bold w-24">Chuyên cần</th>
+                    <th className="border border-black p-2 text-center font-bold w-28">Kết quả</th>
+                    <th className="border border-black p-2 text-center font-bold w-24">Ký nhận</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employees.slice(0, 5).map((e, idx) => (
+                    <tr key={e.id}>
+                      <td className="border border-black p-2 text-center">{idx + 1}</td>
+                      <td className="border border-black p-2 text-center">{e.employeeCode || `NV000${idx + 1}`}</td>
+                      <td className="border border-black p-2 font-bold">{e.fullName}</td>
+                      <td className="border border-black p-2">{e.orgUnit?.name || 'Phòng Kỹ thuật'}</td>
+                      <td className="border border-black p-2 text-center">100%</td>
+                      <td className="border border-black p-2 text-center">Đạt (Cấp CC)</td>
+                      <td className="border border-black p-2 text-center"></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Chữ ký & Nơi nhận theo Nghị định 30 */}
+            <div className="grid grid-cols-2 gap-8 items-start pt-6 text-[12pt] text-black">
+              {/* Nơi nhận theo NĐ 30 */}
+              <div className="space-y-1 text-left">
+                <p className="font-bold italic text-[11pt]">Nơi nhận:</p>
+                <ul className="text-[10pt] leading-tight space-y-0.5 list-none pl-2 text-black">
+                  <li>- Ban Tổng Giám đốc (để b/c);</li>
+                  <li>- Phòng Nhân sự & Kế toán;</li>
+                  <li>- Các đơn vị có học viên;</li>
+                  <li>- Lưu: VT, HĐĐT.</li>
+                </ul>
               </div>
-              <div>
-                <p className="font-bold">TRƯỞNG PHÒNG TỔ CHỨC CÁN BỘ</p>
-                <p className="italic text-xs text-muted-foreground">(Ký tên và đóng dấu)</p>
+
+              {/* Chữ ký người ban hành */}
+              <div className="text-center space-y-1">
+                <p className="font-bold uppercase text-[11.5pt] sm:text-[12pt]">TM. HỘI ĐỒNG ĐÀO TẠO</p>
+                <p className="font-bold uppercase text-[11.5pt] sm:text-[12pt]">TRƯỞNG BAN</p>
+                <p className="italic text-[10.5pt] text-neutral-600">(Ký, ghi rõ họ tên và đóng dấu)</p>
                 <div className="h-16" />
-                <p className="font-bold">Ban Giám Đốc HRMIS</p>
+                <p className="font-bold text-[12pt] uppercase">Trần Minh Hoàng</p>
               </div>
             </div>
           </div>
@@ -1381,67 +1438,127 @@ export default function TrainingGrievancePage() {
           onCancel={() => setIsPrintCertOpen(false)}
           cancelLabel="Đóng"
           confirmLabel="In Báo Cáo & Danh Sách"
-          onConfirm={() => window.print()}
+          onConfirm={() => printDocumentElement('print-training-cert-doc')}
         />
       </Modal>
 
-      {/* ================= MODAL IN: BIÊN BẢN GIẢI QUYẾT KHIẾU NẠI ================= */}
+      {/* ================= MODAL IN: BIÊN BẢN GIẢI QUYẾT KHIẾU NẠI (CHUẨN NĐ 30/2020/NĐ-CP) ================= */}
       <Modal
         open={isPrintGrievanceOpen}
         onOpenChange={(open) => setIsPrintGrievanceOpen(open)}
-        title="Biên Bản Xử Lý Khiếu Nại Lao Động"
+        title="Biên Bản Xử Lý Khiếu Nại Lao Động (Chuẩn Nghị định 30/2020/NĐ-CP)"
         size="lg"
       >
         {selectedGrievance && (
-          <div className="space-y-6 bg-card text-foreground p-6 rounded-lg border border-border font-serif">
-            <div className="text-center border-b border-border pb-4 space-y-1">
-              <p className="text-xs uppercase tracking-widest font-bold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-              <p className="text-xs italic">Độc lập - Tự do - Hạnh phúc</p>
-              <div className="w-24 h-0.5 bg-foreground mx-auto my-1.5" />
-              <h2 className="text-base font-bold uppercase tracking-wider text-foreground pt-2">
-                BIÊN BẢN HỌP XỬ LÝ & GIẢI QUYẾT KHIẾU NẠI LAO ĐỘNG
-              </h2>
-              <p className="text-xs italic font-sans text-muted-foreground">
-                (Theo quy định của Bộ luật Lao động 2019 và Thỏa ước Lao động Tập thể)
+          <div
+            id="print-grievance-doc"
+            className="print-area font-times bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[13pt] print:p-0 print:border-0 print:shadow-none print:m-0 print:max-w-none"
+            style={{ fontFamily: "'Times New Roman', Times, serif" }}
+          >
+            {/* Header Thể thức Văn bản Hành chính theo NĐ 30/2020/NĐ-CP */}
+            <div className="flex justify-between items-start pb-4 border-b border-black">
+              {/* Bên trái: Tên cơ quan, tổ chức ban hành & Số văn bản */}
+              <div className="w-[45%] text-center leading-tight">
+                <p className="font-normal text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
+                  TỔNG CÔNG TY CÔNG NGHỆ HRMIS
+                </p>
+                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
+                  HỘI ĐỒNG ĐỐI THOẠI & GIẢI QUYẾT KN
+                </p>
+                <div className="w-28 border-b border-black mx-auto mt-1 mb-1.5" />
+                <p className="text-[11pt] text-black">
+                  Số: {selectedGrievance.id?.slice(0, 4).toUpperCase() || '01'}/BB-GQKNLĐ
+                </p>
+              </div>
+
+              {/* Bên phải: Quốc hiệu, Tiêu ngữ & Địa danh, ngày tháng năm */}
+              <div className="w-[55%] text-center leading-tight">
+                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
+                  CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+                </p>
+                <p className="font-bold text-[12pt] sm:text-[13pt] text-black">
+                  Độc lập - Tự do - Hạnh phúc
+                </p>
+                <div className="w-40 border-b-[1.5px] border-black mx-auto mt-1 mb-1.5" />
+                <p className="text-[11.5pt] sm:text-[12pt] italic text-black">
+                  Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+                </p>
+              </div>
+            </div>
+
+            {/* Tiêu đề biên bản */}
+            <div className="text-center my-6 space-y-1">
+              <h1 className="text-[14pt] sm:text-[15pt] font-bold uppercase tracking-wide text-black">
+                BIÊN BẢN HỌP ĐỐI THOẠI & GIẢI QUYẾT KHIẾU NẠI LAO ĐỘNG
+              </h1>
+              <p className="text-[11.5pt] sm:text-[12pt] italic text-neutral-800">
+                (Căn cứ quy định của Bộ luật Lao động số 45/2019/QH14 và Thỏa ước Lao động Tập thể)
               </p>
             </div>
 
-            <div className="space-y-3 text-xs font-sans">
-              <p><b>Hôm nay, ngày:</b> {new Date().toLocaleDateString('vi-VN')}, tại Văn phòng Tổng công ty.</p>
-              <div>
-                <p className="font-bold uppercase text-xs text-foreground">I. THÔNG TIN BÊN KHIẾU NẠI:</p>
-                <p>Họ và tên người kiến nghị: <b>{selectedGrievance.employeeName}</b></p>
-                <p>Nội dung kiến nghị: {selectedGrievance.subject}</p>
-                <p>Ngày tiếp nhận đơn: {new Date(selectedGrievance.createdAt).toLocaleDateString('vi-VN')}</p>
+            {/* Nội dung biên bản hành chính */}
+            <div className="space-y-4 text-[12pt] sm:text-[12.5pt] leading-relaxed text-black">
+              <p className="indent-6">
+                Hôm nay, vào hồi {new Date().getHours()} giờ {new Date().getMinutes()} phút, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}, tại Phòng họp số 1 — Trụ sở Tổng công ty HRMIS, Hội đồng đối thoại và giải quyết khiếu nại tiến hành phiên họp giải quyết khiếu nại lao động.
+              </p>
+
+              <div className="space-y-1.5">
+                <p className="font-bold uppercase text-[12pt]">I. THÀNH PHẦN THAM DỰ:</p>
+                <div className="pl-6 space-y-1">
+                  <p><strong>1. Đại diện Người sử dụng lao động:</strong> Ông/Bà Trần Minh Hoàng — Giám đốc Điều hành.</p>
+                  <p><strong>2. Đại diện Ban Chấp hành Công đoàn cơ sở:</strong> Chủ tịch Công đoàn cơ sở cùng các ủy viên.</p>
+                  <p><strong>3. Người có đơn kiến nghị/khiếu nại:</strong> Ông/Bà <strong>{selectedGrievance.employeeName}</strong>.</p>
+                </div>
               </div>
 
-              <div>
-                <p className="font-bold uppercase text-xs text-foreground">II. NỘI DUNG VÀ YÊU CẦU CỤ THỂ:</p>
-                <p className="p-3 bg-muted/40 border border-border rounded-md text-foreground leading-relaxed">
-                  {selectedGrievance.description}
-                </p>
+              <div className="space-y-1.5">
+                <p className="font-bold uppercase text-[12pt]">II. NỘI DUNG VÀ YÊU CẦU CỦA NGƯỜI LAO ĐỘNG:</p>
+                <div className="pl-6 space-y-1">
+                  <p><strong>- Tiêu đề kiến nghị:</strong> {selectedGrievance.subject}</p>
+                  <p><strong>- Ngày tiếp nhận đơn:</strong> {new Date(selectedGrievance.createdAt).toLocaleDateString('vi-VN')}</p>
+                  <p><strong>- Nội dung chi tiết:</strong></p>
+                  <div className="p-3 bg-neutral-50 border border-black/40 rounded-sm text-black italic leading-relaxed">
+                    &quot;{selectedGrievance.description}&quot;
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <p className="font-bold uppercase text-xs text-foreground">III. KẾT LUẬN & BIỆN PHÁP GIẢI QUYẾT:</p>
-                <p className="p-3 bg-muted/40 border border-border rounded-md text-foreground font-medium leading-relaxed">
-                  {selectedGrievance.resolution || 'Hội đồng hòa giải cơ sở đã tiếp nhận, đối thoại trực tiếp và thống nhất phương án xử lý theo quy chế nội bộ.'}
-                </p>
+              <div className="space-y-1.5">
+                <p className="font-bold uppercase text-[12pt]">III. KẾT QUẢ ĐỐI THOẠI VÀ BIỆN PHÁP GIẢI QUYẾT:</p>
+                <div className="pl-6">
+                  <p className="p-3 bg-neutral-50 border border-black/40 rounded-sm text-black leading-relaxed font-medium">
+                    {selectedGrievance.resolution ||
+                      'Hội đồng hòa giải cơ sở cùng Ban Chấp hành Công đoàn đã đối thoại trực tiếp, làm rõ các căn cứ pháp lý và thống nhất phương án xử lý bảo đảm quyền và lợi ích hợp pháp của người lao động theo đúng quy chế nội bộ.'}
+                  </p>
+                </div>
               </div>
+
+              <p className="indent-6">
+                Biên bản được lập thành 03 bản có giá trị pháp lý như nhau, đã được các bên đọc lại, thống nhất nội dung và cùng ký tên xác nhận dưới đây. Phiên họp kết thúc vào hồi {new Date().getHours() + 1} giờ 30 phút cùng ngày.
+              </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 text-center text-xs font-sans pt-4 border-t border-border">
-              <div>
-                <p className="font-bold">ĐẠI DIỆN CÔNG ĐOÀN CƠ SỞ</p>
-                <p className="italic text-xs text-muted-foreground">(Ký và ghi rõ họ tên)</p>
+            {/* Chữ ký các bên theo Nghị định 30 */}
+            <div className="grid grid-cols-3 gap-4 items-start pt-6 text-[11.5pt] sm:text-[12pt] text-black">
+              <div className="text-center space-y-1">
+                <p className="font-bold uppercase">NGƯỜI KHIẾU NẠI</p>
+                <p className="italic text-[10.5pt] text-neutral-600">(Ký và ghi rõ họ tên)</p>
+                <div className="h-16" />
+                <p className="font-bold">{selectedGrievance.employeeName}</p>
+              </div>
+
+              <div className="text-center space-y-1">
+                <p className="font-bold uppercase">ĐẠI DIỆN CÔNG ĐOÀN CƠ SỞ</p>
+                <p className="italic text-[10.5pt] text-neutral-600">(Ký và ghi rõ họ tên)</p>
                 <div className="h-16" />
                 <p className="font-bold">Chủ tịch Công đoàn</p>
               </div>
-              <div>
-                <p className="font-bold">NGƯỜI SỬ DỤNG LAO ĐỘNG</p>
-                <p className="italic text-xs text-muted-foreground">(Ký tên và đóng dấu)</p>
+
+              <div className="text-center space-y-1">
+                <p className="font-bold uppercase">NGƯỜI SỬ DỤNG LAO ĐỘNG</p>
+                <p className="italic text-[10.5pt] text-neutral-600">(Ký tên và đóng dấu)</p>
                 <div className="h-16" />
-                <p className="font-bold">Giám Đốc Nhân Sự</p>
+                <p className="font-bold uppercase">Giám Đốc Nhân Sự</p>
               </div>
             </div>
           </div>
@@ -1451,7 +1568,7 @@ export default function TrainingGrievancePage() {
           onCancel={() => setIsPrintGrievanceOpen(false)}
           cancelLabel="Đóng"
           confirmLabel="In Biên Bản Giải Quyết"
-          onConfirm={() => window.print()}
+          onConfirm={() => printDocumentElement('print-grievance-doc')}
         />
       </Modal>
     </div>

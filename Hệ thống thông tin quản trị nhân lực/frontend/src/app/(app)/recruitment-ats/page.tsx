@@ -563,15 +563,15 @@ export default function RecruitmentAtsPage() {
                                     e.stopPropagation();
                                     convertToEmployeeMutation.mutate(app.id);
                                   }}
-                                  className="flex items-center gap-1 text-xs font-medium text-emerald-600 hover:underline"
+                                  className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                                 >
                                   <Sparkles className="h-3 w-3" />
                                   1-Click Nhận việc
                                 </button>
                               )}
                               {col.key === 'HIRED' && (
-                                <span className="text-xs font-medium text-emerald-600 flex items-center gap-1">
-                                  <CheckCircle2 className="h-3.5 w-3.5" /> Đã vào làm
+                                <span className="text-xs font-medium text-foreground flex items-center gap-1">
+                                  <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground" /> Đã vào làm
                                 </span>
                               )}
                             </div>

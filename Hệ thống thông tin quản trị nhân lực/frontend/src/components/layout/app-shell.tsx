@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  ArrowRightLeft, BookOpenText, Briefcase, CalendarDays, ClipboardCheck, Clock4, FolderOpen,
-  GraduationCap, LayoutDashboard, LogOut, Settings, ShieldCheck, UserCircle2,
-  Users, Wallet, Bell, Menu, X, FileSpreadsheet, TrendingUp, FileText, Layers,
-  ChevronDown, ChevronRight, UserCheck, Receipt, Target, Calculator, Timer, Building2,
-  Network, CreditCard, Laptop, Search, Sparkles
+  Home, Users, Clock4, Wallet, Briefcase, FolderOpen, Settings,
+  Search, Plus, PanelLeftClose, PanelLeft, Folder, FolderClosed,
+  FileText, ChevronRight, ChevronDown, Check, X, Bell, UserCircle2,
+  LogOut, Menu, ArrowRightLeft, Building2, Sparkles, Tag, Filter,
+  ShieldCheck, Layers, Network, Laptop, CalendarDays, Timer,
+  Calculator, CreditCard, Receipt, Target, GraduationCap, FileSpreadsheet
 } from 'lucide-react';
-import { GlobalSearch } from '@/components/layout/global-search';
 import { CommandPalette } from '@/components/layout/command-palette';
 import { cn } from '@/lib/utils';
 import { useAuthStore, type AuthState } from '@/lib/auth-store';
@@ -20,82 +20,377 @@ import { PageContainer } from './page-container';
 import type { MeProfile } from '@/lib/types';
 
 /**
- * Điều hướng chính theo nhóm nghiệp vụ Quản trị Nhân lực Đa năng (Chuẩn Frappe HRMS & BLLĐ 2019)
+ * Biểu tượng hình học tối giản 3 khối isometric (Tri-cube Geometric Logo)
+ * Chuẩn xác theo ảnh tham chiếu giao diện người dùng cung cấp.
  */
-const NAV_GROUPS: { label: string; items: { href: string; label: string; icon: typeof LayoutDashboard; roles?: string[] }[] }[] = [
-  {
-    label: 'Cổng Tự Phục Vụ',
-    items: [
-      { href: '/ess', label: 'Bàn làm việc ESS', icon: UserCheck },
-      { href: '/dashboard', label: 'Tổng quan Hệ thống', icon: LayoutDashboard },
-    ],
-  },
-  {
-    label: 'Nhân sự & Cơ cấu',
-    items: [
-      { href: '/org-chart', label: 'Sơ đồ tổ chức động', icon: Network },
-      { href: '/employees', label: 'Danh sách & Hồ sơ nhân sự', icon: Users },
-      { href: '/assets', label: 'Tài sản & Thiết bị', icon: Laptop },
-      { href: '/personnel', label: 'Quyết định & Biến động', icon: ArrowRightLeft },
-      { href: '/salary-ranks', label: 'Ngạch bậc & Nâng lương', icon: Layers },
-    ],
-  },
-  {
-    label: 'Ca kíp & Chấm công',
-    items: [
-      { href: '/shifts', label: 'Ca kíp & Phân ca', icon: Clock4 },
-      { href: '/attendance', label: 'Bảng chấm công', icon: ShieldCheck },
-      { href: '/leave', label: 'Quản lý Nghỉ phép', icon: CalendarDays },
-      { href: '/overtime', label: 'Làm thêm giờ & Trực ca', icon: Timer },
-    ],
-  },
-  {
-    label: 'Tiền lương & Chi phí',
-    items: [
-      { href: '/payroll-engine', label: 'Tiền lương & Bảng lương', icon: Calculator },
-      { href: '/loans', label: 'Khoản vay & Tạm ứng', icon: CreditCard },
-      { href: '/expense-claims', label: 'Công tác & Chi phí', icon: Receipt },
-    ],
-  },
-  {
-    label: 'Tuyển dụng & Hiệu suất',
-    items: [
-      { href: '/recruitment-ats', label: 'Quản lý Tuyển dụng', icon: Briefcase },
-      { href: '/performance-360', label: 'Đánh giá & Hiệu suất', icon: Target },
-      { href: '/training-grievance', label: 'Đào tạo & Phát triển', icon: GraduationCap },
-    ],
-  },
-  {
-    label: 'Báo cáo & Tài liệu',
-    items: [
-      { href: '/personnel-reports', label: 'Trung tâm Báo cáo & Thống kê', icon: FileSpreadsheet, roles: ['ADMIN', 'KM_MANAGER'] },
-      { href: '/documents', label: 'Kho tài liệu nhân sự', icon: FolderOpen },
-    ],
-  },
-];
+function GeometricCubeLogo({ className = 'h-6 w-6' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      {/* Khối lập phương phía trên (Top Cube) */}
+      <path d="M14 2L19.5 5.2V11.5L14 14.7L8.5 11.5V5.2L14 2Z" fill="currentColor" />
+      <path d="M14 2L19.5 5.2L14 8.4L8.5 5.2L14 2Z" fill="currentColor" opacity="0.9" />
+      <path d="M8.5 5.2L14 8.4V14.7L8.5 11.5V5.2Z" fill="currentColor" opacity="0.75" />
+      <path d="M14 8.4L19.5 5.2V11.5L14 14.7V8.4Z" fill="currentColor" opacity="0.6" />
 
-const ADMIN_NAV = [
-  { href: '/admin/users', label: 'Người dùng' },
-  { href: '/admin/org-units', label: 'Cơ cấu tổ chức' },
-  { href: '/admin/catalogs', label: 'Hệ thống danh mục (Master Data)' },
-  { href: '/admin/attendance', label: 'Thiết bị chấm công' },
-  { href: '/admin/settings', label: 'Cấu hình' },
-  { href: '/admin/audit', label: 'Nhật ký kiểm toán' },
+      {/* Khối lập phương góc dưới bên trái (Bottom-Left Cube) */}
+      <path d="M7 13.5L12.5 16.7V23L7 26.2L1.5 23V16.7L7 13.5Z" fill="currentColor" />
+      <path d="M7 13.5L12.5 16.7L7 19.9L1.5 16.7L7 13.5Z" fill="currentColor" opacity="0.9" />
+      <path d="M1.5 16.7L7 19.9V26.2L1.5 23V16.7Z" fill="currentColor" opacity="0.75" />
+      <path d="M7 19.9L12.5 16.7V23L7 26.2V19.9Z" fill="currentColor" opacity="0.6" />
+
+      {/* Khối lập phương góc dưới bên phải (Bottom-Right Cube) */}
+      <path d="M21 13.5L26.5 16.7V23L21 26.2L15.5 23V16.7L21 13.5Z" fill="currentColor" />
+      <path d="M21 13.5L26.5 16.7L21 19.9L15.5 16.7L21 13.5Z" fill="currentColor" opacity="0.9" />
+      <path d="M15.5 16.7L21 19.9V26.2L15.5 23V16.7Z" fill="currentColor" opacity="0.75" />
+      <path d="M21 19.9L26.5 16.7V23L21 26.2V19.9Z" fill="currentColor" opacity="0.6" />
+    </svg>
+  );
+}
+
+interface TreeItem {
+  href: string;
+  label: string;
+  badge?: string | number;
+  roles?: string[];
+  subItems?: { href: string; label: string; badge?: string | number }[];
+}
+
+interface NavFolder {
+  id: string;
+  label: string;
+  count?: number;
+  items: TreeItem[];
+}
+
+interface NavDomain {
+  id: string;
+  label: string;
+  shortLabel: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles?: string[];
+  folders: NavFolder[];
+  tags: { id: string; label: string; count: number; href: string }[];
+}
+
+/**
+ * Cấu trúc phân hệ Dual-Tier chuẩn hóa (Frappe HRMS & BLLĐ 2019)
+ */
+const DOMAINS: NavDomain[] = [
+  {
+    id: 'workspace',
+    label: 'Cổng Tự Phục Vụ & Không Gian Làm Việc',
+    shortLabel: 'Cổng ESS',
+    icon: Home,
+    folders: [
+      {
+        id: 'ws-general',
+        label: 'Không gian cá nhân',
+        count: 4,
+        items: [
+          { href: '/ess', label: 'Bàn làm việc ESS', badge: 'Chính' },
+          { href: '/dashboard', label: 'Tổng quan Hệ thống', badge: 'KPI' },
+          { href: '/notifications', label: 'Trung tâm Thông báo', badge: 3 },
+          { href: '/profile', label: 'Hồ sơ cá nhân' },
+        ],
+      },
+    ],
+    tags: [
+      { id: 'tag-daily', label: '#Công việc hàng ngày', count: 5, href: '/ess' },
+      { id: 'tag-requests', label: '#Đơn từ của tôi', count: 2, href: '/ess' },
+      { id: 'tag-alerts', label: '#Cảnh báo nhân sự', count: 3, href: '/notifications' },
+    ],
+  },
+  {
+    id: 'personnel',
+    label: 'Nhân Sự & Cơ Cấu Tổ Chức',
+    shortLabel: 'Nhân sự',
+    icon: Users,
+    folders: [
+      {
+        id: 'pers-records',
+        label: 'Hồ sơ & Cơ cấu tổ chức',
+        count: 185,
+        items: [
+          {
+            href: '/employees',
+            label: 'Danh sách & Hồ sơ nhân sự',
+            badge: 128,
+            subItems: [
+              { href: '/employees', label: 'Nhân sự chính thức', badge: 110 },
+              { href: '/employees', label: 'Thử việc & Học việc', badge: 18 },
+            ],
+          },
+          { href: '/org-chart', label: 'Sơ đồ tổ chức động', badge: 12 },
+          { href: '/assets', label: 'Tài sản & Thiết bị làm việc', badge: 45 },
+        ],
+      },
+      {
+        id: 'pers-movements',
+        label: 'Biến động & Nâng ngạch',
+        count: 13,
+        items: [
+          { href: '/personnel', label: 'Quyết định & Biến động', badge: 8 },
+          { href: '/salary-ranks', label: 'Ngạch bậc & Nâng lương', badge: 5 },
+        ],
+      },
+    ],
+    tags: [
+      { id: 'tag-active', label: '#Đang làm việc', count: 110, href: '/employees' },
+      { id: 'tag-probation', label: '#Thử việc', count: 18, href: '/employees' },
+      { id: 'tag-contract', label: '#Hợp đồng lao động', count: 45, href: '/personnel' },
+      { id: 'tag-assets', label: '#Cấp phát thiết bị', count: 12, href: '/assets' },
+    ],
+  },
+  {
+    id: 'time',
+    label: 'Ca Kíp & Chấm Công Lao Động',
+    shortLabel: 'Chấm công',
+    icon: Clock4,
+    folders: [
+      {
+        id: 'time-attendance',
+        label: 'Chấm công & Phân ca',
+        count: 2,
+        items: [
+          { href: '/attendance', label: 'Bảng chấm công', badge: 'Hôm nay' },
+          { href: '/shifts', label: 'Ca kíp & Phân ca', badge: 4 },
+        ],
+      },
+      {
+        id: 'time-leave',
+        label: 'Nghỉ phép & Trực ca',
+        count: 5,
+        items: [
+          { href: '/leave', label: 'Quản lý Nghỉ phép', badge: 3 },
+          { href: '/overtime', label: 'Làm thêm giờ & Trực ca', badge: 2 },
+        ],
+      },
+    ],
+    tags: [
+      { id: 'tag-today', label: '#Điểm danh hôm nay', count: 98, href: '/attendance' },
+      { id: 'tag-pending-leave', label: '#Đơn phép chờ duyệt', count: 3, href: '/leave' },
+      { id: 'tag-ot', label: '#Ca ngoài giờ duyệt gấp', count: 2, href: '/overtime' },
+    ],
+  },
+  {
+    id: 'compensation',
+    label: 'Tiền Lương & Chi Phí Doanh Nghiệp',
+    shortLabel: 'Lương & Quỹ',
+    icon: Wallet,
+    folders: [
+      {
+        id: 'comp-payroll',
+        label: 'Bảng lương & Thu nhập',
+        count: 1,
+        items: [
+          { href: '/payroll-engine', label: 'Tiền lương & Bảng lương', badge: 'Kỳ mới' },
+        ],
+      },
+      {
+        id: 'comp-benefits',
+        label: 'Khoản vay & Phúc lợi cán bộ',
+        count: 5,
+        items: [
+          {
+            href: '/loans',
+            label: 'Khoản vay & Tạm ứng',
+            badge: 5,
+            subItems: [
+              { href: '/loans', label: 'Gói vay an cư', badge: 2 },
+              { href: '/loans', label: 'Tạm ứng thiết bị', badge: 3 },
+            ],
+          },
+          { href: '/expense-claims', label: 'Công tác & Chi phí', badge: 4 },
+        ],
+      },
+    ],
+    tags: [
+      { id: 'tag-nd30', label: '#Hợp đồng vay NĐ 30', count: 5, href: '/loans' },
+      { id: 'tag-payroll-run', label: '#Bảng tính lương T9', count: 1, href: '/payroll-engine' },
+      { id: 'tag-expense-pending', label: '#Thanh toán công tác', count: 4, href: '/expense-claims' },
+    ],
+  },
+  {
+    id: 'talent',
+    label: 'Tuyển Dụng & Phát Triển Nhân Tài',
+    shortLabel: 'Tuyển dụng',
+    icon: Briefcase,
+    folders: [
+      {
+        id: 'talent-recruitment',
+        label: 'Thu hút nhân tài',
+        count: 9,
+        items: [
+          { href: '/recruitment-ats', label: 'Quản lý Tuyển dụng (ATS)', badge: 9 },
+        ],
+      },
+      {
+        id: 'talent-growth',
+        label: 'Đánh giá & Phát triển',
+        count: 2,
+        items: [
+          { href: '/performance-360', label: 'Đánh giá & Hiệu suất 360', badge: 'Đợt 1' },
+          { href: '/training-grievance', label: 'Đào tạo & Khiếu nại', badge: 2 },
+        ],
+      },
+    ],
+    tags: [
+      { id: 'tag-ats-interview', label: '#Lịch phỏng vấn tuần', count: 6, href: '/recruitment-ats' },
+      { id: 'tag-kpi-q3', label: '#Đánh giá KPI Quý 3', count: 1, href: '/performance-360' },
+      { id: 'tag-cert', label: '#Chứng nhận đào tạo', count: 2, href: '/training-grievance' },
+    ],
+  },
+  {
+    id: 'reports-docs',
+    label: 'Báo Cáo Thống Kê & Kho Tài Liệu',
+    shortLabel: 'Tài liệu',
+    icon: FolderOpen,
+    folders: [
+      {
+        id: 'docs-vault',
+        label: 'Kho lưu trữ tài liệu',
+        count: 24,
+        items: [
+          { href: '/documents', label: 'Kho tài liệu nhân sự', badge: 24 },
+        ],
+      },
+      {
+        id: 'docs-analytics',
+        label: 'Trung tâm Báo cáo dữ liệu',
+        count: 1,
+        items: [
+          { href: '/personnel-reports', label: 'Báo cáo & Thống kê HR', badge: 'BLLĐ', roles: ['ADMIN', 'KM_MANAGER'] },
+        ],
+      },
+    ],
+    tags: [
+      { id: 'tag-templates', label: '#Mẫu văn bản hành chính', count: 12, href: '/documents' },
+      { id: 'tag-labor-report', label: '#Báo cáo định kỳ BLLĐ', count: 4, href: '/personnel-reports' },
+    ],
+  },
+  {
+    id: 'admin',
+    label: 'Quản Trị Hệ Thống & Cấu Hình',
+    shortLabel: 'Quản trị',
+    icon: Settings,
+    roles: ['ADMIN'],
+    folders: [
+      {
+        id: 'admin-users',
+        label: 'Phân quyền & Đơn vị',
+        count: 2,
+        items: [
+          { href: '/admin/users', label: 'Người dùng & Phân quyền' },
+          { href: '/admin/org-units', label: 'Cơ cấu tổ chức' },
+        ],
+      },
+      {
+        id: 'admin-system',
+        label: 'Dữ liệu gốc & Kiểm toán',
+        count: 4,
+        items: [
+          { href: '/admin/catalogs', label: 'Danh mục (Master Data)' },
+          { href: '/admin/attendance', label: 'Thiết bị chấm công' },
+          { href: '/admin/settings', label: 'Cấu hình hệ thống' },
+          { href: '/admin/audit', label: 'Nhật ký kiểm toán' },
+        ],
+      },
+    ],
+    tags: [
+      { id: 'tag-user-accounts', label: '#Tài khoản quản trị', count: 3, href: '/admin/users' },
+      { id: 'tag-devices', label: '#Thiết bị kết nối', count: 2, href: '/admin/attendance' },
+      { id: 'tag-catalogs', label: '#Tham số hệ thống', count: 8, href: '/admin/catalogs' },
+    ],
+  },
 ];
 
 export function AppShell({ profile, children }: { profile: MeProfile; children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const clear = useAuthStore((s: AuthState) => s.clear);
   const queryClient = useQueryClient();
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
-  const toggleGroup = (groupLabel: string) => {
-    setCollapsedGroups((prev: Record<string, boolean>) => ({
-      ...prev,
-      [groupLabel]: !prev[groupLabel],
-    }));
+  // Mobile nav state
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  // Command palette state
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
+  // Sub-sidebar toggle (mở/thu gọn cột thứ 2)
+  const [subSidebarOpen, setSubSidebarOpen] = useState(true);
+
+  // Search filter bên trong Sub-sidebar
+  const [subSidebarSearch, setSubSidebarSearch] = useState('');
+
+  // Tab switch giữa "Folders" và "Tags" bên trong Sub-sidebar
+  const [activeTab, setActiveTab] = useState<'folders' | 'tags'>('folders');
+
+  // Trạng thái đóng/mở từng Folder trong cây
+  const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({
+    'ws-general': true,
+    'pers-records': true,
+    'pers-movements': true,
+    'time-attendance': true,
+    'time-leave': true,
+    'comp-payroll': true,
+    'comp-benefits': true,
+    'talent-recruitment': true,
+    'talent-growth': true,
+    'docs-vault': true,
+    'docs-analytics': true,
+    'admin-users': true,
+    'admin-system': true,
+  });
+
+  // Tự động suy ra Domain đang active dựa trên pathname
+  const activeDomainIdFromPath = useMemo(() => {
+    for (const domain of DOMAINS) {
+      for (const folder of domain.folders) {
+        for (const item of folder.items) {
+          if (pathname === item.href || pathname.startsWith(`${item.href}/`)) {
+            return domain.id;
+          }
+          if (item.subItems) {
+            for (const sub of item.subItems) {
+              if (pathname === sub.href) return domain.id;
+            }
+          }
+        }
+      }
+    }
+    return 'workspace';
+  }, [pathname]);
+
+  const [selectedDomainId, setSelectedDomainId] = useState<string>(activeDomainIdFromPath);
+
+  // Khi pathname thay đổi, cập nhật selectedDomainId theo trang đang xem
+  useEffect(() => {
+    setSelectedDomainId(activeDomainIdFromPath);
+  }, [activeDomainIdFromPath]);
+
+  // Khôi phục trạng thái sub-sidebar từ localStorage nếu có
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('hrmis_subsidebar_open');
+      if (saved !== null) {
+        setSubSidebarOpen(saved === 'true');
+      }
+    } catch {
+      // Ignored
+    }
+  }, []);
+
+  const toggleSubSidebar = () => {
+    const nextState = !subSidebarOpen;
+    setSubSidebarOpen(nextState);
+    try {
+      localStorage.setItem('hrmis_subsidebar_open', String(nextState));
+    } catch {
+      // Ignored
+    }
+  };
+
+  const toggleFolder = (folderId: string) => {
+    setOpenFolders((prev) => ({ ...prev, [folderId]: !prev[folderId] }));
   };
 
   async function logout() {
@@ -112,160 +407,384 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
     window.location.replace('/login');
   }
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  // Lọc các domain theo quyền vai trò (roles)
+  const availableDomains = useMemo(() => {
+    return DOMAINS.filter((d) => {
+      if (!d.roles) return true;
+      return d.roles.some((r) => profile.roles.includes(r));
+    });
+  }, [profile.roles]);
 
-  const visibleGroups = NAV_GROUPS
-    .map((group) => ({
-      ...group,
-      items: group.items.filter(({ roles }) => !roles || roles.some((r) => profile.roles.includes(r))),
-    }))
-    .filter((group) => group.items.length > 0);
+  const activeDomain = useMemo(() => {
+    return availableDomains.find((d) => d.id === selectedDomainId) || availableDomains[0] || DOMAINS[0];
+  }, [availableDomains, selectedDomainId]);
 
-  const renderNavGroup = (group: (typeof visibleGroups)[0]) => {
-    const isCollapsed = !!collapsedGroups[group.label];
-    return (
-      <div key={group.label} className="space-y-0.5">
-        <button
-          type="button"
-          onClick={() => toggleGroup(group.label)}
-          className="flex w-full items-center justify-between px-2 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 hover:text-foreground hover:bg-muted/40 rounded-md transition-colors"
-        >
-          <span className="flex items-center gap-1.5">
-            {isCollapsed ? (
-              <ChevronRight className="h-3 w-3 text-muted-foreground/60" />
-            ) : (
-              <ChevronDown className="h-3 w-3 text-muted-foreground/60" />
-            )}
-            {group.label}
-          </span>
-          <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
-            {group.items.length}
-          </span>
-        </button>
-
-        {!isCollapsed && (
-          <div className="space-y-0.5 pl-1 animate-in fade-in duration-100">
-            {group.items.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setMobileNavOpen(false)}
-                className={cn(
-                  'relative flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors',
-                  isActive(href)
-                    ? 'bg-primary/10 text-primary font-semibold shadow-2xs'
-                    : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
-                )}
-              >
-                <Icon className={cn('h-3.5 w-3.5 shrink-0', isActive(href) ? 'text-primary' : 'text-muted-foreground/70')} />
-                <span className="truncate">{label}</span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    );
+  const isLinkActive = (href: string) => {
+    if (href === '/dashboard' || href === '/ess') return pathname === href;
+    return pathname === href || pathname.startsWith(`${href}/`);
   };
 
-  const navLinks = (
-    <nav className="flex flex-col gap-3">
-      {visibleGroups.map((group) => renderNavGroup(group))}
+  // Lọc items trong sub-sidebar theo ô tìm kiếm
+  const filteredFolders = useMemo(() => {
+    if (!subSidebarSearch.trim()) return activeDomain.folders;
+    const q = subSidebarSearch.toLowerCase().trim();
+    return activeDomain.folders
+      .map((folder) => {
+        const matchingItems = folder.items.filter(
+          (item) =>
+            item.label.toLowerCase().includes(q) ||
+            item.subItems?.some((sub) => sub.label.toLowerCase().includes(q))
+        );
+        return {
+          ...folder,
+          items: matchingItems,
+        };
+      })
+      .filter((folder) => folder.items.length > 0 || folder.label.toLowerCase().includes(q));
+  }, [activeDomain, subSidebarSearch]);
 
-      {profile.roles.includes('ADMIN') ? (
-        <div className="space-y-0.5 pt-2 border-t border-border/40">
-          <button
-            type="button"
-            onClick={() => toggleGroup('Quản trị')}
-            className="flex w-full items-center justify-between px-2 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 hover:text-foreground hover:bg-muted/40 rounded-md transition-colors"
-          >
-            <span className="flex items-center gap-1.5">
-              {collapsedGroups['Quản trị'] ? (
-                <ChevronRight className="h-3 w-3 text-muted-foreground/60" />
-              ) : (
-                <ChevronDown className="h-3 w-3 text-muted-foreground/60" />
-              )}
-              Quản trị hệ thống
-            </span>
-            <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
-              {ADMIN_NAV.length}
-            </span>
-          </button>
-
-          {!collapsedGroups['Quản trị'] && (
-            <div className="space-y-0.5 pl-1 animate-in fade-in duration-100">
-              {ADMIN_NAV.map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMobileNavOpen(false)}
-                  className={cn(
-                    'relative flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors',
-                    isActive(href)
-                      ? 'bg-primary/10 text-primary font-semibold shadow-2xs'
-                      : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
-                  )}
-                >
-                  <span className="truncate">{label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : null}
-    </nav>
-  );
+  const filteredTags = useMemo(() => {
+    if (!subSidebarSearch.trim()) return activeDomain.tags;
+    const q = subSidebarSearch.toLowerCase().trim();
+    return activeDomain.tags.filter((t) => t.label.toLowerCase().includes(q));
+  }, [activeDomain, subSidebarSearch]);
 
   return (
     <div className="min-h-dvh bg-background text-foreground antialiased selection:bg-primary/20">
       {/* Universal Command Palette (Ctrl+K) */}
       <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
 
-      {/* ================= SIDEBAR (≥md) ================= */}
-      <aside className="fixed inset-y-0 left-0 z-sidebar hidden w-64 flex-col border-r border-border/60 bg-card md:flex">
-        {/* Header Logo */}
-        <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/60 px-4 bg-card">
-          <Link href="/dashboard" className="flex items-center gap-2.5 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs transition-transform group-hover:scale-105">
-              <Building2 className="h-4 w-4" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-tight text-foreground leading-tight">HRMIS Pro</span>
-              <span className="text-xs text-muted-foreground font-medium leading-tight">Quản trị Nhân lực Toàn diện</span>
-            </div>
+      {/* ========================================================================= */}
+      {/* TIER 1: PRIMARY ICON RAIL (Cột icon mỏng bên trái: w-16 = 64px)            */}
+      {/* ========================================================================= */}
+      <aside
+        className="fixed inset-y-0 left-0 z-sidebar hidden w-16 flex-col items-center justify-between border-r border-border/60 bg-card py-3 md:flex"
+        aria-label="Cột điều hướng phân hệ chính"
+      >
+        {/* Top: Logo hình học tối giản */}
+        <div className="flex flex-col items-center">
+          <Link
+            href="/dashboard"
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-foreground hover:opacity-80 transition-opacity"
+            title="HRMIS Pro — Bàn điều khiển trung tâm"
+          >
+            <GeometricCubeLogo className="h-6 w-6 text-foreground" />
           </Link>
-          <span className="text-xs font-mono px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-bold">
-            v16.0
-          </span>
         </div>
 
-        {/* Danh sách Menu cuộn mượt */}
-        <div className="flex-1 overflow-y-auto px-3 py-3 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30">
-          {navLinks}
+        {/* Middle: Icon phân hệ chính CĂN CHÍNH GIỮA CHIỀU CAO SIDEBAR */}
+        <div className="my-auto flex flex-col items-center gap-2">
+          {availableDomains.map((domain) => {
+            const Icon = domain.icon;
+            const isDomainActive = domain.id === activeDomain.id;
+
+            return (
+              <button
+                key={domain.id}
+                type="button"
+                onClick={() => {
+                  setSelectedDomainId(domain.id);
+                  // Nếu đang đóng sub-sidebar thì bấm vào icon sẽ tự động mở ra
+                  if (!subSidebarOpen) setSubSidebarOpen(true);
+                }}
+                aria-label={domain.label}
+                className={cn(
+                  'group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-150',
+                  isDomainActive
+                    ? 'bg-muted/90 text-foreground font-semibold shadow-2xs border border-border/80'
+                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                )}
+              >
+                <Icon className="h-4 w-4 transition-transform group-hover:scale-105" />
+
+                {/* Tooltip chỉ hiển thị khi thanh phụ đã thu gọn (đóng), với nền tối tương phản rõ nét */}
+                {!subSidebarOpen && (
+                  <span className="pointer-events-none absolute left-[calc(100%+10px)] top-1/2 -translate-y-1/2 z-[80] whitespace-nowrap rounded-md bg-zinc-900 px-2.5 py-1 text-xs font-medium text-white shadow-xl opacity-0 transition-opacity group-hover:opacity-100 border border-zinc-800">
+                    {domain.label}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Bottom: Profile & Đăng xuất */}
+        <div className="flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleSubSidebar}
+            title={subSidebarOpen ? 'Thu gọn cây phân mục' : 'Mở rộng cây phân mục'}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
+          >
+            <PanelLeft className={cn('h-4 w-4 transition-transform', !subSidebarOpen && 'rotate-180 text-primary')} />
+          </button>
+
+          <div className="h-px w-8 bg-border/60" />
+
+          <Link
+            href="/profile"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
+            title={`Tài khoản: ${profile.fullName}`}
+          >
+            <UserCircle2 className="h-5 w-5" />
+          </Link>
         </div>
       </aside>
 
-      {/* ================= TOPBAR (sticky, mọi màn hình) ================= */}
-      <header className="sticky top-0 z-sticky border-b border-border/60 bg-card/80 backdrop-blur-md md:pl-64">
+      {/* ========================================================================= */}
+      {/* TIER 2: SUB-SIDEBAR PANE (Bảng cây thư mục phân nhánh: w-64 = 256px)        */}
+      {/* ========================================================================= */}
+      <aside
+        className={cn(
+          'fixed inset-y-0 left-16 z-sidebar hidden flex-col border-r border-border/60 bg-card/95 backdrop-blur-xs transition-all duration-200 md:flex',
+          subSidebarOpen ? 'w-64 opacity-100' : 'w-0 border-r-0 opacity-0 pointer-events-none overflow-hidden'
+        )}
+        aria-label="Cây thư mục chức năng"
+      >
+        <div className="flex h-full w-64 flex-col p-3.5 space-y-3">
+          {/* Header Sub-Sidebar: Tên phân hệ + Nút '+' & Nút thu gọn */}
+          <div className="flex items-center justify-between pt-0.5">
+            <h2 className="text-sm font-semibold tracking-tight text-foreground truncate max-w-[170px]" title={activeDomain.label}>
+              {activeDomain.shortLabel}
+            </h2>
+            <div className="flex items-center gap-0.5">
+              <button
+                type="button"
+                onClick={toggleSubSidebar}
+                title="Thu gọn bảng điều hướng"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <PanelLeftClose className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Ô tìm kiếm bo tròn với kính lúp */}
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              type="text"
+              value={subSidebarSearch}
+              onChange={(e) => setSubSidebarSearch(e.target.value)}
+              placeholder="Tìm kiếm chức năng..."
+              className="w-full pl-8 pr-7 py-1.5 text-xs bg-muted/40 hover:bg-muted/60 focus:bg-card border border-border/60 rounded-xl outline-none focus:border-foreground/40 transition-all text-foreground placeholder:text-muted-foreground/70"
+            />
+            {subSidebarSearch && (
+              <button
+                onClick={() => setSubSidebarSearch('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+
+          {/* Segmented Pill Tabs: Folders | Tags */}
+          <div className="flex rounded-xl bg-muted/60 p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setActiveTab('folders')}
+              className={cn(
+                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs',
+                activeTab === 'folders'
+                  ? 'bg-card text-foreground font-semibold shadow-2xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Chức năng
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('tags')}
+              className={cn(
+                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs',
+                activeTab === 'tags'
+                  ? 'bg-card text-foreground font-semibold shadow-2xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Thẻ & Phân loại
+            </button>
+          </div>
+
+          {/* Danh sách phân nhánh cây (Tree View) hoặc Tags */}
+          <div className="flex-1 overflow-y-auto pr-1 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30">
+            {activeTab === 'folders' ? (
+              <div className="space-y-3 pt-1">
+                {filteredFolders.map((folder) => {
+                  const isOpen = openFolders[folder.id] ?? true;
+
+                  return (
+                    <div key={folder.id} className="space-y-1">
+                      {/* Thư mục cha (Parent Folder) */}
+                      <button
+                        type="button"
+                        onClick={() => toggleFolder(folder.id)}
+                        className="group flex w-full items-center justify-between py-1 px-1.5 rounded-lg text-xs font-semibold text-foreground/90 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          {isOpen ? (
+                            <Folder className="h-4 w-4 shrink-0 fill-foreground text-foreground" />
+                          ) : (
+                            <FolderClosed className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          )}
+                          <span className="truncate">{folder.label}</span>
+                        </div>
+                        {folder.count !== undefined && (
+                          <span className="rounded-full bg-muted/80 px-2 py-0.5 text-[10px] font-medium text-muted-foreground shrink-0 group-hover:bg-muted">
+                            {folder.count}
+                          </span>
+                        )}
+                      </button>
+
+                      {/* Các mục con kết nối bằng đường kẻ nhánh cây (Tree Lines) */}
+                      {isOpen && folder.items.length > 0 && (
+                        <div className="relative ml-3 pl-3.5 border-l border-border/70 space-y-1 py-0.5 animate-in fade-in duration-150">
+                          {folder.items.map((item) => {
+                            const active = isLinkActive(item.href);
+
+                            return (
+                              <div key={item.href} className="space-y-0.5">
+                                <Link
+                                  href={item.href}
+                                  className={cn(
+                                    'group relative flex items-center justify-between py-1 px-2 rounded-lg text-xs transition-colors',
+                                    'before:absolute before:-left-3.5 before:top-1/2 before:-translate-y-1/2 before:w-2.5 before:h-px before:bg-border/70',
+                                    active
+                                      ? 'bg-muted/90 text-foreground font-semibold shadow-2xs'
+                                      : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                                  )}
+                                >
+                                  <div className="flex items-center gap-2 truncate">
+                                    <FileText className={cn('h-3.5 w-3.5 shrink-0', active ? 'text-foreground' : 'text-muted-foreground/70')} />
+                                    <span className="truncate">{item.label}</span>
+                                  </div>
+                                  {item.badge !== undefined && (
+                                    <span
+                                      className={cn(
+                                        'rounded-full px-1.5 py-0.2 text-[10px] font-medium shrink-0',
+                                        active
+                                          ? 'bg-foreground text-background font-semibold'
+                                          : 'bg-muted/80 text-muted-foreground'
+                                      )}
+                                    >
+                                      {item.badge}
+                                    </span>
+                                  )}
+                                </Link>
+
+                                {/* Nhánh con cấp 3 (Sub-items) */}
+                                {item.subItems && (
+                                  <div className="relative ml-2.5 pl-3 border-l border-border/50 space-y-0.5">
+                                    {item.subItems.map((sub) => {
+                                      const subActive = pathname === sub.href;
+                                      return (
+                                        <Link
+                                          key={sub.label}
+                                          href={sub.href}
+                                          className={cn(
+                                            'relative flex items-center justify-between py-0.5 px-2 rounded-md text-[11px] transition-colors',
+                                            'before:absolute before:-left-3 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-px before:bg-border/50',
+                                            subActive
+                                              ? 'text-foreground font-semibold bg-muted/60'
+                                              : 'text-muted-foreground/80 hover:text-foreground hover:bg-muted/30'
+                                          )}
+                                        >
+                                          <span className="truncate">{sub.label}</span>
+                                          {sub.badge && (
+                                            <span className="text-[9px] text-muted-foreground">{sub.badge}</span>
+                                          )}
+                                        </Link>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {filteredFolders.length === 0 && (
+                  <p className="py-6 text-center text-xs text-muted-foreground">
+                    Không tìm thấy mục phù hợp.
+                  </p>
+                )}
+              </div>
+            ) : (
+              /* TAB: TAGS & PHÂN LOẠI */
+              <div className="space-y-1.5 pt-1">
+                {filteredTags.map((tag) => (
+                  <Link
+                    key={tag.id}
+                    href={tag.href}
+                    className="flex items-center justify-between py-1.5 px-2.5 rounded-lg text-xs text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Tag className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-foreground" />
+                      <span className="font-medium">{tag.label}</span>
+                    </div>
+                    <span className="rounded-full bg-muted/80 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      {tag.count}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* ========================================================================= */}
+      {/* TOPBAR (Sticky trên toàn màn hình, đệm thích ứng theo trạng thái Sidebar) */}
+      {/* ========================================================================= */}
+      <header
+        className={cn(
+          'sticky top-0 z-sticky border-b border-border/60 bg-card/80 backdrop-blur-md transition-[padding] duration-200',
+          subSidebarOpen ? 'md:pl-[320px]' : 'md:pl-16'
+        )}
+      >
         <div className="flex h-14 items-center gap-3 px-4 sm:px-6 lg:px-8">
-          <button className="rounded-md p-1.5 hover:bg-accent md:hidden text-muted-foreground" onClick={() => setMobileNavOpen(true)} aria-label="Mở menu">
+          {/* Mobile hamburger button */}
+          <button
+            className="rounded-md p-1.5 hover:bg-accent md:hidden text-muted-foreground"
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Mở menu điều hướng"
+          >
             <Menu className="h-5 w-5" />
           </button>
+
+          {/* Logo thu nhỏ trên Mobile */}
           <Link href="/dashboard" className="flex items-center gap-2 md:hidden">
-            <Building2 className="h-5 w-5 text-foreground" />
+            <GeometricCubeLogo className="h-5 w-5 text-foreground" />
             <span className="font-bold text-sm">HRMIS</span>
           </Link>
 
-          {/* Tìm kiếm toàn hệ thống & Command Launcher */}
-          <div className="hidden md:flex items-center max-w-md w-full mr-auto">
+          {/* Nút mở lại thanh phụ khi đang thu gọn (Desktop) */}
+          {!subSidebarOpen && (
+            <button
+              onClick={() => setSubSidebarOpen(true)}
+              title="Mở thanh điều hướng phụ"
+              className="hidden md:flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors border border-border/50 shrink-0"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </button>
+          )}
+
+          {/* Thanh tìm kiếm đặt chính giữa Topbar */}
+          <div className="hidden md:flex flex-1 items-center justify-center px-4 max-w-xl mx-auto">
             <button
               onClick={() => setCommandPaletteOpen(true)}
-              className="flex w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3.5 py-1.5 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all"
+              className="flex w-full max-w-md items-center justify-between rounded-xl border border-border/60 bg-muted/30 px-3.5 py-1.5 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all shadow-2xs"
             >
               <span className="flex items-center gap-2">
                 <Search className="h-3.5 w-3.5 text-muted-foreground" />
                 <span>Tìm kiếm nhân viên, chức năng, tạo đơn từ...</span>
               </span>
-              <kbd className="inline-flex items-center rounded-md border border-border bg-card px-1.5 py-0.5 text-xs font-mono font-bold text-muted-foreground">
+              <kbd className="inline-flex items-center rounded-md border border-border bg-card px-1.5 py-0.5 text-[10px] font-mono font-bold text-muted-foreground">
                 Ctrl K
               </kbd>
             </button>
@@ -276,8 +795,8 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
             <Link
               href="/notifications"
               className={cn(
-                'rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors',
-                isActive('/notifications') && 'text-primary bg-primary/10',
+                'rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors',
+                isLinkActive('/notifications') && 'text-primary bg-primary/10'
               )}
               aria-label="Thông báo"
             >
@@ -288,19 +807,23 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
 
             <Link
               href="/profile"
-              className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/60 transition-colors"
+              className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-muted/60 transition-colors"
               aria-label="Hồ sơ cá nhân"
             >
               <UserCircle2 className="h-6 w-6 text-muted-foreground/80" />
               <span className="hidden min-w-0 lg:block text-left">
-                <span className="block max-w-[9rem] truncate text-xs font-semibold text-foreground leading-tight">{profile.fullName}</span>
-                <span className="block text-xs leading-tight text-muted-foreground">{profile.jobTitle ?? profile.email}</span>
+                <span className="block max-w-[9rem] truncate text-xs font-semibold text-foreground leading-tight">
+                  {profile.fullName}
+                </span>
+                <span className="block text-[11px] leading-tight text-muted-foreground truncate">
+                  {profile.jobTitle ?? profile.email}
+                </span>
               </span>
             </Link>
 
             <button
               onClick={logout}
-              className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+              className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
               aria-label="Đăng xuất"
             >
               <LogOut className="h-3.5 w-3.5" />
@@ -310,58 +833,121 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
         </div>
       </header>
 
-      {/* ================= DRAWER mobile nav (overlay + panel) ================= */}
+      {/* ========================================================================= */}
+      {/* DRAWER MOBILE NAV (Menu trượt toàn diện trên điện thoại)                  */}
+      {/* ========================================================================= */}
       {mobileNavOpen ? (
         <div className="fixed inset-0 z-overlay md:hidden" onClick={() => setMobileNavOpen(false)}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
           <div
-            className="absolute inset-y-0 left-0 w-72 max-w-[85%] overflow-y-auto bg-card p-3 shadow-xl"
+            className="absolute inset-y-0 left-0 w-80 max-w-[90%] overflow-y-auto bg-card p-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-4 flex items-center justify-between px-2">
-              <span className="font-bold text-sm">HRMIS</span>
-              <button onClick={() => setMobileNavOpen(false)} aria-label="Đóng menu" className="rounded-md p-1.5 hover:bg-accent">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <GeometricCubeLogo className="h-6 w-6 text-foreground" />
+                <span className="font-bold text-sm">HRMIS Pro</span>
+              </div>
+              <button
+                onClick={() => setMobileNavOpen(false)}
+                aria-label="Đóng menu"
+                className="rounded-md p-1.5 hover:bg-accent"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="mb-3 px-1">
+
+            <div className="mb-3">
               <button
                 onClick={() => {
                   setMobileNavOpen(false);
                   setCommandPaletteOpen(true);
                 }}
-                className="flex w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
+                className="flex w-full items-center justify-between rounded-xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
               >
                 <span>Tìm kiếm nhanh...</span>
                 <kbd className="text-xs font-mono">⌘K</kbd>
               </button>
             </div>
-            {navLinks}
-            <Link href="/profile" onClick={() => setMobileNavOpen(false)} className="mt-4 flex items-center gap-2 rounded-md px-3 py-2 text-xs hover:bg-accent">
-              <Settings className="h-4 w-4" /> Hồ sơ cá nhân
-            </Link>
+
+            <div className="space-y-4">
+              {availableDomains.map((domain) => (
+                <div key={domain.id} className="space-y-1">
+                  <p className="px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {domain.label}
+                  </p>
+                  <div className="space-y-0.5">
+                    {domain.folders.flatMap((f) => f.items).map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMobileNavOpen(false)}
+                        className={cn(
+                          'flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors',
+                          isLinkActive(item.href)
+                            ? 'bg-muted text-foreground font-semibold'
+                            : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                        )}
+                      >
+                        <span className="truncate">{item.label}</span>
+                        {item.badge !== undefined && (
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 border-t border-border/60 pt-3">
+              <Link
+                href="/profile"
+                onClick={() => setMobileNavOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs hover:bg-accent"
+              >
+                <UserCircle2 className="h-4 w-4" /> Hồ sơ cá nhân
+              </Link>
+            </div>
           </div>
         </div>
       ) : null}
 
-      {/* ================= NỘI DUNG ================= */}
-      <main className="md:pl-64 overflow-x-clip min-h-[calc(100dvh-3.5rem)]">
+      {/* ========================================================================= */}
+      {/* VÙNG NỘI DUNG CHÍNH (Workspace Canvas Frame)                              */}
+      {/* ========================================================================= */}
+      <main
+        className={cn(
+          'overflow-x-clip min-h-[calc(100dvh-3.5rem)] transition-[padding] duration-200',
+          subSidebarOpen ? 'md:pl-[320px]' : 'md:pl-16'
+        )}
+      >
         <div className="px-4 py-5 sm:px-6 lg:px-8 pb-20 md:pb-12">
           <PageContainer>{children}</PageContainer>
         </div>
       </main>
 
-      {/* ================= BOTTOM NAV (mobile) ================= */}
+      {/* ========================================================================= */}
+      {/* BOTTOM NAV (Thanh điều hướng nhanh phía đáy trên điện thoại)              */}
+      {/* ========================================================================= */}
       <nav className="fixed inset-x-0 bottom-0 z-sticky grid grid-cols-5 border-t border-border/60 bg-card/90 backdrop-blur-md md:hidden">
         {[
-          { href: '/dashboard', label: 'Tổng quan', icon: LayoutDashboard },
-          { href: '/org-chart', label: 'Tổ chức', icon: Network },
-          { href: '/ess', label: 'Cá nhân', icon: UserCheck },
-          { href: '/attendance', label: 'Chấm công', icon: ShieldCheck },
-          { href: '/payroll-engine', label: 'Lương', icon: Calculator },
+          { href: '/dashboard', label: 'Tổng quan', icon: Home },
+          { href: '/employees', label: 'Nhân sự', icon: Users },
+          { href: '/ess', label: 'Cá nhân', icon: UserCircle2 },
+          { href: '/attendance', label: 'Chấm công', icon: Clock4 },
+          { href: '/loans', label: 'Khoản vay', icon: Wallet },
         ].map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href}
-            className={cn('flex flex-col items-center gap-0.5 py-2 text-xs font-medium', isActive(href) ? 'text-primary' : 'text-muted-foreground')}>
+          <Link
+            key={href}
+            href={href}
+            className={cn(
+              'flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium',
+              isLinkActive(href) ? 'text-primary' : 'text-muted-foreground'
+            )}
+          >
             <Icon className="h-4 w-4" />
             {label}
           </Link>

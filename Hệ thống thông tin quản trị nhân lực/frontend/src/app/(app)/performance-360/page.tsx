@@ -339,7 +339,7 @@ export default function Performance360Page() {
               }}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/70 transition-colors shadow-2xs"
             >
-              <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
+              <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
               Gửi phản hồi 360
             </button>
             <button
@@ -859,7 +859,7 @@ export default function Performance360Page() {
           <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl border border-border space-y-4">
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <CheckCircle2 className="w-4 h-4 text-primary" />
                 Chấm Điểm Mục Tiêu KRA
               </h3>
               <button onClick={() => setIsScoreModalOpen(false)} className="text-muted-foreground hover:text-foreground">
@@ -913,7 +913,7 @@ export default function Performance360Page() {
           <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl border border-border space-y-4">
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-emerald-600" />
+                <MessageSquare className="w-4 h-4 text-primary" />
                 Gửi Phản Hồi Đánh Giá 360 Độ
               </h3>
               <button onClick={() => setIsReviewModalOpen(false)} className="text-muted-foreground hover:text-foreground">

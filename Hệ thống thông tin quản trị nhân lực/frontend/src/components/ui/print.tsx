@@ -90,7 +90,7 @@ export function PrintExportDropdown({
               }}
               className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs font-medium text-foreground hover:bg-accent transition-colors border-t mt-1 pt-2"
             >
-              <FileSpreadsheet className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
               <span>{exportLabel}</span>
             </button>
           ) : null}
@@ -263,3 +263,103 @@ export function PrintSignatureBlock({
     </div>
   );
 }
+
+/**
+ * Hàm in ấn độc lập dành riêng cho các biểu mẫu modal hành chính:
+ * Trích xuất nội dung văn bản sang một iframe A4 độc lập, cách ly hoàn toàn
+ * khỏi các quy tắc CSS ẩn của web app, đảm bảo in ra trang giấy rõ nét 100% không bao giờ bị trắng trang.
+ */
+export function printDocumentElement(elementId: string) {
+  if (typeof window === 'undefined') return;
+  const element = document.getElementById(elementId);
+  if (!element) {
+    window.print();
+    return;
+  }
+
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  iframe.style.zIndex = '-9999';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document;
+  if (!doc) {
+    window.print();
+    return;
+  }
+
+  doc.open();
+  doc.write(`
+    <!DOCTYPE html>
+    <html lang="vi">
+      <head>
+        <meta charset="utf-8" />
+        <title>Văn Bản Hành Chính - In Ấn</title>
+        <style>
+          @page {
+            size: A4 portrait;
+            margin: 15mm 15mm 15mm 20mm;
+          }
+          * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            font-family: 'Times New Roman', Times, serif;
+          }
+          body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            color: #000000;
+            font-size: 12.5pt;
+            line-height: 1.45;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000000;
+            margin: 12px 0;
+            font-size: 11pt;
+          }
+          th, td {
+            border: 1px solid #000000;
+            padding: 6px 4px;
+            color: #000000;
+          }
+          th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: center;
+          }
+          .no-print {
+            display: none !important;
+          }
+        </style>
+      </head>
+      <body>
+        ${element.innerHTML}
+      </body>
+    </html>
+  `);
+  doc.close();
+
+  iframe.contentWindow?.focus();
+  setTimeout(() => {
+    iframe.contentWindow?.print();
+    setTimeout(() => {
+      try {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      } catch {
+        // ignore
+      }
+    }, 1500);
+  }, 250);
+}
+

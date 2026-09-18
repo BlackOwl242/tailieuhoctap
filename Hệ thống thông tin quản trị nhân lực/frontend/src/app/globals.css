@@ -170,11 +170,43 @@
     visibility: hidden !important;
   }
 
-  /* Chỉ hiển thị khu vực văn bản in ấn */
+  /* Chỉ hiển thị khu vực văn bản in ấn, hồ sơ cán bộ và tài liệu hành chính */
   .print-area,
-  .print-area * {
+  .print-area *,
+  .a4-sheet,
+  .a4-sheet *,
+  .huha-canvas,
+  .huha-canvas * {
     visibility: visible !important;
     font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
+  }
+
+  /* Reset toàn bộ Radix Dialog/Modal khi in để in trọn vẹn văn bản không bị che khuất hay ngắt trang */
+  [data-radix-portal] {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+  }
+
+  [data-radix-portal] > [class*="fixed"][class*="inset-0"],
+  [data-radix-portal] > [class*="bg-black"],
+  [data-radix-portal] > [class*="backdrop-blur"] {
+    display: none !important;
+  }
+
+  [role="dialog"] {
+    position: static !important;
+    transform: none !important;
+    max-height: none !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
   }
 
   .print-area {
@@ -184,16 +216,17 @@
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 15mm 15mm 15mm 20mm !important;
+    box-sizing: border-box !important;
     box-shadow: none !important;
     border: none !important;
     background: transparent !important;
     overflow: visible !important;
   }
 
-  .print-area:not(:has(.a4-sheet)) {
-    padding: 15mm 15mm 15mm 20mm !important;
-    box-sizing: border-box !important;
+  .print-area .a4-sheet,
+  .a4-sheet {
+    padding: 0 !important;
   }
 
   .print-only {

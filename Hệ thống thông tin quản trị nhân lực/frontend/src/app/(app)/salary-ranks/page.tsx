@@ -450,7 +450,7 @@ export default function SalaryRanksPage() {
           <TrendingUp className="h-3.5 w-3.5" />
           Xét & Phê duyệt nâng bậc lương
           {qScan.data?.eligibleCount ? (
-            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold">
+            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-muted text-foreground border border-border font-mono text-xs font-medium">
               {qScan.data.eligibleCount}
             </span>
           ) : null}
@@ -568,19 +568,19 @@ export default function SalaryRanksPage() {
               <div className="text-2xl font-bold text-foreground mt-1">{qScan.data?.totalScanned || 0}</div>
               <div className="text-xs text-muted-foreground mt-1">Đã cấu hình ngạch bậc</div>
             </Card>
-            <Card className="p-4 bg-emerald-500/10 border-emerald-500/20 shadow-xs">
-              <div className="text-xs font-semibold text-emerald-700 uppercase">Đủ điều kiện nâng bậc</div>
-              <div className="text-2xl font-bold text-emerald-800 mt-1">{qScan.data?.eligibleCount || 0}</div>
-              <div className="text-xs text-emerald-600 mt-1">Đạt đủ 24/36 tháng giữ bậc</div>
+            <Card className="p-4 border border-border bg-card shadow-2xs">
+              <div className="text-xs font-medium text-muted-foreground uppercase">Đủ điều kiện nâng bậc</div>
+              <div className="text-2xl font-bold text-foreground mt-1">{qScan.data?.eligibleCount || 0}</div>
+              <div className="text-xs text-muted-foreground mt-1">Đạt đủ 24/36 tháng giữ bậc</div>
             </Card>
-            <Card className="p-4 bg-amber-500/10 border-amber-500/20 shadow-xs">
-              <div className="text-xs font-semibold text-amber-700 uppercase">Quá hạn chưa duyệt</div>
-              <div className="text-2xl font-bold text-amber-800 mt-1">{qScan.data?.overdueCount || 0}</div>
-              <div className="text-xs text-amber-600 mt-1">Quá hạn &gt; 3 tháng</div>
+            <Card className="p-4 border border-border bg-card shadow-2xs">
+              <div className="text-xs font-medium text-muted-foreground uppercase">Quá hạn chưa duyệt</div>
+              <div className="text-2xl font-bold text-foreground mt-1">{qScan.data?.overdueCount || 0}</div>
+              <div className="text-xs text-muted-foreground mt-1">Quá hạn &gt; 3 tháng</div>
             </Card>
-            <Card className="p-4 bg-primary/10 border-primary/20 shadow-xs">
-              <div className="text-xs font-semibold text-primary uppercase">Kịch trần ngạch</div>
-              <div className="text-2xl font-bold text-primary mt-1">
+            <Card className="p-4 border border-border bg-card shadow-2xs">
+              <div className="text-xs font-medium text-muted-foreground uppercase">Kịch trần ngạch</div>
+              <div className="text-2xl font-bold text-foreground mt-1">
                 {allProgressionItems.filter((i) => i.currentStep >= i.totalSteps).length}
               </div>
               <div className="text-xs text-muted-foreground mt-1">Hưởng thâm niên vượt khung</div>

@@ -376,7 +376,7 @@ export default function OrgChartPage() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <TableIcon className="h-3.5 w-3.5 text-emerald-600" />
+            <TableIcon className="h-3.5 w-3.5 text-muted-foreground" />
             Bảng Cơ cấu & Định biên (Table View)
           </button>
         </div>
