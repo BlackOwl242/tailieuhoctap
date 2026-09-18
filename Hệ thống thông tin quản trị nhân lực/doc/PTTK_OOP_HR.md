@@ -1610,11 +1610,12 @@ Trong quá trình vận hành các biểu mẫu nghiệp vụ phức tạp (như
 1. `content (z-0)`: Khung nội dung cơ bản của trang tác nghiệp.
 2. `table-sticky (z-10)`: Cột cố định và dòng tiêu đề của bảng dữ liệu nghiệp vụ.
 3. `page-dropdown (z-35)`: Các menu popover, combobox và dropdown sinh ra trong ngữ cảnh trang thông thường (được neo cứng tối đa ở mức 35, tuyệt đối không vượt quá z-index của thanh điều hướng).
-4. `topbar & sidebar (z-40)`: Thanh điều hướng đỉnh Topbar (`h-14` tương đương 56px, `sticky top-0 z-40 bg-card/95 backdrop-blur border-b`) và thanh bên Sidebar (`z-40 border-r`). Nhờ z-index 40, Topbar luôn là trần cao nhất che chắn mọi phần tử cuộn hoặc popup trong trang nội dung bên dưới.
-5. `dialog-overlay (z-60)`: Lớp màn che mờ (backdrop) khi kích hoạt cửa sổ tương tác (Modal/Dialog/Drawer).
-6. `dialog-modal (z-70)`: Hộp thoại tác vụ chính hiển thị nổi bật trên lớp overlay.
-7. `modal-dropdown (z-80)`: Các bộ chọn danh mục, picker ngày tháng nằm bên trong hộp thoại (được đẩy lên z-80 để không bị che bởi Modal).
-8. `system-toast (z-100)`: Thông báo nổi hệ thống (Sonner Toast) hiển thị trên cùng mọi lớp giao diện.
+4. `topbar (z-40)`: Thanh điều hướng đỉnh Topbar (`h-14` tương đương 56px, `sticky top-0 z-40 bg-card/80 backdrop-blur border-b`), được neo ở mức z-40 và bắt đầu từ biên phải của thanh bên (bằng `margin-left`), che chắn mọi phần tử cuộn hoặc popup trong trang nội dung bên dưới.
+5. `sidebar (z-50)`: Thanh điều hướng chính dạng cột (`w-16`) và thanh phụ mở rộng (`w-64`) được cố định toàn chiều cao (`fixed inset-y-0 z-50 border-r`). Nhờ z-index 50 cao hơn Topbar 40, thanh Sidebar luôn hiển thị nguyên vẹn, loại bỏ hoàn toàn nguy cơ Topbar phủ đè lên biểu tượng logo hay thanh tìm kiếm chức năng.
+6. `dialog-overlay (z-60)`: Lớp màn che mờ (backdrop) khi kích hoạt cửa sổ tương tác (Modal/Dialog/Drawer).
+7. `dialog-modal (z-70)`: Hộp thoại tác vụ chính hiển thị nổi bật trên lớp overlay.
+8. `modal-dropdown (z-80)`: Các bộ chọn danh mục, picker ngày tháng nằm bên trong hộp thoại (được đẩy lên z-80 để không bị che bởi Modal).
+9. `system-toast (z-100)`: Thông báo nổi hệ thống (Sonner Toast) hiển thị trên cùng mọi lớp giao diện.
 
 Đồng thời, hệ thống cài đặt cơ chế **Topbar Collision & Scroll Protection**: Khi người dùng mở một popover trong trang, vị trí được định vị bằng hàm `getBoundingClientRect()`, tính toán khoảng trống phía dưới và tự động kẹp chiều cao tối đa (`maxHeight: Math.min(320, spaceBelow)`). Khi người dùng cuộn chuột trên trang, listener cuộn (`scroll listener`) sẽ lập tức tự động đóng popover (`dismiss on scroll`), triệt tiêu 100% nguy cơ popup trôi tự do tràn đè lên Topbar.
 

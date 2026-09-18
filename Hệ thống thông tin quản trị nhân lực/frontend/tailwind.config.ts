@@ -51,7 +51,7 @@ const config: Config = {
         table: '10',
         dropdown: '35',
         sticky: '40',
-        sidebar: '40',
+        sidebar: '50',
         overlay: '60',
         modal: '70',
         toast: '100',

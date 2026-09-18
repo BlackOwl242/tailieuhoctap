@@ -735,8 +735,8 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
       {/* ========================================================================= */}
       <header
         className={cn(
-          'sticky top-0 z-sticky border-b border-border/60 bg-card/80 backdrop-blur-md transition-[padding] duration-200',
-          subSidebarOpen ? 'md:pl-[320px]' : 'md:pl-16'
+          'sticky top-0 z-sticky border-b border-border/60 bg-card/80 backdrop-blur-md transition-all duration-200',
+          subSidebarOpen ? 'md:ml-[320px]' : 'md:ml-16'
         )}
       >
         <div className="flex h-14 items-center gap-3 px-4 sm:px-6 lg:px-8">
