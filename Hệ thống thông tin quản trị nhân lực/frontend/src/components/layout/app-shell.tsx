@@ -78,227 +78,211 @@ interface NavDomain {
 const DOMAINS: NavDomain[] = [
   {
     id: 'workspace',
-    label: 'Cổng Tự Phục Vụ & Không Gian Làm Việc',
-    shortLabel: 'Cổng ESS',
+    label: 'Tổng quan',
+    shortLabel: 'Tổng quan',
     icon: Home,
     folders: [
       {
         id: 'ws-general',
-        label: 'Không gian cá nhân',
+        label: 'Bàn làm việc',
         count: 4,
         items: [
-          { href: '/ess', label: 'Bàn làm việc ESS', badge: 'Chính' },
-          { href: '/dashboard', label: 'Tổng quan Hệ thống', badge: 'KPI' },
-          { href: '/notifications', label: 'Trung tâm Thông báo', badge: 3 },
+          { href: '/dashboard', label: 'Tổng quan', badge: 'KPI' },
+          { href: '/ess', label: 'Cổng nhân viên', badge: 'Chính' },
+          { href: '/notifications', label: 'Thông báo', badge: 3 },
           { href: '/profile', label: 'Hồ sơ cá nhân' },
         ],
       },
     ],
     tags: [
-      { id: 'tag-daily', label: '#Công việc hàng ngày', count: 5, href: '/ess' },
-      { id: 'tag-requests', label: '#Đơn từ của tôi', count: 2, href: '/ess' },
-      { id: 'tag-alerts', label: '#Cảnh báo nhân sự', count: 3, href: '/notifications' },
+      { id: 'tag-daily', label: '#Hàng ngày', count: 5, href: '/ess' },
+      { id: 'tag-requests', label: '#Đơn từ', count: 2, href: '/ess' },
+      { id: 'tag-alerts', label: '#Thông báo', count: 3, href: '/notifications' },
     ],
   },
   {
     id: 'personnel',
-    label: 'Nhân Sự & Cơ Cấu Tổ Chức',
+    label: 'Nhân sự',
     shortLabel: 'Nhân sự',
     icon: Users,
     folders: [
       {
         id: 'pers-records',
-        label: 'Hồ sơ & Cơ cấu tổ chức',
+        label: 'Hồ sơ',
         count: 185,
         items: [
-          {
-            href: '/employees',
-            label: 'Danh sách & Hồ sơ nhân sự',
-            badge: 128,
-            subItems: [
-              { href: '/employees', label: 'Nhân sự chính thức', badge: 110 },
-              { href: '/employees', label: 'Thử việc & Học việc', badge: 18 },
-            ],
-          },
-          { href: '/org-chart', label: 'Sơ đồ tổ chức động', badge: 12 },
-          { href: '/assets', label: 'Tài sản & Thiết bị làm việc', badge: 45 },
+          { href: '/employees', label: 'Hồ sơ nhân sự', badge: 128 },
+          { href: '/org-chart', label: 'Sơ đồ tổ chức' },
+          { href: '/assets', label: 'Tài sản', badge: 45 },
         ],
       },
       {
         id: 'pers-movements',
-        label: 'Biến động & Nâng ngạch',
+        label: 'Chế độ',
         count: 13,
         items: [
-          { href: '/personnel', label: 'Quyết định & Biến động', badge: 8 },
-          { href: '/salary-ranks', label: 'Ngạch bậc & Nâng lương', badge: 5 },
+          { href: '/personnel', label: 'Biến động nhân sự', badge: 8 },
+          { href: '/salary-ranks', label: 'Ngạch bậc lương', badge: 5 },
         ],
       },
     ],
     tags: [
       { id: 'tag-active', label: '#Đang làm việc', count: 110, href: '/employees' },
       { id: 'tag-probation', label: '#Thử việc', count: 18, href: '/employees' },
-      { id: 'tag-contract', label: '#Hợp đồng lao động', count: 45, href: '/personnel' },
-      { id: 'tag-assets', label: '#Cấp phát thiết bị', count: 12, href: '/assets' },
+      { id: 'tag-contract', label: '#Hợp đồng', count: 45, href: '/personnel' },
+      { id: 'tag-assets', label: '#Tài sản', count: 12, href: '/assets' },
     ],
   },
   {
     id: 'time',
-    label: 'Ca Kíp & Chấm Công Lao Động',
+    label: 'Chấm công',
     shortLabel: 'Chấm công',
     icon: Clock4,
     folders: [
       {
         id: 'time-attendance',
-        label: 'Chấm công & Phân ca',
+        label: 'Điểm danh',
         count: 2,
         items: [
           { href: '/attendance', label: 'Bảng chấm công', badge: 'Hôm nay' },
-          { href: '/shifts', label: 'Ca kíp & Phân ca', badge: 4 },
+          { href: '/shifts', label: 'Ca làm việc', badge: 4 },
         ],
       },
       {
         id: 'time-leave',
-        label: 'Nghỉ phép & Trực ca',
+        label: 'Đơn từ',
         count: 5,
         items: [
-          { href: '/leave', label: 'Quản lý Nghỉ phép', badge: 3 },
-          { href: '/overtime', label: 'Làm thêm giờ & Trực ca', badge: 2 },
+          { href: '/leave', label: 'Nghỉ phép', badge: 3 },
+          { href: '/overtime', label: 'Làm thêm giờ', badge: 2 },
         ],
       },
     ],
     tags: [
       { id: 'tag-today', label: '#Điểm danh hôm nay', count: 98, href: '/attendance' },
-      { id: 'tag-pending-leave', label: '#Đơn phép chờ duyệt', count: 3, href: '/leave' },
-      { id: 'tag-ot', label: '#Ca ngoài giờ duyệt gấp', count: 2, href: '/overtime' },
+      { id: 'tag-pending-leave', label: '#Phép chờ duyệt', count: 3, href: '/leave' },
+      { id: 'tag-ot', label: '#Làm thêm giờ', count: 2, href: '/overtime' },
     ],
   },
   {
     id: 'compensation',
-    label: 'Tiền Lương & Chi Phí Doanh Nghiệp',
-    shortLabel: 'Lương & Quỹ',
+    label: 'Tiền lương',
+    shortLabel: 'Tiền lương',
     icon: Wallet,
     folders: [
       {
         id: 'comp-payroll',
-        label: 'Bảng lương & Thu nhập',
+        label: 'Bảng lương',
         count: 1,
         items: [
-          { href: '/payroll-engine', label: 'Tiền lương & Bảng lương', badge: 'Kỳ mới' },
+          { href: '/payroll-engine', label: 'Bảng lương', badge: 'Kỳ mới' },
         ],
       },
       {
         id: 'comp-benefits',
-        label: 'Khoản vay & Phúc lợi cán bộ',
+        label: 'Phúc lợi',
         count: 5,
         items: [
-          {
-            href: '/loans',
-            label: 'Khoản vay & Tạm ứng',
-            badge: 5,
-            subItems: [
-              { href: '/loans', label: 'Gói vay an cư', badge: 2 },
-              { href: '/loans', label: 'Tạm ứng thiết bị', badge: 3 },
-            ],
-          },
-          { href: '/expense-claims', label: 'Công tác & Chi phí', badge: 4 },
+          { href: '/loans', label: 'Tạm ứng & Vay', badge: 5 },
+          { href: '/expense-claims', label: 'Công tác phí', badge: 4 },
         ],
       },
     ],
     tags: [
-      { id: 'tag-nd30', label: '#Hợp đồng vay NĐ 30', count: 5, href: '/loans' },
-      { id: 'tag-payroll-run', label: '#Bảng tính lương T9', count: 1, href: '/payroll-engine' },
-      { id: 'tag-expense-pending', label: '#Thanh toán công tác', count: 4, href: '/expense-claims' },
+      { id: 'tag-nd30', label: '#Khoản vay', count: 5, href: '/loans' },
+      { id: 'tag-payroll-run', label: '#Bảng tính lương', count: 1, href: '/payroll-engine' },
+      { id: 'tag-expense-pending', label: '#Công tác phí', count: 4, href: '/expense-claims' },
     ],
   },
   {
     id: 'talent',
-    label: 'Tuyển Dụng & Phát Triển Nhân Tài',
-    shortLabel: 'Tuyển dụng',
+    label: 'Phát triển',
+    shortLabel: 'Phát triển',
     icon: Briefcase,
     folders: [
       {
         id: 'talent-recruitment',
-        label: 'Thu hút nhân tài',
+        label: 'Tuyển dụng',
         count: 9,
         items: [
-          { href: '/recruitment-ats', label: 'Quản lý Tuyển dụng (ATS)', badge: 9 },
+          { href: '/recruitment-ats', label: 'Tuyển dụng', badge: 9 },
         ],
       },
       {
         id: 'talent-growth',
-        label: 'Đánh giá & Phát triển',
+        label: 'Nhân tài',
         count: 2,
         items: [
-          { href: '/performance-360', label: 'Đánh giá & Hiệu suất 360', badge: 'Đợt 1' },
+          { href: '/performance-360', label: 'Đánh giá KPI', badge: 'Đợt 1' },
           { href: '/training-grievance', label: 'Đào tạo & Khiếu nại', badge: 2 },
         ],
       },
     ],
     tags: [
-      { id: 'tag-ats-interview', label: '#Lịch phỏng vấn tuần', count: 6, href: '/recruitment-ats' },
-      { id: 'tag-kpi-q3', label: '#Đánh giá KPI Quý 3', count: 1, href: '/performance-360' },
-      { id: 'tag-cert', label: '#Chứng nhận đào tạo', count: 2, href: '/training-grievance' },
+      { id: 'tag-ats-interview', label: '#Lịch phỏng vấn', count: 6, href: '/recruitment-ats' },
+      { id: 'tag-kpi-q3', label: '#Đánh giá KPI', count: 1, href: '/performance-360' },
+      { id: 'tag-cert', label: '#Đào tạo', count: 2, href: '/training-grievance' },
     ],
   },
   {
     id: 'reports-docs',
-    label: 'Báo Cáo Thống Kê & Kho Tài Liệu',
-    shortLabel: 'Tài liệu',
+    label: 'Báo cáo',
+    shortLabel: 'Báo cáo',
     icon: FolderOpen,
     folders: [
       {
         id: 'docs-vault',
-        label: 'Kho lưu trữ tài liệu',
+        label: 'Tài liệu',
         count: 24,
         items: [
-          { href: '/documents', label: 'Kho tài liệu nhân sự', badge: 24 },
+          { href: '/documents', label: 'Kho tài liệu', badge: 24 },
         ],
       },
       {
         id: 'docs-analytics',
-        label: 'Trung tâm Báo cáo dữ liệu',
+        label: 'Báo cáo',
         count: 1,
         items: [
-          { href: '/personnel-reports', label: 'Báo cáo & Thống kê HR', badge: 'BLLĐ', roles: ['ADMIN', 'KM_MANAGER'] },
+          { href: '/personnel-reports', label: 'Báo cáo nhân sự', badge: 'BLLĐ', roles: ['ADMIN', 'KM_MANAGER'] },
         ],
       },
     ],
     tags: [
-      { id: 'tag-templates', label: '#Mẫu văn bản hành chính', count: 12, href: '/documents' },
-      { id: 'tag-labor-report', label: '#Báo cáo định kỳ BLLĐ', count: 4, href: '/personnel-reports' },
+      { id: 'tag-templates', label: '#Mẫu văn bản', count: 12, href: '/documents' },
+      { id: 'tag-labor-report', label: '#Báo cáo định kỳ', count: 4, href: '/personnel-reports' },
     ],
   },
   {
     id: 'admin',
-    label: 'Quản Trị Hệ Thống & Cấu Hình',
+    label: 'Quản trị',
     shortLabel: 'Quản trị',
     icon: Settings,
     roles: ['ADMIN'],
     folders: [
       {
         id: 'admin-users',
-        label: 'Phân quyền & Đơn vị',
+        label: 'Phân quyền',
         count: 2,
         items: [
-          { href: '/admin/users', label: 'Người dùng & Phân quyền' },
-          { href: '/admin/org-units', label: 'Cơ cấu tổ chức' },
+          { href: '/admin/users', label: 'Tài khoản' },
+          { href: '/admin/org-units', label: 'Đơn vị phòng ban' },
         ],
       },
       {
         id: 'admin-system',
-        label: 'Dữ liệu gốc & Kiểm toán',
+        label: 'Hệ thống',
         count: 4,
         items: [
-          { href: '/admin/catalogs', label: 'Danh mục (Master Data)' },
-          { href: '/admin/attendance', label: 'Thiết bị chấm công' },
-          { href: '/admin/settings', label: 'Cấu hình hệ thống' },
-          { href: '/admin/audit', label: 'Nhật ký kiểm toán' },
+          { href: '/admin/catalogs', label: 'Danh mục gốc' },
+          { href: '/admin/attendance', label: 'Máy chấm công' },
+          { href: '/admin/settings', label: 'Cấu hình' },
+          { href: '/admin/audit', label: 'Nhật ký' },
         ],
       },
     ],
     tags: [
       { id: 'tag-user-accounts', label: '#Tài khoản quản trị', count: 3, href: '/admin/users' },
-      { id: 'tag-devices', label: '#Thiết bị kết nối', count: 2, href: '/admin/attendance' },
+      { id: 'tag-devices', label: '#Máy chấm công', count: 2, href: '/admin/attendance' },
       { id: 'tag-catalogs', label: '#Tham số hệ thống', count: 8, href: '/admin/catalogs' },
     ],
   },
@@ -489,9 +473,9 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                 }}
                 aria-label={domain.label}
                 className={cn(
-                  'group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-150',
+                  'group relative flex h-10 w-10 items-center justify-center rounded-xl transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none',
                   isDomainActive
-                    ? 'bg-muted/90 text-foreground font-semibold shadow-2xs border border-border/80'
+                    ? 'bg-muted/90 text-foreground font-semibold shadow-xs'
                     : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                 )}
               >
@@ -514,7 +498,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
             type="button"
             onClick={toggleSubSidebar}
             title={subSidebarOpen ? 'Thu gọn cây phân mục' : 'Mở rộng cây phân mục'}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none"
           >
             <PanelLeft className={cn('h-4 w-4 transition-transform', !subSidebarOpen && 'rotate-180 text-primary')} />
           </button>
@@ -523,7 +507,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
 
           <Link
             href="/profile"
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none"
             title={`Tài khoản: ${profile.fullName}`}
           >
             <UserCircle2 className="h-5 w-5" />
@@ -552,7 +536,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                 type="button"
                 onClick={toggleSubSidebar}
                 title="Thu gọn bảng điều hướng"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors outline-none focus:outline-none"
               >
                 <PanelLeftClose className="h-4 w-4" />
               </button>
@@ -567,7 +551,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
               value={subSidebarSearch}
               onChange={(e) => setSubSidebarSearch(e.target.value)}
               placeholder="Tìm kiếm chức năng..."
-              className="w-full pl-8 pr-7 py-1.5 text-xs bg-muted/40 hover:bg-muted/60 focus:bg-card border border-border/60 rounded-xl outline-none focus:border-foreground/40 transition-all text-foreground placeholder:text-muted-foreground/70"
+              className="w-full pl-8 pr-7 py-1.5 text-xs bg-muted/40 hover:bg-muted/60 focus:bg-card border border-border/60 rounded-xl outline-none focus:border-border transition-all text-foreground placeholder:text-muted-foreground/70"
             />
             {subSidebarSearch && (
               <button
@@ -585,9 +569,9 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
               type="button"
               onClick={() => setActiveTab('folders')}
               className={cn(
-                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs',
+                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs outline-none focus:outline-none',
                 activeTab === 'folders'
-                  ? 'bg-card text-foreground font-semibold shadow-2xs'
+                  ? 'bg-card text-foreground font-semibold shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -597,9 +581,9 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
               type="button"
               onClick={() => setActiveTab('tags')}
               className={cn(
-                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs',
+                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs outline-none focus:outline-none',
                 activeTab === 'tags'
-                  ? 'bg-card text-foreground font-semibold shadow-2xs'
+                  ? 'bg-card text-foreground font-semibold shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -620,7 +604,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                       <button
                         type="button"
                         onClick={() => toggleFolder(folder.id)}
-                        className="group flex w-full items-center justify-between py-1 px-1.5 rounded-lg text-xs font-semibold text-foreground/90 hover:bg-muted/50 transition-colors"
+                        className="group flex w-full items-center justify-between py-1 px-1.5 rounded-lg text-xs font-semibold text-foreground/90 hover:bg-muted/50 transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none"
                       >
                         <div className="flex items-center gap-2 truncate">
                           {isOpen ? (
@@ -644,14 +628,18 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                             const active = isLinkActive(item.href);
 
                             return (
-                              <div key={item.href} className="space-y-0.5">
+                              <div key={item.href} className="relative space-y-0.5">
+                                {/* Đường kẻ nhánh cây ngang độc lập, tách rời Link để không bị trình duyệt vẽ viền focus méo mó */}
+                                <span
+                                  aria-hidden="true"
+                                  className="pointer-events-none absolute -left-3.5 top-3.5 h-px w-2.5 bg-border/70"
+                                />
                                 <Link
                                   href={item.href}
                                   className={cn(
-                                    'group relative flex items-center justify-between py-1 px-2 rounded-lg text-xs transition-colors',
-                                    'before:absolute before:-left-3.5 before:top-1/2 before:-translate-y-1/2 before:w-2.5 before:h-px before:bg-border/70',
+                                    'group relative flex items-center justify-between py-1 px-2 rounded-lg text-xs transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none',
                                     active
-                                      ? 'bg-muted/90 text-foreground font-semibold shadow-2xs'
+                                      ? 'bg-muted/90 text-foreground font-semibold shadow-xs'
                                       : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                                   )}
                                 >
@@ -664,7 +652,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                                       className={cn(
                                         'rounded-full px-1.5 py-0.2 text-[10px] font-medium shrink-0',
                                         active
-                                          ? 'bg-foreground text-background font-semibold'
+                                          ? 'bg-muted-foreground/15 text-foreground font-medium'
                                           : 'bg-muted/80 text-muted-foreground'
                                       )}
                                     >
@@ -679,22 +667,26 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                                     {item.subItems.map((sub) => {
                                       const subActive = pathname === sub.href;
                                       return (
-                                        <Link
-                                          key={sub.label}
-                                          href={sub.href}
-                                          className={cn(
-                                            'relative flex items-center justify-between py-0.5 px-2 rounded-md text-[11px] transition-colors',
-                                            'before:absolute before:-left-3 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-px before:bg-border/50',
-                                            subActive
-                                              ? 'text-foreground font-semibold bg-muted/60'
-                                              : 'text-muted-foreground/80 hover:text-foreground hover:bg-muted/30'
-                                          )}
-                                        >
-                                          <span className="truncate">{sub.label}</span>
-                                          {sub.badge && (
-                                            <span className="text-[9px] text-muted-foreground">{sub.badge}</span>
-                                          )}
-                                        </Link>
+                                        <div key={sub.label} className="relative">
+                                          <span
+                                            aria-hidden="true"
+                                            className="pointer-events-none absolute -left-3 top-2.5 h-px w-2 bg-border/50"
+                                          />
+                                          <Link
+                                            href={sub.href}
+                                            className={cn(
+                                              'relative flex items-center justify-between py-0.5 px-2 rounded-md text-[11px] transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none',
+                                              subActive
+                                                ? 'text-foreground font-semibold bg-muted/60'
+                                                : 'text-muted-foreground/80 hover:text-foreground hover:bg-muted/30'
+                                            )}
+                                          >
+                                            <span className="truncate">{sub.label}</span>
+                                            {sub.badge && (
+                                              <span className="text-[9px] text-muted-foreground">{sub.badge}</span>
+                                            )}
+                                          </Link>
+                                        </div>
                                       );
                                     })}
                                   </div>

@@ -143,7 +143,7 @@ export default function DocumentsPage() {
   return (
     <>
       <PageHeader
-        title="Kho Tài liệu Nhân sự"
+        title="Kho tài liệu"
         description="Lưu trữ chính sách, quy chế, biểu mẫu và quy trình quản trị nhân sự toàn công ty."
         actions={
           isHr ? (

@@ -281,8 +281,8 @@ export default function PersonnelActionsPage() {
   return (
     <>
       <PageHeader
-        title="Quyết định & Biến động"
-        description="Quản lý và ban hành các quyết định thuyên chuyển, điều động, bãi nhiệm, kỷ luật, thôi việc và nâng ngạch lương."
+        title="Biến động nhân sự"
+        description="Quản lý các quyết định thuyên chuyển, điều động, bãi nhiệm, kỷ luật, thôi việc và nâng ngạch lương."
         actions={
           <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5">
             <Plus className="h-4 w-4" /> Tạo quyết định

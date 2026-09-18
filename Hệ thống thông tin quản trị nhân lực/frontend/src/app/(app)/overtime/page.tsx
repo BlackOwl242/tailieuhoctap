@@ -91,9 +91,9 @@ export default function OvertimePage() {
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title="Làm thêm giờ (Overtime)"
+        title="Làm thêm giờ"
         description="Đăng ký và phê duyệt làm thêm giờ minh bạch — đảm bảo quyền lợi theo quy định và tự động kết nối bảng lương."
-        breadcrumbs={[{ label: 'Ca kíp & Chấm công' }, { label: 'Làm thêm giờ' }]}
+        breadcrumbs={[{ label: 'Chấm công' }, { label: 'Làm thêm giờ' }]}
         actions={
           <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5 shadow-2xs">
             <Plus className="h-3.5 w-3.5" /> Đăng ký làm thêm

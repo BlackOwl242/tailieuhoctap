@@ -117,9 +117,9 @@ export default function LeavePage() {
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title="Quản trị Nghỉ phép"
+        title="Nghỉ phép"
         description="Quỹ phép minh bạch — phê duyệt là tự động trừ quỹ ngày và ghi nhận công phép vào bảng chấm công."
-        breadcrumbs={[{ label: 'Ca kíp & Chấm công' }, { label: 'Nghỉ phép' }]}
+        breadcrumbs={[{ label: 'Chấm công' }, { label: 'Nghỉ phép' }]}
         actions={
           <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5 shadow-2xs">
             <Plus className="h-3.5 w-3.5" /> Tạo đơn nghỉ phép

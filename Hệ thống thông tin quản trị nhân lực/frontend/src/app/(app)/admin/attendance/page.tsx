@@ -70,7 +70,7 @@ export default function AdminAttendancePage() {
   return (
     <>
       <PageHeader
-        title="Quản trị chấm công"
+        title="Máy chấm công"
         description="Kết nối máy chấm công qua webhook/CSV hoặc chạy bộ mô phỏng để có dữ liệu demo."
         actions={
           <Button size="sm" variant="outline" disabled={simulate.isPending} onClick={() => simulate.mutate()}>

@@ -213,12 +213,16 @@ async function seedAll() {
   console.log(`Successfully seeded/updated ${count} employees across all 21 organizational units!`);
 }
 
-seedAll()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+module.exports = { seedAll, ALL_STAFF };
+
+if (require.main === module) {
+  seedAll()
+    .then(async () => {
+      await prisma.$disconnect();
+    })
+    .catch(async (e) => {
+      console.error(e);
+      await prisma.$disconnect();
+      process.exit(1);
+    });
+}

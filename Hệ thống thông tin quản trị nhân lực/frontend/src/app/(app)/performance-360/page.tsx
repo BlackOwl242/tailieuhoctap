@@ -316,9 +316,9 @@ export default function Performance360Page() {
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title="Quản trị Hiệu suất & Đánh giá 360 Độ"
-        description="Thiết lập mục tiêu KRA/KPI theo trọng số phần trăm, quy trình tự đánh giá và quản lý chấm điểm minh bạch, kết hợp phản hồi 360 độ đa chiều."
-        breadcrumbs={[{ label: 'Hiệu suất' }, { label: 'Đánh giá 360' }]}
+        title="Đánh giá KPI"
+        description="Thiết lập mục tiêu KPI theo trọng số, quy trình tự đánh giá và phản hồi đa chiều."
+        breadcrumbs={[{ label: 'Phát triển' }, { label: 'Đánh giá KPI' }]}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <button

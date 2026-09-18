@@ -301,8 +301,8 @@ export default function EmployeesPage() {
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title="Danh sách & Hồ sơ Nhân sự"
-        description="Quản lý toàn diện danh bạ nhân sự doanh nghiệp và hồ sơ lý lịch cán bộ, công chức, viên chức chuẩn Mẫu 2C-BNV."
+        title="Hồ sơ nhân sự"
+        description="Quản lý danh bạ nhân sự và hồ sơ cán bộ, công chức, viên chức chuẩn Mẫu 2C-BNV."
         breadcrumbs={[{ label: 'Nhân sự' }, { label: 'Hồ sơ nhân sự' }]}
         actions={
           <div className="flex items-center gap-2">

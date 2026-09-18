@@ -357,7 +357,7 @@ export default function PayrollEnginePage() {
   return (
     <div className="space-y-5 pb-12">
       <WorkspaceHeader
-        title="Quản Lý Bảng Lương"
+        title="Bảng lương"
         description="Tính toán bảng lương chu kỳ, khấu trừ bảo hiểm thuế và lập phiếu lương nhân sự."
         breadcrumbs={[{ label: 'Tiền lương' }, { label: 'Bảng lương' }]}
         actions={

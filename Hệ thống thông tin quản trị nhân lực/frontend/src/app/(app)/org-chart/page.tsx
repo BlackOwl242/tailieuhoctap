@@ -291,9 +291,9 @@ export default function OrgChartPage() {
     <div className="space-y-6 pb-12">
       {/* Page Header */}
       <WorkspaceHeader
-        title="Sơ đồ Cơ cấu Tổ chức & Định biên Nhân sự"
-        description="Trực quan hóa cây phả hệ tổ chức phòng ban, quản lý phân cấp và theo dõi tỷ lệ lấp đầy định biên nhân sự theo tiêu chuẩn quản trị hiện đại."
-        breadcrumbs={[{ label: 'Tổ chức' }, { label: 'Sơ đồ & Định biên' }]}
+        title="Sơ đồ tổ chức"
+        description="Trực quan hóa cây phả hệ tổ chức phòng ban và theo dõi tỷ lệ lấp đầy định biên nhân sự."
+        breadcrumbs={[{ label: 'Nhân sự' }, { label: 'Sơ đồ tổ chức' }]}
         actions={
           <div className="flex items-center gap-2">
             <PrintExportDropdown

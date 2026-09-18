@@ -48,9 +48,10 @@ const config: Config = {
       // Token z-index dùng chung — KHÔNG dùng số trực tiếp trong component
       zIndex: {
         content: '0',
-        sticky: '20',
-        sidebar: '30',
-        dropdown: '50',
+        table: '10',
+        dropdown: '35',
+        sticky: '40',
+        sidebar: '40',
         overlay: '60',
         modal: '70',
         toast: '100',

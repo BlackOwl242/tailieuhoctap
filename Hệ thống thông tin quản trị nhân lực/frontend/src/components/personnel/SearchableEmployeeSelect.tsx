@@ -47,7 +47,14 @@ export function SearchableEmployeeSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [highlightIndex, setHighlightIndex] = useState(0);
-  const [coords, setCoords] = useState<{ top: number; left: number; width: number; openUpwards: boolean } | null>(null);
+  const [coords, setCoords] = useState<{
+    top?: number;
+    bottom?: number;
+    left: number;
+    width: number;
+    maxHeight: number;
+    openUpwards: boolean;
+  } | null>(null);
   const [mounted, setMounted] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -86,18 +93,35 @@ export function SearchableEmployeeSelect({
     });
   }, [employees, search]);
 
-  // Tính toạ độ fixed cho portal popover
+  // Chiều cao thanh topbar sticky (h-14 = 56px)
+  const TOPBAR_HEIGHT = 56;
+
+  // Tính toạ độ fixed cho portal popover — an toàn tuyệt đối với topbar
   const computeCoords = React.useCallback(() => {
     if (!containerRef.current) return;
     const r = containerRef.current.getBoundingClientRect();
+
+    // Nếu trigger đã bị cuộn lọt vào sau topbar hoặc ra khỏi màn hình -> đóng lại
+    if (r.bottom <= TOPBAR_HEIGHT || r.top >= window.innerHeight) {
+      setIsOpen(false);
+      return;
+    }
+
     const popoverWidth = Math.min(Math.max(r.width, 320), 500);
-    const spaceBelow = window.innerHeight - r.bottom;
-    const shouldOpenUp = spaceBelow < 300 && r.top > spaceBelow;
+    const spaceAbove = Math.max(0, r.top - TOPBAR_HEIGHT);
+    const spaceBelow = Math.max(0, window.innerHeight - r.bottom);
+
+    // Chỉ mở lên trên khi phía dưới chật VÀ phía trên có tối thiểu 160px để không đè lên topbar
+    const shouldOpenUp = spaceBelow < 260 && spaceAbove > spaceBelow && spaceAbove >= 160;
+    const maxHeight = shouldOpenUp ? Math.min(340, spaceAbove - 8) : Math.min(340, spaceBelow - 12);
+
     const leftPos = Math.min(r.left, window.innerWidth - popoverWidth - 12);
     setCoords({
-      top: shouldOpenUp ? r.top - 6 : r.bottom + 6,
+      top: shouldOpenUp ? undefined : Math.max(TOPBAR_HEIGHT + 6, r.bottom + 6),
+      bottom: shouldOpenUp ? window.innerHeight - (r.top - 6) : undefined,
       left: Math.max(4, leftPos),
       width: popoverWidth,
+      maxHeight,
       openUpwards: shouldOpenUp,
     });
   }, []);
@@ -142,19 +166,25 @@ export function SearchableEmployeeSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  // Tái tính toạ độ khi cuộn/resize
+  // Đóng khi cuộn ngoài hoặc đổi kích thước cửa sổ để tránh popover bay lơ lửng đè lên topbar
   useEffect(() => {
     if (!isOpen) return;
-    function handleScrollOrResize() {
-      computeCoords();
+    function handleScroll(e: Event) {
+      if (popoverRef.current && popoverRef.current.contains(e.target as Node)) {
+        return;
+      }
+      setIsOpen(false);
     }
-    window.addEventListener('scroll', handleScrollOrResize, true);
-    window.addEventListener('resize', handleScrollOrResize);
+    function handleResize() {
+      setIsOpen(false);
+    }
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener('scroll', handleScrollOrResize, true);
-      window.removeEventListener('resize', handleScrollOrResize);
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleResize);
     };
-  }, [isOpen, computeCoords]);
+  }, [isOpen]);
 
   // Xử lý phím điều hướng (ArrowUp, ArrowDown, Enter, Escape)
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -193,18 +223,24 @@ export function SearchableEmployeeSelect({
     return `${code}${cleanName} — ${role}`;
   }, [selectedEmp, placeholder]);
 
+  // Kiểm tra xem có đang nằm trong Modal không để chọn z-index phù hợp
+  const isInsideModal = Boolean(
+    containerRef.current?.closest('[role="dialog"], [aria-modal="true"], .fixed')
+  );
+
   // Nội dung popover (render qua portal)
   const popoverContent = isOpen && coords ? (
     <div
       ref={popoverRef}
-      className="bg-popover border border-border rounded-md shadow-xl overflow-hidden font-sans animate-in fade-in-50 zoom-in-95 duration-100"
+      className="bg-popover border border-border rounded-md shadow-xl overflow-hidden font-sans animate-in fade-in-50 zoom-in-95 duration-100 flex flex-col"
       style={{
         position: 'fixed',
         left: coords.left,
         width: coords.width,
-        top: coords.openUpwards ? undefined : coords.top,
-        bottom: coords.openUpwards ? window.innerHeight - coords.top : undefined,
-        zIndex: 99999,
+        top: coords.top,
+        bottom: coords.bottom,
+        maxHeight: coords.maxHeight,
+        zIndex: isInsideModal ? 80 : 35,
       }}
     >
       {/* Hộp gõ tìm kiếm */}
@@ -243,8 +279,8 @@ export function SearchableEmployeeSelect({
         </div>
       </div>
 
-      {/* Danh sách cuộn các cán bộ */}
-      <div ref={listRef} className="max-h-72 overflow-y-auto py-1 divide-y divide-border/20 font-sans">
+      {/* Danh sách cuộn các cán bộ — co giãn linh hoạt theo maxHeight */}
+      <div ref={listRef} className="overflow-y-auto flex-1 py-1 divide-y divide-border/20 font-sans">
         {filteredEmployees.length > 0 ? (
           filteredEmployees.map((emp, idx) => {
             const isSelected = emp.id === value;

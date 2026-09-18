@@ -331,6 +331,12 @@ export class PersonnelReportsController {
   getEducationByUnit() {
     return this.service.getEducationByUnitReport();
   }
+
+  @Get('bieu-03-education-org')
+  @Roles('ADMIN', 'KM_MANAGER')
+  getEducationByOrg() {
+    return this.service.getEducationByUnitReport();
+  }
 }
 
 // ---------------------------------------------------------------------------

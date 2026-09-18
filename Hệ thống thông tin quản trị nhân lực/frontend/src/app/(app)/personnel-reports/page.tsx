@@ -76,16 +76,16 @@ export default function PersonnelReportsPage() {
   // Query Biểu 03: Trình độ x Đơn vị
   const qBieu03 = useQuery({
     queryKey: ['report-bieu-03'],
-    queryFn: async () => (await api.get('/personnel-reports/bieu-03-education-org')).data,
+    queryFn: async () => (await api.get('/personnel-reports/bieu-03-education-unit')).data,
     enabled: activeReport === 'bieu03',
   });
 
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title="Trung tâm Báo cáo & Thống kê"
-        description="Mẫu biểu báo cáo nhân lực chuẩn hóa: Sơ yếu lý lịch Cán bộ/Nhân sự (Mẫu 2C-BNV), Thống kê Cơ cấu Độ tuổi theo Ngạch bậc (Biểu 01), Ngoại ngữ (Biểu 02), và Trình độ chuyên môn (Biểu 03)."
-        breadcrumbs={[{ label: 'Báo cáo & Tri thức' }, { label: 'Trung tâm báo cáo' }]}
+        title="Báo cáo nhân sự"
+        description="Mẫu biểu báo cáo nhân lực chuẩn hóa: Sơ yếu lý lịch (Mẫu 2C-BNV), Thống kê Độ tuổi theo Ngạch bậc (Biểu 01), Ngoại ngữ (Biểu 02) và Chuyên môn (Biểu 03)."
+        breadcrumbs={[{ label: 'Báo cáo' }, { label: 'Báo cáo nhân sự' }]}
       />
 
       {/* Tabs Chọn Báo cáo */}

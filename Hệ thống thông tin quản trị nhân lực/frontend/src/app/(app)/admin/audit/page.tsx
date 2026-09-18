@@ -33,7 +33,7 @@ export default function AdminAuditPage() {
   return (
     <>
       <PageHeader
-        title="Nhật ký kiểm toán"
+        title="Nhật ký"
         description="Bản ghi chỉ thêm, không sửa/xóa — truy vết mọi thao tác quan trọng."
       />
       <div className="print-area">

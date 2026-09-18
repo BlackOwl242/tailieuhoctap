@@ -410,8 +410,8 @@ export default function SalaryRanksPage() {
   return (
     <>
       <PageHeader
-        title="Ngạch bậc & Nâng bậc Lương"
-        description="Quản trị khung ngạch bậc lương tiêu chuẩn Nhà nước (NĐ 204/2004), Thang bảng lương Doanh nghiệp (BLLĐ 2019) và Tự động quét xét nâng bậc lương định kỳ."
+        title="Ngạch bậc lương"
+        description="Khung ngạch bậc lương tiêu chuẩn Nhà nước (NĐ 204) và thang bảng lương doanh nghiệp."
         actions={
           mainTab === 'progression' ? (
             <Button

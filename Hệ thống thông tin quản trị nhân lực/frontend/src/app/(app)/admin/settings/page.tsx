@@ -58,8 +58,8 @@ export default function AdminSettingsPage() {
   return (
     <>
       <PageHeader
-        title="Cấu hình hệ thống"
-        description="Tham số vận hành là dữ liệu — thay đổi không cần triển khai lại mã nguồn."
+        title="Cấu hình"
+        description="Tham số vận hành hệ thống — thay đổi không cần triển khai lại mã nguồn."
         actions={
           <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
             <Save className="h-4 w-4" /> Lưu thay đổi

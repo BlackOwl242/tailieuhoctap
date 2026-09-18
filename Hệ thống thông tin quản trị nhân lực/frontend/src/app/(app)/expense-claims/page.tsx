@@ -567,9 +567,9 @@ export default function ExpenseClaimsPage() {
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title="Quản trị Công tác & Chi phí"
-        description="Đề xuất chuyến công tác, tạm ứng kinh phí, lập bảng kê thanh quyết toán chi phí và phê duyệt giải ngân đa cấp."
-        breadcrumbs={[{ label: 'Tài chính' }, { label: 'Công tác & Chi phí' }]}
+        title="Công tác phí"
+        description="Đề xuất chuyến công tác, tạm ứng kinh phí, lập bảng kê thanh quyết toán chi phí."
+        breadcrumbs={[{ label: 'Tiền lương' }, { label: 'Công tác phí' }]}
         actions={
           <div className="flex items-center gap-2">
             <Button

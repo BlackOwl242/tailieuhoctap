@@ -296,9 +296,9 @@ export default function LoansPage() {
     <div className="space-y-6 pb-16">
       {/* Workspace Header Doanh Nghiệp Chuẩn */}
       <WorkspaceHeader
-        title="Quản trị Tạm ứng & Khoản vay Phúc lợi"
-        description="Trung tâm quản trị tài chính nhân sự: Hạn ngạch quỹ phúc lợi, thẩm định giải ngân đa giai đoạn và tự động trích trừ lương định kỳ tuân thủ Điều 101, 102 Bộ luật Lao động 2019."
-        breadcrumbs={[{ label: 'Tiền lương & Chi phí' }, { label: 'Khoản vay & Phúc lợi' }]}
+        title="Tạm ứng & Vay"
+        description="Quản trị quỹ phúc lợi, thẩm định giải ngân và trích trừ lương định kỳ theo quy định."
+        breadcrumbs={[{ label: 'Tiền lương' }, { label: 'Tạm ứng & Vay' }]}
         actions={
           <div className="flex items-center gap-2">
             <Button

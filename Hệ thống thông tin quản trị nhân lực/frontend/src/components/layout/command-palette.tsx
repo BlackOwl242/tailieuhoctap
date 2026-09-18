@@ -19,21 +19,21 @@ interface CommandItem {
 }
 
 const COMMANDS: CommandItem[] = [
-  { id: 'ess', title: 'Cổng Tự Phục Vụ (ESS) & Điểm danh', category: 'Cổng cá nhân ESS', href: '/ess', icon: Users, shortcut: 'G E' },
-  { id: 'catalogs', title: 'Hệ thống Danh mục Quản trị (Master Catalogs 32 bảng)', category: 'Thao tác nghiệp vụ', href: '/admin/catalogs', icon: Database, shortcut: 'G M' },
-  { id: 'org-chart', title: 'Sơ đồ Tổ chức Động (Interactive Org Tree)', category: 'Điều hướng nhanh', href: '/org-chart', icon: Network, shortcut: 'G O' },
-  { id: 'employees', title: 'Danh sách Nhân sự Toàn diện', category: 'Điều hướng nhanh', href: '/employees', icon: Users, shortcut: 'G N' },
-  { id: 'shifts', title: 'Ca kíp & Bảng phân ca (Roster)', category: 'Điều hướng nhanh', href: '/shifts', icon: Clock4, shortcut: 'G S' },
-  { id: 'attendance', title: 'Bảng Chấm công Thực tế', category: 'Điều hướng nhanh', href: '/attendance', icon: ShieldCheck },
-  { id: 'payroll-engine', title: 'Bảng Lương Tự Động Đa Thành Phần & Xuất File Ngân Hàng', category: 'Điều hướng nhanh', href: '/payroll-engine', icon: Calculator, shortcut: 'G P' },
-  { id: 'loans', title: 'Quản trị Tạm ứng / Khoản Vay Phúc lợi (Điều 102 BLLĐ)', category: 'Thao tác nghiệp vụ', href: '/loans', icon: CreditCard },
-  { id: 'assets', title: 'Quản trị Cấp Phát & Thu Hồi Tài Sản (Biên bản)', category: 'Thao tác nghiệp vụ', href: '/assets', icon: Laptop },
-  { id: 'recruitment-ats', title: 'Tuyển dụng ATS Kanban & 1-Click Onboard', category: 'Thao tác nghiệp vụ', href: '/recruitment-ats', icon: Briefcase },
-  { id: 'performance-360', title: 'Đánh giá Hiệu suất 360 & KRA Goals', category: 'Thao tác nghiệp vụ', href: '/performance-360', icon: Target },
-  { id: 'expense-claims', title: 'Công tác phí & Bảng kê Chi phí', category: 'Thao tác nghiệp vụ', href: '/expense-claims', icon: Receipt },
-  { id: 'reports', title: 'Trung tâm Báo cáo Thống kê 2C / Biểu mẫu', category: 'Điều hướng nhanh', href: '/personnel-reports', icon: FileSpreadsheet },
-  { id: 'salary-ranks', title: 'Bảng Ngạch Bậc Lương Nhà nước & Doanh nghiệp', category: 'Điều hướng nhanh', href: '/salary-ranks', icon: Layers },
-  { id: 'leave', title: 'Đăng ký Xin Nghỉ Phép (Điều 113 BLLĐ)', category: 'Cổng cá nhân ESS', href: '/leave', icon: Calendar },
+  { id: 'ess', title: 'Cổng nhân viên (ESS)', category: 'Cổng cá nhân ESS', href: '/ess', icon: Users, shortcut: 'G E' },
+  { id: 'catalogs', title: 'Danh mục gốc', category: 'Thao tác nghiệp vụ', href: '/admin/catalogs', icon: Database, shortcut: 'G M' },
+  { id: 'org-chart', title: 'Sơ đồ tổ chức', category: 'Điều hướng nhanh', href: '/org-chart', icon: Network, shortcut: 'G O' },
+  { id: 'employees', title: 'Hồ sơ nhân sự', category: 'Điều hướng nhanh', href: '/employees', icon: Users, shortcut: 'G N' },
+  { id: 'shifts', title: 'Ca làm việc', category: 'Điều hướng nhanh', href: '/shifts', icon: Clock4, shortcut: 'G S' },
+  { id: 'attendance', title: 'Bảng chấm công', category: 'Điều hướng nhanh', href: '/attendance', icon: ShieldCheck },
+  { id: 'payroll-engine', title: 'Bảng lương', category: 'Điều hướng nhanh', href: '/payroll-engine', icon: Calculator, shortcut: 'G P' },
+  { id: 'loans', title: 'Tạm ứng & Vay', category: 'Thao tác nghiệp vụ', href: '/loans', icon: CreditCard },
+  { id: 'assets', title: 'Quản lý tài sản', category: 'Thao tác nghiệp vụ', href: '/assets', icon: Laptop },
+  { id: 'recruitment-ats', title: 'Tuyển dụng', category: 'Thao tác nghiệp vụ', href: '/recruitment-ats', icon: Briefcase },
+  { id: 'performance-360', title: 'Đánh giá KPI', category: 'Thao tác nghiệp vụ', href: '/performance-360', icon: Target },
+  { id: 'expense-claims', title: 'Công tác phí', category: 'Thao tác nghiệp vụ', href: '/expense-claims', icon: Receipt },
+  { id: 'reports', title: 'Báo cáo nhân sự', category: 'Điều hướng nhanh', href: '/personnel-reports', icon: FileSpreadsheet },
+  { id: 'salary-ranks', title: 'Ngạch bậc lương', category: 'Điều hướng nhanh', href: '/salary-ranks', icon: Layers },
+  { id: 'leave', title: 'Nghỉ phép', category: 'Cổng cá nhân ESS', href: '/leave', icon: Calendar },
 ];
 
 export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {

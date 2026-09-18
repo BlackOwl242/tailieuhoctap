@@ -198,11 +198,11 @@ export class LeaveService {
 
 @ApiTags('leave')
 @ApiBearerAuth()
-@Controller('leave')
+@Controller(['leave', 'hrms/leave'])
 export class LeaveController {
   constructor(private readonly service: LeaveService) {}
 
-  @Get('balance')
+  @Get(['balance', 'my-balance'])
   balance(@CurrentUser() user: AuthUser, @Query('year') year?: string) {
     return this.service.myBalance(user, year);
   }

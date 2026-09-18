@@ -253,9 +253,9 @@ export default function RecruitmentAtsPage() {
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title="Quản trị Tuyển dụng ATS"
-        description="Đăng tin tuyển dụng, trực quan hóa tiến độ ứng viên bằng bảng Kanban kéo thả, quản lý bảng điểm phỏng vấn và chuyển đổi ứng viên trúng tuyển thành nhân viên chính thức."
-        breadcrumbs={[{ label: 'Tuyển dụng' }, { label: 'ATS Pipeline' }]}
+        title="Tuyển dụng"
+        description="Đăng tin tuyển dụng, trực quan hóa tiến độ ứng viên bằng bảng Kanban và quản lý phỏng vấn."
+        breadcrumbs={[{ label: 'Phát triển' }, { label: 'Tuyển dụng' }]}
         actions={
           <div className="flex items-center gap-2">
             <Button

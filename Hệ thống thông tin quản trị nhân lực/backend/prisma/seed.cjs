@@ -30,7 +30,7 @@ async function main() {
         "bookmarks","space_follows","article_views","reactions","comments","article_reviews",
         "attachments","article_tags","tags","categories","article_versions","articles",
         "space_members","spaces","audit_logs","notifications","settings",
-        "refresh_tokens","user_roles","users","org_units" CASCADE`);
+        "refresh_tokens","user_roles","roles","users","org_units" CASCADE`);
 
       const passwordHash = await bcrypt.hash('Admin@123', 12);
       const hashOf = (pw) => bcrypt.hashSync(pw, 12);
@@ -60,6 +60,7 @@ async function main() {
           { code: 'KM_MANAGER', name: 'Quản lý tri thức', description: 'Chủ trì nội dung và quy trình duyệt' },
           { code: 'USER', name: 'Nhân viên', description: 'Tự phục vụ và đóng góp tri thức' },
         ],
+        skipDuplicates: true,
       });
 
       // ---------------------------------------------------------------- người dùng
@@ -358,7 +359,7 @@ async function main() {
           { key: 'WORK_END', value: '17:30', updatedBy: admin.id },
         ],
       }).catch(() => undefined);
-    });
+    }, { maxWait: 15000, timeout: 60000 });
 
     console.log('[seed] Done ✔');
     console.log('[seed] Accounts:');
@@ -376,9 +377,11 @@ main()
   .then(async () => {
     // Seed thêm 43 nhân viên demo tên Việt thực tế (idempotent — Mục 3)
     const { seedEmployees } = require('./seed-employees.cjs');
+    const { seedAll } = require('./seed-all-employees.cjs');
     const bcrypt = require('bcryptjs');
     const r = await seedEmployees(prisma, (pw) => bcrypt.hashSync(pw, 10));
     console.log(`[seed] nhân viên demo: tạo mới ${r.created}, bỏ qua ${r.skipped}`);
+    await seedAll();
 
     // Seed 184 Ngạch bậc lương tiêu chuẩn & Hồ sơ Toàn diện
     const { seedPersonnelData } = require('./seed-personnel-ranks.cjs');

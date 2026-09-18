@@ -348,7 +348,7 @@ export default function MasterCatalogsPage() {
               <Database className="h-5 w-5" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Hệ thống Danh mục Quản trị (Master Catalogs)
+              Danh mục gốc
             </h1>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">

@@ -168,9 +168,9 @@ export default function AssetsPage() {
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title="Quản trị Cơ sở vật chất, Tài sản & Thiết bị"
-        description="Theo dõi toàn bộ danh mục tài sản, trụ sở, máy móc, trang thiết bị chuyên dùng; lập biên bản bàn giao khi tiếp nhận và thu hồi khi luân chuyển, thôi việc."
-        breadcrumbs={[{ label: 'Nhân sự & Cơ cấu' }, { label: 'Tài sản & Thiết bị' }]}
+        title="Tài sản"
+        description="Theo dõi danh mục tài sản, trụ sở, máy móc, thiết bị; lập biên bản bàn giao và thu hồi khi luân chuyển."
+        breadcrumbs={[{ label: 'Nhân sự' }, { label: 'Tài sản' }]}
         actions={
           <div className="flex items-center gap-2">
             <button

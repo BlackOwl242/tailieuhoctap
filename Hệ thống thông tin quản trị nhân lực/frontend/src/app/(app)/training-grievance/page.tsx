@@ -497,9 +497,9 @@ export default function TrainingGrievancePage() {
   return (
     <div className="space-y-5 pb-12">
       <WorkspaceHeader
-        title="Phát Triển Đào Tạo & Tiếp Nhận Khiếu Nại"
-        description="Lập kế hoạch đào tạo phát triển năng lực, khảo sát chất lượng và xử lý khiếu nại kiến nghị của cán bộ nhân viên."
-        breadcrumbs={[{ label: 'Nhân sự' }, { label: 'Đào tạo & Khiếu nại' }]}
+        title="Đào tạo & Khiếu nại"
+        description="Kế hoạch đào tạo phát triển năng lực và xử lý kiến nghị của nhân viên."
+        breadcrumbs={[{ label: 'Phát triển' }, { label: 'Đào tạo & Khiếu nại' }]}
         actions={
           <div className="flex gap-2">
             {activeTab === 'training' ? (

@@ -359,9 +359,9 @@ export default function ShiftsPage() {
   return (
     <div className="space-y-5 pb-12">
       <WorkspaceHeader
-        title="Quản Lý Ca Kíp & Bảng Phân Ca"
-        description="Định nghĩa loại ca làm việc, dung sai thời gian chấm công, ma trận phân ca tuần/tháng và theo dõi chuyên cần."
-        breadcrumbs={[{ label: 'Nhân sự' }, { label: 'Ca kíp & Bảng công' }]}
+        title="Ca làm việc"
+        description="Định nghĩa ca làm việc, dung sai thời gian và ma trận phân ca."
+        breadcrumbs={[{ label: 'Chấm công' }, { label: 'Ca làm việc' }]}
         actions={
           <div className="flex gap-2">
             <Button

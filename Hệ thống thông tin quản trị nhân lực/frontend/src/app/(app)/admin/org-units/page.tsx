@@ -489,8 +489,8 @@ export default function AdminOrgUnitsPage() {
   return (
     <>
       <PageHeader
-        title="Cơ cấu tổ chức"
-        description="Cây phòng ban là dữ liệu cấu hình — thêm, sửa, xóa, xem chi tiết theo dạng cây hoặc bảng."
+        title="Đơn vị phòng ban"
+        description="Quản lý cây phân cấp phòng ban và cấu hình thông tin cơ quan đơn vị."
         actions={
           <div className="flex items-center gap-2">
             <Button

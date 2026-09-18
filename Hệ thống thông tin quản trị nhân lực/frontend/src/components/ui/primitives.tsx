@@ -221,7 +221,14 @@ export function Select({
   const [innerVal, setInnerVal] = React.useState<string | number>(
     Array.isArray(defaultValue) ? defaultValue[0] : (defaultValue ?? '')
   );
-  const [coords, setCoords] = React.useState<{ top: number; left: number; width: number; openUpwards: boolean } | null>(null);
+  const [coords, setCoords] = React.useState<{
+    top?: number;
+    bottom?: number;
+    left: number;
+    width: number;
+    maxHeight: number;
+    openUpwards: boolean;
+  } | null>(null);
   const [mounted, setMounted] = React.useState(false);
 
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -279,18 +286,35 @@ export function Select({
     });
   }, [allOptions, search]);
 
-  // Tính toạ độ fixed cho portal popover khi mở
+  // Chiều cao thanh topbar sticky chuẩn của hệ thống (h-14 = 56px)
+  const TOPBAR_HEIGHT = 56;
+
+  // Tính toạ độ fixed cho portal popover khi mở — tuyệt đối không cho phép đè lên topbar
   const computeCoords = React.useCallback(() => {
     if (!containerRef.current) return;
     const r = containerRef.current.getBoundingClientRect();
+
+    // Nếu nút kích hoạt đã bị cuộn lọt vào sau topbar hoặc vượt khỏi viewport -> đóng lại
+    if (r.bottom <= TOPBAR_HEIGHT || r.top >= window.innerHeight) {
+      setIsOpen(false);
+      return;
+    }
+
     const popoverWidth = Math.min(Math.max(r.width, 220), 500);
-    const spaceBelow = window.innerHeight - r.bottom;
-    const shouldOpenUp = spaceBelow < 280 && r.top > spaceBelow;
+    const spaceAbove = Math.max(0, r.top - TOPBAR_HEIGHT);
+    const spaceBelow = Math.max(0, window.innerHeight - r.bottom);
+
+    // Chỉ mở lên trên khi phía dưới chật VÀ phía trên có tối thiểu 160px để không bao giờ đè lên topbar
+    const shouldOpenUp = spaceBelow < 240 && spaceAbove > spaceBelow && spaceAbove >= 160;
+    const maxHeight = shouldOpenUp ? Math.min(320, spaceAbove - 8) : Math.min(320, spaceBelow - 12);
+
     const leftPos = Math.min(r.left, window.innerWidth - popoverWidth - 12);
     setCoords({
-      top: shouldOpenUp ? r.top - 6 : r.bottom + 6,
+      top: shouldOpenUp ? undefined : Math.max(TOPBAR_HEIGHT + 6, r.bottom + 6),
+      bottom: shouldOpenUp ? window.innerHeight - (r.top - 6) : undefined,
       left: Math.max(4, leftPos),
       width: popoverWidth,
+      maxHeight,
       openUpwards: shouldOpenUp,
     });
   }, []);
@@ -335,19 +359,26 @@ export function Select({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  // Đóng hoặc tái tính toạ độ khi cuộn/resize
+  // Đóng khi cuộn ngoài hoặc thay đổi kích thước màn hình để tránh menu bay lơ lửng đè lên topbar
   React.useEffect(() => {
     if (!isOpen) return;
-    function handleScrollOrResize() {
-      computeCoords();
+    function handleScroll(e: Event) {
+      // Cho phép cuộn bên trong chính danh sách lựa chọn của popover
+      if (popoverRef.current && popoverRef.current.contains(e.target as Node)) {
+        return;
+      }
+      setIsOpen(false);
     }
-    window.addEventListener('scroll', handleScrollOrResize, true);
-    window.addEventListener('resize', handleScrollOrResize);
+    function handleResize() {
+      setIsOpen(false);
+    }
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener('scroll', handleScrollOrResize, true);
-      window.removeEventListener('resize', handleScrollOrResize);
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleResize);
     };
-  }, [isOpen, computeCoords]);
+  }, [isOpen]);
 
   // Xử lý chọn phần tử
   function handleSelect(optVal: string | number) {
@@ -401,6 +432,11 @@ export function Select({
   const isInline = className?.includes('w-auto') || className?.includes('inline');
   const widthMatches = className?.match(/\b(w-\[\S+\]|w-\d+|min-w-\[\S+\]|max-w-\[\S+\]|flex-1)\b/g);
 
+  // Kiểm tra xem Select có nằm trong Modal / Dialog không để chọn tầng z-index tương ứng
+  const isInsideModal = Boolean(
+    containerRef.current?.closest('[role="dialog"], [aria-modal="true"], .fixed')
+  );
+
   // Nội dung popover (render qua portal)
   const popoverContent = isOpen && coords ? (
     <div
@@ -410,9 +446,10 @@ export function Select({
         position: 'fixed',
         left: coords.left,
         width: coords.width,
-        top: coords.openUpwards ? undefined : coords.top,
-        bottom: coords.openUpwards ? window.innerHeight - coords.top : undefined,
-        zIndex: 99999,
+        top: coords.top,
+        bottom: coords.bottom,
+        maxHeight: coords.maxHeight,
+        zIndex: isInsideModal ? 80 : 35,
       }}
     >
       {/* Ô tìm kiếm nếu danh sách >= 6 mục hoặc có cờ searchable */}
@@ -452,8 +489,8 @@ export function Select({
         </div>
       )}
 
-      {/* Danh sách cuộn các lựa chọn */}
-      <div ref={listRef} className="max-h-64 overflow-y-auto py-1 divide-y divide-border/20">
+      {/* Danh sách cuộn các lựa chọn — co giãn theo maxHeight của popover */}
+      <div ref={listRef} className="overflow-y-auto flex-1 py-1 divide-y divide-border/20">
         {filteredOptions.length > 0 ? (
           filteredOptions.map((opt, idx) => {
             const isSelected = String(opt.value) === String(currentVal);

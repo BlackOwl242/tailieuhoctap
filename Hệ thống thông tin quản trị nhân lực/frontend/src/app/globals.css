@@ -57,6 +57,58 @@
     @apply border-border;
   }
 
+  /* Khử triệt để mọi viền focus đen và hiệu ứng nháy viền khi bấm trên toàn hệ thống */
+  *,
+  *::before,
+  *::after {
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  *:focus,
+  *:focus-visible,
+  *:active {
+    outline: none !important;
+  }
+
+  button:focus,
+  button:focus-visible,
+  button:active,
+  a:focus,
+  a:focus-visible,
+  a:active,
+  [role="button"]:focus,
+  [role="button"]:focus-visible,
+  [role="button"]:active {
+    outline: none !important;
+  }
+
+  /* Đặc trị cho sidebar: loại bỏ mọi viền đen nhấp nháy khi click link / button */
+  aside a,
+  aside button,
+  aside input,
+  nav a,
+  nav button {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    user-select: none;
+  }
+
+  aside a:focus,
+  aside a:focus-visible,
+  aside a:active,
+  aside button:focus,
+  aside button:focus-visible,
+  aside button:active,
+  nav a:focus,
+  nav a:focus-visible,
+  nav a:active,
+  nav button:focus,
+  nav button:focus-visible,
+  nav button:active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
   }

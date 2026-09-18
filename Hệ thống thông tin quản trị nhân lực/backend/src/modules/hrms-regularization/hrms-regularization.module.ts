@@ -5,6 +5,8 @@ import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestj
 import { IsDateString, IsOptional, IsString } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
+import { CurrentUser } from '../../common/decorators';
+import type { AuthUser } from '../../common/types/auth-user';
 
 export class CreateRegularizationDto {
   @ApiProperty({ example: 'user-id' })
@@ -151,6 +153,11 @@ export class HrmsRegularizationService {
 @Controller('hrms/attendance-regularizations')
 export class HrmsRegularizationController {
   constructor(private readonly service: HrmsRegularizationService) {}
+
+  @Get('my')
+  myRegularizations(@CurrentUser() user: AuthUser) {
+    return this.service.list(undefined, user?.id);
+  }
 
   @Get()
   list(@Query('status') status?: string, @Query('userId') userId?: string) {

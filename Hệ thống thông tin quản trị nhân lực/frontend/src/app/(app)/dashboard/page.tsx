@@ -148,8 +148,8 @@ export default function FrappeHrmsDeskDashboard() {
     <div className="space-y-6 pb-12">
       {/* Header */}
       <WorkspaceHeader
-        title="Bàn làm việc Quản trị Nhân sự"
-        description="Không gian điều hành quản trị nhân lực tích hợp toàn diện: Tuyển dụng ATS, Ca kíp, Chấm công, Tiền lương, Hiệu suất 360, Công tác phí và Đào tạo."
+        title="Tổng quan"
+        description="Không gian điều hành quản trị nhân lực tích hợp: Tuyển dụng, Chấm công, Tiền lương, Hiệu suất và Đào tạo."
         actions={
           <div className="flex items-center gap-2">
             <Link

@@ -5,6 +5,8 @@ import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestj
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
+import { CurrentUser } from '../../common/decorators';
+import type { AuthUser } from '../../common/types/auth-user';
 
 export class CreateAssetDto {
   @ApiProperty({ example: 'AST-008' })
@@ -148,6 +150,11 @@ export class HrmsAssetsService {
 @Controller('hrms/assets')
 export class HrmsAssetsController {
   constructor(private readonly service: HrmsAssetsService) {}
+
+  @Get('my')
+  myAssets(@CurrentUser() user: AuthUser) {
+    return this.service.listAssets(undefined, undefined, user?.id);
+  }
 
   @Get()
   listAssets(

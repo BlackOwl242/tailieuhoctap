@@ -85,9 +85,12 @@ function ActionsCell({ items, rowLabel }: { items: RowActionItem[]; rowLabel: st
   function toggle() {
     if (!open && btnRef.current) {
       const r = btnRef.current.getBoundingClientRect();
+      if (r.bottom <= 56) return;
       const menuW = 220;
       const menuH = 40 * Math.min(visible.length, 6) + 16;
-      const top = r.bottom + 6 + menuH > window.innerHeight ? Math.max(8, r.top - menuH - 6) : r.bottom + 6;
+      const top = r.bottom + 6 + menuH > window.innerHeight
+        ? Math.max(62, r.top - menuH - 6)
+        : Math.max(62, r.bottom + 6);
       const left = r.right + menuW > window.innerWidth ? Math.max(8, r.right - menuW) : r.right - menuW;
       setPos({ top, left });
     }

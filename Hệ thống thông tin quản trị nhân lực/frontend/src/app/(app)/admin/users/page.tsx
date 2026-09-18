@@ -98,7 +98,8 @@ export default function AdminUsersPage() {
   return (
     <>
       <PageHeader
-        title="Quản lý người dùng"
+        title="Tài khoản"
+        description="Quản lý tài khoản người dùng và vai trò phân quyền."
         actions={
           <Button size="sm" onClick={() => setShowCreate(true)}>
             <Plus className="h-4 w-4" /> Thêm người dùng

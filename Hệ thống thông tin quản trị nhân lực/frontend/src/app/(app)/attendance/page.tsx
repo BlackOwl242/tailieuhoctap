@@ -39,9 +39,9 @@ export default function AttendancePage() {
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
-        title="Bảng Chấm Công"
+        title="Bảng chấm công"
         description="Điểm danh đa nguồn: trực tiếp web, quét mã QR tại Kiosk hoặc nhận diện khuôn mặt."
-        breadcrumbs={[{ label: 'Chấm công' }, { label: 'Bảng công cá nhân' }]}
+        breadcrumbs={[{ label: 'Chấm công' }, { label: 'Bảng chấm công' }]}
         actions={
           <div className="flex items-center gap-2">
             <Link href="/check-in?mode=qr"><Button variant="outline" size="sm"><QrCode className="h-4 w-4" /> Kiosk QR</Button></Link>
