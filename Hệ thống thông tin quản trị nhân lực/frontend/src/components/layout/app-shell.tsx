@@ -473,7 +473,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                 }}
                 aria-label={domain.label}
                 className={cn(
-                  'group relative flex h-10 w-10 items-center justify-center rounded-xl transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none',
+                  'group relative flex h-10 w-10 items-center justify-center rounded-xl transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-offset-0 active:outline-none select-none',
                   isDomainActive
                     ? 'bg-muted/90 text-foreground font-semibold shadow-xs'
                     : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
@@ -498,7 +498,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
             type="button"
             onClick={toggleSubSidebar}
             title={subSidebarOpen ? 'Thu gọn cây phân mục' : 'Mở rộng cây phân mục'}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-offset-0 active:outline-none select-none"
           >
             <PanelLeft className={cn('h-4 w-4 transition-transform', !subSidebarOpen && 'rotate-180 text-primary')} />
           </button>
@@ -507,7 +507,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
 
           <Link
             href="/profile"
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-offset-0 active:outline-none select-none"
             title={`Tài khoản: ${profile.fullName}`}
           >
             <UserCircle2 className="h-5 w-5" />
@@ -536,7 +536,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                 type="button"
                 onClick={toggleSubSidebar}
                 title="Thu gọn bảng điều hướng"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors outline-none focus:outline-none"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none"
               >
                 <PanelLeftClose className="h-4 w-4" />
               </button>
@@ -551,12 +551,12 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
               value={subSidebarSearch}
               onChange={(e) => setSubSidebarSearch(e.target.value)}
               placeholder="Tìm kiếm chức năng..."
-              className="w-full pl-8 pr-7 py-1.5 text-xs bg-muted/40 hover:bg-muted/60 focus:bg-card border border-border/60 rounded-xl outline-none focus:border-border transition-all text-foreground placeholder:text-muted-foreground/70"
+              className="w-full pl-8 pr-7 py-1.5 text-xs bg-muted/40 hover:bg-muted/60 focus:bg-card border border-border/60 rounded-xl outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-border transition-all text-foreground placeholder:text-muted-foreground/70"
             />
             {subSidebarSearch && (
               <button
                 onClick={() => setSubSidebarSearch('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -569,7 +569,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
               type="button"
               onClick={() => setActiveTab('folders')}
               className={cn(
-                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs outline-none focus:outline-none',
+                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none',
                 activeTab === 'folders'
                   ? 'bg-card text-foreground font-semibold shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
@@ -581,7 +581,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
               type="button"
               onClick={() => setActiveTab('tags')}
               className={cn(
-                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs outline-none focus:outline-none',
+                'flex-1 py-1 px-3 text-center rounded-lg font-medium transition-all text-xs outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none',
                 activeTab === 'tags'
                   ? 'bg-card text-foreground font-semibold shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
@@ -604,7 +604,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                       <button
                         type="button"
                         onClick={() => toggleFolder(folder.id)}
-                        className="group flex w-full items-center justify-between py-1 px-1.5 rounded-lg text-xs font-semibold text-foreground/90 hover:bg-muted/50 transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none"
+                        className="group flex w-full items-center justify-between py-1 px-1.5 rounded-lg text-xs font-semibold text-foreground/90 hover:bg-muted/50 transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-offset-0 active:outline-none select-none"
                       >
                         <div className="flex items-center gap-2 truncate">
                           {isOpen ? (
@@ -637,7 +637,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                                 <Link
                                   href={item.href}
                                   className={cn(
-                                    'group relative flex items-center justify-between py-1 px-2 rounded-lg text-xs transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none',
+                                    'group relative flex items-center justify-between py-1 px-2 rounded-lg text-xs transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-offset-0 active:outline-none select-none',
                                     active
                                       ? 'bg-muted/90 text-foreground font-semibold shadow-xs'
                                       : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
@@ -675,7 +675,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                                           <Link
                                             href={sub.href}
                                             className={cn(
-                                              'relative flex items-center justify-between py-0.5 px-2 rounded-md text-[11px] transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none',
+                                              'relative flex items-center justify-between py-0.5 px-2 rounded-md text-[11px] transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-offset-0 active:outline-none select-none',
                                               subActive
                                                 ? 'text-foreground font-semibold bg-muted/60'
                                                 : 'text-muted-foreground/80 hover:text-foreground hover:bg-muted/30'
@@ -713,7 +713,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                   <Link
                     key={tag.id}
                     href={tag.href}
-                    className="flex items-center justify-between py-1.5 px-2.5 rounded-lg text-xs text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors group"
+                    className="flex items-center justify-between py-1.5 px-2.5 rounded-lg text-xs text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none group"
                   >
                     <div className="flex items-center gap-2">
                       <Tag className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-foreground" />
@@ -735,14 +735,14 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
       {/* ========================================================================= */}
       <header
         className={cn(
-          'sticky top-0 z-sticky border-b border-border/60 bg-card/80 backdrop-blur-md transition-all duration-200',
+          'sticky top-0 z-sticky flex h-14 items-center justify-between border-b border-border/60 bg-card/80 px-4 backdrop-blur-md transition-all duration-200 sm:px-6',
           subSidebarOpen ? 'md:ml-[320px]' : 'md:ml-16'
         )}
       >
-        <div className="flex h-14 items-center gap-3 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3">
           {/* Mobile hamburger button */}
           <button
-            className="rounded-md p-1.5 hover:bg-accent md:hidden text-muted-foreground"
+            className="rounded-md p-1.5 hover:bg-accent md:hidden text-muted-foreground outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none"
             onClick={() => setMobileNavOpen(true)}
             aria-label="Mở menu điều hướng"
           >
@@ -750,7 +750,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
           </button>
 
           {/* Logo thu nhỏ trên Mobile */}
-          <Link href="/dashboard" className="flex items-center gap-2 md:hidden">
+          <Link href="/dashboard" className="flex items-center gap-2 md:hidden outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none">
             <GeometricCubeLogo className="h-5 w-5 text-foreground" />
             <span className="font-bold text-sm">HRMIS</span>
           </Link>
@@ -760,68 +760,68 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
             <button
               onClick={() => setSubSidebarOpen(true)}
               title="Mở thanh điều hướng phụ"
-              className="hidden md:flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors border border-border/50 shrink-0"
+              className="hidden md:flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors border border-border/50 shrink-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none"
             >
               <PanelLeft className="h-4 w-4" />
             </button>
           )}
+        </div>
 
-          {/* Thanh tìm kiếm đặt chính giữa Topbar */}
-          <div className="hidden md:flex flex-1 items-center justify-center px-4 max-w-xl mx-auto">
-            <button
-              onClick={() => setCommandPaletteOpen(true)}
-              className="flex w-full max-w-md items-center justify-between rounded-xl border border-border/60 bg-muted/30 px-3.5 py-1.5 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all shadow-2xs"
-            >
-              <span className="flex items-center gap-2">
-                <Search className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>Tìm kiếm nhân viên, chức năng, tạo đơn từ...</span>
+        {/* Thanh tìm kiếm đặt chính giữa Topbar */}
+        <div className="hidden md:flex flex-1 items-center justify-center px-4 max-w-xl mx-auto">
+          <button
+            onClick={() => setCommandPaletteOpen(true)}
+            className="flex w-full max-w-md items-center justify-between rounded-xl border border-border/60 bg-muted/30 px-3.5 py-1.5 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all shadow-2xs outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none"
+          >
+            <span className="flex items-center gap-2">
+              <Search className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>Tìm kiếm nhân viên, chức năng, tạo đơn từ...</span>
+            </span>
+            <kbd className="inline-flex items-center rounded-md border border-border bg-card px-1.5 py-0.5 text-[10px] font-mono font-bold text-muted-foreground">
+              Ctrl K
+            </kbd>
+          </button>
+        </div>
+
+        {/* Cụm hành động phải: thông báo + hồ sơ */}
+        <div className="ml-auto flex items-center gap-1.5">
+          <Link
+            href="/notifications"
+            className={cn(
+              'rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none',
+              isLinkActive('/notifications') && 'text-primary bg-primary/10'
+            )}
+            aria-label="Thông báo"
+          >
+            <Bell className="h-4 w-4" />
+          </Link>
+
+          <div className="h-4 w-px bg-border mx-1" />
+
+          <Link
+            href="/profile"
+            className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-muted/60 transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none"
+            aria-label="Hồ sơ cá nhân"
+          >
+            <UserCircle2 className="h-6 w-6 text-muted-foreground/80" />
+            <span className="hidden min-w-0 lg:block text-left">
+              <span className="block max-w-[9rem] truncate text-xs font-semibold text-foreground leading-tight">
+                {profile.fullName}
               </span>
-              <kbd className="inline-flex items-center rounded-md border border-border bg-card px-1.5 py-0.5 text-[10px] font-mono font-bold text-muted-foreground">
-                Ctrl K
-              </kbd>
-            </button>
-          </div>
-
-          {/* Cụm hành động phải: thông báo + hồ sơ */}
-          <div className="ml-auto flex items-center gap-1.5">
-            <Link
-              href="/notifications"
-              className={cn(
-                'rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors',
-                isLinkActive('/notifications') && 'text-primary bg-primary/10'
-              )}
-              aria-label="Thông báo"
-            >
-              <Bell className="h-4 w-4" />
-            </Link>
-
-            <div className="h-4 w-px bg-border mx-1" />
-
-            <Link
-              href="/profile"
-              className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-muted/60 transition-colors"
-              aria-label="Hồ sơ cá nhân"
-            >
-              <UserCircle2 className="h-6 w-6 text-muted-foreground/80" />
-              <span className="hidden min-w-0 lg:block text-left">
-                <span className="block max-w-[9rem] truncate text-xs font-semibold text-foreground leading-tight">
-                  {profile.fullName}
-                </span>
-                <span className="block text-[11px] leading-tight text-muted-foreground truncate">
-                  {profile.jobTitle ?? profile.email}
-                </span>
+              <span className="block text-[11px] leading-tight text-muted-foreground truncate">
+                {profile.jobTitle ?? profile.email}
               </span>
-            </Link>
+            </span>
+          </Link>
 
-            <button
-              onClick={logout}
-              className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-              aria-label="Đăng xuất"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Thoát</span>
-            </button>
-          </div>
+          <button
+            onClick={logout}
+            className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none"
+            aria-label="Đăng xuất"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Thoát</span>
+          </button>
         </div>
       </header>
 

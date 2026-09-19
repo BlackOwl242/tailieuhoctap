@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { LogIn, LogOut, QrCode, Camera } from 'lucide-react';
+import { LogIn, LogOut, Camera } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { cn, formatDateTime, DAY_STATUS_LABEL } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
@@ -40,12 +40,11 @@ export default function AttendancePage() {
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
         title="Bảng chấm công"
-        description="Điểm danh đa nguồn: trực tiếp web, quét mã QR tại Kiosk hoặc nhận diện khuôn mặt."
+        description="Điểm danh qua máy chấm công & nhận diện khuôn mặt sinh trắc học."
         breadcrumbs={[{ label: 'Chấm công' }, { label: 'Bảng chấm công' }]}
         actions={
           <div className="flex items-center gap-2">
-            <Link href="/check-in?mode=qr"><Button variant="outline" size="sm"><QrCode className="h-4 w-4" /> Kiosk QR</Button></Link>
-            <Link href="/check-in?mode=face"><Button variant="outline" size="sm"><Camera className="h-4 w-4" /> Khuôn mặt</Button></Link>
+            <Link href="/check-in"><Button variant="outline" size="sm"><Camera className="h-4 w-4" /> Điểm danh khuôn mặt</Button></Link>
             <PrintExportDropdown
               printLabel="In bảng công"
               exportLabel="Xuất bảng Excel"
@@ -87,7 +86,7 @@ export default function AttendancePage() {
 
       {/* Bảng công 14 ngày */}
       <div className="print-area">
-        <PrintFrame title="BẢNG CHẤM CÔNG CÁ NHÂN" subtitle="Ghi nhận từ hệ thống máy chấm công, mã QR Kiosk & sinh trắc học khuôn mặt" />
+        <PrintFrame title="BẢNG CHẤM CÔNG CÁ NHÂN" subtitle="Ghi nhận từ hệ thống máy chấm công & sinh trắc học khuôn mặt" />
         <Card className="no-print">
           <CardHeader><CardTitle>Bảng công gần đây</CardTitle></CardHeader>
           <CardContent>

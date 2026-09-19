@@ -2,7 +2,6 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { isAxiosError } from 'axios';
 import {
   AlertCircle,
@@ -13,13 +12,11 @@ import {
   CheckCircle2,
   Eye,
   Info,
-  Laptop,
   Loader2,
   Lock,
   LogIn,
   Maximize,
   Minimize,
-  QrCode,
   Radio,
   RefreshCw,
   Scan,
@@ -218,9 +215,6 @@ function extractAdvancedFaceDescriptor(video: HTMLVideoElement): { vector: numbe
 }
 
 function CheckInInner() {
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
-
   // Clock
   const [currentTime, setCurrentTime] = useState<string>('');
   const [currentDate, setCurrentDate] = useState<string>('');
@@ -245,36 +239,7 @@ function CheckInInner() {
 
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // QR state
-  const [qrStatus, setQrStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
-  const [qrMessage, setQrMessage] = useState('Đang xử lý…');
-  const [qrPunchInfo, setQrPunchInfo] = useState<{ punch: string; time: string; status?: string } | null>(null);
   const [needLogin, setNeedLogin] = useState(false);
-
-  useEffect(() => {
-    if (!token) return;
-    setQrStatus('loading');
-    api.post('/attendance/check-in', { method: 'QR', qrToken: token })
-      .then((res) => {
-        setQrStatus('ok');
-        const punch = res.data?.punch === 'IN' ? 'GIỜ VÀO (CHECK-IN)' : 'GIỜ RA (CHECK-OUT)';
-        const time = new Date().toLocaleTimeString('vi-VN');
-        setQrPunchInfo({ punch, time, status: res.data?.status });
-        setQrMessage(`Chấm công thành công (${punch}) lúc ${time}`);
-        if (soundEnabled) playChime('success');
-      })
-      .catch((e) => {
-        setQrStatus('error');
-        if (soundEnabled) playChime('error');
-        if (isUnauthorized(e)) {
-          setNeedLogin(true);
-          setQrMessage('Bạn chưa đăng nhập trên thiết bị này. Hãy đăng nhập rồi quét lại mã.');
-        } else {
-          setQrMessage(errorMessage(e));
-        }
-      });
-  }, [token, soundEnabled]);
 
   // --------------------------------------------------------- FACE Flow
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -596,7 +561,7 @@ function CheckInInner() {
                     Điểm danh khuôn mặt 2D & Cảm biến IR
                   </Badge>
                 </div>
-                <span className="text-xs text-muted-foreground font-medium">Hỗ trợ Cảm biến Hồng ngoại IR · Camera RGB · Kiosk QR</span>
+                <span className="text-xs text-muted-foreground font-medium">Hỗ trợ Cảm biến Hồng ngoại IR · Camera RGB Sinh trắc học</span>
               </div>
             </Link>
           </div>
@@ -622,7 +587,7 @@ function CheckInInner() {
             <button
               onClick={toggleFullscreen}
               className="hidden sm:inline-flex p-2 rounded-md border border-border bg-card hover:bg-muted text-foreground transition-colors"
-              title="Toàn màn hình Kiosk"
+              title="Toàn màn hình"
             >
               {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
             </button>
@@ -638,127 +603,21 @@ function CheckInInner() {
 
       {/* ================= MAIN CONTAINER ================= */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
-        {/* 1. Trang QR Scan Handler (/check-in?token=...) */}
-        {token ? (
-          <div className="w-full max-w-md mx-auto my-auto flex flex-col items-center gap-5 rounded-lg border border-border bg-card p-8 text-center shadow-md">
-            {qrStatus === 'loading' ? (
-              <>
-                <Loader2 className="h-14 w-14 animate-spin text-primary" />
-                <h2 className="text-xl font-bold text-foreground">Đang xác thực mã QR…</h2>
-                <p className="text-xs text-muted-foreground">Đang đối soát mã bảo mật với hệ thống</p>
-              </>
-            ) : qrStatus === 'ok' ? (
-              <>
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shadow-xs">
-                  <CheckCircle2 className="h-10 w-10" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-foreground">Điểm danh thành công!</h2>
-                  <p className="mt-1 text-xs text-muted-foreground">{qrMessage}</p>
-                </div>
-                {qrPunchInfo ? (
-                  <div className="w-full rounded-md border border-border bg-muted/20 p-4 text-left space-y-1.5 text-xs">
-                    <div className="flex justify-between py-1 border-b border-border">
-                      <span className="text-muted-foreground">Hình thức ghi nhận:</span>
-                      <span className="font-bold text-foreground">{qrPunchInfo.punch}</span>
-                    </div>
-                    <div className="flex justify-between py-1 border-b border-border">
-                      <span className="text-muted-foreground">Thời gian điểm danh:</span>
-                      <span className="font-semibold text-foreground font-mono">{qrPunchInfo.time}</span>
-                    </div>
-                    <div className="flex justify-between py-1">
-                      <span className="text-muted-foreground">Trạng thái ca:</span>
-                      <span className="font-medium text-foreground">{qrPunchInfo.status ?? 'HỢP LỆ'}</span>
-                    </div>
-                  </div>
-                ) : null}
-                <div className="flex flex-col gap-2 w-full mt-2">
-                  <Link href="/ess" className="w-full">
-                    <Button className="w-full py-5 font-semibold">Vào Bàn làm việc cá nhân (ESS)</Button>
-                  </Link>
-                  <Link href="/check-in?mode=qr" className="w-full">
-                    <Button variant="outline" className="w-full border-border">
-                      Màn hình Kiosk quét QR
-                    </Button>
-                  </Link>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive border border-destructive/20">
-                  <AlertCircle className="h-10 w-10" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-destructive">Không thể điểm danh</h2>
-                  <p className="mt-1 text-xs text-muted-foreground">{qrMessage}</p>
-                </div>
-                {needLogin ? (
-                  <Link href={`/login?next=${encodeURIComponent(`/check-in?token=${token}`)}`} className="w-full">
-                    <Button className="w-full py-5 font-semibold gap-2"><LogIn className="h-4 w-4" /> Đăng nhập ngay</Button>
-                  </Link>
-                ) : (
-                  <Link href="/check-in?mode=qr" className="w-full">
-                    <Button variant="outline" className="w-full border-border py-5">
-                      <QrCode className="h-4 w-4 mr-2" /> Quét lại mã QR tại Kiosk
-                    </Button>
-                  </Link>
-                )}
-              </>
-            )}
-          </div>
-        ) : null}
-
-        {/* 2. CỔNG ĐIỂM DANH & NHẬN DIỆN KHUÔN MẶT 2D / HỒNG NGOẠI IR */}
-        {!token && (
-          <div className="flex flex-col gap-6">
-            {/* Thanh công cụ phương thức */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-lg border border-border bg-card shadow-xs">
-              <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold bg-primary text-primary-foreground shadow-xs">
-                  <Camera className="h-4 w-4" /> Camera nhận diện khuôn mặt & Hồng ngoại IR
-                </div>
-
-                <Link href="/check-in?mode=qr">
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold bg-muted text-foreground hover:bg-muted/80 transition-all border border-border">
-                    <QrCode className="h-4 w-4" /> Kiosk quét QR
-                  </div>
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    api.post('/attendance/check-in', { method: 'WEB' })
-                      .then((res) => {
-                        const punch = res.data?.punch === 'IN' ? 'GIỜ VÀO' : 'GIỜ RA';
-                        if (soundEnabled) playChime('success');
-                        setFaceResult({
-                          ok: true,
-                          punch,
-                          time: new Date().toLocaleTimeString('vi-VN'),
-                          sensorType: 'Web Portal',
-                          message: `Chấm công Web thành công (${punch}) lúc ${new Date().toLocaleTimeString('vi-VN')}`,
-                        });
-                      })
-                      .catch((e) => {
-                        if (soundEnabled) playChime('error');
-                        if (isUnauthorized(e)) {
-                          setNeedLogin(true);
-                        } else {
-                          setFaceResult({ ok: false, message: errorMessage(e) });
-                        }
-                      });
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold bg-muted text-foreground hover:bg-muted/80 transition-all border border-border"
-                >
-                  <Laptop className="h-4 w-4" /> Chấm công 1 chạm
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Ngưỡng chuẩn an toàn: <strong>≥ 95.0%</strong></span>
+        {/* CỔNG ĐIỂM DANH & NHẬN DIỆN KHUÔN MẶT 2D / HỒNG NGOẠI IR */}
+        <div className="flex flex-col gap-6">
+          {/* Thanh công cụ phương thức */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-lg border border-border bg-card shadow-xs">
+            <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold bg-primary text-primary-foreground shadow-xs">
+                <Camera className="h-4 w-4" /> Camera nhận diện khuôn mặt & Hồng ngoại IR
               </div>
             </div>
+
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Ngưỡng chuẩn an toàn: <strong>≥ 95.0%</strong></span>
+            </div>
+          </div>
 
             {/* Need Login Prompt */}
             {needLogin ? (
@@ -1351,7 +1210,6 @@ function CheckInInner() {
               </div>
             )}
           </div>
-        )}
       </main>
     </div>
   );

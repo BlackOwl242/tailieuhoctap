@@ -67,7 +67,7 @@ export default function FrappeHrmsDeskDashboard() {
         { label: 'Bảng Chấm công Thực tế', href: '/attendance' },
         { label: 'Quản lý Đơn Nghỉ phép', href: '/leave', count: hr?.pendingLeave },
         { label: 'Đăng ký Làm thêm giờ / Trực ca', href: '/overtime', count: hr?.pendingOvertime },
-        { label: 'Điểm danh Kiosk Trực tuyến', href: '/check-in' },
+        { label: 'Điểm danh khuôn mặt & IR', href: '/check-in' },
       ],
     },
     {

@@ -57,7 +57,7 @@
     @apply border-border;
   }
 
-  /* Khử triệt để mọi viền focus đen và hiệu ứng nháy viền khi bấm trên toàn hệ thống */
+  /* Khử triệt để 100% mọi viền focus đen và outline khi Tab / phím mũi tên */
   *,
   *::before,
   *::after {
@@ -66,8 +66,13 @@
 
   *:focus,
   *:focus-visible,
+  *:focus-within,
   *:active {
     outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    -webkit-focus-ring-color: transparent !important;
   }
 
   button:focus,
@@ -78,35 +83,39 @@
   a:active,
   [role="button"]:focus,
   [role="button"]:focus-visible,
-  [role="button"]:active {
+  [role="button"]:active,
+  [tabindex]:focus,
+  [tabindex]:focus-visible {
     outline: none !important;
-  }
-
-  /* Đặc trị cho sidebar: loại bỏ mọi viền đen nhấp nháy khi click link / button */
-  aside a,
-  aside button,
-  aside input,
-  nav a,
-  nav button {
-    outline: none !important;
-    -webkit-tap-highlight-color: transparent !important;
-    user-select: none;
-  }
-
-  aside a:focus,
-  aside a:focus-visible,
-  aside a:active,
-  aside button:focus,
-  aside button:focus-visible,
-  aside button:active,
-  nav a:focus,
-  nav a:focus-visible,
-  nav a:active,
-  nav button:focus,
-  nav button:focus-visible,
-  nav button:active {
-    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
     box-shadow: none !important;
+    -webkit-focus-ring-color: transparent !important;
+  }
+
+  /* Đặc trị triệt để cho sidebar, navigation, tree view: không bao giờ có viền đen khi tab/mũi tên */
+  aside,
+  aside *,
+  nav,
+  nav * {
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  aside *:focus,
+  aside *:focus-visible,
+  aside *:focus-within,
+  aside *:active,
+  nav *:focus,
+  nav *:focus-visible,
+  nav *:focus-within,
+  nav *:active {
+    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-focus-ring-color: transparent !important;
   }
 
   html {
@@ -465,4 +474,44 @@
   .markdown-body td {
     @apply border px-3 py-1.5 text-left;
   }
+}
+
+/* ========================================================================== */
+/* BẢO ĐẢM TRIỆT TIÊU 100% VIỀN ĐEN KHI TAB / DI CHUYỂN PHÍM MŨI TÊN          */
+/* (Quy tắc độc lập nằm ngoài @layer để có độ ưu tiên Cascade cao nhất)        */
+/* ========================================================================== */
+html *:focus,
+html *:focus-visible,
+html *:focus-within,
+html *:active {
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
+html button:focus,
+html button:focus-visible,
+html button:active,
+html a:focus,
+html a:focus-visible,
+html a:active,
+html [role="button"]:focus,
+html [role="button"]:focus-visible,
+html [role="button"]:active,
+html [tabindex]:focus,
+html [tabindex]:focus-visible,
+html aside *:focus,
+html aside *:focus-visible,
+html aside *:active,
+html nav *:focus,
+html nav *:focus-visible,
+html nav *:active {
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-focus-ring-color: transparent !important;
 }

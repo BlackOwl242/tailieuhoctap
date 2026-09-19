@@ -138,12 +138,12 @@ export default function EssPage() {
             {isCheckedIn ? (
               <>
                 <LogOut className="h-4 w-4" />
-                Check-Out Ra Về (Đã vào lúc {checkInTime})
+                Điểm danh ra ca (Đã vào lúc {checkInTime})
               </>
             ) : (
               <>
                 <LogIn className="h-4 w-4" />
-                1-Chạm Check-In Vào Ca
+                Điểm danh vào ca
               </>
             )}
           </button>
@@ -356,7 +356,7 @@ export default function EssPage() {
               <label className="block text-xs font-medium text-foreground mb-1">Lý do giải trình</label>
               <Textarea
                 rows={3}
-                placeholder="VD: Quên quẹt thẻ do đi gặp khách hàng, lỗi thiết bị kiosk..."
+                placeholder="VD: Quên quẹt thẻ do đi gặp khách hàng, lỗi thiết bị chấm công..."
                 value={regReason}
                 onChange={(e) => setRegReason(e.target.value)}
                 className="text-xs resize-none"

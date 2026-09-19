@@ -488,7 +488,7 @@ export default function MasterCatalogsPage() {
         <div className="lg:col-span-8 space-y-4">
           <Card className="shadow-xs border-border/80">
             <CardHeader className="p-4 border-b border-border/60">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div className="flex items-center gap-2">
                     <CardTitle className="text-base font-bold text-foreground">
@@ -503,26 +503,28 @@ export default function MasterCatalogsPage() {
                   </CardDescription>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="relative w-full sm:w-44">
+                <div className="flex flex-col items-end gap-2.5 shrink-0">
+                  <div className="relative w-full sm:w-64">
                     <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
                     <Input
                       type="search"
                       placeholder={`Tìm trong ${currentCatalog?.catalog?.name}...`}
-                      className="pl-8 text-xs h-8"
+                      className="pl-8 text-xs h-8 w-full"
                       value={itemSearch}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setItemSearch(e.target.value)}
                     />
                   </div>
-                  <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={() => window.print()}>
-                    <Printer className="h-3.5 w-3.5 text-primary" /> In toàn bộ danh mục
-                  </Button>
-                  <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={handleExportExcel}>
-                    <FileSpreadsheet className="h-3.5 w-3.5" /> Xuất Excel
-                  </Button>
-                  <Button size="sm" className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground" onClick={handleOpenAdd} disabled={isMutating}>
-                    <Plus className="h-3.5 w-3.5" /> Thêm mục
-                  </Button>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={() => window.print()}>
+                      <Printer className="h-3.5 w-3.5 text-primary" /> In toàn bộ danh mục
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={handleExportExcel}>
+                      <FileSpreadsheet className="h-3.5 w-3.5" /> Xuất Excel
+                    </Button>
+                    <Button size="sm" className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground" onClick={handleOpenAdd} disabled={isMutating}>
+                      <Plus className="h-3.5 w-3.5" /> Thêm mục
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardHeader>

@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
-import { BookOpenText, Loader2, LogOut, QrCode } from 'lucide-react';
+import { BookOpenText, Camera, Loader2, LogOut } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from '@/components/ui/primitives';
@@ -157,12 +157,8 @@ function LoginInner() {
 
         {/* Mục 2 — mở màn hình điểm danh ngay từ trang đăng nhập (không cần đăng nhập) */}
         <div className="mt-6 flex items-center justify-center gap-4 text-center text-xs text-muted-foreground">
-          <Link href="/check-in?mode=qr" className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-foreground">
-            <QrCode className="h-3.5 w-3.5" /> Mở màn hình Kiosk điểm danh (QR)
-          </Link>
-          <span aria-hidden>·</span>
-          <Link href="/check-in?mode=face" className="underline underline-offset-2 hover:text-foreground">
-            Điểm danh khuôn mặt
+          <Link href="/check-in" className="inline-flex items-center gap-1.5 underline underline-offset-2 hover:text-foreground">
+            <Camera className="h-3.5 w-3.5" /> Điểm danh khuôn mặt &amp; Hồng ngoại IR
           </Link>
         </div>
       </div>

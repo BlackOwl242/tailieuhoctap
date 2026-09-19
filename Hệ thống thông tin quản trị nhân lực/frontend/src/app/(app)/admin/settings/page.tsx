@@ -12,7 +12,6 @@ import { PageHeader, ErrorState } from '@/components/common/states';
 const EDITABLE = [
   { key: 'WORK_START', label: 'Giờ bắt đầu ca chuẩn' },
   { key: 'WORK_END', label: 'Giờ kết thúc ca chuẩn' },
-  { key: 'QR_TTL_SEC', label: 'Chu kỳ xoay QR kiosk (giây)' },
   { key: 'FACE_THRESHOLD', label: 'Ngưỡng khớp khuôn mặt' },
   { key: 'REVIEW_DUE_DAYS', label: 'Hạn xử lý duyệt bài (ngày)' },
 ];

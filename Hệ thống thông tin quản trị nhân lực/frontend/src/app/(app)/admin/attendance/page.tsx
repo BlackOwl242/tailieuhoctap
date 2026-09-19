@@ -104,7 +104,6 @@ export default function AdminAttendancePage() {
               <div className="space-y-1"><Label>Loại</Label>
                 <Select value={deviceForm.type} onChange={(e) => setDeviceForm({ ...deviceForm, type: e.target.value })}>
                   <option value="MACHINE_WEBHOOK">Máy (webhook)</option>
-                  <option value="QR_KIOSK">Kiosk QR</option>
                   <option value="SIMULATOR">Mô phỏng</option>
                 </Select></div>
               <Button disabled={!deviceForm.name || createDevice.isPending} onClick={() => createDevice.mutate()}>
