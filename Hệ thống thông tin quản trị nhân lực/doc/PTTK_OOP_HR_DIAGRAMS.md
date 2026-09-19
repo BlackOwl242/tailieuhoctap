@@ -48,7 +48,7 @@ rectangle "HRMIS - 47 use case / 12 nhóm" {
   (UC19 Đăng ký làm thêm giờ) as UC19
   (UC20 Đăng ký nghỉ phép) as UC20
   (UC21 Chốt bảng chấm công) as UC21
-  (UC26 Điểm danh bằng mã QR) as UC26
+  (UC26 Thu thập đồng bộ máy chấm công) as UC26
   (UC27 Điểm danh bằng khuôn mặt) as UC27
   (UC22 Cấu hình công thức lương) as UC22
   (UC23 Tính bảng lương hằng tháng) as UC23
@@ -244,14 +244,14 @@ rectangle "Nhóm E: Chấm công - Nghỉ phép" {
   (UC19 Đăng ký làm thêm giờ) as UC19
   (UC20 Đăng ký nghỉ phép) as UC20
   (UC21 Chốt bảng chấm công) as UC21
-  (UC26 Điểm danh bằng mã QR) as UC26
+  (UC26 Thu thập đồng bộ máy chấm công) as UC26
   (UC27 Điểm danh bằng khuôn mặt) as UC27
 }
 A0 -- UC18
 A0 -- UC19
 A0 -- UC20
 A2 -- UC21
-A0 -- UC26
+A1 -- UC26
 A0 -- UC27
 
 @enduml
@@ -908,31 +908,29 @@ C -> E : khóa dữ liệu công chuyển sang tính lương
 ```
 _Hình D.34. Trình tự UC21 - Chốt bảng chấm công._
 
-### B.UC26. Điểm danh bằng mã QR
+### B.UC26. Thu thập đồng bộ máy chấm công
 
 ```plantuml
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-actor "Nhân viên" as NV
-boundary "Kiosk /check-in" as B
-control "QrTokenService" as C
+actor "Thiết bị / CV hồ sơ" as DEV
+boundary "Giao diện /admin/attendance" as B
+control "AttendanceDevicesService" as C
 control "AttendanceService" as S
-entity "AttendanceEvent" as E
-B -> C : lấy token HMAC {kiosk_id, iat, jti} TTL 30 giây
-NV -> B : quét mã, xác nhận
-B -> S : checkIn(qr_token)
-S -> C : verify chữ ký + TTL <= 60 giây + jti một lần
-alt hợp lệ và không trùng ±2 phút
-  S -> E : INSERT sự kiện (nguồn QR)
-  S -> E : tổng hợp bảng công ngày
-  B --> NV : phản hồi chấm công thành công
-else vi phạm
-  S --> B : từ chối, đánh dấu lệch nếu thiếu giờ ra
+entity "AttendanceDevice / AttendanceEvent" as E
+DEV -> C : Webhook POST / CSV / Simulator
+C -> C : Verify HMAC-SHA256 signature / parse CSV
+alt Chữ ký hợp lệ & thiết bị ACTIVE
+  C -> E : INSERT sự kiện (nguồn MACHINE / SIMULATOR)
+  C -> S : Kích hoạt tổng hợp bảng công ngày
+  C --> DEV : 200 OK (ghi nhận thành công)
+else Lỗi xác thực hoặc định dạng sai
+  C --> DEV : 400 Bad Request / 401 Unauthorized
 end
 @enduml
 ```
-_Hình D.35. Trình tự UC26 - Điểm danh bằng mã QR._
+_Hình D.35. Trình tự UC26 - Thu thập đồng bộ máy chấm công._
 
 ### B.UC27. Điểm danh bằng khuôn mặt
 
@@ -1807,13 +1805,11 @@ skinparam linetype ortho
 skinparam shadowing false
 start
 fork
-:Điểm danh web;
+:Điểm danh web ESS;
 fork again
-:Quét QR tại kiosk;
+:Điểm danh khuôn mặt sinh trắc học & IR;
 fork again
-:Điểm danh khuôn mặt;
-fork again
-:Máy chấm công đẩy webhook/CSV;
+:Máy chấm công đẩy webhook/CSV/Simulator;
 end fork
 :INSERT sự kiện thô (bất biến);
 :Tổng hợp bảng công ngày;
@@ -1881,27 +1877,32 @@ stop
 ```
 _Hình D.80. Hoạt động UC21 - Chốt bảng chấm công._
 
-### C.UC26. Điểm danh bằng mã QR
+### C.UC26. Thu thập đồng bộ máy chấm công
 
 ```plantuml
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Kiosk xin token HMAC TTL 30 giây;
-:Hiển thị mã QR, xoay mỗi 30 giây;
-:Nhân viên quét bằng điện thoại;
-if (Token hợp lệ + jti chưa dùng + ngoài ±2 phút?) then (có)
-:INSERT sự kiện (nguồn QR);
-:Tổng hợp bảng công ngày;
-:Phản hồi chấm công thành công;
+:Thiết bị chấm công hoặc Chuyên viên nạp dữ liệu;
+if (Phương thức?) then (Webhook API)
+  :Nhận payload POST có chữ ký HMAC-SHA256;
+  :Kiểm tra chữ ký theo khóa bí mật của thiết bị;
+else (Tệp CSV / Mô phỏng)
+  :Tải lên tệp CSV hoặc kích hoạt Simulator;
+  :Phân tích cú pháp dòng dữ liệu quẹt thẻ;
+endif
+if (Hợp lệ và thiết bị ACTIVE?) then (có)
+  :INSERT sự kiện thô bất biến (nguồn MACHINE / SIMULATOR);
+  :Tổng hợp bảng công ngày;
+  :Phản hồi kết quả đồng bộ thành công;
 else (không)
-:Từ chối;
+  :Từ chối và ghi log lỗi thiết bị;
 endif
 stop
 @enduml
 ```
-_Hình D.81. Hoạt động UC26 - Điểm danh bằng mã QR._
+_Hình D.81. Hoạt động UC26 - Thu thập đồng bộ máy chấm công._
 
 ### C.UC27. Điểm danh bằng khuôn mặt
 
@@ -2622,13 +2623,11 @@ _Hình D.118. Luồng Tuyển dụng đến Ngày nhận việc._
 skinparam linetype ortho
 start
 fork
-  :Web;
+  :Web ESS;
 fork again
-  :QR kiosk (token HMAC 30 giây);
+  :Khuôn mặt sinh trắc học & IR (AES-256-GCM);
 fork again
-  :Khuôn mặt (AES-256-GCM);
-fork again
-  :Webhook HMAC / CSV;
+  :Máy chấm công Webhook HMAC / CSV / Simulator;
 end fork
 :Sự kiện thô append-only;
 :Tổng hợp bảng công ngày;
@@ -2909,10 +2908,10 @@ package "Nhóm E: Chấm công - Nghỉ phép" {
     [Control: AttendanceService]
     [Entity: AttendanceDay]
   }
-  package "UC26 - Điểm danh bằng mã QR" {
-    [Boundary: /kiosk, /check-in]
-    [Control: QrTokenService, AttendanceService]
-    [Entity: AttendanceEvent]
+  package "UC26 - Thu thập đồng bộ máy chấm công" {
+    [Boundary: /admin/attendance]
+    [Control: AttendanceDevicesService, AttendanceService]
+    [Entity: AttendanceDevice, AttendanceEvent]
   }
   package "UC27 - Điểm danh bằng khuôn mặt" {
     [Boundary: /attendance]
@@ -3273,7 +3272,7 @@ package "Boundary (Next.js)" {
 }
 package "Control (NestJS Service)" {
   class "<<Control>> AttendanceService" as C0
-  class "<<Control>> QrTokenService" as C1
+  class "<<Control>> AttendanceDevicesService" as C1
   class "<<Control>> FaceCryptoService" as C2
   class "<<Control>> OvertimeService" as C3
   class "<<Control>> LeaveService" as C4
@@ -3294,12 +3293,12 @@ C2 ..> E0
 C3 ..> E0
 C4 ..> E0
 note bottom of C0
-  Phục vụ use case: UC18=Ghi nhận chấm công; UC19=Đăng ký làm thêm giờ; UC20=Đăng ký nghỉ phép; UC21=Chốt bảng chấm công; UC26=Điểm danh bằng mã QR; UC27=Điểm danh bằng khuôn mặt
+  Phục vụ use case: UC18=Ghi nhận chấm công; UC19=Đăng ký làm thêm giờ; UC20=Đăng ký nghỉ phép; UC21=Chốt bảng chấm công; UC26=Thu thập đồng bộ máy chấm công; UC27=Điểm danh bằng khuôn mặt
 end note
 
 @enduml
 ```
-_Hình D.139. Lớp nhóm E - gán use case: UC18=Ghi nhận chấm công; UC19=Đăng ký làm thêm giờ; UC20=Đăng ký nghỉ phép; UC21=Chốt bảng chấm công; UC26=Điểm danh bằng mã QR; UC27=Điểm danh bằng khuôn mặt._
+_Hình D.139. Lớp nhóm E - gán use case: UC18=Ghi nhận chấm công; UC19=Đăng ký làm thêm giờ; UC20=Đăng ký nghỉ phép; UC21=Chốt bảng chấm công; UC26=Thu thập đồng bộ máy chấm công; UC27=Điểm danh bằng khuôn mặt._
 
 ### G.F. Lớp nhóm F - Lương - Báo cáo
 
