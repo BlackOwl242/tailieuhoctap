@@ -229,23 +229,32 @@ TÀI LIỆU THAM KHẢO
 - Hình 2.101. Biểu đồ trạng thái Phiếu mượn - trả hồ sơ
 - Hình 2.102. Biểu đồ trạng thái Phiếu lương
 - Hình 2.103. Biểu đồ gói tổng quan của hệ thống
-- Hình 2.104. Biểu đồ lớp Use case Đăng nhập (UC01)
-- Hình 2.105. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC21)
-- Hình 2.106. Biểu đồ lớp miền cốt lõi của hệ thống
-- Hình 2.107. Mô hình cơ sở dữ liệu vật lý của hệ thống
-- Hình 2.108. Mô hình dữ liệu mở rộng cho chấm công đa nguồn
-- Hình 2.109. Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống
+- Hình 2.104. Biểu đồ lớp Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03)
+- Hình 2.105. Biểu đồ lớp Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08)
+- Hình 2.106. Biểu đồ lớp Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14)
+- Hình 2.107. Biểu đồ lớp Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17)
+- Hình 2.108. Biểu đồ lớp Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25)
+- Hình 2.109. Biểu đồ lớp Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31)
+- Hình 2.110. Biểu đồ lớp Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36)
+- Hình 2.111. Biểu đồ lớp Phân hệ Đánh giá hiệu suất, Đào tạo và Khiếu nại (Nhóm H: UC37 - UC39)
+- Hình 2.112. Biểu đồ lớp Phân hệ Hồ sơ cán bộ và Báo cáo nhà nước (Nhóm I: UC40 - UC43)
+- Hình 2.113. Biểu đồ lớp Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47)
+- Hình 2.114. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC21)
+- Hình 2.115. Biểu đồ lớp miền cốt lõi của hệ thống
+- Hình 2.116. Mô hình cơ sở dữ liệu vật lý của hệ thống
+- Hình 2.117. Mô hình dữ liệu mở rộng cho chấm công đa nguồn
+- Hình 2.118. Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống
 
 
 # PHẦN MỞ ĐẦU
 
 ## 1. Lý do chọn đề tài
 
-Trong bối cảnh nền kinh tế số và xu thế toàn cầu hóa hiện nay, ngành công nghệ thông tin tại Việt Nam đang có những bước phát triển vượt bậc. Đối với các doanh nghiệp hoạt động trong lĩnh vực xuất khẩu dịch vụ phần mềm, nguồn nhân lực kỹ thuật chất lượng cao chính là tài sản chiến lược cốt lõi, quyết định trực tiếp đến năng lực cạnh tranh và sự phát triển bền vững của tổ chức. Việc quản lý hiệu quả một đội ngũ nhân sự tri thức đông đảo, đa dạng về chuyên môn, phân tán tại nhiều chi nhánh và làm việc theo các múi giờ quốc tế đặt ra bài toán quản trị vô cùng phức tạp.
+Trong bối cảnh phát triển mạnh mẽ của nền kinh tế số, ngành công nghệ thông tin tại Việt Nam đang khẳng định vị thế quan trọng trên thị trường khu vực và quốc tế. Đối với các doanh nghiệp hoạt động trong lĩnh vực xuất khẩu dịch vụ phần mềm, đội ngũ nhân sự kỹ thuật chất lượng cao chính là nguồn lực then chốt, quyết định trực tiếp đến năng lực cạnh tranh và sự phát triển bền vững của tổ chức. Việc quản lý một lực lượng lao động tri thức đông đảo, đa dạng về chuyên môn kỹ thuật, phân tán tại nhiều chi nhánh và thường xuyên phối hợp theo các múi giờ quốc tế đặt ra không ít thách thức đối với công tác tổ chức và quản trị nhân sự.
 
-Công ty Cổ phần Phần mềm Saigon Technology là một trong những doanh nghiệp gia công và xuất khẩu phần mềm uy tín hàng đầu tại Việt Nam với hơn 430 kỹ sư công nghệ làm việc tại các văn phòng ở Thành phố Hồ Chí Minh, Đà Nẵng cùng các văn phòng đại diện quốc tế tại Hoa Kỳ, Úc, Thụy Sĩ và Singapore. Sự mở rộng quy mô kinh doanh nhanh chóng đã dẫn đến khối lượng dữ liệu nhân sự tăng vọt, trong khi phương thức quản trị bán thủ công trước đây bắt đầu bộc lộ nhiều hạn chế: dữ liệu bị phân mảnh trên các bảng tính riêng lẻ, quy trình đề xuất và phê duyệt thủ tục hành chính còn phụ thuộc vào giấy tờ, công tác tổng hợp ngày công và tính lương tốn nhiều thời gian và dễ phát sinh sai sót, thiếu cơ chế theo dõi lịch sử biến động nhân sự và khó khăn trong việc kết xuất báo cáo nhanh cho Ban Giám đốc.
+Công ty Cổ phần Phần mềm Saigon Technology là một trong những doanh nghiệp gia công và phát triển phần mềm uy tín tại Việt Nam với hơn 430 kỹ sư công nghệ làm việc tại các văn phòng ở Thành phố Hồ Chí Minh, Đà Nẵng cùng các văn phòng đại diện tại Hoa Kỳ, Australia, Thụy Sĩ và Singapore. Cùng với sự mở rộng quy mô hoạt động, khối lượng dữ liệu nhân sự gia tăng nhanh chóng, trong khi phương thức quản lý thủ công và bán tự động trước đây đã bộc lộ nhiều bất cập: dữ liệu bị phân tán trên các bảng tính cá nhân, quy trình đề xuất và xét duyệt thủ tục hành chính còn phụ thuộc vào giấy tờ, công tác tổng hợp ngày công và tính lương mất nhiều thời gian cũng như dễ phát sinh sai sót, thiếu công cụ theo dõi lịch sử biến động nhân sự và việc lập báo cáo tổng hợp cho Ban Giám đốc chưa kịp thời.
 
-Xuất phát từ thực tiễn trên, việc nghiên cứu, phân tích và xây dựng một hệ thống thông tin quản trị nhân lực tích hợp, vận dụng phương pháp phân tích thiết kế hướng đối tượng (OOAD) kết hợp ngôn ngữ mô hình hóa thống nhất (UML) trở thành một yêu cầu cấp bách. Hệ thống phần mềm được thiết kế nhằm chuẩn hóa toàn diện cơ sở dữ liệu nhân sự, tự động hóa chuỗi quy trình tác nghiệp từ tuyển dụng, quản lý hồ sơ, chấm công đa nguồn, xét duyệt nghỉ phép đến tính lương và đánh giá hiệu suất, bảo đảm tuân thủ các quy chuẩn pháp lý lao động hiện hành. Đó chính là lý do em lựa chọn đề tài: "Xây dựng hệ thống thông tin quản trị nhân lực cho Công ty Cổ phần Phần mềm Saigon Technology" cho bài báo cáo kết thúc học phần.
+Xuất phát từ thực tiễn đó, việc nghiên cứu, phân tích và xây dựng hệ thống thông tin quản trị nhân lực ứng dụng phương pháp phân tích thiết kế hướng đối tượng bằng ngôn ngữ mô hình hóa UML là hết sức cần thiết. Phần mềm được xây dựng nhằm chuẩn hóa cơ sở dữ liệu nhân sự, hỗ trợ tự động hóa các quy trình tác nghiệp từ tuyển dụng, quản lý hồ sơ, chấm công, xét duyệt nghỉ phép đến tính lương và đánh giá hiệu suất, đồng thời bảo đảm tuân thủ đúng các quy định pháp luật về lao động hiện hành. Đó chính là lý do em lựa chọn đề tài: "Xây dựng hệ thống thông tin quản trị nhân lực cho Công ty Cổ phần Phần mềm Saigon Technology" cho bài báo cáo kết thúc học phần.
 
 ## 2. Tổng quan về Công ty Cổ phần Phần mềm Saigon Technology
 
@@ -325,26 +334,42 @@ Quá trình phát triển của Saigon Technology từ khi khởi đầu đến 
 ### 2.4. Lĩnh vực hoạt động kinh doanh, Dịch vụ phần mềm và Nền tảng công nghệ
 
 #### A. Các dịch vụ chuyên môn cốt lõi
-Saigon Technology cung cấp giải pháp gia công phần mềm toàn diện vận hành theo phương pháp luận Agile/Scrum:
-- **Phát triển phần mềm tùy chỉnh theo yêu cầu:** Thiết kế, kiến trúc và xây dựng các hệ thống quản trị doanh nghiệp (ERP, CRM, HRM, DMS) và nền tảng kinh doanh trực tuyến SaaS theo yêu cầu chuyên biệt.
-- **Phát triển ứng dụng Web và Di động:** Xây dựng các ứng dụng Web hiện đại chịu tải cao và ứng dụng di động đa nền tảng (iOS & Android) với trải nghiệm người dùng tối ưu.
-- **Trung tâm phát triển phần mềm chuyên trách:** Cung ứng các đội ngũ kỹ sư phần mềm chuyên biệt toàn thời gian, phối hợp ăn khớp theo múi giờ và văn hóa của khách hàng quốc tế.
-- **Dịch vụ Điện toán đám mây và DevOps:** Tư vấn kiến trúc Cloud-Native, di chuyển hạ tầng lên đám mây (AWS, Microsoft Azure, Google Cloud Platform) và thiết lập đường ống CI/CD tự động hóa kiểm thử, triển khai.
-- **Kỹ nghệ Trí tuệ nhân tạo và Dữ liệu lớn:** Xây dựng các mô hình học máy (Machine Learning), xử lý ngôn ngữ tự nhiên (NLP), thị giác máy tính (Computer Vision) và nhận diện sinh trắc học ứng dụng vào chuyển đổi số.
-- **Kiểm thử chất lượng và An toàn bảo mật phần mềm:** Cung cấp dịch vụ kiểm thử tự động (Automation Testing), kiểm thử chức năng, tải trọng và đánh giá an toàn thông tin theo chuẩn quốc tế.
+
+Saigon Technology cung cấp các dịch vụ gia công và phát triển phần mềm theo mô hình linh hoạt Agile/Scrum:
+
+Phát triển phần mềm theo yêu cầu: Thiết kế, xây dựng và tích hợp các hệ thống quản trị doanh nghiệp và nền tảng dịch vụ phần mềm trực tuyến đáp ứng quy trình nghiệp vụ đặc thù của khách hàng.
+
+Phát triển ứng dụng Web và Di động: Xây dựng các ứng dụng Web hiệu năng cao và ứng dụng di động đa nền tảng cho iOS và Android với giao diện thân thiện, tiện dụng.
+
+Trung tâm phát triển phần mềm chuyên trách: Cung ứng các đội ngũ kỹ sư phần mềm làm việc toàn thời gian, phối hợp trực tiếp theo múi giờ và quy trình làm việc của đối tác quốc tế.
+
+Dịch vụ Điện toán đám mây và DevOps: Tư vấn kiến trúc đám mây, chuyển đổi hạ tầng lên các nền tảng AWS, Microsoft Azure, Google Cloud và tự động hóa quy trình tích hợp, triển khai phần mềm.
+
+Kỹ nghệ Trí tuệ nhân tạo và Dữ liệu lớn: Nghiên cứu và ứng dụng các mô hình học máy, xử lý ngôn ngữ tự nhiên, thị giác máy tính và nhận diện sinh trắc học vào chuyển đổi số doanh nghiệp.
+
+Kiểm thử và An toàn bảo mật phần mềm: Cung cấp dịch vụ kiểm thử tự động, kiểm tra hiệu năng, tải trọng và đánh giá an toàn thông tin theo chuẩn quốc tế.
 
 #### B. Nền tảng công nghệ chủ lực
-- *Backend & Hệ thống phân tán:* .NET Core / C#, Java Spring Boot, Node.js (NestJS, Express), Python (Django, FastAPI), Golang, PHP (Laravel).
-- *Frontend & Di động:* React.js, Next.js, Angular, Vue.js, TypeScript, Flutter, React Native, iOS Swift, Android Kotlin.
-- *Cơ sở dữ liệu & Dữ liệu lớn:* PostgreSQL, MySQL, Microsoft SQL Server, MongoDB, Redis, Elasticsearch.
-- *Hạ tầng & Đám mây:* Docker, Kubernetes, AWS, Microsoft Azure, Google Cloud, Terraform, Jenkins, GitHub Actions.
+
+Phía máy chủ và hệ thống phân tán: Sử dụng các công nghệ .NET Core / C#, Java Spring Boot, Node.js (NestJS, Express), Python (Django, FastAPI), Golang và PHP (Laravel).
+
+Phía giao diện và ứng dụng di động: Ứng dụng các thư viện và khung phát triển React.js, Next.js, Angular, Vue.js, TypeScript, Flutter, React Native, iOS Swift và Android Kotlin.
+
+Cơ sở dữ liệu và lưu trữ dữ liệu lớn: Vận hành trên các hệ quản trị PostgreSQL, MySQL, Microsoft SQL Server, MongoDB, Redis và Elasticsearch.
+
+Hạ tầng và điện toán đám mây: Ứng dụng công nghệ container hóa Docker, Kubernetes, hạ tầng đám mây AWS, Microsoft Azure, Google Cloud cùng các quy trình tự động hóa Jenkins và GitHub Actions.
 
 #### C. Cơ cấu thị trường và khách hàng quốc tế
-Doanh thu của Saigon Technology đến từ các thị trường phát triển hàng đầu thế giới:
-- **Hoa Kỳ & Canada (~45%):** Thị trường lớn nhất với các dự án phần mềm tài chính, y tế và nền tảng SaaS khởi nghiệp.
-- **Australia & New Zealand (~25%):** Các dự án ODC dài hạn trong lĩnh vực quản lý bất động sản, logistics và giáo dục trực tuyến.
-- **Tây Âu & Thụy Sĩ (~20%):** Hợp tác với các tập đoàn và viện nghiên cứu trong lĩnh vực FinTech, chuỗi cung ứng và ngân hàng số.
-- **Singapore & Châu Á (~10%):** Các giải pháp thương mại điện tử và thành phố thông minh.
+
+Doanh thu của Saigon Technology đến từ các thị trường trọng điểm trên thế giới:
+
+Thị trường Bắc Mỹ (Hoa Kỳ và Canada): Chiếm khoảng 45% doanh thu, tập trung vào các dự án phần mềm tài chính, y tế và nền tảng trực tuyến.
+
+Thị trường Châu Đại Dương (Australia và New Zealand): Chiếm khoảng 25% doanh thu, với các dự án trung tâm phát triển phần mềm dài hạn trong lĩnh vực bất động sản, vận tải và giáo dục.
+
+Thị trường Tây Âu (Thụy Sĩ và các nước châu Âu): Chiếm khoảng 20% doanh thu, hợp tác với các tập đoàn trong lĩnh vực công nghệ tài chính, chuỗi cung ứng và ngân hàng số.
+
+Thị trường Singapore và khu vực Châu Á: Chiếm khoảng 10% doanh thu, tập trung vào các giải pháp thương mại điện tử và dịch vụ số.
 
 ---
 
@@ -377,7 +402,7 @@ Dưới sự chỉ đạo của Đại hội đồng Cổ đông và Ban Giám �
 
 #### A. Cấp Quản trị Sở hữu và Ban Giám đốc Điều hành
 - **Đại hội đồng Cổ đông (ĐHCĐ):** Cơ quan quyết định cao nhất của công ty cổ phần, thông qua các định hướng kinh doanh chiến lược, kế hoạch phát hành cổ phiếu thưởng ESOP và phê chuẩn ngân sách hoạt động hàng năm.
-- **Ban Giám đốc Điều hành (BGD):** Đứng đầu là **Tổng Giám đốc (CEO Phạm Tiến Thành - "Bruce" Pham)**, cùng các Phó Giám đốc điều hành phụ trách Sản xuất kỹ thuật, Kinh doanh quốc tế, Tài chính và Khối nhân sự. Ban Giám đốc là cấp quyết định tối cao đối với các biến động nhân sự then chốt: phê chuẩn định biên dự án, bổ nhiệm cán bộ cấp cao, phê duyệt chỉ tiêu tuyển dụng vượt khung và thực thi lệnh khóa bất biến kỳ tính lương (LOCKED).
+- **Ban Giám đốc Điều hành (BGD):** Đứng đầu là **Tổng Giám đốc (CEO Phạm Tiến Thành)**, cùng các Phó Giám đốc điều hành phụ trách sản xuất, kinh doanh, tài chính và nhân sự. Ban Giám đốc giữ thẩm quyền phê duyệt cao nhất đối với các quyết định nhân sự trọng yếu của công ty: phê duyệt định biên nhân sự dự án, bổ nhiệm cán bộ quản lý, phê duyệt chỉ tiêu tuyển dụng bổ sung và phê chuẩn chốt khóa kỳ tính lương hàng tháng.
 
 #### B. Khối Quản trị Nguồn nhân lực & Khối Vận hành - Pháp chế (Bộ đôi điều phối & hỗ trợ)
 Cơ cấu tổ chức của Saigon Technology tách bạch chuyên môn hóa cao: Khối Quản trị Nguồn nhân lực (HR) tập trung sâu vào chiến lược phát triển con người, trong khi Khối Vận hành & Pháp chế (OPS) bảo đảm nền tảng hạ tầng công nghệ và tính tuân thủ pháp luật:
@@ -445,13 +470,17 @@ Các đặc thù nổi bật của lực lượng lao động tại Saigon Techn
 
 ### 2.8. Thực trạng quản trị nhân lực và ứng dụng CNTT trước khi triển khai hệ thống quản trị nhân lực
 
-Trước khi đề tài nghiên cứu và xây dựng hệ thống thông tin quản trị nhân lực, phương thức quản lý tại Saigon Technology bộc lộ nhiều điểm nghẽn nghiêm trọng:
-- **Phân mảnh dữ liệu:** Hồ sơ nhân sự lưu rải rác trên các tệp Excel cá nhân của từng chuyên viên; thông tin hợp đồng và văn bằng lưu bản cứng tại kho văn phòng; dữ liệu chấm công nằm cô lập tại các đầu đọc thẻ máy chấm công chi nhánh; dữ liệu biến động nhân sự trao đổi qua email và ứng dụng Slack/Teams.
-- **Rủi ro sai lệch trong tính toán tiền lương và tuân thủ pháp luật:** Việc tính lương hàng tháng cho hơn 430 nhân viên với nhiều loại hợp đồng, nhiều mức trợ cấp, khấu trừ bảo hiểm xã hội và thuế thu nhập cá nhân lũy tiến được thực hiện thủ công bằng công thức bảng tính Excel. Quá trình này mất từ 4-6 ngày làm việc của toàn bộ tổ C&B, tiềm ẩn nguy cơ sai sót số liệu và vi phạm quy định pháp lý (như trích nợ vượt quá 30% lương thực lĩnh theo Điều 102 BLLĐ 2019).
-- **Quy trình phê duyệt giấy tờ cồng kềnh, thiếu minh bạch:** Đơn xin nghỉ phép, đăng ký làm thêm giờ và đề xuất tuyển dụng phải in tờ trình giấy hoặc gửi email chờ ký duyệt qua 3 cấp, dẫn đến độ trễ cao và hoàn toàn thiếu nhật ký kiểm toán để truy vết trách nhiệm.
-- **Thiếu cổng tự phục vụ cho nhân viên:** Nhân viên không thể chủ động kiểm tra số ngày phép còn lại, không xem được chi tiết phiếu lương bảo mật và phải liên hệ trực tiếp với bộ phận nhân sự để tra cứu thông tin cơ bản, gây quá tải cho đội ngũ HR-OPS.
+Trước khi hệ thống thông tin quản trị nhân lực được nghiên cứu và xây dựng, công tác quản trị tại Saigon Technology còn gặp phải một số khó khăn và bất cập thực tế:
 
-Trước thực trạng trên, Ban Giám đốc Saigon Technology đã quyết định triển khai đề tài xây dựng Hệ thống thông tin quản trị nhân lực nhằm tin học hóa các quy trình quản lý, giải quyết tình trạng phân tán dữ liệu và nâng cao hiệu quả vận hành doanh nghiệp.
+Thứ nhất là tình trạng phân tán dữ liệu. Hồ sơ nhân sự chủ yếu được lưu trữ rải rác trên các bảng tính của từng chuyên viên phụ trách; văn bằng, chứng chỉ và hợp đồng lao động lưu trữ dạng bản cứng tại kho văn phòng; dữ liệu điểm danh nằm độc lập trên từng máy chấm công ở các chi nhánh; còn thông tin trao đổi về biến động nhân sự chủ yếu thực hiện qua thư điện tử hoặc các ứng dụng trao đổi nội bộ. Điều này gây khó khăn lớn cho việc tổng hợp dữ liệu và tra cứu thông tin nhanh chóng.
+
+Thứ hai là nguy cơ sai sót trong công tác tính lương và thực hiện các chế độ chính sách. Việc tính toán lương hàng tháng cho hơn 430 nhân sự với nhiều hình thức hợp đồng, ngạch bậc, phụ cấp, các khoản trích nộp bảo hiểm xã hội và thuế thu nhập cá nhân lũy tiến được thực hiện thủ công bằng bảng tính. Quy trình này thường kéo dài từ 4 đến 6 ngày làm việc của bộ phận tiền lương, vừa tốn thời gian vừa tiềm ẩn rủi ro nhầm lẫn số liệu hoặc chậm trễ chi trả cho người lao động.
+
+Thứ ba là quy trình xét duyệt thủ tục hành chính còn nặng tính thủ công. Các loại giấy tờ như phiếu đề xuất tuyển dụng, đơn xin nghỉ phép hay đăng ký làm thêm giờ phải chuyển qua nhiều cấp phê duyệt giấy tờ hoặc chờ đợi email xác nhận, dẫn đến độ trễ trong xử lý và thiếu công cụ theo dõi lịch sử luân chuyển hồ sơ.
+
+Thứ tư là người lao động chưa có kênh tự phục vụ thông tin. Nhân viên chưa thể chủ động tra cứu quỹ phép năm hay xem chi tiết phiếu lương cá nhân mà phải liên hệ trực tiếp với chuyên viên nhân sự, làm gia tăng khối lượng công việc hành chính cho bộ phận quản lý.
+
+Từ những hạn chế nêu trên, việc xây dựng và triển khai một hệ thống thông tin quản trị nhân lực thống nhất là yêu cầu cấp thiết nhằm hiện đại hóa quy trình tác nghiệp, khắc phục tình trạng phân tán dữ liệu và nâng cao hiệu quả quản trị doanh nghiệp.
 
 ---
 
@@ -467,41 +496,44 @@ Hoạt động quản trị nhân lực tại Saigon Technology được vận h
 
 ## 3. Mục tiêu và nhiệm vụ
 
-Mục tiêu tổng quát của đề tài là ứng dụng phương pháp luận phân tích thiết kế hệ thống hướng đối tượng để xây dựng một giải pháp phần mềm quản trị nhân lực toàn diện, hiện đại, đáp ứng đầy đủ các yêu cầu nghiệp vụ thực tế tại Công ty Cổ phần Phần mềm Saigon Technology.
+Mục tiêu tổng quát của đề tài là ứng dụng phương pháp phân tích thiết kế hệ thống hướng đối tượng để xây dựng phần mềm quản trị nhân lực đáp ứng tốt các yêu cầu nghiệp vụ thực tế tại Công ty Cổ phần Phần mềm Saigon Technology.
 
-Để hoàn thành mục tiêu tổng quát nêu trên, đề tài tập trung giải quyết các nhiệm vụ cụ thể sau:
+Để đạt được mục tiêu tổng quát nêu trên, đề tài tập trung giải quyết các nhiệm vụ cụ thể sau:
 
-Một là, khảo sát và phân tích toàn diện hiện trạng tổ chức, mô hình sản xuất phần mềm và các quy trình nghiệp vụ nhân sự thực tế tại Saigon Technology; làm rõ các điểm nghẽn trong công tác quản lý hiện hữu.
+Thứ nhất, khảo sát và phân tích hiện trạng tổ chức, mô hình sản xuất phần mềm cùng các quy trình nghiệp vụ nhân sự tại Saigon Technology, làm rõ những khó khăn, vướng mắc trong công tác quản lý hiện nay.
 
-Hai là, tổng hợp cơ sở lý luận về quản trị nhân lực hiện đại và phương pháp phân tích thiết kế hướng đối tượng (OOAD) sử dụng ngôn ngữ mô hình hóa UML; nghiên cứu các chuẩn mực pháp lý về lao động, tiền lương, bảo hiểm xã hội, thuế thu nhập cá nhân và quy định bảo vệ dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP.
+Thứ hai, hệ thống hóa cơ sở lý luận về quản trị nhân lực và phương pháp phân tích thiết kế hướng đối tượng với ngôn ngữ mô hình hóa UML; nghiên cứu các quy định pháp luật về lao động, tiền lương, bảo hiểm xã hội, thuế thu nhập cá nhân và bảo vệ dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP.
 
-Ba là, xác định các tác nhân và xây dựng danh mục 47 Use Case hoàn chỉnh theo vòng đời nhân sự; phân tích các mô hình hành vi động (biểu đồ trình tự, biểu đồ hoạt động, biểu đồ trạng thái) và mô hình cấu trúc tĩnh (biểu đồ lớp, mô hình dữ liệu quan hệ, kiến trúc phần mềm 3 tầng).
+Thứ ba, xác định các tác nhân và xây dựng danh mục 47 Use Case theo quy trình quản lý nhân sự; xây dựng các mô hình động gồm biểu đồ trình tự, biểu đồ hoạt động, biểu đồ trạng thái và các mô hình tĩnh gồm biểu đồ lớp, cơ sở dữ liệu quan hệ và kiến trúc phần mềm 3 tầng.
 
-Bốn là, hiện thực hóa các giải pháp thiết kế vào mã nguồn cài đặt thực tế với công nghệ hiện đại (Next.js 14, NestJS 10, PostgreSQL 16, Prisma ORM, Docker); tổ chức kiểm thử chức năng và đánh giá hiệu quả vận hành của hệ thống.
+Thứ tư, cài đặt hoàn chỉnh hệ thống trên môi trường công nghệ thực tế với Next.js, NestJS, PostgreSQL, Prisma ORM và Docker; tổ chức kiểm thử chức năng và đánh giá kết quả vận hành của hệ thống.
 
-Năm là, đánh giá ưu điểm, hạn chế và đề xuất định hướng phát triển, nâng cấp hệ thống trong các giai đoạn tiếp theo.
+Thứ năm, đánh giá khách quan các ưu điểm và hạn chế của giải pháp, từ đó đề xuất định hướng phát triển và nâng cấp hệ thống trong tương lai.
 
 ## 4. Đối tượng và phạm vi nghiên cứu
 
-Đối tượng nghiên cứu của đề tài là các quy trình nghiệp vụ quản trị nguồn nhân lực trong doanh nghiệp phần mềm và phương pháp luận phân tích thiết kế hệ thống thông tin hướng đối tượng (OOAD) sử dụng UML.
+Đối tượng nghiên cứu của đề tài là các quy trình nghiệp vụ quản lý nhân sự trong doanh nghiệp công nghệ phần mềm và phương pháp phân tích thiết kế hệ thống thông tin hướng đối tượng bằng ngôn ngữ mô hình hóa UML.
 
-Phạm vi nghiên cứu:
-- Về nội dung: Nghiên cứu trọn vẹn vòng đời quản trị nhân sự tại Saigon Technology, bao gồm: tuyển dụng ứng viên (ATS), tiếp nhận hồ sơ và hội nhập, phân ca và điểm danh đa nguồn, quản lý nghỉ phép và làm thêm giờ, chu kỳ tính lương và phúc lợi (tạm ứng, khoản vay), biến động nhân sự và thôi việc bàn giao, đánh giá hiệu suất 360 độ, quản lý tri thức nội bộ và báo cáo hồ sơ cán bộ theo chuẩn Mẫu 2C-BNV/2008.
-- Về không gian: Tập trung khảo sát và áp dụng tại hai trung tâm sản xuất phần mềm chính của Công ty Cổ phần Phần mềm Saigon Technology tại Thành phố Hồ Chí Minh và thành phố Đà Nẵng.
-- Về thời gian: Số liệu khảo sát và các quy định pháp luật được cập nhật tính đến năm 2026.
+Về phạm vi nghiên cứu:
+
+Về nội dung, đề tài tập trung nghiên cứu toàn bộ quy trình quản lý nhân sự tại Saigon Technology, bao gồm công tác tuyển dụng ứng viên, tiếp nhận hồ sơ và hướng dẫn hội nhập cho nhân viên mới, phân ca và điểm danh, quản lý nghỉ phép và làm thêm giờ, tính toán tiền lương và các chế độ phúc lợi, xử lý biến động nhân sự, quy trình bàn giao thôi việc, đánh giá hiệu suất nhân viên, quản trị kho tri thức nội bộ và lập báo cáo hồ sơ cán bộ theo quy chuẩn Mẫu 2C-BNV/2008.
+
+Về không gian, đề tài khảo sát và triển khai ứng dụng thực tế tại hai văn phòng của Công ty Cổ phần Phần mềm Saigon Technology tại Thành phố Hồ Chí Minh và thành phố Đà Nẵng.
+
+Về thời gian, các số liệu khảo sát, quy trình nghiệp vụ và các văn bản quy phạm pháp luật được cập nhật tính đến năm 2026.
 
 ## 5. Cấu trúc của báo cáo
 
-Nội dung báo cáo kết thúc học phần được bố cục thành ba phần chính:
+Nội dung báo cáo kết thúc học phần được bố cục thành các phần chính:
 
-Phần Mở đầu: Trình bày lý do chọn đề tài, giới thiệu tổng quan về Công ty Cổ phần Phần mềm Saigon Technology, mục tiêu, nhiệm vụ, đối tượng, phạm vi nghiên cứu và cấu trúc của báo cáo.
+Phần Mở đầu: Trình bày tính cấp thiết của đề tài, giới thiệu tổng quan về Công ty Cổ phần Phần mềm Saigon Technology, mục tiêu, nhiệm vụ, đối tượng, phạm vi nghiên cứu và cấu trúc tổng quát của báo cáo.
 
 Phần Nội dung: Gồm ba chương:
-- Chương 1: Cơ sở lý luận về quản trị nhân lực và hệ thống thông tin quản trị nhân lực. Trình bày lý thuyết nền tảng, các công cụ, phương pháp mô hình hóa và phát biểu bài toán nghiệp vụ cần giải quyết tại doanh nghiệp.
-- Chương 2: Thiết kế hệ thống thông tin quản trị nhân lực cho Công ty Cổ phần Phần mềm Saigon Technology. Đây là chương trọng tâm, thể hiện chi tiết phân tích yêu cầu, xác định tác nhân, danh sách 47 use case, đặc tả nghiệp vụ, biểu đồ trình tự, biểu đồ hoạt động, biểu đồ trạng thái, biểu đồ lớp, thiết kế cơ sở dữ liệu, giao diện người dùng và kiến trúc hệ thống 3 tầng.
-- Chương 3: Kết quả đạt được và đề xuất, khuyến nghị hoặc hướng nghiên cứu phát triển. Tổng kết các kết quả định lượng, đánh giá ưu nhược điểm và vạch ra lộ trình hoàn thiện hệ thống trong tương lai.
+Chương 1 trình bày cơ sở lý luận về quản trị nhân lực và hệ thống thông tin nhân sự trong doanh nghiệp, các công cụ và phương pháp mô hình hóa hướng đối tượng, đồng thời phân tích hiện trạng và phát biểu bài toán nghiệp vụ cần giải quyết tại Saigon Technology.
+Chương 2 là nội dung trọng tâm của đề tài, thể hiện chi tiết quá trình phân tích yêu cầu, xác định tác nhân, xây dựng danh mục 47 Use Case, đặc tả nghiệp vụ, các biểu đồ tương tác động, biểu đồ lớp, thiết kế cơ sở dữ liệu, giao diện người dùng và mô hình kiến trúc phần mềm 3 tầng.
+Chương 3 tổng kết các kết quả đạt được sau quá trình cài đặt và thử nghiệm hệ thống, đánh giá khách quan các ưu điểm và hạn chế, đồng thời đề xuất định hướng nghiên cứu và phát triển tiếp theo.
 
-Tài liệu tham khảo: Danh mục các giáo trình, văn bản quy phạm pháp luật và tài liệu kỹ thuật được sử dụng trong quá trình nghiên cứu.
+Phần Tài liệu tham khảo: Liệt kê các giáo trình, văn bản quy phạm pháp luật và tài liệu kỹ thuật được sử dụng trong quá trình nghiên cứu đề tài.
 
 ---
 
@@ -519,7 +551,7 @@ Quản trị nhân lực hiện đại bao gồm sáu nhóm chức năng cốt l
 
 ### 1.1.2. Hệ thống thông tin quản trị nhân lực
 
-Hệ thống thông tin quản trị nhân lực là sự kết hợp giữa quy trình quản trị nhân sự với công nghệ thông tin và truyền thông. Hệ thống thu thập, lưu trữ, xử lý và phân phối thông tin liên quan đến nguồn nhân lực, đóng vai trò là xương sống vận hành số của doanh nghiệp.
+Hệ thống thông tin quản trị nhân lực là sự kết hợp giữa quy trình quản lý nhân sự với công nghệ thông tin. Hệ thống thu thập, lưu trữ, xử lý và phân phối thông tin liên quan đến nguồn nhân lực, đóng vai trò là nền tảng quản lý và vận hành thông tin nhân sự của toàn bộ doanh nghiệp.
 
 Khác với các hệ thống thông tin thông thường, hệ thống thông tin nhân sự mang tính ràng buộc pháp lý rất cao. Mọi dữ liệu về hợp đồng lao động, thời gian làm việc, mức trích nộp bảo hiểm xã hội hay khấu trừ thuế thu nhập cá nhân đều phải tuân thủ nghiêm ngặt theo các quy định của Bộ luật Lao động, Luật Bảo hiểm xã hội và Luật Thuế. Do đó, hệ thống không chỉ thuần túy thực hiện các tác vụ lưu trữ dữ liệu (CRUD) mà còn phải cài đặt các quy tắc kiểm soát nghiệp vụ chặt chẽ, bảo đảm tính toàn vẹn và khả năng truy vết lịch sử dữ liệu.
 
@@ -529,21 +561,11 @@ Quy trình phát triển hệ thống phần mềm trải qua các giai đoạn 
 
 Phương pháp phân tích và thiết kế hướng đối tượng (OOAD) tiếp cận bài toán thực tế bằng cách mô hình hóa hệ thống thành tập hợp các đối tượng tương tác với nhau, mang đầy đủ thuộc tính (dữ liệu) và phương thức (hành vi). OOAD vận dụng triệt để bốn nguyên lý trụ cột của lập trình hướng đối tượng: trừu tượng hóa, bao đóng, kế thừa và đa hình.
 
-Ngôn ngữ mô hình hóa thống nhất (UML) được sử dụng làm phương tiện trực quan để đặc tả, thiết kế và tài liệu hóa các thành phần của hệ thống thông qua các sơ đồ tiêu chuẩn:
-- Biểu đồ Use Case: Mô tả ranh giới hệ thống, xác định các tác nhân và các chức năng mà hệ thống cung cấp;
-- Biểu đồ Trình tự: Mô hình hóa sự tương tác và truyền thông điệp giữa các đối tượng theo dòng thời gian để hoàn thành một kịch bản nghiệp vụ cụ thể;
-- Biểu đồ Hoạt động: Trực quan hóa luồng điều khiển, các bước xử lý tuần tự, rẽ nhánh hoặc song song trong quy trình;
-- Biểu đồ Trạng thái: Mô tả các trạng thái khác nhau của một đối tượng quan trọng trong suốt vòng đời của nó và các sự kiện kích hoạt chuyển trạng thái;
-- Biểu đồ Lớp: Thể hiện cấu trúc tĩnh của hệ thống, bao gồm các lớp, thuộc tính, phương thức và các mối quan hệ (kế thừa, liên kết, phụ thuộc, hợp thành) giữa chúng.
+Ngôn ngữ mô hình hóa thống nhất (UML) được sử dụng làm phương tiện trực quan để đặc tả, thiết kế và tài liệu hóa các thành phần của hệ thống thông qua các nhóm sơ đồ tiêu chuẩn. Trong đó, biểu đồ Use Case mô tả phạm vi hệ thống, xác định các tác nhân và các chức năng cung cấp cho người dùng. Biểu đồ trình tự mô tả sự tương tác và truyền thông điệp giữa các đối tượng theo thứ tự thời gian trong từng kịch bản nghiệp vụ. Biểu đồ hoạt động trực quan hóa luồng xử lý công việc, các bước thực hiện tuần tự hoặc rẽ nhánh trong quy trình. Biểu đồ trạng thái thể hiện các giai đoạn biến đổi trạng thái của những thực thể quan trọng trong hệ thống. Cuối cùng, biểu đồ lớp mô tả cấu trúc tĩnh, bao gồm các lớp đối tượng, thuộc tính, phương thức và mối quan hệ giữa chúng.
 
 ### 1.1.4. Công cụ và phần mềm ứng dụng
 
-Trong đề tài này, các công cụ và nền tảng công nghệ hiện đại được lựa chọn nhằm bảo đảm tính chuyên nghiệp và khả năng triển khai thực tế:
-- Công cụ mô hình hóa: Sử dụng PlantUML và Draw.io để xây dựng các biểu đồ UML chuẩn mực;
-- Hệ quản trị cơ sở dữ liệu: Sử dụng PostgreSQL 16 kết hợp với Prisma ORM, quản trị 87 model quan hệ chia thành 10 miền dữ liệu nghiệp vụ, hỗ trợ tìm kiếm toàn văn (FTS) và lưu trữ nhật ký kiểm toán bất biến;
-- Tầng máy chủ nghiệp vụ: Xây dựng trên nền tảng NestJS 10 (TypeScript) với 39 module nghiệp vụ chuyên sâu, phân tầng rõ ràng theo mô hình Controller - Service - DTO - Entity, tích hợp hai bộ phận dùng chung: Quy trình phê duyệt biến động nhân sự và Chức năng tính toán tiền lương tự động;
-- Tầng giao diện người dùng: Xây dựng bằng Next.js 14 (App Router) với 31 màn hình ứng dụng thực tế phân bổ thành 7 phân hệ nghiệp vụ chuẩn hóa, thiết kế đáp ứng đa thiết bị và tuân thủ các quy chuẩn hiển thị doanh nghiệp;
-- Đóng gói và triển khai: Toàn bộ hệ thống được container hóa bằng Docker Compose với ba dịch vụ độc lập: cơ sở dữ liệu, máy chủ API và máy chủ Web.
+Để phục vụ quá trình phân tích, thiết kế và cài đặt hệ thống, đề tài sử dụng phối hợp các công cụ và nền tảng công nghệ phù hợp với yêu cầu thực tế của doanh nghiệp. Về công cụ mô hình hóa, phần mềm PlantUML và Draw.io được sử dụng để xây dựng hệ thống biểu đồ UML. Về cơ sở dữ liệu, hệ thống sử dụng hệ quản trị PostgreSQL kết hợp công cụ Prisma ORM nhằm quản lý 87 bảng dữ liệu phân bổ theo 10 phân hệ nghiệp vụ, đồng thời hỗ trợ cơ chế lưu vết kiểm toán và tìm kiếm dữ liệu. Về phía máy chủ nghiệp vụ, hệ thống được phát triển trên nền tảng NestJS với ngôn ngữ TypeScript, phân tầng rõ ràng theo mô hình kiến trúc nhiều tầng và tích hợp các bộ xử lý quy trình dùng chung. Giao diện người dùng được xây dựng trên nền tảng Next.js với 31 màn hình chức năng, đáp ứng hiển thị trên nhiều loại thiết bị. Toàn bộ giải pháp được đóng gói và vận hành thông qua nền tảng Docker Compose nhằm bảo đảm tính đồng bộ và thuận tiện khi triển khai thực tế.
 
 ## 1.2. Một số vấn đề liên quan đến chủ đề "Xây dựng hệ thống thông tin quản trị nhân lực cho Công ty Cổ phần Phần mềm Saigon Technology"
 
@@ -714,12 +736,7 @@ Mục đích: Thực hiện thủ tục chấm dứt hợp đồng lao động �
 Trình tự thực hiện tại doanh nghiệp:
 1. Nộp đơn thôi việc: Nhân viên gửi đơn xin thôi việc, bảo đảm thời hạn báo trước theo Điều 35 Bộ luật Lao động 2019 gồm 30 ngày đối với hợp đồng xác định thời hạn và 45 ngày đối với hợp đồng không xác định thời hạn.
 2. Trao đổi nguyện vọng và phê duyệt: Trưởng dự án và đại diện nhân sự gặp gỡ trao đổi để tìm hiểu lý do; trường hợp nhân viên giữ nguyên nguyện vọng thôi việc, Giám đốc ký duyệt ngày làm việc cuối cùng.
-3. Thực hiện bàn giao qua 5 khâu độc lập: Nhân viên hoàn tất xác nhận bàn giao tại 5 bộ phận:
-   - Khâu bàn giao kỹ thuật: Bàn giao mã nguồn dự án, tài liệu thiết kế và tài khoản máy chủ thử nghiệm cho Trưởng dự án nghiệm thu.
-   - Khâu bàn giao tài sản: Trả lại máy tính xách tay, màn hình phụ, thẻ ra vào văn phòng và chìa khóa tủ cá nhân cho Phòng Hành chính.
-   - Khâu thu hồi quyền truy cập: Phòng Công nghệ thông tin khóa hòm thư điện tử nội bộ, ngắt quyền kết nối mạng từ xa và các công cụ quản lý dự án.
-   - Khâu chốt chế độ chính sách: Phòng Tiền lương chốt ngày công tháng cuối, tính tiền những ngày phép năm chưa nghỉ, tính trợ cấp thôi việc nếu đủ điều kiện và hoàn tất thủ tục báo giảm bảo hiểm xã hội.
-   - Khâu quyết toán tài chính: Phòng Kế toán đối chiếu thu hồi các khoản tiền tạm ứng chưa thanh toán và số dư nợ vay phúc lợi còn lại, thực hiện khấu trừ trực tiếp vào kỳ lương cuối cùng.
+3. Thực hiện bàn giao qua 5 khâu độc lập: Nhân viên hoàn tất các thủ tục bàn giao tại năm bộ phận gồm: bàn giao kỹ thuật cho Trưởng dự án (nghiệm thu mã nguồn, tài liệu thiết kế và tài khoản máy chủ thử nghiệm); bàn giao tài sản cho Phòng Hành chính (trả lại máy tính, màn hình phụ, thẻ ra vào và chìa khóa cá nhân); thu hồi quyền truy cập qua Phòng Công nghệ thông tin (khóa hòm thư điện tử nội bộ, ngắt quyền kết nối mạng từ xa và các công cụ dự án); chốt chế độ chính sách tại Phòng Tiền lương (chốt ngày công tháng cuối, tính tiền ngày phép năm chưa nghỉ, trợ cấp thôi việc và báo giảm bảo hiểm xã hội); và quyết toán tài chính tại Phòng Kế toán (đối chiếu hoàn trả tạm ứng, nợ vay và khấu trừ trực tiếp vào kỳ lương cuối cùng).
 4. Ký quyết định thôi việc: Sau khi đủ chữ ký xác nhận của 5 bộ phận trên phiếu bàn giao, Giám đốc ban hành quyết định chấm dứt hợp đồng lao động.
 5. Thanh toán quyền lợi và trả hồ sơ: Trong thời hạn 14 ngày làm việc theo Điều 48 Bộ luật Lao động 2019, Phòng Kế toán chi trả toàn bộ tiền lương và trợ cấp cho nhân viên; Chuyên viên hồ sơ hoàn tất trả sổ bảo hiểm xã hội và hồ sơ cá nhân.
 
@@ -1654,7 +1671,7 @@ Lớp Điều khiển: Đảm nhiệm xử lý các logic nghiệp vụ và đi�
 
 ### 2.2.2. Xác định các đối tượng, lớp từ đặc tả yêu cầu
 
-Bằng phương pháp phân tích ngôn ngữ tự nhiên từ tài liệu khảo sát hiện trạng và đặc tả các ca sử dụng, hệ thống xác định các lớp thực thể cốt lõi tương ứng với các phân hệ chức năng:
+Bằng phương pháp phân tích ngôn ngữ tự nhiên từ tài liệu khảo sát hiện trạng và đặc tả các Use Case, hệ thống xác định các lớp thực thể cốt lõi tương ứng với các phân hệ chức năng:
 
 Nhóm Đối tượng Con người & Tổ chức:
 - NguoiDung (User): Lưu trữ thông tin định danh cơ bản (Mã, Họ tên, Ngày sinh, CCCD, Email, SĐT, Địa chỉ);
@@ -2323,25 +2340,79 @@ Biểu đồ gói tổng quan thể hiện cấu trúc phân rã các gói chứ
 
 ![Hình 2.103: Biểu đồ gói tổng quan của hệ thống](images/hinh_2_17_package_diagram.png)
 
-Biểu đồ lớp phân tích cho các Use Case đại diện thể hiện chi tiết cấu trúc thuộc tính, phương thức và sự liên kết giữa các lớp Boundary, Control và Entity:
+Biểu đồ lớp phân tích cho 10 phân hệ nghiệp vụ thể hiện cấu trúc thuộc tính, phương thức và sự tương tác giữa ba tầng Boundary, Control và Entity, bao quát đầy đủ 47 Use Case của hệ thống:
 
-**1. Biểu đồ lớp phân tích Use case Đăng nhập & Xác thực hệ thống (UC01):**
+**1. Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03):**
 
-Bao gồm lớp giao diện `LoginForm`, lớp điều khiển `AuthService` và các lớp thực thể lưu trữ `User`, `Account`, `RefreshToken`.
+Phân hệ này đảm nhiệm việc bảo mật truy cập, quản lý tài khoản người dùng và thiết lập sơ đồ phòng ban của toàn công ty. Lớp giao diện tiếp nhận thông tin đăng nhập, danh sách tài khoản và sơ đồ cây đơn vị để chuyển tiếp cho lớp điều khiển xử lý. Lớp điều khiển sẽ kiểm tra tính hợp lệ của mật khẩu, cấp quyền truy cập theo từng vai trò công việc và cập nhật các thay đổi trong cơ cấu tổ chức vào các thực thể dữ liệu tài khoản và phòng ban.
 
-![Hình 2.104: Biểu đồ lớp Use case Đăng nhập (UC01)](images/hinh_2_18_class_login.png)
+![Hình 2.104: Biểu đồ lớp Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03)](images/hinh_2_104_class_nhom_a.png)
 
-**2. Biểu đồ lớp phân tích Use case Đăng ký nghỉ phép (UC21):**
+**2. Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08):**
+
+Phân hệ này hỗ trợ toàn bộ quy trình tuyển dụng từ khâu lập phiếu yêu cầu bổ sung nhân sự, xét duyệt định biên cho đến quản lý hồ sơ ứng viên và gửi thư mời nhận việc. Trên giao diện, chuyên viên nhân sự có thể theo dõi ứng viên qua các vòng phỏng vấn trên bảng trực quan và nhập điểm đánh giá. Lớp điều khiển kiểm tra số lượng nhân sự cần tuyển so với chỉ tiêu của phòng ban, tự động cập nhật trạng thái ứng viên và tạo thư thỏa thuận mức lương lưu vào cơ sở dữ liệu.
+
+![Hình 2.105: Biểu đồ lớp Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08)](images/hinh_2_105_class_nhom_b.png)
+
+**3. Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14):**
+
+Phân hệ chịu trách nhiệm lưu trữ toàn diện lý lịch nhân viên, theo dõi hợp đồng lao động, quản lý việc mượn trả bằng cấp gốc và hỗ trợ nhân viên mới làm quen với công việc. Các lớp giao diện giúp nhân viên cập nhật thông tin cá nhân và xem danh sách công việc cần làm khi mới vào công ty. Tầng điều khiển tiếp nhận dữ liệu để thẩm định thời hạn hợp đồng, ghi nhận lịch sử bàn giao hồ sơ và lưu kết quả đánh giá thử việc vào các bảng dữ liệu nhân sự tương ứng.
+
+![Hình 2.106: Biểu đồ lớp Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14)](images/hinh_2_106_class_nhom_c.png)
+
+**4. Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17):**
+
+Phân hệ cung cấp trang làm việc cá nhân để mỗi nhân sự chủ động tra cứu thông tin, nộp đơn từ và cập nhật hồ sơ trực tuyến. Hệ thống phân loại thông tin cá nhân thành các mức độ bảo mật khác nhau. Khi nhân viên muốn thay đổi các thông tin quan trọng như số căn cước công dân hay tài khoản ngân hàng, lớp điều khiển sẽ tạo yêu cầu kèm ảnh chụp minh chứng để chuyển đến bộ phận nhân sự kiểm tra và phê duyệt trước khi ghi đè vào dữ liệu chính thức.
+
+![Hình 2.107: Biểu đồ lớp Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17)](images/hinh_2_107_class_nhom_d.png)
+
+**5. Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25):**
+
+Phân hệ này giải quyết việc theo dõi thời gian làm việc hàng ngày của nhân viên thông qua nhiều hình thức như điểm danh trên web, nhận diện khuôn mặt tại sảnh hoặc kết nối với máy chấm công phần cứng. Lớp điều khiển tiếp nhận các lượt chấm công, đối chiếu với ca làm việc đã phân công để phát hiện đi muộn, về sớm hoặc làm thêm giờ. Đồng thời, hệ thống tự động trừ số ngày nghỉ phép hợp lệ vào quỹ phép năm và tổng hợp thành bảng công hoàn chỉnh vào cuối tháng.
+
+![Hình 2.108: Biểu đồ lớp Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25)](images/hinh_2_108_class_nhom_e.png)
+
+**6. Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31):**
+
+Phân hệ thực hiện tính toán thu nhập hàng tháng cho nhân viên dựa trên ngày công thực tế, phụ cấp, các khoản khấu trừ bảo hiểm và thuế thu nhập cá nhân. Lớp điều khiển tổng hợp dữ liệu từ bảng chấm công, áp dụng công thức lương đã cấu hình để tạo phiếu lương chi tiết cho từng người. Khi bảng lương được lãnh đạo duyệt, hệ thống sẽ chuyển sang trạng thái khóa để bảo đảm dữ liệu không bị thay đổi ngoài ý muốn, đồng thời hỗ trợ quản lý các khoản tạm ứng và thanh toán công tác phí.
+
+![Hình 2.109: Biểu đồ lớp Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31)](images/hinh_2_109_class_nhom_f.png)
+
+**7. Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36):**
+
+Phân hệ quản lý các sự kiện thay đổi trong quá trình làm việc của nhân sự như chuyển công tác giữa các bộ phận, thăng chức, tăng bậc lương, khen thưởng hoặc xử lý kỷ luật. Khi có nhân viên xin nghỉ việc, hệ thống cung cấp danh mục bàn giao trách nhiệm qua từng phòng ban gồm tài sản kỹ thuật, công nợ tài chính và công việc dở dang. Lớp điều khiển giám sát việc hoàn thành đầy đủ các bước bàn giao trước khi hoàn tất thủ tục thôi việc và đóng tài khoản.
+
+![Hình 2.110: Biểu đồ lớp Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36)](images/hinh_2_110_class_nhom_g.png)
+
+**8. Phân hệ Đánh giá hiệu suất, Đào tạo và Khiếu nại (Nhóm H: UC37 - UC39):**
+
+Phân hệ hỗ trợ nâng cao chất lượng nguồn nhân lực thông qua các kỳ đánh giá hiệu suất định kỳ theo mục tiêu công việc, khảo sát phản hồi đa chiều và tổ chức các lớp đào tạo nội bộ. Bên cạnh đó, hệ thống cung cấp kênh gửi khiếu nại hoặc phản ánh ý kiến bảo mật cho người lao động. Tầng điều khiển thu thập phiếu đánh giá để tính điểm xếp loại, ghi nhận kết quả hoàn thành khóa học của nhân viên và chuyển thông tin khiếu nại đến người có thẩm quyền xử lý.
+
+![Hình 2.111: Biểu đồ lớp Phân hệ Đánh giá hiệu suất, Đào tạo và Khiếu nại (Nhóm H: UC37 - UC39)](images/hinh_2_111_class_nhom_h.png)
+
+**9. Phân hệ Hồ sơ cán bộ và Báo cáo nhà nước (Nhóm I: UC40 - UC43):**
+
+Phân hệ đáp ứng yêu cầu quản lý hồ sơ theo đúng quy chuẩn cán bộ, công chức với đầy đủ các trường thông tin theo mẫu của Bộ Nội vụ và bảng lương ngạch bậc nhà nước. Lớp điều khiển tự động kiểm tra mốc thời gian công tác để nhắc nhở thời điểm nâng bậc lương thường xuyên theo quy định. Khi cần báo cáo cho cơ quan quản lý, hệ thống sẽ tự động trích xuất dữ liệu và điền vào các mẫu biểu thống kê theo định dạng quy chuẩn.
+
+![Hình 2.112: Biểu đồ lớp Phân hệ Hồ sơ cán bộ và Báo cáo nhà nước (Nhóm I: UC40 - UC43)](images/hinh_2_112_class_nhom_i.png)
+
+**10. Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47):**
+
+Phân hệ xây dựng kho tài liệu hướng dẫn công việc, quy trình nghiệp vụ chung để toàn bộ nhân viên dễ dàng tìm kiếm và tra cứu kiến thức chuyên môn. Đồng thời, phân hệ cung cấp bảng tổng hợp số liệu trực quan giúp ban giám đốc nắm bắt nhanh tình hình biến động nhân sự, tỷ lệ nghỉ việc và chi phí lương. Mọi thao tác quan trọng trên hệ thống đều được ghi lại trong nhật ký kiểm toán để phục vụ công tác giám sát an toàn thông tin.
+
+![Hình 2.113: Biểu đồ lớp Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47)](images/hinh_2_113_class_nhom_j.png)
+
+**11. Biểu đồ lớp phân tích tương tác Use case Đăng ký nghỉ phép (UC21):**
 
 Bao gồm lớp giao diện `LeaveRequestForm`, lớp điều khiển `LeaveService` cùng các lớp thực thể `LeaveRequest`, `LeaveBalance`, `Employee`.
 
-![Hình 2.105: Biểu đồ lớp Use case Đăng ký nghỉ phép (UC21)](images/hinh_2_19_class_leave.png)
+![Hình 2.114: Biểu đồ lớp Use case Đăng ký nghỉ phép (UC21)](images/hinh_2_19_class_leave.png)
 
-**3. Biểu đồ lớp miền cốt lõi của hệ thống:**
+**12. Biểu đồ lớp miền cốt lõi của hệ thống:**
 
 Thể hiện mối quan hệ liên kết, hợp thành và kế thừa giữa các thực thể dữ liệu chính trong hệ thống quản trị nhân lực của doanh nghiệp.
 
-![Hình 2.106: Biểu đồ lớp miền cốt lõi của hệ thống](images/hinh_2_20_class_domain.png)
+![Hình 2.115: Biểu đồ lớp miền cốt lõi của hệ thống](images/hinh_2_20_class_domain.png)
 
 **Bảng 2.6. Ma trận phân quyền truy cập chức năng**
 
@@ -2364,42 +2435,42 @@ Thể hiện mối quan hệ liên kết, hợp thành và kế thừa giữa c�
 
 ### 2.4.2. Thiết kế lưu trữ dữ liệu
 
-Cơ sở dữ liệu của hệ thống được thiết kế và cài đặt trên hệ quản trị PostgreSQL 16 thông qua công cụ Prisma ORM, bao gồm 87 model quan hệ phân bổ thành 10 miền dữ liệu nghiệp vụ:
+Cơ sở dữ liệu của hệ thống được thiết kế và cài đặt trên hệ quản trị cơ sở dữ liệu quan hệ PostgreSQL 16, quản lý tập trung toàn bộ các thực thể thông tin phục vụ công tác quản trị nhân lực. Cấu trúc lược đồ dữ liệu gồm 87 bảng quan hệ được phân bổ khoa học thành 10 miền nghiệp vụ chính, đáp ứng đầy đủ các yêu cầu về tính toàn vẹn dữ liệu, hiệu năng truy vấn và an toàn thông tin:
 
-**Bảng 2.7. Đặc tả cấu trúc lược đồ Cơ sở dữ liệu quan hệ**
+**Bảng 2.7. Đặc tả cấu trúc lược đồ Cơ sở dữ liệu quan hệ của hệ thống**
 
-| Miền dữ liệu | Model CSDL chính (Prisma ORM) | Số trường | Mục đích lưu trữ và quy tắc toàn vẹn nghiệp vụ |
+| Miền dữ liệu | Danh mục bảng dữ liệu trong CSDL (Prisma ORM) | Số bảng | Mục đích lưu trữ và quy tắc nghiệp vụ |
 | :--- | :--- | :---: | :--- |
-| 1. Định danh & Hệ thống | `User`, `Role`, `UserRole`, `OrgUnit`, `RefreshToken` | 34 | Quản lý tài khoản, thông tin định danh nhân sự, mật khẩu băm bcrypt, phân quyền RBAC và cây tổ chức tự tham chiếu (`parentId`). |
-| 2. Tuyển dụng & ATS | `JobRequisition`, `Candidate`, `HrmsJobOpening`, `HrmsInterviewRound`, `HrmsJobOffer` | 28 | Lưu trữ phiếu đề xuất tuyển dụng, hồ sơ ứng viên, các vòng phỏng vấn, điểm Scorecard và liên kết chuyển đổi 1-Click sang nhân viên. |
-| 3. Hồ sơ & Hợp đồng | `Contract`, `Certificate`, `HrDocument`, `OnboardingAssignment` | 42 | Hợp đồng thử việc/chính thức, vị trí lưu trữ văn bằng chứng chỉ, lịch sử mượn trả hồ sơ và lộ trình hội nhập nhân viên mới. |
-| 4. Phân cấp dữ liệu | `ProfileChangeRequest` | 12 | Hàng đợi thẩm định thông tin Mức 2: lưu giá trị cũ, giá trị mới đề xuất, tệp minh chứng ảnh CCCD và vết phê duyệt nguyên tử. |
-| 5. Chấm công & Ca kíp | `AttendanceEvent`, `AttendanceDay`, `HrmsShiftType`, `HrmsShiftAssignment`, `AttendanceCorrection` | 36 | Lưu trữ sự kiện điểm danh bất biến (Append-Only), ca làm việc, tổng hợp ngày công và nhật ký giải trình hiệu chỉnh công. |
-| 6. Điểm danh đa nguồn | `AttendanceDevice`, `FaceEmbedding` | 18 | Cấu hình máy chấm công webhook HMAC, vector mẫu khuôn mặt 128 chiều mã hóa AES-256-GCM (tuân thủ Nghị định 13). |
-| 7. Nghỉ phép & Làm thêm | `LeaveRequest`, `LeaveBalance`, `OvertimeRequest` | 24 | Quỹ phép năm, lịch sử nghỉ phép tự động trừ số dư khi duyệt, đăng ký và kiểm soát trần thời gian làm thêm giờ (OT). |
-| 8. Tiền lương & Phúc lợi | `PayrollPeriod`, `Payslip`, `HrmsSalaryComponent`, `HrmsSalaryStructure`, `HrmsPayrollRun` | 46 | Chu kỳ tính lương có trạng thái khóa bất biến LOCKED (chặn tính lại với HTTP 409), cấu trúc và phiếu lương chi tiết từng thành phần. |
-| 9. Tài chính nhân sự | `HrmsEmployeeLoan`, `HrmsExpenseClaim`, `HrmsAssetAllocation`, `HrmsTravelRequest` | 38 | Khoản vay phúc lợi (kiểm soát trích nợ <= 30% lương Net), lịch trình hoàn nợ tự động nạp kỳ lương, công tác phí, tài sản thiết bị. |
-| 10. Cán bộ & Tri thức | `PersonnelComprehensiveProfile`, `PersonnelRank`, `Article`, `ArticleVersion`, `AuditLog` | 52 | 111 thuộc tính cán bộ chuẩn Mẫu 2C-BNV, ngạch bậc lương chuẩn NĐ 204, không gian tri thức SOP và nhật ký kiểm toán Append-Only. |
+| 1. Định danh & Cơ cấu tổ chức | `User`, `Role`, `UserRole`, `OrgUnit`, `RefreshToken` | 5 | Quản lý tài khoản người dùng, mã hóa mật khẩu, phân quyền truy cập theo vai trò và mô hình hóa cây sơ đồ tổ chức phòng ban theo mối quan hệ thứ bậc. |
+| 2. Tuyển dụng & Thu hút nhân tài (ATS) | `JobRequisition`, `Candidate`, `HrmsJobOpening`, `HrmsJobApplicant`, `HrmsInterviewRound`, `HrmsJobOffer` | 6 | Lưu trữ phiếu yêu cầu tuyển dụng, hồ sơ ứng viên, pipeline ứng tuyển 6 giai đoạn, lịch phỏng vấn, phiếu chấm điểm và tiếp nhận trực tiếp ứng viên trúng tuyển. |
+| 3. Hồ sơ, Hợp đồng & Hội nhập nhân sự | `Contract`, `Certificate`, `HrDocument`, `OnboardingPath`, `OnboardingPathItem`, `OnboardingAssignment`, `OnboardingItemProgress`, `HandoverChecklist`, `HandoverItem`, `HrmsLifecycleEvent`, `HrmsOnboardingTask` | 11 | Quản lý hợp đồng lao động (thử việc, chính thức), thông tin văn bằng chứng chỉ, vị trí lưu trữ hồ sơ vật lý, lộ trình hội nhập và quy trình 5 bước bàn giao thôi việc. |
+| 4. Biến động nhân sự & Phân cấp dữ liệu | `PersonnelAction`, `ProfileChangeRequest` | 2 | Quản lý các quyết định biến động (bổ nhiệm, điều chuyển, nâng lương, kỷ luật) và hàng đợi kiểm soát cập nhật thông tin định danh Mức 2 có minh chứng ảnh. |
+| 5. Chấm công, Phân ca & Điểm danh đa nguồn | `AttendanceDevice`, `FaceEmbedding`, `AttendanceEvent`, `AttendanceDay`, `AttendanceCorrection`, `HrmsShiftType`, `HrmsShiftAssignment`, `HrmsAttendanceRegularization` | 8 | Quản lý thiết bị điểm danh, vector khuôn mặt sinh trắc học mã hóa, nhật ký quẹt thẻ thời gian thực, bảng tổng hợp công ngày, phân ca và giải trình sai lệch công. |
+| 6. Nghỉ phép & Làm thêm giờ | `LeaveRequest`, `LeaveBalance`, `OvertimeRequest` | 3 | Quản lý quỹ phép năm của nhân viên (tự động cập nhật số dư ngay khi phê duyệt đơn), theo dõi đơn xin nghỉ phép và kiểm soát giới hạn thời gian làm thêm giờ. |
+| 7. Tiền lương & Cấu trúc đãi ngộ động | `PayrollPeriod`, `Payslip`, `HrmsSalaryComponent`, `HrmsSalaryStructure`, `HrmsSalaryStructureItem`, `HrmsSalaryStructureAssignment`, `HrmsPayrollRun`, `HrmsPayrollSlip` | 8 | Quản lý chu kỳ tính lương có khóa sổ an toàn, bảng cấu trúc lương động đa thành phần, phiếu lương chi tiết từng khoản phụ cấp, bảo hiểm và thuế. |
+| 8. Tài chính nhân sự, Phúc lợi & Tài sản | `HrmsEmployeeLoan`, `HrmsEmployeeAdvance`, `HrmsExpenseClaim`, `HrmsAssetAllocation`, `HrmsTravelRequest` | 5 | Quản lý các khoản vay phúc lợi (khống chế mức trích nợ không vượt quá 30% lương thực lĩnh), tự động trừ dần qua bảng lương, thanh quyết toán công tác phí và cấp phát tài sản. |
+| 9. Hiệu suất & Đào tạo phát triển | `PerformanceReview`, `HrmsAppraisalCycle`, `HrmsAppraisalGoal`, `HrmsAppraisalReview`, `TrainingCourse`, `TrainingEnrollment`, `HrmsTrainingProgram`, `HrmsTrainingFeedback`, `HrmsGrievance` | 9 | Đánh giá hiệu suất 360 độ, quản lý mục tiêu OKR/KPI, các khóa đào tạo nâng cao kỹ năng chuyên môn và kênh tiếp nhận giải quyết khiếu nại lao động bảo mật. |
+| 10. Hồ sơ cán bộ Mẫu 2C, Tri thức số & Hệ thống | `PersonnelComprehensiveProfile`, `PersonnelRank`, `PersonnelSalaryHistory`, `PersonnelAppointment`, `PersonnelEducation`, `PersonnelWorkHistory`, `PersonnelRewardDiscipline`, `PersonnelFamilyRelation`, `PersonnelAppraisal`, `PersonnelSocialActivity`, `Space`, `SpaceMember`, `SpaceFollow`, `Category`, `Tag`, `ArticleTag`, `Article`, `ArticleVersion`, `Attachment`, `ArticleReview`, `Comment`, `Reaction`, `ArticleView`, `Bookmark`, `MasterCatalogGroup`, `MasterCatalog`, `MasterCatalogItem`, `Notification`, `AuditLog`, `Setting` | 30 | 111 thuộc tính cán bộ chuyên sâu theo Mẫu 2C-BNV và ngạch bậc lương NĐ 204; kho tri thức số SOP có phiên bản bài viết bất biến; danh mục dùng chung và nhật ký kiểm toán hệ thống. |
 
-Mô hình dữ liệu vật lý thể hiện các mối quan hệ khóa ngoại (Foreign Key) và các chỉ mục toàn vẹn (Unique Constraint) giữa các bảng cốt lõi:
+Lược đồ cơ sở dữ liệu quan hệ của hệ thống thể hiện cấu trúc các bảng dữ liệu cốt lõi cùng các mối quan hệ khóa chính, khóa ngoại và chỉ mục ràng buộc toàn vẹn giữa các phân hệ:
 
-![Hình 2.107: Mô hình cơ sở dữ liệu vật lý của hệ thống](images/hinh_2_21_erd_database.png)
+![Hình 2.116: Mô hình cơ sở dữ liệu vật lý của hệ thống](images/hinh_2_21_erd_database.png)
 
-Để mở rộng hỗ trợ thu nhận dữ liệu chấm công từ các nguồn công nghệ đa dạng, cơ sở dữ liệu tích hợp thêm các bảng chuyên biệt cho phép kết nối máy chấm công phần cứng, lưu trữ vector khuôn mặt và thu nhận bản ghi từ cổng Web:
+Nhằm đáp ứng mô hình làm việc linh hoạt và hiện đại hóa công tác chấm công, cơ sở dữ liệu mở rộng phân hệ quản lý điểm danh đa nguồn, kết nối đồng thời thiết bị chấm công phần cứng, Kiosk nhận diện khuôn mặt và cổng tự phục vụ của nhân viên:
 
-![Hình 2.108: Mô hình dữ liệu mở rộng cho chấm công đa nguồn](images/hinh_2_24_erd_multisource.png)
+![Hình 2.117: Mô hình dữ liệu mở rộng cho chấm công đa nguồn](images/hinh_2_24_erd_multisource.png)
 
-Sơ đồ thể hiện bảng sự kiện chấm công bất biến AttendanceEvent với trường nguồn (MACHINE, WEB, FACE, SIMULATOR) cùng các bảng hỗ trợ FaceEmbedding và AttendanceDevice.
+Sơ đồ trên làm rõ quy trình tiếp nhận và xử lý dữ liệu chấm công: bảng `AttendanceDevice` quản lý thông tin các thiết bị ghi nhận; bảng `FaceEmbedding` lưu trữ các vector mẫu nhận diện khuôn mặt đã được mã hóa an toàn của từng nhân viên; bảng `AttendanceEvent` đóng vai trò là nhật ký tiếp nhận toàn bộ các lượt điểm danh gửi về theo thời gian thực; từ đó hệ thống tổng hợp thành các bản ghi công hoàn chỉnh theo ngày tại bảng `AttendanceDay`. Trường hợp có sự chênh lệch giờ giấc hoặc quên quẹt thẻ, nhân viên gửi đơn giải trình tại bảng `AttendanceCorrection` để người quản lý rà soát và cập nhật lại số liệu.
 
 **Bảng 2.8. So sánh các phương thức điểm danh trong hệ thống**
 
-| Tiêu chí so sánh | Kiosk Khuôn mặt sinh trắc học & IR | Máy chấm công phần cứng (Vân tay/Thẻ) | Web Check-in cổng ESS |
+| Tiêu chí so sánh | Kiosk nhận diện khuôn mặt | Thiết bị chấm công phần cứng (Vân tay / Thẻ) | Cổng tự phục vụ nhân viên (Web) |
 | :--- | :--- | :--- | :--- |
-| Phương thức xác thực | Nhận diện khuôn mặt 2D + cảm biến hồng ngoại | Quẹt vân tay quang học / Thẻ từ RFID | Đăng nhập tài khoản định danh cá nhân |
-| Cơ chế bảo mật & Chống giả mạo | Quét phổ nhiệt IR và chuyển động (Anti-Spoofing), không lưu ảnh gốc | Xác thực phần cứng tại chỗ qua cảm biến vân tay | Xác thực phiên làm việc JWT và lưu vết địa chỉ IP |
-| Giao thức kết nối dữ liệu | Xử lý vector tại trình duyệt, gửi API thời gian thực | Đẩy bản tin HTTP POST có chữ ký HMAC-SHA256 | Gọi trực tiếp RESTful API nội bộ |
-| Đối tượng áp dụng phù hợp | Toàn bộ nhân viên ra/vào sảnh văn phòng | Nhân viên làm việc cố định tại tòa nhà văn phòng | Nhân viên làm việc linh hoạt từ xa (WFH / Onsite) |
-| Tuân thủ Nghị định 13/2023/NĐ-CP | Tuyệt đối tuân thủ (chỉ lưu vector mã hóa AES-256) | Dữ liệu mẫu lưu trên chip nhớ nội bộ của máy | Không thu thập dữ liệu sinh trắc học |
+| Phương thức xác thực | Nhận diện khuôn mặt kết hợp cảm biến hồng ngoại | Quét dấu vân tay quang học hoặc quẹt thẻ từ | Đăng nhập tài khoản định danh cá nhân |
+| Cơ chế bảo mật và chống gian lận | Cảm biến phát hiện chuyển động sống và nhiệt độ, không lưu hình ảnh thực | Xác thực trực tiếp trên chip nhớ của thiết bị | Xác thực phiên làm việc an toàn và ghi nhận địa chỉ mạng truy cập |
+| Kênh truyền dữ liệu | Trình duyệt tính toán vector đặc trưng và truyền qua kết nối bảo mật | Thiết bị gửi dữ liệu qua kênh mạng có mã xác thực an toàn | Kết nối giao diện lập trình nội bộ của hệ thống |
+| Phạm vi áp dụng phù hợp | Nhân viên ra vào tại sảnh và các cửa văn phòng | Nhân viên làm việc cố định tại trụ sở công ty | Nhân viên làm việc từ xa hoặc đi công tác bên ngoài |
+| Tuân thủ quy định bảo vệ dữ liệu | Tuân thủ nghiêm ngặt (chỉ lưu trữ vector đặc trưng đã mã hóa bí mật) | Dữ liệu mẫu vân tay được lưu trữ nội bộ trên thiết bị | Không thu thập dữ liệu sinh trắc học của người dùng |
 
 ### 2.4.3. Thiết kế giao diện người dùng
 
@@ -2448,21 +2519,21 @@ Giao diện người dùng được thiết kế hiện đại trên nền tản
 
 ### 2.4.4. Thiết kế mô hình thành phần
 
-Hệ thống được thiết kế và cài đặt theo mô hình kiến trúc ba tầng (3-Tier Architecture) hoàn chỉnh, bảo đảm tính độc lập cao giữa giao diện, logic xử lý và lưu trữ dữ liệu:
+Hệ thống được thiết kế và cài đặt theo mô hình kiến trúc ba tầng hoàn chỉnh, bảo đảm tính độc lập cao giữa giao diện người dùng, logic xử lý nghiệp vụ và lưu trữ dữ liệu:
 
-Tầng Giao diện người dùng: Xây dựng bằng Next.js 14 Standalone phục vụ giao diện người dùng cho toàn bộ 31 màn hình chức năng, đồng thời đóng vai trò là Reverse Proxy chuyển tiếp các yêu cầu API (`/api/*`) trực tiếp tới máy chủ backend mà không cần cấu hình thêm máy chủ web trung gian.
+Tầng Giao diện người dùng: Xây dựng trên nền tảng Next.js hiện đại, đáp ứng trực quan cho toàn bộ 31 màn hình chức năng, đồng thời tích hợp cơ chế tự động điều phối các yêu cầu dữ liệu trực tiếp tới máy chủ dịch vụ nghiệp vụ một cách an toàn và nhanh chóng.
 
-Tầng Xử lý nghiệp vụ: Xây dựng trên nền tảng NestJS 10 (TypeScript) bao gồm 39 module nghiệp vụ chuyên biệt, vận hành trên hai bộ máy xử lý cốt lõi: Quy trình phê duyệt biến động nhân sự và Chức năng tính lương tự động, tích hợp các dịch vụ bảo vệ phân quyền (JwtAuthGuard, RolesGuard) và cơ chế truyền thông điệp sự kiện (Event-Driven Architecture).
+Tầng Xử lý nghiệp vụ: Xây dựng trên nền tảng NestJS bằng ngôn ngữ TypeScript với 39 module nghiệp vụ chuyên sâu. Tầng này vận hành trên hai bộ máy xử lý cốt lõi: bộ xử lý quy trình phê duyệt biến động nhân sự đa cấp và bộ máy tính toán tiền lương tự động, kết hợp các tầng bảo vệ xác thực phiên đăng nhập, kiểm soát quyền truy cập theo vai trò và cơ chế truyền thông điệp theo sự kiện.
 
-Tầng Lưu trữ dữ liệu: Hệ quản trị cơ sở dữ liệu PostgreSQL 16 quản lý 87 model quan hệ, kết hợp ổ lưu trữ tệp đính kèm độc lập; quản trị cấu trúc lược đồ qua Prisma Migration tự động chạy phiên bản khi khởi động container.
+Tầng Lưu trữ dữ liệu: Sử dụng hệ quản trị cơ sở dữ liệu quan hệ PostgreSQL 16 quản lý tập trung 87 bảng dữ liệu, kết hợp không gian lưu trữ các tệp tài liệu số hóa độc lập; toàn bộ cấu trúc cơ sở dữ liệu được quản lý phiên bản tự động, bảo đảm tính nhất quán và đồng bộ khi triển khai hệ thống.
 
-![Hình 2.109: Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống](images/hinh_2_22_arch_3tier.png)
+![Hình 2.118: Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống](images/hinh_2_22_arch_3tier.png)
 
 Kiến trúc phân tầng rõ ràng giúp hệ thống vận hành ổn định, có độ bao đóng cao, cho phép doanh nghiệp dễ dàng nâng cấp giao diện hoặc tích hợp thêm các dịch vụ công nghệ mới (như phân hệ trí tuệ nhân tạo dự báo nhân sự) trong tương lai mà không làm gián đoạn cấu trúc dữ liệu nền tảng.
 
 ## Tóm tắt chương 2
 
-Chương 2 đã hoàn thành toàn diện nhiệm vụ thiết kế hệ thống thông tin quản trị nhân lực cho Công ty Cổ phần Phần mềm Saigon Technology. Chương đã xác định rõ 11 tác nhân nghiệp vụ ánh xạ vào 3 nhóm vai trò phân quyền; phân tầng yêu cầu từ 18 quy trình thực tế xuống danh mục 47 Use Case hoàn chỉnh theo vòng đời nhân sự; phân tích các mô hình tương tác động thông qua 6 biểu đồ trình tự, 3 biểu đồ hoạt động và 5 biểu đồ trạng thái; xây dựng cấu trúc tĩnh với biểu đồ gói, biểu đồ lớp miền, lược đồ CSDL quan hệ gồm 87 model trên PostgreSQL 16 (bao gồm các bảng mở rộng cho chấm công đa nguồn), thiết kế 31 màn hình ứng dụng phân bổ trong 7 phân hệ nghiệp vụ chuẩn hóa và thiết lập mô hình kiến trúc phần mềm 3 tầng hiện đại.
+Chương 2 đã hoàn thành toàn diện nhiệm vụ thiết kế hệ thống thông tin quản trị nhân lực cho Công ty Cổ phần Phần mềm Saigon Technology. Chương đã xác định rõ 11 tác nhân nghiệp vụ ánh xạ vào 3 nhóm vai trò phân quyền; phân tầng yêu cầu từ 18 quy trình thực tế xuống danh mục 47 Use Case hoàn chỉnh theo vòng đời nhân sự; phân tích các mô hình tương tác động thông qua 6 biểu đồ trình tự, 3 biểu đồ hoạt động và 5 biểu đồ trạng thái; xây dựng cấu trúc tĩnh với biểu đồ gói, biểu đồ lớp miền, lược đồ CSDL quan hệ gồm 87 bảng trên PostgreSQL 16 (bao gồm các bảng mở rộng cho chấm công đa nguồn), thiết kế 31 màn hình ứng dụng phân bổ trong 7 phân hệ nghiệp vụ chuẩn hóa và thiết lập mô hình kiến trúc phần mềm 3 tầng hiện đại.
 
 ---
 
@@ -2472,27 +2543,19 @@ Chương 2 đã hoàn thành toàn diện nhiệm vụ thiết kế hệ thống
 
 Sau quá trình nghiên cứu, khảo sát thực tế tại Công ty Cổ phần Phần mềm Saigon Technology, vận dụng phương pháp phân tích thiết kế hướng đối tượng (OOAD) và tiến hành lập trình cài đặt thực tế toàn bộ hệ thống, đề tài đã đạt được các kết quả cụ thể:
 
-Về mặt nghiệp vụ và chức năng: Hệ thống đã số hóa hoàn chỉnh 18 quy trình nghiệp vụ cốt lõi, hiện thực hóa thành 47 Use Case chức năng trên 31 trang màn hình ứng dụng thực tế (bao gồm 28 màn hình nghiệp vụ phân bổ thành 7 phân hệ giao diện không gian làm việc cùng 2 giao diện chuyên biệt: Kiosk điểm danh khuôn mặt & IR và Login xác thực tập trung). Hệ thống phục vụ 11 tác nhân nghiệp vụ gói gọn trong 3 vai trò phân quyền (USER, KM_MANAGER, ADMIN), bao quát trọn vẹn vòng đời nhân sự từ tuyển dụng ATS, hồ sơ nhân viên, phân cấp quản trị dữ liệu cá nhân 3 mức độ, điểm danh đa nguồn (máy chấm công phần cứng, Kiosk nhận diện khuôn mặt sinh trắc học 2D & cảm biến hồng ngoại IR chống giả mạo, Web ESS), quản lý nghỉ phép, làm thêm giờ, chu kỳ tính lương có khóa bất biến (LOCKED), các chính sách phúc lợi (khoản vay, công tác phí, tài sản), đánh giá hiệu suất 360 độ cho đến kho tri thức nội bộ và bộ hồ sơ cán bộ theo chuẩn Mẫu 2C-BNV/2008.
+Về mặt nghiệp vụ và chức năng: Hệ thống đã số hóa hoàn chỉnh 18 quy trình nghiệp vụ cốt lõi, hiện thực hóa thành 47 Use Case chức năng trên 31 trang màn hình ứng dụng thực tế (bao gồm 28 màn hình nghiệp vụ phân bổ thành 7 phân hệ giao diện không gian làm việc cùng 2 giao diện chuyên biệt: Kiosk điểm danh khuôn mặt & IR và Login xác thực tập trung). Hệ thống phục vụ 11 tác nhân nghiệp vụ gói gọn trong 3 vai trò phân quyền (USER, KM_MANAGER, ADMIN), bao quát trọn vẹn vòng đời nhân sự từ tuyển dụng ATS, hồ sơ nhân viên, phân cấp quản trị dữ liệu cá nhân 3 mức độ, điểm danh đa nguồn (máy chấm công phần cứng, Kiosk nhận diện khuôn mặt sinh trắc học 2D & cảm biến hồng ngoại IR chống giả mạo, Web ESS), quản lý nghỉ phép, làm thêm giờ, chu kỳ tính lương có cơ chế khóa sổ an toàn, các chính sách phúc lợi (khoản vay, công tác phí, tài sản), đánh giá hiệu suất 360 độ cho đến kho tri thức nội bộ và bộ hồ sơ cán bộ theo chuẩn Mẫu 2C-BNV/2008.
 
-Về mặt cơ sở dữ liệu: Thiết kế và cài đặt hoàn chỉnh 87 model quan hệ chia thành 10 miền dữ liệu trên hệ quản trị PostgreSQL 16, quản trị di chuyển lược đồ tự động qua Prisma Migration; kiểm chứng thành công ba ràng buộc bất biến: nhật ký kiểm toán chỉ thêm, sự kiện điểm danh bất biến, và cơ chế khóa kỳ lương chặn tính lại với lỗi HTTP 409 Conflict.
+Về mặt cơ sở dữ liệu: Thiết kế và cài đặt hoàn chỉnh 87 bảng quan hệ phân bổ trong 10 miền dữ liệu trên hệ quản trị PostgreSQL 16; thiết lập và kiểm chứng chặt chẽ các ràng buộc nghiệp vụ: sổ nhật ký kiểm toán và dữ liệu sự kiện điểm danh theo nguyên tắc chỉ ghi thêm để lưu vết vĩnh viễn, cùng cơ chế khóa sổ kỳ lương ngăn chặn hoàn toàn việc tính toán lại nhằm bảo vệ tính toàn vẹn của số liệu kế toán.
 
-Về mặt chất lượng phần mềm: Toàn bộ mã nguồn backend và frontend đều vượt qua các bước kiểm tra cú pháp, kiểm tra kiểu tĩnh TypeScript (`tsc --noEmit`) và linter với 0 lỗi cảnh báo; bộ kịch bản kiểm thử tự động tích hợp end-to-end trên môi trường Docker chạy thật đạt kết quả 39 PASS / 0 FAIL, bao phủ đầy đủ các luồng nghiệp vụ quan trọng: thu hồi token khi đăng xuất, phân cấp hồ sơ Mức 2 có thẩm định minh chứng, kiểm soát quỹ phép, khóa kỳ lương bất biến, thôi việc tự sinh danh mục bàn giao 5 bước và xuất bản tri thức có phiên bản; toàn bộ các route giao diện nội bộ đạt thời gian phản hồi dưới 100ms với mã trạng thái HTTP 200 OK.
+Về mặt chất lượng phần mềm: Toàn bộ mã nguồn phía máy chủ và giao diện đều vượt qua các bước kiểm tra cú pháp và kiểm tra kiểu dữ liệu với 0 lỗi cảnh báo; bộ 39 kịch bản kiểm thử tự động tích hợp trên môi trường thực tế đều đạt kết quả thành công tuyệt đối (39/39 kịch bản đạt chuẩn), bao phủ đầy đủ các luồng nghiệp vụ then chốt: thu hồi phiên đăng nhập khi đăng xuất, quy trình thẩm định hồ sơ Mức 2 có tệp minh chứng, tự động đối soát quỹ phép, khóa sổ kỳ lương, tự động tạo danh mục bàn giao năm bước khi thôi việc và xuất bản tài liệu quy trình; toàn bộ các luồng giao diện đều đạt tốc độ phản hồi nhanh dưới 100ms.
 
 Về khả năng triển khai: Hệ thống được đóng gói hoàn chỉnh thành các container Docker độc lập, sẵn sàng khởi chạy và chuyển giao vận hành bằng một câu lệnh duy nhất (`docker compose up -d`).
 
 ## 3.2. Đánh giá ưu, nhược điểm
 
-**Ưu điểm nổi bật:**
-- Kiến trúc phần mềm phân tầng rõ ràng (3-Tier Architecture) kết hợp mô hình BCE giúp hệ thống có tính đóng gói cao, các thành phần giao diện, xử lý nghiệp vụ và lưu trữ dữ liệu hoạt động độc lập, thuận tiện cho việc bảo trì và mở rộng;
-- Cơ cấu tổ chức doanh nghiệp được thiết kế dưới dạng cây phân cấp tự tham chiếu linh hoạt, cho phép doanh nghiệp tự do thành lập thêm chi nhánh, tách nhập phòng ban mà không phải can thiệp sửa đổi mã nguồn;
-- Cơ chế quản trị dữ liệu nhân sự phân cấp 3 mức độ giúp phân định ranh giới quyền hạn chặt chẽ: cho phép nhân viên chủ động cập nhật thông tin liên lạc (Mức 1), bắt buộc thẩm định đối soát minh chứng đối với thông tin định danh pháp lý và tài chính (Mức 2) và khóa cố định đối với các dữ liệu vị trí, lương do tổ chức quản lý (Mức 3);
-- Cưỡng chế tuân thủ quy trình bằng phần mềm: cơ chế khóa kỳ lương bất biến (LOCKED) chặn hoàn toàn các hành vi tính toán lại tùy tiện, và danh mục kiểm tra thôi việc 5 bước ngăn chặn việc ban hành quyết định chấm dứt hợp đồng khi chưa hoàn tất trách nhiệm bàn giao;
-- Hỗ trợ đa dạng phương thức điểm danh, đặc biệt là kênh Kiosk nhận diện khuôn mặt sinh trắc học kết hợp cảm biến hồng ngoại IR chống giả mạo hình ảnh, xử lý vector tại trình duyệt và mã hóa AES-256-GCM, bảo đảm tuân thủ nghiêm ngặt Nghị định 13/2023/NĐ-CP.
+Về ưu điểm, hệ thống sở hữu kiến trúc phân tầng rõ ràng kết hợp mô hình Boundary-Control-Entity, giúp các thành phần giao diện người dùng, logic xử lý nghiệp vụ và lưu trữ dữ liệu hoạt động độc lập, tạo thuận lợi lớn cho công tác bảo trì và mở rộng tính năng. Cơ cấu tổ chức doanh nghiệp được thiết kế dưới dạng cây phân cấp tự tham chiếu linh hoạt, cho phép công ty dễ dàng bổ sung chi nhánh, sáp nhập hoặc thành lập các phòng ban mới theo nhu cầu thực tế. Dữ liệu nhân sự được quản lý theo mô hình phân cấp ba mức chặt chẽ, vừa tạo điều kiện cho người lao động chủ động cập nhật thông tin cá nhân, vừa đảm bảo tính bảo mật và kiểm soát nghiêm ngặt đối với dữ liệu pháp lý và tiền lương. Hệ thống áp dụng cơ chế khóa kỳ lương bất biến và danh mục kiểm tra thôi việc năm bước nhằm ràng buộc tính tuân thủ quy trình, loại bỏ các thao tác sửa đổi số liệu tùy tiện. Ngoài ra, giải pháp điểm danh đa nguồn kết hợp nhận diện khuôn mặt và cảm biến chống giả mạo, xử lý dữ liệu sinh trắc học trực tiếp tại trình duyệt đã bảo đảm tính xác thực cao và tuân thủ đúng các quy định về bảo vệ dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP.
 
-**Hạn chế còn tồn tại:**
-- Một số tham số pháp lý về thuế và bảo hiểm xã hội hiện đang được cấu hình cố định trong các module nghiệp vụ, cần được chuyển hóa hoàn toàn sang bảng tham số có hiệu lực theo ngày để tối ưu hóa việc quản lý lịch sử;
-- Kênh kết nối máy chấm công phần cứng hiện đang kiểm thử thông qua bộ mô phỏng thiết bị (Simulator) và webhook giả lập, cần tiếp tục phát triển adapter tích hợp trực tiếp SDK chuyên dụng của các hãng phần cứng (như ZKTeco, Ronald Jack);
-- Hệ thống chưa tích hợp chữ ký số công cộng (CA/PKI) để phục vụ việc ký số pháp lý đối với các quyết định hành chính và việc truyền nhận dữ liệu trực tiếp với cơ quan Bảo hiểm xã hội và Cơ quan Thuế.
+Về hạn chế, một số tham số liên quan đến chính sách thuế và bảo hiểm xã hội hiện vẫn được cấu hình tĩnh trong mã nguồn, cần được chuyển sang cơ chế quản lý theo bảng tham số có hiệu lực theo thời gian để thuận tiện hơn khi chính sách thay đổi. Việc kết nối với thiết bị chấm công phần cứng hiện mới được kiểm thử thông qua bộ mô phỏng và webhook giả lập, cần tiếp tục phát triển bộ điều hợp tích hợp trực tiếp với thư viện của các hãng thiết bị. Đồng thời, hệ thống chưa tích hợp chữ ký số công cộng nhằm phục vụ việc ký ban hành các văn bản nhân sự trực tuyến và kết nối dữ liệu trực tiếp với cơ quan bảo hiểm xã hội và cơ quan thuế.
 
 ## 3.3. Hướng nghiên cứu, phát triển
 
