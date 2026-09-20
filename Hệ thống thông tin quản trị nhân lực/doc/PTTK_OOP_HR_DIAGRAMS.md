@@ -59,39 +59,48 @@ skinparam shadowing false
 skinparam packageStyle rectangle
 skinparam defaultFontSize 11
 
-' Tác nhân phía bên trái (6 tác nhân)
+' Tác nhân phía bên trái (6 tác nhân xếp theo thứ tự nhóm chức năng từ trên xuống)
+actor "Chuyên viên\nTuyển dụng" as CVTD
 actor "Nhân viên\nQuản trị IT" as NVIT
-actor "Nhân viên" as NV
 actor "Chuyên viên\nHồ sơ" as CVHS
 actor "Trưởng dự án" as TDA
+actor "Nhân viên" as NV
 actor "Chuyên viên Đào tạo\n& Hiệu suất" as CVDT
-actor "Chuyên viên\nTuyển dụng" as CVTD
 
-' Hệ thống và 10 nhóm Use case ở trung tâm
 rectangle "HỆ THỐNG QUẢN TRỊ NHÂN LỰC (47 USE CASE)" {
-  usecase "A. Quản trị hệ thống & Tổ chức\n(UC01-UC03)" as GA
+  usecase "I. Chuẩn cán bộ & Báo cáo\n(UC40-UC43)" as GI
   usecase "B. Tuyển dụng & Ứng viên\n(UC04-UC08)" as GB
+  usecase "A. Quản trị hệ thống & Tổ chức\n(UC01-UC03)" as GA
+  usecase "J. Quản trị tri thức & Điều hành\n(UC44-UC47)" as GJ
   usecase "C. Hồ sơ nhân sự & Hội nhập\n(UC09-UC14)" as GC
-  usecase "D. Cổng tự phục vụ nhân viên\n(UC15-UC17)" as GD_uc
+  usecase "G. Biến động nhân sự & Thôi việc\n(UC32-UC36)" as GG
   usecase "E. Chấm công & Phân ca\n(UC18-UC25)" as GE
   usecase "F. Tiền lương & Phúc lợi\n(UC26-UC31)" as GF
-  usecase "G. Biến động nhân sự & Thôi việc\n(UC32-UC36)" as GG
+  usecase "D. Cổng tự phục vụ nhân viên\n(UC15-UC17)" as GD_uc
   usecase "H. Đánh giá hiệu suất & Đào tạo\n(UC37-UC39)" as GH
-  usecase "I. Chuẩn cán bộ & Báo cáo\n(UC40-UC43)" as GI
-  usecase "J. Quản trị tri thức & Điều hành\n(UC44-UC47)" as GJ
 }
 
 ' Tác nhân phía bên phải (5 tác nhân)
-actor "Chuyên viên\nTiền lương" as CVTL
-actor "Nhân viên\nHành chính" as NVHC
-actor "Đại diện\nNgười lao động" as DDNLD
 actor "Giám đốc" as GD
 actor "Kế toán viên" as KTV
+actor "Đại diện\nNgười lao động" as DDNLD
+actor "Chuyên viên\nTiền lương" as CVTL
+actor "Nhân viên\nHành chính" as NVHC
 
-' Liên kết tác nhân bên trái -> Use Case (mũi tên nét thẳng vuông góc)
+CVTD --> GB
+
 NVIT --> GA
-NVIT --> GE
 NVIT --> GJ
+
+CVHS --> GC
+CVHS --> GI
+CVHS --> GG
+
+TDA --> GB
+TDA --> GC
+TDA --> GE
+TDA --> GG
+TDA --> GH
 
 NV --> GA
 NV --> GC
@@ -102,39 +111,25 @@ NV --> GG
 NV --> GH
 NV --> GJ
 
-CVHS --> GI
-CVHS --> GD_uc
-CVHS --> GC
-CVHS --> GG
-
-TDA --> GB
-TDA --> GC
-TDA --> GE
-TDA --> GG
-TDA --> GH
-
 CVDT --> GH
 
-CVTD --> GB
+GB <-- GD
+GC <-- GD
+GF <-- GD
+GG <-- GD
+GI <-- GD
+GJ <-- GD
 
-' Liên kết Use Case -> Tác nhân bên phải (mũi tên nét thẳng vuông góc từ tác nhân vào Use Case)
+GB <-- KTV
+GF <-- KTV
+
+GG <-- DDNLD
+
 GE <-- CVTL
 GF <-- CVTL
 GG <-- CVTL
 
 GF <-- NVHC
-
-GG <-- DDNLD
-
-GI <-- GD
-GJ <-- GD
-GC <-- GD
-GF <-- GD
-GG <-- GD
-GB <-- GD
-
-GB <-- KTV
-GF <-- KTV
 @enduml
 ```
 _Hình 2.2. Biểu đồ Use case tổng quan Hệ thống Quản trị nhân lực — 10 nhóm, 47 use case, tác nhân phân bố đều hai bên, đường nối thẳng vuông góc có mũi tên._

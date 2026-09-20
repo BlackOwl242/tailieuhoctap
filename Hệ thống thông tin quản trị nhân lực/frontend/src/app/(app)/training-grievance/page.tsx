@@ -1321,7 +1321,7 @@ export default function TrainingGrievancePage() {
               {/* Bên trái: Tên cơ quan, tổ chức ban hành & Số văn bản */}
               <div className="w-[45%] text-center leading-tight">
                 <p className="font-normal text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  TỔNG CÔNG TY CÔNG NGHỆ HRMIS
+                  CÔNG TY CỔ PHẦN PHẦN MỀM SAIGON TECHNOLOGY
                 </p>
                 <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
                   HỘI ĐỒNG ĐÀO TẠO & PHÁT TRIỂN
@@ -1462,7 +1462,7 @@ export default function TrainingGrievancePage() {
               {/* Bên trái: Tên cơ quan, tổ chức ban hành & Số văn bản */}
               <div className="w-[45%] text-center leading-tight">
                 <p className="font-normal text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  TỔNG CÔNG TY CÔNG NGHỆ HRMIS
+                  CÔNG TY CỔ PHẦN PHẦN MỀM SAIGON TECHNOLOGY
                 </p>
                 <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
                   HỘI ĐỒNG ĐỐI THOẠI & GIẢI QUYẾT KN

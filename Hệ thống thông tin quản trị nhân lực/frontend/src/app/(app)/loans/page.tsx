@@ -1564,7 +1564,7 @@ export default function LoansPage() {
             {/* Header Thể thức Văn bản Hành chính theo NĐ 30/2020/NĐ-CP */}
             <div className="flex justify-between items-start pb-4 border-b border-black">
               <div className="w-[48%] text-center leading-tight">
-                <p className="font-normal text-[11.5pt] uppercase text-black">TỔNG CÔNG TY CÔNG NGHỆ HRMIS</p>
+                <p className="font-normal text-[11.5pt] uppercase text-black">CÔNG TY CỔ PHẦN PHẦN MỀM SAIGON TECHNOLOGY</p>
                 <p className="font-bold text-[12pt] uppercase text-black">HỘI ĐỒNG PHÚC LỢI & CÔNG ĐOÀN</p>
                 <div className="w-32 border-b border-black mx-auto mt-1 mb-1.5" />
                 <p className="text-[11pt] text-black">Số: {selectedDetailLoan.id?.slice(0, 6).toUpperCase() || '01'}/HĐ-VVNB</p>

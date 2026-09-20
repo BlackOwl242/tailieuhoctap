@@ -1632,24 +1632,27 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 
 | STT | Tên Quy trình nghiệp vụ thực tế | Tác nhân chính | Mã Use Case hệ thống tương ứng | Giao diện màn hình thực tế trong ứng dụng |
 | :---: | :--- | :--- | :--- | :--- |
-| 1 | Tuyển dụng & Quản trị ứng viên | Trưởng dự án, CV Tuyển dụng, Giám đốc | UC04, UC05, UC06, UC07, UC08 | `/recruitment-ats`, `/admin/catalogs` |
-| 2 | Tiếp nhận hồ sơ & Hội nhập | Nhân viên mới, CV Hồ sơ, IT | UC09, UC10, UC11, UC14 | `/employees`, `/documents`, `/admin/users` |
-| 3 | Đánh giá thử việc & Ký hợp đồng | Trưởng dự án, CV Hồ sơ, Giám đốc | UC10, UC13 | `/employees/[id]`, `/personnel`, `/salary-ranks` |
-| 4 | Phân ca & Điểm danh đa nguồn | Toàn thể nhân viên, Kiosk, CV Hồ sơ | UC18, UC19, UC20, UC23, UC24, UC25 | `/shifts`, `/check-in`, `/attendance`, `/admin/attendance` |
-| 5 | Quản lý Nghỉ phép | Nhân viên, Trưởng dự án, CV Hồ sơ | UC15, UC21 | `/leave`, `/ess` |
-| 6 | Quản lý Làm thêm giờ (OT) | Nhân viên, Trưởng dự án, CV Tiền lương | UC15, UC22 | `/overtime`, `/attendance` |
-| 7 | Chu kỳ Tính & Khóa Bảng lương | CV Tiền lương, Kế toán, Giám đốc | UC25, UC26, UC27, UC28 | `/payroll-engine`, `/ess`, `/personnel-reports` |
-| 8 | Tạm ứng & Khoản vay phúc lợi | Nhân viên, CV Tiền lương, Giám đốc | UC15, UC29 | `/loans`, `/ess`, `/payroll-engine` |
-| 9 | Đề xuất & Quyết toán công tác | Nhân viên, Trưởng dự án, Kế toán | UC15, UC30 | `/expense-claims`, `/ess` |
-| 10 | Quản lý Cấp phát & Thu hồi tài sản | Nhân viên Hành chính, Nhân viên | UC15, UC31 | `/assets`, `/ess` |
-| 11 | Đánh giá Hiệu suất 360 & OKR/KPI | Nhân viên, Trưởng dự án, CV Nhân sự | UC15, UC37 | `/performance-360`, `/employees/[id]` |
-| 12 | Rà soát & Nâng bậc lương NĐ 204 | CV Hồ sơ, Giám đốc | UC33, UC41, UC42 | `/salary-ranks`, `/personnel`, `/payroll-engine` |
+| 1 | Quản trị hệ thống, Định danh & Phân quyền RBAC | Quản trị viên IT, Toàn thể nhân viên | UC01, UC02, UC03 | `/login`, `/admin/users`, `/admin/org-units`, `/org-chart` |
+| 2 | Tuyển dụng & Quản trị ứng viên | Trưởng dự án, CV Tuyển dụng, Giám đốc | UC04, UC05, UC06, UC07, UC08 | `/recruitment-ats`, `/admin/catalogs` |
+| 3 | Tiếp nhận hồ sơ, Văn bằng & Hội nhập | Nhân viên mới, CV Hồ sơ, IT | UC09, UC10, UC11, UC12, UC14 | `/employees`, `/documents`, `/admin/users`, `/employees/[id]` |
+| 4 | Đánh giá thử việc & Ký hợp đồng | Trưởng dự án, CV Hồ sơ, Giám đốc | UC10, UC13 | `/employees/[id]`, `/personnel`, `/salary-ranks` |
+| 5 | Cổng tự phục vụ & Dữ liệu cá nhân 3 mức độ | Toàn thể nhân viên, CV Hồ sơ | UC15, UC16, UC17 | `/ess`, `/profile`, `/notifications`, `/employees` |
+| 6 | Phân ca & Điểm danh đa nguồn | Toàn thể nhân viên, Kiosk, CV Hồ sơ | UC18, UC19, UC20, UC23, UC24, UC25 | `/shifts`, `/check-in`, `/attendance`, `/admin/attendance` |
+| 7 | Quản lý Nghỉ phép | Nhân viên, Trưởng dự án, CV Hồ sơ | UC15, UC21 | `/leave`, `/ess` |
+| 8 | Quản lý Làm thêm giờ (OT) | Nhân viên, Trưởng dự án, CV Tiền lương | UC15, UC22 | `/overtime`, `/attendance` |
+| 9 | Chu kỳ Tính & Khóa Bảng lương | CV Tiền lương, Kế toán, Giám đốc | UC25, UC26, UC27, UC28 | `/payroll-engine`, `/ess`, `/personnel-reports` |
+| 10 | Tạm ứng & Khoản vay phúc lợi | Nhân viên, CV Tiền lương, Giám đốc | UC15, UC29 | `/loans`, `/ess`, `/payroll-engine` |
+| 11 | Đề xuất & Quyết toán công tác (T&E) | Nhân viên, Trưởng dự án, Kế toán | UC15, UC30 | `/expense-claims`, `/ess` |
+| 12 | Quản lý Cấp phát & Thu hồi tài sản | Nhân viên Hành chính, Nhân viên | UC15, UC31 | `/assets`, `/ess` |
 | 13 | Điều chuyển & Bổ nhiệm vị trí | Trưởng dự án, Giám đốc, CV Hồ sơ | UC09, UC32 | `/personnel`, `/org-chart`, `/employees/[id]` |
-| 14 | Đào tạo nội bộ & Khiếu nại | CV Nhân sự, Nhân viên | UC15, UC38, UC39 | `/training-grievance`, `/employees/[id]` |
+| 14 | Rà soát & Nâng bậc lương NĐ 204 | CV Hồ sơ, Giám đốc | UC33, UC41, UC42 | `/salary-ranks`, `/personnel`, `/payroll-engine` |
 | 15 | Khen thưởng & Kỷ luật lao động | Trưởng dự án, Đại diện NLĐ, Giám đốc | UC34, UC35 | `/personnel`, `/personnel-reports` |
-| 16 | Hồ sơ cán bộ & Báo cáo Mẫu 2C-BNV | CV Hồ sơ | UC40, UC43 | `/personnel-reports`, `/admin/catalogs` |
-| 17 | Thôi việc & Bàn giao đa bộ phận | Nhân viên, CV Hồ sơ, Các bộ phận | UC36 | `/personnel`, `/documents`, `/admin/users` |
-| 18 | Phân cấp Quản trị Dữ liệu Cá nhân | Toàn thể nhân viên, CV Hồ sơ | UC16, UC17 | `/ess`, `/profile`, `/employees` |
+| 16 | Thôi việc & Bàn giao đa bộ phận | Nhân viên, CV Hồ sơ, Các bộ phận | UC36 | `/personnel`, `/documents`, `/admin/users` |
+| 17 | Đánh giá Hiệu suất 360 & OKR/KPI | Nhân viên, Trưởng dự án, CV Nhân sự | UC15, UC37 | `/performance-360`, `/employees/[id]` |
+| 18 | Đào tạo nội bộ & Khiếu nại lao động | CV Nhân sự, Nhân viên | UC15, UC38, UC39 | `/training-grievance`, `/employees/[id]` |
+| 19 | Hồ sơ cán bộ & Báo cáo Mẫu 2C-BNV | CV Hồ sơ | UC40, UC43 | `/personnel-reports`, `/admin/catalogs` |
+| 20 | Quản lý tri thức số & Tìm kiếm toàn văn | Toàn thể nhân viên, Quản lý nội dung | UC44, UC45 | `/documents`, `/employees` |
+| 21 | Bảng điều khiển phân tích & Kiểm toán hệ thống | Ban Giám đốc, Quản lý, Quản trị IT | UC46, UC47 | `/dashboard`, `/admin/audit`, `/admin/settings` |
 
 ---
 
@@ -2383,18 +2386,18 @@ Cơ sở dữ liệu của hệ thống được thiết kế và cài đặt tr
 
 **Bảng 2.7. Đặc tả cấu trúc lược đồ Cơ sở dữ liệu quan hệ**
 
-| Miền dữ liệu | Bảng CSDL chính | Số trường | Mục đích lưu trữ và quy tắc toàn vẹn nghiệp vụ |
+| Miền dữ liệu | Model CSDL chính (Prisma ORM) | Số trường | Mục đích lưu trữ và quy tắc toàn vẹn nghiệp vụ |
 | :--- | :--- | :---: | :--- |
-| 1. Định danh & Hệ thống | `User`, `Account`, `OrgUnit`, `Role` | 34 | Quản lý tài khoản, mật khẩu băm bcrypt, cây tổ chức tự tham chiếu cha - con (`parentId`), định biên nhân sự. |
-| 2. Tuyển dụng & ATS | `JobRequisition`, `Candidate`, `Interview` | 28 | Lưu trữ phiếu đề xuất tuyển dụng, hồ sơ ứng viên, các vòng phỏng vấn, điểm Scorecard và liên kết chuyển đổi ứng viên. |
-| 3. Hồ sơ & Hợp đồng | `Employee`, `Contract`, `Certificate`, `DocLending` | 42 | Hồ sơ nhân viên, hợp đồng thử việc/chính thức, vị trí tủ lưu trữ văn bằng gốc và lịch sử mượn trả. |
+| 1. Định danh & Hệ thống | `User`, `Role`, `UserRole`, `OrgUnit`, `RefreshToken` | 34 | Quản lý tài khoản, thông tin định danh nhân sự, mật khẩu băm bcrypt, phân quyền RBAC và cây tổ chức tự tham chiếu (`parentId`). |
+| 2. Tuyển dụng & ATS | `JobRequisition`, `Candidate`, `HrmsJobOpening`, `HrmsInterviewRound`, `HrmsJobOffer` | 28 | Lưu trữ phiếu đề xuất tuyển dụng, hồ sơ ứng viên, các vòng phỏng vấn, điểm Scorecard và liên kết chuyển đổi 1-Click sang nhân viên. |
+| 3. Hồ sơ & Hợp đồng | `Contract`, `Certificate`, `HrDocument`, `OnboardingAssignment` | 42 | Hợp đồng thử việc/chính thức, vị trí lưu trữ văn bằng chứng chỉ, lịch sử mượn trả hồ sơ và lộ trình hội nhập nhân viên mới. |
 | 4. Phân cấp dữ liệu | `ProfileChangeRequest` | 12 | Hàng đợi thẩm định thông tin Mức 2: lưu giá trị cũ, giá trị mới đề xuất, tệp minh chứng ảnh CCCD và vết phê duyệt nguyên tử. |
-| 5. Chấm công & Ca kíp | `AttendanceEvent`, `AttendanceDay`, `WorkShift` | 36 | Lưu trữ sự kiện điểm danh bất biến (Append-Only), ca làm việc, tổng hợp ngày công và nhật ký hiệu chỉnh công bắt buộc lý do. |
+| 5. Chấm công & Ca kíp | `AttendanceEvent`, `AttendanceDay`, `HrmsShiftType`, `HrmsShiftAssignment`, `AttendanceCorrection` | 36 | Lưu trữ sự kiện điểm danh bất biến (Append-Only), ca làm việc, tổng hợp ngày công và nhật ký giải trình hiệu chỉnh công. |
 | 6. Điểm danh đa nguồn | `AttendanceDevice`, `FaceEmbedding` | 18 | Cấu hình máy chấm công webhook HMAC, vector mẫu khuôn mặt 128 chiều mã hóa AES-256-GCM (tuân thủ Nghị định 13). |
-| 7. Nghỉ phép & Làm thêm | `LeaveRequest`, `LeaveBalance`, `OvertimeRequest` | 24 | Quỹ phép năm, lịch sử nghỉ phép tự động trừ số dư khi duyệt, đăng ký và kiểm soát trần thời gian làm thêm giờ. |
-| 8. Tiền lương & Phúc lợi | `PayrollPeriod`, `Payslip`, `SalaryComponent` | 46 | Chu kỳ tính lương có trạng thái khóa bất biến LOCKED (chặn tính lại với HTTP 409), phiếu lương chi tiết từng thành phần thu nhập. |
-| 9. Tài chính nhân sự | `HrmsEmployeeLoan`, `ExpenseClaim`, `Asset` | 38 | Khoản vay phúc lợi (kiểm soát trích nợ <= 30% lương Net), lịch trình hoàn nợ tự động nạp kỳ lương, công tác phí, tài sản. |
-| 10. Cán bộ & Tri thức | `CadreProfile`, `Article`, `AuditLog` | 52 | 111 thuộc tính cán bộ chuẩn Mẫu 2C-BNV, không gian tri thức phân quyền, nhật ký kiểm toán hệ thống bất biến Append-Only. |
+| 7. Nghỉ phép & Làm thêm | `LeaveRequest`, `LeaveBalance`, `OvertimeRequest` | 24 | Quỹ phép năm, lịch sử nghỉ phép tự động trừ số dư khi duyệt, đăng ký và kiểm soát trần thời gian làm thêm giờ (OT). |
+| 8. Tiền lương & Phúc lợi | `PayrollPeriod`, `Payslip`, `HrmsSalaryComponent`, `HrmsSalaryStructure`, `HrmsPayrollRun` | 46 | Chu kỳ tính lương có trạng thái khóa bất biến LOCKED (chặn tính lại với HTTP 409), cấu trúc và phiếu lương chi tiết từng thành phần. |
+| 9. Tài chính nhân sự | `HrmsEmployeeLoan`, `HrmsExpenseClaim`, `HrmsAssetAllocation`, `HrmsTravelRequest` | 38 | Khoản vay phúc lợi (kiểm soát trích nợ <= 30% lương Net), lịch trình hoàn nợ tự động nạp kỳ lương, công tác phí, tài sản thiết bị. |
+| 10. Cán bộ & Tri thức | `PersonnelComprehensiveProfile`, `PersonnelRank`, `Article`, `ArticleVersion`, `AuditLog` | 52 | 111 thuộc tính cán bộ chuẩn Mẫu 2C-BNV, ngạch bậc lương chuẩn NĐ 204, không gian tri thức SOP và nhật ký kiểm toán Append-Only. |
 
 Mô hình dữ liệu vật lý thể hiện các mối quan hệ khóa ngoại (Foreign Key) và các chỉ mục toàn vẹn (Unique Constraint) giữa các bảng cốt lõi:
 
@@ -2418,12 +2421,13 @@ Sơ đồ thể hiện bảng sự kiện chấm công bất biến AttendanceEv
 
 ### 2.4.3. Thiết kế giao diện người dùng
 
-Giao diện người dùng được thiết kế hiện đại trên nền tảng Design System trung tính của Shadcn UI và Tailwind CSS, tối ưu hóa trải nghiệm thao tác trên cả máy tính để bàn lẫn thiết bị di động. Cấu trúc điều hướng được tổ chức thành 7 phân hệ nghiệp vụ chuẩn hóa bao gồm 28 màn hình tác nghiệp trực tiếp, kết hợp cùng giao diện Kiosk điểm danh và trang đăng nhập xác thực tập trung:
+Giao diện người dùng được thiết kế hiện đại trên nền tảng Design System trung tính của Shadcn UI và Tailwind CSS, tối ưu hóa trải nghiệm thao tác trên cả máy tính để bàn lẫn thiết bị di động. Cấu trúc điều hướng được tổ chức thành 7 phân hệ nghiệp vụ chuẩn hóa bao gồm 29 màn hình tác nghiệp trực tiếp, kết hợp cùng giao diện Kiosk điểm danh và trang đăng nhập xác thực tập trung (tổng cộng 31 màn hình):
 
 1. Phân hệ Không gian làm việc (Workspace):
 - `/dashboard`: Bảng điều khiển phân tích tổng quan các chỉ số nhân sự cốt lõi, tỷ lệ hiện diện hôm nay và lối tắt tác vụ nhanh;
 - `/ess`: Cổng tự phục vụ nhân viên tập trung tích hợp điểm danh trực tuyến, nộp đơn nghỉ phép, đăng ký làm thêm giờ, tra cứu phiếu lương cá nhân và theo dõi khoản vay phúc lợi;
-- `/profile`: Quản trị hồ sơ cá nhân theo mô hình phân cấp 3 mức độ, tích hợp hàng đợi thẩm định đề xuất thay đổi thông tin định danh pháp lý có ảnh minh chứng.
+- `/profile`: Quản trị hồ sơ cá nhân theo mô hình phân cấp 3 mức độ, tích hợp hàng đợi thẩm định đề xuất thay đổi thông tin định danh pháp lý có ảnh minh chứng;
+- `/notifications`: Trung tâm thông báo hệ thống thời gian thực, quản lý các thông báo phê duyệt đơn từ, biến động nhân sự, bài viết và nhắc việc cần xử lý.
 
 2. Phân hệ Nhân sự & Tổ chức (Personnel & Organization):
 - `/org-chart`: Sơ đồ cây cơ cấu tổ chức tương tác đa cấp, trực quan hóa quan hệ báo cáo cấp bậc và quản lý định biên phòng ban;

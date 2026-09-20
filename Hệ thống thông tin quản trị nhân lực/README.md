@@ -55,7 +55,7 @@ Trình duyệt ──► web (Next.js 14 standalone, cổng 8080 duy nhất)
                  ▼
                api (NestJS 10 + Prisma 5, Node 20-alpine)
                  ▼
-               db (PostgreSQL 16-alpine, 32 bảng, FTS pg_trgm)
+               db (PostgreSQL 16-alpine, 87 model quan hệ qua Prisma ORM, FTS pg_trgm)
 ```
 
 - **Backend:** NestJS phân tầng Controller → Service → Prisma; JWT access 15' + refresh xoay vòng;

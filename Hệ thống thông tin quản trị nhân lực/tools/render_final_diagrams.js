@@ -37,7 +37,7 @@ function encodePlantUml(text) {
 async function render(puml, out) {
   const enc = encodePlantUml(puml);
   const url = 'https://www.plantuml.com/plantuml/png/' + enc;
-  console.log(`Rendering ${path.basename(out)} (URL len: ${url.length})...`);
+  console.log(`Rendering ${path.basename(out)}...`);
   return new Promise((res, rej) => {
     https.get(url, r => {
       if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location) {
@@ -106,39 +106,48 @@ skinparam shadowing false
 skinparam packageStyle rectangle
 skinparam defaultFontSize 11
 
-' Tác nhân phía bên trái (6 tác nhân)
+' Tác nhân phía bên trái (6 tác nhân xếp theo thứ tự nhóm chức năng từ trên xuống)
+actor "Chuyên viên\\nTuyển dụng" as CVTD
 actor "Nhân viên\\nQuản trị IT" as NVIT
-actor "Nhân viên" as NV
 actor "Chuyên viên\\nHồ sơ" as CVHS
 actor "Trưởng dự án" as TDA
+actor "Nhân viên" as NV
 actor "Chuyên viên Đào tạo\\n& Hiệu suất" as CVDT
-actor "Chuyên viên\\nTuyển dụng" as CVTD
 
-' Hệ thống và 10 nhóm Use case ở trung tâm
 rectangle "HỆ THỐNG QUẢN TRỊ NHÂN LỰC (47 USE CASE)" {
-  usecase "A. Quản trị hệ thống & Tổ chức\\n(UC01-UC03)" as GA
+  usecase "I. Chuẩn cán bộ & Báo cáo\\n(UC40-UC43)" as GI
   usecase "B. Tuyển dụng & Ứng viên\\n(UC04-UC08)" as GB
+  usecase "A. Quản trị hệ thống & Tổ chức\\n(UC01-UC03)" as GA
+  usecase "J. Quản trị tri thức & Điều hành\\n(UC44-UC47)" as GJ
   usecase "C. Hồ sơ nhân sự & Hội nhập\\n(UC09-UC14)" as GC
-  usecase "D. Cổng tự phục vụ nhân viên\\n(UC15-UC17)" as GD_uc
+  usecase "G. Biến động nhân sự & Thôi việc\\n(UC32-UC36)" as GG
   usecase "E. Chấm công & Phân ca\\n(UC18-UC25)" as GE
   usecase "F. Tiền lương & Phúc lợi\\n(UC26-UC31)" as GF
-  usecase "G. Biến động nhân sự & Thôi việc\\n(UC32-UC36)" as GG
+  usecase "D. Cổng tự phục vụ nhân viên\\n(UC15-UC17)" as GD_uc
   usecase "H. Đánh giá hiệu suất & Đào tạo\\n(UC37-UC39)" as GH
-  usecase "I. Chuẩn cán bộ & Báo cáo\\n(UC40-UC43)" as GI
-  usecase "J. Quản trị tri thức & Điều hành\\n(UC44-UC47)" as GJ
 }
 
 ' Tác nhân phía bên phải (5 tác nhân)
-actor "Chuyên viên\\nTiền lương" as CVTL
-actor "Nhân viên\\nHành chính" as NVHC
-actor "Đại diện\\nNgười lao động" as DDNLD
 actor "Giám đốc" as GD
 actor "Kế toán viên" as KTV
+actor "Đại diện\\nNgười lao động" as DDNLD
+actor "Chuyên viên\\nTiền lương" as CVTL
+actor "Nhân viên\\nHành chính" as NVHC
 
-' Liên kết tác nhân bên trái -> Use Case (mũi tên nét thẳng vuông góc)
+CVTD --> GB
+
 NVIT --> GA
-NVIT --> GE
 NVIT --> GJ
+
+CVHS --> GC
+CVHS --> GI
+CVHS --> GG
+
+TDA --> GB
+TDA --> GC
+TDA --> GE
+TDA --> GG
+TDA --> GH
 
 NV --> GA
 NV --> GC
@@ -149,46 +158,115 @@ NV --> GG
 NV --> GH
 NV --> GJ
 
-CVHS --> GI
-CVHS --> GD_uc
-CVHS --> GC
-CVHS --> GG
-
-TDA --> GB
-TDA --> GC
-TDA --> GE
-TDA --> GG
-TDA --> GH
-
 CVDT --> GH
 
-CVTD --> GB
+GB <-- GD
+GC <-- GD
+GF <-- GD
+GG <-- GD
+GI <-- GD
+GJ <-- GD
 
-' Liên kết Use Case -> Tác nhân bên phải (mũi tên nét thẳng vuông góc từ tác nhân vào Use Case)
+GB <-- KTV
+GF <-- KTV
+
+GG <-- DDNLD
+
 GE <-- CVTL
 GF <-- CVTL
 GG <-- CVTL
 
 GF <-- NVHC
+@enduml`;
 
-GG <-- DDNLD
+// ── SƠ ĐỒ 3: Kiến trúc 3 tầng (Hình 2.109 / hinh_2_22_arch_3tier.png - Bố cục dọc chuẩn A4) ──
+const arch3TierPuml = `@startuml
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam defaultFontName "Arial"
+skinparam defaultFontSize 12
+skinparam packageStyle rectangle
 
-GI <-- GD
-GJ <-- GD
-GC <-- GD
-GF <-- GD
-GG <-- GD
-GB <-- GD
+skinparam package {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  BorderThickness 1.5
+  FontColor #0F172A
+  FontStyle bold
+}
 
-GB <-- KTV
-GF <-- KTV
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #475569
+  BorderThickness 1.2
+  FontColor #1E293B
+  FontSize 11
+}
+
+skinparam database {
+  BackgroundColor #EFF6FF
+  BorderColor #2563EB
+  BorderThickness 1.5
+  FontColor #1E3A8A
+  FontSize 11
+}
+
+skinparam folder {
+  BackgroundColor #F0FDF4
+  BorderColor #16A34A
+  BorderThickness 1.5
+  FontColor #14532D
+  FontSize 11
+}
+
+skinparam arrow {
+  Color #2563EB
+  FontColor #0F172A
+  FontSize 11
+  Thickness 1.5
+}
+
+package "TẦNG 1: GIAO DIỆN NGƯỜI DÙNG (PRESENTATION TIER)" as T1 {
+  component "Web Quản trị & Điều hành Hệ thống\\n(Next.js 14 App Router • Tailwind CSS • TypeScript)" as C_Web
+  component "Cổng Tự phục vụ Nhân viên ESS\\n(Giao diện Responsive Mobile-First Web PWA)" as C_ESS
+  component "Kiosk / Thiết bị Điểm danh Ngoại vi\\n(Face ID 2D + Cảm biến IR + Quét mã QR)" as C_Kiosk
+  
+  C_Web -[hidden]down-> C_ESS
+  C_ESS -[hidden]down-> C_Kiosk
+}
+
+package "TẦNG 2: XỬ LÝ NGHIỆP VỤ (BUSINESS LOGIC TIER - NESTJS 10)" as T2 {
+  component "API Gateway & Security Layer\\n(JWT Authentication • RBAC 3 Vai trò: ADMIN / KM_MANAGER / USER • HMAC Webhook)" as C_Gateway
+
+  component "39 Module Nghiệp vụ Quản trị Nhân sự Chuyên sâu\\n(Hệ thống, Tuyển dụng, Hồ sơ, Chấm công, Tiền lương, Biến động, Mẫu 2C-BNV, SOP)" as C_Modules
+
+  component "Bộ máy Xử lý Trung tâm (Core Business Engines)\\n• ApprovalEngine: Xử lý quy trình duyệt động phân cấp đa cấp\\n• PayrollEngine: Tính toán bảng lương tự động & Cơ chế khóa sổ LOCKED\\n• NotificationService: Hệ thống thông báo in-app thời gian thực" as C_Engines
+
+  C_Gateway -down-> C_Modules : "Điều phối Controller & DTO Validation"
+  C_Modules -down-> C_Engines : "Kích hoạt thực thi logic nghiệp vụ"
+}
+
+package "TẦNG 3: LƯU TRỮ DỮ LIỆU & TÀI NGUYÊN (DATA & STORAGE TIER)" as T3 {
+  database "Cơ sở Dữ liệu Quan hệ PostgreSQL 16 (Prisma ORM)\\n(87 Model Quan hệ • Sổ cái Audit Log Append-Only)" as DB_Postgres
+  database "Hệ thống Bộ nhớ đệm Redis Cache\\n(Quản lý Phiên làm việc & Danh sách Token Blacklist)" as DB_Redis
+  folder "Kho Lưu trữ Tệp & Minh chứng Số hóa\\n(Bản scan Hợp đồng, Minh chứng chấm công Mức 2, SOP)" as FS_Store
+
+  DB_Postgres -[hidden]down-> DB_Redis
+  DB_Redis -[hidden]down-> FS_Store
+}
+
+' Kết nối giữa các tầng từ trên xuống dưới
+C_Kiosk -down-> C_Gateway : "HTTPS / RESTful API (JSON Payload • JWT Auth)"
+C_Engines -down-> DB_Postgres : "Prisma Client (SQL) • Redis Protocol • File Storage"
+
 @enduml`;
 
 async function main() {
   const imagesDir = path.join(__dirname, '..', 'doc', 'images');
   await render(actorTreePuml, path.join(imagesDir, 'hinh_2_1_actor_tree.png'));
   await render(ucOverviewPuml, path.join(imagesDir, 'hinh_2_2_usecase_overview.png'));
-  console.log('Finished rendering both diagrams!');
+  await render(arch3TierPuml, path.join(imagesDir, 'hinh_2_22_arch_3tier.png'));
+  console.log('Finished rendering all 3 core diagrams!');
 }
 
 main().catch(err => {
