@@ -161,7 +161,7 @@ export default function OrgChartPage() {
         id: 'root-company',
         name: 'Ban Giám đốc & Điều hành',
         code: 'BGD',
-        headName: 'Trần Minh Hoàng',
+        headName: 'Phạm Tiến Thành (Bruce Pham)',
         headTitle: 'Tổng Giám đốc (CEO)',
         headcount: 5,
       }

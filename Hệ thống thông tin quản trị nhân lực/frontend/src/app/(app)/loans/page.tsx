@@ -1624,7 +1624,7 @@ export default function LoansPage() {
                 <p className="font-bold uppercase text-[12pt]">CHỦ TỊCH HỘI ĐỒNG</p>
                 <p className="italic text-[10.5pt] text-neutral-600">(Ký, ghi rõ họ tên và đóng dấu)</p>
                 <div className="h-16" />
-                <p className="font-bold text-[12pt] uppercase">Trần Minh Hoàng</p>
+                <p className="font-bold text-[12pt] uppercase">Phạm Tiến Thành</p>
               </div>
             </div>
           </div>

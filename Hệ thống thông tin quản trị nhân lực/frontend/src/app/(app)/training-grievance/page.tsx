@@ -1428,7 +1428,7 @@ export default function TrainingGrievancePage() {
                 <p className="font-bold uppercase text-[11.5pt] sm:text-[12pt]">TRƯỞNG BAN</p>
                 <p className="italic text-[10.5pt] text-neutral-600">(Ký, ghi rõ họ tên và đóng dấu)</p>
                 <div className="h-16" />
-                <p className="font-bold text-[12pt] uppercase">Trần Minh Hoàng</p>
+                <p className="font-bold text-[12pt] uppercase">Phạm Tiến Thành</p>
               </div>
             </div>
           </div>
@@ -1505,7 +1505,7 @@ export default function TrainingGrievancePage() {
               <div className="space-y-1.5">
                 <p className="font-bold uppercase text-[12pt]">I. THÀNH PHẦN THAM DỰ:</p>
                 <div className="pl-6 space-y-1">
-                  <p><strong>1. Đại diện Người sử dụng lao động:</strong> Ông/Bà Trần Minh Hoàng — Giám đốc Điều hành.</p>
+                  <p><strong>1. Đại diện Người sử dụng lao động:</strong> Ông/Bà Phạm Tiến Thành — Tổng Giám đốc Điều hành.</p>
                   <p><strong>2. Đại diện Ban Chấp hành Công đoàn cơ sở:</strong> Chủ tịch Công đoàn cơ sở cùng các ủy viên.</p>
                   <p><strong>3. Người có đơn kiến nghị/khiếu nại:</strong> Ông/Bà <strong>{selectedGrievance.employeeName}</strong>.</p>
                 </div>

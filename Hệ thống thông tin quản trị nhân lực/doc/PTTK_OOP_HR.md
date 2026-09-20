@@ -66,7 +66,7 @@ PHẦN NỘI DUNG
 CHƯƠNG 1: CƠ SỞ LÝ LUẬN VỀ QUẢN TRỊ NHÂN LỰC VÀ HỆ THỐNG THÔNG TIN QUẢN TRỊ NHÂN LỰC
 1.1. Lý thuyết cơ sở
 1.2. Một số vấn đề liên quan đến chủ đề
-1.3. Phát biểu bài toán cần phân tích
+1.3. Phát biểu bài toán cần giải quyết
 Tóm tắt chương 1
 CHƯƠNG 2: THIẾT KẾ HỆ THỐNG THÔNG TIN QUẢN TRỊ NHÂN LỰC CHO CÔNG TY CỔ PHẦN PHẦN MỀM SAIGON TECHNOLOGY
 2.1. Phân tích các yêu cầu nghiệp vụ
@@ -111,6 +111,7 @@ TÀI LIỆU THAM KHẢO
 - Bảng 1.2. Mạng lưới văn phòng và chi nhánh toàn cầu của Saigon Technology
 - Bảng 1.3. Tổng hợp chứng nhận quốc tế và giải thưởng tiêu biểu của Saigon Technology
 - Bảng 1.4. Cơ cấu nguồn nhân lực theo khối chức năng và trình độ tại Saigon Technology
+- Bảng 1.5. Ma trận phân định trách nhiệm liên phòng ban trong các quy trình quản trị nhân sự (RACI Matrix)
 - Bảng 2.1. Ánh xạ tác nhân hệ thống với cơ cấu tổ chức của Saigon Technology
 - Bảng 2.2. Danh sách 47 Use case của Hệ thống Quản trị nhân lực
 - Bảng 2.3. Đặc tả tổng hợp 47 Use case của hệ thống
@@ -154,7 +155,7 @@ TÀI LIỆU THAM KHẢO
 - Hình 2.27. Biểu đồ trình tự Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)
 - Hình 2.28. Biểu đồ trình tự Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)
 - Hình 2.29. Biểu đồ trình tự Use case Cấu hình công thức và ngạch bậc lương (UC26)
-- Hình 2.30. Biểu đồ trình tự Use case Vận hành động cơ tính toán bảng lương tự động (UC27)
+- Hình 2.30. Biểu đồ trình tự Use case Vận hành chức năng tính lương tự động (UC27)
 - Hình 2.31. Biểu đồ trình tự Use case Phê duyệt & Khóa bất biến kỳ lương (LOCKED state) (UC28)
 - Hình 2.32. Biểu đồ trình tự Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)
 - Hình 2.33. Biểu đồ trình tự Use case Quản lý đề xuất công tác & Quyết toán chi phí (T&E) (UC30)
@@ -201,7 +202,7 @@ TÀI LIỆU THAM KHẢO
 - Hình 2.74. Biểu đồ hoạt động Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)
 - Hình 2.75. Biểu đồ hoạt động Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)
 - Hình 2.76. Biểu đồ hoạt động Use case Cấu hình công thức và ngạch bậc lương (UC26)
-- Hình 2.77. Biểu đồ hoạt động Use case Vận hành động cơ tính toán bảng lương tự động (UC27)
+- Hình 2.77. Biểu đồ hoạt động Use case Vận hành chức năng tính lương tự động (UC27)
 - Hình 2.78. Biểu đồ hoạt động Use case Phê duyệt & Khóa bất biến kỳ lương (LOCKED state) (UC28)
 - Hình 2.79. Biểu đồ hoạt động Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)
 - Hình 2.80. Biểu đồ hoạt động Use case Quản lý đề xuất công tác & Quyết toán chi phí (T&E) (UC30)
@@ -386,7 +387,7 @@ Cơ cấu tổ chức của Saigon Technology tách bạch chuyên môn hóa cao
 
 - **Khối Quản trị Nguồn nhân lực (HR):**
   1. *Phòng Tuyển dụng Công nghệ (HR-TA):* Thực hiện chiến dịch săn tìm nhân tài công nghệ cao (Tech Talent Acquisition), phụ trách phễu tuyển dụng ATS từ tiếp nhận hồ sơ, sàng lọc, điều phối phỏng vấn kỹ thuật đến phát hành thư mời nhận việc (Offer Letter).
-  2. *Phòng Tiền lương & Phúc lợi (HR-C&B):* Quản lý dữ liệu chấm công đa nguồn, vận hành công cụ tính toán tiền lương tự động (Automated Payroll Engine), trích nộp bảo hiểm xã hội bắt buộc, tính thuế thu nhập cá nhân theo biểu lũy tiến từng phần, kiểm soát hạn mức trích nợ vay phúc lợi theo Điều 102 BLLĐ 2019 và rà soát nâng bậc lương thường xuyên theo Nghị định 204/2004/NĐ-CP.
+  2. *Phòng Tiền lương & Phúc lợi (HR-C&B):* Quản lý dữ liệu chấm công đa nguồn, vận hành chức năng tính lương tự động (Automated Payroll Module), trích nộp bảo hiểm xã hội bắt buộc, tính thuế thu nhập cá nhân theo biểu lũy tiến từng phần, kiểm soát hạn mức trích nợ vay phúc lợi theo Điều 102 BLLĐ 2019 và rà soát nâng bậc lương thường xuyên theo Nghị định 204/2004/NĐ-CP.
   3. *Phòng Đào tạo & Phát triển (HR-L&D):* Thiết kế và điều phối lộ trình hội nhập 14 ngày cho nhân viên mới, tổ chức các khóa bồi dưỡng kỹ năng công nghệ (AI, Cloud, DevOps), tài trợ thi chứng chỉ quốc tế và quản trị hệ thống tri thức số.
   4. *Phòng Nhân sự Vận hành & Văn hóa (HR-OPS):* Chịu trách nhiệm quản trị hồ sơ cán bộ toàn diện Mẫu 2C-BNV (111 trường dữ liệu và 8 bảng diễn biến), quản lý hợp đồng lao động, chủ trì chu kỳ đánh giá hiệu suất 360 độ, thực thi các thủ tục thuyên chuyển, khen thưởng, kỷ luật, tiếp nhận và hòa giải khiếu nại của người lao động.
 - **Khối Vận hành & Pháp chế (OPS):**
@@ -416,6 +417,31 @@ Khối Delivery là "trung tâm sản xuất" tạo ra toàn bộ doanh thu củ
 - *Phòng Kế toán Doanh nghiệp & Thuế (FIN-ACC):* Hạch toán chi phí tiền lương, bảo hiểm, quyết toán thuế thu nhập doanh nghiệp và thuế TNCN.
 - *Phòng Thanh toán & Dòng tiền (FIN-TREASURY):* Quản lý dòng tiền, trực tiếp thực hiện lệnh chi trả lương qua ngân hàng, chi trả tạm ứng công tác phí và giải ngân khoản vay phúc lợi.
 - *Phòng Kế hoạch Tài chính (FIN-FP&A):* Dự báo ngân sách tiền lương, phân tích biên lợi nhuận dự án (Project Costing) và thẩm định nguồn tài chính cho các đề xuất tuyển dụng mới.
+
+#### F. Mạng lưới Chi nhánh, Cơ sở và Văn phòng đại diện quốc tế (Distributed Facilities & Overseas Network)
+
+Bên cạnh 5 Khối chức năng chuyên môn hóa theo chiều dọc, Saigon Technology tổ chức bộ máy vận hành theo mạng lưới địa bàn phân tán nhằm tối ưu hóa nguồn lực công nghệ trong nước và mở rộng thị trường gia công xuất khẩu quốc tế:
+
+1. **Trụ sở chính tại TP. Hồ Chí Minh (Headquarters - 2 Cơ sở):**
+   - *Cơ sở 1 (Trung tâm Điều hành Đầu não):* Tòa nhà Orchard Parkview, số 130-132 Hồng Hà, Phường 9, Quận Phú Nhuận, TP.HCM. Diện tích sàn làm việc hơn 1.200m², là nơi đặt văn phòng làm việc của Ban Giám đốc Điều hành, Khối Quản trị Nguồn nhân lực (HR: 44 NV), Khối Vận hành & Pháp chế (OPS: 24 NV), Khối Tài chính - Kế toán (FIN: 27 NV), Khối Phát triển Kinh doanh (BIZ: 96 NV) và các nhóm Web Frontend, Backend Microservices, Mobile thuộc Trung tâm Kỹ thuật TP.HCM (DEV-SGN: 145 NV).
+   - *Cơ sở 2 (Trung tâm Nghiên cứu & Phát triển R&D):* Tòa nhà Aloha Building, số 68 Hồng Hà, Phường 2, Quận Tân Bình, TP.HCM (cách cơ sở 1 chỉ 500m). Diện tích hơn 800m², được thiết kế chuyên biệt cho công tác R&D công nghệ cao, tập trung đội ngũ kỹ sư Squad AI & Data Engineering (Computer Vision, Xử lý dữ liệu lớn, Trí tuệ nhân tạo tạo sinh) và Squad Cloud DevOps & SRE.
+
+2. **Chi nhánh Miền Trung tại TP. Đà Nẵng (Danang Development Center):**
+   - *Địa chỉ:* Tầng 5, Tòa nhà ICT1, Khu Công viên Phần mềm số 2, Đường Như Nguyệt, Phường Thuận Phước, Quận Hải Châu, TP. Đà Nẵng.
+   - *Quy mô và nhiệm vụ:* Quy tụ gần 100 kỹ sư phần mềm chất lượng cao thuộc Trung tâm Phần mềm Đà Nẵng (DEV-DAD với 4 Squad công nghệ). Chi nhánh được trang bị đầy đủ bộ phận vệ tinh về quản trị hành chính, nhân sự tại chỗ và IT hạ tầng, hoạt động theo mô hình trung tâm phát triển phần mềm chuyên trách (ODC) phục vụ trực tiếp các thị trường Nhật Bản, Singapore và Châu Á - Thái Bình Dương.
+
+3. **Mạng lưới 4 Văn phòng Đại diện Thương mại Quốc tế (Overseas Representative Offices):**
+   - *Văn phòng Hoa Kỳ (USA):* Reston, Virginia (nằm trong hành lang công nghệ cao Dulles Technology Corridor), phụ trách tiếp cận và chăm sóc các khách hàng doanh nghiệp tại thị trường Bắc Mỹ.
+   - *Văn phòng Australia (Úc):* Sydney, New South Wales, phụ trách thị trường Australia và New Zealand (thị trường chiếm hơn 30% doanh thu ODC của công ty).
+   - *Văn phòng Singapore:* PLUS Building, Cecil Street, Singapore, đóng vai trò trung tâm kết nối tài chính công nghệ và khách hàng khu vực Đông Nam Á.
+   - *Văn phòng Thụy Sĩ (Switzerland):* Zurich, phụ trách phát triển thị trường Tây Âu và Bắc Âu (các quốc gia Đức, Thụy Sĩ, Hà Lan, Na Uy).
+   - *Cơ chế điều phối:* Các văn phòng đại diện quốc tế trực thuộc Khối Kinh doanh Quốc tế (BIZ-GLOBAL), thực hiện xúc tiến thương mại, ký kết hợp đồng dịch vụ phần mềm và tiếp nhận bàn giao dự án; toàn bộ khối lượng sản xuất kỹ thuật được chuyển giao về 2 trung tâm công nghệ tại TP.HCM và Đà Nẵng.
+
+4. **Mô hình Quản trị ma trận (Matrix Governance) và Ứng dụng trên Hệ thống STS HRMIS:**
+   - *Phân quyền dữ liệu theo chi nhánh (Branch-level Data Isolation):* Hệ thống STS HRMIS cho phép phân cấp quản trị linh hoạt. Quản lý chi nhánh Đà Nẵng chỉ được phép phê duyệt phép, điều ca và xem báo cáo nhân sự thuộc chi nhánh Đà Nẵng; Ban Giám đốc và HR Head tại Trụ sở chính TP.HCM có thẩm quyền xem toàn diện báo cáo hợp nhất toàn công ty.
+   - *Chấm công định vị đa cơ sở và Face AI:* Mỗi cơ sở (Orchard Parkview, Aloha, ICT1 Đà Nẵng) được cấu hình dải địa chỉ IP mạng nội bộ, tọa độ GPS Geofencing (bán kính 50m) và mã định danh máy chấm công Face AI riêng biệt. Hệ thống tự động nhận diện nhân sự đang làm việc tại cơ sở nào để tính công chuẩn xác.
+   - *Quản trị chính sách lương - bảo hiểm theo vùng:* Hệ thống cấu hình chính sách tiền lương đóng bảo hiểm linh hoạt: áp dụng mức lương tối thiểu Vùng I đối với nhân sự làm việc tại 2 cơ sở TP.HCM và Vùng II đối với nhân sự tại Chi nhánh Đà Nẵng; hạch toán mã đơn vị nộp BHXH riêng biệt theo từng cơ quan BHXH địa phương.
+   - *Điều chuyển nhân sự nội bộ và công tác quốc tế (Relocation & Onsite Dispatch):* Hệ thống tích hợp Use case Điều chuyển công tác (UC32) cho phép thuyên chuyển nhân sự linh hoạt giữa TP.HCM và Đà Nẵng hoặc cử kỹ sư onsite ngắn/dài hạn sang các văn phòng đại diện quốc tế tại Mỹ, Úc, Singapore, Thụy Sĩ, tự động điều chỉnh hệ số phụ cấp công tác và chế độ bảo hiểm tương ứng.
 
 ---
 
@@ -539,7 +565,7 @@ Ngôn ngữ mô hình hóa thống nhất (UML) được sử dụng làm phươ
 Trong đề tài này, các công cụ và nền tảng công nghệ hiện đại được lựa chọn nhằm bảo đảm tính chuyên nghiệp và khả năng triển khai thực tế:
 - Công cụ mô hình hóa: Sử dụng PlantUML và Draw.io để xây dựng các biểu đồ UML chuẩn mực;
 - Hệ quản trị cơ sở dữ liệu: Sử dụng PostgreSQL 16 kết hợp với Prisma ORM, quản trị 87 model quan hệ chia thành 10 miền dữ liệu nghiệp vụ, hỗ trợ tìm kiếm toàn văn (FTS) và lưu trữ nhật ký kiểm toán bất biến (Append-Only Audit Log);
-- Tầng máy chủ nghiệp vụ (Backend): Xây dựng trên nền tảng NestJS 10 (TypeScript) với 39 module nghiệp vụ chuyên sâu, phân tầng rõ ràng theo mô hình Controller - Service - DTO - Entity, tích hợp hai bộ phận dùng chung: Động cơ phê duyệt biến động nhân sự (Approval Engine) và Động cơ tính toán tiền lương tự động (Payroll Engine);
+- Tầng máy chủ nghiệp vụ (Backend): Xây dựng trên nền tảng NestJS 10 (TypeScript) với 39 module nghiệp vụ chuyên sâu, phân tầng rõ ràng theo mô hình Controller - Service - DTO - Entity, tích hợp hai bộ phận dùng chung: Quy trình phê duyệt biến động nhân sự (Approval Engine) và Chức năng tính toán tiền lương tự động (Payroll Engine);
 - Tầng giao diện người dùng (Frontend): Xây dựng bằng Next.js 14 (App Router) với 31 màn hình ứng dụng thực tế phân bổ thành 7 phân hệ nghiệp vụ chuẩn hóa, thiết kế đáp ứng đa thiết bị (Responsive Design) và tuân thủ các quy chuẩn hiển thị doanh nghiệp;
 - Đóng gói và triển khai: Toàn bộ hệ thống được container hóa bằng Docker Compose với ba dịch vụ độc lập: cơ sở dữ liệu, máy chủ API và máy chủ Web.
 
@@ -569,30 +595,188 @@ Thứ hai, các tham số pháp lý về tiền lương, thuế và bảo hiểm
 
 Thứ ba, dữ liệu tài chính và nhân sự sau khi đã phê duyệt phải tuân thủ nguyên tắc bất biến (Immutability). Cơ chế khóa kỳ lương hoặc nhật ký kiểm toán chỉ thêm (Append-Only) là bắt buộc để ngăn ngừa mọi hành vi sửa đổi trái phép.
 
-## 1.3. Phát biểu bài toán cần phân tích
+## 1.3. Phát biểu bài toán cần giải quyết
 
-### 1.3.1. Bài toán trong thực tế tại Saigon Technology
+### 1.3.1. Bối cảnh hoạt động và đặc thù quản lý nhân lực tại Saigon Technology
 
-Saigon Technology hoạt động trong lĩnh vực dịch vụ gia công phần mềm xuất khẩu, với hơn 430 kỹ sư công nghệ làm việc theo các mô hình dự án ODC chuyên trách. Doanh nghiệp quản lý hai nhóm quy trình tác nghiệp lớn:
-- Nhóm quy trình quản lý tổ chức và nhân sự: Tiếp nhận nhu cầu bổ sung nhân sự từ các dự án, thẩm định định biên, tổ chức tuyển dụng qua pipeline ATS, quản lý hồ sơ nhân viên, ký kết và theo dõi thời hạn hợp đồng lao động, quản lý văn bằng chứng chỉ, mượn trả hồ sơ gốc, đánh giá thử việc, điều chuyển nội bộ, nâng bậc lương, khen thưởng, kỷ luật và xử lý thôi việc bàn giao;
-- Nhóm quy trình chấm công, tiền lương và chế độ đãi ngộ: Phân ca làm việc, thu thập sự kiện điểm danh từ nhiều nguồn (máy chấm công phần cứng, Kiosk nhận diện khuôn mặt sinh trắc học kết hợp cảm biến hồng ngoại IR chống giả mạo, Web Check-in trên cổng ESS), xử lý ngoại lệ lệch công, xét duyệt đơn nghỉ phép và làm thêm giờ, vận hành chu kỳ tính lương hàng tháng, giải quyết tạm ứng và khoản vay phúc lợi, thanh quyết toán công tác phí và kết xuất báo cáo bảo hiểm - thuế.
+Công ty Cổ phần Phần mềm Saigon Technology là doanh nghiệp công nghệ thông tin chuyên cung cấp dịch vụ gia công và xuất khẩu phần mềm. Với quy mô hơn 430 nhân sự làm việc tại hai trung tâm sản xuất ở Thành phố Hồ Chí Minh, Đà Nẵng cùng các văn phòng đại diện tại nước ngoài, hoạt động của công ty phục vụ nhiều khách hàng quốc tế tại các múi giờ khác nhau.
 
-### 1.3.2. Phạm vi hệ thống và phân loại người dùng
+Đặc thù hoạt động trong lĩnh vực phần mềm đặt ra những yêu cầu quản lý nhân sự cụ thể:
+- *Biến động nhân sự gắn liền với tiến độ dự án:* Nhu cầu nhân sự kỹ thuật (lập trình viên, kỹ sư kiểm thử, kiến trúc sư giải pháp) thay đổi theo từng giai đoạn triển khai dự án. Điều này đòi hỏi công tác tuyển dụng và bố trí nhân sự phải kịp thời, bám sát kế hoạch chi phí đã ký với khách hàng.
+- *Hình thức làm việc linh hoạt:* Để phối hợp với các đối tác nước ngoài lệch múi giờ, công ty áp dụng thời gian làm việc linh hoạt kết hợp giữa làm việc tại văn phòng và làm việc từ xa. Do đó, việc theo dõi thời gian làm việc, phân chia ca kíp và điểm danh cần phương thức quản lý phù hợp, thuận tiện cho nhân viên.
+- *Yêu cầu cao về bảo mật và quy trình bàn giao:* Do áp dụng các tiêu chuẩn an toàn thông tin ISO 27001 và SOC 2, mọi việc cấp phát tài khoản, quyền truy cập tài nguyên máy chủ cũng như việc thu hồi thiết bị, bàn giao mã nguồn khi nhân viên nghỉ việc đều phải được kiểm soát chặt chẽ, tránh rò rỉ dữ liệu của khách hàng.
 
-Hệ thống được thiết kế hướng tới việc bao đóng toàn bộ quy trình quản trị nhân lực nội bộ, kết hợp giữa cổng tự phục vụ dành cho người lao động (ESS Portal) và phân hệ quản trị chuyên sâu dành cho cán bộ nhân sự và nhà quản lý.
+Trong thực tế, công tác nhân sự tại Saigon Technology có sự phối hợp thường xuyên giữa nhiều đơn vị: Khối Kỹ thuật và Sản xuất (Delivery), Khối Quản trị Nhân lực (HR), Khối Vận hành và Pháp chế (OPS), Khối Tài chính - Kế toán (FIN) cùng Ban Giám đốc Điều hành (BGD).
 
-Người dùng trong hệ thống được phân thành ba vai trò toàn cục:
-- Vai USER: Dành cho toàn thể nhân viên và trưởng dự án, phục vụ các thao tác tự phục vụ (điểm danh, nộp đơn nghỉ phép, xem phiếu lương cá nhân, đăng ký khoản vay) và quyền đề xuất/phê duyệt trong phạm vi nhóm quản lý;
-- Vai KM_MANAGER: Dành cho chuyên viên nhân sự và chuyên viên tiền lương, chủ trì các nghiệp vụ thẩm định hồ sơ, quản trị hợp đồng, xử lý dữ liệu chấm công, vận hành động cơ tính lương và quản lý danh mục;
-- Vai ADMIN: Dành cho Ban Giám đốc và cán bộ quản trị hệ thống IT, thực hiện phê duyệt các quyết định nhân sự cấp cao, khóa bất biến kỳ lương, cấu hình tham số hệ thống và giám sát nhật ký kiểm toán.
+### 1.3.2. Thực trạng các quy trình quản lý nhân sự tại doanh nghiệp
 
-### 1.3.3. Phát biểu bài toán và yêu cầu nghiệp vụ
+Khảo sát thực tế tại Saigon Technology cho thấy công tác quản lý nhân lực hiện nay bao gồm 9 quy trình chính:
 
-Hệ thống cần giải quyết hai yêu cầu trọng tâm:
+#### 1. Quy trình tuyển dụng và thu hút nhân sự
+- **Mục đích:** Bổ sung kịp thời kỹ sư phần mềm cho các dự án mới thành lập hoặc thay thế các vị trí nhân sự biến động, đúng định biên và kế hoạch chi phí.
+- **Trình tự thực hiện tại doanh nghiệp:**
+  1. *Bước 1 - Lập đề xuất tuyển dụng:* Trưởng dự án lập phiếu đề xuất tuyển dụng, nêu rõ vị trí công nghệ, số lượng, yêu cầu kinh nghiệm và khung lương dự kiến.
+  2. *Bước 2 - Thẩm định định biên:* Chuyên viên tuyển dụng kiểm tra đối chiếu nhu cầu với cơ cấu tổ chức và chỉ tiêu nhân sự của bộ phận.
+  3. *Bước 3 - Kiểm tra ngân sách:* Kế toán viên đối chiếu hợp đồng dự án để xác nhận nguồn kinh phí chi trả lương.
+  4. *Bước 4 - Phê duyệt đề xuất:* Ban Giám đốc xem xét nhu cầu thực tế và ký duyệt chỉ tiêu tuyển dụng.
+  5. *Bước 5 - Tìm kiếm và phỏng vấn:* Chuyên viên tuyển dụng đăng tin, tiếp nhận hồ sơ, sàng lọc ứng viên và sắp xếp lịch phỏng vấn: Trưởng dự án phỏng vấn chuyên môn kỹ thuật; Chuyên viên tuyển dụng phỏng vấn về mức độ phù hợp văn hóa và ngoại ngữ; kết quả được ghi nhận vào phiếu đánh giá.
+  6. *Bước 6 - Gửi thư mời nhận việc:* Chuyên viên tuyển dụng trao đổi mức lương, trình Giám đốc phê duyệt và gửi thư mời nhận việc chính thức cho ứng viên.
+- **Bộ phận liên quan:**
+  - *Trực tiếp:* Phòng Tuyển dụng (chủ trì), Khối Kỹ thuật và Sản xuất (đề xuất và đánh giá chuyên môn), Ban Giám đốc (phê duyệt).
+  - *Gián tiếp:* Phòng Kế toán (kiểm soát ngân sách lương dự án), Phòng IT (chuẩn bị bài kiểm tra kỹ thuật).
+- **Người thực hiện:** Trưởng dự án (đề xuất, phỏng vấn kỹ thuật), Chuyên viên tuyển dụng (sàng lọc, điều phối phỏng vấn, gửi thư mời), Kế toán viên (kiểm tra ngân sách), Giám đốc (phê duyệt), Ứng viên (phản hồi thư mời).
+- **Khó khăn, tồn tại thực tế:** Việc gửi và duyệt phiếu đề xuất qua email hoặc bản giấy mất từ 3 đến 5 ngày; hồ sơ ứng viên lưu rải rác trên máy tính cá nhân của từng chuyên viên gây trùng lặp thông tin và dễ thất lạc khi có sự thay đổi người phụ trách.
 
-Về quản trị vận hành: Tin học hóa toàn bộ vòng đời nhân viên, loại bỏ hoàn toàn sự phân mảnh dữ liệu giữa các phòng ban, thay thế quy trình giấy tờ thủ công bằng luồng phê duyệt điện tử minh bạch, cưỡng chế việc tuân thủ quy trình bằng phần mềm (chỉ phê duyệt quyết định khi đã đủ bằng chứng hợp lệ).
+#### 2. Quy trình tiếp nhận nhân sự mới và quản lý hợp đồng lao động
+- **Mục đích:** Thiết lập quan hệ lao động hợp pháp, chuẩn bị điều kiện làm việc, tài sản, tài khoản hệ thống và hướng dẫn nhân viên mới hòa nhập công việc.
+- **Trình tự thực hiện tại doanh nghiệp:**
+  1. *Bước 1 - Tiếp nhận hồ sơ:* Ứng viên nộp hồ sơ cá nhân (căn cước công dân, sơ yếu lý lịch, bằng cấp, chứng chỉ). Chuyên viên hồ sơ kiểm tra tính hợp lệ và lưu trữ.
+  2. *Bước 2 - Ký hợp đồng thử việc:* Chuyên viên hồ sơ soạn hợp đồng thử việc thời hạn 60 ngày theo Điều 25 Bộ luật Lao động 2019 với mức lương thử việc theo quy định, trình Giám đốc ký kết.
+  3. *Bước 3 - Chuẩn bị tiếp nhận:* Bộ phận nhân sự thông báo trước ngày làm việc đầu tiên: Phòng Hành chính sắp xếp chỗ ngồi, cấp thẻ ra vào; Phòng IT tạo hòm thư điện tử nội bộ, cấp máy tính làm việc và quyền truy cập mạng.
+  4. *Bước 4 - Đón tiếp ngày đầu tiên:* Chuyên viên hồ sơ đón tiếp nhân viên mới, phổ biến nội quy lao động, ký cam kết bảo mật thông tin và bàn giao thiết bị.
+  5. *Bước 5 - Quá trình thử việc:* Nhân viên tham gia các buổi giới thiệu quy trình làm việc của công ty, sau đó về nhóm dự án dưới sự hướng dẫn của người kèm cặp.
+  6. *Bước 6 - Đánh giá thử việc và ký hợp đồng chính thức:* Trước khi hết hạn thử việc 7 ngày, Trưởng dự án đánh giá kết quả. Nếu đạt yêu cầu, Chuyên viên hồ sơ soạn hợp đồng lao động xác định thời hạn trình Giám đốc ký và làm thủ tục báo tăng bảo hiểm xã hội.
+- **Bộ phận liên quan:**
+  - *Trực tiếp:* Phòng Nhân sự vận hành (chủ trì tiếp nhận và hồ sơ), Người lao động mới, Ban Giám đốc.
+  - *Gián tiếp:* Phòng Hành chính (bố trí chỗ ngồi, cấp thẻ), Phòng IT (cấp máy tính, tạo tài khoản), Nhóm dự án (tiếp nhận, hướng dẫn).
+- **Người thực hiện:** Nhân viên mới (nộp hồ sơ, ký hợp đồng), Chuyên viên hồ sơ (kiểm tra hồ sơ, soạn hợp đồng), Nhân viên hành chính (cấp thẻ), Quản trị IT (cấp thiết bị, tài khoản), Trưởng dự án (đánh giá thử việc), Giám đốc (ký hợp đồng).
+- **Khó khăn, tồn tại thực tế:** Việc trao đổi thông tin giữa Nhân sự, IT và Hành chính qua email đôi khi bị chậm trễ khiến nhân viên mới chưa có ngay thiết bị làm việc; việc theo dõi thời hạn thử việc bằng sổ tính Excel dễ dẫn đến quên thời hạn đánh giá và ký hợp đồng chính thức.
 
-Về tuân thủ pháp lý: Tính toán chính xác các chế độ tiền lương, bảo hiểm xã hội và thuế thu nhập cá nhân theo đúng quy định hiện hành; lưu trữ đầy đủ hồ sơ pháp lý và vết kiểm toán cho mọi giao dịch nhân sự; bảo vệ an toàn thông tin định danh cá nhân theo Nghị định 13/2023/NĐ-CP.
+#### 3. Quy trình quản lý thời gian làm việc và chấm công
+- **Mục đích:** Ghi nhận chính xác ngày công thực tế của nhân viên, bảo đảm kỷ luật lao động, làm cơ sở tính lương và phục vụ nghiệm thu dự án với khách hàng.
+- **Trình tự thực hiện tại doanh nghiệp:**
+  1. *Bước 1 - Thiết lập ca làm việc:* Đầu tháng hoặc theo từng giai đoạn dự án, Trưởng dự án xếp lịch làm việc cho các thành viên (ca hành chính chuẩn, ca linh hoạt, hoặc ca trực hỗ trợ đối tác nước ngoài).
+  2. *Bước 2 - Ghi nhận giờ làm:* Hàng ngày, nhân viên thực hiện điểm danh qua các hình thức: quẹt thẻ từ hoặc nhận diện khuôn mặt tại cửa văn phòng, nhận diện tại thiết bị điểm danh ở sảnh, hoặc điểm danh qua trang web nội bộ khi làm việc từ xa.
+  3. *Bước 3 - Tổng hợp dữ liệu:* Dữ liệu từ các cơ sở tại TP.HCM và Đà Nẵng được ghi nhận về máy chủ.
+  4. *Bước 4 - Xử lý giải trình công:* Nếu quên điểm danh, gặp sự cố máy móc hoặc đi công tác ngoài, nhân viên gửi phiếu giải trình kèm lý do để Trưởng dự án phê duyệt.
+  5. *Bước 5 - Đối soát bảng công:* Cuối tháng, Chuyên viên tiền lương rà soát các trường hợp đi muộn, về sớm, tổng hợp số giờ làm thực tế và khóa sổ dữ liệu chấm công.
+- **Bộ phận liên quan:**
+  - *Trực tiếp:* Toàn thể nhân viên, Trưởng dự án, Phòng Tiền lương và Phúc lợi.
+  - *Gián tiếp:* Phòng IT (duy trì đường truyền và máy chấm công), Ban Giám đốc (theo dõi tình hình chuyên cần).
+- **Người thực hiện:** Trưởng dự án (xếp ca, duyệt giải trình), Nhân viên (điểm danh, gửi giải trình), Quản trị IT (kết nối máy móc, hạ tầng), Chuyên viên tiền lương (tổng hợp bảng công, đối soát).
+- **Khó khăn, tồn tại thực tế:** Máy chấm công ở các văn phòng lưu trữ dữ liệu riêng, cuối tháng nhân sự phải xuất file Excel ra ghép nối thủ công; mất nhiều thời gian kiểm tra từng trường hợp quên quẹt thẻ.
+
+#### 4. Quy trình quản lý nghỉ phép và làm thêm giờ
+- **Mục đích:** Đảm bảo quyền nghỉ ngơi của người lao động theo luật định, đồng thời kiểm soát giờ làm thêm nhằm bảo đảm sức khỏe nhân viên và đúng quy định pháp luật.
+- **Trình tự thực hiện tại doanh nghiệp:**
+  1. *Nghỉ phép:* Nhân viên kiểm tra số ngày phép còn lại, gửi đơn xin nghỉ phép (phép năm, phép không hưởng lương, nghỉ ốm, thai sản) trước 1 đến 3 ngày. Trưởng dự án duyệt theo tiến độ công việc; trường hợp nghỉ từ 3 ngày trở lên chuyển tiếp Giám đốc phê duyệt; bộ phận nhân sự kiểm tra chế độ bảo hiểm xã hội nếu là nghỉ ốm đau, thai sản.
+  2. *Làm thêm giờ:* Khi dự án cần đẩy nhanh tiến độ bàn giao, Trưởng dự án lập kế hoạch làm thêm giờ, nêu rõ lý do kỹ thuật, danh sách kỹ sư tham gia và thời gian dự kiến. Chuyên viên tiền lương kiểm tra số giờ làm thêm lũy kế của từng người để bảo đảm không vượt quá 40 giờ/tháng và 200 giờ/năm theo quy định tại Điều 107 Bộ luật Lao động 2019. Ban Giám đốc phê duyệt kế hoạch trước khi thực hiện. Sau khi kết thúc, Trưởng dự án xác nhận số giờ làm thêm thực tế để làm căn cứ chi trả thù lao.
+- **Bộ phận liên quan:**
+  - *Trực tiếp:* Nhân viên, Trưởng dự án, Phòng Tiền lương và Phúc lợi, Ban Giám đốc.
+  - *Gián tiếp:* Phòng Kế toán (ghi nhận chi phí dự án), Khách hàng (nghiệm thu số giờ làm thêm nếu tính phí theo thời gian).
+- **Người thực hiện:** Nhân viên (gửi đơn phép, ghi nhận giờ làm thêm), Trưởng dự án (lập kế hoạch làm thêm, duyệt đơn phép, xác nhận giờ làm thực tế), Chuyên viên tiền lương (kiểm tra quỹ phép, kiểm soát trần giờ làm thêm), Giám đốc (phê duyệt).
+- **Khó khăn, tồn tại thực tế:** Đơn xin nghỉ phép và thông báo làm thêm giờ thường gửi qua tin nhắn chat hoặc email, dễ bị sót khi tổng hợp công; không có hệ thống cảnh báo tự động khi nhân viên sắp chạm trần giờ làm thêm theo luật định.
+
+#### 5. Quy trình tính toán và chi trả tiền lương
+- **Mục đích:** Tính toán chính xác, minh bạch thu nhập hàng tháng của người lao động, đồng thời trích nộp bảo hiểm bắt buộc và khấu trừ thuế thu nhập cá nhân theo đúng quy định.
+- **Trình tự thực hiện tại doanh nghiệp:**
+  1. *Bước 1 - Chốt dữ liệu công:* Ngày 25 hàng tháng, Chuyên viên tiền lương chốt bảng chấm công, phân loại ngày công thực tế, ngày nghỉ phép, ngày nghỉ không lương và số giờ làm thêm.
+  2. *Bước 2 - Tập hợp các khoản thu nhập và giảm trừ:* Lấy dữ liệu lương cơ bản theo hợp đồng, phụ cấp vị trí, thưởng dự án; các khoản trích nộp gồm bảo hiểm xã hội (8%), bảo hiểm y tế (1.5%), bảo hiểm thất nghiệp (1%), tiền tạm ứng trong kỳ, khoản trả nợ vay phúc lợi và giảm trừ gia cảnh.
+  3. *Bước 3 - Tính toán lương thực lĩnh:* Thực hiện tính toán thu nhập chịu thuế, khấu trừ thuế thu nhập cá nhân theo biểu lũy tiến từng phần, kiểm soát trích nợ vay theo Điều 102 Bộ luật Lao động 2019 (không quá 30% lương thực lĩnh) để xác định số tiền thực trả.
+  4. *Bước 4 - Đối soát tài chính:* Chuyên viên tiền lương chuyển bảng thanh toán lương cho Kế toán trưởng đối chiếu với số dư tài khoản ngân hàng và định mức chi phí.
+  5. *Bước 5 - Phê duyệt bảng lương:* Giám đốc ký duyệt bảng thanh toán tiền lương toàn công ty.
+  6. *Bước 6 - Chi trả lương và gửi phiếu lương:* Vào ngày 05 hàng tháng, Kế toán thực hiện lệnh chuyển khoản qua ngân hàng cho nhân viên; Chuyên viên tiền lương xuất và gửi phiếu lương điện tử có mật khẩu đến từng cá nhân, đồng thời làm hồ sơ khai báo với cơ quan bảo hiểm xã hội.
+- **Bộ phận liên quan:**
+  - *Trực tiếp:* Phòng Tiền lương và Phúc lợi (chủ trì tính toán), Khối Tài chính - Kế toán (kiểm tra, chi trả), Ban Giám đốc (phê duyệt), Toàn thể nhân viên.
+  - *Gián tiếp:* Ngân hàng (chuyển tiền), Cơ quan Bảo hiểm xã hội và Cơ quan Thuế.
+- **Người thực hiện:** Chuyên viên tiền lương (tổng hợp công, tính lương, gửi phiếu lương), Kế toán viên/Kế toán trưởng (kiểm tra, chuyển khoản), Giám đốc (phê duyệt bảng lương), Nhân viên (nhận lương, xem phiếu lương).
+- **Khó khăn, tồn tại thực tế:** Việc tính toán lương bằng bảng tính Excel cho hơn 430 nhân sự với nhiều phụ cấp và hình thức hợp đồng khác nhau mất từ 4 đến 5 ngày làm việc; chia sẻ file qua mạng nội bộ tiềm ẩn rủi ro lộ bí mật thông tin thu nhập; thiếu cơ chế khóa dữ liệu kỳ lương sau khi đã duyệt.
+
+#### 6. Quy trình tạm ứng lương, vay phúc lợi và thanh toán công tác phí
+- **Mục đích:** Thực hiện chế độ phúc lợi nội bộ, hỗ trợ tài chính cho người lao động và thanh toán kịp thời các khoản chi phí phát sinh khi đi công tác.
+- **Trình tự thực hiện tại doanh nghiệp:**
+  1. *Tạm ứng lương:* Nhân viên có nhu cầu nộp đơn xin tạm ứng giữa tháng (tối đa 50% lương cơ bản). Trưởng dự án xác nhận; Chuyên viên tiền lương kiểm tra số ngày công đã làm; Kế toán trưởng duyệt chi; số tiền này được tự động trừ vào kỳ lương gần nhất.
+  2. *Vay vốn phúc lợi:* Kỹ sư làm việc từ 12 tháng trở lên có nhu cầu vay vốn ưu đãi từ quỹ phúc lợi công ty nộp hồ sơ. Trưởng dự án xác nhận thời gian gắn bó; Chuyên viên tiền lương thẩm định lịch trả góp hàng tháng (bảo đảm tiền trả nợ mỗi tháng không quá 30% lương thực lĩnh); Kế toán kiểm tra số dư quỹ; Giám đốc duyệt hợp đồng vay; Kế toán giải ngân; hàng tháng trích trừ dần tiền trả nợ vào bảng lương.
+  3. *Thanh toán công tác phí:* Nhân viên được cử đi công tác tại các văn phòng trong và ngoài nước lập dự toán chi phí. Khi hoàn thành chuyến công tác, nhân viên gửi giấy đề nghị thanh toán kèm hóa đơn, chứng từ hợp lệ (vé máy bay, phòng nghỉ, đi lại) để kế toán kiểm tra và chuyển khoản thanh toán.
+- **Bộ phận liên quan:**
+  - *Trực tiếp:* Người lao động, Khối Quản trị Nhân lực, Khối Tài chính - Kế toán, Ban Giám đốc.
+  - *Gián tiếp:* Ban Chấp hành Công đoàn (theo dõi tính công khai của quỹ phúc lợi).
+- **Người thực hiện:** Nhân viên (lập đề xuất, nộp hóa đơn chứng từ), Trưởng dự án (xác nhận), Chuyên viên tiền lương (kiểm tra điều kiện trừ lương), Kế toán viên (kiểm tra hóa đơn, giải ngân), Giám đốc (phê duyệt hợp đồng vay).
+- **Khó khăn, tồn tại thực tế:** Việc theo dõi danh sách vay và lịch thu hồi nợ bằng sổ theo dõi thủ công dễ dẫn đến sai sót hoặc bỏ quên việc khấu trừ khi nhân viên chuyển dự án; việc duyệt công tác phí bằng giấy tờ mất nhiều thời gian luân chuyển.
+
+#### 7. Quy trình đánh giá hiệu suất công việc và đào tạo phát triển
+- **Mục đích:** Đánh giá kết quả công việc và năng lực chuyên môn của nhân viên, làm cơ sở xét thưởng hiệu suất, tăng lương và xây dựng kế hoạch bồi dưỡng nâng cao tay nghề.
+- **Trình tự thực hiện tại doanh nghiệp:**
+  1. *Bước 1 - Đăng ký mục tiêu đầu kỳ:* Định kỳ 6 tháng một lần, Trưởng dự án cùng nhân viên thống nhất các chỉ số công việc (năng suất hoàn thành mã nguồn, tỷ lệ lỗi, tiến độ công việc, kỹ năng cộng tác).
+  2. *Bước 2 - Thu thập kết quả đánh giá:* Đến kỳ đánh giá, nhân viên tự nhận xét kết quả của bản thân; đồng thời 2 đến 3 đồng nghiệp cùng dự án thực hiện đánh giá chéo khách quan về kỹ năng phối hợp và chuyên môn.
+  3. *Bước 3 - Phỏng vấn đánh giá trực tiếp:* Trưởng dự án tổng hợp các nguồn ý kiến, chấm điểm chính thức và trao đổi trực tiếp với nhân viên để chỉ ra điểm mạnh cũng như các nội dung cần cải thiện.
+  4. *Bước 4 - Xếp loại toàn công ty:* Chuyên viên đào tạo tổng hợp kết quả toàn bộ các dự án, xếp loại nhân viên thành 4 nhóm: Xuất sắc (khoảng 15%), Tốt (khoảng 60%), Đạt (khoảng 20%) và Cần cải thiện (khoảng 5%).
+  5. *Bước 5 - Phê chuẩn và xây dựng kế hoạch đào tạo:* Ban Giám đốc phê duyệt danh sách xếp loại. Kết quả được chuyển sang bộ phận tiền lương để xét thưởng; đồng thời bộ phận đào tạo lập danh sách tài trợ kinh phí học và thi các chứng chỉ quốc tế chuyên ngành (kiến trúc điện toán đám mây, quản lý dự án).
+- **Bộ phận liên quan:**
+  - *Trực tiếp:* Toàn thể nhân viên kỹ thuật và Trưởng dự án, Phòng Đào tạo và Phát triển, Ban Giám đốc.
+  - *Gián tiếp:* Phòng Tiền lương và Phúc lợi (lấy kết quả chi thưởng), Phòng Kế toán (cấp kinh phí đào tạo).
+- **Người thực hiện:** Nhân viên (tự đánh giá, đánh giá đồng nghiệp), Trưởng dự án (chấm điểm, trao đổi trực tiếp), Chuyên viên đào tạo (tổng hợp, xếp loại), Giám đốc (phê chuẩn xếp loại và ngân sách đào tạo).
+- **Khó khăn, tồn tại thực tế:** Việc thu thập phiếu đánh giá qua biểu mẫu trực tuyến rời rạc thường bị chậm tiến độ; dữ liệu đánh giá qua các năm không được lưu tập trung nên khó theo dõi quá trình phát triển năng lực của nhân sự; kết quả đánh giá chưa liên kết tự động với khâu tính tiền thưởng.
+
+#### 8. Quy trình điều chuyển, bổ nhiệm, khen thưởng và kỷ luật
+- **Mục đích:** Quản lý các biến động về vị trí công tác, điều chỉnh ngạch bậc lương, ghi nhận đóng góp nổi bật và thực hiện xử lý kỷ luật theo đúng trình tự pháp luật.
+- **Trình tự thực hiện tại doanh nghiệp:**
+  1. *Bổ nhiệm và nâng bậc lương:* Khi nhân viên đạt thành tích tốt hoặc đến kỳ rà soát, Trưởng dự án lập đề xuất; Chuyên viên hồ sơ đối chiếu tiêu chuẩn chức danh; Ban Giám đốc ký quyết định; Chuyên viên hồ sơ soạn phụ lục hợp đồng, cập nhật chức danh trên sơ đồ tổ chức và điều chỉnh phân quyền hệ thống.
+  2. *Khen thưởng:* Khi dự án hoàn thành vượt tiến độ hoặc được khách hàng khen ngợi, Trưởng dự án gửi đề xuất khen thưởng; Hội đồng thi đua khen thưởng thẩm định; Giám đốc ký quyết định và chuyển Kế toán chi trả tiền thưởng.
+  3. *Xử lý kỷ luật lao động:* Khi phát hiện nhân viên vi phạm nội quy lao động (như vi phạm quy định bảo mật thông tin, tự ý bỏ việc nhiều ngày), Trưởng bộ phận lập biên bản; Chuyên viên hồ sơ thu thập chứng cứ và gửi thông báo mời họp xử lý kỷ luật trước ít nhất 5 ngày làm việc theo quy định tại Điều 122 Bộ luật Lao động 2019; cuộc họp xử lý kỷ luật bắt buộc có sự tham gia của Người lao động và Đại diện Ban Chấp hành Công đoàn; các bên ký biên bản cuộc họp; Giám đốc ban hành quyết định kỷ luật (khiển trách, kéo dài thời hạn nâng lương, cách chức hoặc sa thải).
+- **Bộ phận liên quan:**
+  - *Trực tiếp:* Bộ phận phát sinh biến động, Phòng Nhân sự vận hành, Ban Chấp hành Công đoàn, Ban Giám đốc.
+  - *Gián tiếp:* Phòng IT (điều chỉnh quyền truy cập hệ thống), Phòng Kế toán (điều chỉnh mức lương hoặc chi tiền thưởng).
+- **Người thực hiện:** Trưởng dự án (lập đề xuất, lập biên bản vi phạm), Chuyên viên hồ sơ (chuẩn bị thủ tục, hồ sơ), Đại diện Công đoàn (tham gia bảo vệ quyền lợi người lao động), Giám đốc (ký quyết định).
+- **Khó khăn, tồn tại thực tế:** Các văn bản quyết định lưu trữ bản cứng dễ thất lạc; nếu quy trình xử lý kỷ luật không chặt chẽ về thời hạn thông báo và thành phần tham dự sẽ tiềm ẩn nguy cơ khiếu nại lao động; việc bổ nhiệm chức danh mới chưa đồng bộ tự động với quyền truy cập trên các phần mềm quản lý công việc.
+
+#### 9. Quy trình thôi việc và bàn giao công việc
+- **Mục đích:** Thực hiện thủ tục chấm dứt hợp đồng lao động đúng quy định pháp luật, bảo đảm thu hồi đầy đủ tài sản làm việc, bàn giao mã nguồn và tài liệu dự án, tránh nguy cơ rò rỉ dữ liệu của khách hàng.
+- **Trình tự thực hiện tại doanh nghiệp:**
+  1. *Bước 1 - Nộp đơn thôi việc:* Nhân viên gửi đơn xin thôi việc, bảo đảm thời hạn báo trước theo Điều 35 Bộ luật Lao động 2019 (30 ngày đối với hợp đồng xác định thời hạn, 45 ngày đối với hợp đồng không xác định thời hạn).
+  2. *Bước 2 - Trao đổi nguyện vọng và phê duyệt:* Trưởng dự án và đại diện nhân sự gặp gỡ trao đổi để tìm hiểu lý do; trường hợp nhân viên giữ nguyên nguyện vọng thôi việc, Giám đốc ký duyệt ngày làm việc cuối cùng.
+  3. *Bước 3 - Thực hiện bàn giao 5 khâu độc lập:* Nhân viên hoàn tất xác nhận bàn giao tại 5 bộ phận:
+     - *Khâu 1 - Bàn giao kỹ thuật (Khối Kỹ thuật):* Bàn giao mã nguồn dự án, tài liệu thiết kế, tài khoản máy chủ thử nghiệm cho Trưởng dự án nghiệm thu.
+     - *Khâu 2 - Bàn giao tài sản (Phòng Hành chính):* Trả lại máy tính xách tay, màn hình phụ, thẻ ra vào văn phòng, chìa khóa tủ cá nhân.
+     - *Khâu 3 - Thu hồi quyền truy cập (Phòng IT):* Khóa hòm thư điện tử nội bộ, ngắt quyền kết nối mạng từ xa và các công cụ quản lý dự án.
+     - *Khâu 4 - Chốt chế độ chính sách (Phòng Tiền lương):* Chốt ngày công tháng cuối, tính tiền những ngày phép năm chưa nghỉ, tính trợ cấp thôi việc (nếu đủ điều kiện), hoàn tất thủ tục báo giảm bảo hiểm xã hội.
+     - *Khâu 5 - Quyết toán tài chính (Phòng Kế toán):* Đối chiếu thu hồi các khoản tiền tạm ứng chưa thanh toán và số dư nợ vay phúc lợi còn lại (khấu trừ trực tiếp vào kỳ lương cuối cùng).
+  4. *Bước 4 - Ký quyết định thôi việc:* Sau khi đủ chữ ký xác nhận của 5 bộ phận trên phiếu bàn giao, Giám đốc ban hành quyết định chấm dứt hợp đồng lao động.
+  5. *Bước 5 - Thanh toán quyền lợi và trả hồ sơ:* Trong thời hạn 14 ngày làm việc theo Điều 48 Bộ luật Lao động 2019, Phòng Kế toán chi trả toàn bộ tiền lương và trợ cấp cho nhân viên; Chuyên viên hồ sơ hoàn tất trả sổ bảo hiểm xã hội và hồ sơ cá nhân.
+- **Bộ phận liên quan:**
+  - *Trực tiếp:* Nhân viên thôi việc, Khối Kỹ thuật, Phòng Hành chính, Phòng IT, Phòng Tiền lương, Phòng Kế toán, Ban Giám đốc.
+  - *Gián tiếp:* Cơ quan Bảo hiểm xã hội địa phương, Khách hàng dự án.
+- **Người thực hiện:** Nhân viên thôi việc (bàn giao công việc, nhận quyết toán), Trưởng dự án (nghiệm thu kỹ thuật), Nhân viên hành chính (thu hồi tài sản), Quản trị IT (khóa tài khoản mạng), Chuyên viên tiền lương (chốt công, chế độ), Kế toán viên (chi trả thanh toán), Giám đốc (ký quyết định thôi việc).
+- **Khó khăn, tồn tại thực tế:** Phiếu bàn giao bằng giấy chuyển qua 5 bộ phận thường bị kéo dài từ 1 đến 2 tuần, làm chậm tiến độ thanh toán lương và trả sổ bảo hiểm xã hội; việc chậm khóa tài khoản truy cập máy chủ dự án tiềm ẩn rủi ro về an toàn thông tin theo tiêu chuẩn ISO 27001.
+
+### 1.3.3. Ma trận phân định trách nhiệm liên phòng ban trong các quy trình quản trị nhân sự (RACI Matrix)
+
+Để làm rõ trách nhiệm của các bộ phận trong toàn bộ hoạt động quản lý nhân lực tại Saigon Technology, bảng ma trận phân công trách nhiệm RACI (R - Thực hiện, A - Phê duyệt, C - Phối hợp/Tham vấn, I - Nhận thông tin) được tổng hợp như sau:
+
+**Bảng 1.5. Ma trận phân định trách nhiệm liên phòng ban trong các quy trình quản trị nhân sự (RACI Matrix)**
+
+| STT | Quy trình Quản trị Nhân sự | Khối Kỹ thuật (Delivery) | Khối HR (Tuyển dụng) | Khối HR (Hồ sơ) | Khối HR (Tiền lương) | Khối Vận hành (Hành chính & IT) | Khối Tài chính - Kế toán | Ban Giám đốc (BGD) |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1 | Tuyển dụng và thu hút nhân sự | **R** (Đề xuất & Phỏng vấn) | **R** (Sàng lọc & Điều phối) | **I** (Nhận thông tin) | **I** (Tham khảo khung lương) | **C** (Hỗ trợ kỹ thuật) | **C** (Kiểm tra ngân sách) | **A** (Phê duyệt chỉ tiêu & Thư mời) |
+| 2 | Tiếp nhận nhân sự mới & HĐLĐ | **C** (Hướng dẫn công việc) | **I** (Bàn giao hồ sơ) | **R** (Soạn HĐ & Đón tiếp) | **I** (Nhận thông tin lương) | **R** (Cấp máy tính & Thẻ từ) | **I** (Mở tài khoản lương) | **A** (Ký hợp đồng) |
+| 3 | Phân ca và chấm công | **R** (Xếp ca & Duyệt công) | **I** | **C** (Theo dõi hồ sơ) | **R** (Đối soát & Khóa bảng công) | **R** (Bảo trì máy chấm công) | **I** (Nhận số liệu công) | **I** (Xem báo cáo) |
+| 4 | Xét duyệt nghỉ phép & Làm thêm giờ | **R** (Đề xuất OT & Duyệt phép) | **I** | **C** (Kiểm tra chế độ) | **R** (Kiểm soát trần 40h OT) | **I** | **C** (Dự toán chi phí OT) | **A** (Duyệt OT & Nghỉ dài ngày) |
+| 5 | Tính toán và chi trả tiền lương | **I** (Xác nhận ngày công) | **I** | **C** (Cập nhật biến động lương) | **R** (Tính toán & Gửi phiếu lương) | **I** | **C** (Kiểm tra & Chuyển khoản) | **A** (Phê duyệt bảng lương) |
+| 6 | Tạm ứng lương và vay phúc lợi | **C** (Xác nhận thời gian làm) | **I** | **I** (Lưu hồ sơ vay) | **R** (Kiểm tra mức trừ 30%) | **I** | **R** (Kiểm tra quỹ & Giải ngân) | **A** (Phê duyệt hợp đồng vay) |
+| 7 | Đánh giá hiệu suất và đào tạo | **R** (Chấm điểm & Trao đổi 1-1) | **I** | **C** (Lưu hồ sơ đánh giá) | **C** (Lấy kết quả chia thưởng) | **I** | **C** (Cấp ngân sách đào tạo) | **A** (Phê duyệt xếp loại) |
+| 8 | Bổ nhiệm, khen thưởng & Kỷ luật | **R** (Lập đề xuất / Biên bản) | **I** | **R** (Chuẩn bị thủ tục) | **C** (Điều chỉnh bậc lương) | **C** (Cập nhật quyền hệ thống) | **C** (Chi trả / Khấu trừ) | **A** (Ký quyết định chính thức) |
+| 9 | Thôi việc và bàn giao công việc | **R** (Nghiệm thu mã nguồn) | **I** (Trao đổi lý do nghỉ) | **R** (Chốt hồ sơ & Trả sổ BHXH) | **R** (Chốt phép & Chế độ thôi việc) | **R** (Thu hồi máy tính & Khóa tài khoản) | **R** (Thu hồi nợ & Quyết toán) | **A** (Ký quyết định thôi việc) |
+
+*Ghi chú: **R** (Responsible - Bộ phận trực tiếp thực hiện); **A** (Accountable - Cấp phê duyệt và chịu trách nhiệm cao nhất); **C** (Consulted - Bộ phận phối hợp, tham gia ý kiến chuyên môn); **I** (Informed - Bộ phận nhận thông tin để theo dõi).*
+
+### 1.3.4. Phát biểu bài toán tổng quát và yêu cầu hệ thống hóa
+
+Từ thực trạng phân tán và các khó khăn gặp phải trong công tác quản lý thực tế, bài toán đặt ra cho Saigon Technology là: **Xây dựng một hệ thống thông tin quản trị nhân lực thống nhất, quản lý toàn diện vòng đời làm việc của nhân viên, liên thông các khâu phê duyệt giữa các bộ phận, tuân thủ đúng các quy định pháp luật lao động và bảo mật thông tin, đồng thời cung cấp cổng thông tin tự phục vụ thuận tiện cho hơn 430 nhân sự.**
+
+Để giải quyết bài toán trên, hệ thống cần đáp ứng bốn nhóm yêu cầu cụ thể:
+
+1. *Quản lý dữ liệu tập trung và liên thông quy trình:* Xây dựng cơ sở dữ liệu dùng chung, thay thế các bảng tính Excel rời rạc; tự động hóa việc luân chuyển và phê duyệt hồ sơ trực tuyến giữa 5 bộ phận (Dự án -> Nhân sự -> IT -> Kế toán -> Ban Giám đốc), có lưu lại lịch sử xử lý của từng người dùng.
+2. *Tự động hóa các nghiệp vụ chính:* Hỗ trợ theo dõi ứng viên tuyển dụng theo từng vòng; tự động tổng hợp dữ liệu chấm công từ các máy chấm công tại văn phòng và điểm danh trực tuyến; tự động tính toán tiền lương, các khoản bảo hiểm bắt buộc và thuế thu nhập cá nhân theo biểu thuế lũy tiến từng phần.
+3. *Đảm bảo tuân thủ pháp luật và an toàn thông tin:*
+   - Cảnh báo kịp thời khi số giờ làm thêm giờ của nhân viên vượt quá 40 giờ/tháng hoặc 200 giờ/năm theo Điều 107 Bộ luật Lao động 2019;
+   - Khống chế mức trích trừ các khoản nợ vay và tạm ứng không vượt quá 30% tiền lương thực lĩnh hàng tháng theo Điều 102 Bộ luật Lao động 2019;
+   - Khóa dữ liệu bảng lương sau khi đã được Ban Giám đốc phê duyệt, ngăn chặn việc sửa đổi số liệu tùy tiện;
+   - Bảo mật thông tin cá nhân và dữ liệu thu nhập theo quy định bảo vệ dữ liệu cá nhân (Nghị định 13/2023/NĐ-CP) và tiêu chuẩn an toàn thông tin ISO 27001.
+4. *Cổng thông tin tự phục vụ và phân quyền rõ ràng:*
+   - Cung cấp cổng thông tin để nhân viên chủ động điểm danh, tra cứu phiếu lương cá nhân, theo dõi số ngày phép còn lại, gửi đơn xin nghỉ phép và đăng ký làm thêm giờ;
+   - Phân định quyền hạn rõ ràng giữa các nhóm người dùng: nhân viên thông thường, cán bộ phụ trách nghiệp vụ nhân sự và ban giám đốc/quản trị hệ thống, bảo đảm đúng chức năng và bảo mật dữ liệu.
+
+Các yêu cầu nghiệp vụ và kỹ thuật trên là cơ sở định hướng cho việc phân tích tác nhân, xác định use case và thiết kế chi tiết hệ thống ở Chương 2.
 
 ## Tóm tắt chương 1
 
@@ -612,21 +796,21 @@ Tác nhân (Actor) trong phân tích hệ thống hướng đối tượng là b
 
 | STT | Tác nhân nghiệp vụ | Bộ phận / Vị trí thực tế tương ứng | Vai trò hệ thống | Trách nhiệm và quyền hạn chính trên phần mềm |
 | :---: | :--- | :--- | :---: | :--- |
-| 1 | Nhân viên (Employee) | Toàn thể kỹ sư, lập trình viên, chuyên viên tại các dự án và phòng ban | USER | Sử dụng cổng tự phục vụ ESS: điểm danh, nộp đơn nghỉ phép, đăng ký làm thêm giờ, tra cứu phiếu lương cá nhân, cập nhật thông tin liên lạc (Mức 1). |
-| 2 | Trưởng dự án (Project Manager - PM) | Quản lý dự án phần mềm, Trưởng nhóm kỹ thuật (Tech Lead) | USER | Lập phiếu đề xuất tuyển dụng, phân ca làm việc cho thành viên dự án, duyệt đơn nghỉ phép, xác nhận giờ làm thêm, đánh giá thử việc và đánh giá KPI thành viên. |
-| 3 | Chuyên viên Tuyển dụng (Recruiter) | Tổ Tuyển dụng - Ban TC-HC-NS | KM_MANAGER | Quản lý tin tuyển dụng, tiếp nhận và sàng lọc hồ sơ ứng viên trên pipeline ATS Kanban, lên lịch phỏng vấn, lập tờ trình tuyển dụng và gửi thư mời nhận việc. |
-| 4 | Chuyên viên Hồ sơ (HR Records Officer) | Tổ Quản trị Hồ sơ & Thủ tục nhân sự | KM_MANAGER | Tiếp nhận nhân viên mới, lập hợp đồng lao động, số hóa văn bằng chứng chỉ, quản lý mượn trả hồ sơ gốc, thẩm định đề xuất thay đổi thông tin định danh (Mức 2). |
-| 5 | Chuyên viên Tiền lương (C&B Officer) | Tổ Tiền lương & Phúc lợi | KM_MANAGER | Giám sát dữ liệu chấm công, xử lý ngoại lệ lệch công, cấu hình công thức lương, chạy động cơ tính lương tự động, quản lý tạm ứng và khoản vay phúc lợi. |
-| 6 | Chuyên viên Đào tạo & Hiệu suất | Tổ Phát triển Nguồn nhân lực | KM_MANAGER | Tổ chức khóa đào tạo nội bộ, điều phối kỳ đánh giá hiệu suất 360 độ, theo dõi mục tiêu OKR/KPI và tiếp nhận giải quyết khiếu nại lao động. |
-| 7 | Nhân viên Hành chính (Office Admin) | Bộ phận Hành chính - Quản trị văn phòng | KM_MANAGER | Quản lý cấp phát, thu hồi tài sản làm việc (laptop, màn hình), bàn giao chỗ ngồi và thẻ từ ra vào văn phòng. |
-| 8 | Kế toán viên (Accountant) | Phòng Kế toán - Tài chính | KM_MANAGER | Xác nhận ngân sách quỹ lương, đối chiếu bảng thanh toán tiền lương, tạm ứng và thanh quyết toán các khoản chi phí công tác (T&E). |
+| 1 | Nhân viên (Employee) | Toàn thể kỹ sư, lập trình viên, chuyên viên tại các dự án, chi nhánh và phòng ban | USER | Sử dụng cổng tự phục vụ ESS: điểm danh, nộp đơn nghỉ phép, đăng ký làm thêm giờ, tra cứu phiếu lương cá nhân, cập nhật thông tin liên lạc (Mức 1). |
+| 2 | Trưởng dự án (Project Manager - PM) | Quản lý dự án phần mềm, Trưởng nhóm kỹ thuật (Tech Lead/Squad Lead) | USER | Lập phiếu đề xuất tuyển dụng, phân ca làm việc cho thành viên dự án, duyệt đơn nghỉ phép, xác nhận giờ làm thêm, đánh giá thử việc và đánh giá KPI thành viên. |
+| 3 | Chuyên viên Tuyển dụng (Recruiter) | Phòng Tuyển dụng Công nghệ (HR-TA) - Khối Quản trị Nguồn nhân lực | KM_MANAGER | Quản lý tin tuyển dụng, tiếp nhận và sàng lọc hồ sơ ứng viên trên pipeline ATS Kanban, lên lịch phỏng vấn, lập tờ trình tuyển dụng và gửi thư mời nhận việc. |
+| 4 | Chuyên viên Hồ sơ (HR Records Officer) | Phòng Nhân sự Vận hành & Văn hóa (HR-OPS) - Khối Quản trị Nguồn nhân lực | KM_MANAGER | Tiếp nhận nhân viên mới, lập hợp đồng lao động, số hóa văn bằng chứng chỉ, quản lý mượn trả hồ sơ gốc, thẩm định đề xuất thay đổi thông tin định danh (Mức 2). |
+| 5 | Chuyên viên Tiền lương (C&B Officer) | Phòng Tiền lương & Phúc lợi (HR-C&B) - Khối Quản trị Nguồn nhân lực | KM_MANAGER | Giám sát dữ liệu chấm công, xử lý ngoại lệ lệch công, cấu hình công thức lương, chạy chức năng tính lương tự động, quản lý tạm ứng và khoản vay phúc lợi. |
+| 6 | Chuyên viên Đào tạo & Hiệu suất | Phòng Đào tạo & Phát triển (HR-L&D) - Khối Quản trị Nguồn nhân lực | KM_MANAGER | Tổ chức khóa đào tạo nội bộ, điều phối kỳ đánh giá hiệu suất 360 độ, theo dõi mục tiêu OKR/KPI và tiếp nhận giải quyết khiếu nại lao động. |
+| 7 | Nhân viên Hành chính (Office Admin) | Phòng Hành chính & Cơ sở vật chất (OPS-ADMIN) - Khối Vận hành & Pháp chế | KM_MANAGER | Quản lý cấp phát, thu hồi tài sản làm việc (laptop, màn hình), bàn giao chỗ ngồi và thẻ từ ra vào văn phòng tại các cơ sở/chi nhánh. |
+| 8 | Kế toán viên (Accountant) | Phòng Kế toán Doanh nghiệp & Thuế (FIN-ACC) - Khối Tài chính - Kế toán | KM_MANAGER | Xác nhận ngân sách quỹ lương, đối chiếu bảng thanh toán tiền lương, tạm ứng và thanh quyết toán các khoản chi phí công tác (T&E). |
 | 9 | Đại diện Người lao động | Ban Chấp hành Công đoàn cơ sở | USER | Tham gia đóng góp ý kiến và giám sát trong quy trình xử lý kỷ luật lao động và giải quyết khiếu nại theo quy định pháp luật. |
-| 10 | Giám đốc (Executive Director / COO) | Ban Tổng Giám đốc điều hành | ADMIN | Phê duyệt kế hoạch tuyển dụng, ký duyệt hợp đồng lao động, phê duyệt bảng lương tháng, phê duyệt bổ nhiệm, nâng bậc lương và khen thưởng, kỷ luật. |
-| 11 | Nhân viên Quản trị IT (System Admin) | Phòng Hạ tầng & An ninh thông tin (IT/DevOps) | ADMIN | Quản trị tài khoản người dùng, phân quyền RBAC, cấu hình tham số hệ thống, giám sát kết nối máy chấm công và tra cứu nhật ký kiểm toán (Audit Log). |
+| 10 | Giám đốc (Executive Director / COO) | Ban Giám đốc Điều hành (BGD) - Tổng Giám đốc (CEO Phạm Tiến Thành) | ADMIN | Phê duyệt kế hoạch tuyển dụng, ký duyệt hợp đồng lao động, phê duyệt bảng lương tháng, phê duyệt bổ nhiệm, nâng bậc lương và khen thưởng, kỷ luật. |
+| 11 | Nhân viên Quản trị IT (System Admin) | Phòng IT & An ninh Mạng (OPS-IT) - Khối Vận hành & Pháp chế | ADMIN | Quản trị tài khoản người dùng, phân quyền RBAC, cấu hình tham số hệ thống, giám sát kết nối máy chấm công và tra cứu nhật ký kiểm toán (Audit Log). |
 
 ![Hình 2.1: Biểu đồ cây phân cấp Tác nhân (Actor Generalization)](images/hinh_2_1_actor_tree.png)
 
-Sơ đồ thể hiện quan hệ kế thừa giữa 11 tác nhân nghiệp vụ vào 3 nhóm vai trò người dùng chuẩn hóa trên hệ thống.
+Sơ đồ thể hiện quan hệ kế thừa và phân cấp giữa tác nhân chung "Nhân viên" và 10 tác nhân vai trò chuyên biệt hóa trong hệ thống.
 
 ### 2.1.2. Danh sách Use case và phân nhóm nhiệm vụ
 
@@ -639,250 +823,714 @@ Dựa trên kết quả phân tích quy trình nghiệp vụ và các tác nhân
 | 1 | UC01 | Đăng nhập & Xác thực hệ thống | Toàn thể nhân viên | Nhóm A: Quản trị hệ thống & Tổ chức |
 | 2 | UC02 | Quản trị người dùng & Phân quyền RBAC | Nhân viên Quản trị IT | Nhóm A: Quản trị hệ thống & Tổ chức |
 | 3 | UC03 | Quản trị cơ cấu tổ chức & Cây phòng ban | Nhân viên Quản trị IT | Nhóm A: Quản trị hệ thống & Tổ chức |
-| 4 | UC04 | Lập phiếu đề xuất tuyển dụng nhân sự | Trưởng dự án | Nhóm B: Tuyển dụng & Quản lý ứng viên |
-| 5 | UC05 | Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng | Chuyên viên Tuyển dụng, Kế toán | Nhóm B: Tuyển dụng & Quản lý ứng viên |
-| 6 | UC06 | Phê duyệt chỉ tiêu tuyển dụng | Giám đốc | Nhóm B: Tuyển dụng & Quản lý ứng viên |
-| 7 | UC07 | Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban | Chuyên viên Tuyển dụng | Nhóm B: Tuyển dụng & Quản lý ứng viên |
-| 8 | UC08 | Gửi thư mời nhận việc & Thỏa thuận mức lương | Chuyên viên Tuyển dụng, Ứng viên | Nhóm B: Tuyển dụng & Quản lý ứng viên |
-| 9 | UC09 | Quản lý hồ sơ nhân viên toàn diện | Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự, Hợp đồng & Hội nhập |
-| 10 | UC10 | Quản lý hợp đồng lao động & Phụ lục hợp đồng | Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự, Hợp đồng & Hội nhập |
-| 11 | UC11 | Quản lý văn bằng, chứng chỉ chuyên môn | Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự, Hợp đồng & Hội nhập |
-| 12 | UC12 | Mượn - trả hồ sơ, chứng chỉ bản gốc | Nhân viên, Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự, Hợp đồng & Hội nhập |
-| 13 | UC13 | Đánh giá kết quả thử việc & Ký HĐLĐ chính thức | Trưởng dự án, Chuyên viên Hồ sơ, Giám đốc | Nhóm C: Hồ sơ nhân sự, Hợp đồng & Hội nhập |
-| 14 | UC14 | Lộ trình hội nhập nhân viên mới (Onboarding Checklist) | Nhân viên mới, Chuyên viên Hồ sơ, Mentor | Nhóm C: Hồ sơ nhân sự, Hợp đồng & Hội nhập |
-| 15 | UC15 | Cổng tự phục vụ nhân viên tập trung (ESS Portal) | Toàn thể nhân viên | Nhóm D: Cổng tự phục vụ & Phân cấp hồ sơ |
-| 16 | UC16 | Quản lý thông tin cá nhân phân cấp 3 mức độ | Toàn thể nhân viên | Nhóm D: Cổng tự phục vụ & Phân cấp hồ sơ |
-| 17 | UC17 | Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 | Chuyên viên Hồ sơ, Quản trị viên | Nhóm D: Cổng tự phục vụ & Phân cấp hồ sơ |
-| 18 | UC18 | Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca | Toàn thể nhân viên | Nhóm E: Chấm công, Phân ca & Điểm danh đa nguồn |
-| 19 | UC19 | Điểm danh sinh trắc học khuôn mặt & Cảm biến IR | Nhân viên, Kiosk điểm danh | Nhóm E: Chấm công, Phân ca & Điểm danh đa nguồn |
-| 20 | UC20 | Quản trị kết nối thiết bị máy chấm công | Chuyên viên Hồ sơ, Quản trị IT | Nhóm E: Chấm công, Phân ca & Điểm danh đa nguồn |
-| 21 | UC21 | Đăng ký & Xét duyệt nghỉ phép trực tuyến | Nhân viên, Trưởng dự án, Chuyên viên Hồ sơ | Nhóm E: Chấm công, Phân ca & Điểm danh đa nguồn |
-| 22 | UC22 | Đăng ký & Phê duyệt làm thêm giờ (OT) | Nhân viên, Trưởng dự án, Chuyên viên Tiền lương | Nhóm E: Chấm công, Phân ca & Điểm danh đa nguồn |
-| 23 | UC23 | Lập lịch và phân ca làm việc (Shift Scheduling) | Trưởng dự án, Chuyên viên Tiền lương | Nhóm E: Chấm công, Phân ca & Điểm danh đa nguồn |
-| 24 | UC24 | Giải trình bổ sung giờ công & Xử lý lệch công | Nhân viên, Trưởng dự án, Chuyên viên Tiền lương | Nhóm E: Chấm công, Phân ca & Điểm danh đa nguồn |
-| 25 | UC25 | Tổng hợp & Chốt bảng chấm công tháng | Chuyên viên Tiền lương, Trưởng dự án | Nhóm E: Chấm công, Phân ca & Điểm danh đa nguồn |
-| 26 | UC26 | Cấu hình công thức và ngạch bậc lương | Chuyên viên Tiền lương | Nhóm F: Tiền lương, Chế độ đãi ngộ & Phúc lợi |
-| 27 | UC27 | Vận hành động cơ tính toán bảng lương tự động | Chuyên viên Tiền lương | Nhóm F: Tiền lương, Chế độ đãi ngộ & Phúc lợi |
-| 28 | UC28 | Phê duyệt & Khóa bất biến kỳ lương (LOCKED state) | Chuyên viên Tiền lương, Giám đốc | Nhóm F: Tiền lương, Chế độ đãi ngộ & Phúc lợi |
-| 29 | UC29 | Quản lý tạm ứng & Khoản vay phúc lợi nhân viên | Nhân viên, Chuyên viên Tiền lương, Giám đốc | Nhóm F: Tiền lương, Chế độ đãi ngộ & Phúc lợi |
-| 30 | UC30 | Quản lý đề xuất công tác & Quyết toán chi phí (T&E) | Nhân viên, Trưởng dự án, Kế toán | Nhóm F: Tiền lương, Chế độ đãi ngộ & Phúc lợi |
-| 31 | UC31 | Quản lý cấp phát & Thu hồi tài sản làm việc | Nhân viên Hành chính, Nhân viên | Nhóm F: Tiền lương, Chế độ đãi ngộ & Phúc lợi |
+| 4 | UC04 | Lập phiếu đề xuất tuyển dụng nhân sự | Trưởng dự án | Nhóm B: Tuyển dụng & Ứng viên |
+| 5 | UC05 | Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng | Chuyên viên Tuyển dụng, Kế toán | Nhóm B: Tuyển dụng & Ứng viên |
+| 6 | UC06 | Phê duyệt chỉ tiêu tuyển dụng | Giám đốc | Nhóm B: Tuyển dụng & Ứng viên |
+| 7 | UC07 | Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban | Chuyên viên Tuyển dụng | Nhóm B: Tuyển dụng & Ứng viên |
+| 8 | UC08 | Gửi thư mời nhận việc & Thỏa thuận mức lương | Chuyên viên Tuyển dụng, Ứng viên | Nhóm B: Tuyển dụng & Ứng viên |
+| 9 | UC09 | Quản lý hồ sơ nhân viên toàn diện | Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự & Hội nhập |
+| 10 | UC10 | Quản lý hợp đồng lao động & Phụ lục hợp đồng | Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự & Hội nhập |
+| 11 | UC11 | Quản lý văn bằng, chứng chỉ chuyên môn | Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự & Hội nhập |
+| 12 | UC12 | Mượn - trả hồ sơ, chứng chỉ bản gốc | Nhân viên, Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự & Hội nhập |
+| 13 | UC13 | Đánh giá kết quả thử việc & Ký HĐLĐ chính thức | Trưởng dự án, Chuyên viên Hồ sơ, Giám đốc | Nhóm C: Hồ sơ nhân sự & Hội nhập |
+| 14 | UC14 | Lộ trình hội nhập nhân viên mới (Onboarding Checklist) | Nhân viên mới, Chuyên viên Hồ sơ, Mentor | Nhóm C: Hồ sơ nhân sự & Hội nhập |
+| 15 | UC15 | Cổng tự phục vụ nhân viên tập trung (ESS Portal) | Toàn thể nhân viên | Nhóm D: Cổng tự phục vụ nhân viên |
+| 16 | UC16 | Quản lý thông tin cá nhân phân cấp 3 mức độ | Toàn thể nhân viên | Nhóm D: Cổng tự phục vụ nhân viên |
+| 17 | UC17 | Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 | Chuyên viên Hồ sơ, Quản trị viên | Nhóm D: Cổng tự phục vụ nhân viên |
+| 18 | UC18 | Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca | Toàn thể nhân viên | Nhóm E: Chấm công & Phân ca |
+| 19 | UC19 | Điểm danh sinh trắc học khuôn mặt & Cảm biến IR | Nhân viên, Kiosk điểm danh | Nhóm E: Chấm công & Phân ca |
+| 20 | UC20 | Quản trị kết nối thiết bị máy chấm công | Chuyên viên Hồ sơ, Quản trị IT | Nhóm E: Chấm công & Phân ca |
+| 21 | UC21 | Đăng ký & Xét duyệt nghỉ phép trực tuyến | Nhân viên, Trưởng dự án, Chuyên viên Hồ sơ | Nhóm E: Chấm công & Phân ca |
+| 22 | UC22 | Đăng ký & Phê duyệt làm thêm giờ (OT) | Nhân viên, Trưởng dự án, Chuyên viên Tiền lương | Nhóm E: Chấm công & Phân ca |
+| 23 | UC23 | Lập lịch và phân ca làm việc (Shift Scheduling) | Trưởng dự án, Chuyên viên Tiền lương | Nhóm E: Chấm công & Phân ca |
+| 24 | UC24 | Giải trình bổ sung giờ công & Xử lý lệch công | Nhân viên, Trưởng dự án, Chuyên viên Tiền lương | Nhóm E: Chấm công & Phân ca |
+| 25 | UC25 | Tổng hợp & Chốt bảng chấm công tháng | Chuyên viên Tiền lương, Trưởng dự án | Nhóm E: Chấm công & Phân ca |
+| 26 | UC26 | Cấu hình công thức và ngạch bậc lương | Chuyên viên Tiền lương | Nhóm F: Tiền lương & Phúc lợi |
+| 27 | UC27 | Vận hành chức năng tính lương tự động | Chuyên viên Tiền lương | Nhóm F: Tiền lương & Phúc lợi |
+| 28 | UC28 | Phê duyệt & Khóa bất biến kỳ lương (LOCKED state) | Chuyên viên Tiền lương, Giám đốc | Nhóm F: Tiền lương & Phúc lợi |
+| 29 | UC29 | Quản lý tạm ứng & Khoản vay phúc lợi nhân viên | Nhân viên, Chuyên viên Tiền lương, Giám đốc | Nhóm F: Tiền lương & Phúc lợi |
+| 30 | UC30 | Quản lý đề xuất công tác & Quyết toán chi phí (T&E) | Nhân viên, Trưởng dự án, Kế toán | Nhóm F: Tiền lương & Phúc lợi |
+| 31 | UC31 | Quản lý cấp phát & Thu hồi tài sản làm việc | Nhân viên Hành chính, Nhân viên | Nhóm F: Tiền lương & Phúc lợi |
 | 32 | UC32 | Đề xuất & Phê duyệt điều chuyển công tác nội bộ | Trưởng dự án, Giám đốc, Chuyên viên Hồ sơ | Nhóm G: Biến động nhân sự & Thôi việc |
 | 33 | UC33 | Đề xuất & Phê duyệt điều chỉnh bậc lương | Trưởng dự án, Giám đốc, Chuyên viên Tiền lương | Nhóm G: Biến động nhân sự & Thôi việc |
 | 34 | UC34 | Đề xuất & Phê duyệt khen thưởng nhân sự | Trưởng dự án, Giám đốc, Chuyên viên Tiền lương | Nhóm G: Biến động nhân sự & Thôi việc |
 | 35 | UC35 | Xử lý kỷ luật & Vi phạm nội quy lao động | Trưởng dự án, Đại diện NLĐ, Giám đốc | Nhóm G: Biến động nhân sự & Thôi việc |
 | 36 | UC36 | Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận | Nhân viên, Chuyên viên Hồ sơ, Các bộ phận | Nhóm G: Biến động nhân sự & Thôi việc |
-| 37 | UC37 | Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI | Chuyên viên nhân sự, Trưởng dự án, Nhân viên | Nhóm H: Đánh giá hiệu suất, Đào tạo & Phát triển |
-| 38 | UC38 | Quản trị chương trình đào tạo nội bộ | Chuyên viên nhân sự, Nhân viên | Nhóm H: Đánh giá hiệu suất, Đào tạo & Phát triển |
-| 39 | UC39 | Tiếp nhận & Giải quyết khiếu nại lao động bảo mật | Chuyên viên nhân sự, Nhân viên | Nhóm H: Đánh giá hiệu suất, Đào tạo & Phát triển |
-| 40 | UC40 | Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV | Chuyên viên Hồ sơ | Nhóm I: Chuẩn cán bộ & Báo cáo Nhà nước |
-| 41 | UC41 | Quản trị danh mục ngạch bậc lương chuẩn NĐ 204 | Chuyên viên Hồ sơ | Nhóm I: Chuẩn cán bộ & Báo cáo Nhà nước |
-| 42 | UC42 | Tự động rà soát & Phê duyệt nâng bậc lương định kỳ | Chuyên viên Hồ sơ, Giám đốc | Nhóm I: Chuẩn cán bộ & Báo cáo Nhà nước |
-| 43 | UC43 | Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03) | Chuyên viên Hồ sơ | Nhóm I: Chuẩn cán bộ & Báo cáo Nhà nước |
-| 44 | UC44 | Quản lý không gian tri thức số & Tài liệu quy trình SOP | Toàn thể nhân viên (theo quyền không gian) | Nhóm J: Quản trị Tri thức & Điều hành hệ thống |
-| 45 | UC45 | Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia | Toàn thể nhân viên | Nhóm J: Quản trị Tri thức & Điều hành hệ thống |
-| 46 | UC46 | Bảng điều khiển phân tích & Thống kê nhân sự (Dashboard) | Ban Giám đốc, Quản lý, Nhân viên | Nhóm J: Quản trị Tri thức & Điều hành hệ thống |
-| 47 | UC47 | Nhật ký kiểm toán hệ thống & Cấu hình tham số | Nhân viên Quản trị IT | Nhóm J: Quản trị Tri thức & Điều hành hệ thống |
+| 37 | UC37 | Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI | Chuyên viên nhân sự, Trưởng dự án, Nhân viên | Nhóm H: Đánh giá hiệu suất & Đào tạo |
+| 38 | UC38 | Quản trị chương trình đào tạo nội bộ | Chuyên viên nhân sự, Nhân viên | Nhóm H: Đánh giá hiệu suất & Đào tạo |
+| 39 | UC39 | Tiếp nhận & Giải quyết khiếu nại lao động bảo mật | Chuyên viên nhân sự, Nhân viên | Nhóm H: Đánh giá hiệu suất & Đào tạo |
+| 40 | UC40 | Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV | Chuyên viên Hồ sơ | Nhóm I: Chuẩn cán bộ & Báo cáo |
+| 41 | UC41 | Quản trị danh mục ngạch bậc lương chuẩn NĐ 204 | Chuyên viên Hồ sơ | Nhóm I: Chuẩn cán bộ & Báo cáo |
+| 42 | UC42 | Tự động rà soát & Phê duyệt nâng bậc lương định kỳ | Chuyên viên Hồ sơ, Giám đốc | Nhóm I: Chuẩn cán bộ & Báo cáo |
+| 43 | UC43 | Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03) | Chuyên viên Hồ sơ | Nhóm I: Chuẩn cán bộ & Báo cáo |
+| 44 | UC44 | Quản lý không gian tri thức số & Tài liệu quy trình SOP | Toàn thể nhân viên (theo quyền không gian) | Nhóm J: Quản trị tri thức & Điều hành |
+| 45 | UC45 | Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia | Toàn thể nhân viên | Nhóm J: Quản trị tri thức & Điều hành |
+| 46 | UC46 | Bảng điều khiển phân tích & Thống kê nhân sự (Dashboard) | Ban Giám đốc, Quản lý, Nhân viên | Nhóm J: Quản trị tri thức & Điều hành |
+| 47 | UC47 | Nhật ký kiểm toán hệ thống & Cấu hình tham số | Nhân viên Quản trị IT | Nhóm J: Quản trị tri thức & Điều hành |
 
-### 2.1.3. Đặc tả các Use case
+### 2.1.3. Đặc tả chi tiết các Use case của hệ thống
 
-**Bảng 2.3. Đặc tả tổng hợp 47 Use case của hệ thống**
+Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn bộ 47 Use Case trong hệ thống Quản trị nhân lực, được chuẩn hóa theo đúng trình tự nghiệp vụ và tương tác thực tế giữa người dùng và phần mềm:
 
-| Mã UC | Tác nhân chính | Mục đích nghiệp vụ | Luồng xử lý tóm tắt của hệ thống |
-| :---: | :--- | :--- | :--- |
-| UC01 | Toàn thể nhân viên | Xác thực truy cập an toàn | Nhập email/mật khẩu -> Kiểm tra tài khoản -> Cấp JWT Access Token (15 phút) & Refresh Token (7 ngày) -> Điều hướng theo vai trò. |
-| UC02 | Quản trị viên IT | Quản lý tài khoản và quyền hạn | Tạo mới/sửa tài khoản nhân viên -> Gán vai trò RBAC (USER, KM_MANAGER, ADMIN) -> Khóa tài khoản khi thôi việc -> Ghi vết kiểm toán. |
-| UC03 | Quản trị viên IT | Quản trị cơ cấu doanh nghiệp | Cấu hình cây phòng ban tự tham chiếu đa cấp -> Thiết lập định biên nhân sự -> Gán người đứng đầu đơn vị -> Cập nhật trực quan sơ đồ tổ chức. |
-| UC04 | Trưởng dự án | Đề xuất bổ sung nhân sự | Chọn vị trí, chức danh, số lượng, lý do -> Kiểm tra định biên phòng ban -> Lưu phiếu "Chờ thẩm định" -> Thông báo chuyên viên tuyển dụng. |
-| UC05 | CV Tuyển dụng, Kế toán | Thẩm định nhu cầu tuyển dụng | Kiểm tra tính phù hợp của JD và khung lương -> Đối chiếu nguồn ứng viên nội bộ -> Kế toán thẩm định quỹ chi -> Chuyển "Chờ phê duyệt". |
-| UC06 | Giám đốc | Phê chuẩn kế hoạch tuyển dụng | Xem xét đề xuất -> Phê duyệt điện tử -> Kích hoạt trạng thái mở tuyển (Open Requisition) -> Thông báo cho PM và bộ phận tuyển dụng. |
-| UC07 | CV Tuyển dụng | Quản lý hồ sơ ứng viên | Tạo tin tuyển dụng -> Tiếp nhận CV đa kênh -> Kéo-thả ứng viên qua pipeline Kanban 6 bước (Ứng tuyển, Sàng lọc, PV 1, PV 2, Offer, Nhận việc). |
-| UC08 | CV Tuyển dụng | Mời nhận việc và thỏa thuận lương | Lập thư mời theo khung bậc lương -> Trình duyệt nếu vượt khung -> Gửi ứng viên -> Ứng viên xác nhận -> Chuyển ứng viên thành nhân viên mới. |
-| UC09 | CV Hồ sơ | Quản lý hồ sơ nhân viên | Lưu trữ thông tin nhân thân, quá trình công tác, hợp đồng, bằng cấp -> Tìm kiếm toàn văn -> Xuất dữ liệu nhân sự -> Theo dõi biến động. |
-| UC10 | CV Hồ sơ | Quản lý hợp đồng lao động | Lập HĐLĐ thử việc, xác định thời hạn (12-36 tháng) hoặc không xác định thời hạn -> Cảnh báo hợp đồng sắp hết hạn trước 45/30 ngày. |
-| UC11 | CV Hồ sơ | Quản lý bằng cấp, chứng chỉ | Lưu trữ loại bằng, số hiệu, nơi cấp, ngày cấp, bản quét đính kèm -> Lưu vị trí tủ lưu trữ vật lý -> Kiểm tra tính hợp lệ của chứng chỉ. |
-| UC12 | Nhân viên, CV Hồ sơ | Mượn - trả hồ sơ gốc | Lập phiếu mượn bằng cấp gốc -> Ghi nhận lý do và ngày hẹn trả -> Tự động gửi email nhắc trả trước hạn 3 ngày -> Xác nhận thu hồi. |
-| UC13 | Trưởng dự án, Giám đốc | Đánh giá thử việc | Hệ thống nhắc trước 15 ngày -> PM đánh giá năng lực và thái độ -> Đạt: Tự sinh HĐ chính thức; Không đạt: Chấm dứt thử việc. |
-| UC14 | Nhân viên mới, Mentor | Hội nhập nhân sự mới | Khởi tạo Onboarding Checklist 14 ngày -> Nhân viên hoàn thành các khóa học chính sách, cam kết bảo mật NDA -> Mentor và HR nghiệm thu. |
-| UC15 | Toàn thể nhân viên | Cổng tự phục vụ tập trung | Trang tổng quan cá nhân: chấm công trực tuyến, nộp đơn phép/OT, xem phiếu lương điện tử bảo mật, theo dõi tiến độ hoàn nợ khoản vay. |
-| UC16 | Toàn thể nhân viên | Quản trị hồ sơ phân cấp 3 mức | Mức 1: Tự sửa số điện thoại, địa chỉ; Mức 2: Đề xuất đổi CCCD, tài khoản ngân hàng kèm minh chứng; Mức 3: Khóa chỉ xem chức danh, lương. |
-| UC17 | CV Hồ sơ, Quản trị viên | Thẩm định điều chỉnh hồ sơ Mức 2 | Tiếp nhận đề xuất từ hàng đợi thẩm định -> Đối chiếu dữ liệu cũ/mới và ảnh minh chứng -> Duyệt (cập nhật CSDL nguyên tử) hoặc từ chối. |
-| UC18 | Toàn thể nhân viên | Chấm công vào/ra ca làm việc | Thu thập sự kiện Check-in/Check-out từ các kênh -> Ghi vào bảng sự kiện bất biến AttendanceEvent -> Khớp giờ công với ca được gán. |
-| UC19 | Nhân viên, Kiosk | Điểm danh khuôn mặt & IR | Đăng ký vector mẫu (mã hóa AES-256-GCM) -> Kiosk nhận diện thời gian thực qua camera và cảm biến hồng ngoại chống giả mạo -> Ghi nhận công. |
-| UC20 | Quản trị viên IT | Quản trị máy chấm công | Cấu hình thiết bị máy chấm công -> Tiếp nhận webhook kèm chữ ký HMAC-SHA256 hoặc nhập file CSV -> Đồng bộ bản ghi thô vào CSDL. |
-| UC21 | Nhân viên, Trưởng dự án | Đăng ký & Xét duyệt nghỉ phép | Kiểm tra số dư phép khả dụng -> Nộp đơn chọn loại phép -> Trưởng dự án duyệt -> Hệ thống tự động trừ quỹ phép ngay khi duyệt. |
-| UC22 | Nhân viên, Trưởng dự án | Đăng ký làm thêm giờ (OT) | Đăng ký khung giờ làm thêm và lý do -> Kiểm tra giới hạn trần OT (không quá 40h/tháng) -> Quản lý duyệt -> Nạp dữ liệu vào bảng công. |
-| UC23 | Trưởng dự án, CV Tiền lương | Phân ca làm việc | Thiết lập danh mục ca (giờ bắt đầu, kết thúc, thời gian nghỉ, ân hạn đi muộn) -> Gán ca cho nhân viên hoặc nhóm dự án theo tuần/tháng. |
-| UC24 | Nhân viên, Quản lý | Giải trình & Hiệu chỉnh công | Gửi đơn giải trình quên quẹt thẻ hoặc công tác đột xuất kèm minh chứng -> Quản lý duyệt -> Cập nhật bảng công kèm lưu vết kiểm toán. |
-| UC25 | CV Tiền lương, Quản lý | Tổng hợp & Chốt bảng công | Khóa dữ liệu chấm công định kỳ ngày 25 -> Rà soát bản ghi lệch công -> Tổng hợp ngày công thực tế, giờ OT, ngày nghỉ -> Chuyển sang tính lương. |
-| UC26 | CV Tiền lương | Cấu hình công thức lương | Cấu hình các thành phần lương (Gross, lương cơ bản, phụ cấp, thưởng) -> Thiết lập công thức tính thuế TNCN 7 bậc và định mức đóng BHXH. |
-| UC27 | CV Tiền lương | Tính toán bảng lương tự động | Nạp bảng công đã chốt và hợp đồng -> Tự động tính các khoản thu nhập, trừ BHXH (10.5%), thuế TNCN và nợ vay phúc lợi -> Sinh phiếu lương. |
-| UC28 | CV Tiền lương, Giám đốc | Khóa bất biến kỳ lương | Giám đốc duyệt bảng lương -> Chuyển trạng thái kỳ lương sang LOCKED -> Chặn hoàn toàn thao tác tính lại (HTTP 409) -> Xuất lệnh chi ngân hàng. |
-| UC29 | Nhân viên, CV Tiền lương | Vay phúc lợi & Tạm ứng lương | Mô phỏng khoản vay -> Tự động kiểm tra tỷ lệ trích nợ <= 30% lương thực lĩnh -> Duyệt theo quy tắc -> Tự động trích trừ vào kỳ lương hàng tháng. |
-| UC30 | Nhân viên, Kế toán | Đề xuất & Quyết toán công tác phí | Lập đề xuất công tác và dự toán chi phí -> Duyệt tạm ứng -> Thực hiện chuyến đi -> Kê khai hóa đơn điện tử hợp lệ -> Kế toán thanh quyết toán. |
-| UC31 | NV Hành chính, Nhân viên | Cấp phát & Thu hồi tài sản | Lập biên bản bàn giao thiết bị (laptop, màn hình) -> Quản lý vòng đời tài sản (sử dụng, bảo dưỡng, thu hồi) -> Kiểm kê định kỳ. |
-| UC32 | Trưởng dự án, Giám đốc | Điều chuyển nhân sự nội bộ | Lập đề xuất chuyển phòng ban hoặc dự án -> Quản lý hai bên xác nhận -> Giám đốc ký quyết định điều chuyển -> Cập nhật sơ đồ tổ chức. |
-| UC33 | Trưởng dự án, Giám đốc | Điều chỉnh ngạch bậc lương | Đề xuất tăng lương định kỳ hoặc đột xuất theo hiệu suất -> Thẩm định quỹ lương -> Giám đốc ký quyết định -> Cập nhật cấu trúc lương mới. |
-| UC34 | Trưởng dự án, Giám đốc | Khen thưởng nhân sự | Lập danh sách cá nhân/tập thể có thành tích xuất sắc -> Duyệt mức tiền thưởng -> Tự động nạp tiền thưởng vào kỳ tính lương kế tiếp. |
-| UC35 | Trưởng dự án, Đại diện NLĐ | Xử lý kỷ luật lao động | Lập biên bản vi phạm -> Họp hội đồng kỷ luật có đại diện người lao động tham gia -> Ban hành quyết định kỷ luật (khiển trách, kéo dài nâng lương, sa thải). |
-| UC36 | Nhân viên, Các bộ phận | Xử lý thôi việc & Bàn giao | Nhân viên nộp đơn thôi việc -> Duyệt đơn -> Tự động sinh Checklist bàn giao 5 mục -> Đủ xác nhận mới phát hành quyết định và khóa tài khoản. |
-| UC37 | CV Nhân sự, Quản lý | Đánh giá hiệu suất 360 độ | Thiết lập kỳ đánh giá và trọng số OKR/KPI -> Nhân viên tự đánh giá -> Đồng nghiệp đánh giá chéo -> Quản lý chấm điểm -> Phản hồi kết quả. |
-| UC38 | CV Nhân sự, Nhân viên | Quản lý đào tạo nội bộ | Lập kế hoạch khóa học kỹ thuật/quy trình -> Nhân viên ghi danh (giới hạn sĩ số) -> Điểm danh khóa học -> Khảo sát đánh giá chất lượng. |
-| UC39 | CV Nhân sự, Nhân viên | Giải quyết khiếu nại lao động | Tiếp nhận đơn khiếu nại bảo mật qua kênh nội bộ -> Phân công cán bộ xác minh -> Tổ chức đối thoại -> Ban hành kết luận giải quyết khiếu nại. |
-| UC40 | CV Hồ sơ | Quản lý hồ sơ cán bộ 2C-BNV | Quản lý 111 thuộc tính thông tin cán bộ theo quy chuẩn Mẫu 2C-BNV/2008 -> Lưu trữ 8 bảng lịch sử quá trình (lương, đào tạo, công tác...). |
-| UC41 | CV Hồ sơ | Quản trị ngạch bậc lương NĐ 204 | Thiết lập danh mục ngạch công chức/viên chức (A3, A2, A1, B, C), hệ số lương từng bậc và thời gian giữ bậc chuẩn (24 hoặc 36 tháng). |
-| UC42 | CV Hồ sơ, Giám đốc | Nâng bậc lương định kỳ tự động | Quét tự động danh sách cán bộ đủ điều kiện thời gian giữ bậc -> Lập danh sách đề nghị nâng bậc -> Giám đốc duyệt -> Cập nhật hệ số mới. |
-| UC43 | CV Hồ sơ | Xuất biểu mẫu báo cáo nhà nước | Kết xuất Sơ yếu lý lịch Mẫu 2C-BNV/2008 khổ in PDF chuẩn; kết xuất Biểu 01 (tuổi x ngạch), Biểu 02 (ngoại ngữ), Biểu 03 (trình độ) định dạng Excel. |
-| UC44 | Toàn thể nhân viên | Quản trị kho tri thức số (SOP) | Quản lý không gian tri thức phân quyền (Space) -> Soạn thảo bài viết Markdown -> Luồng phê duyệt xuất bản bài viết -> Quản lý phiên bản bài viết bất biến. |
-| UC45 | Toàn thể nhân viên | Tìm kiếm tri thức & Chuyên gia | Tìm kiếm toàn văn (FTS) nội dung bài viết theo quyền hạn truy cập -> Tra cứu danh bạ chuyên môn nội bộ ("ai am hiểu về công nghệ X"). |
-| UC46 | Ban Giám đốc, Quản lý | Bảng điều khiển phân tích số | Trực quan hóa các chỉ số nhân sự: tỷ lệ đi làm hôm nay, cơ cấu nhân lực, biến động lao động, tiến độ phê duyệt đơn từ, quỹ lương kỳ gần nhất. |
-| UC47 | Quản trị viên IT | Nhật ký kiểm toán & Cấu hình | Tra cứu nhật ký kiểm toán hệ thống bất biến (ai thực hiện, tác vụ gì, thời điểm, giá trị trước/sau); cấu hình tham số vận hành dạng key-value. |
+**UC01 - Đăng nhập & Xác thực hệ thống**
 
-**Bảng 2.4. Đặc tả chi tiết các Use case trọng yếu**
+- **Tác nhân chính:** Toàn thể nhân viên
+- **Mục đích / Mô tả:** Xác thực định danh người dùng bằng email công vụ và mật khẩu, phân bổ phiên làm việc bảo mật với JWT.
+- **Điều kiện tiên quyết:** Người dùng đã được cấp tài khoản hoạt động (ACTIVE) trong cơ sở dữ liệu.
+- **Hậu điều kiện:** Hệ thống cấp phát JWT token hợp lệ và điều hướng người dùng tới Dashboard tương ứng với vai trò.
 
-Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của các Use Case đại diện cho các phân hệ chức năng cốt lõi theo đúng trình tự vòng đời nhân sự:
-
-**1. UC01 - Đăng nhập & Xác thực hệ thống**
 | Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Truy cập giao diện `/login`, nhập tên đăng nhập (email công vụ) và mật khẩu cá nhân; bấm nút "Đăng nhập". | Tiếp nhận thông tin, kiểm tra tính hợp lệ của định dạng dữ liệu đầu vào. |
+| 1 | Truy cập giao diện `/login`, nhập email công vụ và mật khẩu; bấm "Đăng nhập". | Tiếp nhận thông tin, kiểm tra tính hợp lệ của định dạng dữ liệu đầu vào. |
 | 2 | - | Truy vấn CSDL tìm tài khoản; đối chiếu mã băm mật khẩu bằng thuật toán bcrypt. |
-| 3 | - | Nếu hợp lệ: Cấp Access Token (JWT thời hạn 15 phút) và Refresh Token (thời hạn 7 ngày); lưu hash Refresh Token vào CSDL; điều hướng người dùng tới Dashboard tương ứng với vai trò. |
+| 3 | - | Nếu hợp lệ: Cấp Access Token (JWT thời hạn 15 phút) và Refresh Token (thời hạn 7 ngày); lưu hash Refresh Token vào CSDL; điều hướng người dùng tới giao diện làm việc. |
 | 4 | - | Nếu không hợp lệ: Thông báo lỗi "Tài khoản hoặc mật khẩu không chính xác"; tăng biến đếm số lần thất bại (nếu nhập sai quá 5 lần liên tiếp, tự động khóa tài khoản trong 15 phút để chống tấn công Brute-Force). |
 
-**2. UC04 - Lập phiếu đề xuất tuyển dụng nhân sự**
-| Bước | Tác nhân (Trưởng dự án / HR) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | Trưởng dự án truy cập phân hệ Tuyển dụng, bấm chọn "Tạo đề xuất tuyển dụng". | Hiển thị biểu mẫu nhập liệu kèm thông tin định biên nhân sự và số lượng nhân sự hiện hữu của dự án. |
-| 2 | Nhập vị trí công việc, số lượng cần tuyển, yêu cầu kỹ năng, mức lương dự kiến và ngày cần nhân sự; gửi đề xuất. | Kiểm tra định biên: Nếu vượt định biên cho phép, cảnh báo yêu cầu phê duyệt ngoại lệ. Ghi nhận phiếu với trạng thái "Chờ thẩm định". |
-| 3 | Chuyên viên tuyển dụng kiểm tra tính khả thi của yêu cầu tuyển dụng và đối chiếu khung lương. | Cập nhật kết quả thẩm định chuyên môn; gửi thông báo song song tới bộ phận Kế toán. |
-| 4 | Kế toán trưởng xác nhận khả năng chi trả của quỹ ngân sách dự án. | Chuyển trạng thái phiếu sang "Chờ phê duyệt"; gửi thông báo kèm tờ trình điện tử tới Giám đốc. |
-| 5 | Giám đốc xem xét và ký duyệt điện tử (hoặc yêu cầu chỉnh sửa/từ chối kèm lý do). | Cập nhật trạng thái "Đã duyệt"; tự động khởi tạo vị trí mở tuyển trên pipeline ATS Kanban; thông báo kết quả cho Trưởng dự án. |
+**UC02 - Quản trị người dùng & Phân quyền RBAC**
 
-**3. UC07 - Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban**
-| Bước | Tác nhân (Chuyên viên Tuyển dụng) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | Truy cập giao diện Tuyển dụng ATS (`/recruitment-ats`), bấm "+ Đăng tin tuyển dụng" hoặc "+ Tiếp nhận ứng viên". | Hiển thị form tạo tin hoặc tiếp nhận hồ sơ ứng viên; lưu thông tin và đưa ứng viên vào cột "Ứng tuyển" (APPLIED). |
-| 2 | Đánh giá sơ loại CV, kéo-thả thẻ ứng viên sang cột "Sàng lọc" (SCREENING); xếp lịch phỏng vấn. | Cập nhật trạng thái ứng viên; tự động gửi email mời phỏng vấn kèm đường link xác nhận cho ứng viên. |
-| 3 | Cán bộ kỹ thuật và HR nhập điểm đánh giá vào Phiếu chấm điểm phỏng vấn (Scorecard). | Lưu trữ kết quả đánh giá; chuyển ứng viên qua các vòng phỏng vấn tiếp theo (INTERVIEW_1, INTERVIEW_2). |
-| 4 | Ứng viên đạt yêu cầu được chuyển sang cột "Đề nghị nhận việc" (OFFER); HR soạn thảo thư mời theo khung lương. | Lưu thông tin thư mời; gửi thư mời điện tử cho ứng viên. |
-| 5 | Khi ứng viên đồng ý nhận việc, HR bấm nút "1-Click Nhận việc" (HIRED). | Hệ thống tự động chuyển đổi hồ sơ ứng viên thành hồ sơ nhân viên chính thức, tự sinh Mã nhân viên và kích hoạt hợp đồng thử việc. |
+- **Tác nhân chính:** Nhân viên Quản trị IT
+- **Mục đích / Mô tả:** Khởi tạo, chỉnh sửa tài khoản người dùng, gán vai trò RBAC hai chiều (vai trò hệ thống × vai trò theo Space) và quản lý trạng thái tài khoản.
+- **Điều kiện tiên quyết:** Quản trị viên IT đã đăng nhập với vai trò ADMIN.
+- **Hậu điều kiện:** Tài khoản người dùng được cập nhật, quyền hạn mới có hiệu lực ngay lập tức; ghi vết kiểm toán hệ thống.
 
-**4. UC08 - Gửi thư mời nhận việc & Thỏa thuận mức lương**
-| Bước | Tác nhân (Chuyên viên Tuyển dụng / Ứng viên) | Hệ thống phần mềm |
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Chuyên viên tuyển dụng lập dự thảo thư mời (chức danh, mức lương, phụ cấp, ngày nhận việc). | Đối chiếu mức lương với thang bảng lương chuẩn của công ty: nếu vượt khung, yêu cầu phê duyệt riêng của Giám đốc. |
-| 2 | Gửi thư mời làm việc tới email của ứng viên. | Ghi nhận trạng thái "Đã gửi Offer"; tạo liên kết bảo mật có thời hạn để ứng viên phản hồi. |
-| 3 | Ứng viên truy cập liên kết và bấm "Chấp thuận nhận việc". | Cập nhật trạng thái "Đã chấp thuận"; thông báo cho HR để chuẩn bị công tác tiếp nhận và hội nhập nhân sự mới. |
+| 1 | Truy cập giao diện `/admin/users`, chọn "Thêm người dùng mới" hoặc chọn tài khoản cần phân quyền. | Hiển thị biểu mẫu thông tin tài khoản và ma trận quyền hạn RBAC. |
+| 2 | Nhập họ tên, email công vụ, mã nhân viên; lựa chọn vai trò (USER, KM_MANAGER, ADMIN) và gán quyền truy cập các không gian Space. | Kiểm tra tính duy nhất của email và mã nhân viên trong hệ thống. |
+| 3 | Bấm "Lưu thông tin". | Cập nhật bảng `User` và bảng quan hệ vai trò; tự động sinh mật khẩu tạm thời mã hóa gửi tới email nhân viên; ghi nhật ký kiểm toán `AuditLog`. |
 
-**5. UC13 - Đánh giá kết quả thử việc & Ký HĐLĐ chính thức**
-| Bước | Tác nhân (Trưởng dự án / HR / Giám đốc) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | - | Trước ngày hết hạn thử việc 15 ngày, tự động quét và gửi thông báo nhắc nhở Trưởng dự án và HR thực hiện đánh giá thử việc. |
-| 2 | Trưởng dự án mở Phiếu đánh giá trên phần mềm, chấm điểm theo các tiêu chí và đưa ra kết luận: "Đạt" hoặc "Không đạt". | Lưu kết quả đánh giá; nếu "Đạt", chuyển tiếp hồ sơ sang Tổ Tiền lương để xếp bậc lương chính thức. |
-| 3 | Chuyên viên tiền lương đối chiếu khung bậc lương, soạn dự thảo Hợp đồng lao động chính thức (12-36 tháng). | Chuyển hồ sơ sang trạng thái "Chờ ký duyệt"; gửi thông báo tới Giám đốc. |
-| 4 | Giám đốc xem xét và ký duyệt quyết định công nhận thử việc và HĐLĐ chính thức. | Hệ thống chuyển trạng thái nhân viên sang "Chính thức" (ACTIVE); tự động đăng ký tham gia BHXH bắt buộc từ tháng ký hợp đồng. |
+**UC03 - Quản trị cơ cấu tổ chức & Cây phòng ban**
 
-**6. UC16 - Quản lý thông tin cá nhân phân cấp 3 mức độ**
-| Bước | Tác nhân (Nhân viên) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | Nhân viên truy cập trang Hồ sơ cá nhân (`/profile`). | Hiển thị hồ sơ theo 3 phân cấp: Mức 1 (Tự cập nhật), Mức 2 (Yêu cầu thẩm định), Mức 3 (Khóa tổ chức). |
-| 2 | Nhân viên chỉnh sửa số điện thoại, địa chỉ tạm trú (Mức 1) và bấm "Lưu". | Hệ thống kiểm tra hợp lệ và cập nhật trực tiếp vào CSDL; hiển thị thông báo thành công tức thì. |
-| 3 | Nhân viên cần đổi số CCCD hoặc tài khoản ngân hàng (Mức 2): nhập thông tin mới, lý do và tải lên ảnh chụp minh chứng. | Kiểm tra tệp đính kèm; khởi tạo bản ghi đề xuất thay đổi (`ProfileChangeRequest`) với trạng thái "Chờ thẩm định". |
-| 4 | - | Gửi đề xuất vào hàng đợi thẩm định của Phòng Nhân sự; khóa tạm thời trường thông tin đang chờ xử lý để tránh gửi trùng lặp. |
+- **Tác nhân chính:** Nhân viên Quản trị IT / Ban Giám đốc
+- **Mục đích / Mô tả:** Thiết lập và quản lý cấu trúc cây phòng ban phân cấp đa tầng, định biên nhân sự và chỉ định trưởng đơn vị.
+- **Điều kiện tiên quyết:** Người dùng có quyền quản trị tổ chức.
+- **Hậu điều kiện:** Cơ cấu tổ chức mới được lưu trữ; sơ đồ cây phòng ban được cập nhật hiển thị theo thời gian thực.
 
-**7. UC17 - Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2**
-| Bước | Tác nhân (Chuyên viên Hồ sơ) | Hệ thống phần mềm |
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Chuyên viên hồ sơ truy cập hàng đợi thẩm định (`ProfileChangeReviewQueue`). | Hiển thị danh sách các đề xuất thay đổi thông tin Mức 2 đang ở trạng thái PENDING. |
-| 2 | Mở chi tiết một đề xuất, xem bảng so sánh trực quan dữ liệu hiện tại (Old Value) và dữ liệu mới đề xuất (New Value) kèm ảnh minh chứng. | Cho phép phóng to ảnh chứng từ (CCCD, thẻ ngân hàng) để kiểm tra tính xác thực. |
-| 3 | Cán bộ nhân sự bấm "Phê duyệt" (hoặc "Từ chối" kèm lý do phản hồi). | Nếu duyệt: Thực thi giao dịch nguyên tử cập nhật dữ liệu mới vào bảng nhân viên, ghi nhận vết kiểm toán và chuyển trạng thái APPROVED. |
-| 4 | - | Gửi thông báo kết quả phê duyệt qua hệ thống và email cá nhân của nhân viên đề xuất. |
+| 1 | Truy cập giao diện `/org-chart`, chọn thao tác thêm mới phòng ban hoặc kéo-thả đơn vị con trên cây tổ chức. | Hiển thị sơ đồ phân cấp trực quan dạng cây (Tree-view). |
+| 2 | Nhập mã đơn vị, tên đơn vị, chọn phòng ban cha (`parentId`), nhập chỉ tiêu định biên nhân sự và chỉ định Trưởng đơn vị (`headId`). | Kiểm tra quan hệ cha-con chống tạo vòng lặp vô hạn (Cycle detection). |
+| 3 | Bấm "Xác nhận cập nhật". | Cập nhật bảng `Department` trong CSDL; đồng bộ phạm vi quản lý duyệt đơn cho Trưởng đơn vị mới. |
 
-**8. UC19 - Điểm danh sinh trắc học khuôn mặt & Cảm biến IR**
-| Bước | Tác nhân (Nhân viên / Kiosk điểm danh) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | Nhân viên đăng ký khuôn mặt: đứng trước camera, tick đồng thuận xử lý dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP. | Trích xuất vector đặc trưng 128 chiều ngay tại trình duyệt, mã hóa AES-256-GCM và lưu vào bảng `FaceEmbedding` (tuyệt đối không lưu ảnh gốc). |
-| 2 | Hàng ngày, nhân viên đứng trước màn hình Kiosk chuyên dụng tại sảnh văn phòng (`/check-in`). | Camera kích hoạt kết hợp cảm biến hồng ngoại IR quét phổ nhiệt và chuyển động để chống giả mạo hình ảnh (Anti-Spoofing). |
-| 3 | - | Trích xuất vector khuôn mặt hiện tại, đối sánh khoảng cách Euclidean với vector đã lưu trữ trong CSDL. |
-| 4 | - | Nếu khớp: Phát âm thanh chào mừng, ghi nhận ngay một bản ghi sự kiện Check-in vào bảng bất biến `AttendanceEvent` với nguồn FACE; hiển thị giờ vào ca. |
-| 5 | - | Nếu không khớp: Thông báo thử lại; sau 3 lần không thành công, hướng dẫn nhân viên liên hệ lễ tân hoặc sử dụng hình thức điểm danh dự phòng. |
+**UC04 - Lập phiếu đề xuất tuyển dụng nhân sự**
 
-**9. UC20 - Quản trị kết nối thiết bị máy chấm công**
-| Bước | Tác nhân (Quản trị viên IT / Thiết bị phần cứng) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | Máy chấm công quẹt vân tay/thẻ từ tại văn phòng đẩy bản tin chấm công qua giao thức HTTP POST vào endpoint API webhook. | Endpoint `/api/attendance-devices/webhook` tiếp nhận bản tin, kiểm tra chữ ký xác thực HMAC-SHA256 theo từng thiết bị. |
-| 2 | - | Nếu chữ ký hợp lệ: Bóc tách mã nhân viên và thời gian quẹt thẻ, ghi nhận sự kiện vào bảng `AttendanceEvent` với nguồn MACHINE. |
-| 3 | Quản trị viên IT có thể nhập tệp nhật ký quẹt thẻ định dạng CSV hoặc kích hoạt bộ mô phỏng thiết bị (Simulator) để kiểm thử dữ liệu. | Đọc dữ liệu, kiểm tra trùng lặp bản ghi và nạp vào CSDL với cờ đánh dấu nguồn tương ứng. |
+- **Tác nhân chính:** Trưởng dự án (PM)
+- **Mục đích / Mô tả:** Khởi tạo nhu cầu bổ sung nhân sự cho dự án/phòng ban kèm yêu cầu chuyên môn, số lượng và khung lương đề xuất.
+- **Điều kiện tiên quyết:** Trưởng dự án có tài khoản hoạt động và thuộc đơn vị có nhu cầu nhân sự.
+- **Hậu điều kiện:** Phiếu đề xuất được tạo với trạng thái `PENDING_REVIEW` và gửi tới bộ phận Tuyển dụng.
 
-**10. UC21 - Đăng ký & Xét duyệt nghỉ phép trực tuyến**
-| Bước | Tác nhân (Nhân viên / Quản lý) | Hệ thống phần mềm |
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Nhân viên mở cổng ESS (`/leave`), chọn "Tạo đơn xin nghỉ phép". | Hiển thị số dư phép năm còn lại và lịch sử các ngày đã nghỉ. |
-| 2 | Chọn loại nghỉ phép (phép năm, việc riêng, nghỉ ốm, không lương), khoảng thời gian và lý do nghỉ; bấm gửi đơn. | Kiểm tra số dư phép: Nếu xin nghỉ phép năm vượt quá quỹ phép khả dụng, chặn gửi đơn và báo lỗi. Nếu hợp lệ, lưu đơn ở trạng thái PENDING. |
-| 3 | - | Gửi thông báo duyệt đơn tới Trưởng dự án quản lý trực tiếp. |
-| 4 | Trưởng dự án xem xét tiến độ công việc và phê duyệt đơn nghỉ phép. | Cập nhật trạng thái đơn sang APPROVED; tự động trừ số ngày nghỉ vào quỹ phép năm của nhân viên; ghi nhận ngày nghỉ vào bảng chấm công tháng. |
+| 1 | Truy cập `/recruitment-ats`, chọn "Lập đề xuất tuyển dụng"; điền chức danh, số lượng, cấp bậc (Junior/Senior), khung lương và mô tả công việc (JD). | Kiểm tra chỉ tiêu đề xuất với định biên còn trống của phòng ban. |
+| 2 | - | Nếu vượt định biên: Hiển thị cảnh báo yêu cầu bổ sung tờ trình giải trình đặc biệt gửi Giám đốc. |
+| 3 | Bấm "Gửi đề xuất". | Lưu bản ghi `Requisition` với trạng thái `PENDING_REVIEW`; gửi thông báo tới Chuyên viên tuyển dụng. |
 
-**11. UC25 - Tổng hợp & Chốt bảng chấm công tháng**
-| Bước | Tác nhân (Chuyên viên Tiền lương) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | Đến ngày 25 hàng tháng, Chuyên viên tiền lương truy cập phân hệ Bảng công (`/attendance`), kích hoạt lệnh tổng hợp công kỳ lương. | Tự động ghép nối các cặp sự kiện Check-in/Check-out sớm nhất và muộn nhất trong ngày của từng nhân viên đối chiếu với ca được gán. |
-| 2 | - | Tính toán số giờ làm việc thực tế, thời gian đi muộn, về sớm, giờ làm thêm đã duyệt và ngày nghỉ phép hợp lệ; gắn cờ các bản ghi bất thường. |
-| 3 | Chuyên viên tiền lương kiểm tra danh sách bản ghi lệch công, tiếp nhận các đơn giải trình giờ công (`AttendanceRegularization`) đã được PM duyệt. | Thực hiện hiệu chỉnh ngày công (bắt buộc nhập lý do và lưu vết kiểm toán tại `AttendanceCorrection`). |
-| 4 | Chuyên viên tiền lương bấm nút "Khóa bảng chấm công". | Chuyển trạng thái bảng công tháng sang LOCKED; ngăn chặn mọi thao tác chỉnh sửa giờ công; kết xuất dữ liệu phục vụ kỳ tính lương. |
+**UC05 - Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng**
 
-**12. UC27 - Vận hành động cơ tính toán bảng lương tự động**
-| Bước | Tác nhân (Chuyên viên Tiền lương) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | Chuyên viên tiền lương truy cập `/payroll-engine`, chọn kỳ lương cần xử lý và bấm "Tính toán bảng lương". | Kiểm tra điều kiện tiên quyết: Bảng chấm công của kỳ tương ứng bắt buộc phải ở trạng thái LOCKED. |
-| 2 | - | Động cơ tính lương (Payroll Engine) tự động thực thi các bước: <br>- Nạp mức lương hợp đồng và ngày công thực tế để tính lương thời gian; <br>- Tính tiền làm thêm giờ (hệ số 150% ngày thường, 200% ngày nghỉ, 300% ngày lễ); <br>- Cộng các khoản phụ cấp và tiền thưởng dự án đã phê duyệt; <br>- Trích nộp BHXH (8%), BHYT (1.5%), BHTN (1%) theo mức lương đóng bảo hiểm (tuân thủ mức trần quy định); <br>- Tính thuế TNCN theo biểu lũy tiến từng phần sau khi giảm trừ gia cảnh bản thân (11 triệu) và người phụ thuộc (4.4 triệu/người); <br>- Tự động khấu trừ nợ vay phúc lợi và tạm ứng lương (bảo đảm tổng khấu trừ <= 30% lương thực lĩnh Net). |
-| 3 | Chuyên viên tiền lương kiểm tra bảng tổng hợp lương, đối chiếu các trường hợp biến động bất thường. | Hiển thị bảng kê chi tiết từng thành phần thu nhập và khấu trừ (Breakdown View). |
-| 4 | Kế toán trưởng thẩm định và chuyển bảng lương trình Giám đốc phê duyệt. | Chuyển trạng thái kỳ lương sang REVIEWED. |
+- **Tác nhân chính:** Chuyên viên Tuyển dụng, Kế toán
+- **Mục đích / Mô tả:** Rà soát tính khả thi về nguồn ứng viên trên thị trường và thẩm định ngân sách quỹ lương phục vụ tuyển dụng.
+- **Điều kiện tiên quyết:** Tồn tại phiếu đề xuất tuyển dụng ở trạng thái `PENDING_REVIEW`.
+- **Hậu điều kiện:** Phiếu đề xuất chuyển sang trạng thái `PENDING_APPROVAL` hoặc bị từ chối/yêu cầu hiệu chỉnh.
 
-**13. UC28 - Phê duyệt & Khóa bất biến kỳ lương (LOCKED state)**
-| Bước | Tác nhân (Giám đốc / Chuyên viên Tiền lương) | Hệ thống phần mềm |
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Giám đốc xem xét bảng tổng hợp chi trả tiền lương và ký duyệt điện tử. | Ghi nhận quyết định phê duyệt của Giám đốc; chuyển trạng thái kỳ lương sang LOCKED. |
-| 2 | - | Kích hoạt cơ chế bảo vệ bất biến: Chặn tuyệt đối mọi hành vi chạy tính toán lại hoặc sửa đổi dữ liệu kỳ lương đã khóa (trả về lỗi HTTP 409 Conflict). |
-| 3 | Chuyên viên tiền lương kết xuất tệp lệnh chi chuyển khoản ngân hàng (Bank Transfer Batch File) và báo cáo bảo hiểm - thuế. | Sinh tệp Excel định dạng chuẩn ngân hàng và mẫu biểu cơ quan BHXH. |
-| 4 | - | Tự động phát hành Phiếu lương điện tử bảo mật (ePayslip) tới từng tài khoản nhân viên trên cổng ESS; gửi thông báo thông báo lương. |
+| 1 | Chuyên viên tuyển dụng mở phiếu đề xuất, rà soát mô tả công việc, khảo sát nguồn ứng viên nội bộ và ngoài thị trường; ghi nhận ý kiến thẩm định. | Cập nhật ý kiến thẩm định chuyên môn vào phiếu. |
+| 2 | Kế toán viên kiểm tra ngân sách quỹ lương và chi phí dự kiến cho vị trí tuyển dụng. | Ghi nhận xác nhận ngân sách hợp lệ. |
+| 3 | Chuyên viên tuyển dụng bấm "Chuyển phê duyệt". | Cập nhật trạng thái phiếu thành `PENDING_APPROVAL`; tạo thông báo tới Giám đốc điều hành. |
 
-**14. UC29 - Quản lý tạm ứng & Khoản vay phúc lợi nhân viên**
-| Bước | Tác nhân (Nhân viên / Chuyên viên Tiền lương) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | Nhân viên mở giao diện Phúc lợi & Khoản vay (`/loans`), sử dụng bộ mô phỏng tài chính chọn số tiền cần vay và kỳ hạn trả chậm (6-36 tháng). | Thuật toán tự động tính toán số tiền trích nợ mỗi kỳ (EMI), lãi suất ưu đãi và đối chiếu với mức lương thực lĩnh bình quân. |
-| 2 | - | Kiểm tra tuân thủ Điều 102 BLLĐ: Nếu số tiền trích nợ dự kiến vượt quá 30% lương thực lĩnh Net, hệ thống tự động cảnh báo và yêu cầu kéo dài thời hạn vay. |
-| 3 | Nhân viên nộp đơn đề nghị vay phúc lợi theo gói mục tiêu (trang bị thiết bị, học tập, hỗ trợ khẩn cấp). | Lưu đơn vào pipeline Kanban ở cột "Chờ Thẩm Định"; gửi thông báo cho C&B. |
-| 4 | Chuyên viên C&B sử dụng công cụ phê duyệt nhanh 1-chạm (cho các đơn đạt chuẩn quy tắc) hoặc trình Giám đốc duyệt khoản vay lớn. | Cập nhật đơn sang "Đang Trích Lương"; sinh lịch trình khấu trừ định kỳ (Amortization Schedule). |
-| 5 | - | Trong các kỳ tính lương tiếp theo, động cơ tính lương tự động trừ khoản hoàn nợ vào phiếu lương của nhân viên cho đến khi tất toán hoàn toàn. |
+**UC06 - Phê duyệt chỉ tiêu tuyển dụng**
 
-**15. UC36 - Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận**
-| Bước | Tác nhân (Nhân viên / CV Hồ sơ / Các bộ phận) | Hệ thống phần mềm |
-| :---: | :--- | :--- |
-| 1 | Nhân viên nộp đơn xin thôi việc trên hệ thống, nêu rõ lý do và ngày làm việc cuối cùng (tuân thủ thời hạn báo trước theo HĐLĐ). | Lưu đơn ở trạng thái PENDING; gửi thông báo cho PM trực tiếp và Phòng Nhân sự. |
-| 2 | Trưởng dự án và Giám đốc phê duyệt đơn xin thôi việc. | Cập nhật đơn sang APPROVED; hệ thống tự động khởi tạo Danh mục kiểm tra bàn giao đa bộ phận (`HandoverChecklist`) gồm 5 mục bắt buộc. |
-| 3 | Từng bộ phận thực hiện xác nhận trách nhiệm bàn giao trên phần mềm: <br>- Quản lý dự án: Xác nhận bàn giao mã nguồn, tài liệu dự án và quyền truy cập mã nguồn; <br>- Bộ phận Hành chính: Xác nhận thu hồi thẻ nhân viên, chìa khóa và tài sản làm việc; <br>- Bộ phận IT: Xác nhận thu hồi laptop, thiết bị kiểm thử và thu hồi tài khoản hệ thống (Email, Slack, Jira, VPN); <br>- Bộ phận C&B: Xác nhận quyết toán công nợ, hoàn ứng và tính toán ngày phép tồn; <br>- Hệ thống: Tự động xóa mẫu vector khuôn mặt sinh trắc học theo chuẩn Nghị định 13/2023. | Hệ thống kiểm tra điều kiện tiên quyết: Nút "Phát hành quyết định thôi việc" chỉ được kích hoạt khi cả 5/5 hạng mục đều đã được xác nhận hoàn tất. |
-| 4 | Giám đốc ký Quyết định chấm dứt hợp đồng lao động; Chuyên viên hồ sơ đóng sổ bảo hiểm xã hội và bàn giao hồ sơ cho người lao động. | Cập nhật trạng thái nhân viên sang RESIGNED; tự động khóa vĩnh viễn tài khoản truy cập vào ngày làm việc cuối cùng. |
+- **Tác nhân chính:** Giám đốc
+- **Mục đích / Mô tả:** Xem xét toàn diện phiếu đề xuất đã qua thẩm định và ban hành quyết định phê duyệt mở đợt tuyển dụng.
+- **Điều kiện tiên quyết:** Phiếu đề xuất ở trạng thái `PENDING_APPROVAL`.
+- **Hậu điều kiện:** Phiếu đề xuất chuyển sang trạng thái `OPEN` (Mở đợt tuyển dụng).
 
-**16. UC42 - Tự động rà soát & Phê duyệt nâng bậc lương định kỳ**
-| Bước | Tác nhân (Chuyên viên Hồ sơ / Giám đốc) | Hệ thống phần mềm |
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Định kỳ hàng quý, Chuyên viên hồ sơ kích hoạt chức năng rà soát nâng bậc lương theo chuẩn Nghị định 204/2004/NĐ-CP. | Tự động quét cơ sở dữ liệu quá trình lương (`SalaryProgress`), lọc các cán bộ có thời gian giữ bậc đạt đủ chu kỳ quy định (24 tháng đối với ngạch B, C; 36 tháng đối với ngạch A1 trở lên). |
+| 1 | Giám đốc đăng nhập, xem danh sách phiếu chờ duyệt trên Dashboard điều hành. | Hiển thị chi tiết đề xuất, ý kiến thẩm định của Tuyển dụng và Kế toán. |
+| 2 | Lựa chọn "Phê duyệt" (hoặc "Từ chối" kèm lý do phản hồi). | Hệ thống cập nhật trạng thái phiếu thành `OPEN`; phát sinh sự kiện thông báo cho bộ phận Tuyển dụng kích hoạt chiến dịch tìm kiếm ứng viên. |
+
+**UC07 - Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban**
+
+- **Tác nhân chính:** Chuyên viên Tuyển dụng
+- **Mục đích / Mô tả:** Tiếp nhận CV, đánh giá và điều phối ứng viên qua các vòng phỏng vấn trên bảng Kanban trực quan.
+- **Điều kiện tiên quyết:** Đợt tuyển dụng đang ở trạng thái `OPEN`.
+- **Hậu điều kiện:** Trạng thái ứng viên được cập nhật liên tục qua các vòng; lịch phỏng vấn được đồng bộ.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Truy cập bảng Kanban `/recruitment-ats`, chọn đợt tuyển dụng; tải lên CV ứng viên hoặc tiếp nhận CV từ cổng ứng tuyển. | Tự động bóc tách thông tin ứng viên, tạo thẻ ứng viên ở cột `APPLIED`. |
+| 2 | Kéo-thả thẻ ứng viên qua các cột: Sàng lọc (`SCREENING`) -> Phỏng vấn 1 (`INTERVIEW_1`) -> Phỏng vấn 2 (`INTERVIEW_2`). | Mở popup thiết lập lịch phỏng vấn, chọn người phỏng vấn (Interviewer) và phòng họp. |
+| 3 | Nhập điểm đánh giá phỏng vấn sau buổi họp. | Lưu trữ phiếu đánh giá năng lực ứng viên; cập nhật điểm số bình quân vào hồ sơ. |
+
+**UC08 - Gửi thư mời nhận việc & Thỏa thuận mức lương**
+
+- **Tác nhân chính:** Chuyên viên Tuyển dụng, Ứng viên
+- **Mục đích / Mô tả:** Lập thư mời làm việc (Offer Letter) kèm thỏa thuận lương, gửi cho ứng viên và ghi nhận kết quả phản hồi.
+- **Điều kiện tiên quyết:** Ứng viên đã vượt qua các vòng phỏng vấn (cột `OFFER_PENDING`).
+- **Hậu điều kiện:** Ứng viên chấp nhận offer; hệ thống sẵn sàng chuyển đổi hồ sơ sang quy trình tiếp nhận.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Chuyên viên tuyển dụng chọn ứng viên đạt yêu cầu, nhập thông tin mức lương đề xuất, ngày bắt đầu đi làm và thời gian thử việc; bấm "Tạo thư mời". | Hệ thống áp mẫu Offer Letter chuẩn của công ty, kiểm tra mức lương đề xuất có nằm trong khung lương đã duyệt. |
+| 2 | Bấm "Gửi thư mời nhận việc". | Hệ thống gửi email tự động kèm Offer Letter có chữ ký số tới ứng viên và tạo đường dẫn xác nhận trực tuyến. |
+| 3 | Ứng viên truy cập đường dẫn, bấm "Đồng ý nhận việc" (hoặc từ chối/thỏa thuận lại). | Cập nhật trạng thái ứng viên sang `OFFER_ACCEPTED`; tự động kích hoạt luồng hội nhập Onboarding. |
+
+**UC09 - Quản lý hồ sơ nhân viên toàn diện**
+
+- **Tác nhân chính:** Chuyên viên Hồ sơ
+- **Mục đích / Mô tả:** Quản trị hồ sơ lý lịch trích ngang của toàn thể nhân viên, bao gồm thông tin cá nhân, phòng ban, quá trình công tác.
+- **Điều kiện tiên quyết:** Chuyên viên hồ sơ có quyền quản trị dữ liệu nhân sự.
+- **Hậu điều kiện:** Hồ sơ nhân viên được lưu trữ đầy đủ trong CSDL, phục vụ cho mọi phân hệ khác.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Truy cập `/employees`, tra cứu nhân viên theo tên, mã NV hoặc phòng ban. | Hiển thị danh sách nhân viên kèm ảnh, chức danh, trạng thái làm việc. |
+| 2 | Mở chi tiết hồ sơ; cập nhật thông tin cá nhân, số CCCD, hộ khẩu, người phụ thuộc giảm trừ gia cảnh. | Kiểm tra tính hợp lệ dữ liệu (độ dài CCCD, định dạng ngày sinh, mã số thuế). |
+| 3 | Bấm "Lưu thay đổi". | Cập nhật bản ghi `Employee`; lưu lịch sử thay đổi vào bảng kiểm toán. |
+
+**UC10 - Quản lý hợp đồng lao động & Phụ lục hợp đồng**
+
+- **Tác nhân chính:** Chuyên viên Hồ sơ
+- **Mục đích / Mô tả:** Khởi tạo, gia hạn, ký kết HĐLĐ (thử việc, xác định thời hạn, không xác định thời hạn) và cảnh báo hợp đồng sắp hết hạn.
+- **Điều kiện tiên quyết:** Nhân viên đã có hồ sơ trong hệ thống.
+- **Hậu điều kiện:** HĐLĐ được ban hành; ngày hết hạn được đưa vào hàng đợi cảnh báo tự động.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Vào mục Hợp đồng trong hồ sơ nhân viên, chọn "Tạo mới hợp đồng". | Hiển thị form nhập: Loại hợp đồng, thời hạn, mức lương đóng BHXH, chức danh công việc. |
+| 2 | Điền thông tin và đính kèm bản quét hợp đồng đã ký; bấm "Lưu hợp đồng". | Lưu bản ghi `Contract`; cập nhật mức lương cơ bản hiện tại của nhân viên. |
+| 3 | - | Hệ thống tự động kích hoạt tiến trình định kỳ quét các HĐLĐ còn hiệu lực dưới 45 ngày để cảnh báo cho HR gia hạn. |
+
+**UC11 - Quản lý văn bằng, chứng chỉ chuyên môn**
+
+- **Tác nhân chính:** Chuyên viên Hồ sơ
+- **Mục đích / Mô tả:** Lưu trữ, phân loại văn bằng đại học, chứng chỉ kỹ thuật quốc tế (AWS, PMP, Scrum Master...) và theo dõi hạn sử dụng.
+- **Điều kiện tiên quyết:** Nhân viên đã nộp văn bằng chứng chỉ cho phòng nhân sự.
+- **Hậu điều kiện:** Dữ liệu bằng cấp được chuẩn hóa và gắn liền với hồ sơ năng lực nhân viên.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Tại hồ sơ nhân viên, chuyển sang tab "Bằng cấp & Chứng chỉ", chọn "Thêm mới". | Hiển thị form khai báo: Tên chứng chỉ, tổ chức cấp, ngày cấp, ngày hết hạn, bản mềm scan. |
+| 2 | Nhập thông tin và bấm "Lưu". | Kiểm tra tính hợp lệ của thời hạn chứng chỉ, cập nhật bảng `Certificate`. |
+| 3 | - | Hệ thống tự động cập nhật ma trận kỹ năng của nhân viên phục vụ điều phối dự án. |
+
+**UC12 - Mượn - trả hồ sơ, chứng chỉ bản gốc**
+
+- **Tác nhân chính:** Nhân viên, Chuyên viên Hồ sơ
+- **Mục đích / Mô tả:** Quy trình tiếp nhận đề xuất mượn hồ sơ gốc (bằng tốt nghiệp, sổ bảo hiểm) từ nhân viên và quản lý việc hoàn trả đúng hạn.
+- **Điều kiện tiên quyết:** Phòng nhân sự đang lưu giữ bản gốc hồ sơ của nhân viên.
+- **Hậu điều kiện:** Phiếu mượn được tạo; trạng thái vị trí hồ sơ vật lý được cập nhật.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên gửi yêu cầu mượn hồ sơ gốc qua cổng ESS, nêu rõ lý do và ngày cam kết hoàn trả. | Tạo phiếu mượn ở trạng thái `PENDING` gửi tới Chuyên viên hồ sơ. |
+| 2 | Chuyên viên hồ sơ kiểm tra vị trí tủ lưu trữ, bàn giao hồ sơ vật lý và bấm "Xác nhận bàn giao". | Chuyển trạng thái phiếu mượn sang `BORROWED`; lưu ngày giờ bàn giao thực tế. |
+| 3 | Khi nhân viên trả hồ sơ, Chuyên viên hồ sơ kiểm tra tính nguyên vẹn và bấm "Xác nhận đã trả". | Chuyển trạng thái sang `RETURNED`; lưu vết đóng phiếu mượn. |
+
+**UC13 - Đánh giá kết quả thử việc & Ký HĐLĐ chính thức**
+
+- **Tác nhân chính:** Trưởng dự án, Chuyên viên Hồ sơ, Giám đốc
+- **Mục đích / Mô tả:** Tự động kích hoạt quy trình đánh giá kết thúc thời gian thử việc và ban hành HĐLĐ chính thức nếu đạt yêu cầu.
+- **Điều kiện tiên quyết:** Nhân viên có hợp đồng thử việc sắp kết thúc trong vòng 15 ngày tới.
+- **Hậu điều kiện:** Kết quả thử việc được phê duyệt; tự động sinh hợp đồng lao động chính thức.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Hệ thống tự động gửi thông báo nhắc đánh giá thử việc tới Trưởng dự án quản lý trực tiếp. | Tạo mẫu đánh giá thử việc trên hệ thống. |
+| 2 | Trưởng dự án truy cập hệ thống, chấm điểm mức độ hoàn thành công việc, tinh thần kỷ luật và chọn kết luận: "Đạt" hoặc "Không đạt". | Lưu kết quả đánh giá, gửi thông báo tới Giám đốc phê duyệt. |
+| 3 | Giám đốc ký duyệt kết quả đánh giá. | Hệ thống chuyển trạng thái nhân viên sang chính thức (`OFFICIAL`); tự động sinh bản thảo Hợp đồng xác định thời hạn 1 năm. |
+
+**UC14 - Lộ trình hội nhập nhân viên mới (Onboarding Checklist)**
+
+- **Tác nhân chính:** Nhân viên mới, Chuyên viên Hồ sơ, Mentor
+- **Mục đích / Mô tả:** Quản trị danh sách các đầu việc hội nhập trong 14 ngày đầu tiên của nhân viên mới (cấp email, máy tính, học văn hóa doanh nghiệp).
+- **Điều kiện tiên quyết:** Nhân viên mới nhận việc vào ngày đầu tiên (Day-1).
+- **Hậu điều kiện:** Toàn bộ các nhiệm vụ trong checklist hoàn thành; nhân viên hòa nhập môi trường làm việc.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Vào ngày nhận việc, hệ thống tự động khởi tạo danh sách Onboarding Checklist gồm các mục: IT cấp máy tính/tài khoản, HR phổ biến nội quy, Mentor hướng dẫn dự án. | Hiển thị bảng tiến độ hội nhập trên trang cá nhân của nhân viên mới. |
+| 2 | Mỗi bên liên quan (IT, Mentor, HR, Nhân viên) hoàn thành công việc nào thì bấm tick chọn mục đó. | Hệ thống cập nhật phần trăm tiến độ hoàn thành theo thời gian thực. |
+| 3 | Khi đủ 100% mục hoàn tất, Mentor và HR bấm "Xác nhận hoàn thành hội nhập". | Đóng quy trình hội nhập, ghi nhận nhân viên sẵn sàng nhận bàn giao công việc chính thức. |
+
+**UC15 - Cổng tự phục vụ nhân viên tập trung (ESS Portal)**
+
+- **Tác nhân chính:** Toàn thể nhân viên
+- **Mục đích / Mô tả:** Cung cấp trang tổng quan tập trung cho nhân viên xem số dư phép, thông tin chấm công hàng ngày, phiếu lương và nộp đơn từ trực tuyến.
+- **Điều kiện tiên quyết:** Nhân viên đã đăng nhập tài khoản vào hệ thống.
+- **Hậu điều kiện:** Mọi thông tin cá nhân liên quan được hiển thị bảo mật, đầy đủ và trực quan.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên truy cập `/ess`. | Hệ thống tải dữ liệu tổng hợp: Thống kê giờ công tháng này, số ngày phép còn lại, thông báo đơn từ và liên kết nhanh tới các biểu mẫu. |
+| 2 | Nhân viên chọn xem Phiếu lương điện tử gần nhất. | Yêu cầu nhập lại mật khẩu hoặc mã PIN bảo mật; hiển thị chi tiết thu nhập, thuế TNCN và thực lĩnh. |
+
+**UC16 - Quản lý thông tin cá nhân phân cấp 3 mức độ**
+
+- **Tác nhân chính:** Toàn thể nhân viên
+- **Mục đích / Mô tả:** Cho phép nhân viên tự xem và sửa đổi thông tin cá nhân theo cơ chế phân quyền bảo vệ 3 mức (Mức 1 tự sửa, Mức 2 phải duyệt, Mức 3 khóa).
+- **Điều kiện tiên quyết:** Nhân viên đang truy cập trang thông tin cá nhân `/profile`.
+- **Hậu điều kiện:** Thông tin Mức 1 được cập nhật tức thì; thông tin Mức 2 sinh phiếu đề xuất chờ thẩm định.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên truy cập `/profile`, xem các trường thông tin được chia theo 3 nhóm màu sắc nhận diện. | Phân định quyền: Mức 1 (SĐT, nơi ở hiện tại, liên hệ khẩn cấp) cho phép sửa; Mức 2 (CCCD, STK ngân hàng) cho phép đề xuất; Mức 3 (Lương, Chức danh) chỉ đọc. |
+| 2 | Nhân viên thay đổi SĐT (Mức 1) và bấm "Cập nhật". | Hệ thống lưu ngay vào CSDL mà không cần phê duyệt. |
+| 3 | Nhân viên sửa số tài khoản ngân hàng (Mức 2), tải ảnh thẻ ATM minh chứng và bấm "Gửi đề xuất". | Hệ thống sinh bản ghi `ProfileChangeRequest` ở trạng thái `PENDING` và đẩy vào hàng đợi của bộ phận nhân sự. |
+
+**UC17 - Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2**
+
+- **Tác nhân chính:** Chuyên viên Hồ sơ, Quản trị viên
+- **Mục đích / Mô tả:** Kiểm tra tính xác thực của đề xuất thay đổi thông tin quan trọng (CCCD, ngân hàng) kèm ảnh minh chứng trước khi áp dụng vào hồ sơ gốc.
+- **Điều kiện tiên quyết:** Tồn tại yêu cầu thay đổi thông tin ở trạng thái `PENDING`.
+- **Hậu điều kiện:** Hồ sơ nhân viên được cập nhật dữ liệu mới nếu được duyệt; hoặc bị từ chối kèm lý do.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Chuyên viên hồ sơ mở danh sách phê duyệt hồ sơ. | Hiển thị bảng so sánh đối chiếu: Giá trị cũ (Old Value) vs Giá trị mới đề xuất (New Value) cùng hình ảnh đính kèm. |
+| 2 | Chuyên viên đối chiếu tính hợp lệ của giấy tờ minh chứng. | Kích hoạt nút phê duyệt. |
+| 3 | Bấm "Duyệt yêu cầu". | Thực thi giao dịch CSDL nguyên tử: Cập nhật thông tin vào bảng `Employee`, đổi trạng thái yêu cầu sang `APPROVED`, gửi thông báo kết quả tới nhân viên. |
+
+**UC18 - Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca**
+
+- **Tác nhân chính:** Toàn thể nhân viên
+- **Mục đích / Mô tả:** Thu thập sự kiện Check-in / Check-out từ nhiều kênh (Web Portal, Ứng dụng di động, Máy chấm công) vào bảng sự kiện bất biến.
+- **Điều kiện tiên quyết:** Nhân viên có mặt tại điểm làm việc hoặc trong khung giờ quy định.
+- **Hậu điều kiện:** Sự kiện chấm công thô được ghi nhận kèm dấu vết thời gian bất biến.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên thực hiện thao tác Check-in trên Web hoặc quẹt thẻ tại cổng. | Tiếp nhận sự kiện; ghi nhận thời gian máy chủ (Server Timestamp), mã thiết bị và tọa độ GPS (nếu qua mobile). |
+| 2 | - | Ghi bản ghi bất biến vào bảng `AttendanceEvent`. |
+| 3 | - | Khớp giờ check-in với ca làm việc được phân bổ để xác định trạng thái ban đầu: Đúng giờ, Đi muộn (Late). Hiển thị phản hồi tức thì cho nhân viên. |
+
+**UC19 - Điểm danh sinh trắc học khuôn mặt & Cảm biến IR**
+
+- **Tác nhân chính:** Nhân viên, Kiosk điểm danh
+- **Mục đích / Mô tả:** Nhận diện khuôn mặt thời gian thực kết hợp cảm biến hồng ngoại chống giả mạo tại các điểm Kiosk văn phòng.
+- **Điều kiện tiên quyết:** Nhân viên đã được đăng ký vector đặc trưng khuôn mặt (mã hóa AES-256-GCM) trong CSDL.
+- **Hậu điều kiện:** Nhân diện thành công và sinh sự kiện chấm công tự động.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên đứng trước camera Kiosk điểm danh tại cửa ra vào văn phòng. | Camera thu nhận luồng hình ảnh; cảm biến hồng ngoại (IR) kiểm tra độ sống (Liveness detection) để chống dùng ảnh chụp/màn hình điện thoại. |
+| 2 | - | Trích xuất vector khuôn mặt 512 chiều, đối chiếu với cơ sở dữ liệu vector bằng thuật toán Cosine Similarity. |
+| 3 | - | Nếu độ tương đồng >= 0.85: Xác định danh tính nhân viên, phát âm thanh "Xin chào [Tên NV] - Điểm danh thành công", ghi nhận sự kiện Check-in vào CSDL. |
+| 4 | - | Nếu thất bại: Thông báo "Không nhận diện được, vui lòng thử lại". |
+
+**UC20 - Quản trị kết nối thiết bị máy chấm công**
+
+- **Tác nhân chính:** Chuyên viên Hồ sơ, Quản trị IT
+- **Mục đích / Mô tả:** Cấu hình kết nối mạng, quản lý webhook đồng bộ dữ liệu thời gian thực từ các máy chấm công vân tay/thẻ từ tại các chi nhánh.
+- **Điều kiện tiên quyết:** Máy chấm công vật lý được kết nối mạng nội bộ công ty.
+- **Hậu điều kiện:** Dữ liệu chấm công từ thiết bị được đồng bộ tự động và an toàn vào CSDL.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Quản trị IT vào mục Quản trị thiết bị, khai báo thông số máy: IP, Serial Number, vị trí văn phòng và khóa bảo mật HMAC. | Hệ thống kiểm tra kết nối mạng (Ping / Handshake) tới thiết bị. |
+| 2 | Thiết lập endpoint tiếp nhận Webhook sự kiện. | Hệ thống sẵn sàng lắng nghe các HTTP POST webhook gửi từ thiết bị. |
+| 3 | Khi máy chấm công gửi dữ liệu thô, hệ thống kiểm tra chữ ký số HMAC-SHA256. | Nếu chữ ký hợp lệ: Giải nén gói tin và ghi nhận hàng loạt sự kiện vào CSDL. |
+
+**UC21 - Đăng ký & Xét duyệt nghỉ phép trực tuyến**
+
+- **Tác nhân chính:** Nhân viên, Trưởng dự án, Chuyên viên Hồ sơ
+- **Mục đích / Mô tả:** Nộp đơn xin nghỉ phép (phép năm, phép ốm, việc riêng), tự động kiểm tra quỹ phép khả dụng và luồng phê duyệt trực tuyến.
+- **Điều kiện tiên quyết:** Nhân viên có tài khoản và còn số dư phép khả dụng trong năm.
+- **Hậu điều kiện:** Đơn phép được duyệt; quỹ phép của nhân viên được trừ tự động; dữ liệu nạp vào bảng công.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên vào `/leave`, chọn "Tạo đơn xin nghỉ phép"; chọn loại phép, khoảng ngày nghỉ và lý do. | Hệ thống kiểm tra số dư phép (`LeaveBalance`) và kiểm tra trùng lịch với các đơn phép đã nộp trước đó. |
+| 2 | Bấm "Gửi đơn". | Tạo đơn trạng thái `PENDING`, gửi email thông báo kèm link phê duyệt nhanh cho Trưởng dự án (PM). |
+| 3 | Trưởng dự án mở đơn, xem xét phân bổ công việc của nhóm và bấm "Duyệt". | Hệ thống trừ ngay số ngày nghỉ vào quỹ phép của nhân viên; ghi chú ngày nghỉ vào bảng chấm công tháng; gửi thông báo hoàn tất cho nhân viên. |
+
+**UC22 - Đăng ký & Phê duyệt làm thêm giờ (OT)**
+
+- **Tác nhân chính:** Nhân viên, Trưởng dự án, Chuyên viên Tiền lương
+- **Mục đích / Mô tả:** Đăng ký kế hoạch làm thêm giờ ngoài giờ tiêu chuẩn, kiểm soát trần thời gian OT theo luật và phê duyệt ghi nhận.
+- **Điều kiện tiên quyết:** Có nhu cầu làm thêm giờ do tiến độ dự án yêu cầu.
+- **Hậu điều kiện:** Giờ làm thêm được duyệt và tự động đưa vào bảng công tháng phục vụ tính lương hệ số cao.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên lập phiếu đăng ký OT trên hệ thống: Chọn dự án, ngày làm thêm, khung giờ (từ mấy giờ đến mấy giờ), lý do. | Hệ thống kiểm tra trần OT: Đảm bảo không quá 4h/ngày và không vượt trần 40h/tháng theo quy định Bộ luật Lao động. |
+| 2 | Bấm "Nộp phiếu OT". | Chuyển đơn tới Trưởng dự án phụ trách. |
+| 3 | Trưởng dự án duyệt phiếu. | Hệ thống lưu trạng thái `APPROVED`; nạp kế hoạch OT vào cơ chế đối soát chấm công để tính hệ số lương OT (150%, 200%, 300%). |
+
+**UC23 - Lập lịch và phân ca làm việc (Shift Scheduling)**
+
+- **Tác nhân chính:** Trưởng dự án, Chuyên viên Tiền lương
+- **Mục đích / Mô tả:** Thiết lập danh mục ca làm việc (ca hành chính, ca hỗ trợ khách hàng, ca đêm) và gán lịch ca cho nhân viên theo tuần/tháng.
+- **Điều kiện tiên quyết:** Danh mục ca làm việc đã được khai báo khung giờ chuẩn.
+- **Hậu điều kiện:** Lịch ca được công bố; làm căn cứ tự động so khớp giờ check-in/out.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Người quản lý truy cập `/shifts`, chọn phòng ban hoặc dự án và chọn tuần làm việc. | Hiển thị ma trận phân ca dạng lưới (Lịch tuần/tháng). |
+| 2 | Gán ca làm việc (Ca Sáng 8h-12h, Ca Chiều 13h30-17h30, Ca Tối) cho từng nhân sự hoặc áp dụng lịch mẫu cho cả nhóm. | Kiểm tra thời gian nghỉ ngơi tối thiểu giữa hai ca liên tiếp của nhân viên. |
+| 3 | Bấm "Công bố lịch ca". | Lưu bản ghi phân ca; gửi thông báo lịch làm việc mới tới ứng dụng di động/web của từng nhân viên. |
+
+**UC24 - Giải trình bổ sung giờ công & Xử lý lệch công**
+
+- **Tác nhân chính:** Nhân viên, Trưởng dự án, Chuyên viên Tiền lương
+- **Mục đích / Mô tả:** Cho phép nhân viên gửi đơn giải trình khi quên quẹt thẻ hoặc đi công tác đột xuất kèm minh chứng để hiệu chỉnh dữ liệu chấm công.
+- **Điều kiện tiên quyết:** Bảng chấm công có bản ghi ghi nhận đi muộn/về sớm hoặc thiếu lượt quẹt thẻ.
+- **Hậu điều kiện:** Dữ liệu công được điều chỉnh về trạng thái hợp lệ có lưu vết kiểm toán đầy đủ.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên xem bảng công cá nhân, bấm vào ngày bị thiếu công để tạo "Đơn giải trình quên quẹt thẻ / Công tác". | Hiển thị form giải trình: Chọn loại lý do (quên thẻ, hỏng máy, gặp khách hàng), nhập giờ vào/ra thực tế, tải tài liệu/ảnh minh chứng. |
+| 2 | Bấm "Gửi giải trình". | Gửi đơn tới Quản lý trực tiếp. |
+| 3 | Quản lý xác nhận và bấm "Chấp thuận". | Hệ thống cập nhật lại ngày công trong bảng tổng hợp `AttendanceDay`; lưu lại lý do và danh tính người duyệt vào lịch sử kiểm toán. |
+
+**UC25 - Tổng hợp & Chốt bảng chấm công tháng**
+
+- **Tác nhân chính:** Chuyên viên Tiền lương, Trưởng dự án
+- **Mục đích / Mô tả:** Khóa dữ liệu chấm công định kỳ ngày 25 hàng tháng, giải quyết toàn bộ sai lệch công và tổng hợp bảng công chuẩn bị tính lương.
+- **Điều kiện tiên quyết:** Đến kỳ chốt công tháng (thường là ngày 25 của tháng làm việc).
+- **Hậu điều kiện:** Bảng công tháng được chốt ở trạng thái `LOCKED`, chuyển giao toàn bộ số liệu công cho phân hệ tính lương.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Chuyên viên tiền lương chọn kỳ công (Tháng/Năm), bấm "Khóa dữ liệu thô". | Ngăn chặn nhân viên nộp thêm đơn giải trình hoặc đơn phép cho kỳ công đó. |
+| 2 | Hệ thống chạy batch job tổng hợp dữ liệu: | Tự động tính: Tổng ngày công chuẩn, ngày công thực tế, số ngày nghỉ hưởng lương/không lương, tổng số giờ OT theo từng hệ số. |
+| 3 | Chuyên viên rà soát các bản ghi cảnh báo lệch công còn tồn đọng và xử lý triệt để. | Hiển thị bảng tổng hợp công toàn công ty. |
+| 4 | Bấm "Chốt bảng công". | Chuyển trạng thái bảng công sang `FINALIZED`, gửi tín hiệu sẵn sàng sang phân hệ tính lương. |
+
+**UC26 - Cấu hình công thức và ngạch bậc lương**
+
+- **Tác nhân chính:** Chuyên viên Tiền lương
+- **Mục đích / Mô tả:** Thiết lập các thành phần thu nhập (lương cứng, phụ cấp ăn trưa, xăng xe, trách nhiệm), định mức đóng bảo hiểm và biểu thuế TNCN lũy tiến.
+- **Điều kiện tiên quyết:** Chuyên viên tiền lương có quyền quản trị phân hệ đãi ngộ.
+- **Hậu điều kiện:** Quy tắc tính lương mới được lưu lại, áp dụng tự động cho các chu kỳ tính lương tiếp theo.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Truy cập `/payroll-engine`, chọn "Cấu hình thành phần lương". | Hiển thị danh mục phụ cấp, khoản khấu trừ và công thức tính. |
+| 2 | Thiết lập mức giảm trừ gia cảnh bản thân (11 triệu/tháng) và người phụ thuộc (4.4 triệu/người/tháng); cập nhật tỷ lệ đóng BHXH (8%), BHYT (1.5%), BHTN (1%) và mức lương cơ sở trần. | Kiểm tra tính hợp lệ về mặt pháp luật của các tỷ lệ phần trăm. |
+| 3 | Bấm "Lưu cấu hình". | Lưu phiên bản cấu hình lương mới có ghi nhận ngày bắt đầu hiệu lực. |
+
+**UC27 - Vận hành chức năng tính lương tự động**
+
+- **Tác nhân chính:** Chuyên viên Tiền lương
+- **Mục đích / Mô tả:** Khởi chạy tiến trình tính toán tiền lương tự động cho toàn thể nhân viên dựa trên bảng công đã chốt, hợp đồng lao động và thuế/bảo hiểm.
+- **Điều kiện tiên quyết:** Bảng chấm công kỳ này đã được chốt (`FINALIZED`) và hợp đồng còn hiệu lực.
+- **Hậu điều kiện:** Bảng thanh toán tiền lương và phiếu lương điện tử của toàn bộ nhân viên được tạo lập ở trạng thái `DRAFT`.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Chuyên viên tiền lương truy cập `/payroll-engine`, chọn kỳ lương cần tính và bấm "Khởi chạy tính lương tự động". | Hệ thống hiển thị thanh tiến trình xử lý theo lô (Batch processing). |
+| 2 | - | Hệ thống tự động thực thi các phép tính song song cho từng nhân viên: <br>1. Lương thời gian = (Lương cơ bản / Ngày công chuẩn) * Ngày công thực tế; <br>2. Tiền OT = Giờ OT * Đơn giá giờ * Hệ số (1.5 / 2.0 / 3.0); <br>3. Tổng phụ cấp + Thưởng; <br>4. Trừ BHXH (10.5% lương đóng BH, áp dụng mức trần 20 lần lương cơ sở); <br>5. Tính thuế TNCN lũy tiến từng phần 7 bậc sau khi giảm trừ gia cảnh; <br>6. Tự động khấu trừ nợ vay phúc lợi / tạm ứng (đảm bảo tổng trừ <= 30% lương Net). |
+| 3 | - | Sinh tự động bảng tổng hợp tiền lương và các phiếu lương chi tiết (`SalarySlip`). Hiển thị cảnh báo đối với các trường hợp lương âm hoặc bất thường để HR kiểm tra. |
+
+**UC28 - Phê duyệt & Khóa bất biến kỳ lương (LOCKED state)**
+
+- **Tác nhân chính:** Chuyên viên Tiền lương, Giám đốc
+- **Mục đích / Mô tả:** Trình duyệt bảng lương lên Ban Giám đốc và thực hiện khóa kỳ lương bất biến, xuất file ủy nhiệm chi ngân hàng.
+- **Điều kiện tiên quyết:** Bảng lương đã được tính toán hoàn chỉnh ở trạng thái `DRAFT`.
+- **Hậu điều kiện:** Kỳ lương chuyển sang `LOCKED`; kích hoạt chặn mọi hành vi chỉnh sửa (HTTP 409 Conflict); phát hành phiếu lương bảo mật.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Chuyên viên tiền lương rà soát bảng tổng kết quỹ lương, bấm "Trình ký phê duyệt". | Đóng gói báo cáo quỹ lương, gửi thông báo phê duyệt tới Ban Giám đốc. |
+| 2 | Giám đốc đăng nhập, kiểm tra báo cáo tổng quỹ lương và ký phê duyệt điện tử. | Cập nhật trạng thái bảng lương thành `APPROVED`. |
+| 3 | Chuyên viên tiền lương bấm "Khóa kỳ lương (Lock Payroll)". | Chuyển trạng thái kỳ lương sang `LOCKED` bất biến; kích hoạt cơ chế chặn hoàn toàn mọi thao tác tính lại; tự động xuất file chi lương theo định dạng ngân hàng (VBB, Vietcombank...); phát hành phiếu lương tới cổng ESS của từng nhân viên. |
+
+**UC29 - Quản lý tạm ứng & Khoản vay phúc lợi nhân viên**
+
+- **Tác nhân chính:** Nhân viên, Chuyên viên Tiền lương, Giám đốc
+- **Mục đích / Mô tả:** Quy trình nhân viên nộp đơn vay phúc lợi công ty hoặc tạm ứng lương; tự động thẩm định định mức khấu trừ hàng tháng qua bảng lương.
+- **Điều kiện tiên quyết:** Nhân viên chính thức có thời gian công tác từ 6 tháng trở lên.
+- **Hậu điều kiện:** Khoản vay được giải ngân; lịch hoàn nợ tự động được tích hợp vào các kỳ lương kế tiếp.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên truy cập `/loans`, nhập số tiền cần vay/tạm ứng, mục đích và chọn kỳ hạn trả nợ (3 - 12 tháng). | Hệ thống mô phỏng lịch trả góp, tự động kiểm tra số tiền trả hàng tháng không được vượt quá 30% mức lương thực lĩnh bình quân. |
+| 2 | Bấm "Gửi đơn vay". | Gửi đơn tới Chuyên viên tiền lương và Giám đốc phê duyệt. |
+| 3 | Giám đốc duyệt khoản vay. | Hệ thống tạo hợp đồng vay phúc lợi; kích hoạt thông báo sang Kế toán giải ngân; đưa các kỳ trả góp vào danh sách khấu trừ tự động của bảng lương. |
+
+**UC30 - Quản lý đề xuất công tác & Quyết toán chi phí (T&E)**
+
+- **Tác nhân chính:** Nhân viên, Trưởng dự án, Kế toán
+- **Mục đích / Mô tả:** Lập kế hoạch đi công tác, tạm ứng công tác phí và kê khai hóa đơn điện tử quyết toán chi phí sau chuyến đi.
+- **Điều kiện tiên quyết:** Có phát sinh nhu cầu đi công tác phục vụ dự án.
+- **Hậu điều kiện:** Chi phí công tác được quyết toán minh bạch; hoàn ứng hoặc chi trả bổ sung cho nhân viên.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên vào `/expense-claims`, tạo "Đề xuất công tác": Điền điểm đến, thời gian, dự toán vé máy bay/khách sạn/công tác phí. | Gửi đề xuất tới Trưởng dự án và Kế toán thẩm định. |
+| 2 | Sau khi chuyến công tác hoàn thành, nhân viên tải lên các hóa đơn điện tử (vé máy bay, khách sạn, tiếp khách) để quyết toán. | Kế toán đối soát tính hợp lệ của hóa đơn theo quy chuẩn thuế. |
+| 3 | Kế toán bấm "Phê duyệt quyết toán". | Hệ thống đối trừ với số tiền đã tạm ứng, xuất phiếu thanh toán phần chênh lệch cho nhân viên. |
+
+**UC31 - Quản lý cấp phát & Thu hồi tài sản làm việc**
+
+- **Tác nhân chính:** Nhân viên Hành chính, Nhân viên
+- **Mục đích / Mô tả:** Theo dõi vòng đời tài sản làm việc (laptop, màn hình, thẻ từ) từ khi bàn giao cho nhân viên đến bảo dưỡng và thu hồi khi thôi việc.
+- **Điều kiện tiên quyết:** Tài sản đã được nhập kho hành chính kèm mã định danh QR/Serial.
+- **Hậu điều kiện:** Biên bản bàn giao điện tử được xác nhận; tài sản được ghi nhận gắn với trách nhiệm của nhân viên.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên hành chính vào `/assets`, chọn tài sản trong kho và chọn nhân viên tiếp nhận. | Hệ thống hiển thị thông số thiết bị và tình trạng hiện tại. |
+| 2 | Bấm "Tạo biên bản bàn giao". | Gửi thông báo xác nhận tới tài khoản ESS của nhân viên kèm cam kết giữ gìn thiết bị. |
+| 3 | Nhân viên kiểm tra thiết bị thực tế và bấm "Xác nhận nhận tài sản". | Cập nhật trạng thái tài sản sang `ASSIGNED`; gắn mã tài sản vào hồ sơ nhân viên phục vụ kiểm kê. |
+
+**UC32 - Đề xuất & Phê duyệt điều chuyển công tác nội bộ**
+
+- **Tác nhân chính:** Trưởng dự án, Giám đốc, Chuyên viên Hồ sơ
+- **Mục đích / Mô tả:** Thực hiện quy trình điều chuyển nhân viên giữa các dự án hoặc giữa các phòng ban chức năng.
+- **Điều kiện tiên quyết:** Nhân viên đang làm việc chính thức tại một đơn vị.
+- **Hậu điều kiện:** Phòng ban/dự án mới của nhân viên được cập nhật; quyền hạn truy cập tài nguyên tự động chuyển đổi.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Trưởng dự án lập phiếu đề xuất điều chuyển nhân sự trên hệ thống, nêu rõ đơn vị tiếp nhận và ngày hiệu lực. | Hệ thống chuyển phiếu tới Quản lý đơn vị tiếp nhận để lấy ý kiến đồng thuận. |
+| 2 | Quản lý đơn vị mới bấm "Đồng ý tiếp nhận". | Chuyển hồ sơ đề xuất lên Giám đốc điều hành phê duyệt. |
+| 3 | Giám đốc ký duyệt quyết định điều chuyển. | Cập nhật trường `departmentId` của nhân viên; tự động điều chỉnh phân quyền dữ liệu và quyền duyệt đơn sang đơn vị mới. |
+
+**UC33 - Đề xuất & Phê duyệt điều chỉnh bậc lương**
+
+- **Tác nhân chính:** Trưởng dự án, Giám đốc, Chuyên viên Tiền lương
+- **Mục đích / Mô tả:** Quy trình đề xuất tăng lương định kỳ hoặc đột xuất căn cứ trên hiệu suất công việc và sự phát triển năng lực của nhân viên.
+- **Điều kiện tiên quyết:** Nhân viên đạt thành tích xuất sắc hoặc đến kỳ đánh giá tăng lương định kỳ.
+- **Hậu điều kiện:** Mức lương mới được cập nhật vào hợp đồng/phụ lục hợp đồng, có hiệu lực từ chu kỳ lương kế tiếp.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Quản lý lập phiếu đề xuất tăng lương cho nhân viên: Nhập mức lương đề xuất mới, kèm đánh giá kết quả đóng góp. | Hệ thống đối chiếu mức lương mới với khung lương (Salary Band) của chức danh đó. |
+| 2 | Chuyên viên tiền lương thẩm định quỹ lương và trình Giám đốc. | Hiển thị tỷ lệ tăng lương và tác động tới tổng quỹ lương. |
+| 3 | Giám đốc phê duyệt quyết định tăng lương. | Tự động tạo phụ lục hợp đồng mới; cập nhật mức lương mới vào hồ sơ nhân sự và áp dụng cho kỳ tính lương tiếp theo. |
+
+**UC34 - Đề xuất & Phê duyệt khen thưởng nhân sự**
+
+- **Tác nhân chính:** Trưởng dự án, Giám đốc, Chuyên viên Tiền lương
+- **Mục đích / Mô tả:** Lập danh sách khen thưởng cho cá nhân hoặc tập thể có thành tích đột xuất (như hoàn thành dự án lớn trước hạn, sáng kiến cải tiến).
+- **Điều kiện tiên quyết:** Có thành tích xuất sắc được ghi nhận trong hoạt động dự án.
+- **Hậu điều kiện:** Quyết định khen thưởng được ban hành; tiền thưởng được tự động nạp vào kỳ lương kế tiếp.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Người đề xuất tạo phiếu khen thưởng: Chọn cá nhân/nhóm, hình thức khen thưởng (bằng khen, tiền mặt, cổ phiếu thưởng) và số tiền. | Gửi phiếu tới Hội đồng thi đua khen thưởng và Giám đốc. |
+| 2 | Giám đốc ký duyệt quyết định khen thưởng. | Ban hành thông báo vinh danh trên bảng tin nội bộ. |
+| 3 | - | Hệ thống tự động đồng bộ số tiền thưởng vào bảng tính lương tháng kế tiếp của nhân viên được khen thưởng. |
+
+**UC35 - Xử lý kỷ luật & Vi phạm nội quy lao động**
+
+- **Tác nhân chính:** Trưởng dự án, Đại diện NLĐ, Giám đốc
+- **Mục đích / Mô tả:** Quy trình lập biên bản vi phạm, tổ chức họp hội đồng kỷ luật có sự tham gia của Công đoàn và ban hành quyết định xử lý đúng luật.
+- **Điều kiện tiên quyết:** Phát sinh hành vi vi phạm nội quy lao động hoặc thỏa ước lao động tập thể.
+- **Hậu điều kiện:** Quyết định kỷ luật được lưu vào hồ sơ nhân sự; ảnh hưởng tới việc xét tăng lương/khen thưởng.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Cán bộ quản lý lập biên bản vi phạm kỷ luật trên hệ thống (đi muộn nhiều lần, vi phạm bảo mật...), đính kèm bằng chứng. | Gửi thông báo triệu tập họp hội đồng kỷ luật tới các bên liên quan (đương sự, HR, Đại diện công đoàn). |
+| 2 | Sau cuộc họp, thư ký nhập biên bản họp và hình thức xử lý được thống nhất (Khiển trách, Kéo dài thời hạn nâng lương, Sa thải). | Trình quyết định kỷ luật lên Giám đốc. |
+| 3 | Giám đốc ký ban hành quyết định kỷ luật. | Lưu quyết định vào hồ sơ nhân sự; tự động đóng băng quyền nâng bậc lương định kỳ trong thời gian thi hành kỷ luật. |
+
+**UC36 - Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận**
+
+- **Tác nhân chính:** Nhân viên, Chuyên viên Hồ sơ, Các bộ phận liên quan
+- **Mục đích / Mô tả:** Quy trình xử lý đơn xin thôi việc, tự động sinh Checklist bàn giao 5 bên (Dự án, IT, Hành chính, Kế toán, HR) và khóa tài khoản đúng ngày nghỉ việc.
+- **Điều kiện tiên quyết:** Nhân viên nộp đơn xin thôi việc tuân thủ thời hạn báo trước theo luật định (30 ngày đối với HĐ xác định thời hạn, 45 ngày đối với HĐ không xác định thời hạn).
+- **Hậu điều kiện:** Hoàn tất bàn giao tài sản và công việc; phát hành quyết định chấm dứt HĐLĐ; khóa tài khoản truy cập hệ thống.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên nộp đơn xin thôi việc qua cổng ESS, nêu lý do và ngày mong muốn nghỉ việc. | Hệ thống kiểm tra thời hạn báo trước theo loại hợp đồng hiện hành. |
+| 2 | Trưởng phòng và Giám đốc duyệt đơn xin thôi việc. | Tự động sinh ma trận Checklist bàn giao đa bộ phận gồm 5 đầu mối: <br>- Dự án: Bàn giao tài liệu, mã nguồn và chuyển giao task còn dở dang; <br>- IT: Thu hồi quyền truy cập mã nguồn Git, tài khoản email công vụ, thu hồi máy tính; <br>- Hành chính: Thu hồi thẻ từ, chìa khóa tủ cá nhân; <br>- Kế toán: Quyết toán các khoản tạm ứng công tác, đối soát số dư nợ vay phúc lợi; <br>- Nhân sự: Chốt ngày làm việc cuối cùng, tính số ngày phép còn tồn chưa nghỉ để thanh toán tiền phép thừa. |
+| 3 | Đại diện từng bộ phận đăng nhập hệ thống để bấm xác nhận hoàn tất nội dung bàn giao phụ trách. | Khi đủ 5/5 bộ phận xác nhận, hệ thống cho phép Chuyên viên nhân sự phát hành Quyết định chấm dứt hợp đồng lao động. |
+| 4 | Vào 23:59:59 của ngày làm việc cuối cùng. | Hệ thống tự động vô hiệu hóa tài khoản người dùng (`User.isActive = false`), chuyển trạng thái nhân viên sang `TERMINATED` và lưu vết thời điểm khóa tài khoản vào Audit Log. |
+
+**UC37 - Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI**
+
+- **Tác nhân chính:** Chuyên viên nhân sự, Trưởng dự án, Nhân viên
+- **Mục đích / Mô tả:** Khởi tạo kỳ đánh giá định kỳ, nhân viên tự đánh giá, lấy ý kiến đánh giá chéo từ đồng nghiệp (Peer Review) và quản lý chấm điểm chung cuộc.
+- **Điều kiện tiên quyết:** Đến chu kỳ đánh giá hiệu suất (quý hoặc năm).
+- **Hậu điều kiện:** Điểm hiệu suất tổng hợp được chốt, làm cơ sở xếp loại và xét thưởng.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Chuyên viên nhân sự tạo kỳ đánh giá `/performance-360`, thiết lập bộ tiêu chí và tỷ trọng điểm (Tự đánh giá 20%, Đồng nghiệp 30%, Quản lý 50%). | Gửi biểu mẫu đánh giá tới toàn thể nhân viên. |
+| 2 | Nhân viên hoàn thành bản tự đánh giá kết quả OKR/KPI và chọn đồng nghiệp đánh giá chéo. | Hệ thống phân phối phiếu đánh giá ẩn danh cho đồng nghiệp. |
+| 3 | Trưởng dự án xem xét điểm tổng hợp và thực hiện phỏng vấn đánh giá trực tiếp (Performance Review meeting), đưa ra xếp loại cuối cùng (A/B/C/D). | Lưu điểm hiệu suất vào hồ sơ nhân viên phục vụ xét tăng lương. |
+
+**UC38 - Quản trị chương trình đào tạo nội bộ**
+
+- **Tác nhân chính:** Chuyên viên nhân sự, Nhân viên
+- **Mục đích / Mô tả:** Lập kế hoạch khóa học nâng cao kỹ thuật/quy trình, cho phép nhân viên ghi danh, điểm danh lớp học và đánh giá chất lượng đào tạo.
+- **Điều kiện tiên quyết:** Kế hoạch đào tạo năm đã được duyệt ngân sách.
+- **Hậu điều kiện:** Khóa học được tổ chức; kết quả đào tạo và chứng chỉ nội bộ được ghi nhận vào hồ sơ học viên.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Chuyên viên nhân sự tạo khóa học trên hệ thống: Tên khóa học, giảng viên, thời gian, địa điểm, giới hạn sĩ số. | Đăng tải khóa học lên danh mục đào tạo nội bộ. |
+| 2 | Nhân viên quan tâm bấm "Đăng ký tham gia". | Hệ thống kiểm tra số lượng đăng ký còn trống, gửi xác nhận và lịch học vào lịch cá nhân. |
+| 3 | Sau khóa học, giảng viên điểm danh và chấm điểm kiểm tra cuối khóa. | Hệ thống cập nhật chứng chỉ hoàn thành khóa học vào hồ sơ của nhân viên. |
+
+**UC39 - Tiếp nhận & Giải quyết khiếu nại lao động bảo mật**
+
+- **Tác nhân chính:** Chuyên viên nhân sự, Nhân viên
+- **Mục đích / Mô tả:** Kênh tiếp nhận khiếu nại hoặc phản ánh bảo mật từ nhân viên về môi trường làm việc, xung đột lợi ích và quy trình hòa giải độc lập.
+- **Điều kiện tiên quyết:** Nhân viên có vấn đề cần khiếu nại chính thức.
+- **Hậu điều kiện:** Khiếu nại được xác minh, đối thoại và ban hành kết luận giải quyết minh bạch.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên gửi đơn khiếu nại qua kênh bảo mật trên hệ thống, có thể chọn chế độ ẩn danh người gửi với bên ngoài. | Hệ thống mã hóa nội dung khiếu nại, chỉ phân quyền cho Cán bộ phụ trách quan hệ lao động được đọc. |
+| 2 | Cán bộ nhân sự tiến hành xác minh thông tin, tổ chức phiên đối thoại hòa giải giữa các bên liên quan. | Ghi nhận biên bản làm việc vào hồ sơ vụ việc. |
+| 3 | Ban hành văn bản kết luận giải quyết khiếu nại. | Thông báo kết quả tới người khiếu nại và lưu trữ bảo mật trong hệ thống. |
+
+**UC40 - Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV**
+
+- **Tác nhân chính:** Chuyên viên Hồ sơ
+- **Mục đích / Mô tả:** Quản lý và cập nhật 111 thuộc tính thông tin cán bộ chuẩn hóa theo quy định Mẫu 2C-BNV/2008 của Bộ Nội vụ kèm 8 bảng lịch sử quá trình.
+- **Điều kiện tiên quyết:** Cán bộ/nhân viên thuộc diện theo dõi hồ sơ chuẩn hóa nhà nước.
+- **Hậu điều kiện:** Dữ liệu cán bộ được lưu trữ chuẩn mực, sẵn sàng xuất file báo cáo theo đúng quy chuẩn Bộ Nội vụ.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Chuyên viên hồ sơ truy cập phân hệ Quản lý hồ sơ 2C-BNV. | Hiển thị giao diện 111 trường thông tin: Thành phần gia đình, ngày vào Đảng, ngạch bậc, trình độ lý luận chính trị, quá trình lương, đào tạo, công tác... |
+| 2 | Cập nhật thông tin chi tiết và lưu lịch sử quá trình. | Hệ thống kiểm tra tính tương thích chuẩn mã hóa dữ liệu theo chuẩn Bộ Nội vụ. |
+| 3 | Bấm "Lưu hồ sơ 2C". | Dữ liệu được lưu trữ an toàn, phục vụ công tác kết xuất báo cáo thống kê định kỳ. |
+
+**UC41 - Quản trị danh mục ngạch bậc lương chuẩn NĐ 204**
+
+- **Tác nhân chính:** Chuyên viên Hồ sơ
+- **Mục đích / Mô tả:** Thiết lập danh mục ngạch công chức, viên chức (A3, A2, A1, B, C), hệ số lương theo từng bậc và thời gian giữ bậc quy định (24 hoặc 36 tháng).
+- **Điều kiện tiên quyết:** Chuyên viên hồ sơ có quyền quản trị danh mục chính sách tiền lương nhà nước.
+- **Hậu điều kiện:** Bảng ngạch bậc chuẩn được áp dụng làm căn cứ cho việc xếp lương và nâng lương định kỳ.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Truy cập danh mục ngạch bậc `/salary-ranks`. | Hiển thị bảng phân ngạch: Nhóm ngạch, tên ngạch (Chuyên viên chính, Chuyên viên, Cán sự...), các bậc lương từ 1 đến 9 hoặc 12 kèm hệ số tương ứng. |
+| 2 | Cấu hình thời gian giữ bậc tiêu chuẩn (3 năm cho ngạch loại A, 2 năm cho ngạch loại B, C). | Kiểm tra tính nhất quán của thang bảng lương theo Nghị định 204/2004/NĐ-CP. |
+| 3 | Bấm "Cập nhật danh mục ngạch bậc". | Hệ thống áp dụng bảng ngạch bậc làm căn cứ quét nâng lương tự động. |
+
+**UC42 - Tự động rà soát & Phê duyệt nâng bậc lương định kỳ**
+
+- **Tác nhân chính:** Chuyên viên Hồ sơ, Giám đốc
+- **Mục đích / Mô tả:** Tiến trình tự động quét hồ sơ cán bộ đủ điều kiện về thời gian giữ bậc để lập danh sách đề nghị nâng bậc lương thường xuyên trình duyệt.
+- **Điều kiện tiên quyết:** Đến kỳ rà soát nâng bậc lương (thường diễn ra hàng quý).
+- **Hậu điều kiện:** Quyết định nâng bậc lương được ban hành; hệ số lương mới được cập nhật vào hồ sơ cán bộ.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Định kỳ hàng quý, Chuyên viên hồ sơ kích hoạt chức năng rà soát nâng bậc lương theo chuẩn Nghị định 204/2004/NĐ-CP. | Tự động quét CSDL quá trình lương (`SalaryProgress`), lọc các cán bộ có thời gian giữ bậc đạt đủ chu kỳ quy định (24 tháng đối với ngạch B, C; 36 tháng đối với ngạch A1 trở lên). |
 | 2 | - | Sinh danh sách cán bộ đủ điều kiện nâng bậc lương thường xuyên; đối với cán bộ đã kịch khung, tự động tính tỷ lệ hưởng phụ cấp thâm niên vượt khung (5% cho năm đầu tiên, mỗi năm sau thêm 1%). |
 | 3 | Chuyên viên hồ sơ rà soát danh sách, loại trừ các trường hợp bị kỷ luật kéo dài thời hạn nâng bậc (nếu có); lập tờ trình nâng bậc lương. | Đóng gói danh sách đề xuất thành hồ sơ trình ký điện tử gửi tới Giám đốc. |
 | 4 | Giám đốc xem xét và ký Quyết định nâng bậc lương hàng loạt. | Hệ thống cập nhật ngạch, bậc và hệ số lương mới vào hồ sơ cán bộ; tự động áp dụng hệ số mới vào chu kỳ tính lương tiếp theo. |
 
+**UC43 - Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03)**
+
+- **Tác nhân chính:** Chuyên viên Hồ sơ
+- **Mục đích / Mô tả:** Tự động kết xuất Sơ yếu lý lịch Mẫu 2C-BNV/2008 khổ in PDF chuẩn và xuất khẩu các Biểu 01, 02, 03 định dạng Excel phục vụ báo cáo cơ quan chủ quản.
+- **Điều kiện tiên quyết:** Dữ liệu hồ sơ cán bộ đã được nhập đầy đủ trong hệ thống.
+- **Hậu điều kiện:** Tập tin PDF/Excel chuẩn được tạo lập, sẵn sàng in ấn nộp cơ quan cấp trên.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Chuyên viên hồ sơ chọn cán bộ cần xuất hồ sơ, chọn chức năng "Xuất Sơ yếu lý lịch Mẫu 2C". | Hệ thống nạp 111 trường dữ liệu vào mẫu in chuẩn theo Quyết định 02/2008/QĐ-BNV; xuất ra file PDF có căn lề và định dạng chuẩn trang. |
+| 2 | Để báo cáo định kỳ, chọn "Xuất báo cáo thống kê": Biểu 01 (Cơ cấu độ tuổi x Ngạch), Biểu 02 (Trình độ ngoại ngữ), Biểu 03 (Trình độ chuyên môn). | Hệ thống tự động tổng hợp toàn bộ cán bộ trong cơ quan và trích xuất file Excel có cấu trúc và công thức chuẩn theo quy định. |
+
+**UC44 - Quản lý không gian tri thức số & Tài liệu quy trình SOP**
+
+- **Tác nhân chính:** Toàn thể nhân viên (theo quyền không gian)
+- **Mục đích / Mô tả:** Quản trị các bài viết hướng dẫn, quy trình vận hành tiêu chuẩn (SOP), tài liệu kỹ thuật được phân loại theo từng Không gian tri thức (Space).
+- **Điều kiện tiên quyết:** Nhân viên có quyền đóng góp nội dung vào Space tương ứng.
+- **Hậu điều kiện:** Tài liệu SOP được lưu trữ, kiểm soát phiên bản bất biến và phê duyệt xuất bản.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên truy cập `/documents`, chọn Không gian tri thức (Công nghệ, Nhân sự, Quy trình dự án) và bấm "Viết bài mới". | Hiển thị trình soạn thảo bài viết hỗ trợ định dạng Markdown và chèn tài liệu đính kèm. |
+| 2 | Soạn thảo nội dung quy trình, gắn thẻ phân loại (tags) và bấm "Gửi duyệt xuất bản". | Lưu bản thảo ở trạng thái chờ duyệt, gửi thông báo tới Trưởng không gian (KM_MANAGER). |
+| 3 | KM_MANAGER rà soát nội dung và bấm "Xuất bản". | Bài viết được công bố công khai cho các thành viên trong Space; hệ thống lưu trữ lịch sử phiên bản (`ArticleVersion`) để tra cứu lại khi cần. |
+
+**UC45 - Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia**
+
+- **Tác nhân chính:** Toàn thể nhân viên
+- **Mục đích / Mô tả:** Công cụ tìm kiếm thông minh hỗ trợ tìm kiếm toàn văn (Full-Text Search) tài liệu và tra cứu danh bạ nhân sự theo chuyên môn kỹ thuật.
+- **Điều kiện tiên quyết:** Nhân viên đã đăng nhập vào hệ thống.
+- **Hậu điều kiện:** Trả về các tài liệu phù hợp quyền hạn và danh sách nhân sự có chuyên môn tương ứng.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Nhân viên nhập từ khóa tìm kiếm (ví dụ: "Quy trình xin visa", "Chuyên gia NestJS") vào thanh tìm kiếm toàn cục. | Hệ thống thực thi thuật toán tìm kiếm toàn văn FTS trên PostgreSQL kết hợp lọc quyền truy cập bài viết. |
+| 2 | Hiển thị kết quả chia làm 2 tab: "Tài liệu / Bài viết" và "Chuyên gia nội bộ". | Nhân viên có thể mở trực tiếp bài viết hướng dẫn hoặc bấm vào thẻ nhân sự để xem liên hệ và kinh nghiệm của chuyên gia. |
+
+**UC46 - Bảng điều khiển phân tích & Thống kê nhân sự (Dashboard)**
+
+- **Tác nhân chính:** Ban Giám đốc, Quản lý các cấp
+- **Mục đích / Mô tả:** Trực quan hóa các chỉ số nhân lực theo thời gian thực (tỷ lệ đi làm hôm nay, tháp tuổi, biến động nhân sự, tiến độ tuyển dụng, tổng quỹ lương).
+- **Điều kiện tiên quyết:** Người dùng có quyền xem báo cáo phân tích quản trị.
+- **Hậu điều kiện:** Các biểu đồ trực quan được cập nhật thời gian thực, hỗ trợ ra quyết định điều hành.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Ban Giám đốc truy cập trang `/dashboard`. | Hệ thống tổng hợp dữ liệu từ tất cả các phân hệ và kết xuất các biểu đồ trực quan: |
+| 2 | - | 1. Tỷ lệ đi làm hôm nay (Biểu đồ tròn: Đúng giờ, Đi muộn, Nghỉ phép, Chưa chấm công); <br>2. Cơ cấu nhân lực theo kỹ năng và phòng ban (Biểu đồ cột); <br>3. Biến động nhân sự và tỷ lệ nghỉ việc (Turnover Rate); <br>4. Thống kê tiến độ tuyển dụng ATS; <br>5. Báo cáo so sánh quỹ lương thực tế so với ngân sách kế hoạch. |
+| 3 | Người dùng chọn bộ lọc thời gian hoặc chi nhánh. | Hệ thống tự động tính toán lại các chỉ số KPI theo bộ lọc tức thì. |
+
+**UC47 - Nhật ký kiểm toán hệ thống & Cấu hình tham số**
+
+- **Tác nhân chính:** Nhân viên Quản trị IT
+- **Mục đích / Mô tả:** Truy vấn nhật ký kiểm toán bất biến (Audit Log) ghi lại mọi thao tác quan trọng trên hệ thống và cấu hình các tham số vận hành chung.
+- **Điều kiện tiên quyết:** Quản trị viên IT đăng nhập với quyền ADMIN.
+- **Hậu điều kiện:** Mọi hoạt động khả nghi được giám sát; các tham số vận hành hệ thống được cập nhật an toàn.
+
+| Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
+| :---: | :--- | :--- |
+| 1 | Quản trị viên truy cập `/admin/audit-log`, nhập tiêu chí tìm kiếm: Khoảng thời gian, người thực hiện, loại thao tác (CREATE/UPDATE/DELETE/LOGIN), đối tượng bị tác động. | Hệ thống truy vấn bảng `AuditLog` lưu trữ bất biến (Append-only). |
+| 2 | Hiển thị chi tiết bản ghi kiểm toán: | Xem rõ địa chỉ IP, User-Agent, thời điểm chính xác và dữ liệu thay đổi trước/sau (Diff JSON: Old Values vs New Values). |
+| 3 | Quản trị viên chuyển sang tab Cấu hình hệ thống `/admin/settings`, cập nhật các tham số vận hành (Thời gian hết hạn JWT, dung lượng tệp tải lên tối đa, email nhận cảnh báo). | Hệ thống áp dụng cấu hình mới vào bộ nhớ đệm ứng dụng và ghi lại sự kiện thay đổi cấu hình vào Audit Log. |
+
 ### 2.1.4. Xây dựng biểu đồ Use case
 
-Biểu đồ Use case tổng quan thể hiện bức tranh toàn cảnh về sự tương tác giữa 11 tác nhân nghiệp vụ và 47 Use Case chức năng được phân nhóm khoa học trong hệ thống.
+Biểu đồ Use case tổng quan thể hiện bức tranh toàn cảnh về sự tương tác giữa 6 nhóm tác nhân nghiệp vụ chủ chốt và 10 phân hệ chức năng bao quát toàn bộ 47 Use Case trong Hệ thống thông tin Quản trị nhân lực STS HRMIS.
 
 ![Hình 2.2: Biểu đồ Use case tổng quan Hệ thống Quản trị nhân lực](images/hinh_2_2_usecase_overview.png)
 
-Để làm rõ chi tiết quan hệ giữa các Use Case trong từng phân hệ, biểu đồ Use case phân rã nghiệp vụ Tuyển dụng (Nhóm B) được mô hình hóa chi tiết với các quan hệ phụ thuộc `<<include>>` và mở rộng `<<extend>>`.
+Để làm rõ chi tiết quan hệ giữa các Use Case trong từng phân hệ, hệ thống được phân rã thành 10 biểu đồ Use Case nghiệp vụ chuyên biệt, mô hình hóa đầy đủ 47 Use Case từ UC01 đến UC47:
 
-![Hình 2.3: Biểu đồ Use case nhóm B - Tuyển dụng](images/hinh_2_3_usecase_recruitment.png)
+#### A. Nhóm A - Quản trị hệ thống & Tổ chức (UC01 - UC03)
+Biểu đồ mô tả tương tác đăng nhập, phân quyền RBAC và cấu hình cây phòng ban doanh nghiệp.
+![Hình 2.3: Biểu đồ Use case Nhóm A - Quản trị hệ thống & Tổ chức](images/hinh_2_3_usecase_nhom_a.png)
 
-Sơ đồ mô tả quy trình tiếp nhận chỉ tiêu, thẩm định định biên, đăng tin tuyển dụng ATS, phỏng vấn và gửi thư mời làm việc cho ứng viên.
+#### B. Nhóm B - Tuyển dụng & Ứng viên (UC04 - UC08)
+Biểu đồ mô tả chu trình tuyển dụng từ đề xuất nhu cầu, kiểm soát định biên, duyệt chỉ tiêu, sàng lọc ứng viên ATS Kanban đến phát hành thư mời làm việc.
+![Hình 2.4: Biểu đồ Use case Nhóm B - Tuyển dụng & Ứng viên](images/hinh_2_4_usecase_nhom_b.png)
+
+#### C. Nhóm C - Hồ sơ nhân sự & Hội nhập (UC09 - UC14)
+Biểu đồ mô tả quản lý hồ sơ nhân viên toàn diện, hợp đồng lao động, bằng cấp chứng chỉ, mượn trả hồ sơ gốc, đánh giá thử việc và lộ trình hội nhập Onboarding.
+![Hình 2.5: Biểu đồ Use case Nhóm C - Hồ sơ nhân sự & Hội nhập](images/hinh_2_5_usecase_nhom_c.png)
+
+#### D. Nhóm D - Cổng tự phục vụ nhân viên (UC15 - UC17)
+Biểu đồ mô tả cổng tự phục vụ tập trung của nhân viên, cơ chế quản lý thông tin phân cấp 3 mức độ và luồng thẩm định điều chỉnh hồ sơ.
+![Hình 2.6: Biểu đồ Use case Nhóm D - Cổng tự phục vụ nhân viên](images/hinh_2_6_usecase_nhom_d.png)
+
+#### E. Nhóm E - Chấm công & Phân ca (UC18 - UC25)
+Biểu đồ mô tả chu trình ghi nhận sự kiện điểm danh đa nguồn (Khuôn mặt IR, Web, Máy chấm công), đăng ký nghỉ phép, OT, phân ca, giải trình lệch công và chốt bảng công tháng.
+![Hình 2.7: Biểu đồ Use case Nhóm E - Chấm công & Phân ca](images/hinh_2_7_usecase_nhom_e.png)
+
+#### F. Nhóm F - Tiền lương & Phúc lợi (UC26 - UC31)
+Biểu đồ mô tả cấu hình công thức lương, vận hành chức năng tính lương tự động, khóa kỳ lương bất biến LOCKED, quản lý khoản vay phúc lợi, quyết toán công tác phí T&E và cấp phát tài sản.
+![Hình 2.8: Biểu đồ Use case Nhóm F - Tiền lương & Phúc lợi](images/hinh_2_8_usecase_nhom_f.png)
+
+#### G. Nhóm G - Biến động nhân sự & Thôi việc (UC32 - UC36)
+Biểu đồ mô tả quy trình điều chuyển nội bộ, điều chỉnh bậc lương, khen thưởng, kỷ luật lao động và tiếp nhận xử lý thôi việc bàn giao 5 bên.
+![Hình 2.9: Biểu đồ Use case Nhóm G - Biến động nhân sự & Thôi việc](images/hinh_2_9_usecase_nhom_g.png)
+
+#### H. Nhóm H - Đánh giá hiệu suất & Đào tạo (UC37 - UC39)
+Biểu đồ mô tả quy trình đánh giá hiệu suất 360 độ OKR/KPI, tổ chức đào tạo nội bộ và tiếp nhận giải quyết khiếu nại lao động bảo mật.
+![Hình 2.10: Biểu đồ Use case Nhóm H - Đánh giá hiệu suất & Đào tạo](images/hinh_2_10_usecase_nhom_h.png)
+
+#### I. Nhóm I - Chuẩn cán bộ & Báo cáo (UC40 - UC43)
+Biểu đồ mô tả quản lý hồ sơ cán bộ theo chuẩn Mẫu 2C-BNV, danh mục ngạch bậc lương NĐ 204, tự động rà soát nâng bậc lương và kết xuất biểu mẫu báo cáo nhà nước.
+![Hình 2.11: Biểu đồ Use case Nhóm I - Chuẩn cán bộ & Báo cáo](images/hinh_2_11_usecase_nhom_i.png)
+
+#### J. Nhóm J - Quản trị tri thức & Điều hành (UC44 - UC47)
+Biểu đồ mô tả quản trị kho tri thức số SOP, tìm kiếm toàn văn FTS & danh bạ chuyên gia, bảng điều khiển phân tích số Dashboard và nhật ký kiểm toán hệ thống.
+![Hình 2.12: Biểu đồ Use case Nhóm J - Quản trị tri thức & Điều hành](images/hinh_2_12_usecase_nhom_j.png)
 
 ### 2.1.5. Phân tầng yêu cầu: từ quy trình nghiệp vụ đến use case hệ thống
 
@@ -922,13 +1570,13 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 
 **7. Quy trình Chu kỳ Tính & Khóa Bảng lương hàng tháng (Monthly Payroll Cycle):**
 - Bối cảnh & Căn cứ: Căn cứ Điều 90 đến Điều 104 Bộ luật Lao động 2019, Luật Thuế TNCN và Luật Bảo hiểm xã hội hiện hành.
-- Trình tự thực hiện: Vào ngày 25 hàng tháng, bộ phận nhân sự khóa dữ liệu chấm công; Chuyên viên tiền lương kích hoạt Động cơ tính lương tự động (`/payroll-engine`); Hệ thống tự động tính toán chi tiết: lương thời gian theo ngày công thực tế, lương làm thêm giờ, phụ cấp, thưởng dự án, trích nộp bảo hiểm xã hội (10.5%), giảm trừ gia cảnh, tính thuế TNCN theo biểu lũy tiến và khấu trừ nợ vay phúc lợi (đảm bảo tổng khấu trừ không vượt quá 30% lương Net); Kế toán trưởng đối soát tổng quỹ lương; Giám đốc phê duyệt điện tử; Chuyên viên nhân sự chuyển trạng thái kỳ lương sang LOCKED (kích hoạt cơ chế bất biến, chặn hoàn toàn mọi thao tác tính lại với lỗi HTTP 409); Hệ thống kết xuất lệnh chi ngân hàng và phát hành Phiếu lương điện tử (ePayslip) bảo mật tới từng nhân viên qua cổng ESS.
-- Ánh xạ Use case & Giao diện: UC25, UC26, UC27, UC28. Giao diện: Động cơ tính lương (`/payroll-engine`), Phiếu lương cá nhân (`/ess`), Báo cáo nhân sự (`/personnel-reports`).
+- Trình tự thực hiện: Vào ngày 25 hàng tháng, bộ phận nhân sự khóa dữ liệu chấm công; Chuyên viên tiền lương kích hoạt Chức năng tính lương tự động (`/payroll-engine`); Hệ thống tự động tính toán chi tiết: lương thời gian theo ngày công thực tế, lương làm thêm giờ, phụ cấp, thưởng dự án, trích nộp bảo hiểm xã hội (10.5%), giảm trừ gia cảnh, tính thuế TNCN theo biểu lũy tiến và khấu trừ nợ vay phúc lợi (đảm bảo tổng khấu trừ không vượt quá 30% lương Net); Kế toán trưởng đối soát tổng quỹ lương; Giám đốc phê duyệt điện tử; Chuyên viên nhân sự chuyển trạng thái kỳ lương sang LOCKED (kích hoạt cơ chế bất biến, chặn hoàn toàn mọi thao tác tính lại với lỗi HTTP 409); Hệ thống kết xuất lệnh chi ngân hàng và phát hành Phiếu lương điện tử (ePayslip) bảo mật tới từng nhân viên qua cổng ESS.
+- Ánh xạ Use case & Giao diện: UC25, UC26, UC27, UC28. Giao diện: Chức năng tính lương tự động (`/payroll-engine`), Phiếu lương cá nhân (`/ess`), Báo cáo nhân sự (`/personnel-reports`).
 
 **8. Quy trình Tạm ứng Lương & Khoản vay phúc lợi (Advance & Welfare Loans):**
 - Bối cảnh & Căn cứ: Căn cứ Điều 101 và Điều 102 Bộ luật Lao động 2019 về tạm ứng tiền lương, giới hạn khấu trừ lương (không quá 30% thực lĩnh) và Quy chế Quỹ phúc lợi nội bộ của Saigon Technology (hạn mức luân chuyển 2 tỷ VNĐ).
 - Trình tự thực hiện: Nhân viên sử dụng công cụ mô phỏng tài chính trên giao diện `/loans` kéo chọn số tiền và thời hạn vay (6-36 tháng); Hệ thống tự động tính số tiền trích nợ mỗi kỳ (EMI) và kiểm tra ngưỡng an toàn thu nhập theo Điều 102 (nếu tỷ lệ khấu trừ > 30% lương Net, hệ thống cảnh báo và yêu cầu kéo dài kỳ hạn); Nhân viên nộp hồ sơ theo các gói mục tiêu; Chuyên viên C&B sử dụng công cụ phê duyệt nhanh 1-chạm hoặc trình Giám đốc phê duyệt; Sau khi giải ngân, hệ thống tự động sinh lịch trình hoàn nợ và tự động nạp khoản trích trừ vào phiếu lương hàng tháng; Nhân viên có thể thực hiện tất toán sớm bất kỳ lúc nào trực tiếp trên giao diện mà không chịu phí phạt.
-- Ánh xạ Use case & Giao diện: UC15, UC29. Giao diện: Quản trị Phúc lợi & Khoản vay (`/loans`), Cổng ESS (`/ess`), Động cơ tính lương (`/payroll-engine`).
+- Ánh xạ Use case & Giao diện: UC15, UC29. Giao diện: Quản trị Phúc lợi & Khoản vay (`/loans`), Cổng ESS (`/ess`), Chức năng tính lương tự động (`/payroll-engine`).
 
 **9. Quy trình Đề xuất công tác & Quyết toán chi phí (Travel & Expense Claims):**
 - Bối cảnh & Căn cứ: Phục vụ các đợt cử chuyên gia, kỹ sư đi công tác tại các chi nhánh (Hà Nội, Đà Nẵng, TP.HCM) hoặc làm việc trực tiếp tại văn phòng khách hàng quốc tế (Onsite). Căn cứ Quy chế tài chính nội bộ và quy định về chứng từ thuế hợp lệ.
@@ -948,7 +1596,7 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 **12. Quy trình Rà soát Tăng lương định kỳ & Nâng bậc lương chuẩn Nghị định 204:**
 - Bối cảnh & Căn cứ: Căn cứ quy chế tiền lương của doanh nghiệp và hệ thống ngạch bậc lương chuẩn Nghị định 204/2004/NĐ-CP (áp dụng cho khối chuyên gia và cán bộ nòng cốt).
 - Trình tự thực hiện: Định kỳ hàng quý, hệ thống tự động quét dữ liệu diễn biến lương (`SalaryProgress`), lập danh sách nhân sự đủ thời gian giữ bậc (24 tháng đối với ngạch B, C; 36 tháng đối với ngạch A1 trở lên); Chuyên viên tiền lương rà soát, đối chiếu với kết quả đánh giá KPI và năng lực thực tế; Lập tờ trình nâng bậc lương kèm hệ số mới hoặc phụ cấp thâm niên vượt khung; Giám đốc xem xét và ký Quyết định nâng bậc lương; Hệ thống tự động cập nhật hệ số mới vào hợp đồng và áp dụng cho kỳ lương tiếp theo.
-- Ánh xạ Use case & Giao diện: UC33, UC41, UC42. Giao diện: Bảng bậc lương (`/salary-ranks`), Biến động nhân sự (`/personnel`), Động cơ tính lương (`/payroll-engine`).
+- Ánh xạ Use case & Giao diện: UC33, UC41, UC42. Giao diện: Bảng bậc lương (`/salary-ranks`), Biến động nhân sự (`/personnel`), Chức năng tính lương tự động (`/payroll-engine`).
 
 **13. Quy trình Điều chuyển, Luân chuyển & Bổ nhiệm vị trí công tác (Transfer & Promotion):**
 - Bối cảnh & Căn cứ: Thực hiện khi điều động nhân sự giữa các dự án phần mềm, bổ nhiệm cán bộ quản lý hoặc luân chuyển giữa các chi nhánh TP.HCM - Đà Nẵng.
@@ -1230,11 +1878,11 @@ Kịch bản tương tác Use Case UC26: Tác nhân Chuyên viên Tiền lương
 
 ![Hình 2.29: Biểu đồ trình tự Use case Cấu hình công thức và ngạch bậc lương (UC26)](images/hinh_seq_uc26.png)
 
-#### 2.3.1.27. Biểu đồ trình tự Use case Vận hành động cơ tính toán bảng lương tự động (UC27)
+#### 2.3.1.27. Biểu đồ trình tự Use case Vận hành chức năng tính lương tự động (UC27)
 
 Kịch bản tương tác Use Case UC27: Tác nhân Chuyên viên Tiền lương tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
 
-![Hình 2.30: Biểu đồ trình tự Use case Vận hành động cơ tính toán bảng lương tự động (UC27)](images/hinh_seq_uc27.png)
+![Hình 2.30: Biểu đồ trình tự Use case Vận hành chức năng tính lương tự động (UC27)](images/hinh_seq_uc27.png)
 
 #### 2.3.1.28. Biểu đồ trình tự Use case Phê duyệt & Khóa bất biến kỳ lương (LOCKED state) (UC28)
 
@@ -1516,11 +2164,11 @@ Tiến trình hoạt động Use Case UC26: Tác nhân Chuyên viên Tiền lư�
 
 ![Hình 2.76: Biểu đồ hoạt động Use case Cấu hình công thức và ngạch bậc lương (UC26)](images/hinh_act_uc26.png)
 
-#### 2.3.2.27. Biểu đồ hoạt động Use case Vận hành động cơ tính toán bảng lương tự động (UC27)
+#### 2.3.2.27. Biểu đồ hoạt động Use case Vận hành chức năng tính lương tự động (UC27)
 
 Tiến trình hoạt động Use Case UC27: Tác nhân Chuyên viên Tiền lương kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
 
-![Hình 2.77: Biểu đồ hoạt động Use case Vận hành động cơ tính toán bảng lương tự động (UC27)](images/hinh_act_uc27.png)
+![Hình 2.77: Biểu đồ hoạt động Use case Vận hành chức năng tính lương tự động (UC27)](images/hinh_act_uc27.png)
 
 #### 2.3.2.28. Biểu đồ hoạt động Use case Phê duyệt & Khóa bất biến kỳ lương (LOCKED state) (UC28)
 
@@ -1792,7 +2440,7 @@ Giao diện người dùng được thiết kế hiện đại trên nền tản
 - `/overtime`: Đăng ký và phê duyệt làm thêm giờ, kiểm soát trần thời gian tối đa theo luật lao động.
 
 4. Phân hệ Đãi ngộ & Tài chính (Compensation & Benefits):
-- `/payroll-engine`: Động cơ tính toán tiền lương tự động, cấu hình thành phần thu nhập, trích nộp BHXH, thuế TNCN và thực thi khóa bất biến kỳ lương (LOCKED);
+- `/payroll-engine`: Chức năng tính toán tiền lương tự động, cấu hình thành phần thu nhập, trích nộp BHXH, thuế TNCN và thực thi khóa bất biến kỳ lương (LOCKED);
 - `/loans`: Trung tâm quản trị phúc lợi và khoản vay nhân viên, tích hợp công cụ mô phỏng tài chính, kiểm soát trích nợ không quá 30% lương Net và hỗ trợ tất toán sớm;
 - `/expense-claims`: Quản lý đề xuất công tác và thanh quyết toán chi phí công tác phí kèm hóa đơn điện tử.
 
@@ -1818,7 +2466,7 @@ Hệ thống được thiết kế và cài đặt theo mô hình kiến trúc b
 
 Tầng Giao diện người dùng (Presentation Tier): Xây dựng bằng Next.js 14 Standalone phục vụ giao diện người dùng cho toàn bộ 31 màn hình chức năng, đồng thời đóng vai trò là Reverse Proxy chuyển tiếp các yêu cầu API (`/api/*`) trực tiếp tới máy chủ backend mà không cần cấu hình thêm máy chủ web trung gian.
 
-Tầng Xử lý nghiệp vụ (Business Logic Tier): Xây dựng trên nền tảng NestJS 10 (TypeScript) bao gồm 39 module nghiệp vụ chuyên biệt, vận hành trên hai bộ máy xử lý cốt lõi: Động cơ phê duyệt biến động nhân sự (Approval Engine) và Động cơ tính lương tự động (Payroll Engine), tích hợp các dịch vụ bảo vệ phân quyền (JwtAuthGuard, RolesGuard) và cơ chế truyền thông điệp sự kiện (Event-Driven Architecture).
+Tầng Xử lý nghiệp vụ (Business Logic Tier): Xây dựng trên nền tảng NestJS 10 (TypeScript) bao gồm 39 module nghiệp vụ chuyên biệt, vận hành trên hai bộ máy xử lý cốt lõi: Quy trình phê duyệt biến động nhân sự (Approval Engine) và Chức năng tính lương tự động (Payroll Engine), tích hợp các dịch vụ bảo vệ phân quyền (JwtAuthGuard, RolesGuard) và cơ chế truyền thông điệp sự kiện (Event-Driven Architecture).
 
 Tầng Lưu trữ dữ liệu (Data Tier): Hệ quản trị cơ sở dữ liệu PostgreSQL 16 quản lý 87 model quan hệ, kết hợp ổ lưu trữ tệp đính kèm độc lập; quản trị cấu trúc lược đồ qua Prisma Migration tự động chạy phiên bản khi khởi động container.
 

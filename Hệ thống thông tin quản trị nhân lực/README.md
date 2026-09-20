@@ -1,7 +1,7 @@
-# KMS — Hệ thống Quản lý Tri thức Nội bộ · Saigon Technology
+# HRMIS — Hệ thống Thông tin Quản trị Nhân lực · Saigon Technology
 
-Web-app quản lý tri thức nội bộ xây dựng theo tài liệu thiết kế tại [`doc/KMS_PLAN.md`](doc/KMS_PLAN.md)
-(kế thừa phân tích nghiệp vụ HRMIS trong [`doc/Plan.md`](doc/Plan.md) và [`doc/PTTK_OOP_HR.md`](doc/PTTK_OOP_HR.md)).
+Hệ thống thông tin quản trị nhân lực tích hợp xây dựng theo tài liệu thiết kế tại [`doc/PTTK_OOP_HR.md`](doc/PTTK_OOP_HR.md)
+và bộ biểu đồ thiết kế UML 47 Use Case tại [`doc/PTTK_OOP_HR_DIAGRAMS.md`](doc/PTTK_OOP_HR_DIAGRAMS.md).
 
 > **Clone-and-run:** `git clone` → `docker compose up -d` → mở **http://localhost:8080** → đăng nhập bằng tài khoản demo. Không cần tạo file hay sửa cấu hình gì thêm.
 
@@ -67,7 +67,7 @@ Trình duyệt ──► web (Next.js 14 standalone, cổng 8080 duy nhất)
 - **Chấm công đa nguồn:** QR kiosk xoay 30s (token HMAC + jti one-time), khuôn mặt trên trình duyệt
   (vector mã hóa AES-256-GCM), webhook HMAC + CSV import cho máy chấm công, bộ mô phỏng tích hợp.
 
-Chi tiết đầy đủ: [`doc/KMS_PLAN.md`](doc/KMS_PLAN.md).
+Chi tiết đầy đủ: [`doc/PTTK_OOP_HR.md`](doc/PTTK_OOP_HR.md) và [`plans/ke-hoach-cai-thien-hrms.md`](plans/ke-hoach-cai-thien-hrms.md).
 
 ---
 
