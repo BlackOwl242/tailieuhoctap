@@ -125,7 +125,7 @@ TÀI LIỆU THAM KHẢO
 - Hình 1.1. Sơ đồ cơ cấu tổ chức tổng thể Công ty Saigon Technology
 - Hình 1.2. Cơ cấu chi tiết Khối Quản trị Nguồn nhân lực và Khối Vận hành & Pháp chế
 - Hình 1.3. Cơ cấu chi tiết Khối Kỹ thuật & Sản xuất Phần mềm
-- Hình 1.4. Mô hình phối hợp 3 mắt xích cốt lõi
+- Hình 1.4. Mô hình phối hợp giữa các đơn vị trong quản trị nhân lực
 - Hình 2.1. Biểu đồ cây phân cấp Tác nhân
 - Hình 2.2. Biểu đồ Use case tổng quan Hệ thống Quản trị nhân lực
 - Hình 2.3. Biểu đồ Use case nhóm B - Tuyển dụng
@@ -287,20 +287,20 @@ Nhằm phục vụ tốt nhất khách hàng quốc tế tại các thị trư�
 
 ### 2.2. Lịch sử hình thành và các mốc phát triển chiến lược
 
-Quá trình hình thành và phát triển của Saigon Technology là minh chứng rõ nét cho sự chuyển mình từ một nhóm kỹ sư công nghệ khởi nghiệp thành một công ty phần mềm đạt chuẩn mực quốc tế:
+Quá trình phát triển của Saigon Technology từ khi khởi đầu đến nay:
 
 - **Giai đoạn 2012 - 2014 (Khởi nghiệp và tạo dựng nền tảng):** Tiền thân của Saigon Technology xuất phát điểm từ năm 2012 tại TP. Hồ Chí Minh với nhóm sáng lập chỉ gồm 3 kỹ sư phần mềm xuất sắc. Giai đoạn đầu tập trung nghiên cứu, phát triển các giải pháp phần mềm trên nền tảng Web và ứng dụng di động cho thị trường trong nước và khu vực.
-- **Năm 2015 (Chính thức xác lập pháp nhân và định hướng gia công quốc tế):** Ngày 13/11/2015, Công ty Cổ phần Công nghệ Phần mềm STS chính thức được cấp Giấy phép ĐKKD. Ban Lãnh đạo xác định bước đi chiến lược mang tính sống còn: chuyển hướng 100% nguồn lực sang lĩnh vực xuất khẩu phần mềm áp dụng triệt để quy trình phát triển linh hoạt (Agile/Scrum).
+- **Năm 2015 (Chính thức xác lập pháp nhân và định hướng gia công quốc tế):** Ngày 13/11/2015, Công ty Cổ phần Công nghệ Phần mềm STS chính thức được cấp Giấy phép ĐKKD. Công ty xác định định hướng chiến lược: tập trung nguồn lực phát triển dịch vụ xuất khẩu phần mềm theo quy trình linh hoạt Agile/Scrum.
 - **Giai đoạn 2018 - 2019 (Mở rộng quy mô và Trung tâm Đà Nẵng):** Quy mô công ty vượt mốc 100 nhân sự. Khai trương Trung tâm phát triển phần mềm tại Thành phố Đà Nẵng (Khu Phần mềm Đà Nẵng, tòa nhà ICT1), mở rộng không gian nghiên cứu phát triển và tiếp cận nguồn nhân tài kỹ thuật dồi dào của miền Trung.
 - **Năm 2020 (Chuẩn hóa hệ thống quản lý quốc tế):** Chuyển trụ sở chính tại TP.HCM về khu phức hợp Hồng Hà diện tích hơn 2.000m². Đạt chứng nhận Hệ thống quản lý chất lượng **ISO 9001:2015** và Hệ thống quản lý an toàn thông tin **ISO/IEC 27001:2013** do tổ chức BSI (Vương quốc Anh) và DAS đánh giá cấp chứng chỉ. Được Hiệp hội Phần mềm và Dịch vụ CNTT Việt Nam (VINASA) vinh danh tại **Giải thưởng Sao Khuê**.
 - **Giai đoạn 2021 - 2023 (Khẳng định vị thế toàn cầu):** Đạt chứng nhận quốc tế danh giá *"Great Place to Work"* (Môi trường làm việc lý tưởng); lọt Top 15 Doanh nghiệp gia công phần mềm Agile hàng đầu Việt Nam do VINASA bình chọn; liên tục dẫn đầu bảng xếp hạng nhà phát triển phần mềm uy tín tại Việt Nam trên nền tảng quốc tế Clutch (điểm xếp hạng 4.8/5 sao). Thiết lập mạng lưới văn phòng đại diện thương mại tại Mỹ, Úc, Singapore và Thụy Sĩ.
-- **Giai đoạn 2024 - 2026 (Đột phá công nghệ và Số hóa toàn diện):** Đội ngũ nhân sự phát triển vượt mức 430 kỹ sư; hoàn thành hơn 850 dự án cho hơn 350 khách hàng doanh nghiệp trên toàn cầu; mở rộng năng lực sang Trí tuệ nhân tạo (AI & Machine Learning), Điện toán đám mây (Cloud Migration AWS/Azure); và đặt trọng tâm xây dựng Hệ thống thông tin quản trị nhân lực để số hóa toàn diện bộ máy vận hành nội bộ.
+- **Giai đoạn 2024 - 2026:** Quy mô công ty đạt hơn 430 nhân sự, hoàn thành hơn 850 dự án cho hơn 350 khách hàng doanh nghiệp. Công ty mở rộng năng lực sang mảng Trí tuệ nhân tạo và Điện toán đám mây, đồng thời triển khai Hệ thống thông tin quản trị nhân lực để chuẩn hóa công tác quản lý nội bộ.
 
 ---
 
 ### 2.3. Tầm nhìn chiến lược, Sứ mệnh phát triển và Hệ giá trị cốt lõi
 
-Văn hóa doanh nghiệp và định hướng kinh doanh của Saigon Technology được xây dựng vững chắc trên kim chỉ nam:
+Định hướng hoạt động và các giá trị văn hóa của Saigon Technology được xác định cụ thể như sau:
 
 #### A. Tầm nhìn chiến lược
 *"To be Vietnam's trusted software outsourcing company where clients can find the most affordable and high quality software development services."*  
@@ -308,17 +308,17 @@ Văn hóa doanh nghiệp và định hướng kinh doanh của Saigon Technology
 
 #### B. Sứ mệnh phát triển
 *"To offer the best and the most effective software outsourcing services to our customers."*  
-(Cung cấp các dịch vụ gia công phát triển phần mềm tốt nhất, hiệu quả nhất cho khách hàng; mang trí tuệ và tài năng công nghệ của kỹ sư Việt Nam vươn tầm thế giới; đồng thời kiến tạo môi trường làm việc nhân bản, lấy con người làm trọng tâm để nhân viên phát huy tối đa tiềm năng).
+(Cung cấp dịch vụ phát triển phần mềm chất lượng cao và hiệu quả cho khách hàng; xây dựng môi trường làm việc chuyên nghiệp, tạo điều kiện thuận lợi để nhân viên phát huy năng lực chuyên môn).
 
 #### C. Khẩu hiệu hành động
 **"Your success is our mission"** (Thành công của bạn là sứ mệnh của chúng tôi).
 
 #### D. Hệ thống 5 Giá trị cốt lõi
-1. **Result-Orientation (Hướng tới kết quả):** Đặt mục tiêu rõ ràng, quyết tâm vượt qua mọi khó khăn kỹ thuật để bàn giao sản phẩm phần mềm đúng tiến độ, đạt chuẩn mực chất lượng cao nhất đã cam kết với khách hàng.
-2. **Customer-Focus (Tập trung vào khách hàng):** Lắng nghe sâu sắc nhu cầu của đối tác, coi sự thành công và hài lòng bền vững của khách hàng là thước đo giá trị cao nhất của doanh nghiệp.
-3. **Integrity (Chính trực & Minh bạch):** Giữ trọn sự trung thực trong mọi cam kết, minh bạch tuyệt đối về chi phí, mã nguồn và tiến độ công việc, tuân thủ nghiêm ngặt chuẩn mực đạo đức kinh doanh quốc tế.
+1. **Hướng tới kết quả:** Đặt mục tiêu rõ ràng, tập trung giải quyết các yêu cầu kỹ thuật để bàn giao sản phẩm phần mềm đúng tiến độ và chất lượng cam kết với khách hàng.
+2. **Tập trung vào khách hàng:** Lắng nghe nhu cầu của đối tác, lấy sự hài lòng và hiệu quả công việc của khách hàng làm mục tiêu trọng tâm.
+3. **Chính trực và minh bạch:** Giữ sự trung thực trong mọi cam kết, minh bạch về chi phí, tiến độ công việc và tuân thủ các chuẩn mực đạo đức nghề nghiệp.
 4. **Empowerment (Trao quyền & Khuyến khích đổi mới):** Tin tưởng, trao quyền tự chủ chuyên môn cho các kỹ sư và quản trị viên, khuyến khích tư duy đổi mới sáng tạo và tạo không gian phát triển nghề nghiệp công bằng.
-5. **Collaboration (Hợp tác & Tinh thần đồng đội):** Đề cao sức mạnh tập thể, thúc đẩy sự chia sẻ tri thức liên phòng ban và tương tác cởi mở, không rào cản giữa các thành viên.
+5. **Hợp tác và tinh thần đồng đội:** Đề cao sức mạnh tập thể, thúc đẩy sự chia sẻ tri thức liên phòng ban và tương tác cởi mở, không rào cản giữa các thành viên.
 
 ---
 
@@ -418,30 +418,6 @@ Khối Delivery là "trung tâm sản xuất" tạo ra toàn bộ doanh thu củ
 - *Phòng Thanh toán & Dòng tiền (FIN-TREASURY):* Quản lý dòng tiền, trực tiếp thực hiện lệnh chi trả lương qua ngân hàng, chi trả tạm ứng công tác phí và giải ngân khoản vay phúc lợi.
 - *Phòng Kế hoạch Tài chính (FIN-FP&A):* Dự báo ngân sách tiền lương, phân tích biên lợi nhuận dự án và thẩm định nguồn tài chính cho các đề xuất tuyển dụng mới.
 
-#### F. Mạng lưới Chi nhánh, Cơ sở và Văn phòng đại diện quốc tế
-
-Bên cạnh 5 Khối chức năng chuyên môn hóa theo chiều dọc, Saigon Technology tổ chức bộ máy vận hành theo mạng lưới địa bàn phân tán nhằm tối ưu hóa nguồn lực công nghệ trong nước và mở rộng thị trường gia công xuất khẩu quốc tế:
-
-1. **Trụ sở chính tại TP. Hồ Chí Minh (Headquarters - 2 Cơ sở):**
-   - *Cơ sở 1 (Trung tâm Điều hành Đầu não):* Tòa nhà Orchard Parkview, số 130-132 Hồng Hà, Phường 9, Quận Phú Nhuận, TP.HCM. Diện tích sàn làm việc hơn 1.200m², là nơi đặt văn phòng làm việc của Ban Giám đốc Điều hành, Khối Quản trị Nguồn nhân lực (HR: 44 NV), Khối Vận hành & Pháp chế (OPS: 24 NV), Khối Tài chính - Kế toán (FIN: 27 NV), Khối Phát triển Kinh doanh (BIZ: 96 NV) và các nhóm Web Frontend, Backend Microservices, Mobile thuộc Trung tâm Kỹ thuật TP.HCM (DEV-SGN: 145 NV).
-   - *Cơ sở 2 (Trung tâm Nghiên cứu & Phát triển R&D):* Tòa nhà Aloha Building, số 68 Hồng Hà, Phường 2, Quận Tân Bình, TP.HCM (cách cơ sở 1 chỉ 500m). Diện tích hơn 800m², được thiết kế chuyên biệt cho công tác R&D công nghệ cao, tập trung đội ngũ kỹ sư Squad AI & Data Engineering (Computer Vision, Xử lý dữ liệu lớn, Trí tuệ nhân tạo tạo sinh) và Squad Cloud DevOps & SRE.
-
-2. **Chi nhánh Miền Trung tại TP. Đà Nẵng:**
-   - *Địa chỉ:* Tầng 5, Tòa nhà ICT1, Khu Công viên Phần mềm số 2, Đường Như Nguyệt, Phường Thuận Phước, Quận Hải Châu, TP. Đà Nẵng.
-   - *Quy mô và nhiệm vụ:* Quy tụ gần 100 kỹ sư phần mềm chất lượng cao thuộc Trung tâm Phần mềm Đà Nẵng (DEV-DAD với 4 Squad công nghệ). Chi nhánh được trang bị đầy đủ bộ phận vệ tinh về quản trị hành chính, nhân sự tại chỗ và IT hạ tầng, hoạt động theo mô hình trung tâm phát triển phần mềm chuyên trách (ODC) phục vụ trực tiếp các thị trường Nhật Bản, Singapore và Châu Á - Thái Bình Dương.
-
-3. **Mạng lưới 4 Văn phòng Đại diện Thương mại Quốc tế:**
-   - *Văn phòng Hoa Kỳ (USA):* Reston, Virginia (nằm trong hành lang công nghệ cao Dulles Technology Corridor), phụ trách tiếp cận và chăm sóc các khách hàng doanh nghiệp tại thị trường Bắc Mỹ.
-   - *Văn phòng Australia (Úc):* Sydney, New South Wales, phụ trách thị trường Australia và New Zealand (thị trường chiếm hơn 30% doanh thu ODC của công ty).
-   - *Văn phòng Singapore:* PLUS Building, Cecil Street, Singapore, đóng vai trò trung tâm kết nối tài chính công nghệ và khách hàng khu vực Đông Nam Á.
-   - *Văn phòng Thụy Sĩ (Switzerland):* Zurich, phụ trách phát triển thị trường Tây Âu và Bắc Âu (các quốc gia Đức, Thụy Sĩ, Hà Lan, Na Uy).
-   - *Cơ chế điều phối:* Các văn phòng đại diện quốc tế trực thuộc Khối Kinh doanh Quốc tế (BIZ-GLOBAL), thực hiện xúc tiến thương mại, ký kết hợp đồng dịch vụ phần mềm và tiếp nhận bàn giao dự án; toàn bộ khối lượng sản xuất kỹ thuật được chuyển giao về 2 trung tâm công nghệ tại TP.HCM và Đà Nẵng.
-
-4. **Mô hình Quản trị ma trận và Ứng dụng trên Hệ thống STS HRMIS:**
-   - *Phân quyền dữ liệu theo chi nhánh:* Hệ thống STS HRMIS cho phép phân cấp quản trị linh hoạt. Quản lý chi nhánh Đà Nẵng chỉ được phép phê duyệt phép, điều ca và xem báo cáo nhân sự thuộc chi nhánh Đà Nẵng; Ban Giám đốc và HR Head tại Trụ sở chính TP.HCM có thẩm quyền xem toàn diện báo cáo hợp nhất toàn công ty.
-   - *Chấm công định vị đa cơ sở và Face AI:* Mỗi cơ sở (Orchard Parkview, Aloha, ICT1 Đà Nẵng) được cấu hình dải địa chỉ IP mạng nội bộ, tọa độ GPS Geofencing (bán kính 50m) và mã định danh máy chấm công Face AI riêng biệt. Hệ thống tự động nhận diện nhân sự đang làm việc tại cơ sở nào để tính công chuẩn xác.
-   - *Quản trị chính sách lương - bảo hiểm theo vùng:* Hệ thống cấu hình chính sách tiền lương đóng bảo hiểm linh hoạt: áp dụng mức lương tối thiểu Vùng I đối với nhân sự làm việc tại 2 cơ sở TP.HCM và Vùng II đối với nhân sự tại Chi nhánh Đà Nẵng; hạch toán mã đơn vị nộp BHXH riêng biệt theo từng cơ quan BHXH địa phương.
-   - *Điều chuyển nhân sự nội bộ và công tác quốc tế:* Hệ thống tích hợp Use case Điều chuyển công tác (UC32) cho phép thuyên chuyển nhân sự linh hoạt giữa TP.HCM và Đà Nẵng hoặc cử kỹ sư onsite ngắn/dài hạn sang các văn phòng đại diện quốc tế tại Mỹ, Úc, Singapore, Thụy Sĩ, tự động điều chỉnh hệ số phụ cấp công tác và chế độ bảo hiểm tương ứng.
 
 ---
 
@@ -475,15 +451,15 @@ Trước khi đề tài nghiên cứu và xây dựng hệ thống thông tin qu
 - **Quy trình phê duyệt giấy tờ cồng kềnh, thiếu minh bạch:** Đơn xin nghỉ phép, đăng ký làm thêm giờ và đề xuất tuyển dụng phải in tờ trình giấy hoặc gửi email chờ ký duyệt qua 3 cấp, dẫn đến độ trễ cao và hoàn toàn thiếu nhật ký kiểm toán để truy vết trách nhiệm.
 - **Thiếu cổng tự phục vụ cho nhân viên:** Nhân viên không thể chủ động kiểm tra số ngày phép còn lại, không xem được chi tiết phiếu lương bảo mật và phải liên hệ trực tiếp với bộ phận nhân sự để tra cứu thông tin cơ bản, gây quá tải cho đội ngũ HR-OPS.
 
-Đứng trước thực trạng trên, Ban Giám đốc Saigon Technology đã chỉ đạo triển khai cấp bách dự án **Thiết kế và Xây dựng Hệ thống Thông tin Quản trị Nhân lực Toàn diện ** nhằm tin học hóa toàn diện chu trình nhân sự, xóa bỏ tình trạng phân mảnh dữ liệu và xây dựng nền tảng quản trị nguồn nhân lực số hiện đại.
+Trước thực trạng trên, Ban Giám đốc Saigon Technology đã quyết định triển khai đề tài xây dựng Hệ thống thông tin quản trị nhân lực nhằm tin học hóa các quy trình quản lý, giải quyết tình trạng phân tán dữ liệu và nâng cao hiệu quả vận hành doanh nghiệp.
 
 ---
 
-### 2.9. Mối quan hệ liên kết nghiệp vụ và Mô hình phối hợp 3 mắt xích
+### 2.9. Mối quan hệ liên kết nghiệp vụ giữa các bộ phận
 
-Mọi quyết định và luồng nghiệp vụ nhân sự trong toàn công ty được vận hành theo cơ chế phối hợp ba mắt xích cốt lõi: **Ban Giám đốc (Quyết định - Decision) — Các Khối Chức năng Điều phối (Trung tâm - Hub) — Các Khối Sản xuất & Kinh doanh (Cầu nối thực thi - Bridge)**:
+Hoạt động quản trị nhân lực tại Saigon Technology được vận hành thông qua sự phối hợp chặt chẽ giữa ba nhóm bộ phận chính: **Ban Giám đốc (định hướng và phê duyệt) — Khối Quản trị Nguồn nhân lực và Vận hành (tham mưu và điều phối) — Khối Kỹ thuật và Kinh doanh (đề xuất và thực thi)**:
 
-![Hình 1.4: Mô hình phối hợp 3 mắt xích cốt lõi](images/hinh_1_4_matrix_3links.png)
+![Hình 1.4: Mô hình phối hợp giữa các đơn vị trong quản trị nhân lực](images/hinh_1_4_matrix_3links.png)
 
 
 
@@ -537,7 +513,7 @@ Tài liệu tham khảo: Danh mục các giáo trình, văn bản quy phạm ph�
 
 ### 1.1.1. Tổng quan về quản trị nhân lực
 
-Quản trị nhân lực là hệ thống các triết lý, chính sách và hoạt động chức năng nhằm thu hút, đào tạo, phát triển và duy trì đội ngũ người lao động, bảo đảm tổ chức đạt được các mục tiêu chiến lược đề ra. Trong các doanh nghiệp công nghệ cao như Saigon Technology, nguồn lực con người giữ vị trí trung tâm, trực tiếp kiến tạo giá trị thông qua các sản phẩm phần mềm và giải pháp chuyển đổi số cho khách hàng toàn cầu.
+Quản trị nhân lực là hệ thống các triết lý, chính sách và hoạt động chức năng nhằm thu hút, đào tạo, phát triển và duy trì đội ngũ người lao động, bảo đảm tổ chức đạt được các mục tiêu chiến lược đề ra. Trong các doanh nghiệp sản xuất phần mềm như Saigon Technology, nguồn nhân lực kỹ thuật giữ vị trí quan trọng, trực tiếp tạo ra giá trị qua các sản phẩm và dịch vụ công nghệ.
 
 Quản trị nhân lực hiện đại bao gồm sáu nhóm chức năng cốt lõi: hoạch định nguồn nhân lực và tuyển dụng; đào tạo và phát triển năng lực chuyên môn; quản lý hiệu suất và đánh giá thành tích; đãi ngộ, tiền lương và phúc lợi (C&B); quan hệ lao động và tuân thủ pháp lý; quản lý thông tin và hồ sơ nhân sự. Sự phối hợp đồng bộ giữa các chức năng này tạo nên một môi trường làm việc chuyên nghiệp, khích lệ tinh thần đổi mới sáng tạo và giảm thiểu tỷ lệ biến động nhân sự.
 
@@ -1492,7 +1468,7 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 
 ### 2.1.4. Xây dựng biểu đồ Use case
 
-Biểu đồ Use case tổng quan thể hiện bức tranh toàn cảnh về sự tương tác giữa 6 nhóm tác nhân nghiệp vụ chủ chốt và 10 phân hệ chức năng bao quát toàn bộ 47 Use Case trong Hệ thống thông tin Quản trị nhân lực STS HRMIS.
+Biểu đồ Use case tổng quan thể hiện các tương tác giữa các nhóm tác nhân nghiệp vụ và 10 phân hệ chức năng bao quát toàn bộ 47 Use Case trong Hệ thống thông tin Quản trị nhân lực STS HRMIS.
 
 ![Hình 2.2: Biểu đồ Use case tổng quan Hệ thống Quản trị nhân lực](images/hinh_2_2_usecase_overview.png)
 
@@ -1666,7 +1642,7 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 
 ### 2.2.1. Định nghĩa và biểu diễn đối tượng, lớp
 
-Trong phương pháp phân tích thiết kế hướng đối tượng (OOAD), đối tượng đại diện cho một thực thể cụ thể trong miền bài toán thực tế, mang trong mình trạng thái dữ liệu (thuộc tính) và khả năng xử lý nghiệp vụ (phương thức). Lớp là bản thiết kế trừu tượng định nghĩa tập hợp các thuộc tính và hành vi chung cho một nhóm đối tượng.
+Trong phương pháp phân tích thiết kế hướng đối tượng (OOAD), đối tượng đại diện cho một thực thể cụ thể trong bài toán, bao gồm dữ liệu (thuộc tính) và các hành vi xử lý (phương thức). Lớp là bản thiết kế trừu tượng định nghĩa tập hợp các thuộc tính và hành vi chung cho một nhóm đối tượng.
 
 Để phân tách trách nhiệm rõ ràng theo mẫu kiến trúc BCE, các lớp trong hệ thống được phân thành ba nhóm chính:
 
@@ -1674,7 +1650,7 @@ Lớp Thực thể: Đại diện cho các đối tượng lưu trữ dữ liệ
 
 Lớp Biên / Giao diện: Đóng vai trò là cổng giao tiếp tương tác giữa tác nhân bên ngoài với hệ thống bên trong, bao gồm các trang màn hình tác nghiệp Next.js, biểu mẫu nhập liệu, bảng hiển thị dữ liệu và các hộp thoại tương tác.
 
-Lớp Điều khiển: Đóng vai trò là bộ não xử lý logic và điều phối các luồng nghiệp vụ trung tâm, được hiện thực hóa bằng các dịch vụ NestJS Service (như AuthService, RecruitmentService, AttendanceService, PayrollService).
+Lớp Điều khiển: Đảm nhiệm xử lý các logic nghiệp vụ và điều phối dữ liệu giữa tầng giao diện và cơ sở dữ liệu, được hiện thực hóa bằng các dịch vụ NestJS Service (như AuthService, RecruitmentService, AttendanceService, PayrollService).
 
 ### 2.2.2. Xác định các đối tượng, lớp từ đặc tả yêu cầu
 
@@ -1682,7 +1658,7 @@ Bằng phương pháp phân tích ngôn ngữ tự nhiên từ tài liệu khả
 
 Nhóm Đối tượng Con người & Tổ chức:
 - NguoiDung (User): Lưu trữ thông tin định danh cơ bản (Mã, Họ tên, Ngày sinh, CCCD, Email, SĐT, Địa chỉ);
-- NhanVien (Employee): Kế thừa từ NguoiDung, bổ sung thông tin nhân sự (Mã NV, Ngày vào công ty, Vị trí, Đơn vị trực thuộc, Trạng thái PROBATION/ACTIVE/RESIGNED);
+- NhanVien: Kế thừa từ NguoiDung, bổ sung thông tin nhân sự (Mã NV, Ngày vào công ty, Vị trí, Đơn vị trực thuộc, Trạng thái PROBATION/ACTIVE/RESIGNED);
 - DonVi (OrgUnit): Cấu trúc phòng ban và chi nhánh theo mô hình cây tự tham chiếu, quản lý định biên nhân sự;
 - VaiTro (Role): Vai trò phân quyền (USER, KM_MANAGER, ADMIN);
 - TaiKhoan (Account): Định danh xác thực, mật khẩu băm bcrypt, mã token JWT và trạng thái khóa tài khoản.
@@ -1700,36 +1676,36 @@ Nhóm Đối tượng Hồ sơ, Hợp đồng & Biến động:
 - VanBang (Certificate): Bằng tốt nghiệp đại học, chứng chỉ công nghệ, số hiệu, nơi cấp, bản quét lưu trữ;
 - PhieuMuonTra (DocumentLending): Phiếu mượn - trả bằng cấp bản gốc, ngày mượn, hạn trả, ngày thu hồi;
 - DeXuatBienDong (PersonnelAction): Đề xuất dùng chung cho các luồng thuyên chuyển, tăng lương, khen thưởng, kỷ luật, thôi việc;
-- NhiemVuBanGiao (HandoverChecklist): Danh mục kiểm tra trách nhiệm bàn giao 5 bước độc lập khi thôi việc.
+- NhiemVuBanGiao: Danh mục kiểm tra trách nhiệm bàn giao 5 bước độc lập khi thôi việc.
 
 Nhóm Đối tượng Chấm công, Nghỉ phép & Điểm danh:
-- SuKienDiemDanh (AttendanceEvent): Sự kiện điểm danh bất biến (Thời điểm, Nguồn: MACHINE/WEB/FACE/SIMULATOR, Cờ lệch);
-- ThietBiChamCong (AttendanceDevice): Cấu hình máy chấm công phần cứng, vị trí lắp đặt, khóa xác thực HMAC;
-- MauKhuonMat (FaceEmbedding): Vector đặc trưng khuôn mặt 128 chiều đã mã hóa AES-256-GCM (không lưu ảnh gốc);
-- CaLamViec (WorkShift): Khung giờ làm việc chuẩn, thời gian nghỉ giữa ca, dung sai ân hạn đi muộn;
-- BangCongNgay (DailyAttendance): Tổng hợp ngày công, giờ vào/ra thực tế, phút đi muộn, về sớm, giờ làm thêm;
-- DonNghiPhep (LeaveRequest): Đơn xin nghỉ phép, loại phép, khoảng thời gian, trạng thái phê duyệt;
-- SoDuPhep (LeaveBalance): Quỹ phép năm của nhân viên (12 ngày chuẩn + thâm niên 1 ngày/5 năm).
+- SuKienDiemDanh: Sự kiện điểm danh bất biến (Thời điểm, Nguồn: MACHINE/WEB/FACE/SIMULATOR, Cờ lệch);
+- ThietBiChamCong: Cấu hình máy chấm công phần cứng, vị trí lắp đặt, khóa xác thực HMAC;
+- MauKhuonMat: Vector đặc trưng khuôn mặt 128 chiều đã mã hóa AES-256-GCM (không lưu ảnh gốc);
+- CaLamViec: Khung giờ làm việc chuẩn, thời gian nghỉ giữa ca, dung sai ân hạn đi muộn;
+- BangCongNgay: Tổng hợp ngày công, giờ vào/ra thực tế, phút đi muộn, về sớm, giờ làm thêm;
+- DonNghiPhep: Đơn xin nghỉ phép, loại phép, khoảng thời gian, trạng thái phê duyệt;
+- SoDuPhep: Quỹ phép năm của nhân viên (12 ngày chuẩn + thâm niên 1 ngày/5 năm).
 
 Nhóm Đối tượng Tiền lương, Phúc lợi & Tài sản:
-- ThanhPhanLuong (SalaryComponent): Thành phần lương Gross, phụ cấp, thưởng, các khoản khấu trừ;
-- KyLuong (PayrollPeriod): Kỳ lương tháng, trạng thái chu kỳ (OPEN -> REVIEWED -> LOCKED);
-- PhieuLuong (Payslip): Phiếu lương điện tử chi tiết từng cá nhân;
-- KhoanVay (EmployeeLoan): Khoản vay phúc lợi, lãi suất ưu đãi, thời hạn, số tiền khấu trừ mỗi kỳ (EMI <= 30% lương Net);
-- CongTacPhi (ExpenseClaim): Đề xuất công tác, tạm ứng và bảng thanh quyết toán chi phí kèm hóa đơn điện tử;
-- TaiSan (Asset): Quản lý vòng đời tài sản thiết bị kỹ thuật (laptop, màn hình), trạng thái bàn giao và thu hồi.
+- ThanhPhanLuong: Thành phần lương Gross, phụ cấp, thưởng, các khoản khấu trừ;
+- KyLuong: Kỳ lương tháng, trạng thái chu kỳ (OPEN -> REVIEWED -> LOCKED);
+- PhieuLuong: Phiếu lương điện tử chi tiết từng cá nhân;
+- KhoanVay: Khoản vay phúc lợi, lãi suất ưu đãi, thời hạn, số tiền khấu trừ mỗi kỳ (EMI <= 30% lương Net);
+- CongTacPhi: Đề xuất công tác, tạm ứng và bảng thanh quyết toán chi phí kèm hóa đơn điện tử;
+- TaiSan: Quản lý vòng đời tài sản thiết bị kỹ thuật (laptop, màn hình), trạng thái bàn giao và thu hồi.
 
 Nhóm Đối tượng Quản trị & Tri thức:
-- HoSoCanBo (CadreProfile): Hồ sơ lý lịch 111 thuộc tính theo Mẫu 2C-BNV/2008 và 8 bảng diễn biến lịch sử;
-- NgachLuong (SalaryGrade): Khung 184 ngạch bậc lương chuẩn Nghị định 204/2004/NĐ-CP;
-- BaiViet (Article): Bài viết quy trình SOP, phiên bản nội dung bất biến (ArticleVersion);
-- NhatKyKiemToan (AuditLog): Nhật ký kiểm toán hệ thống ghi vết chỉ thêm (Append-Only) cho mọi giao dịch dữ liệu.
+- HoSoCanBo: Hồ sơ lý lịch 111 thuộc tính theo Mẫu 2C-BNV/2008 và 8 bảng diễn biến lịch sử;
+- NgachLuong: Khung 184 ngạch bậc lương chuẩn Nghị định 204/2004/NĐ-CP;
+- BaiViet: Bài viết quy trình SOP, phiên bản nội dung bất biến (ArticleVersion);
+- NhatKyKiemToan: Nhật ký kiểm toán hệ thống ghi vết chỉ thêm (Append-Only) cho mọi giao dịch dữ liệu.
 
 ## 2.3. Phân tích hành vi của hệ thống
 
 ### 2.3.1. Xây dựng biểu đồ trình tự
 
-Biểu đồ trình tự mô tả chi tiết chuỗi tương tác theo thứ tự thời gian giữa các tác nhân người dùng, lớp biên giao diện (Boundary), lớp điều khiển nghiệp vụ (Control) và các thực thể dữ liệu (Entity) trong hệ thống. Dưới đây là đầy đủ 47 biểu đồ trình tự tương ứng với 47 Use Case nghiệp vụ của toàn bộ hệ thống quản trị nhân lực:
+Biểu đồ trình tự mô tả chi tiết chuỗi tương tác theo thứ tự thời gian giữa các tác nhân người dùng, lớp biên giao diện, lớp điều khiển nghiệp vụ và các thực thể dữ liệu trong hệ thống. Dưới đây là đầy đủ 47 biểu đồ trình tự tương ứng với 47 Use Case nghiệp vụ của toàn bộ hệ thống quản trị nhân lực:
 
 #### 2.3.1.1. Biểu đồ trình tự Use case Đăng nhập & Xác thực hệ thống (UC01)
 
@@ -2363,7 +2339,7 @@ Bao gồm lớp giao diện `LeaveRequestForm`, lớp điều khiển `LeaveServ
 
 **3. Biểu đồ lớp miền cốt lõi của hệ thống:**
 
-Thể hiện toàn cảnh mối quan hệ liên kết, hợp thành và kế thừa giữa các thực thể cốt lõi nhất cấu thành nên hệ sinh thái quản trị nhân lực của doanh nghiệp.
+Thể hiện mối quan hệ liên kết, hợp thành và kế thừa giữa các thực thể dữ liệu chính trong hệ thống quản trị nhân lực của doanh nghiệp.
 
 ![Hình 2.106: Biểu đồ lớp miền cốt lõi của hệ thống](images/hinh_2_20_class_domain.png)
 
@@ -2429,13 +2405,13 @@ Sơ đồ thể hiện bảng sự kiện chấm công bất biến AttendanceEv
 
 Giao diện người dùng được thiết kế hiện đại trên nền tảng Design System trung tính của Shadcn UI và Tailwind CSS, tối ưu hóa trải nghiệm thao tác trên cả máy tính để bàn lẫn thiết bị di động. Cấu trúc điều hướng được tổ chức thành 7 phân hệ nghiệp vụ chuẩn hóa bao gồm 29 màn hình tác nghiệp trực tiếp, kết hợp cùng giao diện Kiosk điểm danh và trang đăng nhập xác thực tập trung (tổng cộng 31 màn hình):
 
-1. Phân hệ Không gian làm việc (Workspace):
+1. Phân hệ Không gian làm việc:
 - `/dashboard`: Bảng điều khiển phân tích tổng quan các chỉ số nhân sự cốt lõi, tỷ lệ hiện diện hôm nay và lối tắt tác vụ nhanh;
 - `/ess`: Cổng tự phục vụ nhân viên tập trung tích hợp điểm danh trực tuyến, nộp đơn nghỉ phép, đăng ký làm thêm giờ, tra cứu phiếu lương cá nhân và theo dõi khoản vay phúc lợi;
 - `/profile`: Quản trị hồ sơ cá nhân theo mô hình phân cấp 3 mức độ, tích hợp hàng đợi thẩm định đề xuất thay đổi thông tin định danh pháp lý có ảnh minh chứng;
 - `/notifications`: Trung tâm thông báo hệ thống thời gian thực, quản lý các thông báo phê duyệt đơn từ, biến động nhân sự, bài viết và nhắc việc cần xử lý.
 
-2. Phân hệ Nhân sự & Tổ chức (Personnel & Organization):
+2. Phân hệ Nhân sự & Tổ chức:
 - `/org-chart`: Sơ đồ cây cơ cấu tổ chức tương tác đa cấp, trực quan hóa quan hệ báo cáo cấp bậc và quản lý định biên phòng ban;
 - `/employees`: Danh bạ nhân sự toàn công ty hỗ trợ tìm kiếm toàn văn, lọc đa tiêu chí và kết xuất dữ liệu;
 - `/employees/[id]`: Hồ sơ nhân sự chi tiết thiết kế dạng thẻ chuyển tab (Thông tin cá nhân, Hợp đồng, Bằng cấp, Tài sản, Quá trình công tác);
@@ -2443,27 +2419,27 @@ Giao diện người dùng được thiết kế hiện đại trên nền tản
 - `/salary-ranks`: Cấu hình khung ngạch bậc lương theo tiêu chuẩn Nghị định 204/2004/NĐ-CP;
 - `/assets`: Quản lý vòng đời cấp phát và thu hồi tài sản làm việc (laptop, màn hình).
 
-3. Phân hệ Chấm công & Ca làm việc (Time & Attendance):
+3. Phân hệ Chấm công & Ca làm việc:
 - `/shifts`: Lập lịch phân ca làm việc, cấu hình khung giờ chuẩn và dung sai ân hạn đi muộn;
 - `/attendance`: Bảng chấm công tổng hợp theo tháng, hiển thị trực quan trạng thái ngày công, nghỉ phép và làm thêm giờ;
 - `/leave`: Quản lý đơn nghỉ phép với cơ chế tự động kiểm tra số dư và trừ quỹ phép ngay khi duyệt;
 - `/overtime`: Đăng ký và phê duyệt làm thêm giờ, kiểm soát trần thời gian tối đa theo luật lao động.
 
-4. Phân hệ Đãi ngộ & Tài chính (Compensation & Benefits):
+4. Phân hệ Đãi ngộ & Tài chính:
 - `/payroll-engine`: Chức năng tính toán tiền lương tự động, cấu hình thành phần thu nhập, trích nộp BHXH, thuế TNCN và thực thi khóa bất biến kỳ lương (LOCKED);
 - `/loans`: Trung tâm quản trị phúc lợi và khoản vay nhân viên, tích hợp công cụ mô phỏng tài chính, kiểm soát trích nợ không quá 30% lương Net và hỗ trợ tất toán sớm;
 - `/expense-claims`: Quản lý đề xuất công tác và thanh quyết toán chi phí công tác phí kèm hóa đơn điện tử.
 
-5. Phân hệ Phát triển & Tuyển dụng (Development & Recruitment):
+5. Phân hệ Phát triển & Tuyển dụng:
 - `/recruitment-ats`: Hệ thống tuyển dụng ứng viên với bảng điều khiển Kanban 6 giai đoạn, hỗ trợ nút "1-Click Nhận việc" để tự động chuyển ứng viên thành nhân viên chính thức;
 - `/performance-360`: Đánh giá hiệu suất đa chiều kết hợp tự đánh giá, đánh giá chéo đồng nghiệp và quản lý mục tiêu OKR/KPI;
 - `/training-grievance`: Quản lý các khóa đào tạo nội bộ và kênh tiếp nhận giải quyết khiếu nại lao động bảo mật.
 
-6. Phân hệ Báo cáo & Tài liệu số (Reports & Documents):
+6. Phân hệ Báo cáo & Tài liệu số:
 - `/personnel-reports`: Báo cáo nhân sự và hồ sơ cán bộ quản lý 111 trường thông tin theo chuẩn Mẫu 2C-BNV/2008, hỗ trợ kết xuất biểu mẫu in ấn A4;
 - `/documents`: Kho tri thức số nội bộ lưu trữ các quy trình vận hành chuẩn (SOP) với cơ chế quản lý phiên bản bất biến.
 
-7. Phân hệ Quản trị hệ thống (System Administration):
+7. Phân hệ Quản trị hệ thống:
 - Gồm 6 màn hình quản trị chuyên sâu dành cho vai trò ADMIN: quản trị tài khoản người dùng (`/admin/users`), quản trị cây đơn vị (`/admin/org-units`), quản trị danh mục dùng chung (`/admin/catalogs`), quản trị máy chấm công (`/admin/attendance`), cấu hình tham số (`/admin/settings`) và nhật ký kiểm toán hệ thống (`/admin/audit`).
 
 8. Giao diện Chuyên biệt:
@@ -2474,11 +2450,11 @@ Giao diện người dùng được thiết kế hiện đại trên nền tản
 
 Hệ thống được thiết kế và cài đặt theo mô hình kiến trúc ba tầng (3-Tier Architecture) hoàn chỉnh, bảo đảm tính độc lập cao giữa giao diện, logic xử lý và lưu trữ dữ liệu:
 
-Tầng Giao diện người dùng (Presentation Tier): Xây dựng bằng Next.js 14 Standalone phục vụ giao diện người dùng cho toàn bộ 31 màn hình chức năng, đồng thời đóng vai trò là Reverse Proxy chuyển tiếp các yêu cầu API (`/api/*`) trực tiếp tới máy chủ backend mà không cần cấu hình thêm máy chủ web trung gian.
+Tầng Giao diện người dùng: Xây dựng bằng Next.js 14 Standalone phục vụ giao diện người dùng cho toàn bộ 31 màn hình chức năng, đồng thời đóng vai trò là Reverse Proxy chuyển tiếp các yêu cầu API (`/api/*`) trực tiếp tới máy chủ backend mà không cần cấu hình thêm máy chủ web trung gian.
 
-Tầng Xử lý nghiệp vụ (Business Logic Tier): Xây dựng trên nền tảng NestJS 10 (TypeScript) bao gồm 39 module nghiệp vụ chuyên biệt, vận hành trên hai bộ máy xử lý cốt lõi: Quy trình phê duyệt biến động nhân sự và Chức năng tính lương tự động, tích hợp các dịch vụ bảo vệ phân quyền (JwtAuthGuard, RolesGuard) và cơ chế truyền thông điệp sự kiện (Event-Driven Architecture).
+Tầng Xử lý nghiệp vụ: Xây dựng trên nền tảng NestJS 10 (TypeScript) bao gồm 39 module nghiệp vụ chuyên biệt, vận hành trên hai bộ máy xử lý cốt lõi: Quy trình phê duyệt biến động nhân sự và Chức năng tính lương tự động, tích hợp các dịch vụ bảo vệ phân quyền (JwtAuthGuard, RolesGuard) và cơ chế truyền thông điệp sự kiện (Event-Driven Architecture).
 
-Tầng Lưu trữ dữ liệu (Data Tier): Hệ quản trị cơ sở dữ liệu PostgreSQL 16 quản lý 87 model quan hệ, kết hợp ổ lưu trữ tệp đính kèm độc lập; quản trị cấu trúc lược đồ qua Prisma Migration tự động chạy phiên bản khi khởi động container.
+Tầng Lưu trữ dữ liệu: Hệ quản trị cơ sở dữ liệu PostgreSQL 16 quản lý 87 model quan hệ, kết hợp ổ lưu trữ tệp đính kèm độc lập; quản trị cấu trúc lược đồ qua Prisma Migration tự động chạy phiên bản khi khởi động container.
 
 ![Hình 2.109: Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống](images/hinh_2_22_arch_3tier.png)
 
