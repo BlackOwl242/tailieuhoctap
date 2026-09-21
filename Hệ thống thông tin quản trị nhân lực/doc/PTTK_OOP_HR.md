@@ -87,20 +87,59 @@ TÀI LIỆU THAM KHẢO
 
 | STT | Từ viết tắt | Thuật ngữ đầy đủ và Diễn giải |
 | :---: | :---: | :--- |
-| 1 | OOAD | Object-Oriented Analysis and Design (Phân tích và thiết kế hướng đối tượng) |
-| 2 | OOP | Object-Oriented Programming (Lập trình hướng đối tượng) |
-| 3 | UML | Unified Modeling Language (Ngôn ngữ mô hình hóa thống nhất) |
-| 4 | STS | STS Software Technology JSC (Công ty Cổ phần Phần mềm Saigon Technology) |
-| 5 | ODC | Offshore Development Center (Trung tâm phát triển phần mềm chuyên trách) |
-| 6 | BGD | Board of Directors / Executive Board (Ban Giám đốc Điều hành) |
-| 7 | PM | Project Manager (Quản trị viên Dự án phần mềm) |
-| 8 | C&B | Compensation & Benefits (Bộ phận Chế độ Đãi ngộ, Tiền lương và Phúc lợi) |
-| 9 | KPI / OKR | Key Performance Indicator / Objectives and Key Results (Chỉ số hiệu suất & Mục tiêu) |
-| 10 | CRUD | Create, Read, Update, Delete (Bốn thao tác dữ liệu cơ bản) |
-| 11 | RBAC | Role-Based Access Control (Kiểm soát truy cập dựa trên vai trò) |
-| 12 | ERD | Entity-Relationship Diagram (Sơ đồ quan hệ thực thể cơ sở dữ liệu) |
-| 13 | RESTful API | Representational State Transfer API (Giao diện lập trình ứng dụng chuẩn REST) |
-| 14 | JSON | JavaScript Object Notation (Định dạng trao đổi dữ liệu tiêu chuẩn) |
+| 1 | AI | Artificial Intelligence (Trí tuệ nhân tạo) |
+| 2 | API | Application Programming Interface (Giao diện lập trình ứng dụng) |
+| 3 | ATS | Applicant Tracking System (Hệ thống quản lý và theo dõi hồ sơ ứng viên tuyển dụng) |
+| 4 | BGD | Ban Giám đốc (Ban Giám đốc Điều hành công ty) |
+| 5 | BHTN | Bảo hiểm thất nghiệp |
+| 6 | BHXH | Bảo hiểm xã hội |
+| 7 | BHYT | Bảo hiểm y tế |
+| 8 | BNV | Bộ Nội vụ (Quy chuẩn hồ sơ cán bộ mẫu 2C-BNV) |
+| 9 | C&B | Compensation & Benefits (Bộ phận Chế độ đãi ngộ, Tiền lương và Phúc lợi) |
+| 10 | CCCD | Căn cước công dân |
+| 11 | CNTT | Công nghệ thông tin |
+| 12 | CRUD | Create, Read, Update, Delete (Bốn thao tác dữ liệu cơ bản: Tạo mới, Đọc, Sửa, Xóa) |
+| 13 | CSDL | Cơ sở dữ liệu |
+| 14 | CV | Curriculum Vitae (Bản tóm tắt lý lịch trích ngang và kinh nghiệm của ứng viên) |
+| 15 | ĐHCĐ | Đại hội đồng Cổ đông |
+| 16 | ĐKKD | Đăng ký kinh doanh |
+| 17 | ERD | Entity-Relationship Diagram (Sơ đồ quan hệ thực thể cơ sở dữ liệu) |
+| 18 | ESOP | Employee Stock Ownership Plan (Kế hoạch phát hành cổ phiếu thưởng cho người lao động) |
+| 19 | ESS | Employee Self-Service (Cổng thông tin tự phục vụ dành cho nhân viên) |
+| 20 | FTS | Full-Text Search (Tìm kiếm toàn văn theo chỉ mục) |
+| 21 | GPS | Global Positioning System (Hệ thống định vị toàn cầu) |
+| 22 | HĐLĐ | Hợp đồng lao động |
+| 23 | HR | Human Resources (Nguồn nhân lực / Bộ phận Quản trị Nhân sự) |
+| 24 | HRMS | Human Resource Management System (Hệ thống thông tin quản trị nhân lực) |
+| 25 | IR | Infrared (Cảm biến hồng ngoại phát hiện thân nhiệt chống giả mạo sinh trắc) |
+| 26 | ISO | International Organization for Standardization (Tổ chức Tiêu chuẩn hóa Quốc tế) |
+| 27 | IT | Information Technology (Công nghệ thông tin) |
+| 28 | JD | Job Description (Bản mô tả vị trí và tiêu chuẩn công việc) |
+| 29 | JSON | JavaScript Object Notation (Định dạng trao đổi dữ liệu tiêu chuẩn) |
+| 30 | JWT | JSON Web Token (Tiêu chuẩn mã hóa token xác thực phiên làm việc an toàn) |
+| 31 | KPI | Key Performance Indicator (Chỉ số đánh giá hiệu suất công việc then chốt) |
+| 32 | NDA | Non-Disclosure Agreement (Thỏa thuận cam kết bảo mật thông tin) |
+| 33 | NĐ | Nghị định (Nghị định của Chính phủ) |
+| 34 | ODC | Offshore Development Center (Trung tâm phát triển phần mềm chuyên trách) |
+| 35 | OKR | Objectives and Key Results (Mục tiêu và kết quả then chốt) |
+| 36 | OOAD | Object-Oriented Analysis and Design (Phân tích và thiết kế hướng đối tượng) |
+| 37 | OOP | Object-Oriented Programming (Lập trình hướng đối tượng) |
+| 38 | ORM | Object-Relational Mapping (Kỹ thuật ánh xạ quan hệ - đối tượng trong CSDL) |
+| 39 | OT | Overtime (Làm thêm ngoài giờ) |
+| 40 | PM | Project Manager (Quản trị viên dự án phần mềm) |
+| 41 | QR | Quick Response code (Mã phản hồi nhanh hai chiều) |
+| 42 | RACI | Responsible, Accountable, Consulted, Informed (Ma trận phân định vai trò và trách nhiệm) |
+| 43 | RBAC | Role-Based Access Control (Mô hình kiểm soát truy cập dựa trên vai trò) |
+| 44 | RESTful API | Representational State Transfer API (Giao diện API chuẩn kiến trúc dịch vụ REST) |
+| 45 | SOP | Standard Operating Procedure (Quy trình thao tác vận hành chuẩn) |
+| 46 | SSO | Single Sign-On (Cơ chế xác thực đăng nhập một lần) |
+| 47 | STS | STS Software Technology JSC (Công ty Cổ phần Công nghệ Phần mềm STS / Saigon Technology) |
+| 48 | SYLL | Sơ yếu lý lịch |
+| 49 | TNCN | Thuế thu nhập cá nhân |
+| 50 | TP.HCM | Thành phố Hồ Chí Minh |
+| 51 | UI / UX | User Interface / User Experience (Giao diện người dùng / Trải nghiệm người dùng) |
+| 52 | UML | Unified Modeling Language (Ngôn ngữ mô hình hóa thống nhất) |
+| 53 | VINASA | Hiệp hội Phần mềm và Dịch vụ Công nghệ thông tin Việt Nam |
 
 ---
 
@@ -111,15 +150,13 @@ TÀI LIỆU THAM KHẢO
 - Bảng 1.2. Mạng lưới văn phòng và chi nhánh toàn cầu của Saigon Technology
 - Bảng 1.3. Tổng hợp chứng nhận quốc tế và giải thưởng tiêu biểu của Saigon Technology
 - Bảng 1.4. Cơ cấu nguồn nhân lực theo khối chức năng và trình độ tại Saigon Technology
-- Bảng 1.5. Ma trận phân định trách nhiệm liên phòng ban trong các quy trình quản trị nhân sự
+- Bảng 1.5. Ma trận phân định trách nhiệm liên phòng ban trong các quy trình quản trị nhân sự (RACI Matrix)
 - Bảng 2.1. Ánh xạ tác nhân hệ thống với cơ cấu tổ chức của Saigon Technology
 - Bảng 2.2. Danh sách 47 Use case của Hệ thống Quản trị nhân lực
-- Bảng 2.3. Đặc tả tổng hợp 47 Use case của hệ thống
-- Bảng 2.4. Đặc tả chi tiết các Use case trọng yếu
-- Bảng 2.5. Bảng ánh xạ ba tầng: từ Quy trình nghiệp vụ đến Use Case và Màn hình thực tế
-- Bảng 2.6. Ma trận phân quyền truy cập chức năng
-- Bảng 2.7. Đặc tả cấu trúc lược đồ Cơ sở dữ liệu quan hệ
-- Bảng 2.8. So sánh các phương thức điểm danh trong hệ thống
+- Bảng 2.3. Bảng ánh xạ ba tầng: từ Quy trình nghiệp vụ đến Use Case và Màn hình thực tế
+- Bảng 2.4. Ma trận phân quyền truy cập chức năng theo vai trò người dùng (RBAC Matrix)
+- Bảng 2.5. Đặc tả cấu trúc lược đồ Cơ sở dữ liệu quan hệ của hệ thống
+- Bảng 2.6. So sánh các phương thức điểm danh trong hệ thống
 
 **Danh mục Sơ đồ, Hình ảnh:**
 - Hình 1.1. Sơ đồ cơ cấu tổ chức tổng thể Công ty Saigon Technology
@@ -128,123 +165,133 @@ TÀI LIỆU THAM KHẢO
 - Hình 1.4. Mô hình phối hợp giữa các đơn vị trong quản trị nhân lực
 - Hình 2.1. Biểu đồ cây phân cấp Tác nhân
 - Hình 2.2. Biểu đồ Use case tổng quan Hệ thống Quản trị nhân lực
-- Hình 2.3. Biểu đồ Use case nhóm B - Tuyển dụng
-- Hình 2.4. Biểu đồ trình tự Use case Đăng nhập & Xác thực hệ thống (UC01)
-- Hình 2.5. Biểu đồ trình tự Use case Quản trị người dùng & Phân quyền RBAC (UC02)
-- Hình 2.6. Biểu đồ trình tự Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)
-- Hình 2.7. Biểu đồ trình tự Use case Lập phiếu đề xuất tuyển dụng nhân sự (UC04)
-- Hình 2.8. Biểu đồ trình tự Use case Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng (UC05)
-- Hình 2.9. Biểu đồ trình tự Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)
-- Hình 2.10. Biểu đồ trình tự Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban (UC07)
-- Hình 2.11. Biểu đồ trình tự Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)
-- Hình 2.12. Biểu đồ trình tự Use case Quản lý hồ sơ nhân viên toàn diện (UC09)
-- Hình 2.13. Biểu đồ trình tự Use case Quản lý hợp đồng lao động & Phụ lục hợp đồng (UC10)
-- Hình 2.14. Biểu đồ trình tự Use case Quản lý văn bằng, chứng chỉ chuyên môn (UC11)
-- Hình 2.15. Biểu đồ trình tự Use case Mượn - trả hồ sơ, chứng chỉ bản gốc (UC12)
-- Hình 2.16. Biểu đồ trình tự Use case Đánh giá kết quả thử việc & Ký HĐLĐ chính thức (UC13)
-- Hình 2.17. Biểu đồ trình tự Use case Lộ trình hội nhập nhân viên mới (UC14)
-- Hình 2.18. Biểu đồ trình tự Use case Cổng tự phục vụ nhân viên tập trung (UC15)
-- Hình 2.19. Biểu đồ trình tự Use case Quản lý thông tin cá nhân phân cấp 3 mức độ (UC16)
-- Hình 2.20. Biểu đồ trình tự Use case Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 (UC17)
-- Hình 2.21. Biểu đồ trình tự Use case Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca (UC18)
-- Hình 2.22. Biểu đồ trình tự Use case Điểm danh sinh trắc học khuôn mặt & Cảm biến IR (UC19)
-- Hình 2.23. Biểu đồ trình tự Use case Quản trị kết nối thiết bị máy chấm công (UC20)
-- Hình 2.24. Biểu đồ trình tự Use case Đăng ký & Xét duyệt nghỉ phép trực tuyến (UC21)
-- Hình 2.25. Biểu đồ trình tự Use case Đăng ký & Phê duyệt làm thêm giờ (OT) (UC22)
-- Hình 2.26. Biểu đồ trình tự Use case Lập lịch và phân ca làm việc (UC23)
-- Hình 2.27. Biểu đồ trình tự Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)
-- Hình 2.28. Biểu đồ trình tự Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)
-- Hình 2.29. Biểu đồ trình tự Use case Cấu hình công thức và ngạch bậc lương (UC26)
-- Hình 2.30. Biểu đồ trình tự Use case Vận hành chức năng tính lương tự động (UC27)
-- Hình 2.31. Biểu đồ trình tự Use case Phê duyệt & Khóa bất biến kỳ lương (UC28)
-- Hình 2.32. Biểu đồ trình tự Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)
-- Hình 2.33. Biểu đồ trình tự Use case Quản lý đề xuất công tác & Quyết toán chi phí (UC30)
-- Hình 2.34. Biểu đồ trình tự Use case Quản lý cấp phát & Thu hồi tài sản làm việc (UC31)
-- Hình 2.35. Biểu đồ trình tự Use case Đề xuất & Phê duyệt điều chuyển công tác nội bộ (UC32)
-- Hình 2.36. Biểu đồ trình tự Use case Đề xuất & Phê duyệt điều chỉnh bậc lương (UC33)
-- Hình 2.37. Biểu đồ trình tự Use case Đề xuất & Phê duyệt khen thưởng nhân sự (UC34)
-- Hình 2.38. Biểu đồ trình tự Use case Xử lý kỷ luật & Vi phạm nội quy lao động (UC35)
-- Hình 2.39. Biểu đồ trình tự Use case Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận (UC36)
-- Hình 2.40. Biểu đồ trình tự Use case Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI (UC37)
-- Hình 2.41. Biểu đồ trình tự Use case Quản trị chương trình đào tạo nội bộ (UC38)
-- Hình 2.42. Biểu đồ trình tự Use case Tiếp nhận & Giải quyết khiếu nại lao động bảo mật (UC39)
-- Hình 2.43. Biểu đồ trình tự Use case Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV (UC40)
-- Hình 2.44. Biểu đồ trình tự Use case Quản trị danh mục ngạch bậc lương chuẩn NĐ 204 (UC41)
-- Hình 2.45. Biểu đồ trình tự Use case Tự động rà soát & Phê duyệt nâng bậc lương định kỳ (UC42)
-- Hình 2.46. Biểu đồ trình tự Use case Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03) (UC43)
-- Hình 2.47. Biểu đồ trình tự Use case Quản lý không gian tri thức số & Tài liệu quy trình SOP (UC44)
-- Hình 2.48. Biểu đồ trình tự Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)
-- Hình 2.49. Biểu đồ trình tự Use case Bảng điều khiển phân tích & Thống kê nhân sự (UC46)
-- Hình 2.50. Biểu đồ trình tự Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)
-- Hình 2.51. Biểu đồ hoạt động Use case Đăng nhập & Xác thực hệ thống (UC01)
-- Hình 2.52. Biểu đồ hoạt động Use case Quản trị người dùng & Phân quyền RBAC (UC02)
-- Hình 2.53. Biểu đồ hoạt động Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)
-- Hình 2.54. Biểu đồ hoạt động Use case Lập phiếu đề xuất tuyển dụng nhân sự (UC04)
-- Hình 2.55. Biểu đồ hoạt động Use case Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng (UC05)
-- Hình 2.56. Biểu đồ hoạt động Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)
-- Hình 2.57. Biểu đồ hoạt động Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban (UC07)
-- Hình 2.58. Biểu đồ hoạt động Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)
-- Hình 2.59. Biểu đồ hoạt động Use case Quản lý hồ sơ nhân viên toàn diện (UC09)
-- Hình 2.60. Biểu đồ hoạt động Use case Quản lý hợp đồng lao động & Phụ lục hợp đồng (UC10)
-- Hình 2.61. Biểu đồ hoạt động Use case Quản lý văn bằng, chứng chỉ chuyên môn (UC11)
-- Hình 2.62. Biểu đồ hoạt động Use case Mượn - trả hồ sơ, chứng chỉ bản gốc (UC12)
-- Hình 2.63. Biểu đồ hoạt động Use case Đánh giá kết quả thử việc & Ký HĐLĐ chính thức (UC13)
-- Hình 2.64. Biểu đồ hoạt động Use case Lộ trình hội nhập nhân viên mới (UC14)
-- Hình 2.65. Biểu đồ hoạt động Use case Cổng tự phục vụ nhân viên tập trung (UC15)
-- Hình 2.66. Biểu đồ hoạt động Use case Quản lý thông tin cá nhân phân cấp 3 mức độ (UC16)
-- Hình 2.67. Biểu đồ hoạt động Use case Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 (UC17)
-- Hình 2.68. Biểu đồ hoạt động Use case Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca (UC18)
-- Hình 2.69. Biểu đồ hoạt động Use case Điểm danh sinh trắc học khuôn mặt & Cảm biến IR (UC19)
-- Hình 2.70. Biểu đồ hoạt động Use case Quản trị kết nối thiết bị máy chấm công (UC20)
-- Hình 2.71. Biểu đồ hoạt động Use case Đăng ký & Xét duyệt nghỉ phép trực tuyến (UC21)
-- Hình 2.72. Biểu đồ hoạt động Use case Đăng ký & Phê duyệt làm thêm giờ (OT) (UC22)
-- Hình 2.73. Biểu đồ hoạt động Use case Lập lịch và phân ca làm việc (UC23)
-- Hình 2.74. Biểu đồ hoạt động Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)
-- Hình 2.75. Biểu đồ hoạt động Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)
-- Hình 2.76. Biểu đồ hoạt động Use case Cấu hình công thức và ngạch bậc lương (UC26)
-- Hình 2.77. Biểu đồ hoạt động Use case Vận hành chức năng tính lương tự động (UC27)
-- Hình 2.78. Biểu đồ hoạt động Use case Phê duyệt & Khóa bất biến kỳ lương (UC28)
-- Hình 2.79. Biểu đồ hoạt động Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)
-- Hình 2.80. Biểu đồ hoạt động Use case Quản lý đề xuất công tác & Quyết toán chi phí (UC30)
-- Hình 2.81. Biểu đồ hoạt động Use case Quản lý cấp phát & Thu hồi tài sản làm việc (UC31)
-- Hình 2.82. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt điều chuyển công tác nội bộ (UC32)
-- Hình 2.83. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt điều chỉnh bậc lương (UC33)
-- Hình 2.84. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt khen thưởng nhân sự (UC34)
-- Hình 2.85. Biểu đồ hoạt động Use case Xử lý kỷ luật & Vi phạm nội quy lao động (UC35)
-- Hình 2.86. Biểu đồ hoạt động Use case Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận (UC36)
-- Hình 2.87. Biểu đồ hoạt động Use case Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI (UC37)
-- Hình 2.88. Biểu đồ hoạt động Use case Quản trị chương trình đào tạo nội bộ (UC38)
-- Hình 2.89. Biểu đồ hoạt động Use case Tiếp nhận & Giải quyết khiếu nại lao động bảo mật (UC39)
-- Hình 2.90. Biểu đồ hoạt động Use case Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV (UC40)
-- Hình 2.91. Biểu đồ hoạt động Use case Quản trị danh mục ngạch bậc lương chuẩn NĐ 204 (UC41)
-- Hình 2.92. Biểu đồ hoạt động Use case Tự động rà soát & Phê duyệt nâng bậc lương định kỳ (UC42)
-- Hình 2.93. Biểu đồ hoạt động Use case Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03) (UC43)
-- Hình 2.94. Biểu đồ hoạt động Use case Quản lý không gian tri thức số & Tài liệu quy trình SOP (UC44)
-- Hình 2.95. Biểu đồ hoạt động Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)
-- Hình 2.96. Biểu đồ hoạt động Use case Bảng điều khiển phân tích & Thống kê nhân sự (UC46)
-- Hình 2.97. Biểu đồ hoạt động Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)
-- Hình 2.98. Biểu đồ trạng thái vòng đời Nhân viên
-- Hình 2.99. Biểu đồ trạng thái Phiếu tuyển dụng
-- Hình 2.100. Biểu đồ trạng thái Đơn nghỉ phép
-- Hình 2.101. Biểu đồ trạng thái Phiếu mượn - trả hồ sơ
-- Hình 2.102. Biểu đồ trạng thái Phiếu lương
-- Hình 2.103. Biểu đồ gói tổng quan của hệ thống
-- Hình 2.104. Biểu đồ lớp Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03)
-- Hình 2.105. Biểu đồ lớp Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08)
-- Hình 2.106. Biểu đồ lớp Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14)
-- Hình 2.107. Biểu đồ lớp Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17)
-- Hình 2.108. Biểu đồ lớp Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25)
-- Hình 2.109. Biểu đồ lớp Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31)
-- Hình 2.110. Biểu đồ lớp Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36)
-- Hình 2.111. Biểu đồ lớp Phân hệ Đánh giá hiệu suất, Đào tạo và Khiếu nại (Nhóm H: UC37 - UC39)
-- Hình 2.112. Biểu đồ lớp Phân hệ Hồ sơ cán bộ và Báo cáo nhà nước (Nhóm I: UC40 - UC43)
-- Hình 2.113. Biểu đồ lớp Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47)
-- Hình 2.114. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC21)
-- Hình 2.115. Biểu đồ lớp miền cốt lõi của hệ thống
-- Hình 2.116. Mô hình cơ sở dữ liệu vật lý của hệ thống
-- Hình 2.117. Mô hình dữ liệu mở rộng cho chấm công đa nguồn
-- Hình 2.118. Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống
+- Hình 2.3. Biểu đồ Use case Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03)
+- Hình 2.4. Biểu đồ Use case Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08)
+- Hình 2.5. Biểu đồ Use case Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14)
+- Hình 2.6. Biểu đồ Use case Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17)
+- Hình 2.7. Biểu đồ Use case Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25)
+- Hình 2.8. Biểu đồ Use case Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31)
+- Hình 2.9. Biểu đồ Use case Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36)
+- Hình 2.10. Biểu đồ Use case Phân hệ Đánh giá hiệu suất, Đào tạo và Khiếu nại (Nhóm H: UC37 - UC39)
+- Hình 2.11. Biểu đồ Use case Phân hệ Hồ sơ cán bộ và Báo cáo nhà nước (Nhóm I: UC40 - UC43)
+- Hình 2.12. Biểu đồ Use case Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47)
+- Hình 2.13. Biểu đồ trình tự Use case Đăng nhập & Xác thực hệ thống (UC01)
+- Hình 2.14. Biểu đồ trình tự Use case Quản trị người dùng & Phân quyền RBAC (UC02)
+- Hình 2.15. Biểu đồ trình tự Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)
+- Hình 2.16. Biểu đồ trình tự Use case Lập phiếu đề xuất tuyển dụng nhân sự (UC04)
+- Hình 2.17. Biểu đồ trình tự Use case Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng (UC05)
+- Hình 2.18. Biểu đồ trình tự Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)
+- Hình 2.19. Biểu đồ trình tự Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS (UC07)
+- Hình 2.20. Biểu đồ trình tự Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)
+- Hình 2.21. Biểu đồ trình tự Use case Quản lý hồ sơ nhân viên toàn diện (UC09)
+- Hình 2.22. Biểu đồ trình tự Use case Quản lý hợp đồng lao động & Phụ lục hợp đồng (UC10)
+- Hình 2.23. Biểu đồ trình tự Use case Quản lý văn bằng, chứng chỉ chuyên môn (UC11)
+- Hình 2.24. Biểu đồ trình tự Use case Mượn - trả hồ sơ, chứng chỉ bản gốc (UC12)
+- Hình 2.25. Biểu đồ trình tự Use case Đánh giá kết quả thử việc & Ký HĐLĐ chính thức (UC13)
+- Hình 2.26. Biểu đồ trình tự Use case Lộ trình hội nhập nhân viên mới (UC14)
+- Hình 2.27. Biểu đồ trình tự Use case Cổng tự phục vụ nhân viên tập trung (UC15)
+- Hình 2.28. Biểu đồ trình tự Use case Quản lý thông tin cá nhân phân cấp 3 mức độ (UC16)
+- Hình 2.29. Biểu đồ trình tự Use case Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 (UC17)
+- Hình 2.30. Biểu đồ trình tự Use case Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca (UC18)
+- Hình 2.31. Biểu đồ trình tự Use case Điểm danh sinh trắc học khuôn mặt & Cảm biến IR (UC19)
+- Hình 2.32. Biểu đồ trình tự Use case Quản trị kết nối thiết bị máy chấm công (UC20)
+- Hình 2.33. Biểu đồ trình tự Use case Đăng ký & Xét duyệt nghỉ phép trực tuyến (UC21)
+- Hình 2.34. Biểu đồ trình tự Use case Đăng ký & Phê duyệt làm thêm giờ (OT) (UC22)
+- Hình 2.35. Biểu đồ trình tự Use case Lập lịch và phân ca làm việc (UC23)
+- Hình 2.36. Biểu đồ trình tự Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)
+- Hình 2.37. Biểu đồ trình tự Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)
+- Hình 2.38. Biểu đồ trình tự Use case Cấu hình công thức và ngạch bậc lương (UC26)
+- Hình 2.39. Biểu đồ trình tự Use case Vận hành chức năng tính lương tự động (UC27)
+- Hình 2.40. Biểu đồ trình tự Use case Phê duyệt & Khóa bất biến kỳ lương (UC28)
+- Hình 2.41. Biểu đồ trình tự Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)
+- Hình 2.42. Biểu đồ trình tự Use case Quản lý đề xuất công tác & Quyết toán chi phí (UC30)
+- Hình 2.43. Biểu đồ trình tự Use case Quản lý cấp phát & Thu hồi tài sản làm việc (UC31)
+- Hình 2.44. Biểu đồ trình tự Use case Đề xuất & Phê duyệt điều chuyển công tác nội bộ (UC32)
+- Hình 2.45. Biểu đồ trình tự Use case Đề xuất & Phê duyệt điều chỉnh bậc lương (UC33)
+- Hình 2.46. Biểu đồ trình tự Use case Đề xuất & Phê duyệt khen thưởng nhân sự (UC34)
+- Hình 2.47. Biểu đồ trình tự Use case Xử lý kỷ luật & Vi phạm nội quy lao động (UC35)
+- Hình 2.48. Biểu đồ trình tự Use case Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận (UC36)
+- Hình 2.49. Biểu đồ trình tự Use case Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI (UC37)
+- Hình 2.50. Biểu đồ trình tự Use case Quản trị chương trình đào tạo nội bộ (UC38)
+- Hình 2.51. Biểu đồ trình tự Use case Tiếp nhận & Giải quyết khiếu nại lao động bảo mật (UC39)
+- Hình 2.52. Biểu đồ trình tự Use case Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV (UC40)
+- Hình 2.53. Biểu đồ trình tự Use case Quản trị danh mục ngạch bậc lương chuẩn NĐ 204 (UC41)
+- Hình 2.54. Biểu đồ trình tự Use case Tự động rà soát & Phê duyệt nâng bậc lương định kỳ (UC42)
+- Hình 2.55. Biểu đồ trình tự Use case Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03) (UC43)
+- Hình 2.56. Biểu đồ trình tự Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành (UC44)
+- Hình 2.57. Biểu đồ trình tự Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)
+- Hình 2.58. Biểu đồ trình tự Use case Bảng điều khiển phân tích & Thống kê nhân sự (UC46)
+- Hình 2.59. Biểu đồ trình tự Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)
+- Hình 2.60. Biểu đồ hoạt động Use case Đăng nhập & Xác thực hệ thống (UC01)
+- Hình 2.61. Biểu đồ hoạt động Use case Quản trị người dùng & Phân quyền RBAC (UC02)
+- Hình 2.62. Biểu đồ hoạt động Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)
+- Hình 2.63. Biểu đồ hoạt động Use case Lập phiếu đề xuất tuyển dụng nhân sự (UC04)
+- Hình 2.64. Biểu đồ hoạt động Use case Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng (UC05)
+- Hình 2.65. Biểu đồ hoạt động Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)
+- Hình 2.66. Biểu đồ hoạt động Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS (UC07)
+- Hình 2.67. Biểu đồ hoạt động Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)
+- Hình 2.68. Biểu đồ hoạt động Use case Quản lý hồ sơ nhân viên toàn diện (UC09)
+- Hình 2.69. Biểu đồ hoạt động Use case Quản lý hợp đồng lao động & Phụ lục hợp đồng (UC10)
+- Hình 2.70. Biểu đồ hoạt động Use case Quản lý văn bằng, chứng chỉ chuyên môn (UC11)
+- Hình 2.71. Biểu đồ hoạt động Use case Mượn - trả hồ sơ, chứng chỉ bản gốc (UC12)
+- Hình 2.72. Biểu đồ hoạt động Use case Đánh giá kết quả thử việc & Ký HĐLĐ chính thức (UC13)
+- Hình 2.73. Biểu đồ hoạt động Use case Lộ trình hội nhập nhân viên mới (UC14)
+- Hình 2.74. Biểu đồ hoạt động Use case Cổng tự phục vụ nhân viên tập trung (UC15)
+- Hình 2.75. Biểu đồ hoạt động Use case Quản lý thông tin cá nhân phân cấp 3 mức độ (UC16)
+- Hình 2.76. Biểu đồ hoạt động Use case Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 (UC17)
+- Hình 2.77. Biểu đồ hoạt động Use case Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca (UC18)
+- Hình 2.78. Biểu đồ hoạt động Use case Điểm danh sinh trắc học khuôn mặt & Cảm biến IR (UC19)
+- Hình 2.79. Biểu đồ hoạt động Use case Quản trị kết nối thiết bị máy chấm công (UC20)
+- Hình 2.80. Biểu đồ hoạt động Use case Đăng ký & Xét duyệt nghỉ phép trực tuyến (UC21)
+- Hình 2.81. Biểu đồ hoạt động Use case Đăng ký & Phê duyệt làm thêm giờ (OT) (UC22)
+- Hình 2.82. Biểu đồ hoạt động Use case Lập lịch và phân ca làm việc (UC23)
+- Hình 2.83. Biểu đồ hoạt động Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)
+- Hình 2.84. Biểu đồ hoạt động Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)
+- Hình 2.85. Biểu đồ hoạt động Use case Cấu hình công thức và ngạch bậc lương (UC26)
+- Hình 2.86. Biểu đồ hoạt động Use case Vận hành chức năng tính lương tự động (UC27)
+- Hình 2.87. Biểu đồ hoạt động Use case Phê duyệt & Khóa bất biến kỳ lương (UC28)
+- Hình 2.88. Biểu đồ hoạt động Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)
+- Hình 2.89. Biểu đồ hoạt động Use case Quản lý đề xuất công tác & Quyết toán chi phí (UC30)
+- Hình 2.90. Biểu đồ hoạt động Use case Quản lý cấp phát & Thu hồi tài sản làm việc (UC31)
+- Hình 2.91. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt điều chuyển công tác nội bộ (UC32)
+- Hình 2.92. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt điều chỉnh bậc lương (UC33)
+- Hình 2.93. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt khen thưởng nhân sự (UC34)
+- Hình 2.94. Biểu đồ hoạt động Use case Xử lý kỷ luật & Vi phạm nội quy lao động (UC35)
+- Hình 2.95. Biểu đồ hoạt động Use case Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận (UC36)
+- Hình 2.96. Biểu đồ hoạt động Use case Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI (UC37)
+- Hình 2.97. Biểu đồ hoạt động Use case Quản trị chương trình đào tạo nội bộ (UC38)
+- Hình 2.98. Biểu đồ hoạt động Use case Tiếp nhận & Giải quyết khiếu nại lao động bảo mật (UC39)
+- Hình 2.99. Biểu đồ hoạt động Use case Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV (UC40)
+- Hình 2.100. Biểu đồ hoạt động Use case Quản trị danh mục ngạch bậc lương chuẩn NĐ 204 (UC41)
+- Hình 2.101. Biểu đồ hoạt động Use case Tự động rà soát & Phê duyệt nâng bậc lương định kỳ (UC42)
+- Hình 2.102. Biểu đồ hoạt động Use case Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03) (UC43)
+- Hình 2.103. Biểu đồ hoạt động Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành (UC44)
+- Hình 2.104. Biểu đồ hoạt động Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)
+- Hình 2.105. Biểu đồ hoạt động Use case Bảng điều khiển phân tích & Thống kê nhân sự (UC46)
+- Hình 2.106. Biểu đồ hoạt động Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)
+- Hình 2.107. Biểu đồ trạng thái vòng đời Nhân viên
+- Hình 2.108. Biểu đồ trạng thái Phiếu tuyển dụng
+- Hình 2.109. Biểu đồ trạng thái Đơn nghỉ phép
+- Hình 2.110. Biểu đồ trạng thái Phiếu mượn - trả hồ sơ
+- Hình 2.111. Biểu đồ trạng thái Phiếu lương
+- Hình 2.112. Biểu đồ gói tổng quan của hệ thống
+- Hình 2.113. Biểu đồ lớp Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03)
+- Hình 2.114. Biểu đồ lớp Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08)
+- Hình 2.115. Biểu đồ lớp Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14)
+- Hình 2.116. Biểu đồ lớp Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17)
+- Hình 2.117. Biểu đồ lớp Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25)
+- Hình 2.118. Biểu đồ lớp Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31)
+- Hình 2.119. Biểu đồ lớp Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36)
+- Hình 2.120. Biểu đồ lớp Phân hệ Đánh giá hiệu suất, Đào tạo và Khiếu nại (Nhóm H: UC37 - UC39)
+- Hình 2.121. Biểu đồ lớp Phân hệ Hồ sơ cán bộ và Báo cáo nhà nước (Nhóm I: UC40 - UC43)
+- Hình 2.122. Biểu đồ lớp Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47)
+- Hình 2.123. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC21)
+- Hình 2.124. Biểu đồ lớp miền cốt lõi của hệ thống
+- Hình 2.125. Mô hình cơ sở dữ liệu vật lý của hệ thống
+- Hình 2.126. Mô hình dữ liệu mở rộng cho chấm công đa nguồn
+- Hình 2.127. Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống
 
+---
 
 # PHẦN MỞ ĐẦU
 
@@ -797,7 +844,7 @@ Tác nhân trong phân tích hệ thống hướng đối tượng là bất k�
 | :---: | :--- | :--- | :---: | :--- |
 | 1 | Nhân viên | Toàn thể kỹ sư, lập trình viên, chuyên viên tại các dự án, chi nhánh và phòng ban | USER | Sử dụng cổng tự phục vụ ESS: điểm danh, nộp đơn nghỉ phép, đăng ký làm thêm giờ, tra cứu phiếu lương cá nhân, cập nhật thông tin liên lạc (Mức 1). |
 | 2 | Trưởng dự án | Quản lý dự án phần mềm, Trưởng nhóm kỹ thuật | USER | Lập phiếu đề xuất tuyển dụng, phân ca làm việc cho thành viên dự án, duyệt đơn nghỉ phép, xác nhận giờ làm thêm, đánh giá thử việc và đánh giá KPI thành viên. |
-| 3 | Chuyên viên Tuyển dụng | Phòng Tuyển dụng Công nghệ (HR-TA) - Khối Quản trị Nguồn nhân lực | KM_MANAGER | Quản lý tin tuyển dụng, tiếp nhận và sàng lọc hồ sơ ứng viên trên pipeline ATS Kanban, lên lịch phỏng vấn, lập tờ trình tuyển dụng và gửi thư mời nhận việc. |
+| 3 | Chuyên viên Tuyển dụng | Phòng Tuyển dụng Công nghệ (HR-TA) - Khối Quản trị Nguồn nhân lực | KM_MANAGER | Quản lý tin tuyển dụng, tiếp nhận và sàng lọc hồ sơ ứng viên trên pipeline Quy trình tuyển dụng đa giai đoạn, lên lịch phỏng vấn, lập tờ trình tuyển dụng và gửi thư mời nhận việc. |
 | 4 | Chuyên viên Hồ sơ | Phòng Nhân sự Vận hành & Văn hóa (HR-OPS) - Khối Quản trị Nguồn nhân lực | KM_MANAGER | Tiếp nhận nhân viên mới, lập hợp đồng lao động, số hóa văn bằng chứng chỉ, quản lý mượn trả hồ sơ gốc, thẩm định đề xuất thay đổi thông tin định danh (Mức 2). |
 | 5 | Chuyên viên Tiền lương | Phòng Tiền lương & Phúc lợi (HR-C&B) - Khối Quản trị Nguồn nhân lực | KM_MANAGER | Giám sát dữ liệu chấm công, xử lý ngoại lệ lệch công, cấu hình công thức lương, chạy chức năng tính lương tự động, quản lý tạm ứng và khoản vay phúc lợi. |
 | 6 | Chuyên viên Đào tạo & Hiệu suất | Phòng Đào tạo & Phát triển (HR-L&D) - Khối Quản trị Nguồn nhân lực | KM_MANAGER | Tổ chức khóa đào tạo nội bộ, điều phối kỳ đánh giá hiệu suất 360 độ, theo dõi mục tiêu OKR/KPI và tiếp nhận giải quyết khiếu nại lao động. |
@@ -805,7 +852,7 @@ Tác nhân trong phân tích hệ thống hướng đối tượng là bất k�
 | 8 | Kế toán viên | Phòng Kế toán Doanh nghiệp & Thuế (FIN-ACC) - Khối Tài chính - Kế toán | KM_MANAGER | Xác nhận ngân sách quỹ lương, đối chiếu bảng thanh toán tiền lương, tạm ứng và thanh quyết toán các khoản chi phí công tác. |
 | 9 | Đại diện Người lao động | Ban Chấp hành Công đoàn cơ sở | USER | Tham gia đóng góp ý kiến và giám sát trong quy trình xử lý kỷ luật lao động và giải quyết khiếu nại theo quy định pháp luật. |
 | 10 | Giám đốc | Ban Giám đốc Điều hành (BGD) - Tổng Giám đốc (CEO Phạm Tiến Thành) | ADMIN | Phê duyệt kế hoạch tuyển dụng, ký duyệt hợp đồng lao động, phê duyệt bảng lương tháng, phê duyệt bổ nhiệm, nâng bậc lương và khen thưởng, kỷ luật. |
-| 11 | Nhân viên Quản trị IT | Phòng IT & An ninh Mạng (OPS-IT) - Khối Vận hành & Pháp chế | ADMIN | Quản trị tài khoản người dùng, phân quyền RBAC, cấu hình tham số hệ thống, giám sát kết nối máy chấm công và tra cứu nhật ký kiểm toán (Audit Log). |
+| 11 | Nhân viên Quản trị CNTT | Phòng IT & An ninh Mạng (OPS-IT) - Khối Vận hành & Pháp chế | ADMIN | Quản trị tài khoản người dùng, phân quyền RBAC, cấu hình tham số hệ thống, giám sát kết nối máy chấm công và tra cứu nhật ký kiểm toán (Audit Log). |
 
 ![Hình 2.1: Biểu đồ cây phân cấp Tác nhân](images/hinh_2_1_actor_tree.png)
 
@@ -820,12 +867,12 @@ Dựa trên kết quả phân tích quy trình nghiệp vụ và các tác nhân
 | STT | Mã Use case | Tên Use case nghiệp vụ | Tác nhân chính | Nhóm phân hệ chức năng |
 | :---: | :---: | :--- | :--- | :--- |
 | 1 | UC01 | Đăng nhập & Xác thực hệ thống | Toàn thể nhân viên | Nhóm A: Quản trị hệ thống & Tổ chức |
-| 2 | UC02 | Quản trị người dùng & Phân quyền RBAC | Nhân viên Quản trị IT | Nhóm A: Quản trị hệ thống & Tổ chức |
-| 3 | UC03 | Quản trị cơ cấu tổ chức & Cây phòng ban | Nhân viên Quản trị IT | Nhóm A: Quản trị hệ thống & Tổ chức |
+| 2 | UC02 | Quản trị người dùng & Phân quyền RBAC | Nhân viên Quản trị CNTT | Nhóm A: Quản trị hệ thống & Tổ chức |
+| 3 | UC03 | Quản trị cơ cấu tổ chức & Cây phòng ban | Nhân viên Quản trị CNTT | Nhóm A: Quản trị hệ thống & Tổ chức |
 | 4 | UC04 | Lập phiếu đề xuất tuyển dụng nhân sự | Trưởng dự án | Nhóm B: Tuyển dụng & Ứng viên |
 | 5 | UC05 | Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng | Chuyên viên Tuyển dụng, Kế toán | Nhóm B: Tuyển dụng & Ứng viên |
 | 6 | UC06 | Phê duyệt chỉ tiêu tuyển dụng | Giám đốc | Nhóm B: Tuyển dụng & Ứng viên |
-| 7 | UC07 | Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban | Chuyên viên Tuyển dụng | Nhóm B: Tuyển dụng & Ứng viên |
+| 7 | UC07 | Quản lý hồ sơ ứng viên & Tuyển dụng Quy trình tuyển dụng đa giai đoạn | Chuyên viên Tuyển dụng | Nhóm B: Tuyển dụng & Ứng viên |
 | 8 | UC08 | Gửi thư mời nhận việc & Thỏa thuận mức lương | Chuyên viên Tuyển dụng, Ứng viên | Nhóm B: Tuyển dụng & Ứng viên |
 | 9 | UC09 | Quản lý hồ sơ nhân viên toàn diện | Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự & Hội nhập |
 | 10 | UC10 | Quản lý hợp đồng lao động & Phụ lục hợp đồng | Chuyên viên Hồ sơ | Nhóm C: Hồ sơ nhân sự & Hội nhập |
@@ -838,7 +885,7 @@ Dựa trên kết quả phân tích quy trình nghiệp vụ và các tác nhân
 | 17 | UC17 | Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 | Chuyên viên Hồ sơ, Quản trị viên | Nhóm D: Cổng tự phục vụ nhân viên |
 | 18 | UC18 | Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca | Toàn thể nhân viên | Nhóm E: Chấm công & Phân ca |
 | 19 | UC19 | Điểm danh sinh trắc học khuôn mặt & Cảm biến IR | Nhân viên, Kiosk điểm danh | Nhóm E: Chấm công & Phân ca |
-| 20 | UC20 | Quản trị kết nối thiết bị máy chấm công | Chuyên viên Hồ sơ, Quản trị IT | Nhóm E: Chấm công & Phân ca |
+| 20 | UC20 | Quản trị kết nối thiết bị máy chấm công | Chuyên viên Hồ sơ, Quản trị CNTT | Nhóm E: Chấm công & Phân ca |
 | 21 | UC21 | Đăng ký & Xét duyệt nghỉ phép trực tuyến | Nhân viên, Trưởng dự án, Chuyên viên Hồ sơ | Nhóm E: Chấm công & Phân ca |
 | 22 | UC22 | Đăng ký & Phê duyệt làm thêm giờ (OT) | Nhân viên, Trưởng dự án, Chuyên viên Tiền lương | Nhóm E: Chấm công & Phân ca |
 | 23 | UC23 | Lập lịch và phân ca làm việc | Trưởng dự án, Chuyên viên Tiền lương | Nhóm E: Chấm công & Phân ca |
@@ -862,10 +909,10 @@ Dựa trên kết quả phân tích quy trình nghiệp vụ và các tác nhân
 | 41 | UC41 | Quản trị danh mục ngạch bậc lương chuẩn NĐ 204 | Chuyên viên Hồ sơ | Nhóm I: Chuẩn cán bộ & Báo cáo |
 | 42 | UC42 | Tự động rà soát & Phê duyệt nâng bậc lương định kỳ | Chuyên viên Hồ sơ, Giám đốc | Nhóm I: Chuẩn cán bộ & Báo cáo |
 | 43 | UC43 | Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03) | Chuyên viên Hồ sơ | Nhóm I: Chuẩn cán bộ & Báo cáo |
-| 44 | UC44 | Quản lý không gian tri thức số & Tài liệu quy trình SOP | Toàn thể nhân viên (theo quyền không gian) | Nhóm J: Quản trị tri thức & Điều hành |
+| 44 | UC44 | Quản lý không gian tri thức số & Tài liệu quy trình vận hành chuẩn | Toàn thể nhân viên (theo quyền không gian) | Nhóm J: Quản trị tri thức & Điều hành |
 | 45 | UC45 | Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia | Toàn thể nhân viên | Nhóm J: Quản trị tri thức & Điều hành |
 | 46 | UC46 | Bảng điều khiển phân tích & Thống kê nhân sự | Ban Giám đốc, Quản lý, Nhân viên | Nhóm J: Quản trị tri thức & Điều hành |
-| 47 | UC47 | Nhật ký kiểm toán hệ thống & Cấu hình tham số | Nhân viên Quản trị IT | Nhóm J: Quản trị tri thức & Điều hành |
+| 47 | UC47 | Nhật ký kiểm toán hệ thống & Cấu hình tham số | Nhân viên Quản trị CNTT | Nhóm J: Quản trị tri thức & Điều hành |
 
 ### 2.1.3. Đặc tả chi tiết các Use case của hệ thống
 
@@ -887,7 +934,7 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 
 **UC02 - Quản trị người dùng & Phân quyền RBAC**
 
-- **Tác nhân chính:** Nhân viên Quản trị IT
+- **Tác nhân chính:** Nhân viên Quản trị CNTT
 - **Mục đích / Mô tả:** Khởi tạo, chỉnh sửa tài khoản người dùng, gán vai trò RBAC hai chiều (vai trò hệ thống × vai trò theo Space) và quản lý trạng thái tài khoản.
 - **Điều kiện tiên quyết:** Quản trị viên IT đã đăng nhập với vai trò ADMIN.
 - **Hậu điều kiện:** Tài khoản người dùng được cập nhật, quyền hạn mới có hiệu lực ngay lập tức; ghi vết kiểm toán hệ thống.
@@ -900,7 +947,7 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 
 **UC03 - Quản trị cơ cấu tổ chức & Cây phòng ban**
 
-- **Tác nhân chính:** Nhân viên Quản trị IT / Ban Giám đốc
+- **Tác nhân chính:** Nhân viên Quản trị CNTT / Ban Giám đốc
 - **Mục đích / Mô tả:** Thiết lập và quản lý cấu trúc cây phòng ban phân cấp đa tầng, định biên nhân sự và chỉ định trưởng đơn vị.
 - **Điều kiện tiên quyết:** Người dùng có quyền quản trị tổ chức.
 - **Hậu điều kiện:** Cơ cấu tổ chức mới được lưu trữ; sơ đồ cây phòng ban được cập nhật hiển thị theo thời gian thực.
@@ -949,7 +996,7 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 | 1 | Giám đốc đăng nhập, xem danh sách phiếu chờ duyệt trên Dashboard điều hành. | Hiển thị chi tiết đề xuất, ý kiến thẩm định của Tuyển dụng và Kế toán. |
 | 2 | Lựa chọn "Phê duyệt" (hoặc "Từ chối" kèm lý do phản hồi). | Hệ thống cập nhật trạng thái phiếu thành `OPEN`; phát sinh sự kiện thông báo cho bộ phận Tuyển dụng kích hoạt chiến dịch tìm kiếm ứng viên. |
 
-**UC07 - Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban**
+**UC07 - Quản lý hồ sơ ứng viên & Tuyển dụng Quy trình tuyển dụng đa giai đoạn**
 
 - **Tác nhân chính:** Chuyên viên Tuyển dụng
 - **Mục đích / Mô tả:** Tiếp nhận CV, đánh giá và điều phối ứng viên qua các vòng phỏng vấn trên bảng Kanban trực quan.
@@ -1023,7 +1070,7 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 
 | Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Nhân viên gửi yêu cầu mượn hồ sơ gốc qua cổng ESS, nêu rõ lý do và ngày cam kết hoàn trả. | Tạo phiếu mượn ở trạng thái `PENDING` gửi tới Chuyên viên hồ sơ. |
+| 1 | Nhân viên gửi yêu cầu mượn hồ sơ gốc qua cổng tự phục vụ nhân viên, nêu rõ lý do và ngày cam kết hoàn trả. | Tạo phiếu mượn ở trạng thái `PENDING` gửi tới Chuyên viên hồ sơ. |
 | 2 | Chuyên viên hồ sơ kiểm tra vị trí tủ lưu trữ, bàn giao hồ sơ vật lý và bấm "Xác nhận bàn giao". | Chuyển trạng thái phiếu mượn sang `BORROWED`; lưu ngày giờ bàn giao thực tế. |
 | 3 | Khi nhân viên trả hồ sơ, Chuyên viên hồ sơ kiểm tra tính nguyên vẹn và bấm "Xác nhận đã trả". | Chuyển trạng thái sang `RETURNED`; lưu vết đóng phiếu mượn. |
 
@@ -1120,14 +1167,14 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 
 **UC20 - Quản trị kết nối thiết bị máy chấm công**
 
-- **Tác nhân chính:** Chuyên viên Hồ sơ, Quản trị IT
+- **Tác nhân chính:** Chuyên viên Hồ sơ, Quản trị CNTT
 - **Mục đích / Mô tả:** Cấu hình kết nối mạng, quản lý webhook đồng bộ dữ liệu thời gian thực từ các máy chấm công vân tay/thẻ từ tại các chi nhánh.
 - **Điều kiện tiên quyết:** Máy chấm công vật lý được kết nối mạng nội bộ công ty.
 - **Hậu điều kiện:** Dữ liệu chấm công từ thiết bị được đồng bộ tự động và an toàn vào CSDL.
 
 | Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Quản trị IT vào mục Quản trị thiết bị, khai báo thông số máy: IP, Serial Number, vị trí văn phòng và khóa bảo mật HMAC. | Hệ thống kiểm tra kết nối mạng (Ping / Handshake) tới thiết bị. |
+| 1 | Quản trị CNTT vào mục Quản trị thiết bị, khai báo thông số máy: IP, Serial Number, vị trí văn phòng và khóa bảo mật HMAC. | Hệ thống kiểm tra kết nối mạng (Ping / Handshake) tới thiết bị. |
 | 2 | Thiết lập endpoint tiếp nhận Webhook sự kiện. | Hệ thống sẵn sàng lắng nghe các HTTP POST webhook gửi từ thiết bị. |
 | 3 | Khi máy chấm công gửi dữ liệu thô, hệ thống kiểm tra chữ ký số HMAC-SHA256. | Nếu chữ ký hợp lệ: Giải nén gói tin và ghi nhận hàng loạt sự kiện vào CSDL. |
 
@@ -1234,7 +1281,7 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 | :---: | :--- | :--- |
 | 1 | Chuyên viên tiền lương rà soát bảng tổng kết quỹ lương, bấm "Trình ký phê duyệt". | Đóng gói báo cáo quỹ lương, gửi thông báo phê duyệt tới Ban Giám đốc. |
 | 2 | Giám đốc đăng nhập, kiểm tra báo cáo tổng quỹ lương và ký phê duyệt điện tử. | Cập nhật trạng thái bảng lương thành `APPROVED`. |
-| 3 | Chuyên viên tiền lương bấm "Khóa kỳ lương". | Chuyển trạng thái kỳ lương sang `LOCKED` bất biến; kích hoạt cơ chế chặn hoàn toàn mọi thao tác tính lại; tự động xuất file chi lương theo định dạng ngân hàng (VBB, Vietcombank...); phát hành phiếu lương tới cổng ESS của từng nhân viên. |
+| 3 | Chuyên viên tiền lương bấm "Khóa kỳ lương". | Chuyển trạng thái kỳ lương sang `LOCKED` bất biến; kích hoạt cơ chế chặn hoàn toàn mọi thao tác tính lại; tự động xuất file chi lương theo định dạng ngân hàng (VBB, Vietcombank...); phát hành phiếu lương tới cổng tự phục vụ nhân viên của từng nhân viên. |
 
 **UC29 - Quản lý tạm ứng & Khoản vay phúc lợi nhân viên**
 
@@ -1336,7 +1383,7 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 
 | Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Nhân viên nộp đơn xin thôi việc qua cổng ESS, nêu lý do và ngày mong muốn nghỉ việc. | Hệ thống kiểm tra thời hạn báo trước theo loại hợp đồng hiện hành. |
+| 1 | Nhân viên nộp đơn xin thôi việc qua cổng tự phục vụ nhân viên, nêu lý do và ngày mong muốn nghỉ việc. | Hệ thống kiểm tra thời hạn báo trước theo loại hợp đồng hiện hành. |
 | 2 | Trưởng phòng và Giám đốc duyệt đơn xin thôi việc. | Tự động sinh ma trận Checklist bàn giao đa bộ phận gồm 5 đầu mối: <br>- Dự án: Bàn giao tài liệu, mã nguồn và chuyển giao task còn dở dang; <br>- IT: Thu hồi quyền truy cập mã nguồn Git, tài khoản email công vụ, thu hồi máy tính; <br>- Hành chính: Thu hồi thẻ từ, chìa khóa tủ cá nhân; <br>- Kế toán: Quyết toán các khoản tạm ứng công tác, đối soát số dư nợ vay phúc lợi; <br>- Nhân sự: Chốt ngày làm việc cuối cùng, tính số ngày phép còn tồn chưa nghỉ để thanh toán tiền phép thừa. |
 | 3 | Đại diện từng bộ phận đăng nhập hệ thống để bấm xác nhận hoàn tất nội dung bàn giao phụ trách. | Khi đủ 5/5 bộ phận xác nhận, hệ thống cho phép Chuyên viên nhân sự phát hành Quyết định chấm dứt hợp đồng lao động. |
 | 4 | Vào 23:59:59 của ngày làm việc cuối cùng. | Hệ thống tự động vô hiệu hóa tài khoản người dùng (`User.isActive = false`), chuyển trạng thái nhân viên sang `TERMINATED` và lưu vết thời điểm khóa tài khoản vào Audit Log. |
@@ -1432,12 +1479,12 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 | 1 | Chuyên viên hồ sơ chọn cán bộ cần xuất hồ sơ, chọn chức năng "Xuất Sơ yếu lý lịch Mẫu 2C". | Hệ thống nạp 111 trường dữ liệu vào mẫu in chuẩn theo Quyết định 02/2008/QĐ-BNV; xuất ra file PDF có căn lề và định dạng chuẩn trang. |
 | 2 | Để báo cáo định kỳ, chọn "Xuất báo cáo thống kê": Biểu 01 (Cơ cấu độ tuổi x Ngạch), Biểu 02 (Trình độ ngoại ngữ), Biểu 03 (Trình độ chuyên môn). | Hệ thống tự động tổng hợp toàn bộ cán bộ trong cơ quan và trích xuất file Excel có cấu trúc và công thức chuẩn theo quy định. |
 
-**UC44 - Quản lý không gian tri thức số & Tài liệu quy trình SOP**
+**UC44 - Quản lý không gian tri thức số & Tài liệu quy trình vận hành chuẩn**
 
 - **Tác nhân chính:** Toàn thể nhân viên (theo quyền không gian)
 - **Mục đích / Mô tả:** Quản trị các bài viết hướng dẫn, quy trình vận hành tiêu chuẩn (SOP), tài liệu kỹ thuật được phân loại theo từng Không gian tri thức (Space).
 - **Điều kiện tiên quyết:** Nhân viên có quyền đóng góp nội dung vào Space tương ứng.
-- **Hậu điều kiện:** Tài liệu SOP được lưu trữ, kiểm soát phiên bản bất biến và phê duyệt xuất bản.
+- **Hậu điều kiện:** Tài liệu quy trình vận hành được lưu trữ, kiểm soát phiên bản bất biến và phê duyệt xuất bản.
 
 | Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
@@ -1472,7 +1519,7 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 
 **UC47 - Nhật ký kiểm toán hệ thống & Cấu hình tham số**
 
-- **Tác nhân chính:** Nhân viên Quản trị IT
+- **Tác nhân chính:** Nhân viên Quản trị CNTT
 - **Mục đích / Mô tả:** Truy vấn nhật ký kiểm toán bất biến (Audit Log) ghi lại mọi thao tác quan trọng trên hệ thống và cấu hình các tham số vận hành chung.
 - **Điều kiện tiên quyết:** Quản trị viên IT đăng nhập với quyền ADMIN.
 - **Hậu điều kiện:** Mọi hoạt động khả nghi được giám sát; các tham số vận hành hệ thống được cập nhật an toàn.
@@ -1496,7 +1543,7 @@ Biểu đồ mô tả tương tác đăng nhập, phân quyền RBAC và cấu h
 ![Hình 2.3: Biểu đồ Use case Nhóm A - Quản trị hệ thống & Tổ chức](images/hinh_2_3_usecase_nhom_a.png)
 
 #### B. Nhóm B - Tuyển dụng & Ứng viên (UC04 - UC08)
-Biểu đồ mô tả chu trình tuyển dụng từ đề xuất nhu cầu, kiểm soát định biên, duyệt chỉ tiêu, sàng lọc ứng viên ATS Kanban đến phát hành thư mời làm việc.
+Biểu đồ mô tả chu trình tuyển dụng từ đề xuất nhu cầu, kiểm soát định biên, duyệt chỉ tiêu, sàng lọc ứng viên Quy trình tuyển dụng đa giai đoạn đến phát hành thư mời làm việc.
 ![Hình 2.4: Biểu đồ Use case Nhóm B - Tuyển dụng & Ứng viên](images/hinh_2_4_usecase_nhom_b.png)
 
 #### C. Nhóm C - Hồ sơ nhân sự & Hội nhập (UC09 - UC14)
@@ -1528,7 +1575,7 @@ Biểu đồ mô tả quản lý hồ sơ cán bộ theo chuẩn Mẫu 2C-BNV, d
 ![Hình 2.11: Biểu đồ Use case Nhóm I - Chuẩn cán bộ & Báo cáo](images/hinh_2_11_usecase_nhom_i.png)
 
 #### J. Nhóm J - Quản trị tri thức & Điều hành (UC44 - UC47)
-Biểu đồ mô tả quản trị kho tri thức số SOP, tìm kiếm toàn văn FTS & danh bạ chuyên gia, bảng điều khiển phân tích số Dashboard và nhật ký kiểm toán hệ thống.
+Biểu đồ mô tả quản trị kho tri thức số và quy trình vận hành chuẩn, tìm kiếm toàn văn FTS & danh bạ chuyên gia, bảng điều khiển phân tích số Dashboard và nhật ký kiểm toán hệ thống.
 ![Hình 2.12: Biểu đồ Use case Nhóm J - Quản trị tri thức & Điều hành](images/hinh_2_12_usecase_nhom_j.png)
 
 ### 2.1.5. Phân tầng yêu cầu: từ quy trình nghiệp vụ đến use case hệ thống
@@ -1554,12 +1601,12 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 
 **4. Quy trình Phân ca, Chấm công & Điểm danh đa nguồn:**
 - Bối cảnh & Căn cứ: Phục vụ hơn 430 kỹ sư làm việc tại TP.HCM và Đà Nẵng theo nhiều ca: hành chính, lệch giờ (US/EU shift) và làm việc từ xa (Remote/Hybrid). Căn cứ Điều 97 Bộ luật Lao động 2019 về ghi nhận thời gian làm việc.
-- Trình tự thực hiện: Trưởng dự án hoặc HR lập lịch phân ca cho từng nhân sự hoặc nhóm dự án; Hàng ngày, nhân viên thực hiện điểm danh qua một trong các kênh chuẩn hóa: (a) Máy chấm công vân tay/thẻ từ đẩy dữ liệu qua webhook có chữ ký HMAC-SHA256, (b) Kiosk nhận diện khuôn mặt sinh trắc học kết hợp cảm biến hồng ngoại IR chống giả mạo tại sảnh (`/check-in`), (c) Web Check-in trên cổng ESS; Hệ thống tự động ghép ca, tính toán giờ làm việc thực tế, thời gian đi muộn, về sớm và xác định trạng thái ngày công; Trường hợp quên điểm danh, nhân viên nộp đơn giải trình kèm minh chứng để quản lý phê duyệt hiệu chỉnh; Đến ngày 25 hàng tháng, chuyên viên nhân sự chốt bảng chấm công chuẩn bị cho kỳ tính lương.
+- Trình tự thực hiện: Trưởng dự án hoặc HR lập lịch phân ca cho từng nhân sự hoặc nhóm dự án; Hàng ngày, nhân viên thực hiện điểm danh qua một trong các kênh chuẩn hóa: (a) Máy chấm công vân tay/thẻ từ đẩy dữ liệu qua webhook có chữ ký HMAC-SHA256, (b) Kiosk nhận diện khuôn mặt sinh trắc học kết hợp cảm biến hồng ngoại IR chống giả mạo tại sảnh (`/check-in`), (c) Web Check-in trên cổng tự phục vụ nhân viên; Hệ thống tự động ghép ca, tính toán giờ làm việc thực tế, thời gian đi muộn, về sớm và xác định trạng thái ngày công; Trường hợp quên điểm danh, nhân viên nộp đơn giải trình kèm minh chứng để quản lý phê duyệt hiệu chỉnh; Đến ngày 25 hàng tháng, chuyên viên nhân sự chốt bảng chấm công chuẩn bị cho kỳ tính lương.
 - Ánh xạ Use case & Giao diện: UC18, UC19, UC20, UC23, UC24, UC25. Giao diện: Bảng chấm công (`/attendance`), Phân ca (`/shifts`), Kiosk điểm danh (`/check-in`), Quản trị máy chấm công (`/admin/attendance`).
 
 **5. Quy trình Quản lý Nghỉ phép:**
 - Bối cảnh & Căn cứ: Căn cứ Điều 113 đến Điều 115 Bộ luật Lao động 2019 về chế độ nghỉ phép năm (12 ngày phép cơ bản, cộng thêm 1 ngày sau mỗi 5 năm thâm niên) và các chế độ nghỉ việc riêng, nghỉ bảo hiểm (ốm đau, thai sản).
-- Trình tự thực hiện: Nhân viên tra cứu số dư phép khả dụng trên cổng ESS (`/leave`) và tạo đơn xin nghỉ phép; Hệ thống tự động kiểm tra số dư: nếu quỹ phép còn đủ, chuyển đơn tới Trưởng dự án phê duyệt; Trưởng dự án cân đối tiến độ chạy nước rút (Sprint) để phê duyệt hoặc từ chối; Khi đơn được duyệt, hệ thống tự động trừ quỹ phép ngay lập tức và nạp ngày nghỉ vào bảng chấm công tháng; Bộ phận C&B theo dõi các chứng từ nghỉ ốm đau, thai sản để làm thủ tục trợ cấp BHXH.
+- Trình tự thực hiện: Nhân viên tra cứu số dư phép khả dụng trên cổng tự phục vụ nhân viên (`/leave`) và tạo đơn xin nghỉ phép; Hệ thống tự động kiểm tra số dư: nếu quỹ phép còn đủ, chuyển đơn tới Trưởng dự án phê duyệt; Trưởng dự án cân đối tiến độ chạy nước rút (Sprint) để phê duyệt hoặc từ chối; Khi đơn được duyệt, hệ thống tự động trừ quỹ phép ngay lập tức và nạp ngày nghỉ vào bảng chấm công tháng; Bộ phận C&B theo dõi các chứng từ nghỉ ốm đau, thai sản để làm thủ tục trợ cấp BHXH.
 - Ánh xạ Use case & Giao diện: UC15, UC21. Giao diện: Quản lý nghỉ phép (`/leave`), Cổng thông tin nhân viên (`/ess`).
 
 **6. Quy trình Quản lý Làm thêm giờ:**
@@ -1569,7 +1616,7 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 
 **7. Quy trình Chu kỳ Tính & Khóa Bảng lương hàng tháng:**
 - Bối cảnh & Căn cứ: Căn cứ Điều 90 đến Điều 104 Bộ luật Lao động 2019, Luật Thuế TNCN và Luật Bảo hiểm xã hội hiện hành.
-- Trình tự thực hiện: Vào ngày 25 hàng tháng, bộ phận nhân sự khóa dữ liệu chấm công; Chuyên viên tiền lương kích hoạt Chức năng tính lương tự động (`/payroll-engine`); Hệ thống tự động tính toán chi tiết: lương thời gian theo ngày công thực tế, lương làm thêm giờ, phụ cấp, thưởng dự án, trích nộp bảo hiểm xã hội (10.5%), giảm trừ gia cảnh, tính thuế TNCN theo biểu lũy tiến và khấu trừ nợ vay phúc lợi (đảm bảo tổng khấu trừ không vượt quá 30% lương Net); Kế toán trưởng đối soát tổng quỹ lương; Giám đốc phê duyệt điện tử; Chuyên viên nhân sự chuyển trạng thái kỳ lương sang LOCKED (kích hoạt cơ chế bất biến, chặn hoàn toàn mọi thao tác tính lại với lỗi HTTP 409); Hệ thống kết xuất lệnh chi ngân hàng và phát hành Phiếu lương điện tử (ePayslip) bảo mật tới từng nhân viên qua cổng ESS.
+- Trình tự thực hiện: Vào ngày 25 hàng tháng, bộ phận nhân sự khóa dữ liệu chấm công; Chuyên viên tiền lương kích hoạt Chức năng tính lương tự động (`/payroll-engine`); Hệ thống tự động tính toán chi tiết: lương thời gian theo ngày công thực tế, lương làm thêm giờ, phụ cấp, thưởng dự án, trích nộp bảo hiểm xã hội (10.5%), giảm trừ gia cảnh, tính thuế TNCN theo biểu lũy tiến và khấu trừ nợ vay phúc lợi (đảm bảo tổng khấu trừ không vượt quá 30% lương Net); Kế toán trưởng đối soát tổng quỹ lương; Giám đốc phê duyệt điện tử; Chuyên viên nhân sự chuyển trạng thái kỳ lương sang LOCKED (kích hoạt cơ chế bất biến, chặn hoàn toàn mọi thao tác tính lại với lỗi HTTP 409); Hệ thống kết xuất lệnh chi ngân hàng và phát hành Phiếu lương điện tử (ePayslip) bảo mật tới từng nhân viên qua cổng tự phục vụ nhân viên.
 - Ánh xạ Use case & Giao diện: UC25, UC26, UC27, UC28. Giao diện: Chức năng tính lương tự động (`/payroll-engine`), Phiếu lương cá nhân (`/ess`), Báo cáo nhân sự (`/personnel-reports`).
 
 **8. Quy trình Tạm ứng Lương & Khoản vay phúc lợi:**
@@ -1584,7 +1631,7 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 
 **10. Quy trình Quản lý Cấp phát & Thu hồi Tài sản, Thiết bị:**
 - Bối cảnh & Căn cứ: Quản lý vòng đời tài sản kỹ thuật cao (laptop, màn hình phụ, thiết bị kiểm thử) theo tiêu chuẩn bảo mật ISO 27001.
-- Trình tự thực hiện: Căn cứ đề xuất của dự án hoặc tiếp nhận nhân sự mới, bộ phận Hành chính lập phiếu bàn giao tài sản, ghi nhận số seri, cấu hình và trạng thái thiết bị; Nhân viên ký nhận bàn giao điện tử trên cổng ESS; Hệ thống theo dõi lịch sử luân chuyển, bảo dưỡng định kỳ và cảnh báo thiết bị đến hạn khấu hao; Khi nhân viên chuyển dự án hoặc thôi việc, bộ phận Hành chính thực hiện kiểm kê, thu hồi tài sản và xác nhận hoàn tất nghĩa vụ trên hệ thống.
+- Trình tự thực hiện: Căn cứ đề xuất của dự án hoặc tiếp nhận nhân sự mới, bộ phận Hành chính lập phiếu bàn giao tài sản, ghi nhận số seri, cấu hình và trạng thái thiết bị; Nhân viên ký nhận bàn giao điện tử trên cổng tự phục vụ nhân viên; Hệ thống theo dõi lịch sử luân chuyển, bảo dưỡng định kỳ và cảnh báo thiết bị đến hạn khấu hao; Khi nhân viên chuyển dự án hoặc thôi việc, bộ phận Hành chính thực hiện kiểm kê, thu hồi tài sản và xác nhận hoàn tất nghĩa vụ trên hệ thống.
 - Ánh xạ Use case & Giao diện: UC15, UC31. Giao diện: Quản lý tài sản (`/assets`), Cổng thông tin cá nhân (`/ess`).
 
 **11. Quy trình Đánh giá Hiệu suất 360 độ & Quản trị Mục tiêu OKR/KPI:**
@@ -1624,10 +1671,10 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 
 **18. Quy trình Phân cấp Quản trị Dữ liệu Cá nhân & Thẩm định Điều chỉnh Hồ sơ Nhân sự:**
 - Bối cảnh & Căn cứ: Căn cứ Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân, nhằm ngăn ngừa việc tự ý chỉnh sửa các thông tin định danh pháp lý và tài chính.
-- Trình tự thực hiện: Dữ liệu hồ sơ nhân sự được phân định thành 3 phân cấp: Mức 1 (Thông tin liên lạc như SĐT, địa chỉ - nhân viên tự sửa trên ESS); Mức 2 (Thông tin định danh pháp lý và tài chính như CCCD, số tài khoản ngân hàng, bằng cấp - nhân viên lập đề xuất thay đổi kèm hình ảnh chứng từ minh chứng hợp lệ); Mức 3 (Vị trí, ngạch bậc, mức lương - khóa cố định chỉ xem, chỉ thay đổi qua quyết định hành chính); Chuyên viên hồ sơ tiếp nhận yêu cầu Mức 2 tại Hàng đợi thẩm định (`ProfileChangeReviewQueue`), đối soát ảnh chụp minh chứng với dữ liệu đề xuất; Bấm phê duyệt để hệ thống cập nhật nguyên tử vào CSDL và lưu vết kiểm toán, hoặc từ chối kèm lý do phản hồi cho nhân viên.
+- Trình tự thực hiện: Dữ liệu hồ sơ nhân sự được phân định thành 3 phân cấp: Mức 1 (Thông tin liên lạc như SĐT, địa chỉ - nhân viên tự sửa trên cổng tự phục vụ nhân viên); Mức 2 (Thông tin định danh pháp lý và tài chính như CCCD, số tài khoản ngân hàng, bằng cấp - nhân viên lập đề xuất thay đổi kèm hình ảnh chứng từ minh chứng hợp lệ); Mức 3 (Vị trí, ngạch bậc, mức lương - khóa cố định chỉ xem, chỉ thay đổi qua quyết định hành chính); Chuyên viên hồ sơ tiếp nhận yêu cầu Mức 2 tại Hàng đợi thẩm định (`ProfileChangeReviewQueue`), đối soát ảnh chụp minh chứng với dữ liệu đề xuất; Bấm phê duyệt để hệ thống cập nhật nguyên tử vào CSDL và lưu vết kiểm toán, hoặc từ chối kèm lý do phản hồi cho nhân viên.
 - Ánh xạ Use case & Giao diện: UC16, UC17. Giao diện: Cổng ESS (`/ess`), Hồ sơ cá nhân (`/profile`), Quản lý nhân viên (`/employees`).
 
-**Bảng 2.5. Bảng ánh xạ ba tầng: từ Quy trình nghiệp vụ đến Use Case và Màn hình thực tế**
+**Bảng 2.3. Bảng ánh xạ ba tầng: từ Quy trình nghiệp vụ đến Use Case và Màn hình thực tế**
 
 | STT | Tên Quy trình nghiệp vụ thực tế | Tác nhân chính | Mã Use Case hệ thống tương ứng | Giao diện màn hình thực tế trong ứng dụng |
 | :---: | :--- | :--- | :--- | :--- |
@@ -1651,7 +1698,7 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 | 18 | Đào tạo nội bộ & Khiếu nại lao động | CV Nhân sự, Nhân viên | UC15, UC38, UC39 | `/training-grievance`, `/employees/[id]` |
 | 19 | Hồ sơ cán bộ & Báo cáo Mẫu 2C-BNV | CV Hồ sơ | UC40, UC43 | `/personnel-reports`, `/admin/catalogs` |
 | 20 | Quản lý tri thức số & Tìm kiếm toàn văn | Toàn thể nhân viên, Quản lý nội dung | UC44, UC45 | `/documents`, `/employees` |
-| 21 | Bảng điều khiển phân tích & Kiểm toán hệ thống | Ban Giám đốc, Quản lý, Quản trị IT | UC46, UC47 | `/dashboard`, `/admin/audit`, `/admin/settings` |
+| 21 | Bảng điều khiển phân tích & Kiểm toán hệ thống | Ban Giám đốc, Quản lý, Quản trị CNTT | UC46, UC47 | `/dashboard`, `/admin/audit`, `/admin/settings` |
 
 ---
 
@@ -1715,7 +1762,7 @@ Nhóm Đối tượng Tiền lương, Phúc lợi & Tài sản:
 Nhóm Đối tượng Quản trị & Tri thức:
 - HoSoCanBo: Hồ sơ lý lịch 111 thuộc tính theo Mẫu 2C-BNV/2008 và 8 bảng diễn biến lịch sử;
 - NgachLuong: Khung 184 ngạch bậc lương chuẩn Nghị định 204/2004/NĐ-CP;
-- BaiViet: Bài viết quy trình SOP, phiên bản nội dung bất biến (ArticleVersion);
+- BaiViet: Bài viết quy trình vận hành chuẩn, phiên bản nội dung bất biến (ArticleVersion);
 - NhatKyKiemToan: Nhật ký kiểm toán hệ thống ghi vết chỉ thêm (Append-Only) cho mọi giao dịch dữ liệu.
 
 ## 2.3. Phân tích hành vi của hệ thống
@@ -1732,13 +1779,13 @@ Kịch bản tương tác Use Case UC01: Tác nhân Toàn thể nhân viên tư�
 
 #### 2.3.1.2. Biểu đồ trình tự Use case Quản trị người dùng & Phân quyền RBAC (UC02)
 
-Kịch bản tương tác Use Case UC02: Tác nhân Nhân viên Quản trị IT tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
+Kịch bản tương tác Use Case UC02: Tác nhân Nhân viên Quản trị CNTT tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
 
 ![Hình 2.5: Biểu đồ trình tự Use case Quản trị người dùng & Phân quyền RBAC (UC02)](images/hinh_seq_uc02.png)
 
 #### 2.3.1.3. Biểu đồ trình tự Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)
 
-Kịch bản tương tác Use Case UC03: Tác nhân Nhân viên Quản trị IT tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
+Kịch bản tương tác Use Case UC03: Tác nhân Nhân viên Quản trị CNTT tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
 
 ![Hình 2.6: Biểu đồ trình tự Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)](images/hinh_seq_uc03.png)
 
@@ -1760,11 +1807,11 @@ Kịch bản tương tác Use Case UC06: Tác nhân Giám đốc tương tác v�
 
 ![Hình 2.9: Biểu đồ trình tự Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)](images/hinh_seq_uc06.png)
 
-#### 2.3.1.7. Biểu đồ trình tự Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban (UC07)
+#### 2.3.1.7. Biểu đồ trình tự Use case Quản lý hồ sơ ứng viên & Tuyển dụng Quy trình tuyển dụng đa giai đoạn (UC07)
 
 Kịch bản tương tác Use Case UC07: Tác nhân Chuyên viên Tuyển dụng tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
 
-![Hình 2.10: Biểu đồ trình tự Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban (UC07)](images/hinh_seq_uc07.png)
+![Hình 2.10: Biểu đồ trình tự Use case Quản lý hồ sơ ứng viên & Tuyển dụng Quy trình tuyển dụng đa giai đoạn (UC07)](images/hinh_seq_uc07.png)
 
 #### 2.3.1.8. Biểu đồ trình tự Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)
 
@@ -1840,7 +1887,7 @@ Kịch bản tương tác Use Case UC19: Tác nhân Nhân viên, Kiosk điểm d
 
 #### 2.3.1.20. Biểu đồ trình tự Use case Quản trị kết nối thiết bị máy chấm công (UC20)
 
-Kịch bản tương tác Use Case UC20: Tác nhân Chuyên viên Hồ sơ, Quản trị IT tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
+Kịch bản tương tác Use Case UC20: Tác nhân Chuyên viên Hồ sơ, Quản trị CNTT tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
 
 ![Hình 2.23: Biểu đồ trình tự Use case Quản trị kết nối thiết bị máy chấm công (UC20)](images/hinh_seq_uc20.png)
 
@@ -1982,11 +2029,11 @@ Kịch bản tương tác Use Case UC43: Tác nhân Chuyên viên Hồ sơ tươ
 
 ![Hình 2.46: Biểu đồ trình tự Use case Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03) (UC43)](images/hinh_seq_uc43.png)
 
-#### 2.3.1.44. Biểu đồ trình tự Use case Quản lý không gian tri thức số & Tài liệu quy trình SOP (UC44)
+#### 2.3.1.44. Biểu đồ trình tự Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành chuẩn (UC44)
 
 Kịch bản tương tác Use Case UC44: Tác nhân Toàn thể nhân viên (theo quyền không gian) tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
 
-![Hình 2.47: Biểu đồ trình tự Use case Quản lý không gian tri thức số & Tài liệu quy trình SOP (UC44)](images/hinh_seq_uc44.png)
+![Hình 2.47: Biểu đồ trình tự Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành chuẩn (UC44)](images/hinh_seq_uc44.png)
 
 #### 2.3.1.45. Biểu đồ trình tự Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)
 
@@ -2002,7 +2049,7 @@ Kịch bản tương tác Use Case UC46: Tác nhân Ban Giám đốc, Quản lý
 
 #### 2.3.1.47. Biểu đồ trình tự Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)
 
-Kịch bản tương tác Use Case UC47: Tác nhân Nhân viên Quản trị IT tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
+Kịch bản tương tác Use Case UC47: Tác nhân Nhân viên Quản trị CNTT tương tác với giao diện hệ thống; tầng điều khiển tiếp nhận và xác thực nghiệp vụ, thực hiện truy vấn và cập nhật trạng thái dữ liệu trên cơ sở dữ liệu, đồng thời tự động ghi nhận nhật ký kiểm toán hệ thống.
 
 ![Hình 2.50: Biểu đồ trình tự Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)](images/hinh_seq_uc47.png)
 
@@ -2018,13 +2065,13 @@ Tiến trình hoạt động Use Case UC01: Tác nhân Toàn thể nhân viên k
 
 #### 2.3.2.2. Biểu đồ hoạt động Use case Quản trị người dùng & Phân quyền RBAC (UC02)
 
-Tiến trình hoạt động Use Case UC02: Tác nhân Nhân viên Quản trị IT kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
+Tiến trình hoạt động Use Case UC02: Tác nhân Nhân viên Quản trị CNTT kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
 
 ![Hình 2.52: Biểu đồ hoạt động Use case Quản trị người dùng & Phân quyền RBAC (UC02)](images/hinh_act_uc02.png)
 
 #### 2.3.2.3. Biểu đồ hoạt động Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)
 
-Tiến trình hoạt động Use Case UC03: Tác nhân Nhân viên Quản trị IT kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
+Tiến trình hoạt động Use Case UC03: Tác nhân Nhân viên Quản trị CNTT kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
 
 ![Hình 2.53: Biểu đồ hoạt động Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)](images/hinh_act_uc03.png)
 
@@ -2046,11 +2093,11 @@ Tiến trình hoạt động Use Case UC06: Tác nhân Giám đốc kích hoạt
 
 ![Hình 2.56: Biểu đồ hoạt động Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)](images/hinh_act_uc06.png)
 
-#### 2.3.2.7. Biểu đồ hoạt động Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban (UC07)
+#### 2.3.2.7. Biểu đồ hoạt động Use case Quản lý hồ sơ ứng viên & Tuyển dụng Quy trình tuyển dụng đa giai đoạn (UC07)
 
 Tiến trình hoạt động Use Case UC07: Tác nhân Chuyên viên Tuyển dụng kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
 
-![Hình 2.57: Biểu đồ hoạt động Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban (UC07)](images/hinh_act_uc07.png)
+![Hình 2.57: Biểu đồ hoạt động Use case Quản lý hồ sơ ứng viên & Tuyển dụng Quy trình tuyển dụng đa giai đoạn (UC07)](images/hinh_act_uc07.png)
 
 #### 2.3.2.8. Biểu đồ hoạt động Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)
 
@@ -2126,7 +2173,7 @@ Tiến trình hoạt động Use Case UC19: Tác nhân Nhân viên, Kiosk điể
 
 #### 2.3.2.20. Biểu đồ hoạt động Use case Quản trị kết nối thiết bị máy chấm công (UC20)
 
-Tiến trình hoạt động Use Case UC20: Tác nhân Chuyên viên Hồ sơ, Quản trị IT kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
+Tiến trình hoạt động Use Case UC20: Tác nhân Chuyên viên Hồ sơ, Quản trị CNTT kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
 
 ![Hình 2.70: Biểu đồ hoạt động Use case Quản trị kết nối thiết bị máy chấm công (UC20)](images/hinh_act_uc20.png)
 
@@ -2268,11 +2315,11 @@ Tiến trình hoạt động Use Case UC43: Tác nhân Chuyên viên Hồ sơ k�
 
 ![Hình 2.93: Biểu đồ hoạt động Use case Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03) (UC43)](images/hinh_act_uc43.png)
 
-#### 2.3.2.44. Biểu đồ hoạt động Use case Quản lý không gian tri thức số & Tài liệu quy trình SOP (UC44)
+#### 2.3.2.44. Biểu đồ hoạt động Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành chuẩn (UC44)
 
 Tiến trình hoạt động Use Case UC44: Tác nhân Toàn thể nhân viên (theo quyền không gian) kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
 
-![Hình 2.94: Biểu đồ hoạt động Use case Quản lý không gian tri thức số & Tài liệu quy trình SOP (UC44)](images/hinh_act_uc44.png)
+![Hình 2.94: Biểu đồ hoạt động Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành chuẩn (UC44)](images/hinh_act_uc44.png)
 
 #### 2.3.2.45. Biểu đồ hoạt động Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)
 
@@ -2288,7 +2335,7 @@ Tiến trình hoạt động Use Case UC46: Tác nhân Ban Giám đốc, Quản 
 
 #### 2.3.2.47. Biểu đồ hoạt động Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)
 
-Tiến trình hoạt động Use Case UC47: Tác nhân Nhân viên Quản trị IT kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
+Tiến trình hoạt động Use Case UC47: Tác nhân Nhân viên Quản trị CNTT kích hoạt thao tác chức năng; hệ thống tiến hành kiểm tra điều kiện hợp lệ đầu vào, rẽ nhánh xử lý nghiệp vụ tương ứng và cập nhật trạng thái bản ghi trên cơ sở dữ liệu.
 
 ![Hình 2.97: Biểu đồ hoạt động Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)](images/hinh_act_uc47.png)
 
@@ -2322,7 +2369,7 @@ Vòng đời phiếu mượn hồ sơ: Yêu cầu mượn (REQUESTED) -> HR xu�
 
 #### 5. Biểu đồ trạng thái Phiếu lương
 
-Vòng đời phiếu lương: Tính dự thảo (DRAFT) -> Kế toán trưởng thẩm định (REVIEWED) -> Giám đốc ký duyệt khóa bất biến (LOCKED) -> Phát hành qua cổng ESS (PUBLISHED) -> Đã thanh toán chuyển khoản (PAID).
+Vòng đời phiếu lương: Tính dự thảo (DRAFT) -> Kế toán trưởng thẩm định (REVIEWED) -> Giám đốc ký duyệt khóa bất biến (LOCKED) -> Phát hành qua cổng tự phục vụ nhân viên (PUBLISHED) -> Đã thanh toán chuyển khoản (PAID).
 
 ![Hình 2.102: Biểu đồ trạng thái Phiếu lương](images/hinh_2_16_state_payslip.png)
 
@@ -2414,7 +2461,7 @@ Thể hiện mối quan hệ liên kết, hợp thành và kế thừa giữa c�
 
 ![Hình 2.115: Biểu đồ lớp miền cốt lõi của hệ thống](images/hinh_2_20_class_domain.png)
 
-**Bảng 2.6. Ma trận phân quyền truy cập chức năng**
+**Bảng 2.4. Ma trận phân quyền truy cập chức năng**
 
 | Phân hệ chức năng | Bảng dữ liệu chính | Quyền hạn vai USER | Quyền hạn vai KM_MANAGER | Quyền hạn vai ADMIN |
 | :--- | :--- | :---: | :---: | :---: |
@@ -2437,7 +2484,7 @@ Thể hiện mối quan hệ liên kết, hợp thành và kế thừa giữa c�
 
 Cơ sở dữ liệu của hệ thống được thiết kế và cài đặt trên hệ quản trị cơ sở dữ liệu quan hệ PostgreSQL 16, quản lý tập trung toàn bộ các thực thể thông tin phục vụ công tác quản trị nhân lực. Cấu trúc lược đồ dữ liệu gồm 87 bảng quan hệ được phân bổ khoa học thành 10 miền nghiệp vụ chính, đáp ứng đầy đủ các yêu cầu về tính toàn vẹn dữ liệu, hiệu năng truy vấn và an toàn thông tin:
 
-**Bảng 2.7. Đặc tả cấu trúc lược đồ Cơ sở dữ liệu quan hệ của hệ thống**
+**Bảng 2.5. Đặc tả cấu trúc lược đồ Cơ sở dữ liệu quan hệ của hệ thống**
 
 | Miền dữ liệu | Danh mục bảng dữ liệu trong CSDL (Prisma ORM) | Số bảng | Mục đích lưu trữ và quy tắc nghiệp vụ |
 | :--- | :--- | :---: | :--- |
@@ -2450,19 +2497,19 @@ Cơ sở dữ liệu của hệ thống được thiết kế và cài đặt tr
 | 7. Tiền lương & Cấu trúc đãi ngộ động | `PayrollPeriod`, `Payslip`, `HrmsSalaryComponent`, `HrmsSalaryStructure`, `HrmsSalaryStructureItem`, `HrmsSalaryStructureAssignment`, `HrmsPayrollRun`, `HrmsPayrollSlip` | 8 | Quản lý chu kỳ tính lương có khóa sổ an toàn, bảng cấu trúc lương động đa thành phần, phiếu lương chi tiết từng khoản phụ cấp, bảo hiểm và thuế. |
 | 8. Tài chính nhân sự, Phúc lợi & Tài sản | `HrmsEmployeeLoan`, `HrmsEmployeeAdvance`, `HrmsExpenseClaim`, `HrmsAssetAllocation`, `HrmsTravelRequest` | 5 | Quản lý các khoản vay phúc lợi (khống chế mức trích nợ không vượt quá 30% lương thực lĩnh), tự động trừ dần qua bảng lương, thanh quyết toán công tác phí và cấp phát tài sản. |
 | 9. Hiệu suất & Đào tạo phát triển | `PerformanceReview`, `HrmsAppraisalCycle`, `HrmsAppraisalGoal`, `HrmsAppraisalReview`, `TrainingCourse`, `TrainingEnrollment`, `HrmsTrainingProgram`, `HrmsTrainingFeedback`, `HrmsGrievance` | 9 | Đánh giá hiệu suất 360 độ, quản lý mục tiêu OKR/KPI, các khóa đào tạo nâng cao kỹ năng chuyên môn và kênh tiếp nhận giải quyết khiếu nại lao động bảo mật. |
-| 10. Hồ sơ cán bộ Mẫu 2C, Tri thức số & Hệ thống | `PersonnelComprehensiveProfile`, `PersonnelRank`, `PersonnelSalaryHistory`, `PersonnelAppointment`, `PersonnelEducation`, `PersonnelWorkHistory`, `PersonnelRewardDiscipline`, `PersonnelFamilyRelation`, `PersonnelAppraisal`, `PersonnelSocialActivity`, `Space`, `SpaceMember`, `SpaceFollow`, `Category`, `Tag`, `ArticleTag`, `Article`, `ArticleVersion`, `Attachment`, `ArticleReview`, `Comment`, `Reaction`, `ArticleView`, `Bookmark`, `MasterCatalogGroup`, `MasterCatalog`, `MasterCatalogItem`, `Notification`, `AuditLog`, `Setting` | 30 | 111 thuộc tính cán bộ chuyên sâu theo Mẫu 2C-BNV và ngạch bậc lương NĐ 204; kho tri thức số SOP có phiên bản bài viết bất biến; danh mục dùng chung và nhật ký kiểm toán hệ thống. |
+| 10. Hồ sơ cán bộ Mẫu 2C, Tri thức số & Hệ thống | `PersonnelComprehensiveProfile`, `PersonnelRank`, `PersonnelSalaryHistory`, `PersonnelAppointment`, `PersonnelEducation`, `PersonnelWorkHistory`, `PersonnelRewardDiscipline`, `PersonnelFamilyRelation`, `PersonnelAppraisal`, `PersonnelSocialActivity`, `Space`, `SpaceMember`, `SpaceFollow`, `Category`, `Tag`, `ArticleTag`, `Article`, `ArticleVersion`, `Attachment`, `ArticleReview`, `Comment`, `Reaction`, `ArticleView`, `Bookmark`, `MasterCatalogGroup`, `MasterCatalog`, `MasterCatalogItem`, `Notification`, `AuditLog`, `Setting` | 30 | 111 thuộc tính cán bộ chuyên sâu theo Mẫu 2C-BNV và ngạch bậc lương NĐ 204; kho tri thức số và quy trình vận hành chuẩn có phiên bản bài viết bất biến; danh mục dùng chung và nhật ký kiểm toán hệ thống. |
 
 Lược đồ cơ sở dữ liệu quan hệ của hệ thống thể hiện cấu trúc các bảng dữ liệu cốt lõi cùng các mối quan hệ khóa chính, khóa ngoại và chỉ mục ràng buộc toàn vẹn giữa các phân hệ:
 
-![Hình 2.116: Mô hình cơ sở dữ liệu vật lý của hệ thống](images/hinh_2_21_erd_database.png)
+![Hình 2.125: Mô hình cơ sở dữ liệu vật lý của hệ thống](images/hinh_2_21_erd_database.png)
 
 Nhằm đáp ứng mô hình làm việc linh hoạt và hiện đại hóa công tác chấm công, cơ sở dữ liệu mở rộng phân hệ quản lý điểm danh đa nguồn, kết nối đồng thời thiết bị chấm công phần cứng, Kiosk nhận diện khuôn mặt và cổng tự phục vụ của nhân viên:
 
-![Hình 2.117: Mô hình dữ liệu mở rộng cho chấm công đa nguồn](images/hinh_2_24_erd_multisource.png)
+![Hình 2.126: Mô hình dữ liệu mở rộng cho chấm công đa nguồn](images/hinh_2_24_erd_multisource.png)
 
 Sơ đồ trên làm rõ quy trình tiếp nhận và xử lý dữ liệu chấm công: bảng `AttendanceDevice` quản lý thông tin các thiết bị ghi nhận; bảng `FaceEmbedding` lưu trữ các vector mẫu nhận diện khuôn mặt đã được mã hóa an toàn của từng nhân viên; bảng `AttendanceEvent` đóng vai trò là nhật ký tiếp nhận toàn bộ các lượt điểm danh gửi về theo thời gian thực; từ đó hệ thống tổng hợp thành các bản ghi công hoàn chỉnh theo ngày tại bảng `AttendanceDay`. Trường hợp có sự chênh lệch giờ giấc hoặc quên quẹt thẻ, nhân viên gửi đơn giải trình tại bảng `AttendanceCorrection` để người quản lý rà soát và cập nhật lại số liệu.
 
-**Bảng 2.8. So sánh các phương thức điểm danh trong hệ thống**
+**Bảng 2.6. So sánh các phương thức điểm danh trong hệ thống**
 
 | Tiêu chí so sánh | Kiosk nhận diện khuôn mặt | Thiết bị chấm công phần cứng (Vân tay / Thẻ) | Cổng tự phục vụ nhân viên (Web) |
 | :--- | :--- | :--- | :--- |
@@ -2527,7 +2574,7 @@ Tầng Xử lý nghiệp vụ: Xây dựng trên nền tảng NestJS bằng ngô
 
 Tầng Lưu trữ dữ liệu: Sử dụng hệ quản trị cơ sở dữ liệu quan hệ PostgreSQL 16 quản lý tập trung 87 bảng dữ liệu, kết hợp không gian lưu trữ các tệp tài liệu số hóa độc lập; toàn bộ cấu trúc cơ sở dữ liệu được quản lý phiên bản tự động, bảo đảm tính nhất quán và đồng bộ khi triển khai hệ thống.
 
-![Hình 2.118: Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống](images/hinh_2_22_arch_3tier.png)
+![Hình 2.127: Sơ đồ kiến trúc phần mềm 3 tầng của hệ thống](images/hinh_2_22_arch_3tier.png)
 
 Kiến trúc phân tầng rõ ràng giúp hệ thống vận hành ổn định, có độ bao đóng cao, cho phép doanh nghiệp dễ dàng nâng cấp giao diện hoặc tích hợp thêm các dịch vụ công nghệ mới (như phân hệ trí tuệ nhân tạo dự báo nhân sự) trong tương lai mà không làm gián đoạn cấu trúc dữ liệu nền tảng.
 
@@ -2543,7 +2590,7 @@ Chương 2 đã hoàn thành toàn diện nhiệm vụ thiết kế hệ thống
 
 Sau quá trình nghiên cứu, khảo sát thực tế tại Công ty Cổ phần Phần mềm Saigon Technology, vận dụng phương pháp phân tích thiết kế hướng đối tượng (OOAD) và tiến hành lập trình cài đặt thực tế toàn bộ hệ thống, đề tài đã đạt được các kết quả cụ thể:
 
-Về mặt nghiệp vụ và chức năng: Hệ thống đã số hóa hoàn chỉnh 18 quy trình nghiệp vụ cốt lõi, hiện thực hóa thành 47 Use Case chức năng trên 31 trang màn hình ứng dụng thực tế (bao gồm 28 màn hình nghiệp vụ phân bổ thành 7 phân hệ giao diện không gian làm việc cùng 2 giao diện chuyên biệt: Kiosk điểm danh khuôn mặt & IR và Login xác thực tập trung). Hệ thống phục vụ 11 tác nhân nghiệp vụ gói gọn trong 3 vai trò phân quyền (USER, KM_MANAGER, ADMIN), bao quát trọn vẹn vòng đời nhân sự từ tuyển dụng ATS, hồ sơ nhân viên, phân cấp quản trị dữ liệu cá nhân 3 mức độ, điểm danh đa nguồn (máy chấm công phần cứng, Kiosk nhận diện khuôn mặt sinh trắc học 2D & cảm biến hồng ngoại IR chống giả mạo, Web ESS), quản lý nghỉ phép, làm thêm giờ, chu kỳ tính lương có cơ chế khóa sổ an toàn, các chính sách phúc lợi (khoản vay, công tác phí, tài sản), đánh giá hiệu suất 360 độ cho đến kho tri thức nội bộ và bộ hồ sơ cán bộ theo chuẩn Mẫu 2C-BNV/2008.
+Về mặt nghiệp vụ và chức năng: Hệ thống đã số hóa hoàn chỉnh 18 quy trình nghiệp vụ cốt lõi, hiện thực hóa thành 47 Use Case chức năng trên 31 trang màn hình ứng dụng thực tế (bao gồm 28 màn hình nghiệp vụ phân bổ thành 7 phân hệ giao diện không gian làm việc cùng 2 giao diện chuyên biệt: Kiosk điểm danh khuôn mặt & IR và Login xác thực tập trung). Hệ thống phục vụ 11 tác nhân nghiệp vụ gói gọn trong 3 vai trò phân quyền (USER, KM_MANAGER, ADMIN), bao quát trọn vẹn vòng đời nhân sự từ tuyển dụng ATS, hồ sơ nhân viên, phân cấp quản trị dữ liệu cá nhân 3 mức độ, điểm danh đa nguồn (máy chấm công phần cứng, Kiosk nhận diện khuôn mặt sinh trắc học 2D & cảm biến hồng ngoại IR chống giả mạo, cổng tự phục vụ nhân viên nền web), quản lý nghỉ phép, làm thêm giờ, chu kỳ tính lương có cơ chế khóa sổ an toàn, các chính sách phúc lợi (khoản vay, công tác phí, tài sản), đánh giá hiệu suất 360 độ cho đến kho tri thức nội bộ và bộ hồ sơ cán bộ theo chuẩn Mẫu 2C-BNV/2008.
 
 Về mặt cơ sở dữ liệu: Thiết kế và cài đặt hoàn chỉnh 87 bảng quan hệ phân bổ trong 10 miền dữ liệu trên hệ quản trị PostgreSQL 16; thiết lập và kiểm chứng chặt chẽ các ràng buộc nghiệp vụ: sổ nhật ký kiểm toán và dữ liệu sự kiện điểm danh theo nguyên tắc chỉ ghi thêm để lưu vết vĩnh viễn, cùng cơ chế khóa sổ kỳ lương ngăn chặn hoàn toàn việc tính toán lại nhằm bảo vệ tính toàn vẹn của số liệu kế toán.
 
