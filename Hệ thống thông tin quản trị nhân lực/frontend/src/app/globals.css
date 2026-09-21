@@ -515,3 +515,42 @@ html nav *:active {
   box-shadow: none !important;
   -webkit-focus-ring-color: transparent !important;
 }
+
+/* ========================================================================= */
+/* HOVER MARQUEE & AUTO-SCROLL CHO VĂN BẢN RÚT GỌN (...)                     */
+/* ========================================================================= */
+.hover-marquee-wrapper {
+  display: block;
+  overflow: hidden;
+  position: relative;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.hover-marquee-inner {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.hover-marquee-wrapper:hover .hover-marquee-inner[data-overflow="true"] {
+  display: inline-block;
+  width: auto;
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+  animation: hover-marquee-slide var(--marquee-dur, 3.5s) cubic-bezier(0.2, 0, 0.3, 1) infinite alternate;
+}
+
+@keyframes hover-marquee-slide {
+  0%, 20% {
+    transform: translateX(0);
+  }
+  80%, 100% {
+    transform: translateX(var(--marquee-dist, -40px));
+  }
+}

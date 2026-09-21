@@ -77,11 +77,40 @@ export default function OrgChartPage() {
 
     const enrichNode = (node: any, level = 1): OrgNode => {
       const unitEmps = employeeList.filter((e) => e.orgUnitId === node.id);
-      const manager =
-        unitEmps.find((e) => {
-          const t = e.jobTitle.toLowerCase();
-          return t.includes('tổng giám đốc') || t.includes('giám đốc') || t.includes('trưởng') || t.includes('lead');
-        }) || unitEmps[0];
+
+      // Phân định chuẩn theo tài liệu doc/PTTK_OOP_HR.md
+      let headTitle = node.headTitle;
+      let headName = node.headName;
+
+      if (node.code === 'SG-TECH') {
+        headTitle = 'Tổng Giám đốc (CEO & Đại diện Pháp luật)';
+        headName = 'Trần Minh Hoàng';
+      } else if (node.code === 'ĐHCĐ' || node.code === 'DHCD') {
+        headTitle = 'Chủ tịch Hội đồng Quản trị';
+        headName = 'Phạm Tiến Thành';
+      } else if (node.code === 'BGD') {
+        headTitle = 'Tổng Giám đốc (CEO)';
+        headName = 'Trần Minh Hoàng';
+      } else {
+        const manager =
+          unitEmps.find((e) => {
+            const t = e.jobTitle.toLowerCase();
+            return t.includes('tổng giám đốc') || t.includes('giám đốc') || t.includes('trưởng') || t.includes('lead');
+          }) || unitEmps[0];
+
+        if (!headTitle) {
+          headTitle = manager
+            ? manager.jobTitle
+            : level === 1
+            ? 'Tổng Giám đốc (CEO)'
+            : level === 2
+            ? 'Giám đốc Khối'
+            : 'Trưởng phòng / Trưởng nhóm';
+        }
+        if (!headName) {
+          headName = manager ? manager.fullName : level === 1 ? 'Ban Giám đốc' : 'Chưa bổ nhiệm';
+        }
+      }
 
       const children =
         node.children && node.children.length > 0
@@ -98,16 +127,8 @@ export default function OrgChartPage() {
         id: node.id,
         name: node.name,
         code: node.code,
-        headTitle:
-          node.headTitle ||
-          (manager
-            ? manager.jobTitle
-            : level === 1
-            ? 'Tổng Giám đốc (CEO)'
-            : level === 2
-            ? 'Trưởng Ban'
-            : 'Trưởng bộ phận'),
-        headName: node.headName || (manager ? manager.fullName : level === 1 ? 'Ban Giám đốc' : 'Chưa bổ nhiệm'),
+        headTitle,
+        headName,
         headcount: totalHeadcount || unitEmps.length || node.memberCount || 0,
         children,
       };
@@ -126,14 +147,27 @@ export default function OrgChartPage() {
       const target = current > 0 ? current + 2 : 5;
       const fill = Math.min(100, Math.round((current / target) * 100));
 
-      const levelLabels = ['Ban Lãnh đạo (Cấp 1)', 'Khối / Ban (Cấp 2)', 'Trung tâm / Phòng (Cấp 3)', 'Tổ / Nhóm (Cấp 4)'];
+      let levelLabel = 'Cấp 3: Trung tâm / Phòng';
+      if (node.code === 'SG-TECH') {
+        levelLabel = 'Cấp 1: Ban Lãnh đạo Công ty';
+      } else if (node.code === 'ĐHCĐ' || node.code === 'DHCD') {
+        levelLabel = 'Cấp 1: Quản trị Sở hữu (ĐHCĐ & HĐQT)';
+      } else if (node.code === 'BGD') {
+        levelLabel = 'Cấp 1: Ban Giám đốc Điều hành';
+      } else if (level === 2 || ['DELIVERY', 'HR', 'OPS', 'BIZ', 'FIN'].includes(node.code)) {
+        levelLabel = 'Cấp 2: Khối chức năng';
+      } else if (level === 3) {
+        levelLabel = 'Cấp 3: Trung tâm / Phòng';
+      } else {
+        levelLabel = 'Cấp 4: Tổ / Nhóm / Squad';
+      }
 
       rows.push({
         id: node.id,
         code: node.code,
         name: node.name,
         level,
-        levelLabel: levelLabels[Math.min(level - 1, levelLabels.length - 1)],
+        levelLabel,
         parentId: node.parentId || null,
         parentName: level === 1 ? '— (Cấp cao nhất)' : parentName,
         headName: node.headName || 'Chưa bổ nhiệm',
@@ -159,11 +193,11 @@ export default function OrgChartPage() {
     return (
       enrichedTree[0] ?? {
         id: 'root-company',
-        name: 'Ban Giám đốc & Điều hành',
-        code: 'BGD',
-        headName: 'Phạm Tiến Thành (Bruce Pham)',
-        headTitle: 'Tổng Giám đốc (CEO)',
-        headcount: 5,
+        name: 'Saigon Technology',
+        code: 'SG-TECH',
+        headName: 'Trần Minh Hoàng',
+        headTitle: 'Tổng Giám đốc (CEO & Đại diện Pháp luật)',
+        headcount: 384,
       }
     );
   }, [selectedNode, enrichedTree]);

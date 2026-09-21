@@ -85,10 +85,11 @@ const DOMAINS: NavDomain[] = [
       {
         id: 'ws-general',
         label: 'Bàn làm việc',
-        count: 4,
+        count: 5,
         items: [
           { href: '/dashboard', label: 'Tổng quan', badge: 'KPI' },
           { href: '/ess', label: 'Cổng nhân viên', badge: 'Chính' },
+          { href: '/org-chart', label: 'Sơ đồ tổ chức' },
           { href: '/notifications', label: 'Thông báo', badge: 3 },
           { href: '/profile', label: 'Hồ sơ cá nhân' },
         ],
@@ -105,6 +106,7 @@ const DOMAINS: NavDomain[] = [
     label: 'Nhân sự',
     shortLabel: 'Nhân sự',
     icon: Users,
+    roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR'],
     folders: [
       {
         id: 'pers-records',
@@ -138,6 +140,7 @@ const DOMAINS: NavDomain[] = [
     label: 'Chấm công',
     shortLabel: 'Chấm công',
     icon: Clock4,
+    roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB'],
     folders: [
       {
         id: 'time-attendance',
@@ -169,6 +172,7 @@ const DOMAINS: NavDomain[] = [
     label: 'Tiền lương',
     shortLabel: 'Tiền lương',
     icon: Wallet,
+    roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'],
     folders: [
       {
         id: 'comp-payroll',
@@ -199,6 +203,7 @@ const DOMAINS: NavDomain[] = [
     label: 'Phát triển',
     shortLabel: 'Phát triển',
     icon: Briefcase,
+    roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER', 'HR_TRAINER'],
     folders: [
       {
         id: 'talent-recruitment',
@@ -243,7 +248,7 @@ const DOMAINS: NavDomain[] = [
         label: 'Báo cáo',
         count: 1,
         items: [
-          { href: '/personnel-reports', label: 'Báo cáo nhân sự', badge: 'BLLĐ', roles: ['ADMIN', 'KM_MANAGER'] },
+          { href: '/personnel-reports', label: 'Báo cáo nhân sự', badge: 'BLLĐ', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR', 'ACCOUNTANT'] },
         ],
       },
     ],
@@ -262,8 +267,9 @@ const DOMAINS: NavDomain[] = [
       {
         id: 'admin-users',
         label: 'Phân quyền',
-        count: 2,
+        count: 3,
         items: [
+          { href: '/admin/roles', label: 'Quản lý phân quyền', badge: 'RBAC' },
           { href: '/admin/users', label: 'Tài khoản' },
           { href: '/admin/org-units', label: 'Đơn vị phòng ban' },
         ],
@@ -408,24 +414,30 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
-  // Lọc items trong sub-sidebar theo ô tìm kiếm
+  // Lọc items trong sub-sidebar theo ô tìm kiếm VÀ quyền vai trò
   const filteredFolders = useMemo(() => {
-    if (!subSidebarSearch.trim()) return activeDomain.folders;
+    const userRoles = profile?.roles || [];
     const q = subSidebarSearch.toLowerCase().trim();
     return activeDomain.folders
       .map((folder) => {
-        const matchingItems = folder.items.filter(
-          (item) =>
+        const matchingItems = folder.items.filter((item) => {
+          // Kiểm tra vai trò nếu item có yêu cầu roles
+          if (item.roles && !item.roles.some((r) => userRoles.includes(r))) {
+            return false;
+          }
+          if (!q) return true;
+          return (
             item.label.toLowerCase().includes(q) ||
             item.subItems?.some((sub) => sub.label.toLowerCase().includes(q))
-        );
+          );
+        });
         return {
           ...folder,
           items: matchingItems,
         };
       })
-      .filter((folder) => folder.items.length > 0 || folder.label.toLowerCase().includes(q));
-  }, [activeDomain, subSidebarSearch]);
+      .filter((folder) => folder.items.length > 0);
+  }, [activeDomain, subSidebarSearch, profile?.roles]);
 
   const filteredTags = useMemo(() => {
     if (!subSidebarSearch.trim()) return activeDomain.tags;
@@ -436,7 +448,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
   return (
     <div className="min-h-dvh bg-background text-foreground antialiased selection:bg-primary/20">
       {/* Universal Command Palette (Ctrl+K) */}
-      <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
+      <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} userRoles={profile?.roles || []} />
 
       {/* ========================================================================= */}
       {/* TIER 1: PRIMARY ICON RAIL (Cột icon mỏng bên trái: w-16 = 64px)            */}
@@ -869,7 +881,10 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                     {domain.label}
                   </p>
                   <div className="space-y-0.5">
-                    {domain.folders.flatMap((f) => f.items).map((item) => (
+                    {domain.folders
+                      .flatMap((f) => f.items)
+                      .filter((item) => !item.roles || item.roles.some((r) => profile?.roles?.includes(r)))
+                      .map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
@@ -922,16 +937,23 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
       </main>
 
       {/* ========================================================================= */}
-      {/* BOTTOM NAV (Thanh điều hướng nhanh phía đáy trên điện thoại)              */}
-      {/* ========================================================================= */}
       <nav className="fixed inset-x-0 bottom-0 z-sticky grid grid-cols-5 border-t border-border/60 bg-card/90 backdrop-blur-md md:hidden">
-        {[
-          { href: '/dashboard', label: 'Tổng quan', icon: Home },
-          { href: '/employees', label: 'Nhân sự', icon: Users },
-          { href: '/ess', label: 'Cá nhân', icon: UserCircle2 },
-          { href: '/attendance', label: 'Chấm công', icon: Clock4 },
-          { href: '/loans', label: 'Khoản vay', icon: Wallet },
-        ].map(({ href, label, icon: Icon }) => (
+        {(profile?.roles?.some((r) => r !== 'USER')
+          ? [
+              { href: '/dashboard', label: 'Tổng quan', icon: Home },
+              { href: '/employees', label: 'Nhân sự', icon: Users },
+              { href: '/ess', label: 'Cá nhân', icon: UserCircle2 },
+              { href: '/attendance', label: 'Chấm công', icon: Clock4 },
+              { href: '/loans', label: 'Khoản vay', icon: Wallet },
+            ]
+          : [
+              { href: '/dashboard', label: 'Bàn việc', icon: Home },
+              { href: '/ess', label: 'Cổng ESS', icon: UserCircle2 },
+              { href: '/org-chart', label: 'Sơ đồ', icon: Network },
+              { href: '/documents', label: 'Tài liệu', icon: FolderOpen },
+              { href: '/profile', label: 'Hồ sơ', icon: Users },
+            ]
+        ).map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
             href={href}

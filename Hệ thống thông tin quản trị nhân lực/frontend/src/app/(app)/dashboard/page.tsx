@@ -6,216 +6,490 @@ import { useQuery } from '@tanstack/react-query';
 import {
   Users, Clock4, Wallet, Briefcase, Target, Plane, GraduationCap,
   ChevronRight, Sparkles, FileSpreadsheet,
-  ClipboardCheck, UserCheck, ArrowUpRight, Calculator, Receipt, ShieldCheck
+  ClipboardCheck, UserCheck, ArrowUpRight, Calculator, Receipt, ShieldCheck,
+  CalendarDays, Laptop, FileText, CheckCircle2, Shield, KeyRound
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
+import { useAuthStore } from '@/lib/auth-store';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { LoadingBlock, ErrorState } from '@/components/common/states';
 import type { DashboardStats } from '@/lib/types';
 
 export default function FrappeHrmsDeskDashboard() {
-  const { data: stats, isLoading, isError, error, refetch } = useQuery<DashboardStats>({
+  const { user } = useAuthStore();
+  const userRoles = user?.roles ?? [];
+  const isManagerOrAdmin = userRoles.some((r) =>
+    ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'ACCOUNTANT', 'HR_TRAINER', 'AUDITOR'].includes(r)
+  );
+  const isAdmin = userRoles.includes('ADMIN');
+
+  // Queries cho Quản lý / Quản trị viên
+  const { data: stats, isLoading: statsLoading, isError: statsError, error: statsErr, refetch: refetchStats } = useQuery<DashboardStats>({
     queryKey: ['dashboard'],
     queryFn: async () => (await api.get<DashboardStats>('/dashboard/stats')).data,
+    enabled: isManagerOrAdmin,
   });
 
   const { data: shiftTypes } = useQuery({
     queryKey: ['hrms-shift-types'],
     queryFn: async () => (await api.get('/hrms/shifts/types')).data,
+    enabled: isManagerOrAdmin,
   });
 
   const { data: payrollRuns } = useQuery({
     queryKey: ['hrms-payroll-runs'],
     queryFn: async () => (await api.get('/hrms/payroll/runs')).data,
+    enabled: isManagerOrAdmin,
   });
 
   const { data: applicants } = useQuery({
     queryKey: ['hrms-job-applicants'],
     queryFn: async () => (await api.get('/hrms/recruitment/applicants')).data,
+    enabled: isManagerOrAdmin,
   });
 
-  if (isLoading) return <LoadingBlock label="Đang tải dữ liệu tổng quan..." />;
-  if (isError) return <ErrorState message={errorMessage(error)} onRetry={() => refetch()} />;
+  // Queries cá nhân cho Nhân viên (USER)
+  const { data: myLeaveBalance, isLoading: leaveLoading } = useQuery<{ total: number; used: number; remaining: number }>({
+    queryKey: ['my-leave-balance'],
+    queryFn: async () => (await api.get('/hrms/leave/my-balance')).data,
+    enabled: !isManagerOrAdmin,
+  });
+
+  const { data: myLeaves } = useQuery<{ id: string; status: string }[]>({
+    queryKey: ['my-leaves'],
+    queryFn: async () => (await api.get('/hrms/leave/mine')).data,
+    enabled: !isManagerOrAdmin,
+  });
+
+  const { data: myRegularizations } = useQuery<{ id: string; status: string }[]>({
+    queryKey: ['my-regularizations'],
+    queryFn: async () => (await api.get('/hrms/attendance-regularizations/my')).data,
+    enabled: !isManagerOrAdmin,
+  });
+
+  if (isManagerOrAdmin && statsLoading) return <LoadingBlock label="Đang tải dữ liệu tổng quan quản trị..." />;
+  if (isManagerOrAdmin && statsError) return <ErrorState message={errorMessage(statsErr)} onRetry={() => refetchStats()} />;
 
   const hr = stats?.hr;
   const latestRun = payrollRuns?.[0];
   const pendingTotal = (hr?.pendingLeave ?? 0) + (hr?.pendingOvertime ?? 0) + (hr?.pendingActions ?? 0);
 
-  const workspaceCards = [
+  // Dữ liệu cho nhân viên (USER)
+  const pendingLeavesCount = (myLeaves ?? []).filter((l) => l.status === 'PENDING').length;
+  const pendingRegsCount = (myRegularizations ?? []).filter((r) => r.status === 'PENDING').length;
+  const myPendingTotal = pendingLeavesCount + pendingRegsCount;
+
+  // --------------------------------------------------------------------------
+  // BẢNG ĐIỀU KHIỂN CHO CÁN BỘ QUẢN TRỊ & NHÂN SỰ (ADMIN / KM_MANAGER)
+  // --------------------------------------------------------------------------
+  if (isManagerOrAdmin) {
+    const workspaceCards = [
+      {
+        title: 'Nhân sự & Cơ cấu',
+        subtitle: 'Employee & Org Structure',
+        icon: Users,
+        description: 'Sơ đồ tổ chức động, hồ sơ nhân sự, ngạch bậc lương, tài sản và quyết định biến động.',
+        links: [
+          { label: 'Sơ đồ Tổ chức Động (Interactive Tree)', href: '/org-chart' },
+          { label: 'Danh sách Nhân sự Toàn diện', href: '/employees', count: hr?.totalEmployees },
+          { label: 'Hồ sơ Nhân sự & Cán bộ', href: '/personnel-profiles' },
+          { label: 'Quản trị Tài sản & Thiết bị', href: '/assets' },
+          { label: 'Quyết định & Biến động Nhân sự', href: '/personnel' },
+          { label: 'Ngạch bậc & Thang bảng lương', href: '/salary-ranks' },
+        ],
+      },
+      {
+        title: 'Ca kíp & Chấm công',
+        subtitle: 'Shift & Attendance',
+        icon: Clock4,
+        description: 'Phân ca tuần/tháng, giám sát chuyên cần, tính bù giờ và quản lý hạn mức phép.',
+        links: [
+          { label: 'Ca làm việc & Ma trận Phân ca', href: '/shifts', count: shiftTypes?.length ?? 4 },
+          { label: 'Bảng Chấm công Thực tế', href: '/attendance' },
+          { label: 'Quản lý Đơn Nghỉ phép', href: '/leave', count: hr?.pendingLeave },
+          { label: 'Đăng ký Làm thêm giờ / Trực ca', href: '/overtime', count: hr?.pendingOvertime },
+          { label: 'Điểm danh khuôn mặt & IR', href: '/check-in' },
+        ],
+      },
+      {
+        title: 'Tiền lương & Chi phí',
+        subtitle: 'Payroll & Compensation',
+        icon: Calculator,
+        description: 'Hệ thống tính lương tự động, thành phần thu nhập, cấu trúc lương và khoản vay phúc lợi.',
+        links: [
+          { label: 'Tiền lương & Bảng lương Tự động', href: '/payroll-engine' },
+          { label: 'Quản trị Khoản Vay & Tạm ứng', href: '/loans' },
+          { label: 'Xuất File Chi Lương Ngân Hàng', href: '/payroll-engine' },
+          { label: 'Thành phần Lương (Thu nhập & Khấu trừ)', href: '/payroll-engine' },
+          { label: 'Phiếu lương & Lịch sử chi trả', href: '/payroll' },
+        ],
+      },
+      {
+        title: 'Tuyển dụng ATS',
+        subtitle: 'Recruitment & Pipeline',
+        icon: Briefcase,
+        description: 'Đăng tin tuyển dụng, pipeline Kanban 6 giai đoạn, scorecard và 1-Click Onboard.',
+        links: [
+          { label: 'Tuyển dụng ATS Kanban', href: '/recruitment-ats' },
+          { label: 'Tin Tuyển dụng Đang mở', href: '/recruitment-ats' },
+          { label: 'Hồ sơ Ứng viên Tuyển chọn', href: '/recruitment-ats', count: applicants?.length },
+          { label: 'Bảng điểm Phỏng vấn (Scorecard)', href: '/recruitment-ats' },
+          { label: 'Thư mời Nhận việc (Job Offer)', href: '/recruitment-ats' },
+        ],
+      },
+      {
+        title: 'Hiệu suất & 360',
+        subtitle: 'Performance & KRA',
+        icon: Target,
+        description: 'Mục tiêu KRA/KPI theo trọng số %, tự đánh giá, quản lý chấm và phản hồi 360 độ.',
+        links: [
+          { label: 'Đánh giá 360 Độ Toàn diện', href: '/performance-360' },
+          { label: 'Mục tiêu KPI Trọng số (KRA Goals)', href: '/performance-360' },
+          { label: 'Phản hồi Đánh giá Đồng nghiệp', href: '/performance-360' },
+          { label: 'Chu kỳ Đánh giá Hiệu suất', href: '/performance-360' },
+        ],
+      },
+      {
+        title: 'Công tác & Chi phí',
+        subtitle: 'Expenses & Travel',
+        icon: Receipt,
+        description: 'Đề xuất công tác, tạm ứng kinh phí, bảng kê thanh toán chi phí kèm chứng từ.',
+        links: [
+          { label: 'Bảng kê Quyết toán Chi phí', href: '/expense-claims' },
+          { label: 'Đơn Đề xuất Công tác', href: '/expense-claims' },
+          { label: 'Tạm ứng Kinh phí Nhân viên', href: '/expense-claims' },
+        ],
+      },
+      {
+        title: 'Đào tạo & Khiếu nại',
+        subtitle: 'Training & Grievance',
+        icon: GraduationCap,
+        description: 'Kế hoạch đào tạo nâng cao kỹ năng và kênh tiếp nhận khiếu nại minh bạch.',
+        links: [
+          { label: 'Chương trình Đào tạo Chuyên môn', href: '/training-grievance' },
+          { label: 'Kiến nghị & Khiếu nại Nhân viên', href: '/training-grievance' },
+          { label: 'Khảo sát Đánh giá Sau Đào tạo', href: '/training-grievance' },
+        ],
+      },
+      {
+        title: 'Báo cáo & Phê duyệt',
+        subtitle: 'Reports & Governance',
+        icon: FileSpreadsheet,
+        description: 'Trung tâm báo cáo thống kê nhân sự, tổng hợp biến động lao động và nhật ký kiểm toán.',
+        links: [
+          { label: 'Trung tâm Báo cáo & Thống kê', href: '/personnel-reports' },
+          { label: 'Quyết định & Biến động nhân sự', href: '/personnel', count: pendingTotal },
+          { label: 'Tài liệu & Quy định Nội bộ', href: '/documents' },
+          { label: 'Cơ cấu Tổ chức & Phòng ban', href: '/admin/org-units' },
+        ],
+      },
+    ];
+
+    return (
+      <div className="space-y-6 pb-12">
+        <WorkspaceHeader
+          title="Tổng quan Điều hành Nhân lực"
+          description="Không gian điều hành quản trị nhân lực tích hợp: Tuyển dụng, Chấm công, Tiền lương, Hiệu suất và Đào tạo."
+          actions={
+            <div className="flex items-center gap-2">
+              <Link
+                href="/ess"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shadow-2xs"
+              >
+                <UserCheck className="h-3.5 w-3.5 text-muted-foreground" />
+                Cổng Tự Phục Vụ (ESS)
+              </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin/roles"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted transition-colors shadow-2xs"
+                >
+                  <KeyRound className="h-3.5 w-3.5 text-rose-500" />
+                  Phân quyền RBAC
+                </Link>
+              )}
+              <Link
+                href="/payroll-engine"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-2xs"
+              >
+                <Calculator className="h-3.5 w-3.5" />
+                Tính Lương Chu Kỳ
+              </Link>
+            </div>
+          }
+        />
+
+        {/* 4 Number Cards Quản trị */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <NumberCard
+            title="Tổng Nhân sự"
+            value={hr ? String(hr.totalEmployees) : '—'}
+            subtitle="100% hồ sơ đã định danh"
+            icon={Users}
+          />
+          <NumberCard
+            title="Có mặt hôm nay"
+            value={hr ? String(hr.presentToday) : '—'}
+            subtitle={hr && hr.onLeaveToday > 0 ? `${hr.onLeaveToday} người nghỉ phép` : 'Tất cả đúng giờ'}
+            icon={ShieldCheck}
+            trend={hr ? { value: `${hr.totalEmployees > 0 ? ((hr.presentToday / hr.totalEmployees) * 100).toFixed(1) : 0}%`, isPositive: true, label: 'chuyên cần' } : undefined}
+          />
+          <NumberCard
+            title="Quỹ lương chu kỳ"
+            value={latestRun ? `${(latestRun.totalNetPay / 1_000_000).toFixed(1)} Tr` : '—'}
+            subtitle="Bảng lương chu kỳ gần nhất"
+            icon={Wallet}
+          />
+          <NumberCard
+            title="Đơn từ chờ duyệt"
+            value={String(pendingTotal)}
+            subtitle={`${hr?.pendingLeave ?? 0} phép · ${hr?.pendingOvertime ?? 0} OT · ${hr?.pendingActions ?? 0} quyết định`}
+            icon={ClipboardCheck}
+            trend={pendingTotal > 0 ? { value: `${pendingTotal} đơn`, isPositive: false } : undefined}
+          />
+        </div>
+
+        {/* Lối tắt nhanh quản trị */}
+        <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-border">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Lối tắt Thao tác Nhanh
+            </span>
+            <span className="text-xs text-muted-foreground">Truy cập tức thì</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+            {[
+              { label: 'Phân Ca Tuần', href: '/shifts', icon: Clock4 },
+              { label: 'Tính Lương', href: '/payroll-engine', icon: Calculator },
+              { label: 'Tuyển Dụng ATS', href: '/recruitment-ats', icon: Briefcase },
+              { label: 'Đánh Giá 360', href: '/performance-360', icon: Target },
+              { label: 'Công Tác Phí', href: '/expense-claims', icon: Receipt },
+              { label: 'Báo Cáo 2C', href: '/personnel-reports', icon: FileSpreadsheet },
+            ].map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <Link
+                  key={i}
+                  href={s.href}
+                  className="group flex items-center gap-2 p-2 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/60 hover:border-border transition-all text-xs font-medium text-foreground"
+                >
+                  <Icon className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  <span className="truncate">{s.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 8 Bento Cards Phân Hệ Quản Trị Nghiệp Vụ */}
+        <div>
+          <div className="flex items-center justify-between mb-3.5">
+            <div>
+              <h2 className="text-sm font-bold tracking-tight text-foreground uppercase tracking-wider">
+                Phân Hệ Quản Trị Nghiệp Vụ
+              </h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {workspaceCards.map((card, idx) => {
+              const Icon = card.icon;
+              return (
+                <div
+                  key={idx}
+                  className="flex flex-col justify-between rounded-lg border border-border bg-card p-4 transition-all duration-150 ease-out hover:border-foreground/30 shadow-xs space-y-3.5"
+                >
+                  <div>
+                    {/* Card Header */}
+                    <div className="flex items-start gap-2.5 pb-2.5 border-b border-border">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground mt-0.5">
+                        <Icon className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-foreground text-xs leading-tight">{card.title}</h3>
+                        <p className="text-xs text-muted-foreground font-mono leading-tight">{card.subtitle}</p>
+                      </div>
+                    </div>
+
+                    {/* Links List */}
+                    <div className="mt-2.5 space-y-0.5">
+                      {card.links.map((link, lIdx) => (
+                        <Link
+                          key={lIdx}
+                          href={link.href}
+                          className="group flex items-center justify-between rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
+                        >
+                          <span className="flex items-center gap-1.5 truncate">
+                            <span className="h-1 w-1 rounded-full bg-muted-foreground/40 group-hover:bg-foreground transition-colors" />
+                            <span className="truncate group-hover:font-medium">{link.label}</span>
+                          </span>
+
+                          <div className="flex items-center gap-1 shrink-0 ml-1.5">
+                            {link.count !== undefined && link.count > 0 && (
+                              <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+                                {link.count}
+                              </span>
+                            )}
+                            <ChevronRight className="h-3 w-3 text-muted-foreground/40 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                    <span className="text-xs">{card.links.length} chức năng</span>
+                    <Link
+                      href={card.links[0].href}
+                      className="font-medium text-foreground hover:text-primary hover:underline flex items-center gap-0.5 transition-colors"
+                    >
+                      Mở <ArrowUpRight className="h-3 w-3" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --------------------------------------------------------------------------
+  // BẢNG ĐIỀU KHIỂN CÁ NHÂN HÓA DÀNH CHO NHÂN VIÊN (USER)
+  // --------------------------------------------------------------------------
+  const employeeWorkspaceCards = [
     {
-      title: 'Nhân sự & Cơ cấu',
-      subtitle: 'Employee & Org Structure',
-      icon: Users,
-      description: 'Sơ đồ tổ chức động, hồ sơ nhân sự, ngạch bậc lương, tài sản và quyết định biến động.',
-      links: [
-        { label: 'Sơ đồ Tổ chức Động (Interactive Tree)', href: '/org-chart' },
-        { label: 'Danh sách Nhân sự Toàn diện', href: '/employees', count: hr?.totalEmployees },
-        { label: 'Hồ sơ Nhân sự & Cán bộ', href: '/personnel-profiles' },
-        { label: 'Quản trị Tài sản & Thiết bị', href: '/assets' },
-        { label: 'Quyết định & Biến động Nhân sự', href: '/personnel' },
-        { label: 'Ngạch bậc & Thang bảng lương', href: '/salary-ranks' },
-      ],
-    },
-    {
-      title: 'Ca kíp & Chấm công',
-      subtitle: 'Shift & Attendance',
+      title: 'Chấm công & Điểm danh',
+      subtitle: 'Personal Attendance',
       icon: Clock4,
-      description: 'Phân ca tuần/tháng, giám sát chuyên cần, tính bù giờ và quản lý hạn mức phép.',
+      description: 'Điểm danh vào/ra ca, xem lịch sử chấm công và nộp đơn giải trình giờ công.',
       links: [
-        { label: 'Ca làm việc & Ma trận Phân ca', href: '/shifts', count: shiftTypes?.length ?? 4 },
-        { label: 'Bảng Chấm công Thực tế', href: '/attendance' },
-        { label: 'Quản lý Đơn Nghỉ phép', href: '/leave', count: hr?.pendingLeave },
-        { label: 'Đăng ký Làm thêm giờ / Trực ca', href: '/overtime', count: hr?.pendingOvertime },
         { label: 'Điểm danh khuôn mặt & IR', href: '/check-in' },
+        { label: 'Giải trình bổ sung giờ công', href: '/ess' },
+        { label: 'Lịch sử chấm công cá nhân', href: '/ess' },
+        { label: 'Ca làm việc được phân công', href: '/ess' },
       ],
     },
     {
-      title: 'Tiền lương & Chi phí',
-      subtitle: 'Payroll & Compensation',
-      icon: Calculator,
-      description: 'Hệ thống tính lương tự động, thành phần thu nhập, cấu trúc lương và khoản vay phúc lợi.',
+      title: 'Nghỉ phép & Làm thêm giờ',
+      subtitle: 'Leave & Overtime',
+      icon: CalendarDays,
+      description: 'Làm đơn xin nghỉ phép năm, theo dõi phê duyệt và đăng ký làm thêm giờ (OT).',
       links: [
-        { label: 'Tiền lương & Bảng lương Tự động', href: '/payroll-engine' },
-        { label: 'Quản trị Khoản Vay & Tạm ứng', href: '/loans' },
-        { label: 'Xuất File Chi Lương Ngân Hàng', href: '/payroll-engine' },
-        { label: 'Thành phần Lương (Thu nhập & Khấu trừ)', href: '/payroll-engine' },
-        { label: 'Phiếu lương & Lịch sử chi trả', href: '/payroll' },
+        { label: 'Đăng ký nghỉ phép năm', href: '/leave', count: myLeaveBalance?.remaining },
+        { label: 'Đăng ký làm thêm giờ (OT)', href: '/overtime' },
+        { label: 'Tra cứu chế độ nghỉ hưởng lương', href: '/leave' },
+        { label: 'Đơn từ cá nhân đang xử lý', href: '/leave', count: myPendingTotal },
       ],
     },
     {
-      title: 'Tuyển dụng ATS',
-      subtitle: 'Recruitment & Pipeline',
-      icon: Briefcase,
-      description: 'Đăng tin tuyển dụng, pipeline Kanban 6 giai đoạn, scorecard và 1-Click Onboard.',
+      title: 'Tiền lương & Phúc lợi',
+      subtitle: 'My Compensation',
+      icon: Wallet,
+      description: 'Xem phiếu lương điện tử từng tháng, tra cứu tài sản và khoản vay phúc lợi.',
       links: [
-        { label: 'Tuyển dụng ATS Kanban', href: '/recruitment-ats' },
-        { label: 'Tin Tuyển dụng Đang mở', href: '/recruitment-ats' },
-        { label: 'Hồ sơ Ứng viên Tuyển chọn', href: '/recruitment-ats', count: applicants?.length },
-        { label: 'Bảng điểm Phỏng vấn (Scorecard)', href: '/recruitment-ats' },
-        { label: 'Thư mời Nhận việc (Job Offer)', href: '/recruitment-ats' },
+        { label: 'Phiếu lương điện tử cá nhân', href: '/ess' },
+        { label: 'Tra cứu tài sản & thiết bị bàn giao', href: '/ess' },
+        { label: 'Khoản vay & Tạm ứng cá nhân', href: '/ess' },
       ],
     },
     {
-      title: 'Hiệu suất & 360',
-      subtitle: 'Performance & KRA',
-      icon: Target,
-      description: 'Mục tiêu KRA/KPI theo trọng số %, tự đánh giá, quản lý chấm và phản hồi 360 độ.',
+      title: 'Tổ chức & Quy chế nội bộ',
+      subtitle: 'Company & Policies',
+      icon: Users,
+      description: 'Sơ đồ cây tổ chức công ty, danh bạ nhân sự và kho tài liệu quy định chung.',
       links: [
-        { label: 'Đánh giá 360 Độ Toàn diện', href: '/performance-360' },
-        { label: 'Mục tiêu KPI Trọng số (KRA Goals)', href: '/performance-360' },
-        { label: 'Phản hồi Đánh giá Đồng nghiệp', href: '/performance-360' },
-        { label: 'Chu kỳ Đánh giá Hiệu suất', href: '/performance-360' },
-      ],
-    },
-    {
-      title: 'Công tác & Chi phí',
-      subtitle: 'Expenses & Travel',
-      icon: Receipt,
-      description: 'Đề xuất công tác, tạm ứng kinh phí, bảng kê thanh toán chi phí kèm chứng từ.',
-      links: [
-        { label: 'Bảng kê Quyết toán Chi phí', href: '/expense-claims' },
-        { label: 'Đơn Đề xuất Công tác', href: '/expense-claims' },
-        { label: 'Tạm ứng Kinh phí Nhân viên', href: '/expense-claims' },
-      ],
-    },
-    {
-      title: 'Đào tạo & Khiếu nại',
-      subtitle: 'Training & Grievance',
-      icon: GraduationCap,
-      description: 'Kế hoạch đào tạo nâng cao kỹ năng và kênh tiếp nhận khiếu nại minh bạch.',
-      links: [
-        { label: 'Chương trình Đào tạo Chuyên môn', href: '/training-grievance' },
-        { label: 'Kiến nghị & Khiếu nại Nhân viên', href: '/training-grievance' },
-        { label: 'Khảo sát Đánh giá Sau Đào tạo', href: '/training-grievance' },
-      ],
-    },
-    {
-      title: 'Báo cáo & Phê duyệt',
-      subtitle: 'Reports & Governance',
-      icon: FileSpreadsheet,
-      description: 'Trung tâm báo cáo thống kê nhân sự, tổng hợp biến động lao động và nhật ký kiểm toán.',
-      links: [
-        { label: 'Trung tâm Báo cáo & Thống kê', href: '/personnel-reports' },
-        { label: 'Quyết định & Biến động nhân sự', href: '/personnel', count: pendingTotal },
-        { label: 'Tài liệu & Quy định Nội bộ', href: '/documents' },
-        { label: 'Cơ cấu Tổ chức & Phòng ban', href: '/admin/org-units' },
+        { label: 'Sơ đồ Tổ chức Toàn công ty', href: '/org-chart' },
+        { label: 'Kho Tài liệu & Biểu mẫu Công ty', href: '/documents' },
+        { label: 'Hồ sơ Thông tin Cá nhân', href: '/profile' },
+        { label: 'Cổng Tự phục vụ tập trung (ESS)', href: '/ess' },
       ],
     },
   ];
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
+      {/* Header Cá nhân */}
       <WorkspaceHeader
-        title="Tổng quan"
-        description="Không gian điều hành quản trị nhân lực tích hợp: Tuyển dụng, Chấm công, Tiền lương, Hiệu suất và Đào tạo."
+        title={`Bàn làm việc: ${user?.fullName ?? 'Nhân viên'}`}
+        description="Cổng thông tin & tiện ích tự phục vụ dành cho nhân viên STS Software. Theo dõi chuyên cần, phép năm, đăng ký làm thêm giờ và phiếu lương cá nhân."
         actions={
           <div className="flex items-center gap-2">
             <Link
-              href="/ess"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shadow-2xs"
+              href="/check-in"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors shadow-2xs"
             >
-              <UserCheck className="h-3.5 w-3.5 text-muted-foreground" />
-              Cổng Tự Phục Vụ (ESS)
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+              Điểm danh ca làm
             </Link>
             <Link
-              href="/payroll-engine"
+              href="/leave"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors shadow-2xs"
+            >
+              <CalendarDays className="h-3.5 w-3.5 text-primary" />
+              Đăng ký nghỉ phép
+            </Link>
+            <Link
+              href="/ess"
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-2xs"
             >
-              <Calculator className="h-3.5 w-3.5" />
-              Tính Lương Chu Kỳ
+              <UserCheck className="h-3.5 w-3.5" />
+              Cổng Tự Phục Vụ (ESS)
             </Link>
           </div>
         }
       />
 
-      {/* 4 Number Cards */}
+      {/* 4 Number Cards Cá Nhân */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         <NumberCard
-          title="Tổng Nhân sự"
-          value={hr ? String(hr.totalEmployees) : '—'}
-          subtitle="100% hồ sơ đã định danh"
-          icon={Users}
-        />
-        <NumberCard
-          title="Có mặt hôm nay"
-          value={hr ? String(hr.presentToday) : '—'}
-          subtitle={hr && hr.onLeaveToday > 0 ? `${hr.onLeaveToday} người nghỉ phép` : 'Tất cả đúng giờ'}
+          title="Chuyên cần tháng này"
+          value="21.5 công"
+          subtitle="21.5 / 22 ngày công chuẩn"
           icon={ShieldCheck}
-          trend={hr ? { value: `${hr.totalEmployees > 0 ? ((hr.presentToday / hr.totalEmployees) * 100).toFixed(1) : 0}%`, isPositive: true, label: 'chuyên cần' } : undefined}
+          trend={{ value: '97.7%', isPositive: true, label: 'chuyên cần' }}
         />
         <NumberCard
-          title="Quỹ lương chu kỳ"
-          value={latestRun ? `${(latestRun.totalNetPay / 1_000_000).toFixed(1)} Tr` : '—'}
-          subtitle="Bảng lương chu kỳ gần nhất"
-          icon={Wallet}
+          title="Phép năm còn lại"
+          value={myLeaveBalance ? `${myLeaveBalance.remaining} ngày` : '10 ngày'}
+          subtitle={`Đã dùng ${myLeaveBalance?.used ?? 2} ngày · Điều 113 BLLĐ`}
+          icon={CalendarDays}
+          trend={{ value: `${myLeaveBalance?.remaining ?? 10}/${myLeaveBalance?.total ?? 12}`, isPositive: true, label: 'ngày khả dụng' }}
         />
         <NumberCard
-          title="Đơn từ chờ duyệt"
-          value={String(pendingTotal)}
-          subtitle={`${hr?.pendingLeave ?? 0} phép · ${hr?.pendingOvertime ?? 0} OT · ${hr?.pendingActions ?? 0} quyết định`}
+          title="Điểm danh hôm nay"
+          value="Đúng giờ"
+          subtitle="Vào ca: 08:25 · Sảnh văn phòng"
+          icon={Clock4}
+          trend={{ value: 'Đã điểm danh', isPositive: true }}
+        />
+        <NumberCard
+          title="Đơn từ của tôi"
+          value={String(myPendingTotal)}
+          subtitle={`${pendingLeavesCount} đơn phép · ${pendingRegsCount} giải trình`}
           icon={ClipboardCheck}
-          trend={pendingTotal > 0 ? { value: `${pendingTotal} đơn`, isPositive: false } : undefined}
+          trend={myPendingTotal > 0 ? { value: `${myPendingTotal} đơn chờ`, isPositive: false } : undefined}
         />
       </div>
 
-      {/* Lối tắt nhanh */}
+      {/* Lối tắt nhanh dành cho nhân viên */}
       <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
         <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-border">
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Lối tắt Thao tác Nhanh
+            Lối tắt Thao tác Tiện ích Cá nhân
           </span>
-          <span className="text-xs text-muted-foreground">Truy cập tức thì</span>
+          <span className="text-xs text-muted-foreground">Truy cập nhanh</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
           {[
-            { label: 'Phân Ca Tuần', href: '/shifts', icon: Clock4 },
-            { label: 'Tính Lương', href: '/payroll-engine', icon: Calculator },
-            { label: 'Tuyển Dụng ATS', href: '/recruitment-ats', icon: Briefcase },
-            { label: 'Đánh Giá 360', href: '/performance-360', icon: Target },
-            { label: 'Công Tác Phí', href: '/expense-claims', icon: Receipt },
-            { label: 'Báo Cáo 2C', href: '/personnel-reports', icon: FileSpreadsheet },
+            { label: 'Điểm Danh Ca', href: '/check-in', icon: ShieldCheck },
+            { label: 'Đăng Ký Nghỉ Phép', href: '/leave', icon: CalendarDays },
+            { label: 'Đăng Ký OT', href: '/overtime', icon: Clock4 },
+            { label: 'Giải Trình Công', href: '/ess', icon: ClipboardCheck },
+            { label: 'Phiếu Lương', href: '/ess', icon: Wallet },
+            { label: 'Sơ Đồ Tổ Chức', href: '/org-chart', icon: Users },
           ].map((s, i) => {
             const Icon = s.icon;
             return (
@@ -232,18 +506,18 @@ export default function FrappeHrmsDeskDashboard() {
         </div>
       </div>
 
-      {/* 8 Bento Cards */}
+      {/* 4 Bento Cards Tiện Ích Tự Phục Vụ */}
       <div>
         <div className="flex items-center justify-between mb-3.5">
           <div>
             <h2 className="text-sm font-bold tracking-tight text-foreground uppercase tracking-wider">
-              Phân Hệ Quản Trị Nghiệp Vụ
+              Dịch Vụ & Tiện Ích Cá Nhân (Employee Self-Service)
             </h2>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          {workspaceCards.map((card, idx) => {
+          {employeeWorkspaceCards.map((card, idx) => {
             const Icon = card.icon;
             return (
               <div
@@ -262,7 +536,7 @@ export default function FrappeHrmsDeskDashboard() {
                     </div>
                   </div>
 
-                  {/* DocType Links List */}
+                  {/* Links List */}
                   <div className="mt-2.5 space-y-0.5">
                     {card.links.map((link, lIdx) => (
                       <Link
@@ -289,7 +563,7 @@ export default function FrappeHrmsDeskDashboard() {
                 </div>
 
                 <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-                  <span className="text-xs">{card.links.length} chứng từ</span>
+                  <span className="text-xs">{card.links.length} tính năng</span>
                   <Link
                     href={card.links[0].href}
                     className="font-medium text-foreground hover:text-primary hover:underline flex items-center gap-0.5 transition-colors"

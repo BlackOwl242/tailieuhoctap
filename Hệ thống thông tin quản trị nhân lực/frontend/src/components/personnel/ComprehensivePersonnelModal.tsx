@@ -433,7 +433,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                   {userId ? 'Chỉnh sửa Hồ sơ Cán bộ Toàn diện' : 'Khai báo Hồ sơ Cán bộ Chuyên sâu'}
                 </h2>
                 <Badge variant={profileMode === 'STATE' ? 'default' : 'secondary'} className="text-xs font-medium">
-                  {profileMode === 'STATE' ? '🏛️ Chuẩn 2C-BNV / NĐ 204' : '🏢 Doanh nghiệp Tư nhân'}
+                  {profileMode === 'STATE' ? 'Chuẩn BNV / NĐ 204' : 'Doanh nghiệp Tư nhân'}
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">

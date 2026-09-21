@@ -18,12 +18,12 @@ ENV NODE_ENV=production
 RUN apk add --no-cache openssl
 WORKDIR /app
 RUN apk add --no-cache wget && addgroup -S kms && adduser -S kms -G kms
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/scripts ./scripts
+COPY --chown=kms:kms --from=build /app/node_modules ./node_modules
+COPY --chown=kms:kms --from=build /app/dist ./dist
+COPY --chown=kms:kms --from=build /app/prisma ./prisma
+COPY --chown=kms:kms --from=build /app/scripts ./scripts
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh && mkdir -p /app/uploads && chown -R kms:kms /app
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh && mkdir -p /app/uploads && chown -R kms:kms /app/uploads
 USER kms
 EXPOSE 3001
 HEALTHCHECK --interval=10s --timeout=5s --retries=12 --start-period=40s \

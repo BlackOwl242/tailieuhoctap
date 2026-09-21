@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Save } from 'lucide-react';
+import Link from 'next/link';
+import { Save, ShieldCheck, KeyRound, ArrowRight } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
 import { Button, Card, CardContent, Input, Label, Skeleton } from '@/components/ui/primitives';
@@ -57,14 +58,50 @@ export default function AdminSettingsPage() {
   return (
     <>
       <PageHeader
-        title="Cấu hình"
-        description="Tham số vận hành hệ thống — thay đổi không cần triển khai lại mã nguồn."
+        title="Cấu hình hệ thống"
+        description="Tham số vận hành hệ thống và quản trị phân quyền vai trò người dùng (RBAC)."
         actions={
-          <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
-            <Save className="h-4 w-4" /> Lưu thay đổi
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/roles"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted transition-colors shadow-2xs"
+            >
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              Quản lý phân quyền vai trò
+            </Link>
+            <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
+              <Save className="h-4 w-4" /> Lưu thay đổi
+            </Button>
+          </div>
         }
       />
+
+      {/* Khối Lối tắt nhanh tới Quản lý Phân quyền */}
+      <Card className="border-border shadow-2xs mb-6">
+        <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
+              <KeyRound className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                Quản lý Phân quyền & Ma trận Vai trò (RBAC)
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Thiết lập quyền hạn cho các vai trò (Quản trị viên, Cán bộ Nhân sự, Nhân viên) và gán phân quyền theo tài khoản người dùng.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/admin/roles"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shadow-2xs shrink-0 self-start sm:self-auto"
+          >
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Mở Quản lý Phân quyền
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </CardContent>
+      </Card>
       <Card>
         <CardContent className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5">
           {EDITABLE.map(({ key, label }) => (

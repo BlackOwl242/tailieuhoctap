@@ -16,38 +16,40 @@ interface CommandItem {
   href: string;
   icon: typeof Search;
   shortcut?: string;
+  roles?: string[];
 }
 
 const COMMANDS: CommandItem[] = [
   { id: 'ess', title: 'Cổng nhân viên (ESS)', category: 'Cổng cá nhân ESS', href: '/ess', icon: Users, shortcut: 'G E' },
-  { id: 'catalogs', title: 'Danh mục gốc', category: 'Thao tác nghiệp vụ', href: '/admin/catalogs', icon: Database, shortcut: 'G M' },
+  { id: 'catalogs', title: 'Danh mục gốc', category: 'Thao tác nghiệp vụ', href: '/admin/catalogs', icon: Database, shortcut: 'G M', roles: ['ADMIN'] },
   { id: 'org-chart', title: 'Sơ đồ tổ chức', category: 'Điều hướng nhanh', href: '/org-chart', icon: Network, shortcut: 'G O' },
-  { id: 'employees', title: 'Hồ sơ nhân sự', category: 'Điều hướng nhanh', href: '/employees', icon: Users, shortcut: 'G N' },
-  { id: 'shifts', title: 'Ca làm việc', category: 'Điều hướng nhanh', href: '/shifts', icon: Clock4, shortcut: 'G S' },
-  { id: 'attendance', title: 'Bảng chấm công', category: 'Điều hướng nhanh', href: '/attendance', icon: ShieldCheck },
-  { id: 'payroll-engine', title: 'Bảng lương', category: 'Điều hướng nhanh', href: '/payroll-engine', icon: Calculator, shortcut: 'G P' },
-  { id: 'loans', title: 'Tạm ứng & Vay', category: 'Thao tác nghiệp vụ', href: '/loans', icon: CreditCard },
-  { id: 'assets', title: 'Quản lý tài sản', category: 'Thao tác nghiệp vụ', href: '/assets', icon: Laptop },
-  { id: 'recruitment-ats', title: 'Tuyển dụng', category: 'Thao tác nghiệp vụ', href: '/recruitment-ats', icon: Briefcase },
-  { id: 'performance-360', title: 'Đánh giá KPI', category: 'Thao tác nghiệp vụ', href: '/performance-360', icon: Target },
-  { id: 'expense-claims', title: 'Công tác phí', category: 'Thao tác nghiệp vụ', href: '/expense-claims', icon: Receipt },
-  { id: 'reports', title: 'Báo cáo nhân sự', category: 'Điều hướng nhanh', href: '/personnel-reports', icon: FileSpreadsheet },
-  { id: 'salary-ranks', title: 'Ngạch bậc lương', category: 'Điều hướng nhanh', href: '/salary-ranks', icon: Layers },
+  { id: 'employees', title: 'Hồ sơ nhân sự', category: 'Điều hướng nhanh', href: '/employees', icon: Users, shortcut: 'G N', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR'] },
+  { id: 'shifts', title: 'Ca làm việc', category: 'Điều hướng nhanh', href: '/shifts', icon: Clock4, shortcut: 'G S', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB'] },
+  { id: 'attendance', title: 'Bảng chấm công', category: 'Điều hướng nhanh', href: '/attendance', icon: ShieldCheck, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB'] },
+  { id: 'payroll-engine', title: 'Bảng lương', category: 'Điều hướng nhanh', href: '/payroll-engine', icon: Calculator, shortcut: 'G P', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
+  { id: 'loans', title: 'Tạm ứng & Vay', category: 'Thao tác nghiệp vụ', href: '/loans', icon: CreditCard, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
+  { id: 'assets', title: 'Quản lý tài sản', category: 'Thao tác nghiệp vụ', href: '/assets', icon: Laptop, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER'] },
+  { id: 'recruitment-ats', title: 'Tuyển dụng', category: 'Thao tác nghiệp vụ', href: '/recruitment-ats', icon: Briefcase, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER'] },
+  { id: 'performance-360', title: 'Đánh giá KPI', category: 'Thao tác nghiệp vụ', href: '/performance-360', icon: Target, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER', 'HR_TRAINER'] },
+  { id: 'expense-claims', title: 'Công tác phí', category: 'Thao tác nghiệp vụ', href: '/expense-claims', icon: Receipt, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
+  { id: 'reports', title: 'Báo cáo nhân sự', category: 'Điều hướng nhanh', href: '/personnel-reports', icon: FileSpreadsheet, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR', 'ACCOUNTANT'] },
+  { id: 'salary-ranks', title: 'Ngạch bậc lương', category: 'Điều hướng nhanh', href: '/salary-ranks', icon: Layers, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB'] },
   { id: 'leave', title: 'Nghỉ phép', category: 'Cổng cá nhân ESS', href: '/leave', icon: Calendar },
 ];
 
-export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function CommandPalette({ isOpen, onClose, userRoles = [] }: { isOpen: boolean; onClose: () => void; userRoles?: string[] }) {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const filteredCommands = useMemo(() => {
-    if (!query.trim()) return COMMANDS;
+    const roleMatched = COMMANDS.filter((c) => !c.roles || c.roles.some((r) => userRoles.includes(r)));
+    if (!query.trim()) return roleMatched;
     const q = query.toLowerCase();
-    return COMMANDS.filter(
+    return roleMatched.filter(
       (c) => c.title.toLowerCase().includes(q) || c.category.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, userRoles]);
 
   useEffect(() => {
     setSelectedIndex(0);

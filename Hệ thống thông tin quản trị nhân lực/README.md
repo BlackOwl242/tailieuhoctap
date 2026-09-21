@@ -17,13 +17,14 @@ docker compose up -d          # build + khởi động db/api/web (lần đầu 
 
 Mở **http://localhost:8080** và đăng nhập:
 
-| Vai                           | Email                    | Mật khẩu      |
-| ----------------------------- | ------------------------ | ------------- |
-| Quản trị viên (ADMIN)         | `admin@demo.local`       | `Admin@123`   |
-| Quản lý tri thức (KM_MANAGER) | `km.manager@demo.local`  | `Manager@123` |
-| Trưởng nhóm Java (USER)       | `pm.java@demo.local`     | `Pm@123456`   |
-| Nhân viên mới (USER)          | `dev.fresher@demo.local` | `Fresher@123` |
-| EDITOR Space QA (USER)        | `editor.qa@demo.local`   | `Editor@123`  |
+| Vai trò                       | Họ tên & Chức danh / Đơn vị | Email                    | Mật khẩu      |
+| ----------------------------- | --------------------------- | ------------------------ | ------------- |
+| Ban Giám Đốc (BOD)            | Trần Minh Hoàng (Tổng Giám đốc / CEO - BGD) | `ceo@saigontechnology.vn` | `Admin@123`   |
+| Cổ đông & HĐQT (SHAREHOLDER)  | Phạm Tiến Thành (Chủ tịch HĐQT / ĐHCĐ) | `chairman@saigontechnology.vn` | `Admin@123`   |
+| Quản trị viên CNTT (ADMIN)    | Nguyễn Hoàng Nam (IT SysAdmin / Phòng IT) | `admin@demo.local`       | `Admin@123`   |
+| Cán bộ Nhân sự (KM_MANAGER)   | Dương Khánh Chi (HR Manager / Nhân sự) | `km.manager@demo.local`  | `Manager@123` |
+| Trưởng nhóm Java (LINE_MGR)   | Đỗ Hoàng Nam (PM Lead kỹ thuật) | `pm.java@demo.local`     | `Pm@123456`   |
+| Kỹ sư phần mềm (USER)         | Phan Quốc Huy (Fresher / Cổng ESS) | `dev.fresher@demo.local` | `Fresher@123` |
 
 Lần đầu chạy, hệ thống **tự động** áp dụng migration và seed dữ liệu mô phỏng
 (cây tổ chức Saigon Technology, 6 Space, ~12 bài viết tiếng Việt, onboarding path,

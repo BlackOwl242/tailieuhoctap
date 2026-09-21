@@ -10,12 +10,14 @@ import { useAuthStore } from '@/lib/auth-store';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from '@/components/ui/primitives';
 import type { AuthUser } from '@/lib/types';
 
-// Tài khoản demo hiển thị ngay trên màn hình đăng nhập cho tiện trình diễn
+// Tài khoản demo hiển thị ngay trên màn hình đăng nhập — Phân định rõ Ban Giám Đốc, Cổ đông ĐHCĐ và Quản trị Hệ thống CNTT
 const DEMO_ACCOUNTS = [
-  { label: 'Quản trị viên', email: 'admin@demo.local', password: 'Admin@123' },
-  { label: 'Quản lý nội dung', email: 'km.manager@demo.local', password: 'Manager@123' },
-  { label: 'Trưởng nhóm Java', email: 'pm.java@demo.local', password: 'Pm@123456' },
-  { label: 'Nhân viên mới', email: 'dev.fresher@demo.local', password: 'Fresher@123' },
+  { label: 'Tổng Giám đốc (CEO - Ban Giám Đốc)', email: 'ceo@saigontechnology.vn', password: 'Admin@123' },
+  { label: 'Chủ tịch HĐQT / Cổ đông (ĐHCĐ)', email: 'chairman@saigontechnology.vn', password: 'Admin@123' },
+  { label: 'Quản trị viên Hệ thống CNTT (SysAdmin)', email: 'admin@demo.local', password: 'Admin@123' },
+  { label: 'Cán bộ Quản trị Nhân sự (HR C&B)', email: 'km.manager@demo.local', password: 'Manager@123' },
+  { label: 'Trưởng nhóm kỹ thuật (PM / Lead)', email: 'pm.java@demo.local', password: 'Pm@123456' },
+  { label: 'Kỹ sư Phần mềm (Cổng ESS)', email: 'dev.fresher@demo.local', password: 'Fresher@123' },
 ];
 
 /** Chỉ nhận đường dẫn nội bộ — chống open-redirect. */

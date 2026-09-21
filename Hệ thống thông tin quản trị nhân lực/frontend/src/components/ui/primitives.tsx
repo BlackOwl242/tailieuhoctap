@@ -6,6 +6,7 @@ import * as AvatarPrimitive from '@radix-ui/react-avatar';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { ChevronDown, Search, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HoverMarquee } from './hover-marquee';
 
 /** Ảnh đại diện: fallback chữ cái đầu khi chưa có ảnh. */
 export function Avatar({ className, children }: { className?: string; children: React.ReactNode }) {
@@ -300,7 +301,8 @@ export function Select({
       return;
     }
 
-    const popoverWidth = Math.min(Math.max(r.width, 220), 500);
+    // Độ rộng menu dropdown tối thiểu 380px để hiển thị trọn vẹn câu tiếng Việt, tối đa 560px
+    const popoverWidth = Math.min(Math.max(r.width, 380), Math.min(560, window.innerWidth - 20));
     const spaceAbove = Math.max(0, r.top - TOPBAR_HEIGHT);
     const spaceBelow = Math.max(0, window.innerHeight - r.bottom);
 
@@ -308,11 +310,13 @@ export function Select({
     const shouldOpenUp = spaceBelow < 240 && spaceAbove > spaceBelow && spaceAbove >= 160;
     const maxHeight = shouldOpenUp ? Math.min(320, spaceAbove - 8) : Math.min(320, spaceBelow - 12);
 
-    const leftPos = Math.min(r.left, window.innerWidth - popoverWidth - 12);
+    // Căn trái hoặc đẩy lùi sang trái nếu popover vượt quá mép phải màn hình
+    const maxLeft = Math.max(8, window.innerWidth - popoverWidth - 12);
+    const leftPos = Math.max(8, Math.min(r.left, maxLeft));
     setCoords({
       top: shouldOpenUp ? undefined : Math.max(TOPBAR_HEIGHT + 6, r.bottom + 6),
       bottom: shouldOpenUp ? window.innerHeight - (r.top - 6) : undefined,
-      left: Math.max(4, leftPos),
+      left: leftPos,
       width: popoverWidth,
       maxHeight,
       openUpwards: shouldOpenUp,
@@ -512,16 +516,18 @@ export function Select({
                 )}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 min-w-0">
                     {opt.badge && (
                       <span className="font-mono text-xs font-semibold px-1.5 py-0.5 rounded-md bg-muted text-foreground border border-border shrink-0">
                         {opt.badge}
                       </span>
                     )}
-                    <span className="truncate">{opt.label}</span>
+                    <HoverMarquee text={String(opt.label)} className="flex-1 min-w-0">
+                      {opt.label}
+                    </HoverMarquee>
                   </div>
                   {opt.sublabel && (
-                    <div className="text-xs text-muted-foreground truncate mt-0.5">{opt.sublabel}</div>
+                    <HoverMarquee text={String(opt.sublabel)} className="text-xs text-muted-foreground mt-0.5" />
                   )}
                 </div>
 
@@ -569,9 +575,12 @@ export function Select({
           className
         )}
       >
-        <span className={cn('truncate flex-1', !selectedOption && !currentVal && 'text-muted-foreground')}>
+        <HoverMarquee
+          text={displayLabel}
+          className={cn('flex-1 min-w-0 text-left', !selectedOption && !currentVal && 'text-muted-foreground')}
+        >
           {displayLabel}
-        </span>
+        </HoverMarquee>
         <ChevronDown
           className={cn(
             'w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-150',

@@ -12,6 +12,7 @@ import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
 import { Button, Input, Select } from '@/components/ui/primitives';
+import { Modal } from '@/components/ui/modal';
 
 interface AssetItem {
   id: string;
@@ -353,140 +354,127 @@ export default function AssetsPage() {
       )}
 
       {/* Modal Khai Báo Tài Sản Mới */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-semibold text-foreground">Khai Báo Tài Sản / Thiết Bị Mới</h3>
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+      <Modal
+        open={isCreateModalOpen}
+        onOpenChange={(open) => setIsCreateModalOpen(open)}
+        title="Khai Báo Tài Sản / Thiết Bị Mới"
+        description="Đăng ký mã định danh và thông tin tài sản mới vào hệ thống quản lý."
+        size="md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-foreground mb-1">
+              Mã tài sản <span className="text-destructive">*</span>
+            </label>
+            <Input
+              type="text"
+              placeholder="VD: AST-010"
+              value={assetCode}
+              onChange={(e) => setAssetCode(e.target.value)}
+              className="h-9 text-xs font-mono font-bold"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-foreground mb-1">
+              Tên tài sản / Thông số kỹ thuật <span className="text-destructive">*</span>
+            </label>
+            <Input
+              type="text"
+              placeholder="VD: Máy in Laser Đa năng / Bàn làm việc chữ L / Máy chiếu hội trường"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="h-9 text-xs"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-foreground mb-1">Phân loại tài sản</label>
+              <Select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full h-9 text-xs"
               >
-                <X className="h-4 w-4" />
-              </button>
+                {ASSET_CATEGORIES.filter((c) => c.key !== 'ALL').map((cat) => (
+                  <option key={cat.key} value={cat.key}>
+                    {cat.label}
+                  </option>
+                ))}
+              </Select>
             </div>
-
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Mã tài sản <span className="text-destructive">*</span></label>
+              <label className="block text-xs font-medium text-foreground mb-1">Nguyên giá (VND)</label>
               <Input
-                type="text"
-                placeholder="VD: AST-010"
-                value={assetCode}
-                onChange={(e) => setAssetCode(e.target.value)}
-                className="h-9 text-xs font-mono font-bold"
+                type="number"
+                step={500000}
+                value={value}
+                onChange={(e) => setValue(Number(e.target.value))}
+                className="h-9 text-xs font-bold"
               />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Tên tài sản / Thông số kỹ thuật <span className="text-destructive">*</span></label>
-              <Input
-                type="text"
-                placeholder="VD: Máy in Laser Đa năng / Bàn làm việc chữ L / Máy chiếu hội trường"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="h-9 text-xs"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-foreground mb-1">Phân loại tài sản</label>
-                <Select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full h-9 text-xs"
-                >
-                  {ASSET_CATEGORIES.filter((c) => c.key !== 'ALL').map((cat) => (
-                    <option key={cat.key} value={cat.key}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-foreground mb-1">Nguyên giá (VND)</label>
-                <Input
-                  type="number"
-                  step={500000}
-                  value={value}
-                  onChange={(e) => setValue(Number(e.target.value))}
-                  className="h-9 text-xs font-bold"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Số hiệu / Số Serial / Biển số</label>
-              <Input
-                type="text"
-                placeholder="VD: SN-2026-X88 hoặc 51K-892.45"
-                value={serialNumber}
-                onChange={(e) => setSerialNumber(e.target.value)}
-                className="h-9 text-xs font-mono"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Ghi chú xuất xứ / Tình trạng</label>
-              <Input
-                type="text"
-                placeholder="VD: Mua sắm theo gói thầu 2026 / Mới 100%"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="h-9 text-xs"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsCreateModalOpen(false)}
-              >
-                Hủy bỏ
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => {
-                  createMutation.mutate({
-                    assetCode,
-                    name,
-                    category,
-                    serialNumber,
-                    value,
-                    notes,
-                  });
-                }}
-                disabled={!name || !assetCode}
-              >
-                Lưu Khai Báo
-              </Button>
             </div>
           </div>
+
+          <div>
+            <label className="block text-xs font-medium text-foreground mb-1">Số hiệu / Số Serial / Biển số</label>
+            <Input
+              type="text"
+              placeholder="VD: SN-2026-X88 hoặc 51K-892.45"
+              value={serialNumber}
+              onChange={(e) => setSerialNumber(e.target.value)}
+              className="h-9 text-xs font-mono"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-foreground mb-1">Ghi chú xuất xứ / Tình trạng</label>
+            <Input
+              type="text"
+              placeholder="VD: Mua sắm theo gói thầu 2026 / Mới 100%"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="h-9 text-xs"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-border/50">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsCreateModalOpen(false)}
+            >
+              Hủy bỏ
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                createMutation.mutate({
+                  assetCode,
+                  name,
+                  category,
+                  serialNumber,
+                  value,
+                  notes,
+                });
+              }}
+              disabled={!name || !assetCode}
+            >
+              Lưu Khai Báo
+            </Button>
+          </div>
         </div>
-      )}
+      </Modal>
 
       {/* Modal Cấp Phát — Liên kết trực tiếp với Nhân sự thực tế trong hệ thống */}
-      {isAllocateModalOpen && selectedAsset && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div>
-                <h3 className="text-base font-semibold text-foreground">
-                  Lập Biên Bản Cấp Phát & Bàn Giao
-                </h3>
-                <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                  Tài sản: {selectedAsset.assetCode} — {selectedAsset.name}
-                </p>
-              </div>
-              <button
-                onClick={() => setIsAllocateModalOpen(false)}
-                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
+      {selectedAsset && (
+        <Modal
+          open={isAllocateModalOpen}
+          onOpenChange={(open) => setIsAllocateModalOpen(open)}
+          title="Lập Biên Bản Cấp Phát & Bàn Giao"
+          description={`Tài sản: ${selectedAsset.assetCode} — ${selectedAsset.name}`}
+          size="md"
+        >
+          <div className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-foreground mb-1">
                 Nhân sự tiếp nhận bàn giao <span className="text-destructive">*</span>
@@ -514,8 +502,8 @@ export default function AssetsPage() {
               )}
             </div>
 
-            <div className="p-3 rounded-lg bg-muted/30 text-xs space-y-1 text-muted-foreground">
-              <p>Mã tài sản: <b className="text-foreground">{selectedAsset.assetCode}</b></p>
+            <div className="p-3 rounded-lg bg-muted/30 text-xs space-y-1 text-muted-foreground border border-border/50">
+              <p>Mã tài sản: <b className="text-foreground font-mono">{selectedAsset.assetCode}</b></p>
               <p>Phân loại: <b className="text-foreground">{ASSET_CATEGORY_LABEL[selectedAsset.category] || selectedAsset.category}</b></p>
               <p>Nguyên giá: <b className="text-foreground">{selectedAsset.value.toLocaleString('vi-VN')} đ</b></p>
               <p className="text-xs text-primary pt-1">
@@ -523,7 +511,7 @@ export default function AssetsPage() {
               </p>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex justify-end gap-2 pt-3 border-t border-border/50">
               <Button
                 variant="outline"
                 size="sm"
@@ -542,13 +530,12 @@ export default function AssetsPage() {
                   });
                 }}
                 disabled={!assigneeId}
-                className="px-4 py-2 rounded-md bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               >
                 Xác Nhận Bàn Giao
               </Button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

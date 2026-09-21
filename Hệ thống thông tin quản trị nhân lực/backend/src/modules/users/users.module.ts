@@ -19,7 +19,7 @@ class ListUsersQueryDto {
   @ApiPropertyOptional() @IsOptional() @IsString() query?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
   @ApiPropertyOptional() @IsOptional() @IsInt() page?: number = 1;
-  @ApiPropertyOptional() @IsOptional() @IsInt() limit?: number = 20;
+  @ApiPropertyOptional() @IsOptional() @IsInt() limit?: number = 1000;
 }
 
 class CreateUserDto {
@@ -33,10 +33,10 @@ class CreateUserDto {
   @ApiPropertyOptional() @IsOptional() @IsNumber() baseSalary?: number;
   @ApiPropertyOptional() @IsOptional() @IsDateString() hireDate?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() employmentStatus?: string;
-  @ApiPropertyOptional({ enum: ['ADMIN', 'KM_MANAGER', 'USER'], isArray: true })
+  @ApiPropertyOptional({ type: [String], isArray: true })
   @IsOptional()
   @IsArray()
-  @IsIn(['ADMIN', 'KM_MANAGER', 'USER'], { each: true, message: 'Vai trò không hợp lệ' })
+  @IsString({ each: true, message: 'Mã vai trò phải là chuỗi hợp lệ' })
   roleCodes?: string[];
   @ApiPropertyOptional() @IsOptional() @IsArray() expertise?: string[];
 }
@@ -48,7 +48,11 @@ class UpdateUserDto {
   @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MinLength(8) password?: string;
   @ApiPropertyOptional() @IsOptional() @IsEnum(UserStatus) status?: UserStatus;
-  @ApiPropertyOptional() @IsOptional() @IsArray() @IsIn(['ADMIN', 'KM_MANAGER', 'USER'], { each: true }) roleCodes?: string[];
+  @ApiPropertyOptional({ type: [String], isArray: true })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true, message: 'Mã vai trò phải là chuỗi hợp lệ' })
+  roleCodes?: string[];
   @ApiPropertyOptional() @IsOptional() @IsArray() expertise?: string[];
 }
 
@@ -66,7 +70,7 @@ export class UsersService {
   /** Danh sách người dùng có phân trang + tìm kiếm theo tên/email. */
   async list(q: ListUsersQueryDto) {
     const page = Math.max(1, q.page ?? 1);
-    const limit = Math.min(100, Math.max(1, q.limit ?? 20));
+    const limit = Math.min(2000, Math.max(1, q.limit ?? 1000));
     const where = {
       deletedAt: null,
       ...(q.query
@@ -208,5 +212,7 @@ export class UsersController {
   }
 }
 
-@Module({ controllers: [UsersController], providers: [UsersService] })
+import { RolesController } from './roles.controller';
+
+@Module({ controllers: [UsersController, RolesController], providers: [UsersService] })
 export class UsersModule {}

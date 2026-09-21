@@ -146,11 +146,10 @@ TÀI LIỆU THAM KHẢO
 # DANH MỤC BẢNG BIỂU, SƠ ĐỒ
 
 **Danh mục Bảng biểu:**
-- Bảng 1.1. Hồ sơ định danh pháp lý Công ty Cổ phần Phần mềm Saigon Technology
-- Bảng 1.2. Mạng lưới văn phòng và chi nhánh toàn cầu của Saigon Technology
-- Bảng 1.3. Tổng hợp chứng nhận quốc tế và giải thưởng tiêu biểu của Saigon Technology
-- Bảng 1.4. Cơ cấu nguồn nhân lực theo khối chức năng và trình độ tại Saigon Technology
-- Bảng 1.5. Ma trận phân định trách nhiệm liên phòng ban trong các quy trình quản trị nhân sự (RACI Matrix)
+- Bảng 1.1. Mạng lưới văn phòng và chi nhánh toàn cầu của Saigon Technology
+- Bảng 1.2. Tổng hợp chứng nhận quốc tế và giải thưởng tiêu biểu của Saigon Technology
+- Bảng 1.3. Cơ cấu nguồn nhân lực theo khối chức năng và trình độ tại Saigon Technology
+- Bảng 1.4. Ma trận phân định trách nhiệm liên phòng ban trong các quy trình quản trị nhân sự (RACI Matrix)
 - Bảng 2.1. Ánh xạ tác nhân hệ thống với cơ cấu tổ chức của Saigon Technology
 - Bảng 2.2. Danh sách 47 Use case của Hệ thống Quản trị nhân lực
 - Bảng 2.3. Bảng ánh xạ ba tầng: từ Quy trình nghiệp vụ đến Use Case và Màn hình thực tế
@@ -309,26 +308,9 @@ Xuất phát từ thực tiễn đó, việc nghiên cứu, phân tích và xây
 
 Công ty Cổ phần Phần mềm Saigon Technology (tên đăng ký pháp nhân chính thức theo Giấy chứng nhận đăng ký doanh nghiệp: **Công ty Cổ phần Công nghệ Phần mềm STS**; tên giao dịch quốc tế: **STS SOFTWARE TECHNOLOGY JOINT STOCK COMPANY**, thường được nhận diện trên thị trường công nghệ toàn cầu dưới thương hiệu **Saigon Technology** hoặc **STS Software**) là doanh nghiệp công nghệ thông tin chuyên cung cấp dịch vụ gia công và phát triển phần mềm theo tiêu chuẩn quốc tế hàng đầu tại Việt Nam.
 
-**Bảng 1.1. Hồ sơ định danh pháp lý Công ty Cổ phần Phần mềm Saigon Technology**
-
-| Tiêu chí định danh | Thông tin chi tiết xác thực |
-| :--- | :--- |
-| **Tên tiếng Việt đầy đủ** | CÔNG TY CỔ PHẦN CÔNG NGHỆ PHẦN MỀM STS |
-| **Tên tiếng Anh quốc tế** | STS SOFTWARE TECHNOLOGY JOINT STOCK COMPANY |
-| **Tên thương hiệu giao dịch** | Saigon Technology / STS Software |
-| **Mã số thuế (Doanh nghiệp)** | **0313534747** |
-| **Ngày cấp ĐKKD đầu tiên** | **13/11/2015** (khởi nguồn sáng lập kỹ thuật từ năm 2012) |
-| **Cơ quan cấp phép** | Sở Kế hoạch và Đầu tư Thành phố Hồ Chí Minh |
-| **Người đại diện theo pháp luật**| **Ông Phạm Tiến Thành** (Chức danh: Tổng Giám đốc / Founder & CEO - "Bruce" Pham) |
-| **Loại hình doanh nghiệp** | Công ty cổ phần ngoài nhà nước |
-| **Ngành nghề kinh doanh chính** | Lập trình máy vi tính, dịch vụ phần mềm, tư vấn quản trị CNTT (Mã ngành VSIC: 6201, 6202) |
-| **Website chính thức** | [https://saigontechnology.com](https://saigontechnology.com) & [https://saigontechnology.com.vn](https://saigontechnology.com.vn) |
-| **Hộp thư điện tử liên hệ** | `sales@saigontechnology.com` / `hr@saigontechnology.com` |
-| **Đường dây nóng** | (+84) 767 496 612 / (+84) 28 3620 0214 |
-
 Nhằm phục vụ tốt nhất khách hàng quốc tế tại các thị trường trọng điểm và tối ưu hóa nguồn lực kỹ sư chất lượng cao trong nước, Saigon Technology đã xây dựng mạng lưới hiện diện đa quốc gia với 2 trung tâm phát triển phần mềm lớn tại Việt Nam và 4 văn phòng đại diện quốc tế:
 
-**Bảng 1.2. Mạng lưới văn phòng và chi nhánh toàn cầu của Saigon Technology**
+**Bảng 1.1. Mạng lưới văn phòng và chi nhánh toàn cầu của Saigon Technology**
 
 | Khu vực / Quốc gia | Địa chỉ trụ sở & Văn phòng đại diện | Vai trò chức năng |
 | :--- | :--- | :--- |
@@ -424,7 +406,7 @@ Thị trường Singapore và khu vực Châu Á: Chiếm khoảng 10% doanh thu
 
 Uy tín của doanh nghiệp được khẳng định qua hệ thống chứng nhận chất lượng và các giải thưởng chuyên ngành:
 
-**Bảng 1.3. Tổng hợp chứng nhận quốc tế và giải thưởng tiêu biểu của Saigon Technology**
+**Bảng 1.2. Tổng hợp chứng nhận quốc tế và giải thưởng tiêu biểu của Saigon Technology**
 
 | Nhóm chứng nhận / Giải thưởng | Tên danh hiệu / Tiêu chuẩn | Tổ chức đánh giá & Cấp phép | Năm đạt được / Hiệu lực |
 | :--- | :--- | :--- | :--- |
@@ -497,7 +479,7 @@ Khối Delivery là "trung tâm sản xuất" tạo ra toàn bộ doanh thu củ
 
 Nguồn nhân lực là tài sản quý giá nhất tại một doanh nghiệp xuất khẩu phần mềm. Việc phân tích đặc điểm nhân sự là cơ sở thực tiễn để thiết kế chính xác các phân hệ trong hệ thống:
 
-**Bảng 1.4. Cơ cấu nguồn nhân lực theo khối chức năng và trình độ tại Saigon Technology**
+**Bảng 1.3. Cơ cấu nguồn nhân lực theo khối chức năng và trình độ tại Saigon Technology**
 
 | Khối chức năng | Số lượng nhân sự | Tỷ lệ (%) | Trình độ Đại học / Thạc sĩ | Ngoại ngữ (Tiếng Anh lưu loát) | Địa bàn làm việc chính |
 | :--- | :---: | :---: | :---: | :---: | :--- |
@@ -795,7 +777,7 @@ Khó khăn và tồn tại thực tế: Phiếu bàn giao bằng giấy chuyển
 
 Để làm rõ trách nhiệm của các bộ phận trong toàn bộ hoạt động quản lý nhân lực tại Saigon Technology, ma trận phân định trách nhiệm RACI gồm bốn vai trò: R - Thực hiện, A - Phê duyệt, C - Phối hợp hoặc Tham vấn, I - Nhận thông tin được tổng hợp như sau:
 
-**Bảng 1.5. Ma trận phân định trách nhiệm liên phòng ban trong các quy trình quản trị nhân sự**
+**Bảng 1.4. Ma trận phân định trách nhiệm liên phòng ban trong các quy trình quản trị nhân sự**
 
 | STT | Quy trình Quản trị Nhân sự | Khối Kỹ thuật | Phòng Tuyển dụng | Phòng Nhân sự vận hành | Phòng Tiền lương và Phúc lợi | Khối Vận hành | Khối Tài chính - Kế toán | Ban Giám đốc |
 | :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -836,7 +818,7 @@ Chương 1 đã trình bày có hệ thống cơ sở lý luận về quản tr�
 
 ### 2.1.1. Xác định và phân loại các tác nhân
 
-Tác nhân trong phân tích hệ thống hướng đối tượng là bất kỳ thực thể nào bên ngoài (con người, phòng ban hoặc hệ thống khác) có tương tác trực tiếp và trao đổi thông tin với phần mềm. Dựa trên kết quả khảo sát cơ cấu tổ chức và quy trình nghiệp vụ thực tế tại Công ty Cổ phần Phần mềm Saigon Technology, hệ thống xác định 11 tác nhân nghiệp vụ cụ thể. Để tối ưu hóa việc phân quyền truy cập trên hệ thống phần mềm, 11 tác nhân này được phân loại và kế thừa vào ba nhóm vai trò người dùng chính: Toàn thể Nhân viên (USER), Cán bộ Nghiệp vụ Nhân sự (KM_MANAGER) và Quản trị viên Cấp cao (ADMIN).
+Tác nhân trong phân tích hệ thống hướng đối tượng là bất kỳ thực thể nào bên ngoài (con người, phòng ban hoặc hệ thống khác) có tương tác trực tiếp và trao đổi thông tin với phần mềm. Dựa trên kết quả khảo sát cơ cấu tổ chức và quy trình nghiệp vụ thực tế tại Công ty Cổ phần Phần mềm Saigon Technology, hệ thống xác định 12 tác nhân nghiệp vụ cụ thể. Để tối ưu hóa việc phân quyền truy cập trên hệ thống phần mềm và phân định rành mạch giữa **Nghiệp vụ Điều hành Doanh nghiệp**, **Quản trị Sở hữu của Cổ đông** và **Quản trị Kỹ thuật CNTT**, các tác nhân được ánh xạ tương ứng vào mô hình phân quyền RBAC đa vai trò: Toàn thể Nhân viên (USER), Cán bộ Nghiệp vụ Nhân sự (KM_MANAGER, HR_CB, HR_RECRUITER, HR_TRAINER), Cán bộ Quản lý (LINE_MANAGER, ACCOUNTANT, AUDITOR), Ban Giám Đốc Điều hành (BOD), Cổ đông & Hội đồng Quản trị (SHAREHOLDER) và Quản trị viên Kỹ thuật Hệ thống CNTT (ADMIN).
 
 **Bảng 2.1. Ánh xạ tác nhân hệ thống với cơ cấu tổ chức của Saigon Technology**
 
@@ -851,12 +833,13 @@ Tác nhân trong phân tích hệ thống hướng đối tượng là bất k�
 | 7 | Nhân viên Hành chính | Phòng Hành chính & Cơ sở vật chất (OPS-ADMIN) - Khối Vận hành & Pháp chế | KM_MANAGER | Quản lý cấp phát, thu hồi tài sản làm việc (laptop, màn hình), bàn giao chỗ ngồi và thẻ từ ra vào văn phòng tại các cơ sở/chi nhánh. |
 | 8 | Kế toán viên | Phòng Kế toán Doanh nghiệp & Thuế (FIN-ACC) - Khối Tài chính - Kế toán | KM_MANAGER | Xác nhận ngân sách quỹ lương, đối chiếu bảng thanh toán tiền lương, tạm ứng và thanh quyết toán các khoản chi phí công tác. |
 | 9 | Đại diện Người lao động | Ban Chấp hành Công đoàn cơ sở | USER | Tham gia đóng góp ý kiến và giám sát trong quy trình xử lý kỷ luật lao động và giải quyết khiếu nại theo quy định pháp luật. |
-| 10 | Giám đốc | Ban Giám đốc Điều hành (BGD) - Tổng Giám đốc (CEO Phạm Tiến Thành) | ADMIN | Phê duyệt kế hoạch tuyển dụng, ký duyệt hợp đồng lao động, phê duyệt bảng lương tháng, phê duyệt bổ nhiệm, nâng bậc lương và khen thưởng, kỷ luật. |
-| 11 | Nhân viên Quản trị CNTT | Phòng IT & An ninh Mạng (OPS-IT) - Khối Vận hành & Pháp chế | ADMIN | Quản trị tài khoản người dùng, phân quyền RBAC, cấu hình tham số hệ thống, giám sát kết nối máy chấm công và tra cứu nhật ký kiểm toán (Audit Log). |
+| 10 | Ban Giám Đốc (Tổng Giám đốc) | Ban Giám đốc Điều hành (BGD) - Tổng Giám đốc (CEO & Đại diện Pháp luật: Trần Minh Hoàng) | BOD | Ban Lãnh đạo điều hành doanh nghiệp: Phê duyệt kế hoạch định biên tuyển dụng, ký duyệt hợp đồng lao động chính thức, phê duyệt bảng lương tháng, phê duyệt bổ nhiệm, khen thưởng và kỷ luật. Xem dashboard điều hành toàn công ty. |
+| 11 | Cổ đông & Hội đồng Quản trị | Đại hội đồng Cổ đông & Hội đồng Quản trị (ĐHCĐ) - Chủ tịch HĐQT: Phạm Tiến Thành | SHAREHOLDER | Quản trị sở hữu và giám sát tối cao: Xem báo cáo thường niên ĐHCĐ, báo cáo tài chính - quỹ lương tổng thể, chiến lược nhân sự, giám sát tuân thủ và kiểm toán độc lập. |
+| 12 | Quản trị viên Hệ thống CNTT | Phòng IT & An ninh Mạng (OPS-IT) - Khối Vận hành & Pháp chế (Nguyễn Hoàng Nam) | ADMIN | Quản trị kỹ thuật CNTT (IT SysAdmin): Quản trị hạ tầng máy chủ phần mềm, cấu hình tham số hệ thống, phân quyền vai trò RBAC, tích hợp máy chấm công và giám sát nhật ký kiểm toán (Audit Log) theo ISO 27001. Không can thiệp quyết định kinh doanh / phê duyệt tiền lương của Ban Giám Đốc. |
 
 ![Hình 2.1: Biểu đồ cây phân cấp Tác nhân](images/hinh_2_1_actor_tree.png)
 
-Sơ đồ thể hiện quan hệ kế thừa và phân cấp giữa tác nhân chung "Nhân viên" và 10 tác nhân vai trò chuyên biệt hóa trong hệ thống.
+Sơ đồ thể hiện quan hệ kế thừa và phân cấp giữa tác nhân chung "Nhân viên" và các tác nhân vai trò chuyên biệt hóa trong hệ thống (phân định rõ Ban Giám Đốc điều hành, Cổ đông sở hữu và Quản trị viên kỹ thuật CNTT).
 
 ### 2.1.2. Danh sách Use case và phân nhóm nhiệm vụ
 
@@ -935,15 +918,15 @@ Dưới đây là đặc tả kịch bản tác nghiệp chi tiết của toàn 
 **UC02 - Quản trị người dùng & Phân quyền RBAC**
 
 - **Tác nhân chính:** Nhân viên Quản trị CNTT
-- **Mục đích / Mô tả:** Khởi tạo, chỉnh sửa tài khoản người dùng, gán vai trò RBAC hai chiều (vai trò hệ thống × vai trò theo Space) và quản lý trạng thái tài khoản.
+- **Mục đích / Mô tả:** Khởi tạo, chỉnh sửa tài khoản người dùng, gán vai trò RBAC doanh nghiệp đa cấp (10 vai trò: ADMIN, BOD, KM_MANAGER, LINE_MANAGER, HR_CB, ACCOUNTANT, HR_RECRUITER, HR_TRAINER, AUDITOR, USER) và cấu hình ma trận phân quyền 8 phân hệ trực tiếp trên hệ thống.
 - **Điều kiện tiên quyết:** Quản trị viên IT đã đăng nhập với vai trò ADMIN.
-- **Hậu điều kiện:** Tài khoản người dùng được cập nhật, quyền hạn mới có hiệu lực ngay lập tức; ghi vết kiểm toán hệ thống.
+- **Hậu điều kiện:** Quyền hạn mới có hiệu lực ngay lập tức tại Cổng API và Menu giao diện; toàn bộ thao tác được ghi vết vào nhật ký kiểm toán hệ thống.
 
 | Bước | Tác nhân (Người dùng) | Hệ thống phần mềm |
 | :---: | :--- | :--- |
-| 1 | Truy cập giao diện `/admin/users`, chọn "Thêm người dùng mới" hoặc chọn tài khoản cần phân quyền. | Hiển thị biểu mẫu thông tin tài khoản và ma trận quyền hạn RBAC. |
-| 2 | Nhập họ tên, email công vụ, mã nhân viên; lựa chọn vai trò (USER, KM_MANAGER, ADMIN) và gán quyền truy cập các không gian Space. | Kiểm tra tính duy nhất của email và mã nhân viên trong hệ thống. |
-| 3 | Bấm "Lưu thông tin". | Cập nhật bảng `User` và bảng quan hệ vai trò; tự động sinh mật khẩu tạm thời mã hóa gửi tới email nhân viên; ghi nhật ký kiểm toán `AuditLog`. |
+| 1 | Truy cập giao diện Quản lý phân quyền `/admin/roles` (hoặc `/admin/users`). | Hiển thị 3 tab chức năng: Phân quyền tài khoản (383 nhân sự), Danh mục vai trò và Ma trận phân quyền 8 phân hệ (RBAC Matrix). |
+| 2 | Tại Tab "Phân quyền tài khoản", chọn tài khoản cần thay đổi quyền và chọn vai trò tương ứng trong danh mục 10 vai trò doanh nghiệp; hoặc chuyển sang Tab "Ma trận phân quyền" để biên tập quyền hạn cho từng phân hệ. | Hệ thống hiển thị huy hiệu vai trò phân loại trực quan; kiểm tra tính toàn vẹn dữ liệu vai trò. |
+| 3 | Bấm "Cập nhật vai trò" hoặc "Lưu cấu hình quyền". | Cập nhật quan hệ `UserRole` và bản ghi cấu hình `Setting` (`RBAC_PERMISSIONS_MATRIX`); ghi nhật ký kiểm toán `AuditLog`. |
 
 **UC03 - Quản trị cơ cấu tổ chức & Cây phòng ban**
 
@@ -1678,7 +1661,7 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 
 | STT | Tên Quy trình nghiệp vụ thực tế | Tác nhân chính | Mã Use Case hệ thống tương ứng | Giao diện màn hình thực tế trong ứng dụng |
 | :---: | :--- | :--- | :--- | :--- |
-| 1 | Quản trị hệ thống, Định danh & Phân quyền RBAC | Quản trị viên IT, Toàn thể nhân viên | UC01, UC02, UC03 | `/login`, `/admin/users`, `/admin/org-units`, `/org-chart` |
+| 1 | Quản trị hệ thống, Định danh & Phân quyền RBAC | Quản trị viên IT, Toàn thể nhân viên | UC01, UC02, UC03 | `/login`, `/admin/roles`, `/admin/users`, `/admin/org-units`, `/org-chart` |
 | 2 | Tuyển dụng & Quản trị ứng viên | Trưởng dự án, CV Tuyển dụng, Giám đốc | UC04, UC05, UC06, UC07, UC08 | `/recruitment-ats`, `/admin/catalogs` |
 | 3 | Tiếp nhận hồ sơ, Văn bằng & Hội nhập | Nhân viên mới, CV Hồ sơ, IT | UC09, UC10, UC11, UC12, UC14 | `/employees`, `/documents`, `/admin/users`, `/employees/[id]` |
 | 4 | Đánh giá thử việc & Ký hợp đồng | Trưởng dự án, CV Hồ sơ, Giám đốc | UC10, UC13 | `/employees/[id]`, `/personnel`, `/salary-ranks` |
@@ -1697,7 +1680,7 @@ Dưới đây là mô tả chi tiết 18 quy trình nghiệp vụ cốt lõi đa
 | 17 | Đánh giá Hiệu suất 360 & OKR/KPI | Nhân viên, Trưởng dự án, CV Nhân sự | UC15, UC37 | `/performance-360`, `/employees/[id]` |
 | 18 | Đào tạo nội bộ & Khiếu nại lao động | CV Nhân sự, Nhân viên | UC15, UC38, UC39 | `/training-grievance`, `/employees/[id]` |
 | 19 | Hồ sơ cán bộ & Báo cáo Mẫu 2C-BNV | CV Hồ sơ | UC40, UC43 | `/personnel-reports`, `/admin/catalogs` |
-| 20 | Quản lý tri thức số & Tìm kiếm toàn văn | Toàn thể nhân viên, Quản lý nội dung | UC44, UC45 | `/documents`, `/employees` |
+| 20 | Quản lý kho tài liệu quy chế & Tìm kiếm | Toàn thể nhân viên, Cán bộ Nhân sự | UC44, UC45 | `/documents`, `/employees` |
 | 21 | Bảng điều khiển phân tích & Kiểm toán hệ thống | Ban Giám đốc, Quản lý, Quản trị CNTT | UC46, UC47 | `/dashboard`, `/admin/audit`, `/admin/settings` |
 
 ---
@@ -2461,22 +2444,20 @@ Thể hiện mối quan hệ liên kết, hợp thành và kế thừa giữa c�
 
 ![Hình 2.115: Biểu đồ lớp miền cốt lõi của hệ thống](images/hinh_2_20_class_domain.png)
 
-**Bảng 2.4. Ma trận phân quyền truy cập chức năng**
+**Bảng 2.4. Ma trận phân quyền truy cập chức năng theo vai trò doanh nghiệp (RBAC Matrix)**
 
-| Phân hệ chức năng | Bảng dữ liệu chính | Quyền hạn vai USER | Quyền hạn vai KM_MANAGER | Quyền hạn vai ADMIN |
-| :--- | :--- | :---: | :---: | :---: |
-| Tài khoản & Tổ chức | User, Account, OrgUnit | R (chỉ xem bản thân) | R (xem đơn vị) | C, R, U, D |
-| Tuyển dụng & ATS | JobRequisition, Candidate | C, R (trong dự án) | C, R, U, D | C, R, U, D |
-| Hồ sơ & Hợp đồng | Employee, Contract, Certificate | R (xem cá nhân) | C, R, U | C, R, U, D |
-| Thẩm định hồ sơ Mức 2 | ProfileChangeRequest | C, R (tạo đề xuất cá nhân) | R, U (thẩm định duyệt) | C, R, U, D |
-| Chấm công & Phân ca | AttendanceEvent, WorkShift | C, R (điểm danh, xem ca) | C, R, U (hiệu chỉnh công) | C, R, U, D |
-| Nghỉ phép & Làm thêm | LeaveRequest, OvertimeRequest | C, R (nộp đơn cá nhân) | C, R, U (duyệt đơn) | C, R, U, D |
-| Tiền lương & Kỳ lương | PayrollPeriod, Payslip | R (chỉ xem phiếu lương cá nhân) | C, R, U (tính toán, đối chiếu) | C, R, U (phê duyệt, khóa lương) |
-| Phúc lợi & Khoản vay | EmployeeLoan, ExpenseClaim | C, R (đăng ký vay, xem nợ) | C, R, U (thẩm định duyệt) | C, R, U, D |
-| Biến động & Thôi việc | PersonnelAction, HandoverChecklist | C, R (nộp đơn thôi việc) | C, R, U (xác nhận bàn giao) | C, R, U, D (ký quyết định) |
-| Hồ sơ cán bộ & Báo cáo | CadreProfile, SalaryGrade | - | C, R, U (quản lý, xuất biểu) | C, R, U, D |
-| Tri thức số & SOP | Article, ArticleVersion | C, R (soạn thảo, tra cứu) | C, R, U, D (duyệt xuất bản) | C, R, U, D |
-| Nhật ký kiểm toán | AuditLog | - | - | R (chỉ đọc) |
+Hệ thống triển khai cơ chế kiểm soát truy cập dựa trên vai trò (RBAC) kết hợp phân cấp dữ liệu tổ chức, quản lý phân quyền tập trung cho 384 nhân sự thực tế qua 11 vai trò nghiệp vụ (ADMIN, BOD, SHAREHOLDER, KM_MANAGER, LINE_MANAGER, HR_CB, ACCOUNTANT, HR_RECRUITER, HR_TRAINER, AUDITOR, USER):
+
+| Phân hệ chức năng | Bảng dữ liệu chính | Nhân viên (USER) | Quản lý bộ phận (LINE_MANAGER) | Cán bộ C&B / Tuyển dụng / L&D | Kế toán (ACCOUNTANT) | Kiểm toán (AUDITOR) | Ban Giám Đốc (BOD) | Cổ đông & HĐQT (SHAREHOLDER) | Quản trị nhân sự (KM_MANAGER) | Quản trị hệ thống (ADMIN) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1. Cổng tự phục vụ ESS | User, Notification | C, R (cá nhân) | C, R, U (duyệt đơn nhóm) | C, R (cá nhân + tra cứu) | C, R (chứng từ cá nhân) | R (giám sát quy trình) | R (dashboard điều hành) | R (dashboard HĐQT) | C, R, U (dashboard nhân sự) | C, R, U, D (toàn quyền) |
+| 2. Hồ sơ & Hợp đồng | Employee, Contract, Certificate | R (hồ sơ cá nhân) | R (nhân sự bộ phận) | C, R, U (tiếp nhận, C&B, L&D) | R (tài khoản, MST) | R (soát xét pháp lý HĐ) | R (toàn bộ nhân sự cty) | R (định biên, quy mô cty) | C, R, U (quản lý hồ sơ, ký HĐ) | C, R, U, D (toàn quyền) |
+| 3. Chấm công & Phân ca | AttendanceEvent, WorkShift, AttendanceCorrection | C, R (điểm danh cá nhân) | C, R, U (phân ca, duyệt giải trình) | C, R, U (tổng hợp công tháng C&B) | R (tổng hợp ngày công) | R (kiểm tra tuân thủ giờ làm) | R (thống kê tỷ lệ đi làm cty) | R (báo cáo năng suất cty) | C, R, U (chốt bảng công tháng) | C, R, U, D (toàn quyền + máy chấm công) |
+| 4. Tiền lương & Khoản vay | PayrollPeriod, Payslip, EmployeeLoan, ExpenseClaim | R (phiếu lương cá nhân, nộp đơn vay) | R (chi phí lương bộ phận ủy quyền) | C, R, U (động cơ tính lương, BHXH) | C, R, U (đối soát, chi trả, duyệt chi) | R (kiểm toán công thức, thuế) | R, U (phê duyệt quỹ lương tháng) | R (tổng hợp chi phí quỹ lương) | C, R, U (tính lương, duyệt vay NĐ 30) | C, R, U, D (toàn quyền + công thức) |
+| 5. Tuyển dụng & ATS | JobRequisition, Candidate, InterviewRound | - | C, R (lập đề xuất, phỏng vấn) | C, R, U, D (quản trị ATS, đề xuất offer) | - | R (giám sát tính minh bạch) | R, U (phê duyệt định biên năm) | R (báo cáo chiến lược nhân tài) | C, R, U (quản lý tin, duyệt offer) | C, R, U, D (toàn quyền kiểm soát) |
+| 6. Đánh giá KPI & Đào tạo | PerformanceReview, TrainingCourse, Grievance | C, R (tự đánh giá, nộp khiếu nại) | C, R, U (giao KPI, đánh giá 360) | C, R, U (quản trị khóa học, tính thưởng) | - | R (giám sát xử lý khiếu nại) | R, U (phê duyệt khung KPI, xếp loại) | R (báo cáo thực hiện OKR/KPI) | C, R, U (điều phối đào tạo, khiếu nại) | C, R, U, D (toàn quyền điều phối) |
+| 7. Báo cáo & BLLĐ | CadreProfile, SalaryGrade, LaborReport | - | R (báo cáo hiệu suất bộ phận) | R, U (báo cáo tuyển dụng, lương BHXH) | R (báo cáo chi phí công tác) | R (báo cáo tuân thủ BLLĐ, rủi ro) | R (báo cáo quản trị cấp cao) | R (báo cáo ĐHCĐ, ESG, kiểm toán) | C, R, U (kết xuất Mẫu 2C-BNV, BLLĐ) | C, R, U, D (toàn quyền kết xuất) |
+| 8. Cấu hình & Kiểm toán | Setting, AuditLog, AttendanceDevice | - | - | - | - | R (nhật ký kiểm toán AuditLog) | R (xem cấu hình tham số) | R (kiểm toán bảo mật) | - | C, R, U, D (toàn quyền RBAC, kiểm toán) |
 
 *(Ghi chú: C: Create - Tạo mới, R: Read - Xem/Đọc, U: Update - Chỉnh sửa, D: Delete - Xóa dữ liệu).*
 

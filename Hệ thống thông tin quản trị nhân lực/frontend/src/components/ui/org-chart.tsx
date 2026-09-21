@@ -20,12 +20,16 @@ export interface OrgNode {
   children?: OrgNode[];
 }
 
-const LEVEL_LABELS = [
-  { label: 'Cấp 1: Ban Lãnh đạo', color: 'bg-muted/40 text-muted-foreground border-border' },
-  { label: 'Cấp 2: Khối / Ban', color: 'bg-muted/40 text-muted-foreground border-border' },
-  { label: 'Cấp 3: Trung tâm / Phòng', color: 'bg-muted/40 text-muted-foreground border-border' },
-  { label: 'Cấp 4: Tổ / Nhóm chuyên môn', color: 'bg-muted/40 text-muted-foreground border-border' },
-];
+export function getOrgNodeLevelLabel(node: OrgNode, level: number): string {
+  if (node.code === 'SG-TECH') return 'Cấp 1: Ban Lãnh đạo Công ty';
+  if (node.code === 'BGD') return 'Cấp 1: Ban Giám đốc Điều hành';
+  if (node.code === 'ĐHCĐ') return 'Cấp 1: Quản trị Sở hữu (ĐHCĐ)';
+  if (['DELIVERY', 'HR', 'OPS', 'BIZ', 'FIN'].includes(node.code)) return 'Cấp 2: Khối chức năng';
+  if (node.code.startsWith('SQ-') || node.code.startsWith('QA-')) return 'Cấp 4: Tổ / Nhóm chuyên môn';
+  if (level >= 3) return 'Cấp 3: Trung tâm / Phòng';
+  if (level === 2) return 'Cấp 2: Khối / Ban';
+  return 'Cấp 1: Ban Lãnh đạo';
+}
 
 export function OrgChartNode({
   node,
@@ -51,7 +55,7 @@ export function OrgChartNode({
 
   const hasChildren = Boolean(node.children && node.children.length > 0);
   const isSelected = selectedId === node.id;
-  const levelBadge = LEVEL_LABELS[Math.min(level, LEVEL_LABELS.length - 1)];
+  const levelLabelText = getOrgNodeLevelLabel(node, level);
 
   return (
     <li className="relative flex flex-col items-center list-none px-3 pt-6">
@@ -98,7 +102,7 @@ export function OrgChartNode({
         {/* Level Indicator */}
         <div className="mb-1.5">
           <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-md border border-border bg-muted/40 text-muted-foreground">
-            {levelBadge.label}
+            {levelLabelText}
           </span>
         </div>
 

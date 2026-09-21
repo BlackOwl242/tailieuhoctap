@@ -9,7 +9,7 @@
  * | Thuật ngữ cũ (sai/khó hiểu)   | Thuật ngữ chuẩn                  | Ghi chú                          |
  * |-------------------------------|----------------------------------|----------------------------------|
  * | Space / Space tri thức        | Không gian / Không gian tri thức | Đơn vị lưu trữ tài liệu          |
- * | Quản lý tri thức (vai)        | Quản lý nội dung                 | Nhãn vai KM_MANAGER trên UI      |
+ * | Quản lý tri thức (vai)        | Cán bộ Nhân sự                   | Nhãn vai KM_MANAGER trên UI (HRMIS) |
  * | Hộp phê duyệt / Hộp duyệt     | Phê duyệt                        |                                  |
  * | Chuyên gia                    | Tìm chuyên gia                   | Trang tra cứu nhân sự theo môn   |
  * | Chuyển giao tri thức          | Bàn giao công việc               | Checklist nghỉ việc (UC17)       |
@@ -31,7 +31,14 @@ export const NAV_GROUP_LABELS = {
 
 /** Nhãn vai hiển thị trên UI (map từ roleCode). */
 export const ROLE_LABELS: Record<string, string> = {
-  ADMIN: 'Quản trị viên',
-  KM_MANAGER: 'Quản lý nội dung',
-  USER: 'Nhân viên',
+  ADMIN: 'Quản trị viên Hệ thống',
+  BOD: 'Ban Giám Đốc (Executive)',
+  KM_MANAGER: 'Cán bộ Quản trị Nhân sự',
+  LINE_MANAGER: 'Quản lý / Trưởng bộ phận',
+  HR_CB: 'Chuyên viên C&B (Lương & Phúc lợi)',
+  ACCOUNTANT: 'Kế toán Doanh nghiệp & Thanh toán',
+  HR_RECRUITER: 'Chuyên viên Tuyển dụng (Recruiter)',
+  HR_TRAINER: 'Chuyên viên Đào tạo & Phát triển (L&D)',
+  AUDITOR: 'Kiểm toán Nội bộ & Pháp chế',
+  USER: 'Nhân viên (Cổng ESS)',
 };

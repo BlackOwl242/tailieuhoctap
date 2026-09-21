@@ -56,9 +56,9 @@ async function main() {
       // ---------------------------------------------------------------- vai trò
       await tx.role.createMany({
         data: [
-          { code: 'ADMIN', name: 'Quản trị viên', description: 'Toàn quyền hệ thống' },
-          { code: 'KM_MANAGER', name: 'Quản lý tri thức', description: 'Chủ trì nội dung và quy trình duyệt' },
-          { code: 'USER', name: 'Nhân viên', description: 'Tự phục vụ và đóng góp tri thức' },
+          { code: 'ADMIN', name: 'Quản trị viên', description: 'Toàn quyền quản trị hệ thống: Cấu hình tham số, phân quyền vai trò RBAC, cơ cấu tổ chức và nhật ký kiểm toán.' },
+          { code: 'KM_MANAGER', name: 'Cán bộ Nhân sự', description: 'Chủ trì các phân hệ nghiệp vụ: Hồ sơ nhân sự, Hợp đồng, Chấm công, Tiền lương, Tuyển dụng và Báo cáo BLLĐ.' },
+          { code: 'USER', name: 'Nhân viên', description: 'Cổng tự phục vụ ESS: Chấm công, nộp đơn phép/OT, tra cứu phiếu lương và sơ đồ tổ chức.' },
         ],
         skipDuplicates: true,
       });
