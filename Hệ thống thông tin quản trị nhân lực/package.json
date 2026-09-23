@@ -9,5 +9,8 @@
   "scripts": {
     "lint": "npm run lint --workspaces",
     "typecheck": "npm run typecheck --workspace=backend && npm run typecheck --workspace=frontend"
+  },
+  "devDependencies": {
+    "docx": "^9.7.1"
   }
 }
