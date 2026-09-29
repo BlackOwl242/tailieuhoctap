@@ -129,6 +129,7 @@ export class HrmsPayrollService {
     const comp = await this.prisma.hrmsSalaryComponent.findUnique({ where: { id } });
     if (!comp) throw new NotFoundException('Không tìm thấy thành phần lương');
 
+    await this.prisma.hrmsSalaryStructureItem.deleteMany({ where: { componentId: id } });
     await this.prisma.hrmsSalaryComponent.delete({ where: { id } });
 
     await this.audit.log({
@@ -237,6 +238,7 @@ export class HrmsPayrollService {
     const run = await this.prisma.hrmsPayrollRun.findUnique({ where: { id } });
     if (!run) throw new NotFoundException('Không tìm thấy bảng lương');
 
+    await this.prisma.hrmsPayrollSlip.deleteMany({ where: { payrollRunId: id } });
     await this.prisma.hrmsPayrollRun.delete({ where: { id } });
 
     await this.audit.log({
@@ -250,6 +252,10 @@ export class HrmsPayrollService {
   }
 
   async createPayrollRun(actorId: string, dto: CreatePayrollRunDto) {
+    const fromDate = new Date(dto.fromDate);
+    const toDate = new Date(dto.toDate);
+    toDate.setHours(23, 59, 59, 999);
+
     const users = await this.prisma.user.findMany({
       where: { status: 'ACTIVE' },
       select: {
@@ -257,6 +263,18 @@ export class HrmsPayrollService {
         orgUnit: { select: { name: true } },
       },
     });
+
+    // Truy vấn dữ liệu chấm công thực tế của tất cả nhân viên trong kỳ lương
+    const attendance = await this.prisma.attendanceDay.groupBy({
+      by: ['userId'],
+      where: {
+        workDate: { gte: fromDate, lte: toDate },
+        status: { in: ['PRESENT', 'LATE', 'EARLY_LEAVE', 'ON_LEAVE', 'HOLIDAY'] },
+      },
+      _count: { userId: true },
+    });
+    const attendanceMap = new Map(attendance.map((a) => [a.userId, a._count.userId]));
+    const hasAnyAttendance = attendance.length > 0;
 
     const run = await this.prisma.hrmsPayrollRun.create({
       data: {
@@ -273,17 +291,48 @@ export class HrmsPayrollService {
     let totalGross = 0;
     let totalDeduction = 0;
     let totalNet = 0;
+    const standardWorkingDays = 22;
 
     for (const u of users) {
       const base = u.baseSalary || 15000000;
-      const lunch = 730000;
+      
+      // Số ngày làm việc thực tế: Nếu hệ thống có dữ liệu chấm công kỳ này thì lấy thực tế, nếu chưa có thì tạm tính chuẩn 22 ngày
+      const actualDays = hasAnyAttendance ? (attendanceMap.get(u.id) ?? 0) : standardWorkingDays;
+      const unpaidDays = Math.max(0, standardWorkingDays - actualDays);
+
+      // Khoản giảm trừ ngày vắng / không đủ công (theo Điều 27 PTTK)
+      const unpaidDeduction = Math.round((base / standardWorkingDays) * unpaidDays);
+
+      // Phụ cấp ăn trưa theo số ngày đi làm thực tế
+      const lunchPerDay = Math.round(730000 / standardWorkingDays);
+      const lunch = Math.round(lunchPerDay * Math.min(standardWorkingDays, actualDays));
       const gross = base + lunch;
+
+      // Bảo hiểm theo mức lương cơ bản hợp đồng
       const bhxh = Math.round(base * 0.08);
       const bhyt = Math.round(base * 0.015);
       const bhtn = Math.round(base * 0.01);
-      const taxable = Math.max(0, gross - lunch - 11000000);
+
+      // Thu nhập chịu thuế (sau khi trừ khoản giảm trừ ngày nghỉ không lương và giảm trừ bản thân 11tr)
+      const taxable = Math.max(0, gross - lunch - unpaidDeduction - 11000000);
       const pit = Math.round(taxable * 0.05);
-      const deduction = bhxh + bhyt + bhtn + pit;
+
+      const deductionsList = [
+        { name: 'Bảo hiểm Xã hội (8%)', amount: bhxh },
+        { name: 'Bảo hiểm Y tế (1.5%)', amount: bhyt },
+        { name: 'Bảo hiểm Thất nghiệp (1%)', amount: bhtn },
+      ];
+
+      if (unpaidDays > 0) {
+        deductionsList.push({
+          name: `Trừ nghỉ không lương / Thiếu công (${unpaidDays} ngày)`,
+          amount: unpaidDeduction,
+        });
+      }
+
+      deductionsList.push({ name: 'Thuế Thu nhập Cá nhân (TNCN)', amount: pit });
+
+      const deduction = bhxh + bhyt + bhtn + pit + unpaidDeduction;
       const net = gross - deduction;
 
       totalGross += gross;
@@ -298,6 +347,8 @@ export class HrmsPayrollService {
           employeeCode: u.employeeCode,
           department: u.orgUnit?.name ?? 'Chưa phân bổ',
           jobTitle: u.jobTitle ?? 'Nhân viên',
+          workingDays: standardWorkingDays,
+          actualWorkDays: actualDays,
           baseSalary: base,
           grossPay: gross,
           totalDeduction: deduction,
@@ -305,14 +356,9 @@ export class HrmsPayrollService {
           breakdown: {
             earnings: [
               { name: 'Lương Cơ bản', amount: base },
-              { name: 'Phụ cấp Ăn trưa (Miễn thuế)', amount: lunch },
+              { name: `Phụ cấp Ăn trưa (${actualDays}/${standardWorkingDays} ngày)`, amount: lunch },
             ],
-            deductions: [
-              { name: 'Bảo hiểm Xã hội (8%)', amount: bhxh },
-              { name: 'Bảo hiểm Y tế (1.5%)', amount: bhyt },
-              { name: 'Bảo hiểm Thất nghiệp (1%)', amount: bhtn },
-              { name: 'Thuế Thu nhập Cá nhân (TNCN)', amount: pit },
-            ],
+            deductions: deductionsList,
           },
           status: 'APPROVED',
         },

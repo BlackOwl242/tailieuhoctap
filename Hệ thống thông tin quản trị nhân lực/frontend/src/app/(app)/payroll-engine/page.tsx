@@ -1,9 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
+import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Calculator, Plus, Trash2, Edit3, Eye, Printer, FileText, Download,
+  BookOpen, ShieldCheck, Percent, Clock, Award, Info, CheckCircle2, ChevronRight,
+  Layers, Sliders, FileSpreadsheet, Sparkles, ArrowRight, ExternalLink
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
@@ -42,6 +46,8 @@ interface PayrollSlip {
   employeeCode?: string;
   department?: string;
   jobTitle?: string;
+  workingDays?: number;
+  actualWorkDays?: number;
   baseSalary: number;
   grossPay: number;
   totalDeduction: number;
@@ -68,13 +74,26 @@ interface PayrollRun {
 }
 
 export default function PayrollEnginePage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const toast = useToast();
+  const searchParams = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<'runs' | 'components' | 'structures'>('runs');
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [selectedSlip, setSelectedSlip] = useState<PayrollSlip | null>(null);
   const [isPayslipModalOpen, setIsPayslipModalOpen] = useState(false);
+  const [payslipViewMode, setPayslipViewMode] = useState<'summary' | 'formula'>('summary');
+
+  // Lắng nghe URL query parameter ?tab=regulations -> Chuyển hướng sang trang độc lập /regulations
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'regulations') {
+      router.replace('/regulations');
+    } else if (tabParam === 'components' || tabParam === 'structures' || tabParam === 'runs') {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams, router]);
 
   // Modals state
   const [isProcessModalOpen, setIsProcessModalOpen] = useState(false);
@@ -269,6 +288,28 @@ export default function PayrollEnginePage() {
       render: (s: PayrollSlip) => <span className="text-xs text-muted-foreground">{s.department || 'Ban Tổ chức'}</span>,
     },
     {
+      key: 'actualWorkDays',
+      header: 'Ngày công',
+      sortable: true,
+      render: (s: PayrollSlip) => {
+        const actual = s.actualWorkDays ?? 22;
+        const standard = s.workingDays ?? 22;
+        const isFull = actual >= standard;
+        return (
+          <div className="text-xs">
+            <span className={`font-mono font-medium ${isFull ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+              {actual}/{standard} công
+            </span>
+            {!isFull && (
+              <span className="block text-[10px] text-rose-500 font-mono">
+                Thiếu {standard - actual} ngày
+              </span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
       key: 'baseSalary',
       header: 'Lương cơ bản',
       sortable: true,
@@ -280,7 +321,7 @@ export default function PayrollEnginePage() {
     },
     {
       key: 'grossPay',
-      header: 'Tổng Gross',
+      header: 'Tổng thu nhập gộp',
       sortable: true,
       render: (s: PayrollSlip) => (
         <span className="text-xs font-mono text-foreground">
@@ -361,7 +402,17 @@ export default function PayrollEnginePage() {
         description="Tính toán bảng lương chu kỳ, khấu trừ bảo hiểm thuế và lập phiếu lương nhân sự."
         breadcrumbs={[{ label: 'Tiền lương' }, { label: 'Bảng lương' }]}
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/regulations">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs h-8"
+              >
+                <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+                Sổ tay Quy ước C&amp;B
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"
@@ -386,36 +437,39 @@ export default function PayrollEnginePage() {
         }
       />
 
-      {/* Navigation Tabs (Minimalist border) */}
-      <div className="flex border-b border-border text-sm">
+      {/* Navigation Tabs (Đồng bộ chuẩn hệ thống) */}
+      <div className="flex border-b border-border text-xs sm:text-sm font-medium overflow-x-auto gap-2">
         <button
           onClick={() => setActiveTab('runs')}
-          className={`px-3 py-2 border-b-2 font-medium transition-colors ${
+          className={`flex items-center gap-2 px-3 pb-2.5 pt-1 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'runs'
-              ? 'border-foreground text-foreground'
+              ? 'border-foreground text-foreground font-semibold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
-          Bảng lương ({runs.length})
+          <FileSpreadsheet className="w-4 h-4" />
+          Kỳ bảng lương ({runs.length})
         </button>
         <button
           onClick={() => setActiveTab('components')}
-          className={`px-3 py-2 border-b-2 font-medium transition-colors ${
+          className={`flex items-center gap-2 px-3 pb-2.5 pt-1 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'components'
-              ? 'border-foreground text-foreground'
+              ? 'border-foreground text-foreground font-semibold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
-          Thành phần thu nhập & khấu trừ ({components.length})
+          <Layers className="w-4 h-4" />
+          Thành phần lương ({components.length})
         </button>
         <button
           onClick={() => setActiveTab('structures')}
-          className={`px-3 py-2 border-b-2 font-medium transition-colors ${
+          className={`flex items-center gap-2 px-3 pb-2.5 pt-1 border-b-2 whitespace-nowrap transition-colors ${
             activeTab === 'structures'
-              ? 'border-foreground text-foreground'
+              ? 'border-foreground text-foreground font-semibold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
+          <Sliders className="w-4 h-4" />
           Cấu trúc lương ({structures.length})
         </button>
       </div>
@@ -853,16 +907,15 @@ export default function PayrollEnginePage() {
               className="mt-1 w-full text-xs"
             >
               <option value="">-- Chọn nhân viên --</option>
-              {employees.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.fullName} ({e.employeeCode || 'NV'})
+              {employees.map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.fullName} ({emp.employeeCode})
                 </option>
               ))}
             </Select>
           </div>
-
           <div>
-            <label className="text-muted-foreground">Lương cơ bản (VND) *</label>
+            <label className="text-muted-foreground">Lương cơ bản gán (VND) *</label>
             <input
               type="number"
               step={500000}
@@ -875,10 +928,10 @@ export default function PayrollEnginePage() {
 
         <ModalFooterActions
           onCancel={() => setIsAssignModalOpen(false)}
-          confirmLabel="Lưu"
+          confirmLabel="Gán cấu trúc"
           onConfirm={() => {
-            if (!assignUserId || !selectedStructureId) {
-              toast('Vui lòng chọn nhân sự', 'error');
+            if (!assignUserId) {
+              toast('Vui lòng chọn nhân viên', 'error');
               return;
             }
             assignStructureMutation.mutate({
@@ -891,116 +944,319 @@ export default function PayrollEnginePage() {
         />
       </Modal>
 
-      {/* ================= MODAL: PHIẾU LƯƠNG ĐƠN GIẢN, CHUẨN KẾ TOÁN ================= */}
+      {/* ================= MODAL: XEM PHIẾU LƯƠNG CHI TIẾT ================= */}
       <Modal
         open={isPayslipModalOpen}
         onOpenChange={(open) => setIsPayslipModalOpen(open)}
-        title="Phiếu Lương Nhân Viên"
+        title="Chi Tiết Phiếu Lương Cán Bộ Nhân Viên"
         size="lg"
       >
         {selectedSlip && (
-          <div id="print-payslip-doc" className="print-area space-y-4 text-xs font-sans print:font-serif print:text-black print:p-0 print:border-0 print:m-0">
-            {/* Header thông tin */}
-            <div className="border-b border-border pb-3 flex justify-between items-start">
-              <div>
-                <p className="font-semibold text-foreground text-sm uppercase">PHIẾU LƯƠNG NHÂN SỰ</p>
-                <p className="text-muted-foreground mt-0.5">{currentRun?.periodName || 'Kỳ lương hiện hành'}</p>
+          <div className="space-y-4 text-xs font-sans">
+            {/* Chế độ xem: Tóm tắt hoặc Giải trình công thức */}
+            <div className="flex items-center justify-between border-b border-border pb-2 no-print">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPayslipViewMode('summary')}
+                  className={`px-3 py-1.5 rounded-md font-medium text-xs transition-colors ${
+                    payslipViewMode === 'summary'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted/50 text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Phiếu Lương Chuẩn
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPayslipViewMode('formula')}
+                  className={`px-3 py-1.5 rounded-md font-medium text-xs transition-colors ${
+                    payslipViewMode === 'formula'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted/50 text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Giải Trình Công Thức Chi Tiết
+                </button>
               </div>
-              <div className="text-right text-muted-foreground">
-                <p>Mã phiếu: <span className="font-mono text-foreground">{selectedSlip.id.slice(0, 8).toUpperCase()}</span></p>
-              </div>
-            </div>
-
-            {/* Thông tin nhân viên */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs py-1">
-              <div>
-                <span className="text-muted-foreground">Họ tên:</span>
-                <p className="font-medium text-foreground">{selectedSlip.employeeName}</p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Mã NV:</span>
-                <p className="font-mono text-foreground">{selectedSlip.employeeCode || 'NV'}</p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Phòng ban:</span>
-                <p className="text-foreground">{selectedSlip.department || 'Ban Tổ chức'}</p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Chức danh:</span>
-                <p className="text-foreground">{selectedSlip.jobTitle || 'Chuyên viên'}</p>
-              </div>
-            </div>
-
-            {/* Bảng Chi Tiết Thu Nhập & Khấu Trừ (Đơn giản, 1px border) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs border-t border-border pt-3">
-              {/* Cột Thu Nhập */}
-              <div className="space-y-2">
-                <p className="font-semibold text-foreground uppercase text-xs pb-1 border-b border-border">
-                  I. Các khoản thu nhập
-                </p>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Lương cơ bản:</span>
-                    <span className="font-mono">{selectedSlip.baseSalary.toLocaleString('vi-VN')} đ</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Phụ cấp ăn trưa:</span>
-                    <span className="font-mono">730.000 đ</span>
-                  </div>
-                  {selectedSlip.grossPay - selectedSlip.baseSalary - 730000 > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Phụ cấp khác:</span>
-                      <span className="font-mono">
-                        {(selectedSlip.grossPay - selectedSlip.baseSalary - 730000).toLocaleString('vi-VN')} đ
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex justify-between pt-1 border-t border-border font-medium">
-                    <span>Tổng Gross:</span>
-                    <span className="font-mono">{selectedSlip.grossPay.toLocaleString('vi-VN')} đ</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Cột Khấu Trừ */}
-              <div className="space-y-2">
-                <p className="font-semibold text-foreground uppercase text-xs pb-1 border-b border-border">
-                  II. Khoản khấu trừ
-                </p>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">BHXH (8%):</span>
-                    <span className="font-mono">-{Math.round(selectedSlip.baseSalary * 0.08).toLocaleString('vi-VN')} đ</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">BHYT (1.5%):</span>
-                    <span className="font-mono">-{Math.round(selectedSlip.baseSalary * 0.015).toLocaleString('vi-VN')} đ</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">BHTN (1%):</span>
-                    <span className="font-mono">-{Math.round(selectedSlip.baseSalary * 0.01).toLocaleString('vi-VN')} đ</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Thuế TNCN:</span>
-                    <span className="font-mono">
-                      -{Math.max(0, selectedSlip.totalDeduction - Math.round(selectedSlip.baseSalary * 0.105)).toLocaleString('vi-VN')} đ
-                    </span>
-                  </div>
-                  <div className="flex justify-between pt-1 border-t border-border font-medium">
-                    <span>Tổng khấu trừ:</span>
-                    <span className="font-mono">-{selectedSlip.totalDeduction.toLocaleString('vi-VN')} đ</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Thực Lĩnh (Clean, non-neon) */}
-            <div className="flex items-center justify-between p-3 rounded-md bg-muted/40 border border-border">
-              <span className="font-medium text-foreground">Tổng thực lĩnh (Net Pay):</span>
-              <span className="text-base font-semibold font-mono text-foreground">
-                {selectedSlip.netPay.toLocaleString('vi-VN')} VND
+              <span className="text-2xs text-muted-foreground font-mono">
+                Mã phiếu: {selectedSlip.id.slice(0, 8).toUpperCase()}
               </span>
             </div>
+
+            {/* TAB: GIẢI TRÌNH CÔNG THỨC CHI TIẾT */}
+            {payslipViewMode === 'formula' ? (
+              <div className="space-y-3 bg-muted/20 p-4 rounded-lg border border-border">
+                <div className="border-b border-border pb-2">
+                  <h4 className="font-bold text-foreground text-sm flex items-center gap-1.5">
+                    <Calculator className="w-4 h-4 text-primary" />
+                    BẢNG GIẢI TRÌNH BƯỚC TÍNH LƯƠNG CHI TIẾT (FORMULA BREAKDOWN)
+                  </h4>
+                  <p className="text-2xs text-muted-foreground mt-0.5">
+                    Cán bộ: <b className="text-foreground">{selectedSlip.employeeName}</b> ({selectedSlip.employeeCode || 'NV'}) • Vị trí: {selectedSlip.jobTitle || 'Chuyên viên'}
+                  </p>
+                </div>
+
+                {(() => {
+                  const base = selectedSlip.baseSalary;
+                  const stdDays = selectedSlip.workingDays || 22;
+                  const actDays = selectedSlip.actualWorkDays || 22;
+                  const unpaid = Math.max(0, stdDays - actDays);
+                  const dayRate = Math.round(base / stdDays);
+                  const unpaidDeduct = Math.round(dayRate * unpaid);
+                  const lunch = Math.round(35000 * actDays);
+                  const responsibility = 1500000;
+                  const gross = base + lunch + responsibility;
+                  const ins = Math.round(base * 0.105);
+                  const relief = 11000000;
+                  const taxable = Math.max(0, gross - unpaidDeduct - ins - relief);
+                  const pit = Math.round(taxable * 0.05);
+
+                  return (
+                    <div className="space-y-2.5 font-mono text-xs">
+                      {/* Bước 1 */}
+                      <div className="p-2.5 rounded bg-card border border-border/80 space-y-1">
+                        <span className="font-sans font-bold text-foreground block text-xs">
+                          Bước 1: Tính Đơn Giá Ngày Công & Trừ Lương Công Vắng
+                        </span>
+                        <div className="text-muted-foreground">
+                          • Ngày công chuẩn: <b className="text-foreground">{stdDays} ngày</b> | Ngày công thực tế: <b className="text-foreground">{actDays} ngày</b>
+                        </div>
+                        <div className="text-muted-foreground">
+                          • Số ngày nghỉ/vắng: <b className={unpaid > 0 ? 'text-rose-600 font-bold' : 'text-foreground'}>{unpaid} ngày</b>
+                        </div>
+                        <div className="text-muted-foreground">
+                          • Đơn giá 1 ngày công = {base.toLocaleString('vi-VN')} đ / {stdDays} = <b className="text-foreground">{dayRate.toLocaleString('vi-VN')} đ/ngày</b>
+                        </div>
+                        <div className="text-foreground font-semibold">
+                          ➔ Khấu trừ tiền lương = {dayRate.toLocaleString('vi-VN')} × {unpaid} ngày = <span className="text-rose-600">-{unpaidDeduct.toLocaleString('vi-VN')} đ</span>
+                        </div>
+                      </div>
+
+                      {/* Bước 2 */}
+                      <div className="p-2.5 rounded bg-card border border-border/80 space-y-1">
+                        <span className="font-sans font-bold text-foreground block text-xs">
+                          Bước 2: Tính Các Khoản Phụ Cấp & Tổng Thu Nhập Trước Khấu Trừ
+                        </span>
+                        <div className="text-muted-foreground">
+                          • Lương cơ bản theo hợp đồng: <b className="text-foreground">{base.toLocaleString('vi-VN')} đ</b>
+                        </div>
+                        <div className="text-muted-foreground">
+                          • Phụ cấp ăn trưa theo công thực tế: 35.000 đ × {actDays} ngày = <b className="text-foreground">{lunch.toLocaleString('vi-VN')} đ</b>
+                        </div>
+                        <div className="text-muted-foreground">
+                          • Phụ cấp trách nhiệm / nghiệp vụ: <b className="text-foreground">{responsibility.toLocaleString('vi-VN')} đ</b>
+                        </div>
+                        <div className="text-foreground font-semibold">
+                          ➔ Tổng thu nhập trước khấu trừ = {base.toLocaleString('vi-VN')} + {lunch.toLocaleString('vi-VN')} + {responsibility.toLocaleString('vi-VN')} = <span className="text-primary">{gross.toLocaleString('vi-VN')} đ</span>
+                        </div>
+                      </div>
+
+                      {/* Bước 3 */}
+                      <div className="p-2.5 rounded bg-card border border-border/80 space-y-1">
+                        <span className="font-sans font-bold text-foreground block text-xs">
+                          Bước 3: Trích Nộp Bảo Hiểm Bắt Buộc (10.5% Người Lao Động Đóng)
+                        </span>
+                        <div className="text-muted-foreground">
+                          • Bảo hiểm Xã hội (8%): {base.toLocaleString('vi-VN')} × 8% = <b className="text-foreground">-{Math.round(base * 0.08).toLocaleString('vi-VN')} đ</b>
+                        </div>
+                        <div className="text-muted-foreground">
+                          • Bảo hiểm Y tế (1.5%): {base.toLocaleString('vi-VN')} × 1.5% = <b className="text-foreground">-{Math.round(base * 0.015).toLocaleString('vi-VN')} đ</b>
+                        </div>
+                        <div className="text-muted-foreground">
+                          • Bảo hiểm Thất nghiệp (1%): {base.toLocaleString('vi-VN')} × 1% = <b className="text-foreground">-{Math.round(base * 0.01).toLocaleString('vi-VN')} đ</b>
+                        </div>
+                        <div className="text-foreground font-semibold">
+                          ➔ Tổng bảo hiểm người lao động trích nộp = <span className="text-rose-600">-{ins.toLocaleString('vi-VN')} đ</span>
+                        </div>
+                      </div>
+
+                      {/* Bước 4 */}
+                      <div className="p-2.5 rounded bg-card border border-border/80 space-y-1">
+                        <span className="font-sans font-bold text-foreground block text-xs">
+                          Bước 4: Thu Nhập Tính Thuế & Thuế Thu Nhập Cá Nhân (TNCN)
+                        </span>
+                        <div className="text-muted-foreground">
+                          • Giảm trừ gia cảnh bản thân: <b className="text-foreground">-11.000.000 đ/tháng</b>
+                        </div>
+                        <div className="text-muted-foreground">
+                          • Thu nhập tính thuế = {gross.toLocaleString('vi-VN')} - {unpaidDeduct.toLocaleString('vi-VN')} (vắng) - {ins.toLocaleString('vi-VN')} (BH) - 11.000.000 = <b className="text-foreground">{taxable.toLocaleString('vi-VN')} đ</b>
+                        </div>
+                        <div className="text-foreground font-semibold">
+                          ➔ Thuế TNCN (Bậc 1 thuế suất 5%) = {taxable > 0 ? `${taxable.toLocaleString('vi-VN')} × 5% = -${pit.toLocaleString('vi-VN')} đ` : '0 đ (Chưa đến ngưỡng chịu thuế)'}
+                        </div>
+                      </div>
+
+                      {/* Bước 5 */}
+                      <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between font-sans">
+                        <div>
+                          <span className="font-bold text-foreground text-sm block">Bước 5: Tiền Lương Thực Lĩnh</span>
+                          <span className="text-2xs text-muted-foreground">Thực lĩnh = Tổng thu nhập ({gross.toLocaleString('vi-VN')} đ) - Tổng các khoản khấu trừ ({selectedSlip.totalDeduction.toLocaleString('vi-VN')} đ)</span>
+                        </div>
+                        <span className="text-lg font-bold font-mono text-emerald-700 dark:text-emerald-400">
+                          {selectedSlip.netPay.toLocaleString('vi-VN')} đ
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            ) : (
+              /* TAB: PHIẾU LƯƠNG CHUẨN IN ẤN (PRINTABLE DOC) */
+              <div id="print-payslip-doc" className="print-area space-y-4 text-xs font-sans print:font-serif print:text-black print:p-0 print:border-0 print:m-0">
+                {/* Header Tiêu Đề Doanh Nghiệp */}
+                <div className="border-b-2 border-border pb-3 flex justify-between items-start">
+                  <div>
+                    <p className="font-bold text-foreground text-xs uppercase tracking-wider">CÔNG TY CỔ PHẦN CÔNG NGHỆ HRMIS PRO</p>
+                    <p className="font-bold text-foreground text-base uppercase mt-1">PHIẾU LƯƠNG NHÂN VIÊN</p>
+                    <p className="text-muted-foreground mt-0.5">{currentRun?.periodName || 'Kỳ lương hiện hành'}</p>
+                  </div>
+                  <div className="text-right text-muted-foreground">
+                    <p>Mã phiếu: <span className="font-mono text-foreground font-bold">{selectedSlip.id.slice(0, 8).toUpperCase()}</span></p>
+                    <p className="text-2xs mt-1">Ngày lập: {new Date().toLocaleDateString('vi-VN')}</p>
+                  </div>
+                </div>
+
+                {/* Thông tin nhân viên */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs py-2 bg-muted/20 px-3 rounded-md border border-border/60">
+                  <div>
+                    <span className="text-muted-foreground block text-2xs">Họ và tên:</span>
+                    <p className="font-bold text-foreground">{selectedSlip.employeeName}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground block text-2xs">Mã nhân viên:</span>
+                    <p className="font-mono font-medium text-foreground">{selectedSlip.employeeCode || 'NV'}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground block text-2xs">Phòng ban / Đơn vị:</span>
+                    <p className="text-foreground">{selectedSlip.department || 'Văn phòng Trung tâm'}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground block text-2xs">Chức danh công việc:</span>
+                    <p className="text-foreground">{selectedSlip.jobTitle || 'Chuyên viên'}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground block text-2xs">Ngày công chu kỳ:</span>
+                    <p className="font-mono font-bold text-foreground">
+                      {selectedSlip.actualWorkDays ?? 22}/{selectedSlip.workingDays ?? 22} công
+                      {(selectedSlip.workingDays ?? 22) - (selectedSlip.actualWorkDays ?? 22) > 0 && (
+                        <span className="text-rose-600 font-semibold ml-1">
+                          (-{(selectedSlip.workingDays ?? 22) - (selectedSlip.actualWorkDays ?? 22)}d)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bảng Chi Tiết Thu Nhập & Khấu Trừ */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs border-t border-border pt-3">
+                  {/* Cột Thu Nhập */}
+                  <div className="space-y-2">
+                    <p className="font-bold text-foreground uppercase text-xs pb-1 border-b border-border flex items-center justify-between">
+                      <span>I. Các khoản thu nhập</span>
+                      <span className="text-2xs font-normal text-muted-foreground">VND</span>
+                    </p>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Lương cơ bản theo HĐLĐ:</span>
+                        <span className="font-mono font-medium">{selectedSlip.baseSalary.toLocaleString('vi-VN')} đ</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Phụ cấp ăn trưa ({selectedSlip.actualWorkDays ?? 22} ngày):</span>
+                        <span className="font-mono font-medium">
+                          {(Math.round(35000 * (selectedSlip.actualWorkDays ?? 22))).toLocaleString('vi-VN')} đ
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Phụ cấp trách nhiệm / nghiệp vụ:</span>
+                        <span className="font-mono font-medium">1.500.000 đ</span>
+                      </div>
+                      <div className="flex justify-between pt-1 border-t border-border font-bold text-foreground">
+                        <span>TỔNG THU NHẬP TRƯỚC GIẢM TRỪ:</span>
+                        <span className="font-mono text-primary font-bold">{selectedSlip.grossPay.toLocaleString('vi-VN')} đ</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cột Khấu Trừ */}
+                  <div className="space-y-2">
+                    <p className="font-bold text-foreground uppercase text-xs pb-1 border-b border-border flex items-center justify-between">
+                      <span>II. Các khoản khấu trừ</span>
+                      <span className="text-2xs font-normal text-muted-foreground">VND</span>
+                    </p>
+                    <div className="space-y-1.5">
+                      {selectedSlip.breakdown?.deductions && selectedSlip.breakdown.deductions.length > 0 ? (
+                        selectedSlip.breakdown.deductions.map((d, idx) => {
+                          const isUnpaid = d.name.includes('Trừ công') || d.name.includes('nghỉ') || d.name.includes('vắng');
+                          return (
+                            <div key={idx} className="flex justify-between">
+                              <span className={isUnpaid ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-muted-foreground'}>
+                                {d.name}:
+                              </span>
+                              <span className={`font-mono ${isUnpaid ? 'text-rose-600 dark:text-rose-400 font-bold' : ''}`}>
+                                -{d.amount.toLocaleString('vi-VN')} đ
+                              </span>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">BHXH (8%):</span>
+                            <span className="font-mono">-{Math.round(selectedSlip.baseSalary * 0.08).toLocaleString('vi-VN')} đ</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">BHYT (1.5%):</span>
+                            <span className="font-mono">-{Math.round(selectedSlip.baseSalary * 0.015).toLocaleString('vi-VN')} đ</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">BHTN (1%):</span>
+                            <span className="font-mono">-{Math.round(selectedSlip.baseSalary * 0.01).toLocaleString('vi-VN')} đ</span>
+                          </div>
+                        </>
+                      )}
+                      <div className="flex justify-between pt-1 border-t border-border font-bold text-foreground">
+                        <span>TỔNG CÁC KHOẢN KHẤU TRỪ:</span>
+                        <span className="font-mono text-rose-600 font-bold">-{selectedSlip.totalDeduction.toLocaleString('vi-VN')} đ</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Thực Lĩnh Cuối Cùng */}
+                <div className="flex items-center justify-between p-3.5 rounded-lg bg-primary/10 border-2 border-primary/20">
+                  <div>
+                    <span className="font-bold text-foreground text-sm block">SỐ TIỀN THỰC LĨNH:</span>
+                    <span className="text-2xs text-muted-foreground">Đã bao gồm tất cả phụ cấp và trích nộp bảo hiểm, thuế theo quy định</span>
+                  </div>
+                  <span className="text-xl font-bold font-mono text-primary">
+                    {selectedSlip.netPay.toLocaleString('vi-VN')} VND
+                  </span>
+                </div>
+
+                {/* Khối Ký Tên Chuẩn Kế Toán (Printable) */}
+                <div className="pt-6 border-t border-border mt-4 grid grid-cols-3 text-center text-xs">
+                  <div>
+                    <p className="font-bold text-foreground">NGƯỜI LẬP BIỂU</p>
+                    <p className="text-2xs text-muted-foreground italic">(Ký, ghi rõ họ tên)</p>
+                    <div className="h-14" />
+                    <p className="font-medium text-foreground">Bộ phận Tiền lương</p>
+                  </div>
+                  <div>
+                    <p className="font-bold text-foreground">KẾ TOÁN TRƯỞNG</p>
+                    <p className="text-2xs text-muted-foreground italic">(Ký, ghi rõ họ tên)</p>
+                    <div className="h-14" />
+                    <p className="font-medium text-foreground">Phòng Kế toán Tài chính</p>
+                  </div>
+                  <div>
+                    <p className="font-bold text-foreground">GIÁM ĐỐC ĐƠN VỊ</p>
+                    <p className="text-2xs text-muted-foreground italic">(Ký, đóng dấu)</p>
+                    <div className="h-14" />
+                    <p className="font-medium text-foreground">Ban Giám đốc</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

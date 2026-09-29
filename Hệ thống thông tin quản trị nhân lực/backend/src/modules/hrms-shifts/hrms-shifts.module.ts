@@ -147,6 +147,7 @@ export class HrmsShiftsService {
     const shift = await this.prisma.hrmsShiftType.findUnique({ where: { id } });
     if (!shift) throw new NotFoundException('Không tìm thấy ca làm việc');
 
+    await this.prisma.hrmsShiftAssignment.deleteMany({ where: { shiftTypeId: id } });
     await this.prisma.hrmsShiftType.delete({ where: { id } });
 
     await this.audit.log({

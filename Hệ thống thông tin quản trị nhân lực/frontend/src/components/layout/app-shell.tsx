@@ -85,12 +85,11 @@ const DOMAINS: NavDomain[] = [
       {
         id: 'ws-general',
         label: 'Bàn làm việc',
-        count: 5,
         items: [
-          { href: '/dashboard', label: 'Tổng quan', badge: 'KPI' },
-          { href: '/ess', label: 'Cổng nhân viên', badge: 'Chính' },
+          { href: '/dashboard', label: 'Tổng quan' },
+          { href: '/ess', label: 'Cổng nhân viên' },
           { href: '/org-chart', label: 'Sơ đồ tổ chức' },
-          { href: '/notifications', label: 'Thông báo', badge: 3 },
+          { href: '/notifications', label: 'Thông báo' },
           { href: '/profile', label: 'Hồ sơ cá nhân' },
         ],
       },
@@ -111,20 +110,18 @@ const DOMAINS: NavDomain[] = [
       {
         id: 'pers-records',
         label: 'Hồ sơ',
-        count: 185,
         items: [
-          { href: '/employees', label: 'Hồ sơ nhân sự', badge: 128 },
+          { href: '/employees', label: 'Hồ sơ nhân sự' },
           { href: '/org-chart', label: 'Sơ đồ tổ chức' },
-          { href: '/assets', label: 'Tài sản', badge: 45 },
+          { href: '/assets', label: 'Tài sản' },
         ],
       },
       {
         id: 'pers-movements',
-        label: 'Chế độ',
-        count: 13,
+        label: 'Chế độ & Ngạch bậc',
         items: [
-          { href: '/personnel', label: 'Biến động nhân sự', badge: 8 },
-          { href: '/salary-ranks', label: 'Ngạch bậc lương', badge: 5 },
+          { href: '/personnel', label: 'Biến động nhân sự' },
+          { href: '/salary-ranks', label: 'Ngạch bậc lương' },
         ],
       },
     ],
@@ -145,19 +142,17 @@ const DOMAINS: NavDomain[] = [
       {
         id: 'time-attendance',
         label: 'Điểm danh',
-        count: 2,
         items: [
-          { href: '/attendance', label: 'Bảng chấm công', badge: 'Hôm nay' },
-          { href: '/shifts', label: 'Ca làm việc', badge: 4 },
+          { href: '/attendance', label: 'Bảng chấm công' },
+          { href: '/shifts', label: 'Ca làm việc' },
         ],
       },
       {
         id: 'time-leave',
         label: 'Đơn từ',
-        count: 5,
         items: [
-          { href: '/leave', label: 'Nghỉ phép', badge: 3 },
-          { href: '/overtime', label: 'Làm thêm giờ', badge: 2 },
+          { href: '/leave', label: 'Nghỉ phép' },
+          { href: '/overtime', label: 'Làm thêm giờ' },
         ],
       },
     ],
@@ -176,25 +171,25 @@ const DOMAINS: NavDomain[] = [
     folders: [
       {
         id: 'comp-payroll',
-        label: 'Bảng lương',
-        count: 1,
+        label: 'Tiền lương & Quy chế',
         items: [
-          { href: '/payroll-engine', label: 'Bảng lương', badge: 'Kỳ mới' },
+          { href: '/payroll-engine', label: 'Bảng tính lương' },
+          { href: '/regulations', label: 'Quy chế Tiền lương & Phúc lợi' },
         ],
       },
       {
         id: 'comp-benefits',
-        label: 'Phúc lợi',
-        count: 5,
+        label: 'Phúc lợi & Chi phí',
         items: [
-          { href: '/loans', label: 'Tạm ứng & Vay', badge: 5 },
-          { href: '/expense-claims', label: 'Công tác phí', badge: 4 },
+          { href: '/loans', label: 'Tạm ứng & Vay' },
+          { href: '/expense-claims', label: 'Công tác phí' },
         ],
       },
     ],
     tags: [
-      { id: 'tag-nd30', label: '#Khoản vay', count: 5, href: '/loans' },
       { id: 'tag-payroll-run', label: '#Bảng tính lương', count: 1, href: '/payroll-engine' },
+      { id: 'tag-regulations', label: '#Quy chế Tiền lương', count: 5, href: '/regulations' },
+      { id: 'tag-nd30', label: '#Khoản vay', count: 5, href: '/loans' },
       { id: 'tag-expense-pending', label: '#Công tác phí', count: 4, href: '/expense-claims' },
     ],
   },
@@ -208,18 +203,18 @@ const DOMAINS: NavDomain[] = [
       {
         id: 'talent-recruitment',
         label: 'Tuyển dụng',
-        count: 9,
         items: [
-          { href: '/recruitment-ats', label: 'Tuyển dụng', badge: 9 },
+          { href: '/recruitment-ats', label: 'Tuyển dụng & Phỏng vấn' },
         ],
       },
       {
         id: 'talent-growth',
-        label: 'Nhân tài',
-        count: 2,
+        label: 'Đánh giá & Đào tạo',
         items: [
-          { href: '/performance-360', label: 'Đánh giá KPI', badge: 'Đợt 1' },
-          { href: '/training-grievance', label: 'Đào tạo & Khiếu nại', badge: 2 },
+          { href: '/performance-360', label: 'Đánh giá KPI & 360' },
+          { href: '/performance-360?tab=templates', label: 'Biểu mẫu đánh giá chuẩn' },
+          { href: '/performance-360?tab=rubrics', label: 'Quy ước xếp loại thi đua' },
+          { href: '/training-grievance', label: 'Đào tạo & Khiếu nại' },
         ],
       },
     ],
@@ -238,17 +233,15 @@ const DOMAINS: NavDomain[] = [
       {
         id: 'docs-vault',
         label: 'Tài liệu',
-        count: 24,
         items: [
-          { href: '/documents', label: 'Kho tài liệu', badge: 24 },
+          { href: '/documents', label: 'Kho tài liệu' },
         ],
       },
       {
         id: 'docs-analytics',
         label: 'Báo cáo',
-        count: 1,
         items: [
-          { href: '/personnel-reports', label: 'Báo cáo nhân sự', badge: 'BLLĐ', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR', 'ACCOUNTANT'] },
+          { href: '/personnel-reports', label: 'Báo cáo nhân sự', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR', 'ACCOUNTANT'] },
         ],
       },
     ],
@@ -267,9 +260,8 @@ const DOMAINS: NavDomain[] = [
       {
         id: 'admin-users',
         label: 'Phân quyền',
-        count: 3,
         items: [
-          { href: '/admin/roles', label: 'Quản lý phân quyền', badge: 'RBAC' },
+          { href: '/admin/roles', label: 'Quản lý phân quyền' },
           { href: '/admin/users', label: 'Tài khoản' },
           { href: '/admin/org-units', label: 'Đơn vị phòng ban' },
         ],
@@ -277,7 +269,6 @@ const DOMAINS: NavDomain[] = [
       {
         id: 'admin-system',
         label: 'Hệ thống',
-        count: 4,
         items: [
           { href: '/admin/catalogs', label: 'Danh mục gốc' },
           { href: '/admin/attendance', label: 'Máy chấm công' },
