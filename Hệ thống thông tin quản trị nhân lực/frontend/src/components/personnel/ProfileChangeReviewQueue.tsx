@@ -138,7 +138,7 @@ export function ProfileChangeReviewQueue() {
     if (!selectedRequest) return null;
 
     const modalContent = (
-      <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         {/* Backdrop phủ kín hoàn toàn màn hình */}
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
@@ -334,7 +334,7 @@ export function ProfileChangeReviewQueue() {
     if (!isRejectModalOpen || !selectedRequest) return null;
 
     const modalContent = (
-      <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
           onClick={() => setIsRejectModalOpen(false)}

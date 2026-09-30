@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Home, Users, Clock4, Wallet, Briefcase, FolderOpen, Settings,
@@ -287,6 +287,7 @@ const DOMAINS: NavDomain[] = [
 
 export function AppShell({ profile, children }: { profile: MeProfile; children: React.ReactNode }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const clear = useAuthStore((s: AuthState) => s.clear);
   const queryClient = useQueryClient();
@@ -401,6 +402,21 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
   }, [availableDomains, selectedDomainId]);
 
   const isLinkActive = (href: string) => {
+    if (href.includes('?')) {
+      const [path, query] = href.split('?');
+      if (pathname !== path) return false;
+      const params = new URLSearchParams(query);
+      let match = true;
+      params.forEach((v, k) => {
+        if (searchParams.get(k) !== v) match = false;
+      });
+      return match;
+    }
+    // Nếu là /performance-360 (tab mục tiêu mặc định), chỉ active khi không có tab query hoặc tab=goals
+    if (href === '/performance-360') {
+      const tab = searchParams.get('tab');
+      return pathname === href && (!tab || tab === 'goals');
+    }
     if (href === '/dashboard' || href === '/ess') return pathname === href;
     return pathname === href || pathname.startsWith(`${href}/`);
   };

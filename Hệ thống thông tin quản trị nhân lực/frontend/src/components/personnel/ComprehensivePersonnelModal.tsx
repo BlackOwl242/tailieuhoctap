@@ -416,7 +416,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-modal flex items-center justify-center p-3 sm:p-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6">
       {/* Backdrop phủ toàn màn hình */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150" onClick={onClose} />
       <div className="relative bg-card text-card-foreground w-full max-w-6xl max-h-[92vh] rounded-lg shadow-2xl border border-border flex flex-col overflow-hidden">
@@ -1505,7 +1505,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
 
       {/* MODAL CON THÊM QUÁ TRÌNH LỊCH SỬ */}
       {isAddSubOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
           <div className="bg-card p-6 rounded-lg border border-border shadow-xl max-w-lg w-full space-y-4 text-xs">
             <div className="flex items-center justify-between border-b pb-2">
               <span className="font-bold text-sm text-foreground">

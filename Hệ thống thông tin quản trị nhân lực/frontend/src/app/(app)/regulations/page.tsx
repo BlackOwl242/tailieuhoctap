@@ -284,7 +284,7 @@ export default function RegulationsPage() {
                       <th className="py-2.5 px-4 font-semibold">Người lao động đóng</th>
                       <th className="py-2.5 px-4 font-semibold">Doanh nghiệp đóng</th>
                       <th className="py-2.5 px-4 font-semibold">Tổng tỷ lệ</th>
-                      <th className="py-2.5 px-4 font-semibold">Mức khống chế trần đóng</th>
+                      <th className="py-2.5 px-4 font-semibold">Mức trần đóng tối đa</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/60">

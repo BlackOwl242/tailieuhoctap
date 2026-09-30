@@ -34,6 +34,7 @@ import {
   Skeleton
 } from '@/components/ui/primitives';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
+import { Portal } from '@/components/ui/portal';
 import { api, errorMessage } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
 
@@ -740,64 +741,70 @@ export default function MasterCatalogsPage() {
 
       {/* ================= MODAL THÊM / SỬA BẢN GHI ================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-semibold text-foreground">
-                {editingItem ? 'Chỉnh sửa mục danh mục' : 'Thêm mới mục danh mục'}
-              </h3>
-              <Badge variant="outline" className="text-xs">
-                {currentCatalog?.catalog?.name}
-              </Badge>
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+              onClick={() => !isMutating && setIsModalOpen(false)}
+            />
+            <div className="relative z-10 w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4 animate-in zoom-in-95 text-foreground">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <h3 className="text-base font-semibold text-foreground">
+                  {editingItem ? 'Chỉnh sửa mục danh mục' : 'Thêm mới mục danh mục'}
+                </h3>
+                <Badge variant="outline" className="text-xs">
+                  {currentCatalog?.catalog?.name}
+                </Badge>
+              </div>
+
+              <form onSubmit={handleSaveModal} className="space-y-4 text-xs">
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground">Mã danh mục (*)</label>
+                  <Input
+                    value={formCode}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormCode(e.target.value)}
+                    placeholder="Ví dụ: 01001, KINH, TS, DH_QGHN..."
+                    required
+                    className="font-mono text-xs uppercase"
+                    disabled={!!editingItem}
+                  />
+                  <span className="text-xs text-muted-foreground">Mã định danh duy nhất trong hệ thống</span>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground">Tên mục chuẩn hóa (*)</label>
+                  <Input
+                    value={formName}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormName(e.target.value)}
+                    placeholder="Ví dụ: Dân tộc Kinh, Chuyên viên cao cấp..."
+                    required
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground">Ghi chú / Lĩnh vực / Thuộc tính mở rộng</label>
+                  <Input
+                    value={formExtra}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormExtra(e.target.value)}
+                    placeholder="Ví dụ: Quản lý nhà nước, Bảng lương 204..."
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-border/60">
+                  <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)} disabled={isMutating}>
+                    Hủy
+                  </Button>
+                  <Button type="submit" size="sm" className="bg-primary text-primary-foreground" disabled={isMutating}>
+                    {isMutating && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />}
+                    Lưu thay đổi
+                  </Button>
+                </div>
+              </form>
             </div>
-
-            <form onSubmit={handleSaveModal} className="space-y-4 text-xs">
-              <div className="space-y-1">
-                <label className="font-semibold text-foreground">Mã danh mục (*)</label>
-                <Input
-                  value={formCode}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormCode(e.target.value)}
-                  placeholder="Ví dụ: 01001, KINH, TS, DH_QGHN..."
-                  required
-                  className="font-mono text-xs uppercase"
-                  disabled={!!editingItem}
-                />
-                <span className="text-xs text-muted-foreground">Mã định danh duy nhất trong hệ thống</span>
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-foreground">Tên mục chuẩn hóa (*)</label>
-                <Input
-                  value={formName}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormName(e.target.value)}
-                  placeholder="Ví dụ: Dân tộc Kinh, Chuyên viên cao cấp..."
-                  required
-                  className="text-xs"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-foreground">Ghi chú / Lĩnh vực / Thuộc tính mở rộng</label>
-                <Input
-                  value={formExtra}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormExtra(e.target.value)}
-                  placeholder="Ví dụ: Quản lý nhà nước, Bảng lương 204..."
-                  className="text-xs"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-border/60">
-                <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)} disabled={isMutating}>
-                  Hủy
-                </Button>
-                <Button type="submit" size="sm" className="bg-primary text-primary-foreground" disabled={isMutating}>
-                  {isMutating && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />}
-                  Lưu thay đổi
-                </Button>
-              </div>
-            </form>
           </div>
-        </div>
+        </Portal>
       )}
     </div>
   );

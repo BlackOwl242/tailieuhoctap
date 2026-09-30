@@ -14,6 +14,7 @@ import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { LoadingState } from '@/components/common/states';
 import { Badge, Button, Input, Textarea } from '@/components/ui/primitives';
+import { Portal } from '@/components/ui/portal';
 import Link from 'next/link';
 
 export default function EssPage() {
@@ -314,82 +315,88 @@ export default function EssPage() {
 
       {/* Modal Giải Trình Bổ Sung Công */}
       {isRegularizeModalOpen && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4">
-            <h3 className="text-base font-semibold text-foreground">Đơn Giải Trình Bổ Sung Giờ Công</h3>
-            <p className="text-xs text-muted-foreground">
-              Giải trình lý do không thể chấm công đúng giờ để được quản lý duyệt bù công vào hệ thống.
-            </p>
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+              onClick={() => setIsRegularizeModalOpen(false)}
+            />
+            <div className="relative z-10 w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl space-y-4 animate-in zoom-in-95 text-foreground">
+              <h3 className="text-base font-semibold text-foreground">Đơn Giải Trình Bổ Sung Giờ Công</h3>
+              <p className="text-xs text-muted-foreground">
+                Giải trình lý do không thể chấm công đúng giờ để được quản lý duyệt bù công vào hệ thống.
+              </p>
 
-            <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Ngày làm việc cần giải trình</label>
-              <Input
-                type="date"
-                value={regDate}
-                onChange={(e) => setRegDate(e.target.value)}
-                className="h-9 text-xs"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-foreground mb-1">Giờ vào thực tế</label>
+                <label className="block text-xs font-medium text-foreground mb-1">Ngày làm việc cần giải trình</label>
                 <Input
-                  type="time"
-                  value={regInTime}
-                  onChange={(e) => setRegInTime(e.target.value)}
-                  className="h-9 text-xs font-mono"
+                  type="date"
+                  value={regDate}
+                  onChange={(e) => setRegDate(e.target.value)}
+                  className="h-9 text-xs"
                 />
               </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-foreground mb-1">Giờ vào thực tế</label>
+                  <Input
+                    type="time"
+                    value={regInTime}
+                    onChange={(e) => setRegInTime(e.target.value)}
+                    className="h-9 text-xs font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-foreground mb-1">Giờ ra thực tế</label>
+                  <Input
+                    type="time"
+                    value={regOutTime}
+                    onChange={(e) => setRegOutTime(e.target.value)}
+                    className="h-9 text-xs font-mono"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs font-medium text-foreground mb-1">Giờ ra thực tế</label>
-                <Input
-                  type="time"
-                  value={regOutTime}
-                  onChange={(e) => setRegOutTime(e.target.value)}
-                  className="h-9 text-xs font-mono"
+                <label className="block text-xs font-medium text-foreground mb-1">Lý do giải trình</label>
+                <Textarea
+                  rows={3}
+                  placeholder="VD: Quên quẹt thẻ do đi gặp khách hàng, lỗi thiết bị chấm công..."
+                  value={regReason}
+                  onChange={(e) => setRegReason(e.target.value)}
+                  className="text-xs resize-none"
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Lý do giải trình</label>
-              <Textarea
-                rows={3}
-                placeholder="VD: Quên quẹt thẻ do đi gặp khách hàng, lỗi thiết bị chấm công..."
-                value={regReason}
-                onChange={(e) => setRegReason(e.target.value)}
-                className="text-xs resize-none"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsRegularizeModalOpen(false)}
-              >
-                Hủy bỏ
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => {
-                  regularizeMutation.mutate({
-                    userId: user?.id ?? '',
-                    employeeName: user?.fullName ?? '',
-                    workDate: regDate,
-                    requestedCheckIn: regInTime,
-                    requestedCheckOut: regOutTime,
-                    reason: regReason,
-                  });
-                }}
-                disabled={!regReason}
-              >
-                Gửi Đơn Giải Trình
-              </Button>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsRegularizeModalOpen(false)}
+                >
+                  Hủy bỏ
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    regularizeMutation.mutate({
+                      userId: user?.id ?? '',
+                      employeeName: user?.fullName ?? '',
+                      workDate: regDate,
+                      requestedCheckIn: regInTime,
+                      requestedCheckOut: regOutTime,
+                      reason: regReason,
+                    });
+                  }}
+                  disabled={!regReason}
+                >
+                  Gửi Đơn Giải Trình
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        </Portal>
       )}
     </div>
   );

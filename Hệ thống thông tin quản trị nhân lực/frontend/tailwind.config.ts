@@ -53,17 +53,21 @@ const config: Config = {
         sticky: '40',
         sidebar: '50',
         overlay: '60',
-        modal: '70',
-        toast: '100',
+        modal: '100',
+        toast: '110',
       },
       fontFamily: {
-        // Font hệ thống rõ ràng, đồng bộ mọi nền tảng (không tải font ngoài)
+        // Hệ thống thống nhất DUY NHẤT một loại font chữ sans-serif (Inter / System Sans)
         sans: [
           'Inter',
           '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"',
           'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif',
         ],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+        mono: [
+          'Inter',
+          '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"',
+          'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif',
+        ],
       },
       keyframes: {
         'fade-in': { from: { opacity: '0', transform: 'translateY(4px)' }, to: { opacity: '1', transform: 'none' } },

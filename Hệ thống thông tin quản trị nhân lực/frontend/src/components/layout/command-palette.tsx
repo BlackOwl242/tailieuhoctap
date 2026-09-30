@@ -8,6 +8,7 @@ import {
   CreditCard, Laptop, Network, CornerDownLeft, Sparkles, X, Database
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Portal } from '@/components/ui/portal';
 
 interface CommandItem {
   id: string;
@@ -89,8 +90,9 @@ export function CommandPalette({ isOpen, onClose, userRoles = [] }: { isOpen: bo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-modal flex items-start justify-center pt-20 sm:pt-28 px-4">
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-150" onClick={onClose} />
+    <Portal>
+      <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 sm:pt-28 px-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-150" onClick={onClose} />
 
       <div className="relative w-full max-w-xl overflow-hidden rounded-lg border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-150">
         {/* Search Input Bar */}
@@ -188,7 +190,8 @@ export function CommandPalette({ isOpen, onClose, userRoles = [] }: { isOpen: bo
             <Sparkles className="h-3 w-3" /> HRMIS AI Navigation
           </span>
         </div>
+        </div>
       </div>
-    </div>
+    </Portal>
   );
 }

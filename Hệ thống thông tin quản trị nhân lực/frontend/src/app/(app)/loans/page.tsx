@@ -20,6 +20,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { Button, Input, Select, Textarea } from '@/components/ui/primitives';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
+import { Portal } from '@/components/ui/portal';
 import { printDocumentElement } from '@/components/ui/print';
 import { formatDate } from '@/lib/utils';
 
@@ -1645,8 +1646,13 @@ export default function LoansPage() {
       {/* MODAL TRÍCH NỢ NHANH & TẤT TOÁN SỚM                                       */}
       {/* ========================================================================= */}
       {repayLoanTarget && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-card rounded-lg border border-border shadow-xl p-5 space-y-4">
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+              onClick={() => setRepayLoanTarget(null)}
+            />
+            <div className="relative z-10 w-full max-w-md bg-card rounded-lg border border-border shadow-xl p-5 space-y-4 animate-in zoom-in-95 text-foreground">
             <div className="flex items-start justify-between pb-3 border-b border-border">
               <div>
                 <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -1754,16 +1760,22 @@ export default function LoansPage() {
                 <span>{repayMutation.isPending ? 'Đang cập nhật...' : 'Xác Nhận Thu Nợ'}</span>
               </Button>
             </div>
+            </div>
           </div>
-        </div>
+        </Portal>
       )}
 
       {/* ========================================================================= */}
       {/* WIZARD ĐĂNG KÝ VAY PHÚC LỢI THÔNG MINH 3 BƯỚC                             */}
       {/* ========================================================================= */}
       {isApplyWizardOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-card rounded-lg border border-border shadow-2xl p-6 space-y-5">
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+              onClick={() => setIsApplyWizardOpen(false)}
+            />
+            <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto bg-card rounded-lg border border-border shadow-2xl p-6 space-y-5 animate-in zoom-in-95 text-foreground">
             {/* Header & Steps Indicator */}
             <div className="pb-3 border-b border-border">
               <div className="flex items-start justify-between">
@@ -2018,8 +2030,9 @@ export default function LoansPage() {
                 </div>
               </div>
             )}
+            </div>
           </div>
-        </div>
+        </Portal>
       )}
     </div>
   );

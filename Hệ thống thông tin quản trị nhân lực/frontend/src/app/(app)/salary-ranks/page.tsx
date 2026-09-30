@@ -16,6 +16,7 @@ import { PageHeader, ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 import { useOrgConfig, isEnterpriseSector } from '@/lib/org-config';
 import { useToast } from '@/components/ui/toaster';
+import { Portal } from '@/components/ui/portal';
 
 interface PersonnelRankRow {
   code: string;
@@ -634,205 +635,223 @@ export default function SalaryRanksPage() {
 
       {/* Modal Xem chi tiết ngạch lương Nhà nước */}
       {selectedRank && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-          <Card className="w-full max-w-2xl bg-card border border-border shadow-xl p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div>
-                <h3 className="font-bold text-lg text-foreground">{selectedRank.name}</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Mã ngạch: <span className="font-mono font-semibold text-primary">{selectedRank.code}</span> • Nhóm: <span className="font-semibold">{selectedRank.groupCode}</span> • Lĩnh vực: <span className="font-semibold">{selectedRank.field || 'Hành chính'}</span>
-                </p>
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+              onClick={() => setSelectedRank(null)}
+            />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-card border border-border shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 text-foreground">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 className="font-bold text-lg text-foreground">{selectedRank.name}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Mã ngạch: <span className="font-mono font-semibold text-primary">{selectedRank.code}</span> • Nhóm: <span className="font-semibold">{selectedRank.groupCode}</span> • Lĩnh vực: <span className="font-semibold">{selectedRank.field || 'Hành chính'}</span>
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedRank(null)}
+                  className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                onClick={() => setSelectedRank(null)}
-                className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <div className="text-xs text-muted-foreground">
-              Thời gian nâng bậc tiêu chuẩn: <span className="font-bold text-foreground">{selectedRank.stepMonths} tháng</span> ({selectedRank.stepMonths / 12} năm/bậc).
-            </div>
+              <div className="text-xs text-muted-foreground">
+                Thời gian nâng bậc tiêu chuẩn: <span className="font-bold text-foreground">{selectedRank.stepMonths} tháng</span> ({selectedRank.stepMonths / 12} năm/bậc).
+              </div>
 
-            <div className="border border-border rounded-lg overflow-hidden">
-              <table className="w-full text-xs text-left">
-                <thead className="bg-muted/40 text-muted-foreground font-semibold border-b border-border">
-                  <tr>
-                    <th className="p-2.5 text-center">Bậc lương</th>
-                    {selectedRank.coefficients.map((_, idx) => (
-                      <th key={idx} className="p-2.5 text-center">Bậc {idx + 1}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-border">
-                    <td className="p-2.5 font-semibold text-foreground bg-muted/40 text-center">Hệ số</td>
-                    {selectedRank.coefficients.map((coef, idx) => (
-                      <td key={idx} className="p-2.5 text-center font-mono font-bold text-foreground">
-                        {coef.toFixed(2)}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="p-2.5 font-semibold text-foreground bg-muted/40 text-center">Mức lương (2.340.000đ)</td>
-                    {selectedRank.coefficients.map((coef, idx) => (
-                      <td key={idx} className="p-2.5 text-center font-mono text-xs text-primary font-medium">
-                        {(coef * 2340000).toLocaleString('vi-VN')} đ
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+              <div className="border border-border rounded-lg overflow-hidden">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-muted/40 text-muted-foreground font-semibold border-b border-border">
+                    <tr>
+                      <th className="p-2.5 text-center">Bậc lương</th>
+                      {selectedRank.coefficients.map((_, idx) => (
+                        <th key={idx} className="p-2.5 text-center">Bậc {idx + 1}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border">
+                      <td className="p-2.5 font-semibold text-foreground bg-muted/40 text-center">Hệ số</td>
+                      {selectedRank.coefficients.map((coef, idx) => (
+                        <td key={idx} className="p-2.5 text-center font-mono font-bold text-foreground">
+                          {coef.toFixed(2)}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td className="p-2.5 font-semibold text-foreground bg-muted/40 text-center">Mức lương (2.340.000đ)</td>
+                      {selectedRank.coefficients.map((coef, idx) => (
+                        <td key={idx} className="p-2.5 text-center font-mono text-xs text-primary font-medium">
+                          {(coef * 2340000).toLocaleString('vi-VN')} đ
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-            <div className="flex justify-end pt-2">
-              <Button onClick={() => setSelectedRank(null)}>Đóng</Button>
+              <div className="flex justify-end pt-2">
+                <Button onClick={() => setSelectedRank(null)}>Đóng</Button>
+              </div>
             </div>
-          </Card>
-        </div>
+          </div>
+        </Portal>
       )}
 
       {/* Modal Xem chi tiết Band Doanh nghiệp */}
       {selectedBand && (
-        <div className="fixed inset-0 z-modal bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-          <Card className="w-full max-w-lg bg-card border border-border shadow-xl p-6 space-y-4 rounded-lg">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div>
-                <h3 className="font-bold text-base text-foreground">{selectedBand.bandName}</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Chức danh: <span className="font-semibold text-foreground">{selectedBand.levelTitle}</span>
-                </p>
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+              onClick={() => setSelectedBand(null)}
+            />
+            <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl bg-card border border-border shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 text-foreground">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 className="font-bold text-base text-foreground">{selectedBand.bandName}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Chức danh: <span className="font-semibold text-foreground">{selectedBand.levelTitle}</span>
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedBand(null)}
+                  className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                onClick={() => setSelectedBand(null)}
-                className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <div className="grid grid-cols-3 gap-2 text-center p-3 rounded-lg bg-muted/30 border border-border">
-              <div>
-                <div className="text-xs text-muted-foreground">Min (Sàn)</div>
-                <div className="text-xs font-bold text-foreground mt-0.5">{selectedBand.minSalary.toLocaleString('vi-VN')} đ</div>
+              <div className="grid grid-cols-3 gap-2 text-center p-3 rounded-lg bg-muted/30 border border-border">
+                <div>
+                  <div className="text-xs text-muted-foreground">Min (Sàn)</div>
+                  <div className="text-xs font-bold text-foreground mt-0.5">{selectedBand.minSalary.toLocaleString('vi-VN')} đ</div>
+                </div>
+                <div className="border-x border-border">
+                  <div className="text-xs text-primary font-semibold">Mid (Chuẩn)</div>
+                  <div className="text-xs font-bold text-primary mt-0.5">{selectedBand.midSalary.toLocaleString('vi-VN')} đ</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Max (Trần)</div>
+                  <div className="text-xs font-bold text-foreground mt-0.5">{selectedBand.maxSalary.toLocaleString('vi-VN')} đ</div>
+                </div>
               </div>
-              <div className="border-x border-border">
-                <div className="text-xs text-primary font-semibold">Mid (Chuẩn)</div>
-                <div className="text-xs font-bold text-primary mt-0.5">{selectedBand.midSalary.toLocaleString('vi-VN')} đ</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground">Max (Trần)</div>
-                <div className="text-xs font-bold text-foreground mt-0.5">{selectedBand.maxSalary.toLocaleString('vi-VN')} đ</div>
-              </div>
-            </div>
 
-            <div className="space-y-2 text-xs">
-              <div>
-                <span className="font-semibold text-foreground">Vị trí áp dụng điển hình:</span>
-                <p className="text-muted-foreground mt-0.5">{selectedBand.roles}</p>
+              <div className="space-y-2 text-xs">
+                <div>
+                  <span className="font-semibold text-foreground">Vị trí áp dụng điển hình:</span>
+                  <p className="text-muted-foreground mt-0.5">{selectedBand.roles}</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-foreground">Tiêu chuẩn năng lực & đầu ra:</span>
+                  <p className="text-muted-foreground mt-0.5">{selectedBand.criteria}</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-foreground">Chu kỳ rà soát điều chỉnh:</span>
+                  <p className="text-muted-foreground mt-0.5">{selectedBand.reviewCycleMonths} tháng / lần</p>
+                </div>
               </div>
-              <div>
-                <span className="font-semibold text-foreground">Tiêu chuẩn năng lực & đầu ra:</span>
-                <p className="text-muted-foreground mt-0.5">{selectedBand.criteria}</p>
-              </div>
-              <div>
-                <span className="font-semibold text-foreground">Chu kỳ rà soát điều chỉnh:</span>
-                <p className="text-muted-foreground mt-0.5">{selectedBand.reviewCycleMonths} tháng / lần</p>
-              </div>
-            </div>
 
-            <div className="flex justify-end pt-2">
-              <Button onClick={() => setSelectedBand(null)}>Đóng</Button>
+              <div className="flex justify-end pt-2">
+                <Button onClick={() => setSelectedBand(null)}>Đóng</Button>
+              </div>
             </div>
-          </Card>
-        </div>
+          </div>
+        </Portal>
       )}
 
       {/* Modal Phê duyệt Nâng bậc Lương */}
       {selectedPerson && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-          <div className="w-full max-w-lg rounded-lg border border-border bg-card shadow-xl p-6 space-y-5">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div>
-                <h3 className="font-semibold text-base text-foreground">Phê duyệt Nâng bậc Lương</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Nhân sự: <span className="font-semibold text-foreground">{selectedPerson.fullName}</span> ({selectedPerson.employeeCode})
-                </p>
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+              onClick={() => setSelectedPerson(null)}
+            />
+            <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-border bg-card shadow-2xl p-6 space-y-5 animate-in fade-in zoom-in-95 text-foreground">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 className="font-semibold text-base text-foreground">Phê duyệt Nâng bậc Lương</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Nhân sự: <span className="font-semibold text-foreground">{selectedPerson.fullName}</span> ({selectedPerson.employeeCode})
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedPerson(null)}
+                  className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <button
-                onClick={() => setSelectedPerson(null)}
-                className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-muted"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
 
-            <div className="p-4 rounded-md bg-muted/20 border border-border space-y-3 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Ngạch lương:</span>
-                <span className="font-semibold text-foreground">{selectedPerson.rankName} ({selectedPerson.rankCode})</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Bậc lương:</span>
-                <span className="font-medium">
-                  Bậc {selectedPerson.currentStep} (HS {selectedPerson.currentCoefficient.toFixed(2)}) 
-                  <span className="text-muted-foreground font-bold mx-1.5">➔</span> 
-                  <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
-                    Bậc {selectedPerson.nextStep} (HS {selectedPerson.nextCoefficient.toFixed(2)})
-                  </span>
-                </span>
-              </div>
-              {selectedPerson.progressionType === 'OVER_GRADE_ALLOWANCE' && (
+              <div className="p-4 rounded-md bg-muted/20 border border-border space-y-3 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Phụ cấp thâm niên vượt khung:</span>
-                  <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
-                    {selectedPerson.suggestedOverGradePercent}%
+                  <span className="text-muted-foreground">Ngạch lương:</span>
+                  <span className="font-semibold text-foreground">{selectedPerson.rankName} ({selectedPerson.rankCode})</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Bậc lương:</span>
+                  <span className="font-medium">
+                    Bậc {selectedPerson.currentStep} (HS {selectedPerson.currentCoefficient.toFixed(2)}) 
+                    <span className="text-muted-foreground font-bold mx-1.5">➔</span> 
+                    <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
+                      Bậc {selectedPerson.nextStep} (HS {selectedPerson.nextCoefficient.toFixed(2)})
+                    </span>
                   </span>
                 </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Thời gian đã giữ bậc:</span>
-                <span className="font-medium text-foreground">{selectedPerson.monthsHeld} tháng / {selectedPerson.requiredMonths} tháng</span>
+                {selectedPerson.progressionType === 'OVER_GRADE_ALLOWANCE' && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Phụ cấp thâm niên vượt khung:</span>
+                    <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
+                      {selectedPerson.suggestedOverGradePercent}%
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Thời gian đã giữ bậc:</span>
+                  <span className="font-medium text-foreground">{selectedPerson.monthsHeld} tháng / {selectedPerson.requiredMonths} tháng</span>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="font-medium text-foreground mb-1 block">Số Quyết định nâng lương</label>
-                <Input
-                  value={approvalDecisionNo}
-                  onChange={(e) => setApprovalDecisionNo(e.target.value)}
-                  placeholder="Ví dụ: QĐ-NL/2026"
-                  className="h-9 text-xs"
-                />
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="font-medium text-foreground mb-1 block">Số Quyết định nâng lương</label>
+                  <Input
+                    value={approvalDecisionNo}
+                    onChange={(e) => setApprovalDecisionNo(e.target.value)}
+                    placeholder="Ví dụ: QĐ-NL/2026"
+                    className="h-9 text-xs"
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-border">
-              <Button variant="outline" size="sm" onClick={() => setSelectedPerson(null)}>
-                Hủy
-              </Button>
-              <Button
-                size="sm"
-                onClick={() =>
-                  applyMutation.mutate({
-                    userId: selectedPerson.userId,
-                    nextStep: selectedPerson.nextStep,
-                    nextCoefficient: selectedPerson.nextCoefficient,
-                    overGradePercent: selectedPerson.suggestedOverGradePercent,
-                    decisionNo: approvalDecisionNo,
-                  })
-                }
-                disabled={applyMutation.isPending}
-                className="flex items-center gap-1.5"
-              >
-                <Check className="w-4 h-4" />
-                {applyMutation.isPending ? 'Đang duyệt...' : 'Xác nhận Nâng bậc'}
-              </Button>
+              <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                <Button variant="outline" size="sm" onClick={() => setSelectedPerson(null)}>
+                  Hủy
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    applyMutation.mutate({
+                      userId: selectedPerson.userId,
+                      nextStep: selectedPerson.nextStep,
+                      nextCoefficient: selectedPerson.nextCoefficient,
+                      overGradePercent: selectedPerson.suggestedOverGradePercent,
+                      decisionNo: approvalDecisionNo,
+                    })
+                  }
+                  disabled={applyMutation.isPending}
+                  className="flex items-center gap-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  {applyMutation.isPending ? 'Đang duyệt...' : 'Xác nhận Nâng bậc'}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        </Portal>
       )}
     </>
   );

@@ -724,7 +724,7 @@ export default function RecruitmentAtsPage() {
 
       {/* ================= MODAL TẠO TIN TUYỂN DỤNG MỚI (PORTAL) ================= */}
       {mounted && isCreateOpeningModalOpen && createPortal(
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
             onClick={() => setIsCreateOpeningModalOpen(false)}
@@ -882,7 +882,7 @@ export default function RecruitmentAtsPage() {
 
       {/* ================= MODAL TIẾP NHẬN ỨNG VIÊN MỚI (PORTAL) ================= */}
       {mounted && isCreateApplicantModalOpen && createPortal(
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
             onClick={() => setIsCreateApplicantModalOpen(false)}
@@ -1013,7 +1013,7 @@ export default function RecruitmentAtsPage() {
 
       {/* ================= MODAL XEM CHI TIẾT ỨNG VIÊN (PORTAL) ================= */}
       {mounted && isApplicantDetailModalOpen && selectedApplicant && createPortal(
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
             onClick={() => setIsApplicantDetailModalOpen(false)}
@@ -1118,7 +1118,7 @@ export default function RecruitmentAtsPage() {
 
       {/* ================= MODAL XEM CHI TIẾT TIN TUYỂN DỤNG (PORTAL) ================= */}
       {mounted && isOpeningDetailModalOpen && selectedOpening && createPortal(
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
             onClick={() => setIsOpeningDetailModalOpen(false)}
@@ -1258,7 +1258,7 @@ export default function RecruitmentAtsPage() {
 
       {/* ================= MODAL CHẤM ĐIỂM PHỎNG VẤN (PORTAL) ================= */}
       {mounted && isInterviewModalOpen && selectedApplicant && createPortal(
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
             onClick={() => setIsInterviewModalOpen(false)}
@@ -1351,7 +1351,7 @@ export default function RecruitmentAtsPage() {
 
       {/* ================= MODAL GỬI OFFER (PORTAL) ================= */}
       {mounted && isOfferModalOpen && selectedApplicant && createPortal(
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
             onClick={() => setIsOfferModalOpen(false)}
