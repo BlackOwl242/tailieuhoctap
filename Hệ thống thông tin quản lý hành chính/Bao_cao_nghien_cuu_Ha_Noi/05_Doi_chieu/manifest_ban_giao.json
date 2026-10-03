@@ -1,0 +1,700 @@
+{
+  "date": "2026-10-02",
+  "files": [
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/chu_ky_20260930.html",
+      "bytes": 172652,
+      "sha256": "0bba614c9815264866fdddb7423faf2cc9f9e61b993419a114e126966bcf705b"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/chu_ky_20260930.txt",
+      "bytes": 20841,
+      "sha256": "467d5a438eea850b725131cf8459c6615cd1034d13342752e5a369e087c83f78"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/cong_ha_noi_20261002.html",
+      "bytes": 35376,
+      "sha256": "d4020dc8810a4ad5e261155c6113ed2bc3733f4edab1afa2527a5fc547e0b4ce"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/cong_ha_noi_20261002.txt",
+      "bytes": 134,
+      "sha256": "99515a64bd7b23ac68b384d69209a029356f11cdcab69fd837b78ac186d7caea"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/cong_quoc_gia_20261002.html",
+      "bytes": 46556,
+      "sha256": "50fabdb214a421fc12c4cdf8fcadda54c16c73305d09d65c6cbb888cee29d604"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/cong_quoc_gia_20261002.txt",
+      "bytes": 363,
+      "sha256": "ac3e9edee63b0a914d85f2b8fed6c070e2130cf1b83ec5f7794fb330402c87d1"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/danh_muc_nguon.json",
+      "bytes": 18913,
+      "sha256": "848bbfd0ba3cab4af8e85afecf7633d920377e6cce4551365cf3bd61e92f00ff"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/dieu_phoi_2026.html",
+      "bytes": 219998,
+      "sha256": "9ff60ab546713fdcaf132b34740747ffa0d9c6d5de1760dc4073ba432e50e1a0"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/dieu_phoi_2026.txt",
+      "bytes": 25593,
+      "sha256": "b95d33838b485ac2837a2eedbaa758d8419968f4411441a9b4670deb82cda6ef"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/huong_dan_2023.pdf",
+      "bytes": 4552240,
+      "sha256": "decb4b0c5afac52ab09d07c14aed033e55b7bb187c05a4045323664d0687f384"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/huong_dan_2023.txt",
+      "bytes": 30179,
+      "sha256": "ba2b344799c0b983bfd2cc21538249cdc5ad7416abcf2a283daf4140955f6b32"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/huong_dan_2025.html",
+      "bytes": 142946,
+      "sha256": "ae22ad6c02220ca82eb897883a5f7b650ab620a2cfb0cd9eee145e27fbf55d78"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/huong_dan_2025.txt",
+      "bytes": 10929,
+      "sha256": "4682336ec320cf910dc99bc6c7c1f3919fb5f4ac279e74ad01d458f352b42920"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/ke_hoach_86.pdf",
+      "bytes": 833375,
+      "sha256": "4ab158e815a0b32945149042f4c65cce64ca86620dc751d616b1633d028ca0c0"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/ke_hoach_86.txt",
+      "bytes": 27212,
+      "sha256": "88db50862e5c0414f6e963a7c84a554827182f45dc29f692bfdc7b1110960934"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/ket_qua_2026.html",
+      "bytes": 198785,
+      "sha256": "6f0641754bc567d0feb9fe9a0fb9e2af82a5ca12bd34a44aa2d1710052cc9773"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/ket_qua_2026.txt",
+      "bytes": 26552,
+      "sha256": "bebfbcf9ca1fc476afc604e632cf061e2fcee3f2a509ddb30f94eac651af6fb4"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat116.html",
+      "bytes": 83560,
+      "sha256": "bb14b2576a46993439e63c413e02b036f4542813ed22c3fb9d2ea03e073b3fd2"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat116.txt",
+      "bytes": 8229,
+      "sha256": "13cd99c624986efc85509966ac50ba18785a2b7ed3b9c65c207aca36dc52c560"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat116_pdf.pdf",
+      "bytes": 17202411,
+      "sha256": "eded93a3e2820913c6d0801a24977b4588d65c7da1838a952e43faed9af78b08"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat116_pdf.txt",
+      "bytes": 507,
+      "sha256": "8816bee815b4967239097f88c392f0436425f59c36efb60fa5a29ce0161bd829"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat33.html",
+      "bytes": 81446,
+      "sha256": "cf37cf25bf34b16b5418618dff1b819a46a8e9325a2ce8dc080fe095adbecf5c"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat33.txt",
+      "bytes": 7063,
+      "sha256": "98715e5edecca498f85c2c3813ef07131615d393c8b325a88cb3d8df15b4dfde"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat_ho_tich_2026.html",
+      "bytes": 260414,
+      "sha256": "36850d80a7f62a8426aeac44ee143f36ad883f24d405e5b2c06569398e6b62fd"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat_ho_tich_2026.txt",
+      "bytes": 42604,
+      "sha256": "e89934b5870cf6156a748632f423a4c95f12bb19e88f52ae6bb950de261f4792"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat_ho_tich_moi.html",
+      "bytes": 84270,
+      "sha256": "754c2b371c84e662436f7921e5f7d19937a8f09bd8af9df12c802ecb59dd47d7"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/luat_ho_tich_moi.txt",
+      "bytes": 1719,
+      "sha256": "e658b54d6a3f1cb4b22ea80d493dd4f324863c3912444ca6808be3b6a99a14fb"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/nd356.html",
+      "bytes": 84004,
+      "sha256": "cbb5b3ebfacf9c9f91a9b3be55ab908de136e3732db44a33566bbc56d29b820e"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/nd356.txt",
+      "bytes": 8004,
+      "sha256": "687715e03be63b22fb757fd1e327de72c4a7c9a7426701be4c8a7356ef33b0e0"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/nd356_pdf.pdf",
+      "bytes": 2357540,
+      "sha256": "5b36a060c22db1df6c32b8c66da63b0c36571a1f7fa01765e719baac215b6c12"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/nd356_pdf.txt",
+      "bytes": 983,
+      "sha256": "c057397d56105a8b56579daca094ef73bfe5dc08a2eacd8124915713ad19c3e3"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/quy_trinh_663.pdf",
+      "bytes": 2425816,
+      "sha256": "ddb5b2d7c8eda50d8653882a64c05ca2cdde17e9d629cc598412b8b9dcaf8bff"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/quy_trinh_663.txt",
+      "bytes": 217752,
+      "sha256": "cdd8eed1307a7b68a1794aad1021f670cad5e16cdf3eaa2e1767f3ed49f26c20"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/so_hoa_2024.html",
+      "bytes": 243807,
+      "sha256": "354e27d00385bef640284e8b407bd40d6ba386ae8a8869c59966b3f5db278368"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/so_hoa_2024.txt",
+      "bytes": 35445,
+      "sha256": "fb7e1260bf4be49b578aa72ebcd1a02e7efdd28a48dbf41a2fdcb1dc3beddbb0"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tap_huan_20260917.html",
+      "bytes": 189909,
+      "sha256": "96a6383ec5437d4be2a13c94af20e7329071fdc151cdc26abc858972bd7a935c"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tap_huan_20260917.txt",
+      "bytes": 24800,
+      "sha256": "93c343d56e404fe9256c00225712468fe5316b24e6f3b66de0dcfab9cdd6cc18"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/trung_tam.html",
+      "bytes": 396978,
+      "sha256": "6e3a10609d80f64920e74e9dbcfeb2eafe376f985cc7544da7a5f3d21ba9fa01"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/trung_tam.txt",
+      "bytes": 44338,
+      "sha256": "065e6d3440b5797418d83f48005d319f3bd5f9187b9b107ed3d09b2bce5daa04"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt11.html",
+      "bytes": 86182,
+      "sha256": "c0c4cef334952a873480a8bc7311630e3066701eafc86b87257182688eeb012f"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt11.txt",
+      "bytes": 8617,
+      "sha256": "2b14c44028958cf69a59cfdbff351e7a50ffeff40810f84800ecd55cb7b1d817"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt11_pdf.pdf",
+      "bytes": 9956539,
+      "sha256": "77a24f46db3ffcf614f7b23366b01b4529f7e3d392ff4b129368c92261d369cf"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt11_pdf.txt",
+      "bytes": 423,
+      "sha256": "28bd44720b9defc9648086488d8c2f170e43abd79fba1b4a68e7dbaf9f749d32"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt13.html",
+      "bytes": 84428,
+      "sha256": "3561856ebf53625f8d2cb3d844e401310549a439e56edd31e126d9fd0fb83305"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt13.txt",
+      "bytes": 8405,
+      "sha256": "42a336c5c4b4bef3d3f92643ea98182a8036f28f4024dae1e3f7d6ecadb217a2"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt13_pdf.pdf",
+      "bytes": 2141830,
+      "sha256": "d78e88c613504ea36d2d5deff0bc6970570abd5364872076a235dae4172eb81c"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt13_pdf.txt",
+      "bytes": 15005,
+      "sha256": "44517d8d70e1ddc0c4fe82fd426777d0a4de27e1dc419bbf05a4707e2a36fd02"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt21.html",
+      "bytes": 84744,
+      "sha256": "5803a2e64a6d8cb3f599dec5532c09be16996f145c54f26bfe267faf9dc95c1a"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt21.txt",
+      "bytes": 8212,
+      "sha256": "a207babac9e988346dca6ca78ca724baa929bca1f69bf4715e768e5ff1a2fbb5"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt21_pdf.pdf",
+      "bytes": 1693633,
+      "sha256": "6b37d261188844e2097d87a22323288671deceaf3574171f99f061ba7f751997"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/tt21_pdf.txt",
+      "bytes": 871,
+      "sha256": "406a5a751622d99937af8f8bc28d8009148e219a709995c7246a67c212b7d9ab"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/van_hanh_2023.html",
+      "bytes": 50200,
+      "sha256": "afdf0560e46120d8d72422d79a6d698bcd767a1f2e2dd748269012ac390af516"
+    },
+    {
+      "path": "01_Nguon_tham_khao/Bo_sung_2026/van_hanh_2023.txt",
+      "bytes": 10352,
+      "sha256": "8f61553e894f9c6f89f8f6f02d224d5df68ef79c2137d0ae56fd9fbe9d76e7dc"
+    },
+    {
+      "path": "01_Nguon_tham_khao/nghi_dinh_367_2025.pdf",
+      "bytes": 328308,
+      "sha256": "d09b3d03ea9406b974b443f031ab17fec80f4c061473fcebdbf06b139590166c"
+    },
+    {
+      "path": "01_Nguon_tham_khao/nghi_dinh_367_2025.txt",
+      "bytes": 10,
+      "sha256": "9c28a83690b8fc6015bb21b820735507402d8869a7bae78c3133bcaad8622433"
+    },
+    {
+      "path": "01_Nguon_tham_khao/nguon_da_luu.json",
+      "bytes": 1387,
+      "sha256": "96c5e26eb2628b8b58f758475d959e7f5b8e196c346547872a947c7e62b1a1cb"
+    },
+    {
+      "path": "01_Nguon_tham_khao/phuong_an_1811_2025.pdf",
+      "bytes": 590095,
+      "sha256": "1d2d074bf58d4a27f70c0a86579734cc3a17e1282f9ef75784a98ab22b046695"
+    },
+    {
+      "path": "01_Nguon_tham_khao/phuong_an_1811_2025.txt",
+      "bytes": 18570,
+      "sha256": "fb9650d64cd7958a8de99da751c4f2f16a23c3b44daeeeaca1c199b2e7dd7fc9"
+    },
+    {
+      "path": "01_Nguon_tham_khao/quyet_dinh_1811.html",
+      "bytes": 140329,
+      "sha256": "a9f2f4d354ddaa63f7b5da9882937ec4b9fb094fbc7adce5adc6b8b7386e08fd"
+    },
+    {
+      "path": "01_Nguon_tham_khao/README.md",
+      "bytes": 3798,
+      "sha256": "8fcee84e026fa380f8ca6f13084d42ba72eb27eead2a5187f8fcae243c3c7308"
+    },
+    {
+      "path": "01_Nguon_tham_khao/thong_bao_cong_ha_noi.html",
+      "bytes": 35376,
+      "sha256": "d4020dc8810a4ad5e261155c6113ed2bc3733f4edab1afa2527a5fc547e0b4ce"
+    },
+    {
+      "path": "01_Nguon_tham_khao/thong_tu_03_2025.pdf",
+      "bytes": 1033924,
+      "sha256": "743644233404fec4e3d3f116b4cbc1f5d17b5c473d0b61b27f86b9a7e5d48265"
+    },
+    {
+      "path": "01_Nguon_tham_khao/thong_tu_03_2025.txt",
+      "bytes": 54,
+      "sha256": "443bb23099ee290b5d1976273a03fa7c5493bc333a9b58c006f49323d99f7980"
+    },
+    {
+      "path": "02_Noi_dung/01_Mo_dau_va_phuong_phap.md",
+      "bytes": 12701,
+      "sha256": "bb61da9f30c9c15b75724061615fc49b41ecd826c3d8b6ffb840417f598bd6a4"
+    },
+    {
+      "path": "02_Noi_dung/02_He_thong_thuc_te.md",
+      "bytes": 39958,
+      "sha256": "77dee1f3a28c881d1da24065449b2b1460d7d86aae7fcba776b503d61443ca40"
+    },
+    {
+      "path": "02_Noi_dung/03_Phan_tich_yeu_cau.md",
+      "bytes": 43937,
+      "sha256": "59bc5daf9f9d694be3dee7ae08729f3868e299af5ee28f934f1b118d4baf6634"
+    },
+    {
+      "path": "02_Noi_dung/04_Thiet_ke.md",
+      "bytes": 40019,
+      "sha256": "cb2d5d864df44ba2fdbce90340143413a870289f1d10420d5a0cba396086a847"
+    },
+    {
+      "path": "02_Noi_dung/05_Trien_khai_van_hanh.md",
+      "bytes": 23805,
+      "sha256": "88b65af32313af60d3e43d1204b88942becc1c889c434632bc7c7fbd30fa8a80"
+    },
+    {
+      "path": "02_Noi_dung/06_Kiem_thu.md",
+      "bytes": 29634,
+      "sha256": "322427e1800370cab9c0322559b73077feb9595f844f7ecc3b3c2b4c5dd07bb8"
+    },
+    {
+      "path": "02_Noi_dung/07_Quan_tri_ket_luan.md",
+      "bytes": 26682,
+      "sha256": "7b2ab26c9c8c8c8265fc918c7677649d0b54cfc7353b1f7dc01f99afbeeee6bf"
+    },
+    {
+      "path": "02_Noi_dung/08_Tai_lieu_tham_khao.md",
+      "bytes": 10593,
+      "sha256": "763966d39c1d63060b0794af7645828f825946ac3256e8f7e76785b940f571f5"
+    },
+    {
+      "path": "02_Noi_dung/09_Phu_luc.md",
+      "bytes": 5865,
+      "sha256": "829177f485199abd38e01c3eec873e11543eb4232499a91ea9d8f9885507ae8a"
+    },
+    {
+      "path": "03_Thiet_ke/Giao_tiep_mo_rong_OpenAPI.json",
+      "bytes": 17917,
+      "sha256": "0046b78b4d36d7d53e779eb34debea9a6c94968d3732c347790cdd384864743d"
+    },
+    {
+      "path": "03_Thiet_ke/Giao_tiep_OpenAPI.json",
+      "bytes": 19528,
+      "sha256": "ae19e89f348097fa15aa14fb81f37ebb453d882d4c695867c8c5b471c8723827"
+    },
+    {
+      "path": "03_Thiet_ke/Kich_ban_kiem_thu.csv",
+      "bytes": 17001,
+      "sha256": "7ae129a8a5694ae7cca88e67707b3fbec8de82cb73997ea756badbe6ce93fc56"
+    },
+    {
+      "path": "03_Thiet_ke/Mo_hinh_du_lieu.sql",
+      "bytes": 13982,
+      "sha256": "06447899d10b91ae93d1f6624a5702a2068399e46abc3ca76e15eea5858b0908"
+    },
+    {
+      "path": "03_Thiet_ke/README.md",
+      "bytes": 1727,
+      "sha256": "89dd49e171fec02fc65885220c1e67e00ce278d940ad0a7b1625b5fa9966fc5c"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/01_nghien_cuu.png",
+      "bytes": 49569,
+      "sha256": "fc0963806157d07dfdd3edb901e5de441489556d873907c6cd0754a583640a8c"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/01_nghien_cuu.svg",
+      "bytes": 3197,
+      "sha256": "b478be93411cc472864dbfcd676c980d7653aec08909b73d9784615e680c8f88"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/02_ngu_canh.png",
+      "bytes": 78728,
+      "sha256": "359fc035cb26f2b256d545b8bcf52ca6fecc02b2cf7ec35b8c0812601bba2ca7"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/02_ngu_canh.svg",
+      "bytes": 4622,
+      "sha256": "1499060ec6300ad43674c122c7a8657b8bb442dd2ecc37f8447145e7d1d5ff2a"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/03_quy_trinh.png",
+      "bytes": 47253,
+      "sha256": "215489daf80fafafd3afb590153861848635734785aba283fe589a6de41474ab"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/03_quy_trinh.svg",
+      "bytes": 2840,
+      "sha256": "0882dc7658de8494e84bbb11c43272b5c06a0779923cb7a06f64d8dfc417767e"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/04_chuc_nang.png",
+      "bytes": 67613,
+      "sha256": "3d533f5641f2b0958e40daa954d667c2fb0c2fdc1f0b882f059f623a33021a03"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/04_chuc_nang.svg",
+      "bytes": 3202,
+      "sha256": "0f80ddb7893e979af857de539208c2cf82cf1d52090448fb6f0830fa18bdc938"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/05_du_lieu.png",
+      "bytes": 81787,
+      "sha256": "e251057e12847c96847746fa22548df6c301cffc5bd7ae193c652b9f5cb67268"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/05_du_lieu.svg",
+      "bytes": 5779,
+      "sha256": "1bbef089db04662142b23c03e9e8f49ce70170bfba5f8e72b7be190e480ad906"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/06_kien_truc.png",
+      "bytes": 69542,
+      "sha256": "3341a261fa4eded7787dde0cce961d2d4afe6a6fe25d95e3244602368e72fd8c"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/06_kien_truc.svg",
+      "bytes": 2512,
+      "sha256": "9e5823fcf4f83a64ceb89f3e79eccbdca098a67cdd2569d75ae26a229923d722"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/07_trang_thai.png",
+      "bytes": 51439,
+      "sha256": "24334e0d3f1a17194c887a80eb20bca6745038da9ebca4c0ba7990f66e5c22f5"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/07_trang_thai.svg",
+      "bytes": 3512,
+      "sha256": "4367c4bb0f604e5e677a2548d8de63c6342daaf2ec7879c07abbb72aa4fe6e67"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/08_quan_he.png",
+      "bytes": 71099,
+      "sha256": "e0ef0b7a0219f208e3790b2b5f2ee5530a4e889503c115ae5a6c35b71c783852"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/08_quan_he.svg",
+      "bytes": 6054,
+      "sha256": "202b0b2810005b1b6f7dd59e5a3d9e8d3dd388680329fb41102cb8afe1c7940e"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/09_dong_bo.png",
+      "bytes": 62297,
+      "sha256": "78d9c56b0768668275259529f4a5a8b1a100c40edfc57a8d5cf7ac6e7393ae4a"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/09_dong_bo.svg",
+      "bytes": 3458,
+      "sha256": "d271128f5eee75115ca558c0b4899ff06d993211f9d095900af6f853648366a7"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/10_giao_dien.png",
+      "bytes": 85074,
+      "sha256": "e5788035ae380daaefe8592afb7893ec49363b50e52457f449c3c8cf8f6c81d4"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/10_giao_dien.svg",
+      "bytes": 3206,
+      "sha256": "29a750d52f36784bc92fcde7d204d8894b59bc7982e1c48a6f7daa897cbe2e52"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/11_trien_khai.png",
+      "bytes": 74578,
+      "sha256": "e52a8ce1b1ea4ac365c8e6cf6b74f1d4170f9f8c749485bf14d011e5a39cc452"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/11_trien_khai.svg",
+      "bytes": 2762,
+      "sha256": "d6ddd4a5eecb4217e57d4b1967bd2179cb73a5f82c1ad2329fcc88355edb7192"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/12_phuc_hoi.png",
+      "bytes": 56769,
+      "sha256": "caa4e9c0de76ee2f275f1d1fb646448ff8bc432674e53fa4adb8e532e13ff1e3"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/12_phuc_hoi.svg",
+      "bytes": 3291,
+      "sha256": "8975a806b84faa93b4df0e41e3ccf4a2ffa928433f84d79533e3feffc9313889"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/13_ca_su_dung.png",
+      "bytes": 60155,
+      "sha256": "7ad090ab7dcd633052ae6ce196b97d2ed003946ba1b892ead0626e38ec4e2ebe"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/13_ca_su_dung.svg",
+      "bytes": 3290,
+      "sha256": "99df98a8a07cb2cc471551a1b373efecc0ef068c130beb927abde54d1294dda9"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/14_tiep_nhan.png",
+      "bytes": 91810,
+      "sha256": "93628dd3700d74c535e34249472682c47d8b0f11ae35d7261e1b2266b91af7f6"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/14_tiep_nhan.svg",
+      "bytes": 6486,
+      "sha256": "ff21cc59eb9fefacca64376fe528ab3856b334c358a6257f6c2ca1f750b3940a"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/15_quan_he_ho_so.png",
+      "bytes": 70492,
+      "sha256": "dc288eabfe5bb8a5163c8c555e1f789c1b719e8e43a5e598e6f7801e6f04784c"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/15_quan_he_ho_so.svg",
+      "bytes": 5781,
+      "sha256": "d60c33755a3e387e3c704cb42db95580cefd33b48eea6c97bf4681d087338fe5"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/16_quan_he_ket_qua.png",
+      "bytes": 55739,
+      "sha256": "9643b85af3c28421fdfb1594c0c1e257ccfe54171e459fa99fc6813130ea3c9c"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/16_quan_he_ket_qua.svg",
+      "bytes": 5608,
+      "sha256": "736793a3b33e7b13b1f4b3c7b6a9d7217dc6319024c7fb3f7a9499fa56e9f84a"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/17_giao_dien_thuc_te_2023.png",
+      "bytes": 421672,
+      "sha256": "d9ed44281c62deedb1b289fc44a4688306474f3880b4bf3b97cad10845e80f30"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/18_phan_chia_he_thong.png",
+      "bytes": 90756,
+      "sha256": "af3ed98f2b7d0f849bf954935de67cd589a0e94cdf506242ea0f178c9650fd06"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/18_phan_chia_he_thong.svg",
+      "bytes": 4122,
+      "sha256": "28f6936bcf5d9c276e65cd1deb14ee3d9839e8ec82b92c6c1618028ab6f3c54a"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/19_phoi_hop.png",
+      "bytes": 92045,
+      "sha256": "ffcd299fcb116053343107f61b16d95d4fefef2c0951460cd21b2f13034fd97b"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/19_phoi_hop.svg",
+      "bytes": 3756,
+      "sha256": "3465c19501b4a181fdb56cc03cace4e334004191c84ff10dc70142163f399a85"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/20_nop_luu.png",
+      "bytes": 74754,
+      "sha256": "a7bf22840ca21272cd141756834babfe8c6921c796c68ec4060c09967ad7033b"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/20_nop_luu.svg",
+      "bytes": 4419,
+      "sha256": "76f5de678c8f2ba2e3b6d3e280664b8b9c3404e0038ad6f65fcb20a0581bfe3e"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/21_quan_he_lien_thong.png",
+      "bytes": 58873,
+      "sha256": "d771b7e7c5a63ba3016ee2d03df7ba8259e22e8cb18017a1891b3a9d550c0867"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/21_quan_he_lien_thong.svg",
+      "bytes": 4063,
+      "sha256": "efb6553c1791b7e172fc2a0d1c741fbc2e184ea45c668ca3d31b508d7d671e79"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/22_nhanh_chuc_nang.png",
+      "bytes": 75526,
+      "sha256": "a1929e823a1a72e489597d9cd739e1e91ce1f4938234c0ef4fb524ad00de47e0"
+    },
+    {
+      "path": "03_Thiet_ke/So_do/22_nhanh_chuc_nang.svg",
+      "bytes": 3908,
+      "sha256": "3483e2f865dbcf3b916459cd84f2cbbaf7dcebf19048a5f99e4e142782c913b5"
+    },
+    {
+      "path": "03_Thiet_ke/Tu_dien_du_lieu.json",
+      "bytes": 43065,
+      "sha256": "c011ef22ea53285a793b2e352621b4a5969f273f6fc957d639312993cc1f2511"
+    },
+    {
+      "path": "03_Thiet_ke/Tu_dien_du_lieu.md",
+      "bytes": 27420,
+      "sha256": "69479c694a261b5b77d82c3519e22cb28d95643823d609d3f13ed9ae978c52bc"
+    },
+    {
+      "path": "04_Bao_cao/Bao_cao_nghien_cuu_he_thong_hanh_chinh_Ha_Noi.docx",
+      "bytes": 1957388,
+      "sha256": "7f30391d4db3d73319d3033f76c7f4643612247de21cbad4183b49a85f3e5175"
+    },
+    {
+      "path": "04_Bao_cao/Bao_cao_tong_hop.md",
+      "bytes": 260332,
+      "sha256": "2bfbac81786f22d8e748b0fdcd831aa3b1294e0c2b92b3c3b3c6bab91a6784e1"
+    },
+    {
+      "path": "06_Cong_cu/bao_toan_mau.py",
+      "bytes": 950,
+      "sha256": "2e91758908b9794fc4410b2d5d4318131bf6c62454a14f8e7102bd8cc3d8d696"
+    },
+    {
+      "path": "06_Cong_cu/bo_sung_mo_hinh_nhanh.py",
+      "bytes": 4441,
+      "sha256": "b58d36b0ff23ffdbb278684795aa1da593b5c780d2c6428ab0bce16692176752"
+    },
+    {
+      "path": "06_Cong_cu/ghi_nhan_ban_giao.py",
+      "bytes": 8752,
+      "sha256": "94475cd4e91ac74d9a78f534133743bb38080120a7659fe960ba862aa849d211"
+    },
+    {
+      "path": "06_Cong_cu/ghi_nhan_bo_sung.py",
+      "bytes": 8670,
+      "sha256": "53b97a942c5d476b2613cf317f0ec121bb1b81a82affde434fd273ae6ab19146"
+    },
+    {
+      "path": "06_Cong_cu/hoan_thien_bo_sung.py",
+      "bytes": 1078,
+      "sha256": "2be452a18bf6ad04a4caf2125d27afc642b296a6121351a6cb84f77b218e7546"
+    },
+    {
+      "path": "06_Cong_cu/hoan_thien_nhanh.py",
+      "bytes": 2699,
+      "sha256": "8cb4d32f297814873da0cd4889d9c05663f381dd53c702857311e77df3d6ed87"
+    },
+    {
+      "path": "06_Cong_cu/khao_sat_mau.py",
+      "bytes": 1546,
+      "sha256": "1eef17a662067f859e0bcf6c9e054082c41b54076874f4d81145352fc77c7cd1"
+    },
+    {
+      "path": "06_Cong_cu/kiem_tra_bao_cao.py",
+      "bytes": 9064,
+      "sha256": "a62f1767fee71061ba7706ccb3a27f8a9fa85131fabc2db4110b23c5ee819b85"
+    },
+    {
+      "path": "06_Cong_cu/sua_ten_don_vi_nguon.py",
+      "bytes": 1096,
+      "sha256": "a4436bc6cd1bdba9164143c9fe2c25f820777182f4a6c822b2d3a06bf89e7c07"
+    },
+    {
+      "path": "06_Cong_cu/tao_bao_cao.py",
+      "bytes": 11551,
+      "sha256": "0c67a498d12f83d2f87969f68b6820a2e615150f1736476e52d7df9f6727f3ba"
+    },
+    {
+      "path": "06_Cong_cu/tao_bo_sung_thiet_ke.py",
+      "bytes": 9531,
+      "sha256": "c3a590b4389dbf0e8e9a994c2e9944c3ed3eddac4d45dcc3736d15f26f208cf6"
+    },
+    {
+      "path": "06_Cong_cu/tao_thiet_ke.py",
+      "bytes": 39962,
+      "sha256": "b09dbe8ba2e54a2927acc38dfa7217db445c0d8efad4b919b5dbe8ddb77c8d45"
+    },
+    {
+      "path": "06_Cong_cu/thu_thap_bo_sung.py",
+      "bytes": 4638,
+      "sha256": "e26870992b47925dad6c5792946f30f9dba046b33e06e5f98ebdece4963aaf41"
+    },
+    {
+      "path": "06_Cong_cu/thu_thap_nguon.py",
+      "bytes": 2281,
+      "sha256": "44a704d2b644816ec31fb87ed8520db88798fbc48380bd13ae78eac795615ba9"
+    },
+    {
+      "path": "06_Cong_cu/xuat_kiem_tra.ps1",
+      "bytes": 1330,
+      "sha256": "15f1402a57a6e14397c17fd68a242471751078866b60fe50904c9fe9a428317e"
+    }
+  ]
+}

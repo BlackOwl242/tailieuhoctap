@@ -1,0 +1,158 @@
+{
+  "object": "HoSo",
+  "initial": "NHAP",
+  "states": [
+    "CHO_BO_SUNG",
+    "CHO_TIEP_NHAN",
+    "DANG_THU_LY",
+    "DA_PHAT_HANH",
+    "DA_PHE_DUYET",
+    "DA_TIEP_NHAN",
+    "DUNG",
+    "HOAN_THANH",
+    "KHONG_GIAI_QUYET",
+    "NHAP",
+    "TRINH_DUYET",
+    "TU_CHOI"
+  ],
+  "terminal": [
+    "TU_CHOI",
+    "KHONG_GIAI_QUYET",
+    "DUNG",
+    "HOAN_THANH"
+  ],
+  "transitions": [
+    {
+      "source": "NHAP",
+      "event": "gui",
+      "target": "CHO_TIEP_NHAN",
+      "guard": "Đủ trường và tuyến hợp lệ",
+      "role": "Người yêu cầu"
+    },
+    {
+      "source": "CHO_TIEP_NHAN",
+      "event": "yeuCauBoSung",
+      "target": "CHO_BO_SUNG",
+      "guard": "Nêu rõ thiếu sót và căn cứ",
+      "role": "Cán bộ tiếp nhận"
+    },
+    {
+      "source": "CHO_TIEP_NHAN",
+      "event": "tiepNhan",
+      "target": "DA_TIEP_NHAN",
+      "guard": "Đủ thành phần, đúng quyền và phiên bản",
+      "role": "Cán bộ tiếp nhận"
+    },
+    {
+      "source": "CHO_TIEP_NHAN",
+      "event": "tuChoi",
+      "target": "TU_CHOI",
+      "guard": "Có căn cứ và thông báo được duyệt",
+      "role": "Cán bộ tiếp nhận"
+    },
+    {
+      "source": "CHO_BO_SUNG",
+      "event": "tuChoiTiepNhan",
+      "target": "TU_CHOI",
+      "guard": "Giai đoạn tiếp nhận, không thể hoàn thiện, thông báo được duyệt",
+      "role": "Cán bộ tiếp nhận"
+    },
+    {
+      "source": "CHO_BO_SUNG",
+      "event": "boSungTiepNhan",
+      "target": "CHO_TIEP_NHAN",
+      "guard": "Giai đoạn trước là tiếp nhận và bổ sung đã được đối chiếu",
+      "role": "Cán bộ tiếp nhận"
+    },
+    {
+      "source": "CHO_BO_SUNG",
+      "event": "boSungThamDinh",
+      "target": "DANG_THU_LY",
+      "guard": "Giai đoạn trước là thẩm định và đủ bổ sung",
+      "role": "Chuyên viên thụ lý"
+    },
+    {
+      "source": "DA_TIEP_NHAN",
+      "event": "phanCong",
+      "target": "DANG_THU_LY",
+      "guard": "Người nhận có quyền, chỉ một phân công hiện hành",
+      "role": "Lãnh đạo đơn vị"
+    },
+    {
+      "source": "DANG_THU_LY",
+      "event": "yeuCauBoSung",
+      "target": "CHO_BO_SUNG",
+      "guard": "Có căn cứ và giai đoạn quay lại",
+      "role": "Chuyên viên thụ lý"
+    },
+    {
+      "source": "DANG_THU_LY",
+      "event": "trinhDuyet",
+      "target": "TRINH_DUYET",
+      "guard": "Đủ ý kiến bắt buộc và dự thảo hợp lệ",
+      "role": "Chuyên viên thụ lý"
+    },
+    {
+      "source": "DANG_THU_LY",
+      "event": "khongGiaiQuyet",
+      "target": "KHONG_GIAI_QUYET",
+      "guard": "Có kết luận và thẩm quyền",
+      "role": "Chuyên viên thụ lý"
+    },
+    {
+      "source": "TRINH_DUYET",
+      "event": "traChinhSua",
+      "target": "DANG_THU_LY",
+      "guard": "Có ý kiến và phiên bản dự thảo",
+      "role": "Lãnh đạo có thẩm quyền"
+    },
+    {
+      "source": "TRINH_DUYET",
+      "event": "kyDuyet",
+      "target": "DA_PHE_DUYET",
+      "guard": "Đúng bản và chữ ký hợp lệ",
+      "role": "Lãnh đạo có thẩm quyền"
+    },
+    {
+      "source": "DA_PHE_DUYET",
+      "event": "phatHanh",
+      "target": "DA_PHAT_HANH",
+      "guard": "Văn thư cấp số; tệp bất biến",
+      "role": "Văn thư"
+    },
+    {
+      "source": "DA_PHAT_HANH",
+      "event": "xacNhanGiao",
+      "target": "HOAN_THANH",
+      "guard": "Có chứng cứ giao đúng người",
+      "role": "Cán bộ trả kết quả"
+    },
+    {
+      "source": "DA_TIEP_NHAN",
+      "event": "dung",
+      "target": "DUNG",
+      "guard": "Quyết định dừng có căn cứ",
+      "role": "Lãnh đạo có thẩm quyền"
+    },
+    {
+      "source": "DANG_THU_LY",
+      "event": "dung",
+      "target": "DUNG",
+      "guard": "Quyết định dừng có căn cứ",
+      "role": "Lãnh đạo có thẩm quyền"
+    },
+    {
+      "source": "TRINH_DUYET",
+      "event": "dung",
+      "target": "DUNG",
+      "guard": "Quyết định dừng và xử lý dự thảo",
+      "role": "Lãnh đạo có thẩm quyền"
+    }
+  ],
+  "invariants": [
+    "Mỗi chuyển bước kiểm tra phiên bản và phạm vi quyền",
+    "Chuyển bước và nhật ký cùng giao dịch",
+    "Không tự điều chỉnh hạn khi bổ sung hoặc sự cố",
+    "Tài chính, giao nhận, đồng bộ là các chiều độc lập"
+  ]
+}

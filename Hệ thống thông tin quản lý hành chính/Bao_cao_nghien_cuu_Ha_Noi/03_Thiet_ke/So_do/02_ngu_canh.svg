@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1050" viewBox="0 0 2000 1050">
+<rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="black"/></marker></defs>
+<text x="1000.0" y="46" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="bold">Ranh giới nghiệp vụ và hệ thống bên ngoài</text>
+<line x1="496.9462129242776" y1="188.7469240130963" x2="686.9462129242776" y2="523.7469240130963" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="470.40684029475244" y="334.3140308776031" width="129.0" height="39.0" fill="white"/>
+<text x="535.4068402947524" y="369.3140308776031" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Yêu cầu</text>
+<line x1="753.0537870757224" y1="486.2530759869037" x2="563.0537870757224" y2="151.2530759869037" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="652.5931597052476" y="232.6859691223969" width="124.0" height="46.0" fill="white"/>
+<text x="714.5931597052476" y="267.6859691223969" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Kết quả</text>
+<line x1="530" y1="820.0" x2="720" y2="505.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="541.0" y="608.5" width="168.0" height="39.0" fill="white"/>
+<text x="625.0" y="643.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Tác nghiệp</text>
+<line x1="1313.473931084202" y1="522.9859928213623" x2="1493.473931084202" y2="187.98599282136226" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1399.7319710966526" y="332.251506857903" width="122.0" height="32.0" fill="white"/>
+<text x="1460.7319710966526" y="367.251506857903" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Tra cứu</text>
+<line x1="1426.526068915798" y1="152.01400717863774" x2="1246.526068915798" y2="487.0140071786377" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1211.2680289033474" y="234.748493142097" width="136.0" height="39.0" fill="white"/>
+<text x="1279.2680289033474" y="269.748493142097" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Phản hồi</text>
+<line x1="1280" y1="505.0" x2="1460" y2="820.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1304.0" y="608.5" width="132.0" height="39.0" fill="white"/>
+<text x="1370.0" y="643.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Trao đổi</text>
+<rect x="720" y="410" width="560" height="190" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="493.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Hệ thống giải quyết</text>
+<text x="1000.0" y="536.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">thủ tục hành chính Hà Nội</text>
+<rect x="50" y="100" width="480" height="140" fill="white" stroke="black" stroke-width="3"/>
+<text x="290.0" y="158.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Người yêu cầu</text>
+<text x="290.0" y="201.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">qua cổng quốc gia</text>
+<rect x="50" y="750" width="480" height="140" fill="white" stroke="black" stroke-width="3"/>
+<text x="290.0" y="808.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Cán bộ</text>
+<text x="290.0" y="851.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">được giao nhiệm vụ</text>
+<rect x="1460" y="100" width="480" height="140" fill="white" stroke="black" stroke-width="3"/>
+<text x="1700.0" y="158.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Dữ liệu dân cư</text>
+<text x="1700.0" y="201.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">và hộ tịch</text>
+<rect x="1460" y="750" width="480" height="140" fill="white" stroke="black" stroke-width="3"/>
+<text x="1700.0" y="808.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Thanh toán, kho kết quả</text>
+<text x="1700.0" y="851.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">và chuyển phát</text>
+</svg>

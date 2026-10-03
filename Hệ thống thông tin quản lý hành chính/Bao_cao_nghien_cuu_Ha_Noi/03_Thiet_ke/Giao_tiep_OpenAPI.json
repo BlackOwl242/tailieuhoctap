@@ -1,0 +1,754 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Giao tiếp thiết kế quản lý hồ sơ hành chính",
+    "version": "1.0.0",
+    "description": "Thiết kế đề xuất; không phải đặc tả điểm cuối hiện hữu của Hà Nội. Cần thống nhất hợp đồng với đơn vị quản lý trước phát triển."
+  },
+  "paths": {
+    "/v1/procedures/{id}/versions": {
+      "get": {
+        "operationId": "operation1",
+        "summary": "Tra cứu phiên bản",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        }
+      }
+    },
+    "/v1/applications": {
+      "post": {
+        "operationId": "operation2",
+        "summary": "Tạo yêu cầu",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Application"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases/{id}/accept": {
+      "post": {
+        "operationId": "operation3",
+        "summary": "Tiếp nhận",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases/{id}/supplements": {
+      "post": {
+        "operationId": "operation4",
+        "summary": "Yêu cầu bổ sung",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases/{id}/assignments": {
+      "post": {
+        "operationId": "operation5",
+        "summary": "Phân công",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases/{id}/approvals": {
+      "post": {
+        "operationId": "operation6",
+        "summary": "Trình duyệt",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases/{id}/issuance": {
+      "post": {
+        "operationId": "operation7",
+        "summary": "Phát hành",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases/{id}/deliveries": {
+      "post": {
+        "operationId": "operation8",
+        "summary": "Giao kết quả",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/payments/notifications": {
+      "post": {
+        "operationId": "operation9",
+        "summary": "Nhận thông báo thu",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentNotification"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases/{id}/events": {
+      "get": {
+        "operationId": "operation10",
+        "summary": "Tra cứu lịch sử",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đủ quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản hoặc trạng thái"
+          },
+          "422": {
+            "description": "Không thỏa điều kiện nghiệp vụ"
+          },
+          "503": {
+            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Application": {
+        "type": "object",
+        "required": [
+          "procedureVersionId",
+          "requesterId",
+          "formData",
+          "receptionChannel"
+        ],
+        "properties": {
+          "procedureVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "requesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Bắt buộc theo loại thủ tục khi có chủ thể chuyên biệt"
+          },
+          "receptionChannel": {
+            "type": "string",
+            "enum": [
+              "ONLINE",
+              "DIRECT",
+              "POSTAL"
+            ]
+          },
+          "formData": {
+            "type": "object"
+          },
+          "representationEvidenceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "Action": {
+        "type": "object",
+        "required": [
+          "version",
+          "reason"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string"
+          },
+          "legalBasis": {
+            "type": "string"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "documentVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "supplementPhase": {
+            "type": "string",
+            "enum": [
+              "RECEPTION",
+              "ASSESSMENT"
+            ]
+          },
+          "deliveryEvidence": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentNotification": {
+        "type": "object",
+        "required": [
+          "partner",
+          "transactionId",
+          "chargeId",
+          "amount",
+          "signature"
+        ],
+        "properties": {
+          "partner": {
+            "type": "string"
+          },
+          "transactionId": {
+            "type": "string"
+          },
+          "chargeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "signature": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Response": {
+        "type": "object",
+        "required": [
+          "id",
+          "correlationId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "ruleCode": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

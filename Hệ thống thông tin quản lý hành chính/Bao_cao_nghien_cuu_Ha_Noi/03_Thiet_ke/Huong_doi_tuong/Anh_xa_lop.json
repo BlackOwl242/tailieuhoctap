@@ -1,0 +1,191 @@
+{
+  "classes": {
+    "co_quan": "CoQuan",
+    "thu_tuc": "ThuTuc",
+    "phien_ban_thu_tuc": "PhienBanThuTuc",
+    "chu_the": "ChuThe",
+    "tai_khoan": "TaiKhoan",
+    "quyen_pham_vi": "QuyenPhamVi",
+    "ho_so": "HoSo",
+    "uy_quyen": "UyQuyen",
+    "thanh_phan_ho_so": "ThanhPhanHoSo",
+    "phan_cong": "PhanCong",
+    "su_kien_xu_ly": "SuKienXuLy",
+    "yeu_cau_bo_sung": "YeuCauBoSung",
+    "ket_qua": "KetQua",
+    "chu_ky": "ChuKy",
+    "khoan_thu": "KhoanThu",
+    "giao_dich": "GiaoDich",
+    "giao_nhan": "GiaoNhan",
+    "hang_doi_gui": "HangDoiGui",
+    "lich_lam_viec": "LichLamViec",
+    "nhat_ky": "NhatKy",
+    "he_thong_ket_noi": "HeThongKetNoi",
+    "tuyen_xu_ly": "TuyenXuLy",
+    "tham_chieu_lien_thong": "ThamChieuLienThong",
+    "nhiem_vu_phoi_hop": "NhiemVuPhoiHop",
+    "thong_bao": "ThongBao",
+    "dot_nop_luu": "DotNopLuu",
+    "ho_so_nop_luu": "HoSoNopLuu",
+    "phan_anh_kien_nghi": "PhanAnh",
+    "thong_diep_nhan": "ThongDiepNhan",
+    "diem_tiep_nhan": "DiemTiepNhan",
+    "mau_bao_cao": "MauBaoCao",
+    "tai_lieu_huong_dan": "TaiLieuHuongDan",
+    "tai_lieu_kho": "TaiLieuKho",
+    "quyen_khai_thac_kho": "QuyenKhaiThacKho",
+    "chi_dao_dieu_hanh": "ChiDaoDieuHanh"
+  },
+  "parts": {
+    "1": [
+      "co_quan",
+      "chu_the",
+      "tai_khoan",
+      "quyen_pham_vi"
+    ],
+    "2": [
+      "thu_tuc",
+      "phien_ban_thu_tuc",
+      "tuyen_xu_ly",
+      "lich_lam_viec"
+    ],
+    "3": [
+      "ket_qua",
+      "chu_ky",
+      "giao_nhan"
+    ],
+    "4": [
+      "ho_so",
+      "uy_quyen",
+      "thanh_phan_ho_so",
+      "phan_cong",
+      "su_kien_xu_ly",
+      "yeu_cau_bo_sung",
+      "nhiem_vu_phoi_hop"
+    ],
+    "5": [
+      "thong_bao",
+      "phan_anh_kien_nghi",
+      "tai_lieu_huong_dan",
+      "diem_tiep_nhan"
+    ],
+    "6": [
+      "khoan_thu",
+      "giao_dich",
+      "mau_bao_cao"
+    ],
+    "7": [
+      "chi_dao_dieu_hanh",
+      "nhat_ky"
+    ],
+    "8": [
+      "tai_lieu_kho",
+      "quyen_khai_thac_kho",
+      "dot_nop_luu",
+      "ho_so_nop_luu"
+    ],
+    "9": [
+      "he_thong_ket_noi",
+      "tham_chieu_lien_thong",
+      "thong_diep_nhan",
+      "hang_doi_gui"
+    ]
+  },
+  "diagrams": [
+    [
+      1,
+      "lop_nhom_1_1",
+      [
+        "co_quan",
+        "chu_the",
+        "tai_khoan",
+        "quyen_pham_vi"
+      ]
+    ],
+    [
+      2,
+      "lop_nhom_2_1",
+      [
+        "thu_tuc",
+        "phien_ban_thu_tuc",
+        "tuyen_xu_ly",
+        "lich_lam_viec"
+      ]
+    ],
+    [
+      3,
+      "lop_nhom_3_1",
+      [
+        "ket_qua",
+        "chu_ky",
+        "giao_nhan"
+      ]
+    ],
+    [
+      4,
+      "lop_nhom_4_1",
+      [
+        "ho_so",
+        "uy_quyen",
+        "thanh_phan_ho_so",
+        "phan_cong"
+      ]
+    ],
+    [
+      4,
+      "lop_nhom_4_2",
+      [
+        "su_kien_xu_ly",
+        "yeu_cau_bo_sung",
+        "nhiem_vu_phoi_hop"
+      ]
+    ],
+    [
+      5,
+      "lop_nhom_5_1",
+      [
+        "thong_bao",
+        "phan_anh_kien_nghi",
+        "tai_lieu_huong_dan",
+        "diem_tiep_nhan"
+      ]
+    ],
+    [
+      6,
+      "lop_nhom_6_1",
+      [
+        "khoan_thu",
+        "giao_dich",
+        "mau_bao_cao"
+      ]
+    ],
+    [
+      7,
+      "lop_nhom_7_1",
+      [
+        "chi_dao_dieu_hanh",
+        "nhat_ky"
+      ]
+    ],
+    [
+      8,
+      "lop_nhom_8_1",
+      [
+        "tai_lieu_kho",
+        "quyen_khai_thac_kho",
+        "dot_nop_luu",
+        "ho_so_nop_luu"
+      ]
+    ],
+    [
+      9,
+      "lop_nhom_9_1",
+      [
+        "he_thong_ket_noi",
+        "tham_chieu_lien_thong",
+        "thong_diep_nhan",
+        "hang_doi_gui"
+      ]
+    ]
+  ]
+}

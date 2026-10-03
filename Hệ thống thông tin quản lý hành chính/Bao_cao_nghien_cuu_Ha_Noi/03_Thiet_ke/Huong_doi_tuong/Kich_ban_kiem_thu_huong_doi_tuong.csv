@@ -1,0 +1,169 @@
+﻿id,uc,scenario,expected,status
+OO01A,UC01,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO01B,UC01,Không đáp ứng điều kiện: Người đề nghị không tự phê duyệt quyền của mình,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO01C,UC01,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO01D,UC01,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO01E,UC01,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO02A,UC02,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO02B,UC02,Không đáp ứng điều kiện: Mã không trùng và khoảng hiệu lực không chồng lấn,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO02C,UC02,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO02D,UC02,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO02E,UC02,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO03A,UC03,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO03B,UC03,Không đáp ứng điều kiện: Quyết định và tuyến xử lý đã được phê duyệt,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO03C,UC03,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO03D,UC03,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO03E,UC03,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO04A,UC04,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO04B,UC04,Không đáp ứng điều kiện: Không có bước kết thúc không thể đến hoặc chuyển bước trái quyền,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO04C,UC04,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO04D,UC04,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO04E,UC04,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO05A,UC05,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO05B,UC05,"Không đáp ứng điều kiện: Đúng chủ thể, đủ trường bắt buộc và đúng tuyến",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO05C,UC05,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO05D,UC05,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO05E,UC05,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO06A,UC06,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO06B,UC06,Không đáp ứng điều kiện: Đích có thẩm quyền và xác nhận nhận đủ,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO06C,UC06,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO06D,UC06,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO06E,UC06,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO07A,UC07,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO07B,UC07,"Không đáp ứng điều kiện: Đúng phân công, đúng trạng thái và đủ dữ liệu chuyển bước",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO07C,UC07,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO07D,UC07,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO07E,UC07,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO08A,UC08,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO08B,UC08,Không đáp ứng điều kiện: Chủ thể có quyền xem hồ sơ này,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO08C,UC08,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO09A,UC09,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO09B,UC09,"Không đáp ứng điều kiện: Đồ thị hợp lệ, mọi nhánh có lối ra được xác định",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO09C,UC09,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO09D,UC09,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO09E,UC09,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO10A,UC10,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO10B,UC10,"Không đáp ứng điều kiện: Dự thảo được duyệt, chứng thư phù hợp và còn giá trị",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO10C,UC10,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO10D,UC10,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO10E,UC10,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO11A,UC11,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO11B,UC11,Không đáp ứng điều kiện: Đúng hợp đồng và môi trường đã được cấp phép,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO11C,UC11,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO11D,UC11,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO11E,UC11,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO12A,UC12,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO12B,UC12,Không đáp ứng điều kiện: Đủ điều kiện theo phiên bản thủ tục đang áp dụng,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO12C,UC12,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO12D,UC12,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO12E,UC12,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO13A,UC13,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO13B,UC13,Không đáp ứng điều kiện: Bổ sung được đối chiếu với đúng yêu cầu còn mở,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO13C,UC13,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO13D,UC13,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO13E,UC13,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO14A,UC14,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO14B,UC14,Không đáp ứng điều kiện: Người nhận còn quyền và hồ sơ chưa kết thúc,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO14C,UC14,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO14D,UC14,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO14E,UC14,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO15A,UC15,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO15B,UC15,Không đáp ứng điều kiện: Đủ ý kiến bắt buộc hoặc có căn cứ xử lý thay thế,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO15C,UC15,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO15D,UC15,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO15E,UC15,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO16A,UC16,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO16B,UC16,"Không đáp ứng điều kiện: Đúng thẩm quyền, chữ ký hợp lệ và đủ căn cứ",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO16C,UC16,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO16D,UC16,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO16E,UC16,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO17A,UC17,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO17B,UC17,Không đáp ứng điều kiện: Không dừng hồ sơ đã kết thúc bằng thao tác thông thường,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO17C,UC17,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO17D,UC17,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO17E,UC17,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO18A,UC18,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO18B,UC18,"Không đáp ứng điều kiện: Người nhận có quyền, kết quả đã phát hành",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO18C,UC18,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO18D,UC18,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO18E,UC18,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO19A,UC19,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO19B,UC19,Không đáp ứng điều kiện: Có quyền kết xuất và dùng đúng mẫu,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO19C,UC19,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO19D,UC19,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO19E,UC19,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO20A,UC20,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO20B,UC20,"Không đáp ứng điều kiện: Đúng người nhận, đúng mục đích và mức công khai",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO20C,UC20,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO20D,UC20,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO20E,UC20,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO21A,UC21,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO21B,UC21,Không đáp ứng điều kiện: Phạm vi quyền được áp dụng trước khi trả kết quả,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO21C,UC21,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO22A,UC22,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO22B,UC22,Không đáp ứng điều kiện: Tài liệu còn hiệu lực và có nguồn kiểm chứng,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO22C,UC22,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO23A,UC23,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO23B,UC23,Không đáp ứng điều kiện: Mẫu được duyệt và dữ liệu thuộc phạm vi được giao,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO23C,UC23,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO24A,UC24,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO24B,UC24,Không đáp ứng điều kiện: Công thức có mẫu đối chiếu và người phê duyệt,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO24C,UC24,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO24D,UC24,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO24E,UC24,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO25A,UC25,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO25B,UC25,Không đáp ứng điều kiện: Tập hồ sơ chuẩn và quy tắc mẫu số đã được xác định,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO25C,UC25,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO26A,UC26,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO26B,UC26,Không đáp ứng điều kiện: Chỉ truy vấn đơn vị được giao quản lý,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO26C,UC26,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO27A,UC27,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO27B,UC27,Không đáp ứng điều kiện: Người chỉ đạo có quyền và nơi nhận được xác định,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO27C,UC27,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO27D,UC27,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO27E,UC27,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO28A,UC28,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO28B,UC28,"Không đáp ứng điều kiện: Đúng chủ sở hữu, căn cứ quyền và hạn bảo quản",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO28C,UC28,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO28D,UC28,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO28E,UC28,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO29A,UC29,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO29B,UC29,"Không đáp ứng điều kiện: Tài liệu hợp lệ, đúng chủ thể và phù hợp thủ tục đích",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO29C,UC29,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO29D,UC29,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO29E,UC29,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO30A,UC30,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO30B,UC30,"Không đáp ứng điều kiện: Nguồn hợp lệ, đúng hợp đồng và không sai thứ tự",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO30C,UC30,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO30D,UC30,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO30E,UC30,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO31A,UC31,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO31B,UC31,Không đáp ứng điều kiện: Thông điệp được tạo từ giao dịch nghiệp vụ đã lưu,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO31C,UC31,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO31D,UC31,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO31E,UC31,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO32A,UC32,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO32B,UC32,Không đáp ứng điều kiện: Khoản thu thực sự áp dụng và đúng người trả,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO32C,UC32,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO32D,UC32,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO32E,UC32,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO33A,UC33,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO33B,UC33,Không đáp ứng điều kiện: Thông báo được xác thực và mã giao dịch duy nhất,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO33C,UC33,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO33D,UC33,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO33E,UC33,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO34A,UC34,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO34B,UC34,"Không đáp ứng điều kiện: Đọc được, đầy đủ, đúng hồ sơ và đúng quy định xác nhận",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO34C,UC34,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO34D,UC34,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO34E,UC34,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO35A,UC35,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO35B,UC35,"Không đáp ứng điều kiện: Đúng kênh, không trùng yêu cầu cùng nội dung",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO35C,UC35,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO35D,UC35,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO35E,UC35,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO36A,UC36,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
+OO36B,UC36,Không đáp ứng điều kiện: Hồ sơ kết thúc và đủ thành phần được duyệt,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO36C,UC36,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
+OO36D,UC36,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
+OO36E,UC36,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện

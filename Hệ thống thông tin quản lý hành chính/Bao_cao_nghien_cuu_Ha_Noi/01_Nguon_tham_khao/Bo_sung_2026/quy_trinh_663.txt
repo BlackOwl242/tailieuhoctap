@@ -1,0 +1,5836 @@
+
+TRANG 1
+ 
+ 
+PHỤ LỤC I 
+DANH MỤC QUY TRÌNH NỘI BỘ - QUY TRÌNH ĐIỆN TỬ GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH  
+LĨNH VỰC CÔNG CHỨNG, GIÁM ĐỊNH TƯ PHÁP, CHỨNG THỰC THUỘC PHẠM VI  
+CHỨC NĂNG QUẢN LÝ NHÀ NƯỚC CỦA SỞ TƯ PHÁP THÀNH PHỐ HÀ NỘI  
+(Kèm theo Quyết định số       /QĐ-TTPVHCC ngày     tháng      năm 2026  
+của Giám đốc Trung tâm Phục vụ hành chính công Thành phố) 
+ 
+A. Danh mục quy trình nội bộ - quy trình điện tử giải quyết thủ tục hành chính  lĩnh vực Công chứng, Giám định tư pháp 
+thuộc thẩm quyền giải quyết của Sở Tư pháp thành phố Hà Nội 
+STT Tên quy trình  Mã TTHC 
+I Lĩnh vực Công chứng  
+1 Bổ nhiệm công chứng viên 1.013803 
+II Lĩnh vực Giám định tư pháp  
+1 Bổ nhiệm và cấp thẻ giám định viên tư pháp 1.001122 
+2 Cấp lại thẻ giám định viên tư pháp 1.009832 
+3 Cấp phép thành lập văn phòng giám định tư pháp 2.000890 
+4 Đăng ký hoạt động Văn phòng giám định tư pháp 2.000823 
+5 Thay đổi, bổ sung lĩnh vực giám định tư pháp của văn phòng giám định tư pháp 2.000568 
+
+TRANG 2
+2 
+ 
+STT Tên quy trình  Mã TTHC 
+6 Chuyển đổi loại hình văn phòng giám định tư pháp 1.001216 
+7 Cấp lại Giấy đăng ký hoạt động của Văn phòng giám định tư pháp trong trường hợp thay đổi tên gọi, địa 
+chỉ trụ sở, người đại diện theo pháp luật, danh sách thành viên hợp danh của VP GĐTP 2.000555 
+8 Cấp lại giấy đăng ký ho ạt động của văn phòng giám đ ịnh tư pháp trong trư ờng hợp giấy đăng ký ho ạt 
+động bị hư hỏng hoặc bị mất 1.001117 
+9 Miễn nhiệm Giám định viên tư pháp 2.000894 
+ 
+B. Danh mục quy trình nội bộ - quy trình điện tử giải quyết thủ tục hành chính lĩnh vực Chứng thực thuộc thẩm quyền giải 
+quyết của UBND cấp xã 
+STT Tên quy trình Mã TTHC 
+1 Cấp bản sao từ sổ gốc 2.000908 
+2 Chứng thực chữ ký trong các giấy tờ, văn bản (áp dụng cho cả trường hợp chứng thực điểm chỉ và trường 
+hợp người yêu cầu chứng thực không thể ký, không thể điểm chỉ được) 2.000884 
+3 Chứng thực chữ ký người dịch mà người dịch không phải là cộng tác viên dịch thuật của Ủy ban nhân dân 
+cấp xã, tổ chức hành nghề công chứng    2.001008 
+4 Thủ tục chứng thực giao dịch liên quan đến tài sản là động sản, quyền sử dụng đất và nhà ở 2.001035 
+
+TRANG 3
+3 
+ 
+5 Chứng thực Di chúc 2.001019 
+6 Chứng thực văn bản từ chối nhận di sản 2.001016 
+7 Chứng thực văn bản phân chia di sản mà di sản là động sản, quyền sử dụng đất, nhà ở   2.001406 
+8 Chứng thực việc sửa đổi, bổ sung, hủy bỏ giao dịch 2.000913 
+9 Sửa lỗi sai sót trong giao dịch 2.000927 
+10 Cấp bản sao có chứng thực từ bản chính giao dịch đã được chứnng thực 2.000942 
+  
+
+TRANG 4
+ 
+ 
+PHỤ LỤC II 
+QUY TRÌNH NỘI BỘ - QUY TRÌNH ĐIỆN TỬ GIẢI QUYẾT THỦ TỤC HÀNH 
+CHÍNH LĨNH VỰC CÔNG CHỨNG, GIÁM ĐỊNH TƯ PHÁP, CHỨNG THỰC 
+THUỘC PHẠM VI CHỨC NĂNG QUẢN LÝ CỦA  
+SỞ TƯ PHÁP THÀNH PHỐ HÀ NỘI  
+(Kèm theo Quyết định số       /QĐ-TTPVHCC ngày      /    /2026  
+của Giám đốc Trung tâm phục vụ hành chính công) 
+ 
+Phần I. Quy trình nội bộ - Quy trình điện tử giải quyết thủ tục hành chính lĩnh 
+vực Công chứng, Giám định tư pháp thuộc thẩm quyền giải quyết của Sở Tư pháp thành 
+phố Hà Nội 
+I. Lĩnh vực Công chứng 
+1. Bổ nhiệm công chứng viên (Mã 1.013803) 
+1 Mục đích: Quy định trình tự và cách thức thẩm định, trình hồ sơ đề nghị bổ nhiệm 
+công chứng viên 
+2 
+Phạm vi: Áp dụng đối với tổ chức hành nghề công chứng, công chức Sở Tư pháp, 
+Trung tâm Phục vụ Hành chính công, Đ ịa điểm tiếp nhận và trả kết quả giải quyết 
+TTHC theo thông báo c ủa cấp có th ẩm quyền (sau đây g ọi chung là B ộ phận Một 
+cửa) và công chức Bộ phận Một cửa, công chức, người lao động  
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Công chứng năm 2024; 
+- Nghị định số 121/2025/NĐ-CP ngày 11/6/2025 c ủa Chính ph ủ Quy định về phân 
+quyền, phân cấp trong lĩnh vực quản lý nhà nước của Bộ Tư pháp;  
+- Thông tư số 05/2025/TT-BTP ngày 15/5/202555 của Bộ Tư pháp quy định chi tiết một 
+số điều và biện pháp thi hành Luật công chứng; 
+- Thông tư số 11/2025/TT-BTP ngày 15/5/2025 sửa đổi, bổ sung, bãi bỏ một số điều 
+của các thông tư thuộc lĩnh vực quản lí nhà nước của bộ tư pháp; 
+- Thông tư số 30/2025/TT-BTP ngày 31/12/2025 của Bộ Tư pháp sửa đổi một số thủ 
+tục hành chính quy định tại các thông tư trong lĩnh vực Bổ trợ tư pháp; 
+- Quyết định số 857/QĐ-BTP ngày 27/3/2026 c ủa Bộ Tư pháp về việc công bố thủ 
+tục hành chính được sửa đổi, bổ sung trong lĩnh vực công chứng thuộc phạm vi quản 
+lý của Bộ Tư pháp; 
+- Quyết định số 110/QĐ-UBND ngày 09/01/2026 c ủa UBND Thành ph ố về việc 
+thông qua phương án đơn giản hóa thủ tục hành chính lĩnh vực Tư pháp thuộc thẩm 
+quyền giải quyết của các cơ quan, đơn vị thuộc thành phố Hà Nội;  
+- Quyết định số 656/QĐ-UBND ngày 10/02/2026 của Chủ tịch UBND Thành phố về 
+việc ủy quyền cho Giám đ ốc Sở Tư pháp th ành phố Hà Nội giải quyết các th ủ tục 
+
+TRANG 5
+5 
+ 
+hành chính lĩnh vực tư pháp thuộc thẩm quyền giải quyết của Chủ tịch Ủy ban nhân 
+dân thành phố Hà Nội; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản chính Bản sao 
+1 
+Văn bản đề nghị bổ nhiệm công ch ứng viên 
+(Mẫu TP-CC-02 ban hành kèm theo Thông tư 
+số 11/2025/TT-BTP) 
+x  
+2 
+Giấy tờ chứng minh th ời gian công tác pháp 
+luật theo quy định của Bộ trưởng Bộ Tư pháp; 
+trường hợp người đề nghị bổ nhiệm thuộc đối 
+tượng quy định tại khoản 5 và kho ản 6 Đi ều 
+14 của Luật Công chứng thì phải có bản chính 
+hoặc bản sao có chứng thực hoặc bản sao điện 
+tử giấy tờ chứng minh đã mi ễn nhiệm, đã thu 
+hồi ch ứng ch ỉ hành ngh ề hoặc không còn 
+thuộc các trường hợp này (Bản chính hoặc bản 
+sao có chứng thực hoặc bản sao điện tử) 
+Không yêu cầu người đề nghị bổ nhiệm công 
+chứng viên theo quy đ ịnh tại điểm a, đi ểm b 
+khoản 3 Điều này nộp bản chính hoặc bản sao 
+có chứng thực giấy tờ chứng minh th ời gian 
+đóng bảo hiểm xã hội khi Sở Tư pháp khai thác 
+được thông tin v ề giấy tờ này trên Cơ s ở dữ 
+liệu quốc gia về bảo hiểm. Trong thời hạn bổ 
+nhiệm công chứng viên, Sở Tư pháp kiểm tra, 
+tra cứu thông tin v ề giấy tờ chứng minh th ời 
+gian đóng bảo hiểm xã hội trên Cơ sở dữ liệu 
+quốc gia về bảo hiểm. Trường hợp Sở Tư pháp 
+không khai thác được thông tin hoặc thông tin 
+khai thác được trên Cơ sở dữ liệu quốc gia về 
+bảo hiểm không đ ầy đủ, không chính xác thì 
+yêu cầu người đề nghị bổ nhiệm công ch ứng 
+viên hoàn thiện hồ sơ, nộp bản chính hoặc bản 
+sao có ch ứng th ực gi ấy t ờ chứng minh th ời 
+gian đóng bảo hiểm xã hội. 
+x x 
+
+TRANG 6
+6 
+ 
+Giấy tờ chứng minh th ời gian công tác pháp 
+luật theo quy đ ịnh t ại kho ản 4 Đi ều 10 c ủa 
+Luật Công ch ứng và đi ểm b kho ản 1 Đi ều 4 
+của Ngh ị định s ố 104/2025/NĐ-CP là m ột 
+hoặc một số giấy tờ sau đây: 
++ Quyết định bổ nhiệm, bổ nhiệm lại, tuyển 
+dụng, luân chuy ển, điều động, hợp đồng làm 
+việc hoặc hợp đồng lao động kèm theo giấy tờ 
+chứng minh th ời gian đóng b ảo hiểm xã h ội 
+phù hợp với vị trí công tác pháp lu ật được bổ 
+nhiệm, tuyển dụng hoặc ký hợp đồng từ đủ 03 
+năm trở lên đối với những người thuộc trường 
+hợp quy định tại điểm a, b và d kho ản 1 Điều 
+6 Thông tư s ố 05/2025/TT-BTP ngày 
+15/5/2025 của Bộ trưởng Bộ tư pháp quy định 
+chi tiết một số điều và biện pháp thi hành Luật 
+Công ch ứng (Không yêu c ầu ngư ời yêu c ầu 
+nộp g iấy tờ chứng minh th ời gian đóng b ảo 
+hiểm xã h ội khi cơ quan gi ải quy ết th ủ tục 
+hành chính khai thác được thông tin về giấy tờ 
+chứng minh th ời gian đóng b ảo hiểm xã h ội 
+trên Cơ sở dữ liệu quốc gia về bảo hiểm).  
++ Chứng chỉ hành nghề luật sư và thẻ luật sư; 
+chứng chỉ hành nghề đấu giá; chứng chỉ hành 
+nghề quản tài viên; quyết định bổ nhiệm thừa 
+phát l ại và th ẻ thừa phát l ại đ ối v ới nh ững 
+người thuộc trư ờng hợp quy đ ịnh tại điểm c 
+khoản 1 Điều 6 Thông tư số 05/2025/TT-BTP; 
+Chứng chỉ hành nghề hoặc các quyết định quy 
+định tại điểm này phải kèm theo giấy tờ chứng 
+minh thời gian đóng bảo hiểm xã hội từ đủ 03 
+năm trở lên tương ứng với chức danh mà h ọ 
+đảm nhận. Trường hợp người quản lý doanh 
+nghiệp trong lĩnh vực luật sư, đấu giá, quản lý 
+thanh lý tài sản, thừa phát lại mà không hưởng 
+tiền lương ho ặc người hưởng lương hưu, tr ợ 
+cấp bảo hiểm xã h ội, trợ cấp hằng tháng mà 
+đang giao kết hợp đồng lao động không thuộc 
+đối tượng tham gia b ảo hiểm xã hội bắt buộc 
+thì không c ần n ộp kèm theo gi ấy t ờ chứng 
+
+TRANG 7
+7 
+ 
+minh thời gian đóng bảo hiểm xã hội (Không 
+yêu cầu người yêu cầu nộp giấy tờ chứng minh 
+thời gian đóng b ảo hiểm xã h ội khi cơ quan 
+giải quyết thủ tục hành chính khai thác đư ợc 
+thông tin về giấy tờ chứng minh thời gian đóng 
+bảo hiểm xã hội trên Cơ sở dữ liệu quốc gia về 
+bảo hiểm).  
++ Các giấy tờ hợp pháp khác chứng minh thời 
+gian công tác pháp luật. 
+3 
+Giấy chứng nhận kết quả kiểm tra tập sự hành 
+nghề công chứng (Bản chính hoặc bản sao có 
+chứng thực hoặc bản sao điện tử) 
+ x 
+4 
+Giấy khám s ức kho ẻ do cơ s ở khám b ệnh, 
+chữa bệnh có th ẩm quyền cấp trong th ời hạn 
+12 tháng tính đ ến ngày nộp hồ sơ (Bản chính 
+hoặc bản sao có chứng thực hoặc bản sao điện 
+tử) 
+x x 
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ 
+Trong thời hạn 18 ngày l àm việc kể từ ngày nhận đủ hồ sơ hợp lệ, Sở Tư pháp có 
+trách nhiệm kiểm tra h ồ sơ, trong trường hợp cần thiết thì ti ến hành xác minh tính 
+hợp pháp của hồ sơ, thời hạn xác minh hồ sơ không quá 15 ngày làm việc, quyết định 
+bổ nhiệm công chứng viên đ ối với những trường hợp đủ tiêu chuẩn, điều kiện bổ 
+nhiệm công chứng viên; trường hợp từ chối phải thông báo bằng văn bản có nêu rõ 
+lý do 
+3.5 Nơi tiếp nhận hồ sơ và trả kết quả 
+ - Các Chi nhánh Trung tâm phục vụ hành chính công Thành phố 
+3.6 Phí/Lệ phí 
+ Không 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách 
+nhiệm 
+Thời gian 
+(ngày làm 
+việc) 
+Biểu mẫu/Kết quả 
+B1 Công dân nộp hồ sơ  Công dân Giờ hành 
+chính  
+B2 
+Tiếp nhận, kiểm tra hồ sơ: 
+- Trường h ợp h ồ sơ đ ủ điều 
+kiện giải quyết, công ch ức bộ 
+Công chức 
+bộ phận một 
+cửa 
+0,5 ngày - Hồ sơ theo m ục 
+3.2; 
+
+TRANG 8
+8 
+ 
+phận m ột c ửa l ập Gi ấy ti ếp 
+nhận hồ sơ và hẹn ngày trả kết 
+quả; Chuyển hồ sơ cho cơ quan 
+có th ẩm quy ền gi ải quy ết. 
+(Chuyển đồng thời đến Trưởng 
+phòng) 
+- Trường h ợp h ồ sơ chưa đ ầy 
+đủ, chính xác, công c hức ti ếp 
+nhận hướng dẫn bổ sung, hoàn 
+thiện hồ sơ theo quy định; 
+- Trường hợp hồ sơ không đ ủ 
+điều kiện giải quyết, công chức 
+tiếp nhận phải nêu rõ lý do theo 
+mẫu Phiếu từ chối giải quyết hồ 
+sơ. 
+- Giấy tiếp nhận hồ 
+sơ và h ẹn ngày tr ả 
+kết qu ả (mẫu s ố 
+01); 
+- Phiếu yêu c ầu bổ 
+sung, hoàn thiện hồ 
+sơ (mẫu số 02); 
+- Phiếu từ chối tiếp 
+nhận gi ải quy ết h ồ 
+sơ (mẫu số 03). 
+- Phiếu ki ểm soát 
+quá trình giải quyết 
+hồ sơ (m ẫu s ố 05) 
+(Áp d ụng v ới 
+trường hợp xử lý hồ 
+sơ trực tiếp) 
+B3 
+Trưởng phòng B ổ trợ tư pháp 
+chuyển h ồ sơ đ ến công ch ức 
+giải quyết 
+Trưởng 
+phòng Bổ 
+trợ tư pháp 
+0,5 ngày  
+B4 
+Thẩm đ ịnh h ồ sơ: Công ch ức 
+giải quyết hồ sơ tiến hành xem 
+xét, dự thảo văn bản, trình lãnh 
+đạo Phòng phê duyệt.   
+Công chức 
+giải quyết 
+hồ sơ 
+11 ngày 
+- Trường hợp hồ sơ 
+đủ điều kiện: 
++ Phi ếu ki ểm soát 
+quá trình giải quyết 
+hồ sơ; 
++ Văn b ản đ ề nghị 
+bổ nhiệm. 
+- Trường hợp hồ sơ 
+chưa hoặc không đủ 
+điều kiện: 
++ Phi ếu ki ểm soát 
+quá trình giải quyết 
+hồ sơ; 
++ D ự thảo Phi ếu 
+yêu c ầu b ổ sung, 
+hoàn thi ện h ồ sơ 
+hoặc Phi ếu t ừ chối 
+tiếp nhận giải quyết 
+hồ sơ. 
+- Trường hợp chậm, 
+muộn: 
++ Phi ếu ki ểm soát 
+quá trình giải quyết 
+hồ sơ; 
++ Văn b ản đ ề nghị 
+bổ nhiệm; 
+
+TRANG 9
+9 
+ 
+B5 
+Lãnh đạo Phòng xem xét hồ sơ, 
+trình lãnh đạo Sở phê duyệt 
+ 
+Lãnh đạo 
+Phòng 02 ngày 
+- Trường hợp hồ sơ 
+đủ điều kiện: 
++ Phi ếu ki ểm soát 
+quá trình giải quyết 
+hồ sơ; 
++ Văn b ản đ ề nghị 
+bổ nhiệm. 
+- Trường hợp hồ sơ 
+chưa hoặc không đủ 
+điều kiện: 
++ Phi ếu ki ểm soát 
+quá trình giải quyết 
+hồ sơ; 
++ D ự thảo Phi ếu 
+yêu c ầu b ổ sung, 
+hoàn thi ện h ồ sơ 
+hoặc Phiếu t ừ chối 
+tiếp nhận giải quyết 
+hồ sơ. 
+- Trường hợp chậm, 
+muộn: 
++ Phi ếu ki ểm soát 
+quá trình giải quyết 
+hồ sơ; 
++ Văn b ản đ ề nghị 
+bổ nhiệm; 
+ 
+B6 
+- Lãnh đạo Sở xét duyệt hồ sơ: 
++ Ký Quyết định bổ nhiệm 
++ Ký văn bản từ chối giải quyết 
+hồ sơ (trường hợp hồ sơ không 
+đủ điều kiện giải quyết) 
+Hệ thống chuyển đến văn thư  
+Công chức 
+giải quyết 
+hồ sơ/lãnh 
+đạo 
+Phòng/lãnh 
+đạo Sở/văn 
+thư 
+03 ngày 
+- Phiếu ki ểm soát 
+quá trình giải quyết 
+hồ sơ; 
+- Quyết đ ịnh b ổ 
+nhiệm; 
+- Văn bản từ chối. 
+B7 
+Văn thư phát hành văn bản gửi 
+kết qu ả bản đi ện t ử, b ản gi ấy 
+hoặc chuy ển văn b ản t ừ chối 
+giải quyết (nếu có) đ ến Trung 
+tâm phục v ụ hành chính công 
+(để trả kết quả). Đồng thời gửi 
+Trưởng phòng Bổ trợ Tư pháp 
+và công chức giải quyết hồ sơ 
+ 
+Công chức 
+giải quyết 
+hồ sơ/văn 
+thư 
+0,5 ngày 
+- Quyết đ ịnh b ổ 
+nhiệm; 
+- Văn bản từ chối. 
+B8 Trả kết quả Trung tâm 
+phục vụ 0,5 ngày 
+Quyết đ ịnh b ổ 
+nhiệm ho ặc Văn 
+bản từ chối. 
+
+TRANG 10
+10 
+ 
+hành chính 
+công 
+4 Biểu mẫu    
+ Hệ thống biểu mẫu (Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ hoặc 
+Văn bản sửa đổi, bổ sung, thay thế) 
+ Mẫu biểu ban hành kèm theo Thông tư số 11/2025/TT-BTP ngày 15/5/2025. 
+  
+
+TRANG 11
+11 
+ 
+ Mẫu TP-CC-02 
+(Ban hành kèm theo Thông tư số 11/2025/TT-BTP) 
+ 
+Ảnh 3cmx4cm 
+CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM 
+Độc lập - Tự do - Hạnh phúc  
+--------------- 
+ 
+ 
+VĂN BẢN ĐỀ NGHỊ BỔ NHIỆM CÔNG CHỨNG VIÊN 
+Kính gửi: ………………………………..(1) 
+ 
+ 
+I. THÔNG TIN CÁ NHÂN: 
+Tôi tên là (ghi bằng chữ in hoa): ...........................................................................  
+Giới tính (2): ..........................................................................................................  
+Ngày, tháng, năm sinh: ............./ ............../ .............Quốc tịch (3): .........................  
+Số Thẻ căn cước công dân/Số Thẻ căn cước/Số định danh cá nhân:.....................  
+Ngày, tháng, năm cấp (4): ........./........./.................................................................  
+Nơi cấp (5): ............................................................................................................  
+(đối với Thẻ căn cước công dân/Thẻ căn cước) 
+Nơi thường trú (6): .................................................................................................  
+Nơi ở hiện tại (7):....................................................................................................  
+Điện thoại: ......................................... Email (nếu có): .......................................... 
+Số và ngày, tháng, năm c ấp, nơi c ấp của bằng cử nhân luật hoặc thạc sĩ lu ật hoặc tiến sĩ 
+luật:…………………………………………………………….. 
+Số và ngày, tháng, năm cấp của chứng chỉ đào tạo nghề công chứng (trường hợp có thời gian 
+đào tạo nghề công chứng là 6 tháng thì bổ sung thông tin thuộc đối tượng nào theo quy định 
+của Luật Công chứng):………………………………… 
+Thời gian t ập s ự hành ngh ề công ch ứng t ừ .….../….…/….… đ ến ..…./....../…… 
+tại………………………………………………………………………………(8) 
+Đã được Hội đồng kiểm tra kết quả tập sự hành nghề công chứng lần thứ…. cấp Giấy chứng 
+nhận k ết qu ả kiểm tra t ập s ự hành ngh ề công ch ứng s ố: .................... ngày 
+......../........../............................................................................................... (9) 
+II. QUÁ TRÌNH CÔNG TÁC, LÀM VIỆC (từ khi đủ 18 tuổi đến nay): 
+Thời gian  
+(từ ..../.../... đ ến 
+.../.../...) 
+Chức danh, ch ức v ụ, 
+công việc được giao 
+Tên cơ quan, t ổ 
+chức, đơn vị 
+Giấy tờ chứng minh th ời 
+gian công tác pháp luật 
+III. ĐÃ BỊ KẾT ÁN 
+(Ghi đầy đủ các tội danh, số và ngày ra bản án, kể cả trong trường hợp đã được xóa án tích; 
+nếu không có thì ghi “Không có”) 
+
+TRANG 12
+12 
+ 
+.......................................................................................................................... 
+IV. ĐÃ BỊ XỬ LÝ KỶ LUẬT, ÁP DỤNG BIỆN PHÁP XỬ LÝ HÀNH CHÍNH 
+(Ghi đầy đủ các hình thức và thời gian bị xử lý kỷ luật, áp dụng biện pháp xử lý hành chính; 
+nếu không có thì ghi “Không có”) 
+……………………………………………………………………………………. 
+V. THUỘC CÁC TRƯỜNG HỢP KHÔNG ĐƯỢC BỔ NHIỆM CÔNG CHỨNG VIÊN 
+THEO QUY ĐỊNH CỦA LUẬT CÔNG CHỨNG 
+(Ghi cụ thể từng trường hợp; nếu không có thì ghi “Không có”) 
+……………………………………………………………………………………. 
+VI. KHEN THƯỞNG 
+(Ghi cụ thể các hình thức khen thưởng; nếu không có thì ghi “Không có”) 
+……………………………………………………………………………………. 
+Tôi làm văn bản này đề nghị được bổ nhiệm công chứng viên. Tôi cam đoan không thuộc các 
+trường hợp không được bổ nhiệm công chứng viên theo quy định của Luật Công chứng. Tôi 
+cam đoan tuân thủ các nguyên tắc hành nghề công chứng, thực hiện đầy đủ các nghĩa vụ, trách 
+nhiệm của công chứng viên theo quy định của pháp luật. 
+Tôi xin chịu toàn bộ trách nhiệm về tính chính xác, xác thực của các thông tin nêu trên và các 
+giấy tờ khác được cung cấp trong hồ sơ đề nghị bổ nhiệm công chứng viên; nếu sai tôi xin 
+chịu toàn bộ trách nhiệm theo quy định của pháp luật./. 
+ 
+ Tỉnh (thành phố), ngày.......tháng......năm...... 
+Người đề nghị 
+(Chữ ký/chữ ký số, họ tên) 
+ 
+Ghi chú: 
+1. Thông tin số (1): Ghi người có thẩm quyền bổ nhiệm công chứng viên. 
+2. Các thông tin số (2), (3), (4), (5), (6), (7): 
+- Trường hợp nộp hồ sơ trực tuyến: Các thông tin được khai thác từ Cơ sở dữ liệu quốc gia về dân cư để tự 
+động điền vào biểu mẫu, người thực hiện thủ tục hành chính không cần kê khai. Nếu các thông tin không 
+được tự động điền vào biểu mẫu thì người thực hiện thủ tục hành chính kê khai đầy đủ. 
+- Trường hợp nộp hồ sơ giấy (nộp trực tiếp hoặc qua dịch vụ bưu chính): Người thực hiện thủ tục hành chính 
+kê khai đầy đủ trong biểu mẫu. 
+3. Thông tin số (8): Ghi tên tổ chức hành nghề công chứng nơi tập sự. 
+4. Thông tin số (9): Trường hợp không phải kiểm tra kết quả tập sự hành nghề công chứng thì ghi rõ lý do. 
+5. Các thông tin tại biểu mẫu này đồng thời được sử dụng để xây dựng biểu mẫu điện tử tương tác khi cơ 
+quan quản lý nhà nước cung cấp dịch vụ công trực tuyến. 
+  
+
+TRANG 13
+13 
+ 
+II. Lĩnh vực Giám định tư pháp 
+1. Bổ nhiệm và cấp thẻ giám định viên tư pháp (áp d ụng với lĩnh vực giám định 
+tư pháp chưa có quy đ ịnh phân quy ền cho cơ quan chuyên môn thu ộc UBND Thành 
+phố quản lý lĩnh vực giám định tư pháp (Mã 1.001122) 
+1 Mục đích: Quy định trình tự chuyển quyết định bổ nhiệm và cấp thẻ cho giám định 
+viên tư pháp 
+2 
+Phạm vi: Áp dụng đối với người đủ tiêu chuẩn bổ nhiệm, cấp thẻ giám định viên tư 
+pháp; cơ quan chuyên môn c ủa UBND Thành ph ố quản lý lĩnh v ực giám đ ịnh tư 
+pháp; Sở Tư pháp. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Giám đ ịnh tư pháp năm 2012; Lu ật sửa đổi, bổ sung một số điều của Luật 
+Giám định tư pháp năm 2020; 
+- Thông tư s ố 11/2020/TT-BTP ngày 31/12/2020 c ủa Bộ trưởng Bộ Tư pháp quy 
+định về mẫu thẻ, trình tự, thủ tục cấp mới, cấp lại thẻ giám định viên tư pháp;  
+- Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 của Chính phủ quy định chi tiết và 
+bi ện pháp thi hành Lu ật giám định tư pháp; Ngh ị định số 157/2020/NĐ-CP ngày 
+31/12/2020 c ủa Chính ph ủ sửa đ ổi, b ổ sung m ột s ố điều c ủa Ngh ị định s ố 
+85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính phủ quy định chi tiết và bi ện pháp thi 
+hành Luật giám định tư pháp; 
+- Nghị quyết 66.7/2025/NQ-CP ngày 15/11/2025 của Chính phủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu do Chính phủ ban hành; 
+- Thông tư số 03/2024/TT-BTP ngày 15/5/2024 của Bộ trưởng Bộ Tư pháp sửa đổi, 
+bổ sung 08 Thông tư liên quan đến thủ tục hành chính trong lĩnh vực bổ trợ tư pháp; 
+- Thông tư 08/2025/TT-BTP ngày 12/06/2025 của Bộ trưởng Bộ Tư pháp quy định 
+về phân định thẩm quyền của chính quyền địa phương 02 cấp và phân cấp trong lĩnh 
+vực quản lý Nhà nước của Bộ Tư pháp; 
+- Thông tư s ố 30/2025/TT-BTP ngày 31/12/2025 c ủa Bộ Tư pháp s ửa đổi một số 
+thủ tục hành chính quy định tại các Thông tư trong lĩnh vực bổ trợ tư pháp; 
+- Quyết định số 862/QĐ-BTP ngày 27/03/2026 c ủa Bộ Tư pháp Công b ố thủ tục 
+hành chính sửa đổi, bổ sung trong lĩnh vực giám định tư pháp; 
+- Quyết định số 656/QĐ-UBND ngày 10/02/2026 của UBND thành phố Hà Nội về 
+việc uỷ quyền cho Giám đ ốc Sở Tư pháp thành ph ố Hà Nội giải quyết các thủ tục 
+hành chính lĩnh vực tư pháp thuộc thẩm quyền giải quyết của Chủ tịch UBND thành 
+phố Hà Nội; 
+
+TRANG 14
+14 
+ 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản 
+chính Bản sao 
+1 
+Văn bản đề nghị bổ nhiệm giám định viên tư pháp 
+của cơ quan, t ổ chức có thẩm quyền đề nghị quy 
+định tại kho ản 2 Đi ều 9 c ủa Lu ật Giám đ ịnh tư 
+pháp hoặc đơn đ ề nghị bổ nhiệm giám đ ịnh viên 
+tư pháp của cá nhân đã là giám đ ịnh viên tư pháp 
+nhưng bị miễn nhiệm do nghỉ hưu hoặc thôi việc 
+để thành lập Văn phòng giám định tư pháp. 
+x  
+2 Bằng tốt nghiệp đại học trở lên phù h ợp với lĩnh 
+vực chuyên môn được đề nghị bổ nhiệm.  x 
+3 
+Sơ yếu lý l ịch và Phi ếu lý l ịch tư pháp. Trư ờng 
+hợp người được đề nghị bổ nhiệm giám định viên 
+tư pháp đang là công chức, viên chức, sĩ quan quân 
+đội, sĩ quan công an nhân dân, quân nhân chuyên 
+nghiệp, công nhân qu ốc phòng thì không c ần có 
+Phiếu lý lịch tư pháp. 
+x  
+4 
+Giấy xác nh ận v ề thời gian th ực t ế hoạt động 
+chuyên môn của cơ quan, tổ chức nơi người được 
+đề nghị bổ nhiệm làm việc. 
+x  
+5 
+Chứng chỉ đào tạo hoặc bồi dưỡng nghiệp vụ giám 
+định đối với người được đề nghị bổ nhiệm giám 
+định viên tư pháp trong lĩnh vực pháp y và kỹ thuật 
+hình sự. 
+x  
+6 
+02 ảnh màu chân dung cỡ 2cm x 3cm (chụp trong 
+thời gian 06 tháng g ần nhất) để phục vụ việc cấp 
+thẻ. 
+x  
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý và Yêu cầu, điều kiện thực hiện thủ tục hành chính: 
+
+TRANG 15
+15 
+ 
+ 
+Thời gian xử lý: Trong thời hạn 30 ngày kể từ ngày nhận được hồ sơ hợp lệ, Giám 
+đốc Sở Tư pháp quy ết định bổ nhiệm và c ấp thẻ giám định viên tư pháp. Trư ờng 
+hợp từ chối thì phải thông báo cho người đề nghị bằng văn bản và nêu rõ lý do. 
+ 
+Yêu cầu, điều kiện thực hiện thủ tục hành chính: 
+- Công dân Việt Nam thường trú tại Việt Nam có đủ các tiêu chuẩn sau đây có th ể 
+được xem xét, bổ nhiệm giám định viên tư pháp: 
++ Có sức khỏe, phẩm chất đạo đức tốt; 
++ Có trình đ ộ đại học trở lên và đã qua th ực tế hoạt động chuyên môn ở lĩnh vực 
+được đào tạo từ đủ 05 năm trở lên. 
+Trường hợp người được đề nghị bổ nhiệm giám định viên pháp y, pháp y tâm thần, 
+kỹ thuật hình s ự đã trực tiếp giúp vi ệc trong ho ạt động giám đ ịnh ở tổ chức giám 
+định pháp y, pháp y tâm thần, kỹ thuật hình sự thì thời gian hoạt động thực tế chuyên 
+môn từ đủ 03 năm trở lên. 
++ Đối với người được đề nghị bổ nhiệm giám định viên tư pháp trong lĩnh vực pháp 
+y, pháp y tâm th ần và kỹ thuật hình sự phải có chứng chỉ đã qua đào t ạo hoặc bồi 
+dưỡng nghiệp vụ giám định. 
+- Người thuộc một trong các trư ờng hợp sau đây không được bổ nhiệm giám định 
+viên tư pháp: 
++ Mất năng lực hành vi dân sự hoặc bị hạn chế năng lực hành vi dân sự; 
++ Đang bị truy cứu trách nhiệm hình sự; đã bị kết án mà chưa đư ợc xoá án tích v ề 
+tội phạm do vô ý ho ặc tội phạm ít nghiêm tr ọng do cố ý; đã bị kết án về tội phạm 
+nghiêm trọng, tội phạm rất nghiêm trọng, tội phạm đặc biệt nghiêm trọng do cố ý; 
++ Đang bị áp dụng biện pháp xử lý hành chính giáo dục tại xã, phường, thị trấn, đưa 
+vào cơ sở cai nghiện bắt buộc hoặc đưa vào cơ sở giáo dục bắt buộc. 
+3.5 Nơi tiếp nhận hồ sơ và trả kết quả 
+ - Các Chi nhánh Trung tâm phục vụ hành chính công Thành phố 
+3.6 Phí/Lệ phí 
+ Không quy định 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời 
+gian Biểu mẫu/Kết quả 
+B1 Tiếp nh ận h ồ sơ b ổ nhiệm và 
+cấp thẻ giám định viên tư pháp. 
+Bộ phận một 
+cửa/TTPVHCC 
+Giờ 
+hành 
+chính 
+- Hồ sơ theo mục 3.2. 
+
+TRANG 16
+16 
+ 
+B2 Chuyển hồ sơ cho phòng chuyên 
+môn 
+Bộ phận một 
+cửa/TTPVHCC 
+01 
+ngày 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ 
+(mẫu số 05). 
+B3 Phân công xử lý hồ sơ Lãnh đạo 
+Phòng 
+01 
+ngày 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ 
+(mẫu số 05). 
+B4 
+Thẩm đ ịnh h ồ sơ đ ề nghị bổ 
+nhiệm và cấp thẻ giám định viên 
+tư pháp: dự thảo Quyết định bổ 
+nhiệm và cấp thẻ giám định viên 
+tư pháp, in Th ẻ giám định viên 
+tư pháp ho ặc văn b ản t ừ chối 
+trình lãnh đạo phòng phê duyệt 
+Chuyên viên 
+giải quyết hồ 
+sơ 
+19 
+ngày 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ 
+(mẫu số 05); 
+- Quyết đ ịnh b ổ 
+nhiệm và c ấp th ẻ 
+giám đ ịnh viên tư 
+pháp, Th ẻ giám định 
+viên tư pháp. 
+- văn bản từ chối giải 
+quyết 
+ 
+B5 
+Lãnh đạo Phòng xem xét h ồ sơ, 
+ký xác nh ận, trình lãnh đ ạo Sở 
+phê duyệt 
+Lãnh đạo 
+Phòng 
+05 
+ngày 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ 
+(mẫu số 05); 
+- Quyết đ ịnh b ổ 
+nhiệm và c ấp thẻ 
+giám đ ịnh viên tư 
+pháp, Th ẻ giám đ ịnh 
+viên tư pháp. 
+- văn bản từ chối giải 
+quyết 
+B6 
+Lãnh đạo Sở xem xét ký Quy ết 
+định bổ nhiệm và c ấp thẻ giám 
+định viên tư pháp, ký Th ẻ giám 
+định viên tư pháp ho ặc văn bản 
+từ chối. 
+Lãnh đạo Sở 03 
+ngày 
+Quyết định bổ nhiệm 
+và cấp thẻ giám định 
+viên tư pháp, Th ẻ 
+giám đ ịnh viên tư 
+pháp hoặc văn bản từ 
+chối. 
+
+TRANG 17
+17 
+ 
+B7 Phát hành, Bàn giao cho Trung 
+tâm phục vụ hành chính công 
+Văn thư, 
+Chuyên viên 
+giải quyết hồ 
+sơ 
+01 
+ngày 
+- Quyết đ ịnh b ổ 
+nhiệm và c ấp th ẻ 
+giám đ ịnh viên tư 
+pháp; 
+- Thẻ giám định viên 
+tư pháp; 
+- Văn bản từ chối; 
+B8 Trả kết quả cho công dân 
+Trung tâm 
+phục vụ hành 
+chính công 
+Giờ 
+hành 
+chính 
+- Quyết đ ịnh b ổ 
+nhiệm giám định viên 
+tư pháp; 
+- Thẻ giám định viên 
+tư pháp; 
+- văn bản từ chối giải 
+quyết 
+4 Biểu mẫu 
+ 
+Hệ thống biểu mẫu theo cơ ch ế một cửa, một cửa liên thông đư ợc ban hành kèm 
+theo Thông tư 03/2025/TT-VPCP hướng dẫn Nghị định 118/2025/NĐ-CP thực hiện 
+thủ tục hành chính theo cơ chế một cửa, một cửa liên thông tại Bộ phận Một cửa và 
+Cổng Dịch vụ công quốc gia do Văn phòng Chính phủ ban hành. 
+ 
+Mẫu biểu ban hành kèm theo Thông tư s ố 11/2020/TT-BTP ngày 31/12/2020 c ủa 
+Bộ trưởng Bộ Tư pháp quy đ ịnh chi tiết về mẫu thẻ, trình tự, thủ tục cấp mới, cấp 
+lại thẻ giám định viên tư pháp. 
+ 
+  
+
+TRANG 18
+18 
+ 
+Mẫu số 1 
+MẪU THẺ GIÁM ĐỊNH VIÊN TƯ PHÁP 
+(Ban hành kèm theo Thông tư số 11/2020/TT-BTP ngày 31 tháng 12 năm 2020  
+của Bộ trưởng Bộ Tư pháp) 
+Mặt trước: (Hình minh họa) Nền mặt trước là hình ảnh trống đồng và các hoa văn, các 
+họa tiết trang trí, màu vàng) 
+ 
+ 
+ 
+1. Tên cơ quan có thẩm quyền cấp thẻ giám định viên tư pháp. 
+(VD: Bộ Tài chính; Ủy ban nhân dân tỉnh Hà Tĩnh). 
+2. Mã bộ/cơ quan ngang bộ, mã tỉnh và 04 chữ số liên tiếp là số thứ tự của thẻ (ví dụ: Số thẻ được UBND thành phố Hà 
+Nội cấp đầu tiên sẽ là 010001/GĐVTP/UBND, trong đó số 01 là mã thành phố Hà Nội, số 0001 là số thứ tự thẻ giám 
+định viên tư pháp hoặc số: 770001/GĐVTP/BYT là số thẻ được Bộ Y tế cấp, trong đó 77 là mã Bộ Y tế, số 0001 là số 
+thứ tự thẻ. 
+3. Chữ viết tắt của cơ quan có thẩm quyền cấp thẻ giám định viên tư pháp. VD: BYT hoặc UBND-... (Chữ viết tắt tên 
+của địa phương cấp thẻ, ví dụ nếu là Hà Nội thì viết tắt là HN, nếu là Thành phố Hồ Chí Minh thì viết tắt là TPHCM 
+...). 
+4. Lĩnh vực giám định (ví dụ: kỹ thuật hình sự, pháp y, ngân hàng, tiền tệ...). 
+5 . Địa danh, ngày tháng năm cấp thẻ (Ví dụ: Hà Nội, ngày...tháng... năm...). 
+6. Chức vụ của người có thẩm quyền cấp thẻ giám định viên tư pháp. 
+7. Họ tên người ký. 
+ 
+Mặt sau: (Hình minh họa) 
+
+
+TRANG 19
+19 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+
+TRANG 20
+20 
+ 
+Mẫu số 3 - sđ 
+Quyết định bổ nhiệm và cấp thẻ giám định viên tư pháp 
+(Áp dụng tại địa phương) 
+(Ban hành kèm theo Thông tư số 30/2025/TT-BTP  
+ngày 31 tháng 12 năm 2025 của Bộ trưởng Bộ Tư pháp) 
+ 
+……1 
+ 
+ 
+Số:…./QĐ-… 
+CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM 
+Độc lập - Tự do - Hạnh phúc 
+ 
+………, ngày…tháng……năm……2 
+ 
+QUYẾT ĐỊNH 
+Về việc bổ nhiệm và cấp thẻ giám định viên tư pháp 
+…………3 
+Căn cứ …; 
+Căn cứ …; 
+Theo đề nghị của ……………4. 
+QUYẾT ĐỊNH: 
+Điều 1. Bổ nhiệm và c ấp thẻ giám định viên tư pháp đ ối với các ông/bà có tên trong danh 
+sách kèm theo. 
+Điều 2. …5 phối hợp với …6 thực hiện cấp thẻ giám định viên tư pháp theo quy định của Luật 
+Giám định tư pháp và Thông tư số 11/2020/TT-BTP ngày 31 tháng 12 năm 2020 c ủa Bộ trưởng Bộ 
+Tư pháp quy định về mẫu thẻ, trình tự, thủ tục cấp mới, cấp lại thẻ giám định viên tư pháp. 
+Điều 3. Quyết định này có hiệu lực thi hành kể từ ngày ký. 
+...7 và các ông/bà có tên tại Điều 1 chịu trách nhiệm thi hành Quyết định này. 
+Nơi nhận: 
+- Như Điều 3; 
+- Lưu:… 
+ 
+ 
+ 
+………………8 
+ 
+ 
+  
+                                                           
+1 Tên Ủy ban nhân dân hoặc cơ quan chuyên môn thuộc Ủy ban nhân dân tỉnh, thành phố.  
+2 Địa danh và thời gian ban hành văn bản. 
+3 Chủ tịch Ủy ban nhân dân hoặc Thủ trưởng cơ quan chuyên môn thuộc Ủy ban nhân dân tỉnh, thành phố.  
+4 Thủ trưởng cơ quan, đơn vị đề nghị bổ nhiệm và cấp thẻ giám định viên tư pháp. 
+5 Thủ trưởng cơ quan, đơn vị được phân công làm đầu mối quản lý chung công tác giám định tư pháp.  
+6 Thủ trưởng cơ quan, đơn vị đã đề nghị bổ nhiệm và cấp thẻ giám định viên tư pháp. 
+7 Thủ trưởng các cơ quan, đơn vị có liên quan. 
+8 Họ, tên của người có thẩm quyền bổ nhiệm, cấp thẻ. 
+
+TRANG 21
+21 
+ 
+Mẫu số 5 -sđ 
+Quyết định cấp thẻ giám định viên tư pháp 
+(Áp dụng tại địa phương) 
+(Ban hành kèm theo Thông tư số 30/2025/TT-BTP  
+ngày 31 tháng 12 năm 2025 của Bộ trưởng Bộ Tư pháp) 
+ 
+……8 
+ 
+ 
+Số:…./QĐ-… 
+CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM 
+Độc lập - Tự do - Hạnh phúc 
+ 
+………, ngày….tháng……năm……9 
+ 
+QUYẾT ĐỊNH 
+Về việc cấp thẻ giám định viên tư pháp 
+………10 
+Căn cứ…; 
+Căn cứ …; 
+Theo đề nghị của …11. 
+QUYẾT ĐỊNH: 
+Điều 1. Cấp thẻ giám định viên tư pháp cho các ông/bà có tên trong danh sách kèm theo. 
+Điều 2. …12 phối hợp với …13 thực hiện cấp thẻ giám định viên tư pháp theo quy đ ịnh của 
+Luật Giám định tư pháp và Thông tư số 11/2020/TT-BTP ngày 31 tháng 12 năm 2020 của Bộ trưởng 
+Bộ Tư pháp quy định về mẫu thẻ, trình tự, thủ tục cấp mới, cấp lại thẻ giám định viên tư pháp. 
+Điều 3. Quyết định này có hiệu lực thi hành kể từ ngày ký. 
+…14 và các ông/bà có tên tại Điều 1 chịu trách nhiệm thi hành Quyết định này. 
+Nơi nhận: 
+- Như Điều 3; 
+- Lưu:… 
+ 
+ 
+ 
+………………15 
+ 
+  
+                                                           
+8 Tên Ủy ban nhân dân hoặc cơ quan chuyên môn thuộc Ủy ban nhân dân tỉnh, thành phố.  
+9 Địa danh và thời gian ban hành văn bản. 
+10 Chủ tịch Ủy ban nhân dân hoặc Thủ trưởng cơ quan chuyên môn thuộc Ủy ban nhân dân tỉnh, thành phố. 
+11 Thủ trưởng cơ quan, đơn vị đề nghị cấp thẻ giám định viên tư pháp. 
+12 Thủ trưởng cơ quan, đơn vị được phân công làm đầu mối quản lý chung công tác giám định tư pháp.  
+13 Thủ trưởng cơ quan, đơn vị đề nghị cấp thẻ giám định viên tư pháp. 
+14 Thủ trưởng các cơ quan, đơn vị có liên quan. 
+15 Họ, tên, chức vụ của người có thẩm quyền cấp thẻ. 
+
+TRANG 22
+22 
+ 
+2. Cấp lại thẻ giám định viên tư pháp (Mã 1.009832) 
+1 
+Mục đích:  Quy định trình tự và cách thức thẩm định, cấp lại thẻ giám định viên tư 
+pháp trong trường hợp thẻ đã được cấp bị mất, bị hỏng (rách, bẩn, mờ) không thể 
+sử dụng được hoặc có sự thay đổi thông tin đã được ghi trên thẻ. 
+2 Phạm vi: Áp dụng đối với trường hợp đề nghị cấp lại thẻ giám định viên tư pháp; 
+công chức Sở Tư pháp. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Giám định tư pháp năm 2012; Lu ật sửa đổi, bổ sung một số điều của Luật 
+Giám định tư pháp năm 2020; 
+- Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 của Chính phủ quy định chi tiết và 
+biện pháp thi hành Luật giám định tư pháp; 
+- Nghị định số 157/2020/NĐ-CP ngày 31/12/2020 của Chính phủ sửa đổi, bổ sung 
+một số điều của Nghị   định số 85/2013/NĐ-CP ngày 29/7/2013 của Chính phủ quy 
+định chi tiết và bi ện pháp thi hành Luật giám đ ịnh tư pháp; 
+- Thông tư số 11/2020/TT-BTP ngày 31/12/2020 c ủa Bộ trưởng Bộ Tư pháp quy 
+định về mẫu thẻ, trình tự, thủ tục cấp mới, cấp lại thẻ giám định viên tư pháp; 
+- Thông tư số 03/2024/TT-BTP ngày 15/5/2024 của Bộ trưởng Bộ Tư pháp sửa đổi, 
+bổ sung 08 Thông tư liên quan đến thủ tục hành chính trong lĩnh vực bổ trợ tư pháp; 
+- Thông tư 08/2025/TT-BTP ngày 12/06/2025 của Bộ trưởng Bộ Tư pháp quy định 
+về phân định thẩm quyền của chính quy ền địa phương 02 c ấp và phân c ấp trong 
+lĩnh vực quản lý Nhà nước của Bộ Tư pháp; 
+- Thông tư 30/2025/TT-BTP ngày 31/12/2025 của Bộ trưởng Bộ Tư pháp sửa đổi 
+thủ tục hành chính quy đ ịnh tại các Thông tư trong lĩnh v ực bổ trợ tư pháp do Bộ 
+trưởng Bộ Tư pháp ban hành; 
+- Quyết định số 862/QĐ-BTP ngày 27/03/2026 c ủa Bộ Tư pháp Công b ố thủ tục 
+hành chính sửa đổi, bổ sung trong lĩnh vực giám định tư pháp; 
+- Quyết định số 656/QĐ-UBND ngày 10/02/2026 của UBND thành phố Hà Nội về 
+việc uỷ quyền cho Giám đốc Sở Tư pháp thành phố Hà Nội giải quyết các thủ tục 
+hành chính lĩnh vực tư pháp thuộc thẩm quyền giải quyết của Chủ tịch UBND thành 
+phố Hà Nội; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 của Trung tâm phục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Ch ứng thực thuộc phạm vi chức năng quản lý của Sở 
+Tư pháp thành phố Hà Nội. 
+
+TRANG 23
+23 
+ 
+3.2 Thành phần hồ sơ Bản chính Bản sao 
+1 
+Đơn đề nghị cấp lại thẻ giám định viên tư 
+pháp. Trường hợp thẻ bị mất hoặc có thay 
+đổi nội dung ghi trên th ẻ thì đơn đề nghị 
+cấp lại thẻ giám định viên tư pháp phải có 
+xác nhận của cơ quan, đơn vị chủ quản. 
+x  
+2 
+Thẻ giám định viên tư pháp đang sử dụng 
+trong trường hợp có sự thay đổi thông tin 
+đã được ghi trên th ẻ; thẻ giám định viên 
+tư pháp trong trường hợp thẻ bị hỏng. 
+x  
+3 
+02 ảnh màu chân dung c ỡ 2cm x 3cm 
+(chụp trong thời gian 6 tháng gần nhất) để 
+phục vụ việc cấp thẻ. 
+x  
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ 
+Trong thời hạn 15 ngày làm việc kể từ ngày nhận được hồ sơ hợp lệ, Giám đốc Sở 
+Tư pháp quyết định cấp thẻ giám định viên tư pháp. Trư ờng hợp từ chối thì phải 
+thông báo bằng văn bản và nêu rõ lý do. 
+3.5 Nơi tiếp nhận hồ sơ và trả kết quả 
+ - Các Chi nhánh Trung tâm phục vụ hành chính công Thành phố 
+3.6 Phí/Lệ phí 
+ Không quy định 
+3.7 Quy trình xử lý công việc  
+TT Trình tự Trách 
+nhiệm 
+Thời 
+gian 
+Biểu mẫu/Kết quả 
+B1 
+Tiếp nhận và kiểm tra hồ sơ: 
+-  Trường hợp hồ sơ đủ điều 
+kiện gi ải quy ết, công ch ức 
+bộ phận m ột c ửa l ập Gi ấy 
+Bộ phận 
+một cửa 
+Giờ hành 
+chính 
+- Hồ sơ theo mục 3.2; 
+-  Giấy tiếp nhận hồ 
+sơ và h ẹn ngày tr ả 
+kết quả; 
+
+TRANG 24
+24 
+ 
+tiếp nhận hồ sơ và hẹn ngày 
+trả kết quả; 
+- Trường h ợp h ồ sơ chưa 
+đầy đ ủ, chính xác, công 
+chức ti ếp nh ận hư ớng d ẫn 
+bổ sung, hoàn thi ện h ồ sơ 
+theo quy định; 
+- Trường h ợp h ồ sơ không 
+đủ điều ki ện gi ải quy ết, 
+công ch ức ti ếp nh ận ph ải 
+nêu rõ lý do theo mẫu Phiếu 
+từ chối giải quyết hồ sơ. 
+- Phiếu yêu c ầu b ổ 
+sung, hoàn thi ện h ồ 
+sơ; 
+- Phiếu t ừ chối ti ếp 
+nhận gi ải quy ết h ồ 
+sơ. 
+B2 Chuyển h ồ sơ cho phòng 
+chuyên môn 
+Bộ phận 
+một cửa 
+01 ngày làm 
+việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ  
+B3 Phân công xử lý hồ sơ Lãnh đạo 
+Phòng 
+01 ngày làm 
+việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ 
+B4 
+Thẩm đ ịnh h ồ sơ: Chuyên 
+viên gi ải quy ết h ồ sơ ti ến 
+hành xem xét, trình lãnh đạo 
+Phòng 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ 
+08 ngày làm 
+việc 
+-  Trường hợp hồ sơ 
+đủ điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++  Quyết định cấp lại 
+thẻ giám định viên tư 
+pháp 
++ Thẻ giám định viên 
+tư pháp. 
+-  Trường hợp hồ sơ 
+chưa ho ặc không đ ủ 
+điều kiện: 
+
+TRANG 25
+25 
+ 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++ Dự thảo Phiếu yêu 
+cầu b ổ sung, hoàn 
+thiện hồ sơ  
+hoặc Phi ếu t ừ chối 
+tiếp nh ận gi ải quy ết 
+hồ sơ. 
+- Trường h ợp ch ậm, 
+muộn: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình  
+giải quyết hồ sơ; 
++  Văn b ản đ ề nghị 
+cấp lại thẻ;  
++ Phiếu xin lỗi. 
+B5 
+Lãnh đạo Phòng xem xét hồ 
+sơ, ký xác nh ận, trình lãnh 
+đạo Sở phê chuẩn 
+Lãnh đạo 
+Phòng 
+02 ngày làm 
+việc 
+-  Trường hợp hồ sơ 
+đủ điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát  
+quá trình gi ải quy ết 
+hồ sơ; 
++  Quyết định cấp lại 
+thẻ giám định viên tư 
+pháp 
+
+TRANG 26
+26 
+ 
++ Thẻ giám định viên 
+tư pháp. 
+- Trường h ợp h ồ sơ 
+chưa ho ặc không đ ủ 
+điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++ Dự thảo Phiếu yêu 
+cầu b ổ sung, hoàn 
+thiện hồ sơ  
+hoặc Phi ếu t ừ chối 
+tiếp nh ận gi ải quy ết 
+hồ sơ. 
+- Trường h ợp ch ậm, 
+muộn: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++  Văn b ản đ ề nghị 
+cấp lại thẻ; 
++ Phiếu xin lỗi. 
+ 
+B6 
+Lãnh đạo Sở xem xét, quyết 
+định c ấp l ại th ẻ giám đ ịnh 
+viên tư pháp 
+Lãnh đạo 
+Sở thực 
+hiện giải 
+quyết 
+TTHC này 
+theo uỷ 
+quyền của 
+02 ngày làm 
+việc 
+- Hồ sơ; 
+-  Phiếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
+
+TRANG 27
+27 
+ 
+-  Trường h ợp không đ ủ 
+điều ki ện: ký văn b ản t ừ 
+chối giải quyết. 
+ 
+Chủ tịch 
+UBND 
+Thành phố 
++  Quyết định cấp lại 
+thẻ giám định viên tư 
+pháp 
++ Thẻ giám định viên 
+tư pháp. 
+- Văn bản từ chối. 
+B7 Hoàn thiện hồ sơ, phát hành 
+văn bản 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ/văn thư 
+ 
+0,5 ngày làm 
+việc 
+ 
+- Hồ sơ; 
+-  Phiếu ki ểm soát 
+quá trình  
+giải quyết hồ sơ; 
++  Quyết định cấp lại 
+thẻ giám định viên tư 
+pháp 
++ Thẻ giám định viên 
+tư pháp. 
+ 
+B8 
+ 
+Bàn giao và trả kết quả cho 
+tổ chức/cá nhân 
+ 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ/Bộ phận 
+một cửa 
+ 
+0,5 ngày làm 
+việc 
+ 
+-  Phiếu ki ểm soát 
+quá trình  
+giải quyết hồ sơ; 
++  Quyết định cấp lại 
+thẻ giám định viên tư 
+pháp 
++ Thẻ giám định viên 
+tư pháp. 
+4 Biểu mẫu      
+ 
+- Hệ thống biểu mẫu theo cơ chế một cửa, một cửa liên thông được ban hành kèm 
+theo Thông tư 03/2025/TT -VPCP hướng d ẫn Ngh ị định 118/2025/NĐ -CP th ực 
+hiện thủ tục hành chính theo cơ ch ế một cửa, một cửa liên thông tại Bộ phận Một 
+cửa và Cổng Dịch vụ công quốc gia do Văn phòng Chính phủ ban hành. 
+
+TRANG 28
+28 
+ 
+- Mẫu biểu ban hành kèm theo Thông tư số 11/2020/TT-BTP ngày 31/12/2020 của 
+Bộ trưởng Bộ Tư pháp quy định chi tiết về mẫu thẻ, trình tự, thủ tục cấp mới, cấp 
+lại thẻ giám định viên tư pháp. 
+- Mẫu biểu ban hành kèm theo Thông tư s ố 03/2024/TT-BTP ngày 15/5/2024 của 
+Bộ trưởng Bộ Tư pháp s ửa đổi, bổ sung 08 Thông tư liên quan đến thủ tục hành 
+chính trong lĩnh vực bổ trợ tư pháp. 
+ 
+  
+
+TRANG 29
+29 
+ 
+Mẫu số 6-sđ 
+(Ban hành kèm theo Thông tư 03/2024/TT-BTP, được sửa đổi bởi Thông tư số 30/2025/TT-BTP  
+ngày 31 tháng 12 năm 2025 của Bộ trưởng Bộ Tư pháp) 
+ 
+CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM 
+Độc lập - Tự do - Hạnh phúc 
+ 
+ 
+ĐƠN ĐỀ NGHỊ CẤP LẠI THẺ GIÁM ĐỊNH VIÊN TƯ PHÁP 
+Kính gửi (1): .................................................................................................................... 
+ 
+Tên tôi là: ........................... Nam/nữ: ................ Sinh ngày: ......../....../............................ 
+Số thẻ căn cước công dân/Số thẻ căn cước/Số định danh cá nhân:...................................... 
+Ngày cấp: ........../........../............... Nơi cấp: ...................................................................... 
+Nơi đăng ký hộ khẩu thường trú: ....................................................................................... 
+............................................................................................................................................. 
+Chỗ ở hiện tại: .................................................................................................................... 
+Điện thoại: ......................................... Email (nếu có): ...................................................... 
+Quyết định bổ nhiệm số...........ngày........./......../..............nơi bổ nhiệm (2)........................ 
+Thẻ giám định viên tư pháp được cấp số: ........ ngày . ..../ .... /........theo Quyết định số....... 
+ngày…..../........../....... nơi cấp (3)...................................................................................... 
+Lý do đề nghị cấp lại thẻ giám định viên tư pháp…………………................................... 
+Đề nghị (4).......................... cấp lại Thẻ giám định viên tư pháp cho tôi. 
+Tôi xin chịu trách nhiệm hoàn toàn trước pháp luật về sự trung thực, chính xác của nội dung 
+Đơn đề nghị này và hồ sơ kèm theo. 
+       Tỉnh, (thành phố)...., ngày.......tháng......năm........... 
+Người đề nghị 
+(ký và ghi rõ họ tên) 
+Xác nhận của người có thẩm quyền 
+            về lý do cấp lại thẻ16 
+                   (ký và ghi rõ họ tên) 
+ 
+ 
+ 
+ 
+Ghi chú: 
+(1) Cơ quan có thẩm quyền cấp lại thẻ; 
+(2) Cơ quan đã bổ nhiệm; 
+(3) Cơ quan nơi cấp thẻ; 
+(4) Người có thẩm quyền cấp lại thẻ giám định viên tư pháp. 
+ 
+Mẫu số 8 -sđ 
+                                                           
+16 Chỉ dùng cho trường hợp xin cấp lại thẻ do bị mất hoặc có sự thay đổi thông tin ghi trên thẻ . 
+ảnh 
+(2cmx3cm) 
+
+TRANG 30
+30 
+ 
+Quyết định cấp lại thẻ giám định viên tư pháp 
+(Áp dụng tại địa phương) 
+(Ban hành kèm theo Thông tư số 11/2020/TT-BTP ngày 31 tháng 12 năm 2020 của Bộ trưởng  
+Bộ Tư pháp được sửa đổi, bổ sung tại Thông tư số 30/2025/TT-BTP  
+ngày 31 tháng 12 năm 2025 của Bộ trưởng Bộ Tư pháp) 
+ 
+ 
+……17 
+ 
+ 
+Số:…./QĐ-UBND 
+CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM 
+Độc lập - Tự do - Hạnh phúc 
+ 
+………, ngày….tháng……năm……18 
+ 
+QUYẾT ĐỊNH 
+Về việc cấp lại thẻ giám định viên tư pháp 
+………19 
+Căn cứ …; 
+Căn cứ …; 
+Theo đề nghị của …20. 
+QUYẾT ĐỊNH: 
+Điều 1. Cấp lại thẻ giám định viên tư pháp cho các ông/bà có tên trong danh sách kèm theo. 
+Điều 2. …21 phối hợp với …22 thực hiện việc cấp lại thẻ giám định viên tư pháp theo quy định 
+của Luật Giám định tư pháp và Thông tư s ố 11/2020/TT-BTP ngày 31 tháng 12 năm 2020 c ủa Bộ 
+trưởng Bộ Tư pháp quy định về mẫu thẻ, trình tự, thủ tục cấp mới, cấp lại thẻ giám định viên tư pháp. 
+Điều 3. Quyết định này có hiệu lực thi hành kể từ ngày ký. 
+…23 và các ông/bà có tên tại Điều 1 chịu trách nhiệm thi hành Quyết định này. 
+Nơi nhận: 
+- Như Điều 3; 
+- Lưu:… 
+ 
+ 
+ 
+………………24 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+                                                           
+17 Tên Ủy ban nhân dân hoặc cơ quan chuyên môn thuộc Ủy ban nhân dân tỉnh, thành phố.  
+18 Địa danh và thời gian ban hành văn bản. 
+19 Chủ tịch Ủy ban nhân dân hoặc Thủ trưởng cơ quan chuyên môn thuộc Ủy ban nhân dân tỉnh, thành phố.  
+20 Thủ trưởng cơ quan, đơn vị đề nghị cấp lại thẻ giám định viên tư pháp. 
+21 Thủ trưởng cơ quan, đơn vị được phân công làm đầu mối quản lý chung công tác giám định tư pháp.  
+22 Thủ trưởng cơ quan, đơn vị đề nghị cấp lại thẻ giám định viên tư pháp. 
+23 Thủ trưởng các cơ quan, đơn vị có liên quan. 
+24 Họ, tên, chức vụ của người có thẩm quyền cấp lại thẻ.  
+
+TRANG 31
+31 
+ 
+3. Cấp phép thành lập văn phòng giám định tư pháp (Mã 2.000890) 
+1 Mục đích:  Quy định trình tự và cách thức xử lý, giải quyết hồ sơ đề nghị thành 
+lập văn phòng giám định tư pháp 
+2 Phạm vi: Áp dụng đối với giám định viên, công chức Sở Tư pháp, UBND Thành 
+phố. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Giám định tư pháp năm 2012; Lu ật sửa đổi, bổ sung một số điều của Luật 
+Giám định tư pháp năm 2020; 
+- Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 của Chính phủ quy định chi tiết và 
+bi ện pháp thi hành Luật giám đ ịnh tư pháp; 
+- Nghị định số 157/2020/NĐ-CP ngày 31/12/2020 của Chính phủ sửa đổi, bổ sung 
+một số điều của Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 của Chính phủ quy 
+định chi tiết và biện pháp thi hành Luật giám định tư pháp; 
+- Quyết định số 524/QĐ-BTP ngày 05/4/2021 c ủa Bộ Tư pháp Công b ố thủ tục 
+hành chính sửa đổi, bổ sung trong lĩnh vực giám định tư pháp; 
+- Quyết định số 657/QĐ-UBND ngày 10/02/2026 của UBND thành phố Hà Nội về 
+việc uỷ quyền cho Sở Tư pháp thành phố Hà Nội giải quyết các thủ tục hành chính 
+lĩnh vực tư pháp thuộc thẩm quyền giải quyết của UBND thành phố Hà Nội; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 của Trung tâm phục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Ch ứng thực thuộc phạm vi chức năng quản lý của Sở 
+Tư pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản chính Bản sao 
+1 Đơn xin phép thành lập x  
+2 Quyết đ ịnh b ổ nhiệm giám đ ịnh viên tư 
+pháp  x 
+3 Dự thảo quy chế tổ chức, hoạt động của văn 
+phòng giám định tư pháp x  
+4 
+Đề án thành l ập Văn phòng giám  định tư 
+pháp ph ải nêu rõ m ục đích thành l ập; d ự 
+kiến về tên gọi, nhân s ự, địa điểm đặt trụ 
+sở; điều kiện về cơ sở vật chất, trang thiết 
+bị, phương ti ện giám đ ịnh theo quy đ ịnh 
+của bộ, cơ quan ngang b ộ quản lý chuyên 
+x  
+
+TRANG 32
+32 
+ 
+môn v ề lĩnh v ực giám đ ịnh và k ế hoạch 
+triển khai thực hiện.  
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ 
+Trong thời hạn 45 ngày, k ể từ ngày nhận đủ hồ sơ hợp lệ, Giám đốc Sở Tư pháp 
+thống nhất ý kiến với người đứng đầu cơ quan chuyên môn thuộc Ủy ban nhân dân 
+thành phố quản lý lĩnh vực giám định tư pháp, xem xét, quyết định cho phép thành 
+lập Văn phòng giám định tư pháp. Trường hợp không cho phép thì phải thông báo 
+bằng văn bản và nêu rõ lý do. Người bị từ chối có quyển khiếu nại, khởi kiện theo 
+quy định của pháp luật. 
+3.5 Nơi tiếp nhận hồ sơ và trả kết quả 
+ - Các Chi nhánh Trung tâm phục vụ hành chính công Thành phố 
+3.6 Phí/Lệ phí 
+ Không quy định 
+3.7 Quy trình xử lý công việc  
+TT Trình tự Trách 
+nhiệm 
+Thời 
+gian 
+Biểu mẫu/Kết quả 
+B1 
+Tiếp nhận và kiểm tra hồ sơ: 
+-  Trường hợp hồ sơ đủ điều 
+kiện giải quyết, công chức bộ 
+phận m ột c ửa l ập Gi ấy ti ếp 
+nhận h ồ sơ và h ẹn ngày tr ả 
+kết quả; 
+- Trường hợp hồ sơ chưa đầy 
+đủ, chính xác, công chức tiếp 
+nhận hư ớng d ẫn b ổ sung, 
+hoàn thi ện h ồ sơ theo quy 
+định; 
+- Trường hợp hồ sơ không đủ 
+điều ki ện giải quy ết, công 
+chức tiếp nhận phải nêu rõ lý 
+do theo m ẫu Phi ếu t ừ chối 
+giải quyết hồ sơ. 
+Bộ phận 
+một cửa 
+Giờ hành 
+chính 
+- Hồ sơ theo mục 3.2; 
+-  Giấy tiếp nhận hồ 
+sơ và h ẹn ngày tr ả 
+kết quả; 
+- Phiếu yêu c ầu b ổ 
+sung, hoàn thi ện h ồ 
+sơ; 
+- Phiếu t ừ chối ti ếp 
+nhận gi ải quy ết h ồ 
+sơ. 
+
+TRANG 33
+33 
+ 
+B2 Chuyển h ồ sơ cho phòng 
+chuyên môn 
+Bộ phận 
+một 
+cửa 
+0,5 ngày 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ  
+B3 Phân công xử lý hồ sơ 
+Lãnh đạo 
+Phòng 
+0,5 ngày 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ 
+B4 
+Thẩm đ ịnh h ồ sơ: Chuyên 
+viên gi ải quy ết h ồ sơ ti ến 
+hành xem xét, trình lãnh đ ạo 
+Phòng 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ 
+ 
+19 ngày làm 
+việc 
+ 
+-  Trường hợp hồ sơ 
+đủ điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++ Văn bản hỏi ý kiến 
+của 
+|người đ ứng đ ầu cơ 
+quan 
+quản lý lĩnh v ực 
+GĐTP; 
+|Tờ trình, Quyết định 
+cho phép thành l ập 
+văn phòng GĐTP.  
+- Trường h ợp h ồ sơ 
+chưa ho ặc không đ ủ 
+điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++ Dự thảo Phiếu yêu 
+cầu b ổ sung, hoàn 
+thiện h ồ sơ ho ặc 
+Phiếu t ừ chối ti ếp 
+nhận gi ải quy ết h ồ 
+sơ. 
+- Trường h ợp ch ậm, 
+muộn: 
++ Hồ sơ; 
+
+TRANG 34
+34 
+ 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++  Văn bản hỏi ý kiến 
+của ngư ời đ ứng đ ầu 
+cơ quan qu ản lý lĩnh 
+vực GĐTР; Tờ trình, 
+Quyết định cho phép 
+thành lập Văn phòng 
+GĐTР;  
++ Phiếu xin lỗi. 
+ 
+B5 
+Lãnh đạo Phòng xem xét h ồ 
+sơ, ký xác nh ận, trình lãnh 
+đạo Sở phê chuẩn 
+Lãnh đạo 
+Phòng 
+03 ngày làm 
+việc 
+-  Trường hợp hồ sơ 
+đủ điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++ Văn bản hỏi ý kiến 
+của 
+|người đ ứng đ ầu cơ 
+quan 
+quản lý lĩnh v ực 
+GĐTP; 
+|Tờ trình, Quyết định 
+cho phép thành l ập 
+văn phòng GĐTP.  
+- Trường h ợp h ồ sơ 
+chưa ho ặc không đ ủ 
+điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++ Dự thảo Phiếu yêu 
+cầu b ổ sung, hoàn 
+thiện h ồ sơ ho ặc 
+Phiếu t ừ chối ti ếp 
+
+TRANG 35
+35 
+ 
+nhận gi ải quy ết h ồ 
+sơ. 
+- Trường h ợp ch ậm, 
+muộn: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++  Văn bản hỏi ý kiến 
+của ngư ời đ ứng đ ầu 
+cơ quan qu ản lý lĩnh 
+vực GĐTР; Tờ trình, 
+Quyết định cho phép 
+thành lập Văn phòng 
+GĐTР;  
++ Phiếu xin lỗi. 
+ 
+B6 
+Lãnh đạo Sở xét duyệt hồ sơ: 
+ký văn b ản h ỏi ý ki ến c ủa 
+người đứng đầu cơ quan quản 
+lý lĩnh v ực GĐTP; xem xét, 
+quyết đ ịnh cho phép thành 
+lập Văn phòng giám đ ịnh tư 
+pháp hoặc ký văn bản từ chối 
+giải quyết hồ sơ 
+Lãnh đạo 
+Sở 20 ngày 
+- Văn bản hỏi ý kiến 
+của 
+người đ ứng đ ầu cơ 
+quan 
+quản lý lĩnh v ực 
+GĐTP; 
+- Quyết đ ịnh cho 
+phép thành l ập Văn 
+phòng GĐTP/Văn 
+bản từ chối 
+giải quyết hồ sơ. 
+B7 Hoàn thiện hồ sơ, phát hành 
+văn bản 
+Chuyên 
+viên 
+giải quyết 
+hồ 
+sơ/văn thư 
+ 
+01 ngày 
+- Hồ sơ; 
+-  Phiếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++  Quy ết đ ịnh cho 
+phép 
+thành lập văn phòng 
+GĐTP; 
++ Văn bản từ chối. 
+
+TRANG 36
+36 
+ 
+B8 Bàn giao và trả kết quả cho tổ 
+chức/cá nhân 
+Chuyên 
+viên 
+giải quyết 
+hồ 
+sơ/Bộ phận 
+một cửa 
+ 
+01 ngày 
+-  Phiếu ki ểm soát 
+quá trình gi ải quy ết 
+hồ sơ; 
++  Quy ết đ ịnh cho 
+phép 
+thành lập văn phòng 
+GĐTP; 
++ Văn bản từ chối. 
+4 Biểu mẫu      
+ 
+Hệ thống biểu mẫu theo cơ ch ế một cửa, một cửa liên thông đư ợc ban hành kèm 
+theo Thông tư 03/2025/TT -VPCP hư ớng d ẫn Ngh ị định 118/2025/NĐ -CP th ực 
+hiện thủ tục hành chính theo cơ ch ế một cửa, một cửa liên thông tại Bộ phận Một 
+cửa và Cổng Dịch vụ công quốc gia do Văn phòng Chính phủ ban hành. 
+ 
+ 
+
+TRANG 37
+37 
+ 
+4. Đăng ký hoạt động Văn phòng giám định tư pháp (Mã 2.000823)  
+1 Mục đích: Quy định trình tự và cách thức xử lý, giải quyết hồ sơ đăng ký hoạt động 
+Văn phòng giám định tư pháp 
+2 Phạm vi: Áp dụng đối với văn phòng giám định tư pháp, công chức Sở Tư pháp. 
+3 Nội dung quy trình 
+3.1 Cở sở pháp lý 
+ 
+- Luật Giám định tư pháp năm 2012; Luật Giám định tư pháp sửa đổi 2020; 
+- Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính phủ quy định chi tiết và 
+biện pháp thi hành Luật giám định tư pháp;  
+- Nghị định số 157/2020/NĐ-CP ngày 31/12/2020 c ủa Chính phủ sửa đổi, bổ sung 
+một số điều của Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính ph ủ quy 
+định chi tiết và biện pháp thi hành Luật giám định tư pháp; 
+- Quyết định số 524/QĐ-BTP ngày 05/4/2021 của Bộ Tư pháp Công bố thủ tục hành 
+chính sửa đổi, bổ sung trong lĩnh vực giám định tư pháp; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản chính Bản sao 
+1 Đơn đề nghị đăng ký hoạt động x  
+2 Quy chế tổ chức, hoạt động của Văn phòng 
+giám định tư pháp x  
+3 
+Giấy tờ chứng minh có đủ điều kiện bảo đảm 
+|hoạt động của Văn phòng giám đ ịnh tư pháp 
+theo Đ ể án thành l ập quy định t ại đi ểm d 
+khoản 2 Điều 16 của Luật Giám định tư pháp 
+x  
+4 Quyết đ ịnh cho phép thành l ập văn phòng 
+giám định tư pháp  x 
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ Trong thời hạn 30 ngày kể từ ngày nhận đủ hồ sơ hợp lệ 
+
+TRANG 38
+38 
+ 
+3.5 Nơi tiếp nhận và kết quả 
+ - Các Chi nhánh Trung tâm ph ục vụ hành chính công Thành phố / Cổng Dịch vụ 
+công quốc gia. 
+3.6 Phí/Lệ phí 
+ Không quy định 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách 
+nhiệm Thời gian Biểu mẫu/Kết quả 
+B1 
+Tiếp nhận và kiểm tra hồ sơ: 
+- Trường h ợp h ồ sơ đ ủ điều 
+kiện giải quyết, công ch ức bộ 
+phận m ột c ửa l ập Gi ấy ti ếp 
+nhận hồ sơ và hẹn ngày trả kết 
+quả; 
+- Trường hợp hồ sơ chưa đ ầy 
+đủ, chính xác, công ch ức tiếp 
+nhận hướng dẫn bổ sung, hoàn 
+thiện hồ sơ theo quy định; 
+- Trường hợp hồ sơ không đủ 
+điều kiện giải quyết, công chức 
+tiếp nhận phải nêu rõ lý do theo 
+mẫu Phi ếu t ừ chối gi ải quy ết 
+hồ sơ. 
+Trung 
+tâm phục 
+vụ hành 
+chính 
+công 
+Giờ hành 
+chính 
+- Hồ sơ theo mục 3.2; 
+- Giấy tiếp nhận hồ sơ 
+và hẹn ngày trả kết quả  
+- Phiếu yêu c ầu b ổ 
+sung, hoàn thiện hồ sơ  
+- Phiếu t ừ chối ti ếp 
+nhận giải quyết hồ sơ  
+ 
+B2 Chuyển h ồ sơ cho Lãnh đ ạo 
+phòng chuyên môn 
+Trung 
+tâm phục 
+vụ hành 
+chính 
+công 
+01 ngày 
+- Hồ sơ theo mục 3.2; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ  
+B3 Lãnh đ ạo phòng chuyên môn 
+phân công xử lý hồ sơ 
+Lãnh đạo 
+Phòng 01 ngày 
+- Hồ sơ theo mục 3.2; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ  
+B4 
+Thẩm định hồ sơ: Chuyên viên 
+giải quyết hồ sơ tiến hành xem 
+xét, trình lãnh đạo Phòng 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ 
+- 05 ngày 
+(đối với Dự 
+thảo văn bản 
+lấy ý kiến cơ 
+quan chuyên 
+- Trường hợp hồ sơ đủ 
+điều kiện: 
++ Hồ sơ; 
+
+TRANG 39
+39 
+ 
+môn thuộc 
+UBND TP 
+quản lý lĩnh 
+vực GĐTP) 
+- 16 ngày 
+(đối với Dự 
+thảo Giấy 
+đăng ký hoạt 
+động) 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ Dự thảo văn b ản lấy 
+ý kiến cơ quan chuyên 
+môn thu ộc UBND TP 
+quản lý lĩnh v ực 
+GĐTP; D ự thảo Gi ấy 
+đăng ký hoạt động. 
+- Trường h ợp h ồ sơ 
+chưa ho ặc không đ ủ 
+điều kiện: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ D ự thảo Phi ếu yêu 
+cầu bổ sung, hoàn thiện 
+hồ sơ hoặc Phi ếu t ừ 
+chối ti ếp nh ận gi ải 
+quyết hồ sơ. 
+- Trường h ợp ch ậm, 
+muộn: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ Dự thảo văn b ản lấy 
+ý kiến cơ quan chuyên 
+môn thu ộc UBND TP 
+quản lý lĩnh v ực 
+GĐTP; D ự thảo Gi ấy 
+đăng ký hoạt động. 
++ Phiếu xin lỗi. 
+B5 
+Lãnh đ ạo Phòng xem xét h ồ 
+sơ, ký xác nhận, trình lãnh đạo 
+Sở phê duyệt 
+Lãnh đạo 
+Phòng 
+- 01 ngày 
+(đối với Dự 
+thảo văn bản 
+lấy ý kiến 
+của người 
+đứng đầu cơ 
+quan chuyên 
+môn thuộc 
+UBND TP 
+- Trường hợp hồ sơ đủ 
+điều kiện: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ Dự thảo văn b ản lấy 
+ý kiến cơ quan chuyên 
+môn thu ộc UBND TP 
+quản lý lĩnh v ực 
+
+TRANG 40
+40 
+ 
+quản lý lĩnh 
+vực GĐTP) 
+- 05 ngày 
+(đối với Dự 
+thảo Quyết 
+định cho 
+phép thay 
+đổi, bổ sung 
+lĩnh vực 
+GĐTP) 
+GĐTP; D ự thảo Gi ấy 
+đăng ký hoạt động. 
+- Trường hợp h ồ sơ 
+chưa ho ặc không đ ủ 
+điều kiện: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ D ự thảo Phi ếu yêu 
+cầu bổ sung, hoàn thiện 
+hồ sơ ho ặc Phi ếu t ừ 
+chối ti ếp nh ận gi ải 
+quyết hồ sơ. 
+- Trường h ợp ch ậm, 
+muộn: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ Dự thảo văn b ản lấy 
+ý kiến cơ quan chuyên 
+môn thu ộc UBND TP 
+quản lý lĩnh v ực 
+GĐTP; D ự thảo Gi ấy 
+đăng ký hoạt động. 
++ Phiếu xin lỗi. 
+B6 
+Lãnh đạo Sở xét duyệt hồ sơ:  
+- Ký văn b ản l ấy ý ki ến c ủa 
+người đ ứng đ ầu cơ quan 
+chuyên môn thu ộc UBND TP 
+quản lý lĩnh vực GĐTP. 
+- Quyết đ ịnh cho phép thay 
+đổi, b ổ sung lĩnh v ực Giám 
+định tư pháp. 
+Lãnh đạo 
+Sở 
+- 01 ngày 
+(đối với Dự 
+thảo văn bản 
+lấy ý kiến cơ 
+quan chuyên 
+môn thuộc 
+UBND TP 
+quản lý lĩnh 
+vực GĐTP) 
+- 05 ngày 
+(đối với Giấy 
+đăng ký hoạt 
+động) 
+- Hồ sơ; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ; 
+- Văn bản lấy ý kiến cơ 
+quan chuyên môn 
+thuộc UBND TP qu ản 
+lý lĩnh vực GĐTP; 
+- Giấy đăng ký ho ạt 
+động. 
+B7 Hoàn thi ện h ồ sơ, phát hành 
+văn bản  
+Chuyên 
+viên giải 
+01 ngày - Hồ sơ; 
+
+TRANG 41
+41 
+ 
+quyết hồ 
+sơ/văn 
+thư 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
+- Văn bản lấy ý kiến cơ 
+quan chuyên môn 
+thuộc UBND TP qu ản 
+lý lĩnh vực GĐTP; 
+- Giấy đăng ký ho ạt 
+động. 
+- Văn bản từ chối. 
+B8 Bàn giao và tr ả kết quả cho tổ 
+chức/cá nhân 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ/Bộ 
+phận một 
+cửa 
+01 ngày 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ; 
+- Giấy đăng ký ho ạt 
+động. 
+- Văn bản từ chối. 
+4 Biểu mẫu 
+ 
+Hệ thống biểu mẫu theo cơ chế một cửa, một cửa liên thông được ban hành kèm theo 
+Thông tư 03/2025/TT-VPCP hướng dẫn Nghị định 118/2025/NĐ-CP thực hiện thủ 
+tục hành chính theo cơ chế một cửa, một cửa liên thông tại Bộ phận Một cửa và Cổng 
+Dịch vụ công quốc gia do Văn phòng Chính phủ ban hành 
+ 
+  
+
+TRANG 42
+42 
+ 
+5. Thay đổi, bổ sung lĩnh vực giám định tư pháp của văn phòng giám định tư pháp 
+(Mã 2.000568)  
+1 Mục đích: Quy định trình tự và cách thức xử lý, giải quyết hồ sơ đề nghị thay đổi, 
+bổ sung lĩnh vực giám định của văn phòng giám định tư pháp 
+2 Phạm vi: Áp dụng đối với văn phòng giám định tư pháp, công chức Sở Tư pháp. 
+3 Nội dung quy trình 
+3.1 Cở sở pháp lý 
+ 
+- Luật Giám định tư pháp năm 2012; Luật Giám định tư pháp sửa đổi 2020; 
+- Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính phủ quy định chi tiết và 
+biện pháp thi hành Luật giám định tư pháp;  
+- Nghị định số 157/2020/NĐ-CP ngày 31/12/2020 c ủa Chính phủ sửa đổi, bổ sung 
+một số điều của Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính ph ủ quy 
+định chi tiết và biện pháp thi hành Luật giám định tư pháp; 
+- Nghị định 18/2026/NĐ-CP ngày 14/01/2026 c ủa Chính phủ sửa đổi Nghị định để 
+cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc phạm vi quản 
+lý của Bộ Tư pháp; 
+- Quyết định số 862/QĐ-BTP ngày 27/03/2026 của Bộ Tư pháp Công bố thủ tục hành 
+chính sửa đổi, bổ sung trong lĩnh vực giám định tư pháp; 
+- Quyết định số 656/QĐ-UBND ngày 10/02/2026 của UBND thành ph ố Hà Nội về 
+việc uỷ quyền cho Giám đ ốc Sở Tư pháp thành ph ố Hà Nội giải quyết các th ủ tục 
+hành chính lĩnh vực tư pháp thuộc thẩm quyền giải quyết của Chủ tịch UBND thành 
+phố Hà Nội; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 của Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản chính Bản sao 
+1 Văn bản xin phép thay đ ổi, bổ sung lĩnh vực 
+giám định x  
+2 Quyết đ ịnh cho phép thành l ập văn phòng 
+giám định tư pháp đã được cấp x  
+3 
+Đề án về việc thay đổi, bổ sung lĩnh vực giám 
+định, (nêu rõ điều kiện về nhân lực; cơ sở vật 
+chất; trang thi ết b ị, phương ti ện giám đ ịnh 
+theo quy định của bộ, cơ quan ngang bộ quản 
+lý chuyên môn về lĩnh vực giám định, trừ các 
+x  
+
+TRANG 43
+43 
+ 
+lĩnh vực giám đ ịnh không c ần sử dụng trang 
+thiết bị, phương ti ện máy móc giám đ ịnh để 
+đưa ra k ết luận giám đ ịnh và k ế hoạch triển 
+khai thực hiện phù h ợp với việc thay đ ổi, bổ 
+sung lĩnh vực giám định) 
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ 
+Trong thời hạn 30 ngày làm việc, kể từ ngày nhận đủ hồ sơ hợp lệ, Giám đốc Sở Tư 
+pháp quyết định cho phép thay đổi, bổ sung lĩnh vực giám định. Trường hợp không 
+cho phép thay đ ổi, bổ sung lĩnh vực giám định thì phải thông báo b ằng văn bản và 
+nêu rõ lý do. 
+3.5 Nơi tiếp nhận và kết quả 
+ - Các Chi nhánh Trung tâm ph ục vụ hành chính công Thành phố / Cổng Dịch vụ 
+công quốc gia. 
+3.6 Phí/Lệ phí 
+ Không quy định 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách 
+nhiệm Thời gian Biểu mẫu/Kết quả 
+B1 
+Tiếp nhận và kiểm tra hồ sơ: 
+- Trường h ợp h ồ sơ đ ủ điều 
+kiện giải quyết, công chức bộ 
+phận m ột c ửa l ập Gi ấy ti ếp 
+nhận hồ sơ và hẹn ngày trả kết 
+quả; 
+- Trường hợp hồ sơ chưa đầy 
+đủ, chính xác, công chức tiếp 
+nhận hư ớng d ẫn b ổ sung, 
+hoàn thi ện h ồ sơ theo quy 
+định; 
+- Trường hợp hồ sơ không đủ 
+điều ki ện gi ải quy ết, công 
+chức tiếp nhận phải nêu rõ lý 
+Trung tâm 
+phục vụ 
+hành chính 
+công 
+Giờ hành 
+chính 
+- Hồ sơ theo mục 3.2; 
+- Giấy tiếp nhận hồ sơ 
+và hẹn ngày trả kết quả  
+- Phiếu yêu c ầu b ổ 
+sung, hoàn thiện hồ sơ  
+- Phiếu t ừ chối ti ếp 
+nhận giải quyết hồ sơ  
+ 
+
+TRANG 44
+44 
+ 
+do theo m ẫu Phi ếu t ừ chối 
+giải quyết hồ sơ. 
+B2 Chuyển hồ sơ cho Lãnh đ ạo 
+phòng chuyên môn 
+Trung tâm 
+phục vụ 
+hành chính 
+công 
+0,5 ngày làm 
+việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ  
+B3 Lãnh đạo phòng chuyên môn 
+phân công xử lý hồ sơ 
+Lãnh đạo 
+Phòng 
+0,5 ngày làm 
+việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ  
+B4 
+Thẩm đ ịnh h ồ sơ: Chuyên 
+viên gi ải quy ết h ồ sơ ti ến 
+hành xem xét, trình lãnh đ ạo 
+Phòng 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ 
+- 10 ngày 
+làm việc (đối 
+với Dự thảo 
+văn bản lấy 
+ý kiến của 
+người đứng 
+đầu cơ quan 
+chuyên môn 
+thuộc UBND 
+TP quản lý 
+lĩnh vực 
+GĐTP) 
+- 20 ngày 
+làm việc (đối 
+với Dự thảo 
+Quyết định 
+cho phép 
+thay đổi, bổ 
+sung lĩnh 
+vực GĐTP) 
+- Trường hợp hồ sơ đủ 
+điều kiện: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ Dự thảo văn b ản lấy 
+ý kiến của người đứng 
+đầu cơ quan chuyên 
+môn thu ộc UBND TP 
+quản lý lĩnh v ực 
+GĐTP; Dự thảo Quyết 
+định cho phép thay đổi, 
+bổ sung lĩnh v ực 
+GĐTP. 
+- Trường h ợp h ồ sơ 
+chưa ho ặc không đ ủ 
+điều kiện: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ D ự thảo Phi ếu yêu 
+cầu bổ sung, hoàn thiện 
+hồ sơ ho ặc Phi ếu t ừ 
+chối ti ếp nh ận gi ải 
+quyết hồ sơ. 
+- Trường h ợp ch ậm, 
+muộn: 
++ Hồ sơ; 
+
+TRANG 45
+45 
+ 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ Dự thảo văn b ản lấy 
+ý kiến của người đứng 
+đầu cơ quan chuyên 
+môn thu ộc UBND TP 
+quản lý lĩnh v ực 
+GĐTP; Dự thảo Quyết 
+định cho phép thay đổi, 
+bổ sung lĩnh v ực 
+GĐTP. 
++ Phiếu xin lỗi. 
+B5 
+Lãnh đạo Phòng xem xét h ồ 
+sơ, ký xác nh ận, trình lãnh 
+đạo Sở phê duyệt 
+Lãnh đạo 
+Phòng 
+- 01 ngày 
+làm việc (đối 
+với Dự thảo 
+văn bản lấy 
+ý kiến của 
+người đứng 
+đầu cơ quan 
+chuyên môn 
+thuộc UBND 
+TP quản lý 
+lĩnh vực 
+GĐTP) 
+- 04 ngày 
+làm việc (đối 
+với Dự thảo 
+Quyết định 
+cho phép 
+thay đổi, bổ 
+sung lĩnh 
+vực GĐTP) 
+- Trường hợp hồ sơ đủ 
+điều kiện: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ Dự thảo văn b ản lấy 
+ý kiến của người đứng 
+đầu cơ quan chuyên 
+môn thu ộc UBND TP 
+quản lý lĩnh v ực 
+GĐTP; Dự thảo Quyết 
+định cho phép thay đổi, 
+bổ sung lĩnh v ực 
+GĐTP. 
+- Trường h ợp h ồ sơ 
+chưa ho ặc không đ ủ 
+điều kiện: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ D ự thảo Phi ếu yêu 
+cầu bổ sung, hoàn thiện 
+hồ sơ ho ặc Phi ếu t ừ 
+chối ti ếp nh ận gi ải 
+quyết hồ sơ. 
+- Trường h ợp ch ậm, 
+muộn: 
++ Hồ sơ; 
+
+TRANG 46
+46 
+ 
++ Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
++ Dự thảo văn b ản lấy 
+ý kiến của người đứng 
+đầu cơ quan chuyên 
+môn thu ộc UBND TP 
+quản lý lĩnh v ực 
+GĐTP; Dự thảo Quyết 
+định cho phép thay đổi, 
+bổ sung lĩnh v ực 
+GĐTP; 
++ Phiếu xin lỗi. 
+B6 
+Lãnh đạo Sở xét duyệt hồ sơ:  
+- Ký văn b ản lấy ý ki ến của 
+người đ ứng đ ầu cơ quan 
+chuyên môn thuộc UBND TP 
+quản lý lĩnh vực GĐTP. 
+- Quyết đ ịnh cho phép thay 
+đổi, b ổ sung lĩnh v ực Giám 
+định tư pháp. 
+Lãnh đạo 
+Sở 
+- 01 ngày 
+làm việc (đối 
+với Dự thảo 
+văn bản lấy 
+ý kiến của 
+người đứng 
+đầu cơ quan 
+chuyên môn 
+thuộc UBND 
+TP quản lý 
+lĩnh vực 
+GĐTP) 
+- 03 ngày 
+làm việc (đối 
+với Dự thảo 
+Quyết định 
+cho phép 
+thay đổi, bổ 
+sung lĩnh 
+vực GĐTP) 
+- Hồ sơ; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ; 
+- Văn bản l ấy ý ki ến 
+của người đứng đầu cơ 
+quan chuyên môn 
+thuộc UBND TP qu ản 
+lý lĩnh vực GĐTP; 
+- Quyết định cho phép 
+thay đ ổi, b ổ sung lĩnh 
+vực GĐTP. 
+B7 Hoàn thiện hồ sơ, phát hành 
+văn bản  
+Chuyên 
+viên giải 
+quyết hồ 
+sơ/văn thư 
+01 ngày làm 
+việc 
+- Hồ sơ; 
+- Phiếu kiểm soát quá 
+trình giải quyết hồ sơ; 
+- Quyết định cho phép 
+thay đ ổi, b ổ sung lĩnh 
+vực GĐTP; 
+- Văn bản từ chối. 
+
+TRANG 47
+47 
+ 
+B8 Bàn giao và trả kết quả cho tổ 
+chức/cá nhân 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ/Bộ phận 
+một cửa 
+01 ngày làm 
+việc 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ; 
+- Quyết định cho phép 
+thay đ ổi, b ổ sung lĩnh 
+vực GĐTP; 
+- Văn bản từ chối. 
+B9 
+Thống kê và theo dõi: 
+Chuyên viên S ở Tư pháp có 
+trách nhi ệm th ống kê các 
+TTHC th ực hi ện t ại đơn v ị 
+vào Sổ thống kê kết quả thực 
+hiện 
+Bộ phận 
+một 
+cửa/Phòng 
+BTTP/Văn 
+thư 
+Giờ hành 
+chính 
+Phiếu ki ểm soát quá 
+trình gi ải quy ết h ồ sơ; 
+Sổ theo dõi hồ sơ. 
+4 Biểu mẫu 
+ 
+Hệ thống biểu mẫu theo cơ chế một cửa, một cửa liên thông được ban hành kèm theo 
+Thông tư 03/2025/TT-VPCP hướng dẫn Nghị định 118/2025/NĐ-CP thực hiện thủ 
+tục hành chính theo cơ chế một cửa, một cửa liên thông tại Bộ phận Một cửa và Cổng 
+Dịch vụ công quốc gia do Văn phòng Chính phủ ban hành 
+ 
+  
+
+TRANG 48
+48 
+ 
+6. Chuyển đổi loại hình văn phòng giám định tư pháp (Mã 1.001216)  
+1 
+Mục đích:  Quy đ ịnh trình t ự tiếp nh ận, th ẩm định và gi ải quy ết h ồ sơ đ ề nghị 
+chuyển đổi loại hình hoạt động của văn phòng giám định tư pháp từ doanh nghiệp 
+tư nhân sang công ty hợp danh và ngược lại 
+2 Phạm vi: Áp dụng đối với văn phòng giám định tư pháp; công chức Sở Tư pháp. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Giám định tư pháp năm 2012; Luật Giám định tư pháp sửa đổi 2020; 
+- Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 của Chính phủ quy định chi tiết và 
+biện pháp thi hành Luật giám định tư pháp;  
+- Nghị định số 157/2020/NĐ-CP ngày 31/12/2020 của Chính phủ sửa đổi, bổ sung 
+một số điều của Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 của Chính phủ quy 
+định chi tiết và biện pháp thi hành Luật giám định tư pháp; 
+- Nghị định 18/2026/NĐ-CP ngày 14/01/2026 của Chính phủ sửa đổi Nghị định để 
+cắt giảm, đơn gi ản hóa th ủ tục hành chính, đi ều kiện kinh doanh thu ộc phạm vi 
+quản lý của Bộ Tư pháp; 
+- Quyết định số 862/QĐ-BTP ngày 27/03/2026 c ủa Bộ Tư pháp Công b ố thủ tục 
+hành chính sửa đổi, bổ sung trong lĩnh vực giám định tư pháp; 
+- Quyết định số 656/QĐ-UBND ngày 10/02/2026 của UBND thành phố Hà Nội về 
+việc uỷ quyền cho Giám đốc Sở Tư pháp thành phố Hà Nội giải quyết các thủ tục 
+hành chính lĩnh vực tư pháp thuộc thẩm quyền giải quyết của Chủ tịch UBND thành 
+phố Hà Nội; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 của Trung tâm phục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Ch ứng thực thuộc phạm vi chức năng qu ản lý của Sở 
+Tư pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản 
+chính Bản sao 
+1 Văn bản đề nghị chuyển đổi x  
+2 
+Đề án chuyển đổi loại hình hoạt động, 
+trong đó nêu rõ lý do chuyển đổi, tình 
+hình t ổ chức và ho ạt đ ộng c ủa Văn 
+phòng giám đ ịnh tư pháp tính đ ến 
+ngày đề nghị chuyển đổi, dự kiến về 
+tổ chức, tên g ọi, địa điểm đặt trụ sở; 
+nhân sự; điều kiện vật chất; trang thiết 
+x  
+
+TRANG 49
+49 
+ 
+bị, phương tiện giám định, trừ các lĩnh 
+vực giám đ ịnh không c ần s ử dụng 
+trang thi ết b ị, phương ti ện máy móc 
+giám đ ịnh đ ể đưa ra k ết lu ận giám 
+định 
+3 Dự thảo Quy chế mới về tổ chức, hoạt 
+động của Văn phòng x  
+4 Quyết đ ịnh cho phép thành l ập Văn 
+phòng đã được cấp x  
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ 
+Trong thời hạn 12 ngày làm việc, kể từ ngày nhận đủ hồ sơ hợp lệ, Sở Tư pháp xem 
+xét, quyết định cho phép chuyển đổi loại hình hoạt động của Văn phòng giám định 
+tư pháp. 
+3.5 Nơi tiếp nhận hồ sơ và trả kết quả 
+ - Các Chi nhánh Trung tâm phục vụ hành chính công Thành phố / Cổng Dịch vụ 
+công quốc gia. 
+3.6 Phí/Lệ phí 
+ Không quy định 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách 
+nhiệm 
+Thời 
+gian Biểu mẫu/Kết quả 
+B1 
+Tiếp nhận và ki ểm tra 
+hồ sơ: 
+- Trường hợp hồ sơ đủ 
+điều ki ện gi ải quy ết, 
+công chức bộ phận một 
+cửa lập Giấy tiếp nhận 
+hồ sơ và h ẹn ngày tr ả 
+kết quả; 
+- Trường h ợp h ồ sơ 
+chưa đ ầy đ ủ, chính 
+xác, công ch ức ti ếp 
+Trung tâm 
+phục vụ 
+hành chính 
+công thành 
+phố 
+Giờ hành 
+chính 
+- Hồ sơ theo mục 3.2; 
+- Giấy tiếp nhận hồ sơ và h ẹn 
+ngày trả kết quả  
+- Phiếu yêu cầu bổ sung, hoàn 
+thiện hồ sơ  
+- Phiếu từ chối tiếp nhận giải 
+quyết hồ sơ  
+ 
+
+TRANG 50
+50 
+ 
+nhận hư ớng d ẫn b ổ 
+sung, hoàn thiện hồ sơ 
+theo quy định; 
+- Trường h ợp h ồ sơ 
+không đ ủ điều ki ện 
+giải quy ết, công ch ức 
+tiếp nh ận ph ải nêu rõ 
+lý do theo m ẫu Phi ếu 
+từ chối gi ải quy ết h ồ 
+sơ. 
+B2 
+Chuyển h ồ sơ cho 
+Lãnh đ ạo phòng 
+chuyên môn 
+Trung tâm 
+phục vụ 
+hành chính 
+công thành 
+phố 
+0,5 ngày 
+làm việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá trình giải 
+quyết hồ sơ  
+B3 
+Lãnh đ ạo phòng 
+chuyên môn phân công 
+xử lý hồ sơ 
+Lãnh đạo 
+Phòng 
+0,5 ngày 
+làm việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá trình giải 
+quyết hồ sơ  
+B4 
+Thẩm đ ịnh h ồ sơ: 
+Chuyên viên giải quyết 
+hồ sơ ti ến hành xem 
+xét, trình lãnh đ ạo 
+Phòng phê duyệt 
+Chuyên viên 
+giải quyết 
+hồ sơ 
+05 ngày 
+làm việc 
+- Trường h ợp h ồ sơ đ ủ điều 
+kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát quá trình 
+giải quyết hồ sơ; 
++ D ự thảo Quy ết đ ịnh cho 
+phép chuyển đổi loại hình hoạt 
+động Văn phòng giám đ ịnh tư 
+pháp. 
+- Trường hợp hồ sơ chưa hoặc 
+không đủ điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát quá trình 
+giải quyết hồ sơ; 
++ D ự thảo Phi ếu yêu c ầu b ổ 
+sung, hoàn thi ện h ồ sơ ho ặc 
+Phiếu t ừ chối ti ếp nh ận gi ải 
+quyết hồ sơ. 
+B5 Lãnh đ ạo Phòng xem 
+xét hồ sơ, ký xác nhận, 
+Lãnh đạo 
+Phòng 
+02 ngày 
+làm việc 
+- Trường h ợp h ồ sơ đ ủ điều 
+kiện: 
+
+TRANG 51
+51 
+ 
+trình lãnh đ ạo S ở phê 
+duyệt 
++ Hồ sơ; 
++ Phi ếu ki ểm soát quá trình 
+giải quyết hồ sơ; 
++ D ự thảo Quy ết đ ịnh cho 
+phép chuyển đổi loại hình hoạt 
+động Văn phòng giám đ ịnh tư 
+pháp. 
+- Trường hợp hồ sơ chưa hoặc 
+không đủ điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát quá trình 
+giải quyết hồ sơ; 
++ D ự thảo Phi ếu yêu c ầu b ổ 
+sung, hoàn thi ện h ồ sơ ho ặc 
+Phiếu t ừ chối ti ếp nh ận gi ải 
+quyết hồ sơ. 
+B6 
+Lãnh đạo Sở xem xét, 
+ký Quy ết đ ịnh cho 
+phép chuy ển đ ổi lo ại 
+hình ho ạt đ ộng Văn 
+phòng giám đ ịnh tư 
+pháp lại hoặc văn b ản 
+từ chối 
+Lãnh đạo Sở 02 ngày 
+làm việc 
+- Hồ sơ; 
+- Phiếu kiểm soát quá trình giải 
+quyết hồ sơ; 
+- Quyết định cho phép chuyển 
+đổi lo ại hình ho ạt đ ộng Văn 
+phòng giám định tư pháp. 
+B7 Hoàn thiện hồ sơ, phát 
+hành văn bản  
+Chuyên viên 
+giải quyết 
+hồ sơ/văn 
+thư 
+01 ngày 
+làm việc 
+- Hồ sơ; 
+- Phiếu kiểm soát quá trình giải 
+quyết hồ sơ; 
+- Quyết định cho phép chuyển 
+đổi loại hình hoạt động. 
+B8 Bàn giao và trả kết quả 
+cho tổ chức/cá nhân 
+Chuyên viên 
+giải quyết 
+hồ sơ/Bộ 
+phận một 
+cửa 
+01 ngày 
+làm việc 
+- Phiếu kiểm soát quá trình giải 
+quyết hồ sơ; 
+- Quyết định cho phép chuyển 
+đổi loại hình hoạt động. 
+B9 
+Thống kê và theo dõi: 
+Chuyên viên S ở Tư 
+pháp có trách nhi ệm 
+thống kê các TTHC 
+thực hi ện t ại đơn v ị 
+Bộ phận một 
+cửa/Phòng 
+BTTP/Văn 
+thư 
+Giờ hành 
+chính 
+Phiếu kiểm soát quá trình gi ải 
+quyết hồ sơ; Sổ theo dõi hồ sơ. 
+
+TRANG 52
+52 
+ 
+vào S ổ thống kê k ết 
+quả thực hiện 
+4 Biểu mẫu    
+ 
+Hệ thống biểu mẫu theo cơ ch ế một cửa, một cửa liên thông đư ợc ban hành kèm 
+theo Thông tư 03/2025/TT-VPCP hướng dẫn Nghị định 118/2025/NĐ-CP thực hiện 
+thủ tục hành chính theo cơ chế một cửa, một cửa liên thông tại Bộ phận Một cửa và 
+Cổng Dịch vụ công quốc gia do Văn phòng Chính phủ ban hành 
+ 
+  
+
+TRANG 53
+53 
+ 
+7. Cấp lại Giấy đăng ký hoạt động của Văn phòng giám định tư pháp trong trường 
+hợp thay đổi tên gọi, địa chỉ trụ sở, người đại diện theo pháp luật, danh sách thành viên 
+hợp danh của Văn phòng giám định tư pháp (Mã 2.000555)  
+1 
+Mục đích: Quy định trình tự tiếp nhận, thẩm định và giải quyết hồ sơ đề nghị cấp lại 
+giấy đăng ký hoạt động của Văn phòng giám định tư pháp trong trường hợp thay đổi 
+tên gọi, địa chỉ trụ sở, người đại diện theo pháp luật, danh sách thành viên hợp danh 
+2 Phạm vi: Áp dụng đối với Văn phòng giám định tư pháp; công chức Sở Tư pháp. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Giám định tư pháp năm 2012; Luật Giám định tư pháp sửa đổi 2020; 
+- Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính phủ quy định chi tiết và 
+biện pháp thi hành Luật giám định tư pháp;  
+- Nghị định số 157/2020/NĐ-CP ngày 31/12/2020 c ủa Chính ph ủ sửa đổi, bổ sung 
+một số điều của Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính ph ủ quy 
+định chi tiết và biện pháp thi hành Luật giám định tư pháp; 
+- Nghị định 18/2026/NĐ-CP ngày 14/01/2026 c ủa Chính phủ sửa đổi Nghị định để 
+cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc phạm vi quản 
+lý của Bộ Tư pháp; 
+- Quyết định số 862/QĐ-BTP ngày 27/03/2026 của Bộ Tư pháp Công bố thủ tục hành 
+chính sửa đổi, bổ sung trong lĩnh vực giám định tư pháp; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản 
+chính Bản sao 
+1 Văn bản đề nghị cấp lại giấy đăng ký ho ạt 
+động x  
+2 Giấy đăng ký hoạt động cũ x  
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ 03 ngày làm việc. 
+
+TRANG 54
+54 
+ 
+3.5 Nơi tiếp nhận hồ sơ và trả kết quả 
+ - Các Chi nhánh Trung tâm phục vụ hành chính công Thành phố / Cổng Dịch vụ công 
+quốc gia. 
+3.6 Phí/Lệ phí 
+ Không quy định 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách 
+nhiệm 
+Thời 
+gian Biểu mẫu/Kết quả 
+B1 
+Tiếp nhận và kiểm tra hồ sơ: 
+- Trường h ợp h ồ sơ đ ủ điều 
+kiện giải quyết, công ch ức bộ 
+phận m ột c ửa l ập Gi ấy ti ếp 
+nhận hồ sơ và hẹn ngày trả kết 
+quả; 
+- Trường h ợp h ồ sơ chưa đ ầy 
+đủ, chính xác, công ch ức ti ếp 
+nhận hướng dẫn bổ sung, hoàn 
+thiện hồ sơ theo quy định; 
+- Trường hợp hồ sơ không đ ủ 
+điều kiện giải quyết, công chức 
+tiếp nhận phải nêu rõ lý do theo 
+mẫu Phiếu từ chối giải quyết hồ 
+sơ. 
+Trung 
+tâm phục 
+vụ hành 
+chính 
+công 
+thành phố 
+Giờ 
+hành 
+chính 
+- Hồ sơ theo mục 3.2; 
+- Giấy ti ếp nh ận h ồ sơ và 
+hẹn ngày trả kết quả  
+- Phiếu yêu c ầu b ổ sung, 
+hoàn thiện hồ sơ  
+- Phiếu t ừ chối ti ếp nh ận 
+giải quyết hồ sơ  
+ 
+B2 Chuyển h ồ sơ cho Lãnh đ ạo 
+phòng chuyên môn 
+Trung 
+tâm phục 
+vụ hành 
+chính 
+công 
+thành phố 
+0,5 ngày 
+làm việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá trình 
+giải quyết hồ sơ 
+B3 Phân công xử lý hồ sơ Lãnh đạo 
+Phòng 
+0,25 
+ngày 
+làm việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu kiểm soát quá trình 
+giải quyết hồ sơ  
+B4 
+Thẩm định hồ sơ: Chuyên viên 
+giải quyết hồ sơ tiến hành xem 
+xét, trình lãnh đạo Phòng 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ 
+01 ngày 
+làm việc 
+- Trường hợp hồ sơ đủ điều 
+kiện: 
++ Hồ sơ; 
+
+TRANG 55
+55 
+ 
++ Phiếu kiểm soát quá trình 
+giải quyết hồ sơ; 
++ Giấy đăng ký hoạt động. 
+- Trường h ợp h ồ sơ chưa 
+hoặc không đủ điều kiện: 
++ Hồ sơ; 
++ Phiếu kiểm soát quá trình 
+giải quyết hồ sơ; 
++ Dự thảo Phiếu yêu cầu bổ 
+sung, hoàn thiện hồ sơ hoặc 
+Phiếu từ chối tiếp nhận giải 
+quyết hồ sơ. 
+B5 
+Lãnh đạo Phòng xem xét hồ sơ, 
+ký xác nhận, trình lãnh đạo Sở 
+phê chuẩn 
+ 
+Lãnh đạo 
+phòng 
+0,25 
+ngày 
+làm việc 
+ 
+B6 
+Lãnh đạo Sở xét duyệt hồ sơ, 
+ký Giấy đăng ký hoạt động của 
+Văn phòng Th ừa phát l ại. 
+Trường h ợp không đ ủ điều 
+kiện, ký văn bản từ chối 
+Lãnh đạo 
+Sở 
+0,25 
+ngày 
+làm việc 
+- Hồ sơ; 
+- Phiếu kiểm soát quá trình 
+giải quyết hồ sơ; 
+- Giấy đăng ký hoạt động. 
+B7 Hoàn thi ện h ồ sơ, phát hành 
+văn bản  
+Chuyên 
+viên giải 
+quyết hồ 
+sơ/văn 
+thư 
+0,25 
+ngày 
+làm việc 
+- Hồ sơ; 
+- Phiếu kiểm soát quá trình 
+giải quyết hồ sơ; 
+- Giấy đăng ký hoạt động. 
+B8 Bàn giao và tr ả kết quả cho tổ 
+chức/cá nhân 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ/Bộ 
+phận một 
+cửa 
+0,5 ngày 
+làm việc 
+- Phiếu kiểm soát quá trình 
+giải quyết hồ sơ; 
+- Giấy đăng ký hoạt động. 
+4 Biểu mẫu    
+ 
+Hệ thống biểu mẫu theo cơ chế một cửa, một cửa liên thông được ban hành kèm theo 
+Thông tư 03/2025/TT -VPCP hướng dẫn Nghị định 118/2025/NĐ-CP thực hiện thủ 
+tục hành chính theo cơ chế một cửa, một cửa liên thông tại Bộ phận Một cửa và Cổng 
+Dịch vụ công quốc gia do Văn phòng Chính phủ ban hành 
+  
+
+TRANG 56
+56 
+ 
+8. Cấp lại giấy đăng ký hoạt động của văn phòng giám định tư pháp trong trường 
+hợp giấy đăng ký hoạt động bị hư hỏng hoặc bị mất (Mã 1.001117)  
+1 
+Mục đích: Quy định trình tự tiếp nhận, thẩm định và giải quyết hồ sơ đề nghị cấp lại 
+giấy đăng ký ho ạt động của Văn phòng giám đ ịnh tư pháp trong trư ờng hợp giấy 
+đăng ký hoạt động bị hư hỏng hoặc bị mất 
+2 Phạm vi: Áp dụng đối với Văn phòng giám định tư pháp; công chức Sở Tư pháp. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Giám định tư pháp năm 2012; Luật Giám định tư pháp sửa đổi 2020; 
+- Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính phủ quy định chi tiết và 
+biện pháp thi hành Luật giám định tư pháp;  
+- Nghị định số 157/2020/NĐ-CP ngày 31/12/2020 c ủa Chính ph ủ sửa đổi, bổ sung 
+một số điều của Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính ph ủ quy 
+định chi tiết và biện pháp thi hành Luật giám định tư pháp; 
+- Nghị định 18/2026/NĐ-CP ngày 14/01/2026 c ủa Chính phủ sửa đổi Nghị định để 
+cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc phạm vi quản 
+lý của Bộ Tư pháp; 
+- Quyết định số 862/QĐ-BTP ngày 27/03/2026 của Bộ Tư pháp Công bố thủ tục hành 
+chính sửa đổi, bổ sung trong lĩnh vực giám định tư pháp; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản 
+chính Bản sao 
+ Văn bản đề nghị cấp lại Giấy đăng ký hoạt động x  
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ 03 ngày làm việc. 
+3.5 Nơi tiếp nhận hồ sơ và trả kết quả 
+
+TRANG 57
+57 
+ 
+ - Các Chi nhánh Trung tâm phục vụ hành chính công Thành phố / Cổng Dịch vụ 
+công quốc gia. 
+3.6 Phí/Lệ phí 
+ Không quy định 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách 
+nhiệm 
+Thời 
+gian Biểu mẫu/Kết quả 
+B1 
+Tiếp nhận và kiểm tra hồ sơ: 
+- Trường hợp hồ sơ đủ điều kiện 
+giải quy ết, công ch ức b ộ phận 
+một cửa lập Giấy tiếp nhận hồ sơ 
+và hẹn ngày trả kết quả; 
+- Trường hợp hồ sơ chưa đầy đủ, 
+chính xác, công ch ức ti ếp nhận 
+hướng d ẫn b ổ sung, hoàn thi ện 
+hồ sơ theo quy định; 
+- Trường h ợp h ồ sơ không đ ủ 
+điều kiện giải quyết, công ch ức 
+tiếp nhận phải nêu rõ lý do theo 
+mẫu Phiếu từ chối giải quyết hồ 
+sơ. 
+Trung tâm 
+phục vụ 
+hành chính 
+công thành 
+phố 
+Giờ 
+hành 
+chính 
+- Hồ sơ theo mục 3.2; 
+- Giấy tiếp nhận hồ sơ và 
+hẹn ngày trả kết quả  
+- Phiếu yêu cầu bổ sung, 
+hoàn thiện hồ sơ  
+- Phiếu từ chối tiếp nhận 
+giải quyết hồ sơ  
+ 
+B2 Chuyển h ồ sơ cho Lãnh đ ạo 
+phòng chuyên môn 
+Trung tâm 
+phục vụ 
+hành chính 
+công thành 
+phố 
+0,5 
+ngày 
+làm việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ 
+B3 Phân công xử lý hồ sơ Lãnh đạo 
+Phòng 
+0,25 
+ngày 
+làm việc 
+- Hồ sơ theo mục 3.2; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ  
+B4 
+Thẩm định h ồ sơ: Chuyên viên 
+giải quyết hồ sơ ti ến hành xem 
+xét, trình lãnh đạo Phòng 
+Chuyên 
+viên giải 
+quyết hồ sơ 
+01 ngày 
+làm việc 
+- Trường h ợp h ồ sơ đ ủ 
+điều kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát quá 
+trình giải quyết hồ sơ; 
+
+TRANG 58
+58 
+ 
++ Gi ấy đăng ký ho ạt 
+động. 
+- Trường hợp hồ sơ chưa 
+hoặc không đ ủ điều 
+kiện: 
++ Hồ sơ; 
++ Phi ếu ki ểm soát quá 
+trình giải quyết hồ sơ; 
++ Dự thảo Phiếu yêu cầu 
+bổ sung, hoàn thi ện h ồ 
+sơ ho ặc Phi ếu t ừ chối 
+tiếp nh ận gi ải quy ết h ồ 
+sơ. 
+B5 
+Lãnh đạo Phòng xem xét h ồ sơ, 
+ký xác nh ận, trình lãnh đ ạo S ở 
+phê chuẩn 
+ 
+Lãnh đạo 
+phòng 
+0,25 
+ngày 
+làm việc 
+ 
+B6 
+Lãnh đạo Sở xét duyệt hồ sơ, ký 
+Giấy đăng ký hoạt động của Văn 
+phòng Th ừa phát l ại. Trư ờng 
+hợp không đủ điều kiện, ký văn 
+bản từ chối 
+Lãnh đạo 
+Sở 
+0,25 
+ngày 
+làm việc 
+- Hồ sơ; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ; 
+- Giấy đăng ký ho ạt 
+động. 
+B7 Hoàn thiện hồ sơ, phát hành văn 
+bản  
+Chuyên 
+viên giải 
+quyết hồ 
+sơ/văn thư 
+0,25 
+ngày 
+làm việc 
+- Hồ sơ; 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ; 
+- Giấy đăng ký ho ạt 
+động. 
+B8 Bàn giao và tr ả kết qu ả cho t ổ 
+chức/cá nhân 
+Chuyên 
+viên giải 
+quyết hồ 
+sơ/Bộ phận 
+một cửa 
+0,5 
+ngày 
+làm việc 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ; 
+- Giấy đăng ký ho ạt 
+động. 
+B9 
+Thống kê và theo dõi: 
+Chuyên viên S ở Tư pháp có 
+trách nhiệm thống kê các TTHC 
+thực hiện tại đơn vị vào Sổ thống 
+kê kết quả thực hiện 
+Bộ phận 
+một 
+cửa/Phòng 
+BTTP/Văn 
+thư 
+Giờ 
+hành 
+chính 
+Phiếu ki ểm soát quá 
+trình gi ải quy ết h ồ sơ; 
+Sổ theo dõi hồ sơ. 
+
+TRANG 59
+59 
+ 
+4 Biểu mẫu    
+ 
+Hệ thống biểu mẫu theo cơ chế một cửa, một cửa liên thông được ban hành kèm theo 
+Thông tư 03/2025/TT -VPCP hướng dẫn Nghị định 118/2025/NĐ-CP thực hiện thủ 
+tục hành chính theo cơ chế một cửa, một cửa liên thông tại Bộ phận Một cửa và Cổng 
+Dịch vụ công quốc gia do Văn phòng Chính phủ ban hành 
+ 
+  
+
+TRANG 60
+60 
+ 
+9. Miễn nhiệm Giám định viên tư pháp (Mã 2.000894) 
+1 Mục đích: Quy định trình tự miễn nhiệm giám định viên tư pháp 
+2 
+Phạm vi: Áp dụng đối với người đủ tiêu chuẩn miễn nhiệm giám định viên tư pháp; 
+cơ quan chuyên môn của UBND Thành phố quản lý lĩnh vực giám định tư pháp; Sở 
+Tư pháp. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Giám đ ịnh tư pháp năm 2012; Lu ật sửa đổi, bổ sung một số điều của Luật 
+Giám định tư pháp năm 2020; 
+- Nghị định số 85/2013/NĐ-CP ngày 29/7/2013 của Chính phủ quy định chi tiết và 
+bi ện pháp thi hành Lu ật giám đ ịnh tư pháp; Ngh ị định số 157/2020/NĐ-CP ngày 
+31/12/2020 c ủa Chính ph ủ sửa đ ổi, b ổ sung m ột số điều c ủa Ngh ị định s ố 
+85/2013/NĐ-CP ngày 29/7/2013 c ủa Chính phủ quy định chi tiết và bi ện pháp thi 
+hành Luật giám định tư pháp; 
+- Nghị quyết 66.7/2025/NQ-CP ngày 15/11/2025 của Chính phủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu do Chính phủ ban hành; 
+- Quyết định 524/QĐ-BTP năm 2021 công b ố thủ tục hành chính m ới, sửa đổi, bổ 
+sung; được chuẩn hóa, b ị bãi bỏ trong lĩnh v ực Giám đ ịnh tư pháp thu ộc phạm vi 
+chức năng quản lý của Bộ Tư pháp; 
+- Quyết định số 656/QĐ-UBND ngày 10/02/2026 của UBND thành phố Hà Nội về 
+việc uỷ quyền cho Giám đ ốc Sở Tư pháp thành ph ố Hà Nội giải quyết các thủ tục 
+hành chính lĩnh vực tư pháp thuộc thẩm quyền giải quyết của Chủ tịch UBND thành 
+phố Hà Nội; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 của Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản chính Bản sao 
+1 
+Văn bản đ ề nghị miễn nhi ệm giám đ ịnh 
+viên tư pháp c ủa cơ quan, t ổ chức đã đ ề 
+nghị bổ nhiệm người đó 
+x  
+2 
+- Văn bản, giấy tờ chứng minh giám đ ịnh 
+viên tư pháp thu ộc một trong các trư ờng 
+hợp quy đ ịnh t ại kho ản 1 Đi ều 10 Lu ật 
+giám định tư pháp: 
+x  
+
+TRANG 61
+61 
+ 
++ Không còn đ ủ tiêu chu ẩn quy đ ịnh tại 
+khoản 1 Đi ều 7 c ủa Lu ật giám đ ịnh tư 
+pháp. 
++ Thu ộc m ột trong các trư ờng h ợp quy 
+định tại khoản 2 Điều 7 của Luật giám định 
+tư pháp. 
++ Bị xử lý kỷ luật từ hình thức cảnh cáo 
+trở lên hoặc bị xử phạt hành chính do cố ý 
+vi phạm quy đ ịnh của pháp lu ật về giám 
+định tư pháp. 
++ Th ực hi ện m ột trong các hành vi quy 
+định t ại Đi ều 6 c ủa Lu ật giám đ ịnh tư 
+pháp. 
++ Theo đề nghị của giám định viên tư pháp 
+là công chức, viên chức, sĩ quan quân đội, 
+sĩ quan công an nhân dân, quân nhân 
+chuyên nghiệp, công nhân quốc phòng có 
+quyết định nghỉ việc để hưởng chế độ hưu 
+trí hoặc thôi việc. 
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý và Yêu cầu, điều kiện thực hiện thủ tục hành chính 
+ 
+Trong thời hạn 10 ngày, kể từ ngày nhận được hồ sơ hợp lệ, Giám đốc Sở Tư pháp 
+xem xét, quy ết đ ịnh mi ễn nhi ệm giám đ ịnh viên tư pháp và có văn b ản đ ề nghị 
+UBND Thành phố điều chỉnh danh sách giám định viên tư pháp trên cổng thông tin 
+điện tử của Ủy ban nhân dân cấp tỉnh, đồng thời gửi Bộ Tư pháp để điều chỉnh danh 
+sách chung về giám định viên tư pháp. 
+ 
+Yêu cầu, điều kiện thực hiện thủ tục hành chính: 
+Việc miễn nhiệm giám định viên tư pháp đư ợc thực hiện trong các trư ờng hợp sau 
+đây: 
+- Không còn đủ tiêu chuẩn quy định tại khoản 1 Điều 7 của Luật Giám định tư pháp; 
+- Thuộc một trong các trường hợp quy định tại khoản 2 Điều 7 của Luật Giám định 
+tư pháp; 
+- Bị xử lý kỷ luật từ hình thức cảnh cáo trở lên hoặc bị xử phạt hành chính do c ố ý 
+vi phạm quy định của pháp luật về giám định tư pháp; 
+- Thực hiện một trong các hành vi quy định tại Điều 6 của Luật Giám định tư pháp; 
+
+TRANG 62
+62 
+ 
+- Có quyết định nghỉ hưu hoặc quyết định thôi việc, trừ trường hợp có văn bản thể 
+hiện nguyện vọng tiếp tục tham gia hoạt động giám định tư pháp và cơ quan, tổ chức 
+quản lý trực tiếp có nhu cầu sử dụng phù hợp với quy định của pháp luật; 
+- Chuyển đổi vị trí công tác ho ặc chuyển công tác sang cơ quan, t ổ chức khác mà 
+không có điều kiện phù hợp để tiếp tục thực hiện giám định tư pháp; 
+- Theo đề nghị của giám định viên tư pháp. Trư ờng hợp giám định viên tư pháp là 
+công chức, viên chức, sĩ quan quân đội, sĩ quan công an nhân dân, quân nhân chuyên 
+nghiệp, công nhân quốc phòng có quyết định nghỉ việc để hưởng chế độ hưu trí hoặc 
+thôi việc. 
+- Giám định viên tư pháp được bổ nhiệm để thành lập Văn phòng giám định tư pháp 
+nhưng sau thời hạn 01 năm, kể từ ngày được bổ nhiệm không thành lập Văn phòng 
+hoặc sau thời hạn 01 năm, kể từ ngày có quyết định cho phép thành lập Văn phòng 
+mà không đăng ký hoạt động. 
+3.5 Nơi tiếp nhận hồ sơ và trả kết quả 
+ - Các Chi nhánh Trung tâm phục vụ hành chính công Thành phố 
+3.6 Phí/Lệ phí 
+ Không quy định 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời gian Biểu mẫu/Kết quả 
+B1 
+Tiếp nh ận h ồ sơ mi ễn 
+nhiệm giám định viên tư 
+pháp 
+Bộ phận một 
+cửa/TTPVHCC Giờ hành chính - Hồ sơ theo m ục 
+3.2. 
+B2 Chuyển hồ sơ cho phòng 
+chuyên môn 
+Bộ phận một 
+cửa/TTPVHCC 0,5 ngày 
+- Hồ sơ theo m ục 
+3.2; 
+- Phiếu ki ểm soát 
+quá trình gi ải quyết 
+hồ sơ (mẫu số 05). 
+B3 Phân công xử lý hồ sơ Lãnh đạo 
+Phòng 01   ngày 
+- Hồ sơ theo m ục 
+3.2; 
+- Phiếu ki ểm soát 
+quá trình gi ải quyết 
+hồ sơ (mẫu số 05). 
+
+TRANG 63
+63 
+ 
+B4 
+Thẩm định hồ sơ đề nghị 
+miễn nhiệm định viên tư 
+pháp: d ự thảo Quy ết 
+định mi ễn nhi ệm giám 
+định viên tư pháp, văn 
+bản đi ều ch ỉnh danh 
+sách giám đ ịnh viên tư 
+pháp trên cổng thông tin 
+điện t ử của UBND TP, 
+đồng thời g ửi B ộ Tư 
+pháp để điều chỉnh danh 
+sách chung về giám định 
+viên tư pháp ho ặc văn 
+bản t ừ chối trình lãnh 
+đạo phòng phê duyệt 
+Chuyên viên 
+giải quyết hồ 
+sơ 
+04 ngày 
+- Hồ sơ theo m ục 
+3.2; 
+- Phiếu ki ểm soát 
+quá trình gi ải quyết 
+hồ sơ (mẫu số 05); 
+- Dự thảo Quyết 
+định mi ễn nhi ệm 
+giám đ ịnh viên tư 
+pháp, văn b ản đi ều 
+chỉnh danh sách 
+giám đ ịnh viên tư 
+pháp; 
+- Văn b ản t ừ chối 
+giải quyết. 
+B5 
+Lãnh đạo Phòng xem xét 
+hồ sơ, ký xác nhận, trình 
+lãnh đạo Sở phê duyệt 
+Lãnh đạo 
+Phòng 02 ngày 
+- Hồ sơ theo m ục 
+3.2; 
+- Phiếu kiểm soát 
+quá trình gi ải quyết 
+hồ sơ (mẫu số 05); 
+- Dự thảo Quy ết 
+định mi ễn nhi ệm 
+giám đ ịnh viên tư 
+pháp, văn b ản đi ều 
+chỉnh danh sách 
+giám đ ịnh viên tư 
+pháp; 
+- Văn b ản t ừ chối 
+giải quyết. 
+B6 
+Giám đốc Sở xem xét ký 
+Quyết định miễn nhiệm 
+giám định viên tư  pháp, 
+văn bản điều chỉnh danh 
+sách giám đ ịnh viên tư 
+pháp (hoặc văn b ản t ừ 
+chối) 
+Lãnh đạo Sở 02 ngày 
+- Hồ sơ theo m ục 
+3.2; 
+- Phiếu ki ểm soát 
+quá trình gi ải quyết 
+hồ sơ (mẫu số 05); 
+- Dự thảo Quy ết 
+định mi ễn nhi ệm 
+giám đ ịnh viên tư 
+pháp, văn b ản đi ều 
+chỉnh danh sách 
+giám đ ịnh viên tư 
+pháp; 
+
+TRANG 64
+64 
+ 
+- Văn b ản t ừ chối 
+giải quyết; 
+B7 
+Phát hành, Bàn giao cho 
+Trung tâm phục vụ hành 
+chính công 
+Văn thư, 
+Chuyên viên 
+giải quyết hồ 
+sơ 
+0,5   ngày 
+- Quyết đ ịnh mi ễn 
+nhiệm giám đ ịnh 
+viên tư pháp; văn 
+bản điều chỉnh danh 
+sách giám định viên 
+tư pháp; 
+- Văn b ản t ừ chối 
+giải quyết. 
+B8 Trả kết qu ả cho công 
+dân 
+Trung tâm 
+phục vụ hành 
+chính công 
+Giờ hành chính 
+- Quyết đ ịnh mi ễn 
+nhiệm giám đ ịnh 
+viên tư pháp; 
+- Thẻ giám đ ịnh 
+viên tư pháp. 
+4 Biểu mẫu    
+ 
+Hệ thống biểu mẫu theo cơ chế một cửa, một cửa liên thông được ban hành kèm theo 
+Thông tư 03/2025/TT-VPCP hướng dẫn Nghị định 118/2025/NĐ-CP thực hiện thủ 
+tục hành chính theo cơ ch ế một cửa, một cửa liên thông t ại Bộ phận Một cửa và 
+Cổng Dịch vụ công quốc gia do Văn phòng Chính phủ ban hành 
+ 
+  
+
+TRANG 65
+65 
+ 
+Phần II. Quy trình nội bộ - Quy trình điện tử giải quyết thủ tục hành chính lĩnh 
+vực Chứng thực thuộc thẩm quyền giải quyết của UBND cấp xã 
+1. Cấp bản sao từ sổ gốc (Mã 2.000908) 
+1 Mục đích: Quy định trình tự và cách thức thực hiện TTHC Cấp bản sao từ sổ gốc 
+2 
+Phạm vi: 
+- Áp dụng đối với cá nhân, tổ chức thực hiện TTHC đề nghị Cấp bản sao từ sổ gốc  
+- UBND cấp xã, Văn phòng HĐND -UBND cấp xã, Trung tâm Ph ục vụ Hành chính 
+công, Địa điểm tiếp nhận và trả kết quả giải quyết TTHC theo thông báo c ủa cấp có 
+thẩm quyền (sau đây gọi chung là Bộ phận Một cửa) và công chức Bộ phận Một cửa, 
+công chức, người lao động được bố trí tham gia trong quá trình tiếp nhận, giải quyết, 
+trả kết quả chịu trách nhiệm thực hiện Quy trình này. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính ph ủ về cấp bản sao t ừ bản chính, ch ứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính phủ sửa đổi, bổ sung một số điều của Nghị 
+định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung bởi Nghị 
+định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP ngày 14/01/2026 của Chính phủ sửa đổi, bổ sung một 
+số Nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc 
+phạm vi quản lý của Bộ Tư pháp; 
+- Nghị quyết số 66.7/2025/NQ-CP của Chính phủ quy định cắt giảm, đơn giản hóa thủ 
+tục hành chính dựa trên dữ liệu; 
+- Thông tư s ố 01/2020/TT-BTP của Bộ Tư pháp quy đ ịnh chi ti ết và hư ớng dẫn thi 
+hành một số điều của Ngh ị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Quyết định 858/QĐ-BTP của Bộ Tư pháp ngày 27/3/2026 c ủa Bộ Tư pháp về việc 
+công bố thủ tục hành chính đư ợc sửa đổi, bổ sung trong lĩnh v ực chứng thực thuộc 
+phạm vi quản lý của Bộ Tư pháp; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/20 26 của Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh v ực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+
+TRANG 66
+66 
+ 
+3.2 Thành phần hồ sơ Bản chính Bản sao 
+1 
+Một trong các giấy tờ sau: Căn cước điện tử; bản 
+chính hoặc b ản sao c ủa Thẻ căn cư ớc công dân 
+hoặc Th ẻ căn cư ớc ho ặc Gi ấy ch ứng nh ận căn 
+cước hoặc Hộ chiếu hoặc giấy tờ xuất nhập cảnh 
+hoặc giấy tờ có giá trị đi lại quốc tế còn giá trị sử 
+dụng (Không yêu cầu người yêu cầu cấp bản sao 
+từ sổ gốc nộp giấy tờ này khi cơ quan gi ải quyết 
+thủ tục hành chính khai thác được thông tin về Thẻ 
+căn cước công dân hoặc Thẻ căn cước hoặc Giấy 
+chứng nhận căn cước trên Cơ sở dữ liệu quốc gia 
+về dân cư; VNeID) 
+x x 
+2 
+Bản chính ho ặc b ản sao có ch ứng th ực gi ấy t ờ 
+chứng minh quan hệ với người được cấp bản chính 
+trong trường hợp người yêu cầu là người đại diện 
+theo pháp luật, người đại diện theo ủy quyền của 
+cá nhân, tổ chức được cấp bản chính; cha, mẹ, con; 
+vợ, chồng; anh, chị, em ruột; người thừa kế khác 
+của người được cấp bản chính trong trư ờng hợp 
+người đó đã ch ết (Không yêu c ầu người yêu c ầu 
+cấp bản sao từ sổ gốc nộp giấy tờ này khi cơ quan 
+giải quyết thủ tục hành chính khai thác được thông 
+tin về giấy khai sinh, giấy đăng ký kết hôn trên Cơ 
+sở dữ liệu hộ tịch điện tử) 
+x x 
+ 
+Lưu ý:  
+- Yêu cầu, điều kiện thực hiện thủ tục hành chính: Cơ quan, tổ chức căn cứ vào sổ gốc 
+để cấp bản sao; nội dung bản saophải đúng theo sổ gốc 
+- Trường hợp cá nhân, tổ chức đề nghị cấp bản sao trích lục hộ tịch, bản sao Giấy khai 
+sinh thì thực hiện theo TTHC C ấp bản sao trích l ục hộ tịch, bản sao Gi ấy khai sinh 
+nêu tại Danh mục TTHC trong lĩnh vực Hộ tịch 
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+
+TRANG 67
+67 
+ 
+ 
+Thời hạn thực hiện yêu cầu chứng thực là ngay trong ngày cơ quan, tổ chức tiếp nhận 
+yêu cầu hoặc trong ngày làm việc tiếp theo nếu tiếp nhận yêu cầu sau 15 giờ. Thời hạn 
+được tính từ ngày cơ quan, tổ chức nhận đủ hồ sơ hợp lệ trực tiếp, theo dấu bưu điện 
+đến hoặc theo thời điểm hệ thống dịch vụ công ghi nhận đã nhận đủ hồ sơ hợp lệ. 
+3.5 Nơi tiếp nhận và trả kết quả 
+ 
+Nộp trực tiếp hoặc qua dịch vụ bưu chính hoặc trực tuyến trên môi trường điện tử đến 
+cơ quan, tổ chức lưu sổ gốc.  
+Kết quả được trả trực tiếp hoặc qua dịch vụ bưu chính công ích hoặc trực tuyến theo 
+phương thức người yêu cầu đã đăng ký. 
+3.6 Phí 
+ Không 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời 
+gian 
+Biểu mẫu/ 
+Kết quả 
+B1 
+Hồ sơ được nộp trực tiếp tại Trung 
+tâm Phục vụ Hành chính công, Đ ịa 
+điểm ti ếp nh ận và tr ả kết qu ả giải 
+quyết TTHC (Theo thông báo c ủa 
+cấp có thẩm quyền) hoặc gửi qua hệ 
+thống bưu chính công ích ho ặc nộp 
+trực tuyến qua:  
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+Công dân 
+ 
+Trong giờ 
+hành 
+chính 
+Theo mục 3.2 
+B2 
+- Công chức Bộ phận Một cửa kiểm 
+tra tính chính xác, đ ầy đ ủ, th ống 
+nhất, hợp lệ của hồ sơ.   
+-Trường hợp hồ sơ đầy đủ, hợp lệ, 
+thì ti ếp nh ận h ồ sơ, nh ập vào h ệ 
+Công chức 
+Bộ phận 
+Một cửa 
+02 giờ 
+- Sổ theo dõi h ồ 
+sơ  
+- Phiếu tiếp nhận 
+hồ sơ và h ẹn tr ả 
+kết quả  
+
+TRANG 68
+68 
+ 
+thống thông tin giải quy ết TTHC; 
+nếu tiếp nhận hồ sơ sau 15 giờ thì có 
+Phiếu hẹn, trả kết quả cho người có 
+yêu c ầu trong ngày làm vi ệc ti ếp 
+theo. 
+Trường h ợp ti ếp nh ận h ồ sơ theo 
+hình th ức tr ực ti ếp, công ch ức B ộ 
+phận Một cửa thực hiện số hóa (sao 
+chụp, chuyển thành tài li ệu điện tử 
+trên h ệ thống thông tin, cơ s ở dữ 
+liệu) và ký số vào tài liệu, hồ sơ giải 
+quyết thủ tục hành chính đã được số 
+hóa theo quy định. 
+Chuyển h ồ sơ đ ến công ch ức làm 
+công tác tư pháp - hộ tịch để xử lý, 
+đồng th ời chuy ến đ ến lãnh đ ạo 
+UBND c ấp xã, Chánh  Văn phòng 
+HĐND – UBND cấp xã để theo dõi. 
+ 
+B3 
+Công chức làm công tác Tư pháp - 
+Hộ tịch thẩm định hồ sơ: 
+- Trường hợp không tìm thấy sổ gốc 
+hoặc trong s ổ gốc không có thông 
+tin về nội dung yêu cầu cấp bản sao 
+thì trả lời cho công dân. 
+- Trường hợp hồ sơ đủ điều kiện giải 
+quyết:  
++ Căn cứ vào sổ gốc để cấp bản sao 
+cho người yêu cầu;  
++ N ội dung b ản sao ph ải ghi theo 
+đúng nội dung đã ghi trong sổ gốc. 
+Công chức làm 
+công tác Tư 
+pháp - Hộ tịch 
+03 giờ 
+Sổ cấp b ản sao 
+trích lục; 
+Trích l ục b ản 
+sao;  
+Công văn tr ả lời 
+không có thông 
+tin 
+ 
+B4 
+Lãnh đ ạo UBND c ấp xã, Chánh 
+Văn phòng HĐND và UBND cấp xã 
+được ủy quyền ký/ký số chuyển đến 
+bộ phận văn thư 
+Lãnh đạo 
+UBND cấp xã, 
+Chánh Văn 
+phòng được uỷ 
+quyền 
+ 
+02 giờ 
+Trích lục bản sao 
+được c ấp t ừ sổ 
+gốc 
+
+TRANG 69
+69 
+ 
+B5 
+Bộ phận văn thư: phát hành bản điện 
+tử và bản giấy, chuyển đến Bộ phận 
+Một cửa hoặc bàn giao cho đơn v ị 
+cung cấp dịch vụ bưu chính công ích 
+(trường hợp được Trung tâm Ph ục 
+vụ Hành chính công ký h ợp đ ồng 
+hoặc u ỷ quyền) để trả kết quả cho 
+người yêu c ầu, chuy ển đ ến công 
+chức tham mưu để lưu hồ sơ 
+Công chức làm 
+công tác văn 
+thư 
+ 
+Công chức làm 
+công tác tư 
+pháp - hộ tịch; 
+Công chức Bộ 
+phận Một cửa 
+01 giờ 
+Trích lục bản sao 
+được c ấp từ sổ 
+gốc 
+Sổ theo dõi hồ sơ  
+Bản sao được cấp 
+từ sổ gốc 
+B6 Trả kết quả cho công dân Công chức Bộ 
+phận Một cửa 
+Trong giờ 
+hành 
+chính 
+Bản sao được cấp 
+từ sổ gốc 
+4 Biểu mẫu 
+ 
+1. Giấy tiếp nhận hồ sơ và hẹn trả kết quả. 
+2. Phiếu từ chối tiếp nhận giải quyết hồ sơ 
+3. Phiếu xin lỗi và hẹn lại ngày trả kết quả 
+4. Phiếu kiểm soát quá trình giải quyết hồ sơ 
+5. Sổ theo dõi hồ sơ 
+6. Đơn đề nghị cấp bản sao từ sổ gốc 
+ 
+  
+
+TRANG 70
+70 
+ 
+2. Quy trình: Ch ứng th ực chữ ký trong các gi ấy t ờ, văn b ản (áp d ụng cho c ả 
+trường hợp chứng thực điểm chỉ và trường hợp người yêu c ầu chứng thực không th ể 
+ký, không thể điểm chỉ được) (Mã 2.000884) 
+1 Mục đích 
+ 
+Quy trình này quy đ ịnh trình t ự và cách th ức Chứng thực chữ ký trong các gi ấy tờ, 
+văn bản (áp d ụng cho c ả trường hợp chứng thực điểm chỉ và trường hợp người yêu 
+cầu chứng thực không thể ký, không thể điểm chỉ được) 
+2 Phạm vi 
+ 
+- Áp dụng đối với cá nhân có đ ề nghị chứng thực chữ ký trong các gi ấy tờ, văn bản 
+(áp dụng cho cả trường hợp chứng thực điểm chỉ và trường hợp người yêu cầu chứng 
+thực không thể ký, không thể điểm chỉ được). 
+- Áp dụng đối với Trung tâm Phục vụ Hành chính công, Địa điểm tiếp nhận và trả kết 
+quả giải quyết TTHC theo thông báo của cấp có thẩm quyền (sau đây gọi chung là Bộ 
+phận Một cửa) và công ch ức Bộ phận Một cửa, công chức, người lao động được bố 
+trí tham gia trong quá trình ti ếp nhận, giải quyết, trả kết quả chịu trách nhi ệm thực 
+hiện Quy trình này. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính ph ủ về cấp bản sao t ừ bản chính, ch ứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính phủ sửa đổi, bổ sung một số điều của Nghị 
+định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung bởi Nghị 
+định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP của Chính phủ sửa đổi, bổ sung một số Nghị định để 
+cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc phạm vi quản 
+lý của Bộ Tư pháp; 
+- Nghị quyết số 66.7/2025/NQ-CP quy định cắt giảm, đơn giản hóa thủ tục hành chính 
+dựa trên dữ liệu; 
+- Thông tư s ố 01/2020/TT-BTP của Bộ Tư pháp quy đ ịnh chi ti ết và hư ớng dẫn thi 
+hành một số điều của Ngh ị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Thông tư số 226/2016/TT-BTC của Bộ Tài chính quy định mức thu, chế độ thu, nộp, 
+quản lý và sử dụng phí chứng thực; 
+
+TRANG 71
+71 
+ 
+- Quyết định 858/QĐ-BTP ngày 27/3/2026 c ủa Bộ Tư pháp về việc công bố thủ tục 
+hành chính được sửa đổi, bổ sung, thủ tục hành chính bị bãi bỏ trong lĩnh vực chứng 
+thực thuộc phạm vi quản lý của Bộ Tư pháp; 
+- Nghị quyết số 41/2025/NQ-HĐND ngày 29/9/2025 c ủa Hội đồng nhân dân Thành 
+phố về việc Quy đ ịnh ủy quyền giải quyết thủ tục hành chính c ủa Chủ tịch Ủy ban 
+nhân dân cấp xã cho công chức thuộc Ủy ban nhân dân cấp xã trên địa bàn thành phố 
+Hà Nội; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh v ực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Điều kiện thực hiện Thủ tục hành chính 
+ 
+Trường hợp không được chứng thực chữ ký: 
++ Tại thời điểm chứng thực, người yêu c ầu chứng thực chữ ký không nh ận thức và 
+làm chủ được hành vi của mình. 
++ Người yêu cầu chứng thực chữ ký xuất trình Căn cư ớc điện tử hoặc Thẻ căn cước 
+công dân hoặc Thẻ căn cước hoặc Giấy chứng nhận căn cước hoặc Hộ chiếu hoặc giấy 
+tờ xuất nhập cảnh hoặc giấy tờ có giá trị đi lại quốc tế không còn giá trị sử dụng hoặc 
+giả mạo. 
++ Giấy tờ, văn b ản mà ngư ời yêu c ầu chứng thực ký vào có n ội dung quy đ ịnh tại 
+Khoản 4 Điều 22 của Nghị định số 23/2015/NĐ-CP. 
++ Giấy tờ, văn bản có nội dung là hợp đồng, giao dịch; trừ Giấy ủy quyền trong các 
+trường hợp Giấy ủy quyền: (1) ủy quyền về việc nộp hộ, nhận hộ hồ sơ, giấy tờ, trừ 
+trường hợp pháp lu ật quy đ ịnh không đư ợc ủy quyền; (2) ủy quyền nhận hộ lương 
+hưu, bưu phẩm, trợ cấp, phụ cấp; (3) ủy quyền nhờ trông nom nhà cửa; (4) ủy quyền 
+của thành viên hộ gia đình để vay vốn tại Ngân hàng chính sách xã hội; hoặc trừ trường 
+hợp pháp luật có quy định khác. 
+3.3 
+Thành phần hồ sơ: Người yêu cầu 
+chứng thực phải xuất trình các 
+giấy tờ sau: 
+Bản chính Bản sao 
+1 
+Một trong các gi ấy tờ sau: Căn cư ớc 
+điện tử; bản chính ho ặc bản sao c ủa 
+Thẻ căn cước công dân hoặc Thẻ căn 
+cước hoặc Giấy chứng nhận căn cước 
+hoặc Hộ chiếu hoặc giấy tờ xuất nhập 
+cảnh hoặc giấy tờ có giá trị đi lại quốc 
+tế còn giá trị sử dụng (Không yêu cầu 
+x x 
+
+TRANG 72
+72 
+ 
+người yêu c ầu chứng thực xuất trình 
+giấy tờ này khi cơ quan giải quyết thủ 
+tục hành chính khai thác đư ợc thông 
+tin v ề Thẻ căn cư ớc công dân ho ặc 
+Thẻ căn cước hoặc Giấy chứng nhận 
+căn cước trên Cơ sở dữ liệu quốc gia 
+về dân cư;VNeID) 
+2 
+Giấy tờ, văn bản mà mình sẽ yêu cầu 
+chứng th ực ch ữ ký. Trư ờng h ợp 
+chứng thực chữ ký trong giấy tờ, văn 
+bản bằng tiếng nước ngoài, nếu người 
+thực hiện chứng thực không hi ểu rõ 
+nội dung c ủa giấy tờ, văn b ản thì có 
+quyền yêu c ầu người yêu c ầu chứng 
+thực nộp kèm theo b ản dịch ra ti ếng 
+Việt nội dung của giấy tờ, văn bản đó 
+(bản dịch không cần công chứng hoặc 
+chứng thực chữ ký người dịch, người 
+yêu c ầu ch ứng th ực ph ải ch ịu trách 
+nhiệm về nội dung của bản dịch) 
+x  
+3.4 Số lượng hồ sơ 
+ Không quy định 
+3.5 Thời gian xử lý 
+ 
+- Trực tiếp: Thời hạn thực hiện yêu c ầu chứng thực là ngay trong ngày cơ quan, t ổ 
+chức tiếp nhận yêu cầu hoặc trong ngày làm việc tiếp theo nếu tiếp nhận yêu cầu sau 
+15 giờ. Trường hợp trả kết quả trong ngày làm vi ệc tiếp theo hoặc phải kéo dài th ời 
+gian theo thỏa thuận thì người tiếp nhận hồ sơ phải có phiếu hẹn ghi rõ thời gian (giờ, 
+ngày) trả kết quả cho người yêu cầu chứng thực. 
+3.6 Nơi tiếp nhận và trả kết quả 
+ 
+- Nộp hồ sơ trực tiếp tại: Các chi nhánh Trung tâm Phục vụ Hành chính công Thành 
+phố, Địa điểm tiếp nhận và trả kết quả giải quyết TTHC (Theo thông báo c ủa cấp có 
+thẩm quyền) hoặc ngoài trụ sở của cơ quan thực hiện chứng thực nếu người yêu cầu 
+
+TRANG 73
+73 
+ 
+2chứng thực thuộc diện già yếu, không thể đi lại được, đang bị tạm giữ, tạm giam, thi 
+hành án phạt tù hoặc có lý do chính đáng khác thông qua dịch vụ bưu chính công ích 
+- Trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+3.7 Phí 
+ - 10.000 đồng/trường hợp (trường hợp được tính là một hoặc nhiều chữ ký trong một 
+giấy tờ, văn bản). 
+3.8 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời gian 
+Biểu mẫu/ 
+Kết quả 
+ 
+B1 
+- Nộp h ồ sơ tr ực ti ếp t ại 
+Trung tâm Ph ục v ụ Hành 
+chính công, Đ ịa đi ểm ti ếp 
+nhận và trả kết quả giải quyết 
+TTHC (Theo thông báo c ủa 
+cấp có th ẩm quy ền) ho ặc 
+ngoài trụ sở của cơ quan thực 
+hiện ch ứng th ực n ếu ngư ời 
+yêu c ầu ch ứng th ực thu ộc 
+diện già yếu, không thể đi lại 
+được, đang b ị tạm gi ữ, t ạm 
+giam, thi hành án phạt tù hoặc 
+có lý do chính đáng khác. 
+- Nộp trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+Cá nhân/Tổ 
+chức 
+Trong giờ 
+hành chính Theo Mục 3.3 
+ 
+B2 
+Trung tâm Ph ục v ụ Hành 
+chính công, Đ ịa đi ểm ti ếp 
+nhận và trả kết quả giải quyết 
+Công chức 02 giờ Phiếu tiếp nhận hồ sơ 
+và hẹn trả kết quả  
+
+TRANG 74
+74 
+ 
+TTHC (Theo thông báo c ủa 
+cấp có thẩm quyền) thực hiện 
+kiểm tra:  
+-Trường h ợp h ồ sơ đ ầy đ ủ, 
+hợp lệ, thì ti ếp nh ận h ồ sơ; 
+nhập vào h ệ thống thông tin 
+giải quy ết TTHC. N ếu ti ếp 
+nhận hồ sơ sau 15 gi ờ thì có 
+Phiếu h ẹn, tr ả kết qu ả cho 
+người có yêu c ầu trong ngày 
+làm vi ệc ti ếp theo. Trư ờng 
+hợp tr ả kết qu ả trong ngày 
+làm việc tiếp theo ho ặc phải 
+kéo dài th ời gian theo th ỏa 
+thuận thì ngư ời tiếp nhận hồ 
+sơ ph ải có phi ếu h ẹn ghi rõ 
+thời gian (gi ờ, ngày) tr ả kết 
+quả cho người yêu cầu chứng 
+thực. 
+Sau khi tiếp nhận hồ sơ theo 
+hình thức nộp trực tiếp, Công 
+chức Bộ phận Một cửa thực 
+hiện s ố hóa (sao ch ụp, 
+chuyển thành tài li ệu điện tử 
+trên hệ thống thông tin, cơ sở 
+dữ liệu) và ký số vào tài liệu, 
+hồ sơ giải quyết thủ tục hành 
+chính đã đư ợc s ố hóa theo 
+quy định và chuyển hồ sơ đã 
+tiếp nhận. Chuyển hồ sơ đến 
+công ch ức làm công tác tư 
+pháp - hộ tịch để xử lý, đồng 
+thời chuyến đ ến lãnh đ ạo 
+UBND c ấp xã, Chánh Văn 
+phòng HĐND – UBND c ấp 
+xã để theo dõi. 
+Bộ phận Một 
+cửa 
+ 
+ 
+ 
+B3 
+- Người thực hiện chứng thực 
+kiểm tra gi ấy t ờ yêu c ầu 
+chứng thực, nếu thấy đủ giấy 
+tờ theo quy đ ịnh, t ại th ời 
+điểm chứng thực, ngư ời yêu 
+cầu ch ứng th ực minh m ẫn, 
+nhận th ức và làm ch ủ được 
+Lãnh đạo 
+UBND cấp 
+xã, Chánh 
+Văn phòng 
+được ủy 
+quyền hoặc 
+công chức 
+05 giờ 
+Giấy t ờ, văn b ản 
+được chứng thực chữ 
+ký/điểm chỉ 
+
+TRANG 75
+75 
+ 
+hành vi c ủa mình và vi ệc 
+chứng thực không thu ộc các 
+trường h ợp không  được 
+chứng th ực ch ữ ký thì yêu 
+cầu ngư ời yêu c ầu ch ứng 
+thực ký/đi ểm ch ỉ trước m ặt 
+và thực hiện chứng thực như 
+sau:  
+Ghi đầy đủ lời chứng chứng 
+thực ch ữ ký theo m ẫu quy 
+định phía dư ới ch ữ ký đư ợc 
+chứng th ực ho ặc trang li ền 
+sau của trang giấy tờ, văn bản 
+có chữ ký được chứng thực; 
+nếu h ồ sơ ti ếp nh ận t ại B ộ 
+phận Một cửa thì ngư ời tiếp 
+nhận h ồ sơ ký vào dư ới l ời 
+chứng theo mẫu. 
+Người ch ứng th ực ho ặc 
+người đư ợc u ỷ quyền ký 
+chứng thực chữ ký thực hiện 
+ký/ký số, ghi rõ họ tên 
+Chuyển bộ phận văn thư  
+được uỷ 
+quyền 
+B4 
+Bộ phận văn thư: phát hành 
+bản gi ấy ho ặc b ản đi ện t ử 
+(khi đ ủ điều ki ện), chuy ển 
+đến Bộ phận Một cửa để trả 
+kết qu ả cho ngư ời yêu c ầu, 
+chuyển đ ến công ch ức tham 
+mưu đ ể ghi vào s ổ chứng 
+thực và lưu hồ sơ 
+Công chức 
+làm công tác 
+văn thư 
+Công chức 
+làm công tác 
+tư pháp - hộ 
+tịch 
+Công chức 
+Bộ phận Một 
+cửa 
+01 giờ 
+Giấy t ờ, văn b ản 
+được chứng thực chữ 
+ký/điểm ch ỉ Bản 
+giấy/bản điện tử 
+B5 Thu phí, trả kết quả cho công 
+dân 
+Công chức 
+Bộ phận Một 
+cửa 
+Trong giờ 
+hành chính 
+ Giấy t ờ, văn b ản 
+được ch ứng th ực 
+chữ ký/điểm ch ỉ: 
+Bản giấy/bản điện tử 
+4 Biểu mẫu 
+
+TRANG 76
+76 
+ 
+ Biểu mẫu theo Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ 
+ Biểu mẫu theo Nghị định số 23/2015/NĐ-CP của Chính phủ. 
+ Biểu mẫu theo Thông tư số 01/2020/TT-BTP của Bộ Tư pháp 
+ Biểu mẫu theo Thông tư 11/2025/TT-BTP ngày 25/6/2025 
+ 
+
+TRANG 77
+77 
+ 
+3. Quy trình: Chứng thực chữ ký người dịch mà người dịch không phải là cộng tác 
+viên dịch thuật của Ủy ban nhân dân cấp xã (Mã 2.001008) 
+ 
+1 Mục đích 
+ Quy trình này quy đ ịnh trình t ự và cách th ức thực hiện TTHC ch ứng thực chữ ký 
+người dịch mà người dịch không phải là cộng tác viên dịch thuật của UBND cấp xã 
+2 Phạm vi 
+ 
+- Áp dụng đối với cá nhân thực hiện TTHC chứng thực chữ ký người dịch mà người 
+dịch không phải là cộng tác viên dịch thuật của UBND cấp xã  
+- UBND cấp xã, Văn phòng HĐND -UBND cấp xã, Trung tâm Ph ục vụ Hành chính 
+công, Địa điểm tiếp nhận và trả kết quả giải quyết TTHC theo thông báo c ủa cấp có 
+thẩm quyền (sau đây gọi chung là Bộ phận Một cửa) và công chức Bộ phận Một cửa, 
+công chức, người lao động được bố trí tham gia trong quá trình tiếp nhận, giải quyết, 
+trả kết quả chịu trách nhiệm thực hiện Quy trình này. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính ph ủ về cấp bản sao t ừ bản chính, ch ứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính phủ sửa đổi, bổ sung một số điều của Nghị 
+định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung bởi Nghị 
+định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP ngày 14/01/2026 của Chính phủ sửa đổi, bổ sung một 
+số Nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc 
+phạm vi quản lý của Bộ Tư pháp; 
+- Nghị quyết 66.7/2025/NQCP ngày 15/11/2025 c ủa Chính ph ủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu 
+- Thông tư s ố 01/2020/TT-BTP của Bộ Tư pháp quy đ ịnh chi ti ết và hư ớng dẫn thi 
+hành một số điều của Ngh ị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Thông tư số 226/2016/TT-BTC của Bộ Tài chính quy định mức thu, chế độ thu, nộp, 
+quản lý và sử dụng phí chứng thực; 
+- Quyết định 858/QĐ-BTP ngày 27/3/2026 c ủa Bộ Tư pháp về việc công bố thủ tục 
+hành chính được sửa đổi, bổ sung, thủ tục hành chính bị bãi bỏ trong lĩnh vực chứng 
+thực thuộc phạm vi quản lý của Bộ Tư pháp; 
+
+TRANG 78
+78 
+ 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh v ực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 
+Thành phần hồ sơ: Người yêu 
+cầu chứng thực xuất trình các 
+giấy tờ sau: 
+Bản chính Bản sao 
+1 
+Một trong các giấy tờ sau: Căn 
+cước đi ện t ử; b ản chính ho ặc 
+bản sao của Thẻ căn cước công 
+dân ho ặc Th ẻ căn cư ớc ho ặc 
+Giấy chứng nhận căn cước hoặc 
+Hộ chiếu hoặc giấy tờ xuất nhập 
+cảnh hoặc giấy tờ có giá trị đi lại 
+quốc t ế còn giá tr ị sử dụng 
+(Không yêu c ầu người yêu c ầu 
+chứng th ực xu ất trình gi ấy t ờ 
+này khi cơ quan gi ải quyết thủ 
+tục hành chính khai thác đư ợc 
+thông tin về Thẻ căn cước công 
+dân ho ặc Th ẻ căn cư ớc ho ặc 
+Giấy chứng nhận căn cư ớc trên 
+Cơ sở dữ liệu quốc gia v ề dân 
+cư, VNeID) 
+x x 
+2 
++ Bản chính hoặc bản sao từ sổ 
+gốc, bản sao có chứng thực bằng 
+cử nhân (đại học) ngoại ngữ trở 
+lên về thứ tiếng nước ngoài cần 
+dịch hoặc có bằng tốt nghiệp đại 
+học tr ở lên đ ối v ới th ứ tiếng 
+nước ngoài cần dịch; trừ trường 
+hợp dịch những ngôn ngữ không 
+phổ biến mà ngư ời dịch không 
+có bằng c ử nhân ngo ại ng ữ, 
+bằng tốt nghi ệp đ ại h ọc nhưng 
+thông th ạo ngôn ng ữ cần d ịch. 
+(Không yêu c ầu người yêu c ầu 
+chứng th ực xu ất trình gi ấy t ờ 
+này khi cơ quan gi ải quyết thủ 
+tục hành chính khai thác đư ợc 
+x x 
+
+TRANG 79
+79 
+ 
+thông tin từ Cơ sở dữ liệu ngành 
+Giáo dục) 
+3 Bản dịch đính kèm gi ấy tờ, văn 
+bản cần dịch x  
+3.3 Điều kiện thực hiện thủ tục hành chính 
+ 
+* Ủy ban nhân dân c ấp xã ch ỉ 
+chứng th ực ch ữ ký ngư ời d ịch 
+không phải là cộng tác viên khi 
+người đó t ự dịch gi ấy t ờ, văn 
+bản của mình. 
+* Giấy tờ, văn b ản không đư ợc 
+dịch đ ể chứng th ực ch ữ ký 
+người dịch: 
++ Giấy tờ, văn bản đã bị tẩy xóa, 
+sửa ch ữa; thêm, b ớt n ội dung 
+không hợp lệ. 
++ Giấy tờ, văn b ản bị hư hỏng, 
+cũ nát không xác đ ịnh được nội 
+dung. 
++ Giấy tờ, văn bản đóng dấu mật 
+của cơ quan, t ổ chức có th ẩm 
+quyền hoặc không đóng dấu mật 
+nhưng ghi rõ không được dịch. 
++ Giấy tờ, văn bản có nội dung 
+quy đ ịnh t ại Kho ản 4 Đi ều 22 
+của Nghị định số 23/2015/NĐ-
+CP. 
++ Giấy tờ, văn b ản do cơ quan, 
+tổ chức có thẩm quyền của nước 
+ngoài c ấp, công ch ứng ho ặc 
+chứng nhận chưa được hợp pháp 
+hóa lãnh s ự theo quy đ ịnh t ại 
+Khoản 1 Điều 20 của Nghị định 
+số 23/2015/NĐ-CP, trừ giấy hộ 
+chiếu, thẻ căn cước, thẻ thường 
+trú, thẻ cư trú, giấy phép lái xe, 
+bằng t ốt nghi ệp, ch ứng ch ỉ và 
+  
+
+TRANG 80
+80 
+ 
+bảng đi ểm kèm theo b ằng t ốt 
+nghiệp, chứng chỉ. 
+3.3 Số lượng hồ sơ: Không quy định 
+3.4 Thời gian xử lý 
+ 
+Thời hạn thực hiện yêu cầu chứng thực là ngay trong ngày cơ quan, tổ chức tiếp nhận 
+yêu cầu hoặc trong ngày làm việc tiếp theo nếu tiếp nhận yêu cầu sau 15 giờ hoặc có 
+thể kéo dài hơn theo thỏa thuận bằng văn bản với người yêu cầu chứng thực. Trường 
+hợp trả kết quả trong ngày làm vi ệc tiếp theo ho ặc phải kéo dài th ời gian theo th ỏa 
+thuận thì người tiếp nhận hồ sơ phải có phiếu hẹn ghi rõ thời gian (giờ, ngày) trả kết 
+quả cho người yêu cầu chứng thực 
+3.5 Nơi tiếp nhận và trả kết quả 
+ 
+- Trực tiếp: Các Chi nhánh Trung tâm phục vụ hành chính công Thành phố, Địa điểm 
+tiếp nhận và trả kết quả giải quyết TTHC (Theo thông báo của cấp có thẩm quyền) 
+- Trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+3.6 Phí 
+ - 10.000 đồng/trường hợp; 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời gian 
+Biểu mẫu/ 
+Kết quả 
+B1 
+- Trung tâm Ph ục v ụ Hành chính 
+công, Địa điểm tiếp nh ận và tr ả kết 
+quả giải quy ết TTHC (Theo thông 
+báo của cấp có thẩm quyền) 
+Cá nhân Trong giờ 
+hành chính Theo Mục 3.2 
+
+TRANG 81
+81 
+ 
+- Nộp trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+B2 
+ Công ch ức B ộ phận M ột c ửa th ực 
+hiện ki ểm tra gi ấy t ờ do ngư ời yêu 
+cầu chứng thực xuất trình, n ếu thấy 
+đủ giấy tờ theo quy đ ịnh và gi ấy tờ, 
+văn bản đư ợc dịch không thu ộc các 
+trường h ợp gi ấy t ờ, văn b ản không 
+được d ịch đ ể chứng th ực ch ữ ký 
+người dịch thì yêu cầu người dịch ký 
+trước m ặt và ti ếp nh ận h ồ sơ; nh ập 
+vào h ệ thống thông tin gi ải quy ết 
+TTHC 
+- Công chức Bộ phận Một cửa thực 
+hiện số hóa (sao ch ụp, chuyển thành 
+tài li ệu đi ện t ử trên h ệ thống thông 
+tin, cơ s ở dữ liệu) và ký s ố vào tài 
+liệu, h ồ sơ gi ải qu yết th ủ tục hành 
+chính đã được số hóa theo quy định. 
+- Chuyển h ồ sơ đ ến công ch ức làm 
+công tác tư pháp - hộ tịch để xử lý, 
+đồng th ời chuy ến đ ến lãnh đ ạo 
+UBND c ấp xã, Chánh Văn phòng 
+HĐND – UBND cấp xã để theo dõi. 
+Công chức Bộ 
+phận Một cửa 02 giờ 
+-Sổ theo dõi 
+hồ sơ  
+- Phiếu ti ếp 
+nhận hồ sơ và 
+hẹn trả kết quả  
+B3 
+- Thực hiện kiểm tra giấy tờ do người 
+yêu cầu chứng thực xuất trình  
+- Ghi đ ầy đ ủ lời ch ứng ch ứng th ực 
+chữ ký người dịch theo mẫu quy định; 
+- Trình Lãnh đ ạo Ủy ban nhân dân 
+cấp xã, Chánh Văn phòng  được ủy 
+quyền chứng thực 
+Công chức làm 
+công tác Tư 
+pháp - Hộ tịch, 
+ 
+03 giờ 
+ 
+- Phiếu ki ểm 
+soát quá trình 
+giải quy ết h ồ 
+sơ  
+-  Phiếu yêu 
+cầu b ổ sung, 
+hoàn thi ện h ồ 
+sơ    
+- Phiếu từ chối 
+tiếp nh ận gi ải 
+quyết hồ sơ   
+
+TRANG 82
+82 
+ 
+B4 
+ 
+ Trình Lãnh đạo Ủy ban nhân dân cấp 
+xã, Chánh Văn phòng được ủy quyền 
+chứng th ực ký/ký s ố ghi rõ h ọ tên 
+chuyển đến bộ phận văn thư 
+Lãnh đạo 
+UBND cấp xã, 
+Chánh Văn 
+Phòng được ủy 
+quyền 
+02 giờ Hồ sơ 
+B5 
+Bộ phận văn thư: phát hành b ản giấy 
+và bản điện tử, chuyển đến Bộ phận 
+Một cửa để trả kết quả cho người yêu 
+cầu, chuyển đến công chức tham mưu 
+để ghi vào sổ chứng thực và lưu hồ sơ 
+Công chức làm 
+công tác văn 
+thư; Công chức 
+làm công tác tư 
+pháp - hộ tịch; 
+Công chức Bộ 
+phận Một cửa 
+01 giờ 
+Giấy t ờ, văn 
+bản được 
+chứng th ực 
+chữ ký ngư ời 
+dịch 
+ 
+B6 Thu phí, trả kết quả cho công dân 
+Công chức 
+Bộ phận Một 
+cửa 
+Trong giờ 
+hành chính 
+Giấy t ờ, văn 
+bản đư ợc 
+chứng th ực 
+chữ ký ngư ời 
+dịch 
+4 Biểu mẫu 
+ Biểu mẫu theo Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ 
+ Biểu mẫu theo Nghị định số 23/2015/NĐ-CP của Chính phủ. 
+ Biểu mẫu theo Thông tư số 01/2020/TT-BTP của Bộ Tư pháp 
+ Biểu mẫu theo Thông tư 11/2025/TT-BTP ngày 25/6/2025 
+ 
+
+TRANG 83
+83 
+ 
+4. Quy trình: Th ủ tục chứng thực giao d ịch liên quan đ ến tài s ản là đ ộng sản, 
+quyền sử dụng đất và nhà ở (Mã 2.001035) 
+ 
+1 Mục đích  
+ Quy trình này quy đ ịnh trình tự và cách thức thực hiện TTHC Chứng thực giao dịch 
+liên quan đến tài sản là động sản, quyền sử dụng đất và nhà ở. 
+2 Phạm vi 
+ 
+- Áp dụng đối với tổ chức, cá nhân thực hiện TTHC chứng thực giao dịch liên quan 
+đến tài sản là động sản, quyền sử dụng đất và nhà ở. 
+- Áp dụng đối với Trung tâm Phục vụ Hành chính công, Địa điểm tiếp nhận và trả kết 
+quả giải quyết TTHC theo thông báo của cấp có thẩm quyền (sau đây gọi chung là Bộ 
+phận Một cửa) và công ch ức Bộ phận Một cửa, công chức, người lao động được bố 
+trí tham gia ti ếp nhận, giải quyết, trả kết quả chịu trách nhi ệm thực hiện Quy trình 
+này.  
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính ph ủ về cấp bản sao t ừ bản chính, ch ứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính phủ sửa đổi, bổ sung một số điều của Nghị 
+định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung bởi Nghị 
+định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP ngày 14/01/2026 của Chính phủ sửa đổi, bổ sung một 
+số Nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc 
+phạm vi quản lý của Bộ Tư pháp; 
+- Nghị quyết 66.7/2025/NQCP ngày 15/11/2025 c ủa Chính ph ủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu; 
+- Thông tư s ố 01/2020/TT-BTP của Bộ Tư pháp quy đ ịnh chi ti ết và hư ớng dẫn thi 
+hành một số điều của Ngh ị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Thông tư số 226/2016/TT-BTC của Bộ Tài chính quy định mức thu, chế độ thu, nộp, 
+quản lý và sử dụng phí chứng thực; 
+- Quyết định 858/QĐ-BTP ngày 27/3/2026 c ủa Bộ Tư pháp về việc công bố thủ tục 
+hành chính được sửa đổi, bổ sung, thủ tục hành chính bị bãi bỏ trong lĩnh vực chứng 
+thực thuộc phạm vi quản lý của Bộ Tư pháp; 
+
+TRANG 84
+84 
+ 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh v ực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 
+Thành phần hồ sơ: Người yêu 
+cầu chứng thực nộp 01 bộ hồ sơ 
+yêu cầu chứng thực, gồm các 
+giấy tờ sau đây: 
+Bản chính Bản sao 
+1 Dự thảo giao dịch x  
+2 
+Bản chính ho ặc bản sao có ch ứng 
+thực ho ặc b ản sao đi ện t ử được 
+chứng thực từ bản chính của giấy 
+chứng nhận quy ền sở hữu, quyền 
+sử dụng hoặc giấy tờ thay thế được 
+pháp luật quy đ ịnh đối với tài s ản 
+mà pháp lu ật quy đ ịnh ph ải đăng 
+ký quy ền s ở hữu, quy ền s ử dụng 
+trong trư ờng h ợp giao d ịch liên 
+quan đến tài sản đó; trừ trường hợp 
+người lập di chúc đang bị cái chết 
+đe dọa đến tính mạng. Trường hợp 
+nộp hồ sơ trực tiếp, người yêu cầu 
+chứng thực có thể nộp bản sao kèm 
+xuất trình b ản chính đ ể đối chiếu 
+(Không yêu c ầu ngư ời yêu c ầu 
+chứng th ực n ộp gi ấy ch ứng nh ận 
+quyền sử dụng đất, quyền sở hữu 
+tài sản gắn liền với đất khi ngư ời 
+tiếp nhận, giải quyết thủ tục hành 
+chính khai thác được thông tin trên 
+Cơ sở dữ liệu quốc gia về đất đai, 
+giai đoạn đầu áp d ụng đối với đất 
+ở) 
+x x 
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+
+TRANG 85
+85 
+ 
+ 
+Không quá 02 (hai) ngày làm việc, kể từ ngày nhận đủ hồ sơ yêu cầu chứng thực hoặc 
+có thể kéo dài hơn theo thỏa thuận bằng văn bản với người yêu cầu chứng thực. Trường 
+hợp kéo dài thời hạn giải quyết thì người tiếp nhận hồ sơ phải có phiếu hẹn ghi rõ thời 
+gian (giờ, ngày) trả kết quả cho người yêu cầu chứng thực. 
+3.5 Nơi tiếp nhận và trả kết quả 
+ 
+- Trực tiếp: Các chi nhánh Trung tâm Phục vụ Hành chính công Thành phố, Địa điểm 
+tiếp nhận và trả kết quả giải quyết TTHC (Theo thông báo c ủa cấp có thẩm quyền). 
+Việc chứng thực các giao dịch liên quan đến quyền của người sử dụng đất được thực 
+hiện tại Ủy ban nhân dân c ấp xã nơi có đ ất, việc chứng thực các giao d ịch về nhà ở 
+được thực hiện tại Ủy ban nhân dân cấp xã nơi có nhà, trừ các trường hợp sau: chứng 
+thực giao dịch liên quan đến tài sản là động sản; chứng thực di chúc, chứng thực văn 
+bản từ chối nhận di sản; chứng thực văn bản ủy quyền liên quan đ ến việc thực hiện 
+các quyền của người sử dụng đất, nhà ở; chứng thực việc sửa đổi, bổ sung, hủy bỏ 
+giao dịch nêu trên. 
+ - Trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvuconh.gov.vn 
++ motcua.gov.moj.vn 
+3.6 
+Phí:   
+- 50.000 đồng/hợp đồng, giao dịch; 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời gian 
+Biểu mẫu/ 
+Kết quả 
+B1 
+- Nộp hồ sơ tại Trung tâm Ph ục 
+vụ Hành chính công, Đ ịa đi ểm 
+tiếp nhận và trả kết quả giải quyết 
+TTHC (Theo thông báo c ủa cấp 
+có thẩm quyền) Việc chứng thực 
+các giao dịch liên quan đến quyền 
+của người sử dụng đất được thực 
+hiện tại Ủy ban nhân dân c ấp xã 
+nơi có đ ất. Việc chứng thực các 
+giao d ịch liên quan đ ến nhà ở 
+Cá nhân/Tổ chức Trong giờ 
+hành chính Theo mục 3.2 
+
+TRANG 86
+86 
+ 
+được thực hiện tại UBND cấp xã 
+nơi có nhà. 
+- Nộp trực tuyến 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+ 
+ 
+B2 
+Công ch ức B ộ phận M ột c ửa 
+kiểm tra giấy tờ trong hồ sơ yêu 
+cầu chứng thực: 
+-Trường hợp h ồ sơ đ ầy đủ, hợp 
+lệ, thì ti ếp nhận hồ sơ; nhập vào 
+hệ thống thông tin gi ải quy ết 
+TTHC, ký vào t ừng trang c ủa 
+giao d ịch và ký vào dư ới l ời 
+chứng theo m ẫu quy đ ịnh; các 
+bên tham gia hợp đồng, giao dịch 
+phải ký trư ớc m ặt ngư ời ti ếp 
+nhận hồ sơ. Trường hợp người có 
+thẩm quy ền giao k ết giao d ịch 
+của các t ổ chức tín d ụng, doanh 
+nghiệp đã đăng ký chữ ký mẫu tại 
+cơ quan thực hiện chứng thực thì 
+có th ể ký trư ớc vào giao d ịch; 
+người tiếp nhận hồ sơ tại Bộ phận 
+Một c ửa ph ải đ ối chi ếu ch ữ ký 
+của họ trong giao dịch với chữ ký 
+mẫu trư ớc khi th ực hi ện ch ứng 
+thực, nếu nghi ng ờ chữ ký trong 
+hợp đ ồng khác v ới ch ữ ký m ẫu 
+thì yêu c ầu ngư ời đó ký trư ớc 
+mặt. 
+- Công ch ức B ộ phận M ột c ửa 
+thực hi ện s ố hóa (sao  chụp, 
+chuyển thành tài liệu điện tử trên 
+hệ thống thông tin, cơ sở dữ liệu) 
+và ký s ố vào tài li ệu, hồ sơ giải 
+quyết thủ tục hành chính đã được 
+số hóa theo quy định. 
+-Trường hợp hồ sơ chưa đ ầy đủ, 
+hợp lệ thì có thông báo cho người 
+yêu c ầu b ổ sung, hoàn thi ện h ồ 
+Công chức 
+Bộ phận Một cửa 
+04 giờ 
+Phiếu tiếp nhận 
+hồ sơ và hẹn trả 
+kết quả  
+
+TRANG 87
+87 
+ 
+sơ, nêu rõ lo ại giấy tờ, nội dung 
+cần bổ sung để người có yêu cầu 
+bổ sung, hoàn thi ện. Sau khi h ồ 
+sơ đư ợc b ổ sung, th ực hi ện l ại 
+bước trên. 
+- Chuyển h ồ sơ đ ến công ch ức 
+làm công tác tư pháp - hộ tịch để 
+xử lý, đồng thời chuyến đến lãnh 
+đạo UBND c ấp x ã, Chánh Văn 
+phòng HĐND-UBND cấp xã đ ể 
+theo dõi. 
+B3 
+- Người th ực hi ện ch ứng th ực 
+kiểm tra h ồ sơ, n ếu đ ầy đủ, ghi 
+lời chứng tương ứng với từng loại 
+giao dịch theo mẫu  
+- Trường hợp hồ sơ chưa đủ điều 
+kiện giải quyết, công chức hướng 
+dẫn công dân bổ sung, hoàn thiện 
+hồ sơ. 
+Lãnh đạo UBND 
+cấp xã, Chánh 
+Văn phòng được 
+ủy quyền, Công 
+chức làm công tác 
+Tư pháp - Hộ tịch 
+ 
+08 giờ 
+ 
+ 
+- Phiếu ki ểm 
+soát quá trình 
+giải quyết hồ sơ  
+-  Phiếu yêu cầu 
+bổ sung, hoàn 
+thiện hồ sơ    
+- Phiếu t ừ chối 
+tiếp nh ận gi ải 
+quyết hồ sơ   
+B4 
+ Trình Lãnh đạo Ủy ban nhân dân 
+cấp xã, Chánh Văn phòng đư ợc 
+ủy quy ền ch ứng th ực ký/ký s ố 
+ghi rõ họ tên chuyển đến bộ phận 
+văn thư 
+Lãnh đạo UBND 
+cấp xã, Chánh 
+Văn phòng được 
+ủy quyền 
+03 giờ 
+ 
+Hồ sơ 
+B5 
+Bộ phận văn thư: phát hành b ản 
+giấy và b ản điện tử, chuyển đến 
+Bộ phận Một cửa để trả kết quả 
+cho ngư ời yêu c ầu, chuy ển đ ến 
+công chức tham mưu đ ể ghi vào 
+sổ chứng thực và lưu hồ sơ 
+Công chức làm 
+công tác văn thư; 
+Công chức làm 
+công tác tư pháp - 
+hộ tịch; Công 
+chức Bộ phận 
+Một cửa 
+01 giờ 
+ 
+Giao dịch được 
+chứng thực 
+B6 Thu phí, trả kết quả cho công dân Công chức Bộ 
+phận Một cửa 
+Trong giờ 
+hành chính 
+Giao dịch được 
+chứng thực 
+4 Biểu mẫu 
+
+TRANG 88
+88 
+ 
+ Biểu mẫu theo Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ 
+ Biểu mẫu theo Nghị định số 23/2015/NĐ-CP của Chính phủ. 
+ Biểu mẫu theo Thông tư số 01/2020/TT-BTP của Bộ Tư pháp 
+ Biểu mẫu theo Thông tư 11/2025/TT-BTP ngày 25/6/2025 
+ 
+
+TRANG 89
+89 
+ 
+5. Quy trình: Chứng thực Di chúc (Mã 2.001019) 
+1 Mục đích   
+ Quy trình này quy định trình tự và cách thức thực hiện TTHC Chứng thực di chúc 
+2 Phạm vi 
+ 
+- Áp dụng đối với tổ chức/cá nhân thực hiện TTHC chứng thực di chúc 
+- UBND cấp xã, Văn phòng HĐND-UBND cấp xã, Trung tâm Phục vụ Hành chính 
+công, Địa điểm tiếp nhận và trả kết quả giải quyết TTHC theo thông báo của cấp có 
+thẩm quyền (sau đây gọi chung là Bộ phận Một cửa) và công chức Bộ phận Một cửa, 
+công chức, người lao động được bố trí tham gia trong quá trình tiếp nhận, giải quyết, 
+trả kết quả chịu trách nhiệm thực hiện Quy trình này. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính phủ về cấp bản sao từ bản chính, chứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính ph ủ sửa đổi, bổ sung một số điều của 
+Nghị định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản 
+chính, chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung 
+bởi Nghị định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP ngày 14/01/2026 c ủa Chính ph ủ sửa đổi, bổ sung 
+một số Nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh 
+thuộc phạm vi quản lý của Bộ Tư pháp; 
+- Nghị quyết 66.7/2025/NQCP ngày 15/11/2025 của Chính phủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu; 
+- Thông tư số 01/2020/TT-BTP của Bộ Tư pháp quy định chi tiết và hướng dẫn thi 
+hành một số điều của Nghị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Thông tư s ố 226/2016/TT-BTC của Bộ Tài chính quy đ ịnh mức thu, ch ế độ thu, 
+nộp, quản lý và sử dụng phí chứng thực; 
+- Quyết định 858/QĐ-BTP ngày 27/3/2026 của Bộ Tư pháp về việc công bố thủ tục 
+hành chính được sửa đổi, bổ sung, thủ tục hành chính bị bãi bỏ trong lĩnh vực chứng 
+thực thuộc phạm vi quản lý của Bộ Tư pháp. 
+3.2 Thành phần hồ sơ: Người yêu cầu 
+chứng thực nộp 01 (một) bộ hồ sơ 
+Bản chính Bản sao 
+
+TRANG 90
+90 
+ 
+yêu cầu chứng thực, gồm các giấy tờ 
+sau đây 
+1 Dự thảo di chúc x  
+2 
+Bản chính hoặc bản sao có chứng thực 
+hoặc bản sao điện tử được chứng thực 
+từ bản chính c ủa gi ấy ch ứng nh ận 
+quyền sở hữu, quyền sử dụng hoặc giấy 
+tờ thay thế được pháp luật quy định đối 
+với tài sản mà pháp luật quy định phải 
+đăng ký quyền sở hữu, quyền sử dụng 
+trong trư ờng h ợp giao d ịch liên quan 
+đến tài sản đó; trừ trường hợp người lập 
+di chúc đang bị cái chết đe dọa đến tính 
+mạng. Trường hợp nộp hồ sơ trực tiếp, 
+người yêu c ầu chứng thực có th ể nộp 
+bản sao kèm xuất trình bản chính để đối 
+chiếu (Không yêu c ầu ngư ời yêu c ầu 
+chứng thực nộp giấy chứng nhận quyền 
+sử dụng đất, quyền sở hữu tài sản gắn 
+liền v ới đ ất khi ngư ời ti ếp nh ận, gi ải 
+quyết th ủ tục hành  chính khai thác 
+được thông tin trên Cơ sở dữ liệu quốc 
+gia về đất đai, giai đo ạn đầu áp d ụng 
+đối với đất ở) 
+x x 
+3.3. Số lượng hồ sơ 
+  01 bộ 
+3.4 Thời gian xử lý 
+ 
+Không quá 02 (hai) ngày làm vi ệc, kể từ ngày nhận đủ hồ sơ yêu c ầu chứng thực 
+hoặc có thể kéo dài hơn theo thỏa thuận bằng văn bản với người yêu cầu chứng thực. 
+Trường hợp kéo dài thời hạn giải quyết thì người tiếp nhận hồ sơ phải có phiếu hẹn 
+ghi rõ thời gian (giờ, ngày) trả kết quả cho người yêu cầu chứng thực. 
+3.5 Nơi tiếp nhận và trả kết quả 
+
+TRANG 91
+91 
+ 
+ 
+- Các chi nhánh Trung tâm Phục vụ Hành chính công Thành phố, Địa điểm tiếp nhận 
+và trả kết quả giải quyết TTHC (Theo thông báo của cấp có thẩm quyền) 
+- Trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvuconh.gov.vn 
++ motcua.gov.moj.vn 
+3.6 Phí 
+ - 50.000 đồng/di chúc; 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời gian 
+Biểu mẫu/ 
+Kết quả 
+B1 
+- Nộp hồ sơ trực tiếp tại Trung 
+tâm Phục vụ Hành chính công, 
+Địa đi ểm ti ếp nh ận và tr ả kết 
+quả giải quy ết TTHC (Theo 
+thông báo c ủa c ấp có th ẩm 
+quyền) 
+- Nộp trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+Cá nhân/Tổ chức Trong giờ 
+hành chính 
+Theo m ục 
+3.2 
+ 
+B2 
+- Công chức Bộ phận Một cửa 
+thực hiện: 
++ Kiểm tra gi ấy tờ trong hồ sơ 
+yêu cầu chứng thực, nếu đầy đủ, 
+tại thời điểm chứng thực người 
+lập di chúc t ự nguyện, minh 
+mẫn và nh ận th ức, làm ch ủ 
+được hành vi của mình thì thực 
+hiện ti ếp nh ận và ký vào t ừng 
+trang của di chúc và ký vào dưới 
+Công chức Bộ 
+phận Một cửa 04 giờ 
+-Sổ theo dõi 
+hồ sơ  
+- Phiếu ti ếp 
+nhận h ồ sơ 
+và hẹn trả kết 
+quả  
+
+TRANG 92
+92 
+ 
+lời ch ứng theo  quy đ ịnh; nh ập 
+vào h ệ thống thông tin gi ải 
+quyết TTHC 
++ Yêu c ầu ngư ời l ập di chúc 
+phải ký hoặc điểm chỉ trước mặt 
+người tiếp nhận hồ sơ 
+- Công chức Bộ phận Một cửa 
+thực hi ện s ố hóa (sao ch ụp, 
+chuyển thành tài li ệu đi ện t ử 
+trên hệ thống thông tin, cơ sở dữ 
+liệu) và ký số vào tài liệu, hồ sơ 
+giải quyết thủ tục hành chính đã 
+được số hóa theo quy định. 
+-Trường hợp hồ sơ chưa đầy đủ, 
+hợp l ệ thì có thông báo cho 
+người yêu c ầu b ổ sung, hoàn 
+thiện hồ sơ, nêu rõ loại giấy tờ, 
+nội dung cần bổ sung để người 
+có yêu cầu bổ sung, hoàn thiện. 
+Sau khi h ồ sơ đư ợc b ổ sung, 
+thực hiện lại bước trên. 
+- Chuyển hồ sơ đến công ch ức 
+làm công tác tư pháp - hộ tịch 
+để xử lý, đồng thời chuyến đến 
+lãnh đạo UBND cấp xã, Chánh 
+Văn phòng HĐND – UBND 
+cấp xã để theo dõi. 
+ 
+ 
+ 
+ 
+ 
+B3 
+- Thực hiện kiểm tra hồ sơ, nếu 
+đầy đủ, ghi lời chứng theo mẫu  
+- Trường h ợp h ồ sơ chưa đ ủ 
+điều kiện giải quyết, công chức 
+hướng d ẫn công dân b ổ sung, 
+hoàn thiện hồ sơ. 
+- Trình Lãnh đ ạo Ủy ban nhân 
+dân c ấp xã, Chánh Văn phòng 
+được ủy quyền chứng thực 
+Công chức làm 
+công tác Tư pháp 
+- Hộ tịch, 
+ 
+08 giờ 
+ 
+ 
+- Phiếu kiểm 
+soát quá 
+trình gi ải 
+quyết hồ sơ  
+-  Phiếu yêu 
+cầu b ổ sung, 
+hoàn thi ện 
+hồ sơ    
+- Phiếu t ừ 
+chối ti ếp 
+nhận giải 
+quyết hồ sơ   
+
+TRANG 93
+93 
+ 
+B4 
+ Trình Lãnh đ ạo Ủy ban nhân 
+dân c ấp xã, Chánh Văn phòng 
+được ủy quy ền ch ứng th ực 
+ký/ký s ố ghi rõ h ọ tên chuy ển 
+đến bộ phận văn thư 
+Lãnh đạo UBND 
+cấp xã, Chánh 
+Văn phòng được 
+ủy quyền 
+03 giờ Hồ sơ 
+B5 
+Bộ phận văn thư: phát hành bản 
+giấy và bản điện tử, chuyển đến 
+Bộ phận Một cửa để trả kết quả 
+cho người yêu cầu, chuyển đến 
+công chức tham mưu để ghi vào 
+sổ chứng thực và lưu hồ sơ 
+Công chức làm 
+công tác văn thư; 
+Công chức làm 
+công tác tư pháp - 
+hộ tịch; Công 
+chức Bộ phận 
+Một cửa 
+01 giờ 
+Di chúc 
+được ch ứng 
+thực 
+ 
+B6 
+Thu phí, tr ả kết qu ả cho công 
+dân 
+Công chức 
+Bộ phận Một cửa 
+Trong giờ 
+hành chính 
+Di chúc 
+được ch ứng 
+thực 
+4 Biểu mẫu 
+ Biểu mẫu theo Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ 
+ Biểu mẫu theo Nghị định số 23/2015/NĐ-CP của Chính phủ. 
+ Biểu mẫu theo Thông tư số 01/2020/TT-BTP của Bộ Tư pháp 
+ Biểu mẫu theo Thông tư 11/2025/TT-BTP ngày 25/6/2025 
+ 
+  
+
+TRANG 94
+94 
+ 
+6. Quy trình: Chứng thực văn bản từ chối nhận di sản (Mã 2.001016) 
+ 
+1 Mục đích  
+ Quy trình này quy đ ịnh trình tự và cách thức thực hiện TTHC Chứng thực văn bản 
+từ chối nhận di sản 
+2 Phạm vi 
+ 
+- Áp dụng đối với cá nhân, tổ chức đề nghị chứng thực văn bản từ chối nhận di sản 
+- UBND cấp xã, Văn phòng HĐND-UBND cấp xã, Trung tâm Phục vụ Hành chính 
+công, Địa điểm tiếp nhận và trả kết quả giải quyết TTHC theo thông báo của cấp có 
+thẩm quyền (sau đây gọi chung là Bộ phận Một cửa) và công chức Bộ phận Một cửa, 
+công chức, người lao động được bố trí tham gia trong quá trình tiếp nhận, giải quyết, 
+trả kết quả chịu trách nhiệm thực hiện Quy trình này. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính phủ về cấp bản sao từ bản chính, chứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính ph ủ sửa đổi, bổ sung một số điều của 
+Nghị định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản 
+chính, chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung 
+bởi Nghị định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP ngày 14/01/2026 c ủa Chính ph ủ sửa đổi, bổ sung 
+một số Nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh 
+thuộc phạm vi quản lý của Bộ Tư pháp; 
+- Nghị quyết 66.7/2025/NQCP ngày 15/11/2025 c ủa Chính phủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu; 
+- Thông tư số 01/2020/TT-BTP của Bộ Tư pháp quy định chi tiết và hướng dẫn thi 
+hành một số điều của Nghị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Thông tư s ố 226/2016/TT-BTC của Bộ Tài chính quy đ ịnh mức thu, ch ế độ thu, 
+nộp, quản lý và sử dụng phí chứng thực; 
+- Quyết định 858/QĐ-BTP ngày 27/3/2026 của Bộ Tư pháp về việc công bố thủ tục 
+hành chính được sửa đổi, bổ sung, thủ tục hành chính bị bãi bỏ trong lĩnh vực chứng 
+thực thuộc phạm vi quản lý của Bộ Tư pháp; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công 
+
+TRANG 95
+95 
+ 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 
+Thành phần hồ sơ: Người yêu 
+cầu chứng thực nộp 01 bộ hồ sơ 
+yêu cầu chứng thực, gồm các 
+giấy tờ sau đây: 
+Bản 
+chính 
+Bản sao 
+1 Dự thảo văn bản thỏa từ chối nhận 
+di sản x  
+2 
+Bản chính ho ặc bản sao có ch ứng 
+thực ho ặc b ản sao đi ện t ử được 
+chứng thực từ bản chính c ủa giấy 
+chứng nhận quy ền s ở hữu, quyền 
+sử dụng hoặc giấy tờ thay thế được 
+pháp luật quy đ ịnh đối với tài s ản 
+mà pháp lu ật quy đ ịnh ph ải đăng 
+ký quy ền s ở hữu, quy ền s ử dụng 
+trong trường hợp văn b ản từ chối 
+nhận di s ản liên quan đ ến tài s ản 
+đó. Trường hợp nộp hồ sơ trực tiếp, 
+người yêu c ầu ch ứng th ực có th ể 
+nộp b ản sao kèm xu ất trình b ản 
+chính để đối chiếu (Không yêu cầu 
+người yêu cầu chứng thực nộp giấy 
+chứng nh ận quy ền s ử dụng đ ất, 
+quyền sở hữu tài s ản gắn liền với 
+đất khi người tiếp nhận, giải quyết 
+thủ tục hành chính khai thác đư ợc 
+thông tin trên  Cơ sở dữ liệu quốc 
+gia v ề đất đai, giai đo ạn đ ầu áp 
+dụng đối với đất ở) 
+x x 
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ Không quá 02 (hai) ngày làm vi ệc, kể từ ngày nhận đủ hồ sơ yêu c ầu chứng thực 
+hoặc có thể kéo dài hơn theo thỏa thuận bằng văn bản với người yêu cầu chứng thực. 
+
+TRANG 96
+96 
+ 
+Trường hợp kéo dài thời hạn giải quyết thì người tiếp nhận hồ sơ phải có phiếu hẹn 
+ghi rõ thời gian (giờ, ngày) trả kết quả cho người yêu cầu chứng thực. 
+3.5 Nơi tiếp nhận và trả kết quả 
+ 
+- Các chi nhánh Trung tâm Phục vụ Hành chính công Thành phố, Địa điểm tiếp nhận 
+và trả kết quả giải quyết TTHC (Theo thông báo của cấp có thẩm quyền) 
+- Trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvuconh.gov.vn 
++ motcua.gov.moj.vn 
+3.6 Phí 
+ - 50.000 đồng/văn bản; 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời gian 
+Biểu mẫu/ 
+Kết quả 
+B1 
+- Nộp h ồ sơ tr ực ti ếp t ại Trung 
+tâm Ph ục v ụ Hành chính công, 
+Địa điểm tiếp nhận và trả kết quả 
+giải quy ết TTHC (Theo thông 
+báo của cấp có thẩm quyền) 
+- Nộp trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+Cá nhân/Tổ chức Trong giờ 
+hành chính 
+Theo m ục 
+3.2 
+ 
+B2 
+- Công ch ức B ộ phận M ột c ửa 
+thực hiện: 
++ Ki ểm tra gi ấy t ờ trong h ồ sơ 
+yêu cầu chứng thực, nếu đầy đủ, 
+tại thời điểm chứng thực người từ 
+Công chức Bộ 
+phận Một cửa 04 giờ 
+-Sổ theo 
+dõi hồ sơ  
+- Phiếu tiếp 
+nhận h ồ sơ 
+
+TRANG 97
+97 
+ 
+chối nhận di sản tự nguyện, minh 
+mẫn và nhận thức, làm chủ được 
+hành vi c ủa mình thì th ực hi ện 
+tiếp nh ận và ký vào t ừng trang 
+của văn b ản t ừ chối và  ký vào 
+dưới l ời ch ứng theo m ẫu quy 
+định; nhập vào hệ thống thông tin 
+giải quyết TTHC 
++ Yêu cầu người từ chối nhận di 
+sản phải ký ho ặc điểm chỉ trước 
+mặt người tiếp nhận hồ sơ 
+- Công ch ức B ộ phận M ột c ửa 
+thực hi ện s ố hóa (sao ch ụp, 
+chuyển thành tài liệu điện tử trên 
+hệ thống thông tin, cơ sở dữ liệu) 
+và ký s ố vào tài li ệu, hồ sơ giải 
+quyết thủ tục hành chính đã được 
+số hóa theo quy định. 
+-Trường hợp hồ sơ chưa đ ầy đủ, 
+hợp lệ thì có thông báo cho người 
+yêu c ầu b ổ sung, hoàn thi ện h ồ 
+sơ, nêu rõ lo ại giấy tờ, nội dung 
+cần bổ sung để người có yêu cầu 
+bổ sung, hoàn thi ện. Sau khi h ồ 
+sơ đư ợc b ổ sung, th ực hi ện l ại 
+bước trên. 
+- Chuyển h ồ sơ đ ến công ch ức 
+làm công tác tư pháp - hộ tịch để 
+xử lý, đồng thời chuyến đến lãnh 
+đạo UBND c ấp xã, Chánh Văn 
+phòng HĐND-UBND cấp xã đ ể 
+theo dõi. 
+và h ẹn tr ả 
+kết quả  
+ 
+ 
+ 
+ 
+ 
+B3 
+- Thực hiện kiểm tra h ồ sơ, nếu 
+đầy đủ, ghi lời chứng theo mẫu  
+- Trường hợp hồ sơ chưa đủ điều 
+kiện giải quyết, công chức hướng 
+dẫn công dân bổ sung, hoàn thiện 
+hồ sơ. 
+- Trình Lãnh đ ạo Ủy ban nhân 
+dân c ấp xã, Chánh Văn phòng 
+được ủy quyền chứng thực 
+Công chức làm 
+công tác Tư pháp 
+- Hộ tịch, 
+ 
+08 giờ 
+ 
+- Phiếu 
+kiểm soát 
+quá trình 
+giải quy ết 
+hồ sơ  
+-  Phiếu yêu 
+cầu 
+bổ sung, 
+
+TRANG 98
+98 
+ 
+hoàn thi ện 
+hồ sơ    
+- Phiếu t ừ 
+chối ti ếp 
+nhận gi ải 
+quyết hồ sơ   
+B4 
+ Trình Lãnh đạo Ủy ban nhân dân 
+cấp xã, Chánh Văn phòng đư ợc 
+ủy quy ền ch ứng th ực ký/ký s ố 
+ghi rõ họ tên chuyển đến bộ phận 
+văn thư 
+Lãnh đạo UBND 
+cấp xã, Chánh 
+Văn phòng được 
+ủy quyền 
+03 giờ Hồ sơ 
+B5 
+Bộ phận văn thư: phát hành b ản 
+giấy và b ản điện tử, chuyển đến 
+Bộ phận Một cửa để trả kết quả 
+cho ngư ời yêu c ầu, chuy ển đ ến 
+công chức tham mưu đ ể ghi vào 
+sổ chứng thực và lưu hồ sơ 
+Công chức làm 
+công tác văn thư; 
+Công chức làm 
+công tác tư pháp - 
+hộ tịch; Công 
+chức Bộ phận 
+Một cửa 
+01 giờ 
+Văn b ản t ừ 
+chối nh ận 
+di sản được 
+chứng thực 
+B6 Thu phí, trả kết quả cho công dân Công chức Bộ 
+phận Một cửa 
+Trong giờ 
+hành chính 
+Văn b ản t ừ 
+chối nh ận 
+di sản được 
+chứng thực 
+4 Biểu mẫu    
+ Biểu mẫu theo Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ 
+ Biểu mẫu theo Nghị định số 23/2015/NĐ-CP của Chính phủ. 
+ Biểu mẫu theo Thông tư số 01/2020/TT-BTP của Bộ Tư pháp 
+ Biểu mẫu theo Thông tư 11/2025/TT-BTP ngày 25/6/2025 
+ 
+
+TRANG 99
+99 
+ 
+7. Quy trình: Chứng thực văn bản phân chia di sản mà di sản là động sản, quyền sử 
+dụng đất, nhà ở (Mã 2.001406) 
+1 Mục đích 
+ Quy trình này quy đ ịnh trình t ự và cách th ức Chứng thực văn b ản thỏa thuận phân 
+chia di sản mà di sản là động sản, quyền sử dụng đất, nhà ở. 
+2 Phạm vi 
+ 
+- Áp dụng đối với cá nhâ, t ổ chức thực hiện TTHC Ch ứng thực văn b ản thỏa thuận 
+phân chia di sản mà di sản là động sản, quyền sử dụng đất, nhà ở. 
+- UBND cấp xã, Văn phòng HĐND -UBND cấp xã, Trung tâm Phục vụ Hành chính 
+công, Địa điểm tiếp nhận và trả kết quả giải quyết TTHC theo thông báo c ủa cấp có 
+thẩm quyền (sau đây gọi chung là Bộ phận Một cửa) và công chức Bộ phận Một cửa, 
+công chức, người lao động được bố trí tham gia trong quá trình tiếp nhận, giải quyết, 
+trả kết quả chịu trách nhiệm thực hiện Quy trình này 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính ph ủ về cấp bản sao t ừ bản chính, ch ứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính phủ sửa đổi, bổ sung một số điều của Nghị 
+định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung bởi Nghị 
+định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP ngày 14/01/2026 của Chính phủ sửa đổi, bổ sung một số 
+Nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc phạm 
+vi quản lý của Bộ Tư pháp; 
+- Nghị quyết 66.7/2025/NQCP ngày 15/11/2025 c ủa Chính ph ủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu; 
+- Thông tư s ố 01/2020/TT-BTP của Bộ Tư pháp quy đ ịnh chi ti ết và hư ớng dẫn thi 
+hành một số điều của Ngh ị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Thông tư số 226/2016/TT-BTC của Bộ Tài chính quy định mức thu, chế độ thu, nộp, 
+quản lý và sử dụng phí chứng thực; 
+- Quyết định 858/QĐ-BTP ngày 27/3/2026 của Bộ Tư pháp về việc công bố thủ tục 
+hành chính được sửa đổi, bổ sung, thủ tục hành chính bị bãi bỏ trong lĩnh vực chứng 
+thực thuộc phạm vi quản lý của Bộ Tư pháp; 
+
+TRANG 100
+100 
+ 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 của Trung tâm phục vụ hành chính 
+công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh vực Công chứng, 
+Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư pháp thành 
+phố Hà Nội. 
+3.2 
+Thành phần hồ sơ:  Người yêu 
+cầu chứng thực nộp 01 bộ hồ sơ 
+yêu cầu chứng thực, gồm các giấy 
+tờ sau đây: 
+Bản chính Bản sao 
+1 Dự thảo văn bản phân chia di sản x  
+2 
+Bản chính ho ặc b ản sao có ch ứng 
+thực ho ặc b ản sao đi ện t ử được 
+chứng th ực t ừ bản chính c ủa gi ấy 
+chứng nhận quyền sở hữu, quyền sử 
+dụng ho ặc gi ấy t ờ thay th ế được 
+pháp luật quy định đối với tài sản mà 
+pháp lu ật quy đ ịnh ph ải đăng ký 
+quyền sở hữu, quyền sử dụng trong 
+trường hợp văn bản phân chia di sản 
+liên quan đến tài sản đó. Trường hợp 
+nộp hồ sơ trực tiếp, người yêu c ầu 
+chứng thực có thể nộp bản sao kèm 
+xuất trình b ản chính đ ể đối chi ếu 
+(Không yêu c ầu ngư ời yêu c ầu 
+chứng th ực n ộp gi ấy ch ứng nhận 
+quyền sử dụng đất, quyền sở hữu tài 
+sản gắn liền với đất khi ngư ời tiếp 
+nhận, giải quyết thủ tục hành chính 
+khai thác được thông tin trên Cơ s ở 
+dữ liệu quốc gia về đất đai, giai đoạn 
+đầu áp dụng đối với đất ở) 
+ 
+x 
+ 
+x 
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ Không quá 02 (hai) ngày làm việc, kể từ ngày nhận đủ hồ sơ yêu cầu chứng thực hoặc 
+có thể kéo dài hơn theo thỏa thuận bằng văn bản với người yêu cầu chứng thực. Trường 
+
+TRANG 101
+101 
+ 
+hợp kéo dài thời hạn giải quyết thì người tiếp nhận hồ sơ phải có phiếu hẹn ghi rõ thời 
+gian (giờ, ngày) trả kết quả cho người yêu cầu chứng thực. 
+3.5 Nơi tiếp nhận và trả kết quả 
+ 
+- Trực tiếp: Các chi nhánh Trung tâm Phục vụ Hành chính công Thành phố, Địa điểm 
+tiếp nhận và trả kết quả giải quyết TTHC (Theo thông báo c ủa cấp có thẩm quyền). 
+Việc chứng thực các giao dịch liên quan đến quyền của người sử dụng đất được thực 
+hiện tại Ủy ban nhân dân c ấp xã nơi có đ ất, việc chứng thực các giao d ịch về nhà ở 
+được thực hiện tại Ủy ban nhân dân cấp xã nơi có nhà. 
+- Trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvuconh.gov.vn 
++ motcua.gov.moj.vn 
+3.6 Phí 
+ - 50.000 đồng/văn bản 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời gian 
+Biểu mẫu/ 
+Kết quả 
+B1 
+- Nộp hồ sơ trực tiếp tại Trung 
+tâm Phục vụ Hành chính công, 
+Địa điểm tiếp nhận và tr ả kết 
+quả giải quy ết TTHC (Theo 
+thông báo c ủa c ấp có th ẩm 
+quyền) 
+- Nộp trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+Cá nhân/Tổ 
+chức 
+Trong giờ 
+hành chính Theo mục 3.2 
+
+TRANG 102
+102 
+ 
+B2 
+- Công chức Bộ phận Một cửa: 
++ Kiểm tra giấy tờ trong hồ sơ 
+yêu cầu chứng thực, nếu đầy đủ, 
+tại th ời đi ểm ch ứng th ực các 
+bên tham gia th ỏa thuận phân 
+chia di sản tự nguyện, minh mẫn 
+và nh ận th ức, làm ch ủ được 
+hành vi của mình thì tiếp nhận 
+và ký vào t ừng trang c ủa văn 
+bản thỏa thuận phân chia di sản 
+và ký vào dư ới lời chứng theo 
+mẫu quy đ ịnh; nh ập vào h ệ 
+thống thông tin gi ải quy ết 
+TTHC 
++ Yêu c ầu các bên tham gia 
+thỏa thu ận phân chia di s ản 
+phải ký trư ớc m ặt ngư ời ti ếp 
+nhận hồ sơ 
+- Công chức Bộ phận Một cửa 
+thực hi ện s ố hóa (sao ch ụp, 
+chuyển thành tài li ệu đi ện t ử 
+trên hệ thống thông tin, cơ s ở 
+dữ liệu) và ký s ố vào tài li ệu, 
+hồ sơ giải quyết thủ tục hành 
+chính đã được số hóa theo quy 
+định. 
+-Trường h ợp h ồ sơ chưa đ ầy 
+đủ, hợp lệ thì có thông báo cho 
+người yêu c ầu b ổ sung, hoàn 
+thiện hồ sơ, nêu rõ loại giấy tờ, 
+nội dung cần bổ sung để người 
+có yêu cầu bổ sung, hoàn thiện. 
+Sau khi h ồ sơ đư ợc b ổ sung, 
+thực hiện lại bước trên. 
+- Chuyển hồ sơ đến công chức 
+làm công tác tư pháp - hộ tịch 
+để xử lý, đồng thời chuyến đến 
+lãnh đạo UBND cấp xã, Chánh 
+Văn phòng HĐND-UBND cấp 
+xã để theo dõi. 
+Công chức Bộ 
+phận Một cửa 04 giờ 
+-Sổ theo dõi hồ sơ  
+- Phiếu tiếp nhận hồ 
+sơ và h ẹn tr ả kết 
+quả  
+
+TRANG 103
+103 
+ 
+B3 
+- Thực hiện kiểm tra hồ sơ, nếu 
+đầy đủ, ghi lời chứng theo mẫu  
+- Trường h ợp h ồ sơ chưa đ ủ 
+điều kiện giải quyết, công chức 
+hướng dẫn công dân b ổ sung, 
+hoàn thiện hồ sơ. 
+- Trình Lãnh đạo Ủy ban nhân 
+dân cấp xã, Chánh Văn phòng 
+được ủy quyền chứng thực 
+Công chức làm 
+công tác Tư 
+pháp - Hộ tịch, 
+08 giờ 
+- Phiếu ki ểm soát 
+quá trình giải quyết 
+hồ sơ  
+-  Phiếu yêu c ầu 
+bổ sung, hoàn thiện 
+hồ sơ    
+- Phiếu từ chối tiếp 
+nhận gi ải quy ết h ồ 
+sơ   
+B4 
+ Trình Lãnh đ ạo Ủy ban nhân 
+dân cấp xã, Chánh Văn phòng 
+được ủy quy ền ch ứng th ực 
+ký/ký số ghi rõ h ọ tên chuyển 
+đến bộ phận văn thư 
+Lãnh đạo UBND 
+cấp xã, Chánh 
+Văn phòng được 
+ủy quyền 
+03 giờ Hồ sơ 
+B5 
+Bộ phận văn thư: phát hành bản 
+giấy và bản điện tử, chuyển đến 
+Bộ phận Một cửa để trả kết quả 
+cho người yêu cầu, chuyển đến 
+công chức tham mưu để ghi vào 
+sổ chứng thực và lưu hồ sơ 
+Công chức làm 
+công tác văn thư 
+Công chức làm 
+công tác tư pháp 
+- hộ tịch 
+Công chức Bộ 
+phận Một cửa 
+01 giờ 
+Văn bản thỏa thuận 
+phân chia di s ản 
+được chứng thực. 
+ 
+B6 Thu phí, tr ả kết quả cho công 
+dân 
+Công chức Bộ 
+phận Một cửa 
+Trong giờ 
+hành chính 
+Văn bản thỏa thuận 
+phân chia di s ản 
+được chứng thực. 
+4 Biểu mẫu    
+ Biểu mẫu theo Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ 
+ Biểu mẫu theo Nghị định số 23/2015/NĐ-CP của Chính phủ. 
+  Biểu mẫu theo Thông tư số 01/2020/TT-BTP của Bộ Tư pháp 
+ Biểu mẫu theo Thông tư 11/2025/TT-BTP ngày 25/6/2025 
+
+TRANG 104
+104 
+ 
+8. Quy trình: Chứng thực việc sửa đổi, bổ sung, hủy bỏ giao dịch (Mã 2.000913) 
+ 
+1 Mục đích   
+ Quy trình này quy đ ịnh trình tự và cách thức thực hiện TTHC Chứng thực việc sửa 
+đổi, bổ sung, hủy bỏ giao dịch. 
+2 Phạm vi 
+ 
+- Áp dụng đối với tổ chức, cá nhận thực hiện TTHC Chứng thực việc sửa đổi, bổ sung, 
+hủy bỏ giao dịch. 
+- UBND cấp xã, Văn phòng HĐND -UBND cấp xã, Trung tâm Ph ục vụ Hành chính 
+công, Địa điểm tiếp nhận và trả kết quả giải quyết TTHC theo thông báo c ủa cấp có 
+thẩm quyền (sau đây gọi chung là Bộ phận Một cửa) và công chức Bộ phận Một cửa, 
+công chức, người lao động được bố trí tham gia trong quá trình tiếp nhận, giải quyết, 
+trả kết quả chịu trách nhiệm thực hiện Quy trình này 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính ph ủ về cấp bản sao t ừ bản chính, ch ứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính phủ sửa đổi, bổ sung một số điều của Nghị 
+định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung bởi Nghị 
+định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP ngày 14/01/2026 của Chính phủ sửa đổi, bổ sung một 
+số Nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc 
+phạm vi quản lý của Bộ Tư pháp; 
+- Nghị quyết 66.7/2025/NQCP ngày 15/11/2025 c ủa Chính ph ủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu; 
+- Thông tư s ố 01/2020/TT-BTP của Bộ Tư pháp quy đ ịnh chi ti ết và hư ớng dẫn thi 
+hành một số điều của Ngh ị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Thông tư số 226/2016/TT-BTC của Bộ Tài chính quy định mức thu, chế độ thu, nộp, 
+quản lý và sử dụng phí chứng thực; 
+- Quyết định 858/QĐ-BTP ngày 27/3/2026 c ủa Bộ Tư pháp về việc công bố thủ tục 
+hành chính được sửa đổi, bổ sung, thủ tục hành chính bị bãi bỏ trong lĩnh vực chứng 
+thực thuộc phạm vi quản lý của Bộ Tư pháp; 
+
+TRANG 105
+105 
+ 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh v ực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Điều kiện thực hiện Thủ tục hành chính 
+ Việc sửa đổi, bổ sung, hủy bỏ giao dịch đã được chứng thực chỉ được thực hiện khi 
+có thỏa thuận bằng văn bản của các bên tham gia giao dịch. 
+3.3 
+Thành phần hồ sơ: Người yêu 
+cầu chứng thực nộp 01 (một) 
+bộ hồ sơ yêu cầu chứng thực, 
+gồm các giấy tờ sau đây: 
+Bản chính Bản sao 
+1 Giao dịch đã được chứng thực x  
+2 
+Dự thảo giao d ịch s ửa đ ổi, b ổ 
+sung, h ủy bỏ giao d ịch đã đư ợc 
+chứng thực 
+x  
+3 
+Trong trư ờng h ợp n ội dung s ửa 
+đổi, bổ sung, hủy bỏ giao dịch có 
+liên quan đến tài sản phải đăng ký 
+quyền sở hữu, quyền sử dụng thì 
+người yêu c ầu ch ứng th ực ph ải 
+nộp bản sao gi ấy tờ chứng minh 
+quyền s ở hữu, quy ền s ử dụng 
+hoặc giấy tờ thay thế được pháp 
+luật quy đ ịnh và xu ất trình b ản 
+chính đ ể đối chi ếu; tr ừ trường 
+hợp người lập di chúc đang bị cái 
+chết đe d ọa đ ến tính m ạng 
+(Không yêu c ầu ngư ời yêu c ầu 
+chứng thực nộp giấy chứng nhận 
+quyền sử dụng đất, quyền sở hữu 
+tài sản gắn liền với đất khi người 
+tiếp nhận, giải quyết thủ tục hành 
+chính khai thác đư ợc thông tin 
+trên Cơ sở dữ liệu quốc gia về đất 
+đai, giai đoạn đầu áp dụng đối với 
+đất ở) 
+ 
+ 
+x 
+ 
+
+TRANG 106
+106 
+ 
+3.4 Số lượng hồ sơ 
+ 01 bộ 
+3.5 Thời gian xử lý 
+ 
+Thời hạn thực hiện yêu cầu chứng thực là ngay trong ngày cơ quan, tổ chức tiếp nhận 
+yêu cầu hoặc trong ngày làm việc tiếp theo, nếu tiếp nhận yêu cầu sau 15 giờ. Trường 
+hợp trả kết quả trong ngày làm việc tiếp theo thì người tiếp nhận hồ sơ phải có phiếu 
+hẹn ghi rõ thời gian (giờ, ngày) trả kết quả cho người yêu cầu chứng thực. 
+3.6 Nơi tiếp nhận và trả kết quả 
+ 
+- Trực tiếp: Các chi nhánh Trung tâm Phục vụ Hành chính công Thành phố, Địa điểm 
+tiếp nhận và trả kết quả giải quyết TTHC (Theo thông báo của cấp có thẩm quyền) 
+- Trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvuconh.gov.vn 
++ motcua.gov.moj.vn 
+3.7 Phí 
+ - 30.000 đồng/ giao dịch; 
+3.8 Quy trình xử lý công việc 
+TT Trình tự Trách 
+nhiệm 
+Thời 
+gian 
+Biểu mẫu/ 
+Kết quả 
+B1 
+- Nộp h ồ sơ tr ực ti ếp t ại Trung 
+tâm Ph ục v ụ Hành chính công, 
+Địa điểm tiếp nhận và trả kết quả 
+giải quy ết TTHC (Theo thông 
+báo của cấp có thẩm quyền) 
+- Nộp trực tuyến: 
+Cá nhân/Tổ 
+chức 
+Trong 
+giờ hành 
+chính 
+Theo mục 3.3 
+
+TRANG 107
+107 
+ 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+B2 
+- Công ch ức B ộ phận M ột c ửa 
+thực hiện: 
++ Kiểm tra giấy tờ trong hồ sơ yêu 
+cầu ch ứng th ực, n ếu đ ầy đ ủ tại 
+thời đi ểm ch ứng thực các bên 
+tham gia giao d ịch t ự nguyện, 
+minh mẫn và nhận thức, làm chủ 
+được hành vi c ủa mình thì ti ếp 
+nhận hồ sơ, và ký vào t ừng trang 
+của giao d ịch và ký vào dư ới lời 
+chứng theo m ẫu quy đ ịnh; nh ập 
+vào hệ thống thông tin giải quyết 
+TTHC 
+Trường hợp người có thẩm quyền 
+giao kết giao dịch của các tổ chức 
+tín d ụng, doanh nghi ệp đã đăng 
+ký chữ ký mẫu tại cơ quan th ực 
+hiện ch ứng th ực thì có th ể ký 
+trước vào giao d ịch; công ch ức 
+Bộ phận Một cửa phải đối chiếu 
+chữ ký của họ trong giao dịch với 
+chữ ký mẫu trư ớc k hi th ực hi ện 
+chứng thực, nếu nghi ngờ chữ ký 
+trong giao d ịch khác v ới chữ ký 
+mẫu thì yêu c ầu ngư ời đó ký 
+trước mặt. 
++ Yêu cầu các bên tham gia giao 
+dịch phải ký trước mặt người tiếp 
+nhận hồ sơ  
+- Công ch ức B ộ phận M ột c ửa 
+thực hi ện s ố hóa (sao ch ụp, 
+chuyển thành tài liệu điện tử trên 
+hệ thống thông tin, cơ sở dữ liệu) 
+và ký số vào hồ sơ đã được số hóa 
+-Trường hợp hồ sơ chưa đ ầy đủ, 
+hợp lệ thì có thông báo cho người 
+yêu c ầu b ổ sung, hoàn thi ện h ồ 
+sơ, nêu rõ lo ại giấy tờ, nội dung 
+Công chức 
+Bộ phận 
+Một cửa 
+02 giờ 
+- Sổ theo dõi hồ sơ  
+- Phiếu tiếp nhận hồ sơ 
+và hẹn trả kết quả  
+
+TRANG 108
+108 
+ 
+cần bổ sung để người có yêu cầu 
+bổ sung, hoàn thi ện. Sau khi h ồ 
+sơ đư ợc b ổ sung, th ực hi ện l ại 
+bước trên. 
+- Chuyển h ồ sơ đ ến công ch ức 
+làm công tác tư pháp - hộ tịch để 
+xử lý, đồng thời chuyến đến lãnh 
+đạo UBND c ấp xã, Chánh Văn 
+phòng HĐND -UBND c ấp xã đ ể 
+theo dõi. 
+B3 
+- Thực hiện kiểm tra h ồ sơ, nếu 
+đầy đủ, ghi l ời chứng tương ứng 
+với từng loại giao dịch theo mẫu 
+quy định 
+- Trường hợp hồ sơ chưa đủ điều 
+kiện giải quyết, công chức hướng 
+dẫn công dân bổ sung, hoàn thiện 
+hồ sơ. 
+- Trình Lãnh đ ạo UBND c ấp xã, 
+Chánh Văn phòng được ủy quyền 
+chứng thực 
+Công chức 
+làm công tác 
+Tư pháp - 
+Hộ tịch, 
+03 giờ 
+- Phiếu ki ểm soát quá 
+trình giải quyết hồ sơ  
+-  Phiếu yêu c ầu 
+bổ sung, hoàn thi ện h ồ 
+sơ    
+- Phiếu t ừ chối ti ếp 
+nhận giải quyết hồ sơ   
+B4 
+ Trình Lãnh đạo Ủy ban nhân dân 
+cấp xã, Chánh Văn phòng đư ợc 
+ủy quyền chứng thực ký/ký số ghi 
+rõ họ tên chuyển đến bộ phận văn 
+thư 
+Lãnh đạo 
+UBND cấp 
+xã, Chánh 
+Văn phòng 
+được ủy 
+quyền 
+02 giờ Hồ sơ 
+B5 
+Bộ phận văn thư: phát hành b ản 
+giấy và b ản điện tử, chuyển đến 
+Bộ phận Một cửa để trả kết quả 
+cho ngư ời yêu c ầu, chuy ển đ ến 
+công chức tham mưu đ ể ghi vào 
+sổ chứng thực và lưu hồ sơ 
+Công chức 
+làm công tác 
+văn thư 
+Công chức 
+làm công tác 
+tư pháp - hộ 
+tịch 
+Công chức 
+Bộ phận 
+Một cửa 
+01 giờ Giao d ịch đư ợc ch ứng 
+thực 
+
+TRANG 109
+109 
+ 
+B6 Thu phí, trả kết quả cho công dân 
+Công chức 
+Bộ phận 
+Một cửa 
+Trong 
+giờ hành 
+chính 
+Giao d ịch đư ợc ch ứng 
+thực 
+4 Biểu mẫu 
+ Biểu mẫu theo Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ 
+ Biểu mẫu theo Nghị định số 23/2015/NĐ-CP của Chính phủ. 
+ Biểu mẫu theo Thông tư số 01/2020/TT-BTP của Bộ Tư pháp 
+ Biểu mẫu theo Thông tư 11/2025/TT-BTP ngày 25/6/2025 
+ 
+
+TRANG 110
+110 
+ 
+9. Quy trình: Sửa lỗi sai sót trong giao dịch (Mã 2.000927) 
+ 
+1 Mục đích   
+ Quy trình này quy định trình tự và cách thức thực hiện TTHC sửa lỗi sai sót trong giao 
+dịch. 
+2 Phạm vi 
+ 
+- Áp dụng đối tổ chức, cá nhân thực hiện TTHC sửa lỗi sai sót trong giao dịch. 
+- UBND cấp xã, Văn phòng HĐND -UBND cấp xã, Trung tâm Ph ục vụ Hành chính 
+công, Địa điểm tiếp nhận và trả kết quả giải quyết TTHC theo thông báo c ủa cấp có 
+thẩm quyền (sau đây gọi chung là Bộ phận Một cửa) và công chức Bộ phận Một cửa, 
+công chức, người lao động được bố trí tham gia trong quá trình tiếp nhận, giải quyết, 
+trả kết quả chịu trách nhiệm thực hiện Quy trình này. 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính ph ủ về cấp bản sao t ừ bản chính, ch ứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính phủ sửa đổi, bổ sung một số điều của Nghị 
+định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung bởi Nghị 
+định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP ngày 14/01/2026 của Chính phủ sửa đổi, bổ sung một 
+số Nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc 
+phạm vi quản lý của Bộ Tư pháp; 
+- Nghị quyết 66.7/2025/NQCP ngày 15/11/2025 c ủa Chính ph ủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu; 
+- Thông tư s ố 01/2020/TT-BTP của Bộ Tư pháp quy đ ịnh chi ti ết và hư ớng dẫn thi 
+hành một số điều của Ngh ị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Thông tư số 226/2016/TT-BTC của Bộ Tài chính quy định mức thu, chế độ thu, nộp, 
+quản lý và sử dụng phí chứng thực; 
+- Quyết định 858/QĐ-BTP ngày 27/3/2026 c ủa Bộ Tư pháp về việc công bố thủ tục 
+hành chính được sửa đổi, bổ sung, thủ tục hành chính bị bãi bỏ trong lĩnh vực chứng 
+thực thuộc phạm vi quản lý của Bộ Tư pháp; 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh v ực Công 
+
+TRANG 111
+111 
+ 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 
+Thành phần hồ sơ Người yêu 
+cầu chứng thực nộp 01 (một) 
+bộ hồ sơ yêu cầu chứng thực, 
+gồm các giấy tờ sau đây: 
+Bản chính Bản sao 
+1 
+Văn b ản th ỏa thu ận v ề việc s ửa 
+lỗi sai sót trong giao dịch đã được 
+chứng thực 
+x  
+2 Giao dịch đã được chứng thực x  
+3.3 Số lượng hồ sơ 
+ 01 bộ 
+3.4 Thời gian xử lý 
+ 
+Thời hạn thực hiện yêu cầu chứng thực là ngay trong ngày cơ quan, tổ chức tiếp nhận 
+yêu cầu hoặc trong ngày làm việc tiếp theo, nếu tiếp nhận yêu cầu sau 15 giờ. Trường 
+hợp trả kết quả trong ngày làm việc tiếp theo thì người tiếp nhận hồ sơ phải có phiếu 
+hẹn ghi rõ thời gian (giờ, ngày) trả kết quả cho người yêu cầu chứng thực.  
+3.5 Nơi tiếp nhận và trả kết quả 
+ 
+- Trực tiếp: Các chi nhánh Trung tâm Phục vụ Hành chính công Thành phố, Địa điểm 
+tiếp nhận và trả kết quả giải quyết TTHC (Theo thông báo của cấp có thẩm quyền) 
+- Trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvuconh.gov.vn 
++ motcua.gov.moj.vn 
+3.6 Phí 
+ - 25.000 đồng/ giao dịch; 
+
+TRANG 112
+112 
+ 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời 
+gian 
+Biểu mẫu/ 
+Kết quả 
+B1 
+- Nộp hồ sơ trực tiếp tại Trung tâm  
+Phục vụ Hành chính công, Đ ịa điểm 
+tiếp nh ận và tr ả kết qu ả giải quy ết 
+TTHC (Theo thông báo c ủa c ấp có 
+thẩm quyền) 
+- Nộp trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+Cá nhân/Tổ 
+chức 
+Trong giờ 
+hành 
+chính 
+Theo mục 3.2 
+B2 
+- Công chức Bộ phận Một cửa thực 
+hiện: 
++ Ki ểm tra gi ấy tờ trong h ồ sơ yêu 
+cầu chứng thực, nếu đầy đủ tại thời 
+điểm ch ứng th ực thì ti ến hành ti ếp 
+nhận; nh ập vào h ệ thống thông tin 
+giải quyết TTHC  
++ Công ch ức Bộ phận Một cửa thực 
+hiện số hóa (sao ch ụp, chuyển thành 
+tài li ệu đi ện t ử trên h ệ thống thông 
+tin, cơ s ở dữ liệu) và ký s ố vào tài 
+liệu, h ồ sơ gi ải quy ết th ủ tục hành 
+chính đã được số hóa theo quy định. 
+-Trường hợp hồ sơ chưa đầy đủ, hợp 
+lệ thì có thông báo cho người yêu cầu 
+bổ sung, hoàn thiện hồ sơ, nêu rõ loại 
+giấy t ờ, n ội dung c ần b ổ sung đ ể 
+người có yêu cầu bổ sung, hoàn thiện. 
+Sau khi hồ sơ được bổ sung, thực hiện 
+lại bước trên. 
+- Chuyển h ồ sơ đ ến công ch ức làm 
+công tác tư pháp - hộ tịch để xử lý, 
+đồng th ời chuy ến đ ến lãnh đ ạo 
+Công chức 
+Bộ phận Một 
+cửa 
+02 giờ 
+-Sổ theo dõi h ồ 
+sơ  
+- Phiếu tiếp nhận 
+hồ sơ và h ẹn tr ả 
+kết quả  
+
+TRANG 113
+113 
+ 
+UBND c ấp xã, Chánh Văn phòng 
+HĐND – UBND cấp xã để theo dõi. 
+B3 
+- Thực hiện kiểm tra h ồ sơ, nếu đầy 
+đủ, thực hiện chứng thực gạch chân 
+lỗi sai sót c ần sửa, đóng d ấu cưa cơ 
+quan thực hiện chứng thực và ghi vào 
+bên lề của giao dịch nội dung đã sửa, 
+họ tên, ch ữ ký c ủa ngư ời sửa, ngày 
+tháng năm sửa. 
+- Trường hợp hồ sơ chưa đủ điều kiện 
+giải quy ết, công ch ức hư ớng d ẫn 
+công dân bổ sung, hoàn thiện hồ sơ. 
+- Trình Lãnh đ ạo Ủy ban nhân dân 
+cấp xã, Chánh Văn phòng đư ợc ủy 
+quyền chứng thực 
+Công chức 
+làm công tác 
+Tư pháp - Hộ 
+tịch, 
+ 
+03 giờ 
+ 
+- Phiếu kiểm soát 
+quá trình gi ải 
+quyết hồ sơ  
+-  Phiếu yêu c ầu 
+bổ sung, hoàn 
+thiện hồ sơ    
+- Phiếu t ừ chối 
+tiếp nh ận gi ải 
+quyết hồ sơ   
+B4 
+ 
+ Trình Lãnh đạo Ủy ban nhân dân cấp 
+xã, Chánh Văn phòng được ủy quyền 
+chứng th ực ký/ký s ố ghi rõ h ọ tên 
+chuyển đến bộ phận văn thư 
+Lãnh đạo 
+UBND cấp 
+xã, Chánh 
+Văn phòng 
+được ủy 
+quyền 
+02 giờ Hồ sơ 
+B5 
+Bộ phận văn thư: phát hành b ản giấy 
+và bản điện tử, chuyển đến Bộ phận 
+Một cửa để trả kết quả cho người yêu 
+cầu, chuyển đến công chức tham mưu 
+để ghi vào sổ chứng thực và lưu hồ sơ 
+Công chức 
+làm công tác 
+văn thư 
+Công chức 
+làm công tác 
+tư pháp - hộ 
+tịch 
+Công chức 
+Bộ phận Một 
+cửa 
+01 giờ Giao d ịch đư ợc 
+sửa lỗi sai sót  
+B6 Thu phí, trả kết quả cho công dân 
+Công chức 
+Bộ phận Một 
+cửa 
+Trong giờ 
+hành 
+chính 
+Giao d ịch đư ợc 
+sửa lỗi sai sót  
+4 Biểu mẫu 
+
+TRANG 114
+114 
+ 
+ Biểu mẫu theo Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ 
+ Biểu mẫu theo Nghị định số 23/2015/NĐ-CP của Chính phủ. 
+ Biểu mẫu theo Thông tư số 01/2020/TT-BTP của Bộ Tư pháp 
+ Biểu mẫu theo Thông tư 11/2025/TT-BTP ngày 25/6/2025 
+ 
+
+TRANG 115
+115 
+ 
+10. Quy trình: Cấp bản sao có chứng thực từ bản chính giao dịch đã được chứng 
+thực (Mã 2.000942) 
+ 
+1 Mục đích   
+ Quy trình này quy định trình tự và cách thức thực hiện TTHC Cấp bản sao có chứng 
+thực từ bản chính giao dịch đã được chứng thực. 
+2 Phạm vi 
+ 
+- Áp dụng đối với tổ chức, cá nhân thực hiện TTHC cấp bản sao có chứng thực từ bản 
+chính giao dịch đã được chứng thực. 
+- UBND cấp xã, Văn phòng HĐND -UBND cấp xã, Trung tâm Ph ục vụ Hành chính 
+công, Địa điểm tiếp nhận và trả kết quả giải quyết TTHC theo thông báo c ủa cấp có 
+thẩm quyền (sau đây gọi chung là Bộ phận Một cửa) và công chức Bộ phận Một cửa, 
+công chức, người lao động được bố trí tham gia trong quá trình tiếp nhận, giải quyết, 
+trả kết quả chịu trách nhiệm thực hiện Quy trình này 
+3 Nội dung quy trình 
+3.1 Cơ sở pháp lý 
+ 
+- Luật Tổ chức chính quyền địa phương số: 72/2025/QH15; 
+- Nghị định số 23/2015/NĐ-CP của Chính ph ủ về cấp bản sao t ừ bản chính, ch ứng 
+thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Nghị định số 280/2025/NĐ-CP của Chính phủ sửa đổi, bổ sung một số điều của Nghị 
+định số 23/2015/NĐ-CP về cấp bản sao từ sổ gốc, chứng thực bản sao từ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch, được sửa đổi, bổ sung bởi Nghị 
+định số 07/2025/NĐ-CP; 
+- Nghị định số 18/2026/NĐ-CP ngày 14/01/2026 của Chính phủ sửa đổi, bổ sung một 
+số Nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc 
+phạm vi quản lý của Bộ Tư pháp; 
+- Nghị quyết 66.7/2025/NQCP ngày 15/11/2025 c ủa Chính ph ủ quy định cắt giảm, 
+đơn giản hóa thủ tục hành chính dựa trên dữ liệu; 
+- Thông tư s ố 01/2020/TT-BTP của Bộ Tư pháp quy đ ịnh chi ti ết và hư ớng dẫn thi 
+hành một số điều của Ngh ị định số 23/2015/NĐ-CP về cấp bản sao t ừ bản chính, 
+chứng thực chữ ký và chứng thực hợp đồng, giao dịch; 
+- Thông tư số 226/2016/TT-BTC của Bộ Tài chính quy định mức thu, chế độ thu, nộp, 
+quản lý và sử dụng phí chứng thực; 
+- Quyết định 858/QĐ-BTP ngày 27/3/2026 c ủa Bộ Tư pháp về việc công bố thủ tục 
+hành chính được sửa đổi, bổ sung, thủ tục hành chính bị bãi bỏ trong lĩnh vực chứng 
+thực thuộc phạm vi quản lý của Bộ Tư pháp; 
+
+TRANG 116
+116 
+ 
+- Quyết định số 569/QĐ-TTPVHCC ngày 24/4/2026 c ủa Trung tâm ph ục vụ hành 
+chính công Thành phố về việc công bố Danh mục thủ tục hành chính lĩnh v ực Công 
+chứng, Giám định tư pháp, Chứng thực thuộc phạm vi chức năng quản lý của Sở Tư 
+pháp thành phố Hà Nội. 
+3.2 Thành phần hồ sơ Bản chính Bản sao 
+ 
+Người yêu c ầu ch ứng th ực xu ất 
+trình m ột trong các gi ấy t ờ sau: 
+Căn cước điện tử; bản chính ho ặc 
+bản sao của Thẻ căn cước công dân 
+hoặc Th ẻ căn cư ớc hoặc Gi ấy 
+chứng nh ận căn cư ớc ho ặc H ộ 
+chiếu hoặc giấy tờ xuất nhập cảnh 
+hoặc giấy tờ có giá trị đi lại quốc tế 
+còn giá trị sử dụng (Không yêu cầu 
+người yêu c ầu ch ứng th ực xu ất 
+trình giấy tờ này khi cơ quan gi ải 
+quyết thủ tục hành chính khai thác 
+được thông  tin v ề Thẻ căn cư ớc 
+công dân hoặc Thẻ căn cước hoặc 
+Giấy chứng nhận căn cước trên Cơ 
+sở dữ liệu qu ốc gia v ề dân cư, 
+VNeID) 
+ 
+x 
+ 
+x 
+3.3 Số lượng hồ sơ:  Không quy định 
+3.4 Thời gian xử lý 
+ 
+Thời hạn thực hiện yêu cầu chứng thực là ngay trong ngày cơ quan, tổ chức tiếp nhận 
+yêu cầu hoặc trong ngày làm việc tiếp theo nếu tiếp nhận yêu cầu sau 15 giờ. Trường 
+hợp trả kết quả trong ngày làm vi ệc tiếp theo ho ặc phải kéo dài th ời gian theo th ỏa 
+thuận thì người tiếp nhận hồ sơ phải có phiếu hẹn ghi rõ thời gian (giờ, ngày) trả kết 
+quả cho người yêu cầu chứng thực 
+3.5 Nơi tiếp nhận và trả kết quả 
+ 
+- Nộp trực tiếp: Các chi nhánh Trung tâm Phục vụ Hành chính công Thành phố, Địa 
+điểm tiếp nhận và tr ả kết quả giải quyết TTHC (Theo thông báo c ủa cấp có th ẩm 
+quyền) 
+- Nộp trực tuyến: 
+
+TRANG 117
+117 
+ 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+3.6 Phí 
+ - 2.000 đồng/trang; từ trang thứ 3 trở lên thu 1.000 đồng/trang, tối đa thu không quá 
+200.000 đồng/bản. 
+3.7 Quy trình xử lý công việc 
+TT Trình tự Trách nhiệm Thời gian 
+Biểu mẫu/ 
+Kết quả 
+B1 
+- Nộp h ồ sơ tr ực ti ếp t ại Trung 
+tâm Ph ục v ụ Hành chính công, 
+Địa điểm tiếp nhận và trả kết quả 
+giải quy ết TTHC (Theo thông 
+báo của cấp có thẩm quyền) 
+- Nộp trực tuyến: 
++ dichvucong.hanoi.gov.vn 
++ dichvucong.gov.vn 
++ motcua.gov.moj.vn 
+Cá nhân/Tổ 
+chức 
+Trong giờ 
+hành chính Theo mục 3.2 
+B2 
+- Công ch ức B ộ phận M ột c ửa 
+thực hi ện ti ếp nh ận h ồ sơ; nh ập 
+vào hệ thống thông tin giải quyết 
+TTHC 
+- Công ch ức B ộ phận M ột c ửa 
+thực hi ện s ố hóa (sao ch ụp, 
+chuyển thành tài liệu điện tử trên 
+hệ thống thông tin, cơ sở dữ liệu) 
+và ký s ố vào tài li ệu, hồ sơ giải 
+quyết thủ tục hành chính đã được 
+số hóa theo quy định. 
+- Chuyển h ồ sơ đ ến công ch ức 
+làm công tác tư pháp - hộ tịch để 
+xử lý, đồng thời chuyến đến lãnh 
+Công chức 
+Bộ phận Một 
+cửa 
+02 giờ 
+-Sổ theo dõi hồ sơ  
+- Phiếu ti ếp nh ận 
+hồ sơ và h ẹn tr ả 
+kết quả  
+
+TRANG 118
+118 
+ 
+đạo UBND c ấp xã, Chánh Văn 
+phòng HĐND – UBND cấp xã để 
+theo dõi. 
+B3 
+- Kiểm tra gi ấy tờ do người yêu 
+cầu cấp bản sao có chứng thực từ 
+bản chính giao dịch xuất trình  
+- Tra cứu giao d ịch đang lưu tr ữ 
+tại cơ quan đơn vị. Nếu có lưu trữ 
+tiến hành chụp từ bản chính giao 
+dịch đang đư ợc lưu tr ữ để thực 
+hiện chứng thực 
+- Trường hợp tra cứu không có hồ 
+sơ lưu trữ đề nghị người yêu cầu 
+cung cấp thông tin làm căn cứ tra 
+cứu.  
+- Ghi đầy đủ lời chứng theo quy 
+định 
+- Trình Lãnh đ ạo UBND c ấp xã, 
+Chánh Văn phòng được ủy quyền 
+chứng thực 
+Công chức 
+làm công tác 
+Tư pháp - Hộ 
+tịch, 
+ 
+03 giờ 
+ 
+- Phiếu ki ểm soát 
+quá trình gi ải 
+quyết hồ sơ  
+-  Phiếu yêu c ầu 
+bổ sung, hoàn 
+thiện hồ sơ    
+- Phiếu t ừ chối 
+tiếp nh ận gi ải 
+quyết hồ sơ   
+B4 
+ Trình Lãnh đạo Ủy ban nhân dân 
+cấp xã, Chánh Văn phòng đư ợc 
+ủy quyền chứng thực ký/ký số ghi 
+rõ họ tên chuyển đến bộ phận văn 
+thư 
+Lãnh đạo 
+UBND cấp 
+xã, Chánh 
+Văn phòng 
+được ủy 
+quyền 
+02 giờ Hồ sơ 
+B5 
+Bộ phận văn thư: phát hành b ản 
+giấy và b ản điện tử, chuyển đến 
+Bộ phận Một cửa để trả kết quả 
+cho ngư ời yêu c ầu, chuy ển đ ến 
+công chức tham mưu đ ể ghi vào 
+sổ chứng thực và lưu hồ sơ 
+Công chức 
+làm công tác 
+văn thư; Công 
+chức làm 
+công tác tư 
+pháp - hộ 
+tịch; Công 
+chức Bộ phận 
+Một cửa 
+01 giờ Bản sao giao d ịch 
+được chứng thực. 
+
+TRANG 119
+119 
+ 
+B6 Thu phí, trả kết quả cho công dân 
+Công chức 
+Bộ phận Một 
+cửa 
+Trong giờ 
+hành chính 
+Bản sao giao d ịch 
+được chứng thực. 
+4 Biểu mẫu 
+ Biểu mẫu theo Thông tư số 03/2025/TT-VPCP của Văn phòng Chính phủ 
+ Biểu mẫu theo Nghị định số 23/2015/NĐ-CP của Chính phủ. 
+  Biểu mẫu theo Thông tư số 01/2020/TT-BTP của Bộ Tư pháp 
+ Biểu mẫu theo Thông tư 11/2025/TT-BTP ngày 25/6/2025 
+ 

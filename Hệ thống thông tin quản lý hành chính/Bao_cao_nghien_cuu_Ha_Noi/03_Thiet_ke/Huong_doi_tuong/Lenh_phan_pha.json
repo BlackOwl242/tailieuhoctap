@@ -1,0 +1,132 @@
+[
+  {
+    "uc": "UC13",
+    "operation": "lapYeuCauBoSung",
+    "role": "Cán bộ tiếp nhận hoặc chuyên viên thụ lý",
+    "source": "CHO_TIEP_NHAN hoặc DANG_THU_LY",
+    "target": "CHO_BO_SUNG",
+    "fields": [
+      "hoSoId",
+      "giaiDoan",
+      "noiDungThieu",
+      "canCu",
+      "phienBanMongDoi"
+    ],
+    "rule": "Lưu giai đoạn quay lại; không tự đổi hạn"
+  },
+  {
+    "uc": "UC13",
+    "operation": "guiTaiLieuBoSung",
+    "role": "Người yêu cầu hoặc đại diện hợp lệ",
+    "source": "CHO_BO_SUNG",
+    "target": "CHO_BO_SUNG",
+    "fields": [
+      "hoSoId",
+      "yeuCauBoSungId",
+      "taiLieuIds",
+      "phienBanMongDoi"
+    ],
+    "rule": "Chỉ ghi đáp ứng; cán bộ phải đối chiếu trước khi chuyển bước"
+  },
+  {
+    "uc": "UC13",
+    "operation": "doiChieuBoSung",
+    "role": "Cán bộ đúng giai đoạn",
+    "source": "CHO_BO_SUNG",
+    "target": "CHO_TIEP_NHAN hoặc DANG_THU_LY",
+    "fields": [
+      "hoSoId",
+      "yeuCauBoSungId",
+      "ketQuaDoiChieu",
+      "phienBanMongDoi"
+    ],
+    "rule": "Đúng điều kiện và giai đoạn đã lưu"
+  },
+  {
+    "uc": "UC16",
+    "operation": "pheDuyetDuThao",
+    "role": "Lãnh đạo có thẩm quyền",
+    "source": "TRINH_DUYET",
+    "target": "Giữ trạng thái hồ sơ đến khi ký được xác nhận",
+    "fields": [
+      "hoSoId",
+      "ketQuaId",
+      "yKien",
+      "phienBanMongDoi"
+    ],
+    "rule": "Chốt bản dự thảo được duyệt; chưa gọi là phát hành"
+  },
+  {
+    "uc": "UC16",
+    "operation": "traChinhSua",
+    "role": "Lãnh đạo có thẩm quyền",
+    "source": "TRINH_DUYET",
+    "target": "DANG_THU_LY",
+    "fields": [
+      "hoSoId",
+      "ketQuaId",
+      "yKien",
+      "phienBanMongDoi"
+    ],
+    "rule": "Có ý kiến; bản dự thảo mới có phiên bản"
+  },
+  {
+    "uc": "UC10",
+    "operation": "xacNhanKyDuyet",
+    "role": "Người có thẩm quyền và bộ kiểm tra chữ ký",
+    "source": "TRINH_DUYET",
+    "target": "DA_PHE_DUYET",
+    "fields": [
+      "hoSoId",
+      "ketQuaId",
+      "chuKyId",
+      "giaTriBam",
+      "phienBanMongDoi"
+    ],
+    "rule": "Đúng bản được duyệt, chứng thư và chữ ký hợp lệ"
+  },
+  {
+    "uc": "UC16",
+    "operation": "phatHanh",
+    "role": "Văn thư được giao",
+    "source": "DA_PHE_DUYET",
+    "target": "DA_PHAT_HANH",
+    "fields": [
+      "hoSoId",
+      "ketQuaId",
+      "soVanBan",
+      "phienBanMongDoi"
+    ],
+    "rule": "Không sửa tệp đã ký; lưu thông điệp chờ gửi cùng giao dịch"
+  },
+  {
+    "uc": "UC32",
+    "operation": "nhanXacNhanThanhToan",
+    "role": "Bộ chuyển đổi đối tác đã xác thực",
+    "source": "Khoản thu chưa chốt",
+    "target": "Trạng thái tài chính; không tự đổi trạng thái hồ sơ",
+    "fields": [
+      "khoanThuId",
+      "giaoDichId",
+      "maDoiTac",
+      "soTien",
+      "chuKyNoiDung"
+    ],
+    "rule": "Khử trùng và đối soát; thông báo kỹ thuật chưa đủ"
+  },
+  {
+    "uc": "UC36",
+    "operation": "nhanBienNhanNopLuu",
+    "role": "Bộ chuyển đổi lưu trữ đã xác thực",
+    "source": "Gói đã gửi",
+    "target": "Gói đã nhận lưu hoặc bị trả",
+    "fields": [
+      "goiId",
+      "phienBan",
+      "giaTriBam",
+      "maBienNhan",
+      "ketQua"
+    ],
+    "rule": "Đối chiếu đúng gói; không xóa nguồn trước khi đủ căn cứ"
+  }
+]

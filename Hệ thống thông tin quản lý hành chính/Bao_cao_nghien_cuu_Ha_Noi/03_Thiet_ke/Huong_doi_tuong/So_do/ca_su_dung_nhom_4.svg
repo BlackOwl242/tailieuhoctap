@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="2040"><rect width="100%" height="100%" fill="white"/>
+<rect x="610" y="120" width="1330" height="1860" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1260" y="179" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Tiếp nhận và giải quyết</text>
+<circle cx="230" cy="182.0" r="22" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="230,204.0 230,260.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="190,224.0 270,224.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,260.0 195,303.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,260.0 265,303.0" fill="none" stroke="black" stroke-width="3"/>
+<text x="230" y="354.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Cán bộ tiếp nhận</text>
+<circle cx="230" cy="472.0" r="22" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="230,494.0 230,550.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="190,514.0 270,514.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,550.0 195,593.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,550.0 265,593.0" fill="none" stroke="black" stroke-width="3"/>
+<text x="230" y="644.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Lãnh đạo đơn vị</text>
+<circle cx="230" cy="762.0" r="22" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="230,784.0 230,840.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="190,804.0 270,804.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,840.0 195,883.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,840.0 265,883.0" fill="none" stroke="black" stroke-width="3"/>
+<text x="230" y="934.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Chuyên viên thụ</text>
+<text x="230" y="991.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">lý</text>
+<circle cx="230" cy="1052.0" r="22" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="230,1074.0 230,1130.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="190,1094.0 270,1094.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,1130.0 195,1173.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,1130.0 265,1173.0" fill="none" stroke="black" stroke-width="3"/>
+<text x="230" y="1224.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Lãnh đạo có</text>
+<text x="230" y="1281.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">thẩm quyền</text>
+<circle cx="230" cy="1342.0" r="22" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="230,1364.0 230,1420.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="190,1384.0 270,1384.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,1420.0 195,1463.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,1420.0 265,1463.0" fill="none" stroke="black" stroke-width="3"/>
+<text x="230" y="1514.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Cán bộ trả kết</text>
+<text x="230" y="1571.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">quả</text>
+<circle cx="230" cy="1632.0" r="22" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="230,1654.0 230,1710.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="190,1674.0 270,1674.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,1710.0 195,1753.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,1710.0 265,1753.0" fill="none" stroke="black" stroke-width="3"/>
+<text x="230" y="1804.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Người yêu cầu</text>
+<ellipse cx="1280" cy="325" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="324" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC12 Kiểm tra và tiếp nhận hồ sơ</text>
+<polyline points="270,224.0 450.0,224.0 450.0,325 750,325" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="515" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="514" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC13 Yêu cầu và nhận bổ sung</text>
+<polyline points="270,224.0 450.0,224.0 450.0,515 750,515" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="705" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="704" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC14 Phân công xử lý</text>
+<polyline points="270,514.0 480.0,514.0 480.0,705 750,705" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="895" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="894" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC15 Thẩm định và phối hợp</text>
+<polyline points="270,804.0 510.0,804.0 510.0,895 750,895" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="1085" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="1084" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC16 Phê duyệt và phát hành</text>
+<polyline points="270,1094.0 540.0,1094.0 540.0,1085 750,1085" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="1275" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="1274" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC17 Dừng giải quyết theo căn cứ</text>
+<polyline points="270,1094.0 540.0,1094.0 540.0,1275 750,1275" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="1465" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="1464" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC18 Giao và xác nhận kết quả</text>
+<polyline points="270,1384.0 570.0,1384.0 570.0,1465 750,1465" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="1655" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="1654" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC32 Thanh toán khoản thu</text>
+<polyline points="270,1674.0 600.0,1674.0 600.0,1655 750,1655" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="1845" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="1844" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC34 Số hóa hồ sơ giấy</text>
+<polyline points="270,224.0 450.0,224.0 450.0,1845 750,1845" fill="none" stroke="black" stroke-width="3"/>
+</svg>

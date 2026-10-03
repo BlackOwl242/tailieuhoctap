@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3420" height="4575" viewBox="0 0 1140 1525"><rect width="1140" height="1525" fill="white"/>
+<text x="570.0" y="34.41" font-family="Arial" font-size="27" font-weight="bold" text-anchor="middle">Biểu đồ trình tự UC13 Yêu cầu và nhận bổ sung</text>
+<circle cx="100.0" cy="53" r="10" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="100.0,63 100.0,91" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="83.0,73 117.0,73" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="100.0,91 85.0,112" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="100.0,91 115.0,112" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="100.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Cán bộ xử lý</text>
+<circle cx="335.0" cy="53" r="10" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="335.0,63 335.0,91" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="318.0,73 352.0,73" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="335.0,91 320.0,112" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="335.0,91 350.0,112" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="335.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Người nộp</text>
+<circle cx="570.0" cy="88" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="538.0,72 538.0,104" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="538.0,88 556.0,88" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="570.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Bổ sung hồ sơ</text>
+<circle cx="805.0" cy="88" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="798.0,75 804.0,71 811.0,74" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="803.3842268941361,66.38422689413609 811.0,74 800.2328725055028,73.73738713428055" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="805.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Xử lý bổ sung</text>
+<circle cx="1040.0" cy="88" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="1022.0,107 1058.0,107" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="1040.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Yêu cầu và tài</text>
+<text x="1040.0" y="166.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">liệu</text>
+<polyline points="100.0,188 100.0,1374.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="335.0,188 335.0,1374.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="570.0,188 570.0,1374.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="805.0,188 805.0,1374.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="1040.0,188 1040.0,1374.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="18" y="756.0" width="1104" height="596.0" rx="0" fill="white" stroke="#181818"/>
+<polyline points="100.0,756.0 100.0,1352.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="335.0,756.0 335.0,1352.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="570.0,756.0 570.0,1352.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="805.0,756.0 805.0,1352.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="1040.0,756.0 1040.0,1352.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polygon points="18,756.0 87,756.0 87,776.0 71,791.0 18,791.0" fill="#F1F1F1" stroke="#181818"/>
+<text x="52" y="781.92" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">alt</text>
+<polyline points="18,1127.0 1122,1127.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="100.0,235.0 570.0,235.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="560.0,231.0 570.0,235.0 560.0,239.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="570.0,235.0 560.0,231.0 560.0,239.0" fill="#181818" stroke="#181818"/>
+<text x="335.0" y="216.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Lập yêu cầu có căn cứ</text>
+<polyline points="570.0,314.0 805.0,314.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="795.0,310.0 805.0,314.0 795.0,318.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="805.0,314.0 795.0,310.0 795.0,318.0" fill="#181818" stroke="#181818"/>
+<text x="687.5" y="265.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Gửi nội dung cần</text>
+<text x="687.5" y="295.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">bổ sung</text>
+<polyline points="805.0,393.0 1040.0,393.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="1030.0,389.0 1040.0,393.0 1030.0,397.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="1040.0,393.0 1030.0,389.0 1030.0,397.0" fill="#181818" stroke="#181818"/>
+<text x="922.5" y="344.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Lưu yêu cầu và giai</text>
+<text x="922.5" y="374.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">đoạn xử lý</text>
+<polyline points="1040.0,442.0 805.0,442.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="815.0,446.0 805.0,442.0 815.0,438.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="922.5" y="423.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Đã lưu yêu cầu</text>
+<polyline points="805.0,491.0 335.0,491.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="345.0,495.0 335.0,491.0 345.0,487.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="335.0,491.0 345.0,487.0 345.0,495.0" fill="#181818" stroke="#181818"/>
+<text x="570.0" y="472.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Thông báo tài liệu cần bổ sung</text>
+<polyline points="335.0,570.0 570.0,570.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="560.0,566.0 570.0,570.0 560.0,574.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="570.0,570.0 560.0,566.0 560.0,574.0" fill="#181818" stroke="#181818"/>
+<text x="452.5" y="521.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Gửi tài liệu theo</text>
+<text x="452.5" y="551.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">yêu cầu</text>
+<polyline points="570.0,649.0 805.0,649.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="795.0,645.0 805.0,649.0 795.0,653.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="805.0,649.0 795.0,645.0 795.0,653.0" fill="#181818" stroke="#181818"/>
+<text x="687.5" y="600.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Chuyển tài liệu đến</text>
+<text x="687.5" y="630.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">cán bộ</text>
+<polyline points="805.0,698.0 100.0,698.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="110.0,702.0 100.0,698.0 110.0,694.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="100.0,698.0 110.0,694.0 110.0,702.0" fill="#181818" stroke="#181818"/>
+<text x="452.5" y="679.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Yêu cầu kiểm tra tài liệu</text>
+<polyline points="100.0,747.0 805.0,747.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="795.0,743.0 805.0,747.0 795.0,751.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="805.0,747.0 795.0,743.0 795.0,751.0" fill="#181818" stroke="#181818"/>
+<text x="452.5" y="728.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Ghi kết quả kiểm tra</text>
+<rect x="418.33333333333337" y="768.0" width="303.3333333333333" height="31.0" fill="white"/>
+<text x="570.0" y="788.92" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">[Tài liệu đáp ứng yêu cầu]</text>
+<polyline points="805.0,876.0 1040.0,876.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="1030.0,872.0 1040.0,876.0 1030.0,880.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="1040.0,876.0 1030.0,872.0 1030.0,880.0" fill="#181818" stroke="#181818"/>
+<text x="922.5" y="827.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Lưu tài liệu và</text>
+<text x="922.5" y="857.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">bước tiếp tục</text>
+<polyline points="1040.0,955.0 805.0,955.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="815.0,959.0 805.0,955.0 815.0,951.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="922.5" y="906.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Đã ghi nhận đủ bổ</text>
+<text x="922.5" y="936.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">sung</text>
+<polyline points="805.0,1034.0 570.0,1034.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="580.0,1038.0 570.0,1034.0 580.0,1030.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="687.5" y="985.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Trả xác nhận tài</text>
+<text x="687.5" y="1015.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">liệu đã đạt</text>
+<polyline points="570.0,1113.0 335.0,1113.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="345.0,1117.0 335.0,1113.0 345.0,1109.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="452.5" y="1064.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Hiển thị hồ sơ tiếp</text>
+<text x="452.5" y="1094.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">tục xử lý</text>
+<rect x="433.66666666666663" y="1134.0" width="272.6666666666667" height="31.0" fill="white"/>
+<text x="570.0" y="1154.92" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">[Tài liệu chưa đáp ứng]</text>
+<polyline points="805.0,1242.0 570.0,1242.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="580.0,1246.0 570.0,1242.0 580.0,1238.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="687.5" y="1193.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Trả nội dung còn</text>
+<text x="687.5" y="1223.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">thiếu</text>
+<polyline points="570.0,1321.0 335.0,1321.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="345.0,1325.0 335.0,1321.0 345.0,1317.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="452.5" y="1272.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Hiển thị yêu cầu</text>
+<text x="452.5" y="1302.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">làm rõ</text>
+<circle cx="100.0" cy="1395.0" r="10" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="100.0,1405.0 100.0,1433.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="83.0,1415.0 117.0,1415.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="100.0,1433.0 85.0,1454.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="100.0,1433.0 115.0,1454.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="100.0" y="1478.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Cán bộ xử lý</text>
+<circle cx="335.0" cy="1395.0" r="10" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="335.0,1405.0 335.0,1433.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="318.0,1415.0 352.0,1415.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="335.0,1433.0 320.0,1454.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="335.0,1433.0 350.0,1454.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="335.0" y="1478.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Người nộp</text>
+<circle cx="570.0" cy="1430.0" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="538.0,1414.0 538.0,1446.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="538.0,1430.0 556.0,1430.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="570.0" y="1478.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Bổ sung hồ sơ</text>
+<circle cx="805.0" cy="1430.0" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="798.0,1417.0 804.0,1413.0 811.0,1416.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="803.3842268941361,1408.3842268941362 811.0,1416.0 800.2328725055028,1415.7373871342807" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="805.0" y="1478.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Xử lý bổ sung</text>
+<circle cx="1040.0" cy="1430.0" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="1022.0,1449.0 1058.0,1449.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="1040.0" y="1478.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Yêu cầu và tài</text>
+<text x="1040.0" y="1508.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">liệu</text>
+</svg>

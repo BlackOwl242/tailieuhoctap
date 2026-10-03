@@ -1,0 +1,788 @@
+
+
+ Thông tư số 21/2023/TT-BTTTT của Bộ Thông tin và Truyền thông: Quy định về chức năng, tính năng kỹ thuật của Hệ thống thông tin giải quyết thủ tục hành chính cấp bộ, cấp tỉnh
+
+ 
+ 
+ 
+ 
+
+ 
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+
+
+English
+中文
+
+
+
+
+
+ Trang chủChính phủCông dânDoanh nghiệpKiều bàoBáo điện tử chính phủVăn phòng chính phủ
+ 
+
+
+ 
+ 
+ 
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+ 
+
+
+Nước CHXHCN
+Việt Nam
+
+
+Giới thiệu
+Chính phủ
+
+
+Thư điện tử
+ công vụ Chính phủ
+
+
+
+ 
+
+
+
+
+ 
+ Hà Nội
+ 28° - 30°
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Lai Châu
+ 20° - 22°
+ 
+ 
+ 
+ 
+ 
+ 
+ Điện Biên
+ 24° - 26°
+ 
+ 
+ 
+ 
+ 
+ 
+ Sơn La
+ 21° - 23°
+ 
+ 
+ 
+ 
+ 
+ 
+ Phú Thọ
+ 27° - 29°
+ 
+ 
+ 
+ 
+ 
+ 
+ Lào Cai
+ 26° - 28°
+ 
+ 
+ 
+ 
+ 
+ 
+ Tuyên Quang
+ 26° - 28°
+ 
+ 
+ 
+ 
+ 
+ 
+ Thái Nguyên
+ 25° - 27°
+ 
+ 
+ 
+ 
+ 
+ 
+ Cao Bằng
+ 24° - 26°
+ 
+ 
+ 
+ 
+ 
+ 
+ Lạng Sơn
+ 25° - 27°
+ 
+ 
+ 
+ 
+ 
+ 
+ Quảng Ninh
+ 28° - 30°
+ 
+ 
+ 
+ 
+ 
+ 
+ Bắc Ninh
+ 28° - 30°
+ 
+ 
+ 
+ 
+ 
+ 
+ Tp Hải Phòng
+ 27° - 29°
+ 
+ 
+ 
+ 
+ 
+ 
+ Hà Nội
+ 28° - 30°
+ 
+ 
+ 
+ 
+ 
+ 
+ Hưng Yên
+ 28° - 30°
+ 
+ 
+ 
+ 
+ 
+ 
+ Ninh Bình
+ 29° - 31°
+ 
+ 
+ 
+ 
+ 
+ 
+ Thanh Hóa
+ 28° - 30°
+ 
+ 
+ 
+ 
+ 
+ 
+ Nghệ An
+ 28° - 30°
+ 
+ 
+ 
+ 
+ 
+ 
+ Hà Tĩnh
+ 28° - 30°
+ 
+ 
+ 
+ 
+ 
+ 
+ Quảng Trị
+ 27° - 29°
+ 
+ 
+ 
+ 
+ 
+ 
+ Tp Huế
+ 25° - 27°
+ 
+ 
+ 
+ 
+ 
+ 
+ Tp Đà Nẵng
+ 26° - 28°
+ 
+ 
+ 
+ 
+ 
+ 
+ Quảng Ngãi
+ 26° - 28°
+ 
+ 
+ 
+ 
+ 
+ 
+ Gia Lai
+ 27° - 29°
+ 
+ 
+ 
+ 
+ 
+ 
+ Đắk Lắk
+ 26° - 28°
+ 
+ 
+ 
+ 
+ 
+ 
+ Khánh Hòa
+ 27° - 29°
+ 
+ 
+ 
+ 
+ 
+ 
+ Lâm Đồng
+ 26° - 28°
+ 
+ 
+ 
+ 
+ 
+ 
+ Đồng Nai
+ 25° - 27°
+ 
+ 
+ 
+ 
+ 
+ 
+ Tây Ninh
+ 25° - 27°
+ 
+ 
+ 
+ 
+ 
+ 
+ Tp Hồ Chí Minh
+ 25° - 27°
+ 
+ 
+ 
+ 
+ 
+ 
+ Đồng Tháp
+ 25° - 27°
+ 
+ 
+ 
+ 
+ 
+ 
+ Vĩnh Long
+ 25° - 27°
+ 
+ 
+ 
+ 
+ 
+ 
+ An Giang
+ 26° - 28°
+ 
+ 
+ 
+ 
+ 
+ 
+ Tp Cần Thơ
+ 24° - 26°
+ 
+ 
+ 
+ 
+ 
+ 
+ Cà Mau
+ 25° - 27°
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+ 
+ 
+ 
+ 
+ Thủ tướng Phạm Minh Chính dự Hội nghị Cấp cao Đặc biệt ASEAN-Hoa Kỳ, thăm và làm việc tại Hoa Kỳ, Liên Hợp Quốc
+ 
+ 
+ 
+ 
+ 
+ SEA Games 31 - Việt Nam 2022
+ 
+ 
+ 
+ 
+ 
+ Phục hồi và phát triển kinh tế: Những việc cần làm ngay
+ 
+ 
+ 
+ 
+ 
+ Giải ngân vốn đầu tư công
+ 
+ 
+ 
+ 
+ 
+ Chuyển đổi số
+ 
+ 
+ 
+ 
+ 
+ Thích ứng an toàn, linh hoạt, kiểm soát hiệu quả dịch COVID-19
+ 
+ 
+ 
+ 
+
+
+
+
+
+ 
+ 
+ 
+ Trang chủ
+ 
+ 
+ 
+ 
+
+
+
+
+ 
+ 
+ 
+ 
+ Thông tư số 21/2023/TT-BTTTT của Bộ Thông tin và Truyền thông: Quy định về chức năng, tính năng kỹ thuật của Hệ thống thông tin giải quyết thủ tục hành chính cấp bộ, cấp tỉnh
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Số ký hiệu
+ 
+ 21/2023/TT-BTTTT
+ 
+ 
+ Ngày ban hành
+ 
+ 31-12-2023
+ 
+ 
+ Ngày có hiệu lực
+ 
+ 05-04-2024
+ 
+ 
+ 
+ Loại văn bản
+ 
+ Thông tư
+ 
+ 
+ Cơ quan ban hành
+ 
+ Bộ Thông tin và Truyền thông
+ 
+ 
+ Người ký
+ 
+ Nguyễn Mạnh Hùng
+ 
+ 
+ Trích yếu
+ 
+ Quy định về chức năng, tính năng kỹ thuật của Hệ thống thông tin giải quyết thủ tục hành chính cấp bộ, cấp tỉnh
+ 
+ 
+ Tài liệu đính kèm
+ 
+ 
+ 
+ 
+ 21-ttbtttt.signed.pdf
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+
+
+ 
+ 
+ Các văn bản khác
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Quy định biện pháp để tổ chức, hướng dẫn thi hành Luật Thi đua, khen thưởng và Nghị định số 368/2026/NĐ-CP ngày 25 tháng 9 năm 2026 của Chính phủ quy định chi tiết một số điều và biện pháp để tổ chức, hướng dẫn thi hành Luật Thi đua, khen thưởng
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Quy định Chuẩn cơ sở giáo dục đại học
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Quy định quy trình biên soạn, thẩm định và ban hành chương trình, giáo trình các môn học chung trong giáo dục nghề nghiệp 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Sửa đổi, bổ sung một số điều của Thông tư số 13/2018/TT-BXD ngày 27 tháng 12 năm 2018 của Bộ trưởng Bộ Xây dựng hướng dẫn phương pháp định giá dịch vụ thoát nước
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Ban hành định mức chi phí chuẩn bị và hoạt động triển khai thực hiện dự án sau khi ký kết hợp đồng của cơ quan có thẩm quyền, cơ quan ký kết hợp đồng dự án đầu tư theo phương thức đối tác công tư trong lĩnh vực đường bộ
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Quy định về các giới hạn, tỷ lệ bảo đảm an toàn trong hoạt động của ngân hàng thương mại, chi nhánh ngân hàng nước ngoài
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Quy định chi tiết một số điều của Luật Thi đua, khen thưởng đối với ngành y tế
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Hướng dẫn chức năng, nhiệm vụ, quyền hạn và cơ cấu tổ chức của đơn vị sự nghiệp công lập được giao thực hiện nhiệm vụ trong lĩnh vực văn hóa, thể thao thuộc Ủy ban nhân dân xã, phường, đặc khu
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Sửa đổi, bổ sung một số điều của các Thông tư quy định thủ tục hải quan đối với hàng hóa xuất khẩu, nhập khẩu, quá cảnh gửi qua dịch vụ bưu chính của doanh nghiệp được chỉ định, dịch vụ chuyển phát nhanh quốc tế
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Ban hành Quy chuẩn kỹ thuật quốc gia về trụ sạc, trạm sạc xe điện
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ Tất cả văn bản
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Văn bản mới
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Văn bản quy phạm pháp luật
+ 
+ 
+ 
+ Cơ quan ban hành
+ 
+ Quốc hội Chính phủ Thủ tướng Chính phủ Bộ/Cơ quan ngang bộ Liên bộ UBND tỉnh/thành phố
+ 
+ Loại văn bản
+ 
+ Hiến pháp Sắc lệnh - Sắc luật Luật - Pháp lệnh Nghị định Quyết định Thông tư
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Văn bản hợp nhất
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Văn bản chỉ đạo điều hành
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Nghị quyết của Chính phủ
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Nghị quyết phiên họp của Chính phủ
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Báo cáo của Chính phủ
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Thủ tướng và thành viên Chính phủ trả lời chất vấn của ĐBQH
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+© Cục Thông tin và Truyền thông Chính phủ
+
+
+Cục trưởng: Nguyễn Hồng Sâm 
+
+
+Trụ sở: 16 Lê Hồng Phong - Ba Đình - Hà Nội.
+Điện thoại: Văn phòng: 080 43162; Fax: 080.48924
+Email: thongtinchinhphu@chinhphu.vn
+
+
+
+
+
+
+
+Giới thiệu 
+Cục Thông tin 
+và Truyền thông Chính phủ
+
+
+
+
+
+Thư điện tử công vụ Chính phủ
+
+
+
+
+
+Liên hệ
+
+
+
+
+
+Sơ đồ
+Cổng TTĐT
+Chính phủ
+
+
+
+
+
+
+
+Ghi rõ nguồn 'Cục Thông tin và Truyền thông Chính phủ' hoặc
+'www.chinhphu.vn'
+khi phát hành lại thông tin từ các nguồn này.
+
+
+
+
+
+
+
+
+
+
+ 

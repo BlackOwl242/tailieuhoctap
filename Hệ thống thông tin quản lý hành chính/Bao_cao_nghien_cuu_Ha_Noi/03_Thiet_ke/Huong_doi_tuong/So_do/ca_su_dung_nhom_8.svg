@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1170"><rect width="100%" height="100%" fill="white"/>
+<rect x="610" y="120" width="1330" height="990" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1260" y="179" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Kho dữ liệu</text>
+<circle cx="230" cy="182.0" r="22" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="230,204.0 230,260.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="190,224.0 270,224.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,260.0 195,303.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,260.0 265,303.0" fill="none" stroke="black" stroke-width="3"/>
+<text x="230" y="354.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Quản trị kho</text>
+<text x="230" y="411.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">được giao</text>
+<circle cx="230" cy="472.0" r="22" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="230,494.0 230,550.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="190,514.0 270,514.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,550.0 195,593.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,550.0 265,593.0" fill="none" stroke="black" stroke-width="3"/>
+<text x="230" y="644.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Người yêu cầu</text>
+<circle cx="230" cy="762.0" r="22" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="230,784.0 230,840.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="190,804.0 270,804.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,840.0 195,883.0" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="230,840.0 265,883.0" fill="none" stroke="black" stroke-width="3"/>
+<text x="230" y="934.0" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Cán bộ lưu trữ</text>
+<ellipse cx="1280" cy="325" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="324" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC28 Quản trị tài liệu trong kho</text>
+<polyline points="270,224.0 450,224.0 450,325 750,325" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="515" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="514" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC29 Tái sử dụng tài liệu trong kho</text>
+<polyline points="270,514.0 500,514.0 500,515 750,515" fill="none" stroke="black" stroke-width="3"/>
+<ellipse cx="1280" cy="705" rx="530" ry="65" fill="white" stroke="black" stroke-width="3"/>
+<text x="1280" y="704" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">UC36 Lập gói và nộp lưu hồ sơ</text>
+<polyline points="270,804.0 550,804.0 550,705 750,705" fill="none" stroke="black" stroke-width="3"/>
+</svg>

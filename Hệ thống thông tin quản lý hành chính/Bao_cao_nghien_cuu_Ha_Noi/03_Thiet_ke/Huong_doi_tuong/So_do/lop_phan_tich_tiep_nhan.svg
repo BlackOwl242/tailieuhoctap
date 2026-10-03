@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1050"><rect width="100%" height="100%" fill="white"/>
+<text x="1000" y="64" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Lớp phân tích của Use case tiếp nhận</text>
+<rect x="80" y="130" width="780" height="300" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="470.0" y="192" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">«giao diện»</text>
+<text x="470.0" y="249" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">ManHinhTiepNhan</text>
+<text x="470.0" y="306" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">+ guiLenh()</text>
+<rect x="1120" y="130" width="780" height="300" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1510.0" y="192" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">«điều khiển»</text>
+<text x="1510.0" y="249" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">DieuKhienHoSo</text>
+<text x="1510.0" y="306" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">+ tiepNhan()</text>
+<rect x="80" y="630" width="780" height="300" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="470.0" y="692" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">«thực thể»</text>
+<text x="470.0" y="749" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">HoSo</text>
+<text x="470.0" y="806" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">− phien_ban: SốNguyên</text>
+<text x="470.0" y="863" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">+ tiepNhan()</text>
+<rect x="1120" y="630" width="780" height="300" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1510.0" y="692" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">KhoHoSo</text>
+<text x="1510.0" y="749" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">+ luuGiaoDich()</text>
+<polyline points="860,280 1120,280" fill="none" stroke="black" stroke-width="3" stroke-dasharray="14 10"/>
+<polygon points="1120,280 1100.0,272.0 1100.0,288.0" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="1510,430 1510,560 470,560 470,630" fill="none" stroke="black" stroke-width="3" stroke-dasharray="14 10"/>
+<polygon points="470,630 478.0,610.0 462.0,610.0" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="1510,430 1510,630" fill="none" stroke="black" stroke-width="3" stroke-dasharray="14 10"/>
+<polygon points="1510,630 1518.0,610.0 1502.0,610.0" fill="black" stroke="black" stroke-width="3"/>
+</svg>

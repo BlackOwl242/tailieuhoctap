@@ -1,0 +1,20 @@
+{
+  "stats": {
+    "1": {
+      "expected": 1120,
+      "extracted": 1120
+    },
+    "2": {
+      "expected": 921,
+      "extracted": 921
+    },
+    "3": {
+      "expected": 34,
+      "extracted": 34
+    }
+  },
+  "total": 2075,
+  "unique_codes": 2075,
+  "issues": [],
+  "limitations": "Danh mục lịch sử, hướng dẫn tiếp cận; chưa kiểm chứng toàn bộ quy trình chuyên biệt hiện hành"
+}

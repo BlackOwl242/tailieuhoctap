@@ -1,0 +1,151 @@
+{
+  "operation": "archive",
+  "archive": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Luu_tru_don_dep_HTTT_Ha_Noi_20261003",
+  "moved_files": 4416.0,
+  "moved_bytes": 785562891.0,
+  "targets": [
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\assets",
+      "files": 15,
+      "bytes": 1023076.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\docs",
+      "files": 5,
+      "bytes": 273342.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\tools",
+      "files": 5,
+      "bytes": 171053.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_Cao_He_Thong_Thong_Tin_Quan_Ly_Hanh_Chinh_Dien_Tu.docx",
+      "files": 1,
+      "bytes": 1262270.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_Cao_He_Thong_Thong_Tin_Quan_Ly_Hanh_Chinh.md",
+      "files": 1,
+      "bytes": 275147.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\ban_ban_giao",
+      "files": 98,
+      "bytes": 24340012.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Ban_truoc_bo_sung_20261001",
+      "files": 12,
+      "bytes": 1297276.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\bao_cao_render_cuoi",
+      "files": 99,
+      "bytes": 24364315.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\bao_cao_render_v1",
+      "files": 98,
+      "bytes": 23903518.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\bao_cao_render_v2",
+      "files": 1,
+      "bytes": 1939575.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\bao_cao_render_v3",
+      "files": 101,
+      "bytes": 24473326.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\bao_cao_render_v4",
+      "files": 1,
+      "bytes": 1932978.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\bao_cao_render_v5",
+      "files": 1,
+      "bytes": 1933465.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Bien_tap_lai_20261003",
+      "files": 287,
+      "bytes": 118492121.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Bo_sung_20261002",
+      "files": 170,
+      "bytes": 55620821.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Gop_chuong_20261003",
+      "files": 263,
+      "bytes": 98929516.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Kiem_tra_huong_doi_tuong_20261002",
+      "files": 2351,
+      "bytes": 126293090.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\mau_render",
+      "files": 134,
+      "bytes": 30325647.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Mo_dau_20261003",
+      "files": 225,
+      "bytes": 69026843.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\renderer_final",
+      "files": 0,
+      "bytes": null
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Sua_bieu_do_va_bien_tap_20261002",
+      "files": 273,
+      "bytes": 89061975.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Ten_chuong_20261003\\Ban_truoc_doi_ten.docx",
+      "files": 1,
+      "bytes": 20551282.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Ten_chuong_20261003\\Trang",
+      "files": 205,
+      "bytes": 31514818.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\05_Doi_chieu\\Ten_chuong_20261003\\Trang_doi_chieu",
+      "files": 59,
+      "bytes": 35973848.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\06_Cong_cu\\__pycache__",
+      "files": 7,
+      "bytes": 252680.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\04_Bao_cao\\Bao_cao_nghien_cuu_he_thong_hanh_chinh_Ha_Noi.docx",
+      "files": 1,
+      "bytes": 1957388.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\04_Bao_cao\\Bao_cao_tong_hop.md",
+      "files": 1,
+      "bytes": 260332.0
+    },
+    {
+      "path": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\04_Bao_cao\\Tom_tat_thuyet_trinh_he_thong_Ha_Noi.docx",
+      "files": 1,
+      "bytes": 113177.0
+    }
+  ],
+  "time": "2026-10-03T16:49:23",
+  "protected_files_verified": 2790,
+  "protected_hashes_unchanged": true
+}

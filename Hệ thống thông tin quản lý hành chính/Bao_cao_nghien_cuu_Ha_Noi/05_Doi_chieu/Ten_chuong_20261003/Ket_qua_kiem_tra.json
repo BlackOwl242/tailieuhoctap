@@ -1,0 +1,52 @@
+{
+  "docx": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\04_Bao_cao\\Phan_tich_thiet_ke_huong_doi_tuong_Ha_Noi.docx",
+  "sha256": "134f3ff1a0b0b668e9afea0e7c374346c93a481dd7669162a07014d02e04931d",
+  "pages": 204,
+  "titles": [
+    "CHƯƠNG 1. TỔNG QUAN VỀ HỆ THỐNG THÔNG TIN GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH THÀNH PHỐ HÀ NỘI",
+    "CHƯƠNG 2. PHÂN TÍCH HỆ THỐNG",
+    "CHƯƠNG 3. THIẾT KẾ HỆ THỐNG",
+    "CHƯƠNG 4. ĐỀ XUẤT TRIỂN KHAI VÀ QUẢN TRỊ HỆ THỐNG"
+  ],
+  "checks": {
+    "Tên bốn chương đúng phương án": true,
+    "Nội dung từ chương đầu đến phụ lục giữ nguyên": true,
+    "Giữ nguyên nội dung 98 bảng": true,
+    "Hình ảnh và định dạng giữ nguyên": true,
+    "Không có chữ vượt trang hoặc lỗi trường": true
+  },
+  "changed_visual_pages": [
+    5,
+    6,
+    19,
+    28,
+    29,
+    30,
+    33,
+    35,
+    51,
+    53,
+    71,
+    74,
+    78,
+    86,
+    97,
+    99,
+    101,
+    103,
+    105,
+    116,
+    125,
+    129,
+    138,
+    139,
+    145,
+    146,
+    150,
+    151,
+    152,
+    153,
+    154,
+    199
+  ]
+}

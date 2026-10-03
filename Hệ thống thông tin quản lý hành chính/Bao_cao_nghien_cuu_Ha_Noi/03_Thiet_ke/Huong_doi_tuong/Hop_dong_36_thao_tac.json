@@ -1,0 +1,2463 @@
+[
+  {
+    "uc": "UC01",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/capQuyen",
+    "operationId": "capQuyen",
+    "role": "Quản trị được ủy quyền",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "taiKhoanId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "coQuanId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "vaiTro": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "tuNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "denNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "canCu": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "taiKhoanId",
+        "coQuanId",
+        "vaiTro",
+        "tuNgay",
+        "denNgay",
+        "canCu",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Người đề nghị không tự phê duyệt quyền của mình",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "tai_khoan",
+      "quyen_pham_vi"
+    ]
+  },
+  {
+    "uc": "UC02",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/congBoDanhMuc",
+    "operationId": "congBoDanhMuc",
+    "role": "Quản trị nghiệp vụ",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ma": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "ten": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "loai": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "tuNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "denNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nguon": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "ma",
+        "ten",
+        "loai",
+        "tuNgay",
+        "denNgay",
+        "nguon",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Mã không trùng và khoảng hiệu lực không chồng lấn",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "co_quan",
+      "diem_tiep_nhan"
+    ]
+  },
+  {
+    "uc": "UC03",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/congBoPhienBan",
+    "operationId": "congBoPhienBan",
+    "role": "Quản trị nghiệp vụ",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "thuTucId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "quyetDinh": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "tuNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "thanhPhan": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "minItems": 1
+        },
+        "quyTacHan": {
+          "type": "object",
+          "description": "Có lược đồ chuyên biệt theo phiên bản thủ tục; chưa chấp nhận dữ liệu không kiểm tra"
+        },
+        "tuyenId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "thuTucId",
+        "quyetDinh",
+        "tuNgay",
+        "thanhPhan",
+        "quyTacHan",
+        "tuyenId",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Quyết định và tuyến xử lý đã được phê duyệt",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "thu_tuc",
+      "phien_ban_thu_tuc",
+      "tuyen_xu_ly"
+    ]
+  },
+  {
+    "uc": "UC04",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/cauHinhTrangThai",
+    "operationId": "cauHinhTrangThai",
+    "role": "Quản trị nghiệp vụ",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "phienBanThuTucId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "trangThaiNguon": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "trangThaiDich": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "suKien": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "dieuKien": {
+          "type": "object",
+          "description": "Có lược đồ chuyên biệt theo phiên bản thủ tục; chưa chấp nhận dữ liệu không kiểm tra"
+        },
+        "vaiTro": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "phienBanThuTucId",
+        "trangThaiNguon",
+        "trangThaiDich",
+        "suKien",
+        "dieuKien",
+        "vaiTro",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Không có bước kết thúc không thể đến hoặc chuyển bước trái quyền",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "phien_ban_thu_tuc"
+    ]
+  },
+  {
+    "uc": "UC05",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/guiYeuCau",
+    "operationId": "guiYeuCau",
+    "role": "Người yêu cầu",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "phienBanThuTucId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "chuTheId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "uyQuyenId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "toKhai": {
+          "type": "object",
+          "description": "Có lược đồ chuyên biệt theo phiên bản thủ tục; chưa chấp nhận dữ liệu không kiểm tra"
+        },
+        "taiLieuIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "kenh": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "phienBanThuTucId",
+        "chuTheId",
+        "toKhai",
+        "taiLieuIds",
+        "kenh",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đúng chủ thể, đủ trường bắt buộc và đúng tuyến",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so",
+      "chu_the",
+      "uy_quyen",
+      "thanh_phan_ho_so"
+    ]
+  },
+  {
+    "uc": "UC06",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/chuyenTuyen",
+    "operationId": "chuyenTuyen",
+    "role": "Cán bộ tiếp nhận",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "coQuanDichId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "canCu": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "goiBanGiaoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "coQuanDichId",
+        "canCu",
+        "goiBanGiaoId",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đích có thẩm quyền và xác nhận nhận đủ",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so",
+      "tuyen_xu_ly",
+      "tham_chieu_lien_thong"
+    ]
+  },
+  {
+    "uc": "UC07",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/chuyenBuoc",
+    "operationId": "chuyenBuoc",
+    "role": "Chuyên viên thụ lý",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "hanhDong": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "bangChungIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "hanhDong",
+        "bangChungIds",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đúng phân công, đúng trạng thái và đủ dữ liệu chuyển bước",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so",
+      "su_kien_xu_ly",
+      "phan_cong"
+    ]
+  },
+  {
+    "uc": "UC08",
+    "method": "GET",
+    "path": "/api/v1/nghiep-vu/xemTienTrinh",
+    "operationId": "xemTienTrinh",
+    "role": "Người yêu cầu",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "hoSoId"
+      ]
+    },
+    "guard": "Chủ thể có quyền xem hồ sơ này",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Không áp dụng với đọc",
+    "tables": [
+      "ho_so",
+      "su_kien_xu_ly"
+    ]
+  },
+  {
+    "uc": "UC09",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/kiemTraDoThi",
+    "operationId": "kiemTraDoThi",
+    "role": "Quản trị nghiệp vụ",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "phienBanThuTucId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "buocXuLy": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "minItems": 1
+        },
+        "canhNoi": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "minItems": 1
+        },
+        "quyTacTongHop": {
+          "type": "object",
+          "description": "Có lược đồ chuyên biệt theo phiên bản thủ tục; chưa chấp nhận dữ liệu không kiểm tra"
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "phienBanThuTucId",
+        "buocXuLy",
+        "canhNoi",
+        "quyTacTongHop",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đồ thị hợp lệ, mọi nhánh có lối ra được xác định",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "phien_ban_thu_tuc"
+    ]
+  },
+  {
+    "uc": "UC10",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/kyBanDuThao",
+    "operationId": "kyBanDuThao",
+    "role": "Lãnh đạo có thẩm quyền",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ketQuaId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "giaTriBam": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "chungThuId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "ketQuaId",
+        "giaTriBam",
+        "chungThuId",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Dự thảo được duyệt, chứng thư phù hợp và còn giá trị",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ket_qua",
+      "chu_ky"
+    ]
+  },
+  {
+    "uc": "UC11",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/kiemTraKetNoiKy",
+    "operationId": "kiemTraKetNoiKy",
+    "role": "Quản trị tích hợp",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "heThongId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "cauHinhBiMatId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maTuongQuan": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "heThongId",
+        "cauHinhBiMatId",
+        "maTuongQuan",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đúng hợp đồng và môi trường đã được cấp phép",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "he_thong_ket_noi",
+      "chu_ky"
+    ]
+  },
+  {
+    "uc": "UC12",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/tiepNhan",
+    "operationId": "tiepNhan",
+    "role": "Cán bộ tiếp nhận",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "ketQuaKiemTra": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "giayHenId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "ketQuaKiemTra",
+        "giayHenId",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đủ điều kiện theo phiên bản thủ tục đang áp dụng",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so",
+      "phien_ban_thu_tuc",
+      "lich_lam_viec"
+    ]
+  },
+  {
+    "uc": "UC13",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/ghiNhanBoSung",
+    "operationId": "ghiNhanBoSung",
+    "role": "Cán bộ tiếp nhận hoặc chuyên viên đúng giai đoạn",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "yeuCauBoSungId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "giaiDoan": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "taiLieuIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "yeuCauBoSungId",
+        "giaiDoan",
+        "taiLieuIds",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Bổ sung được đối chiếu với đúng yêu cầu còn mở",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so",
+      "yeu_cau_bo_sung",
+      "thanh_phan_ho_so"
+    ],
+    "description": "Lệnh đối chiếu bổ sung; công dân gửi tài liệu và cán bộ lập yêu cầu dùng các lệnh riêng."
+  },
+  {
+    "uc": "UC14",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/giaoNhiemVu",
+    "operationId": "giaoNhiemVu",
+    "role": "Lãnh đạo đơn vị",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "nguoiXuLyId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "canCu": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "nguoiXuLyId",
+        "canCu",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Người nhận còn quyền và hồ sơ chưa kết thúc",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so",
+      "phan_cong",
+      "tai_khoan"
+    ]
+  },
+  {
+    "uc": "UC15",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/tongHopYKien",
+    "operationId": "tongHopYKien",
+    "role": "Chuyên viên thụ lý",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "nhiemVuIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "yKienIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "duThaoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "nhiemVuIds",
+        "yKienIds",
+        "duThaoId",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đủ ý kiến bắt buộc hoặc có căn cứ xử lý thay thế",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so",
+      "nhiem_vu_phoi_hop",
+      "ket_qua"
+    ]
+  },
+  {
+    "uc": "UC16",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/phatHanh",
+    "operationId": "phatHanh",
+    "role": "Văn thư được giao",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "ketQuaId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "chuKyId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "soVanBan": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "ketQuaId",
+        "chuKyId",
+        "soVanBan",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đúng thẩm quyền, chữ ký hợp lệ và đủ căn cứ",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ket_qua",
+      "chu_ky",
+      "ho_so",
+      "hang_doi_gui"
+    ],
+    "description": "Đặc tả này là lệnh phát hành sau phê duyệt và ký. Các lệnh phê duyệt và trả chỉnh sửa được tách riêng."
+  },
+  {
+    "uc": "UC17",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/dungGiaiQuyet",
+    "operationId": "dungGiaiQuyet",
+    "role": "Lãnh đạo có thẩm quyền",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "quyetDinhId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "canCu": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "phuongAnTaiChinh": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "quyetDinhId",
+        "canCu",
+        "phuongAnTaiChinh",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Không dừng hồ sơ đã kết thúc bằng thao tác thông thường",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so",
+      "su_kien_xu_ly",
+      "khoan_thu"
+    ]
+  },
+  {
+    "uc": "UC18",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/xacNhanGiao",
+    "operationId": "xacNhanGiao",
+    "role": "Cán bộ trả kết quả",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ketQuaId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "nguoiNhanId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "kenh": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "bangChungIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "ketQuaId",
+        "nguoiNhanId",
+        "kenh",
+        "bangChungIds",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Người nhận có quyền, kết quả đã phát hành",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ket_qua",
+      "giao_nhan",
+      "chu_the"
+    ]
+  },
+  {
+    "uc": "UC19",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/ketXuatTaiLieu",
+    "operationId": "ketXuatTaiLieu",
+    "role": "Cán bộ tiếp nhận",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mauId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mucDich": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "mauId",
+        "mucDich",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Có quyền kết xuất và dùng đúng mẫu",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so",
+      "ket_qua"
+    ]
+  },
+  {
+    "uc": "UC20",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/lapThongBao",
+    "operationId": "lapThongBao",
+    "role": "Cán bộ được giao",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "nguoiNhanIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "kenh": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "noiDung": {
+          "type": "object",
+          "description": "Có lược đồ chuyên biệt theo phiên bản thủ tục; chưa chấp nhận dữ liệu không kiểm tra"
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "nguoiNhanIds",
+        "kenh",
+        "noiDung",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đúng người nhận, đúng mục đích và mức công khai",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "thong_bao",
+      "ho_so"
+    ]
+  },
+  {
+    "uc": "UC21",
+    "method": "GET",
+    "path": "/api/v1/nghiep-vu/timKiemCoQuyen",
+    "operationId": "timKiemCoQuyen",
+    "role": "Người được cấp quyền",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tuKhoa": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "coQuanId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "thuTucId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "tuNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "denNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trang": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "tuKhoa",
+        "coQuanId",
+        "thuTucId",
+        "tuNgay",
+        "denNgay",
+        "trang"
+      ]
+    },
+    "guard": "Phạm vi quyền được áp dụng trước khi trả kết quả",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Không áp dụng với đọc",
+    "tables": [
+      "ho_so",
+      "ket_qua"
+    ]
+  },
+  {
+    "uc": "UC22",
+    "method": "GET",
+    "path": "/api/v1/nghiep-vu/traCuuCanCu",
+    "operationId": "traCuuCanCu",
+    "role": "Cán bộ được giao",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "thuTucId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "ngayApDung": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cauHoi": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        }
+      },
+      "required": [
+        "thuTucId",
+        "ngayApDung",
+        "cauHoi"
+      ]
+    },
+    "guard": "Tài liệu còn hiệu lực và có nguồn kiểm chứng",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Không áp dụng với đọc",
+    "tables": [
+      "tai_lieu_huong_dan"
+    ]
+  },
+  {
+    "uc": "UC23",
+    "method": "GET",
+    "path": "/api/v1/nghiep-vu/tongHopBaoCao",
+    "operationId": "tongHopBaoCao",
+    "role": "Người giám sát",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mauId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "coQuanId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "tuNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "denNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mocChot": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "mauId",
+        "coQuanId",
+        "tuNgay",
+        "denNgay",
+        "mocChot"
+      ]
+    },
+    "guard": "Mẫu được duyệt và dữ liệu thuộc phạm vi được giao",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Không áp dụng với đọc",
+    "tables": [
+      "mau_bao_cao",
+      "ho_so"
+    ]
+  },
+  {
+    "uc": "UC24",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/congBoMauBaoCao",
+    "operationId": "congBoMauBaoCao",
+    "role": "Quản trị nghiệp vụ",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mauId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "cotDuLieu": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "minItems": 1
+        },
+        "congThuc": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "quyTacLoaiTru": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "tuNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "mauId",
+        "cotDuLieu",
+        "congThuc",
+        "quyTacLoaiTru",
+        "tuNgay",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Công thức có mẫu đối chiếu và người phê duyệt",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "mau_bao_cao"
+    ]
+  },
+  {
+    "uc": "UC25",
+    "method": "GET",
+    "path": "/api/v1/nghiep-vu/thongKeHoSo",
+    "operationId": "thongKeHoSo",
+    "role": "Người giám sát",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "chiTieu": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "coQuanId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "tuNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "denNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mocChot": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "chiTieu",
+        "coQuanId",
+        "tuNgay",
+        "denNgay",
+        "mocChot"
+      ]
+    },
+    "guard": "Tập hồ sơ chuẩn và quy tắc mẫu số đã được xác định",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Không áp dụng với đọc",
+    "tables": [
+      "ho_so",
+      "tham_chieu_lien_thong"
+    ]
+  },
+  {
+    "uc": "UC26",
+    "method": "GET",
+    "path": "/api/v1/nghiep-vu/truyVanDieuHanh",
+    "operationId": "truyVanDieuHanh",
+    "role": "Lãnh đạo đơn vị",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "coQuanId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "trachNhiem": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "hanXuLy": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trang": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "coQuanId",
+        "trachNhiem",
+        "hanXuLy",
+        "trang"
+      ]
+    },
+    "guard": "Chỉ truy vấn đơn vị được giao quản lý",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Không áp dụng với đọc",
+    "tables": [
+      "ho_so",
+      "phan_cong",
+      "lich_lam_viec"
+    ]
+  },
+  {
+    "uc": "UC27",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/banHanhChiDao",
+    "operationId": "banHanhChiDao",
+    "role": "Lãnh đạo đơn vị",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "noiDung": {
+          "type": "object",
+          "description": "Có lược đồ chuyên biệt theo phiên bản thủ tục; chưa chấp nhận dữ liệu không kiểm tra"
+        },
+        "nguoiNhanIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "hanXuLy": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hoSoIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "noiDung",
+        "nguoiNhanIds",
+        "hanXuLy",
+        "hoSoIds",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Người chỉ đạo có quyền và nơi nhận được xác định",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "chi_dao_dieu_hanh",
+      "ho_so"
+    ]
+  },
+  {
+    "uc": "UC28",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/capQuyenKho",
+    "operationId": "capQuyenKho",
+    "role": "Quản trị kho được giao",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "taiLieuId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "chuTheId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "quyen": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "denNgay": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "canCu": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "taiLieuId",
+        "chuTheId",
+        "quyen",
+        "denNgay",
+        "canCu",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đúng chủ sở hữu, căn cứ quyền và hạn bảo quản",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "tai_lieu_kho",
+      "quyen_khai_thac_kho"
+    ]
+  },
+  {
+    "uc": "UC29",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/dungLaiTaiLieu",
+    "operationId": "dungLaiTaiLieu",
+    "role": "Người yêu cầu",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "taiLieuId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mucDich": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "taiLieuId",
+        "mucDich",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Tài liệu hợp lệ, đúng chủ thể và phù hợp thủ tục đích",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "tai_lieu_kho",
+      "thanh_phan_ho_so"
+    ]
+  },
+  {
+    "uc": "UC30",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/nhanSuKien",
+    "operationId": "nhanSuKien",
+    "role": "Hệ thống đối tác",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "heThongId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maSuKien": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "thuTu": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "chuKyNoiDung": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "noiDung": {
+          "type": "object",
+          "description": "Có lược đồ chuyên biệt theo phiên bản thủ tục; chưa chấp nhận dữ liệu không kiểm tra"
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "heThongId",
+        "maSuKien",
+        "thuTu",
+        "chuKyNoiDung",
+        "noiDung",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Nguồn hợp lệ, đúng hợp đồng và không sai thứ tự",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "thong_diep_nhan",
+      "tham_chieu_lien_thong",
+      "he_thong_ket_noi"
+    ]
+  },
+  {
+    "uc": "UC31",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/guiThongDiep",
+    "operationId": "guiThongDiep",
+    "role": "Tiến trình tích hợp",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "thongDiepId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maTuongQuan": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "lanThu": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "thongDiepId",
+        "maTuongQuan",
+        "lanThu",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Thông điệp được tạo từ giao dịch nghiệp vụ đã lưu",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "hang_doi_gui",
+      "ho_so",
+      "tham_chieu_lien_thong"
+    ]
+  },
+  {
+    "uc": "UC32",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/taoGiaoDichThu",
+    "operationId": "taoGiaoDichThu",
+    "role": "Người yêu cầu",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "khoanThuId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "soTien": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Số nguyên theo đơn vị đồng; không dùng số thực"
+        },
+        "phuongThuc": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "khoanThuId",
+        "soTien",
+        "phuongThuc",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Khoản thu thực sự áp dụng và đúng người trả",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "khoan_thu",
+      "giao_dich"
+    ]
+  },
+  {
+    "uc": "UC33",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/doiSoat",
+    "operationId": "doiSoat",
+    "role": "Cán bộ tài chính",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "giaoDichId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maDoiTac": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "soTien": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Số nguyên theo đơn vị đồng; không dùng số thực"
+        },
+        "trangThaiDoiTac": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "kyDoiSoat": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "giaoDichId",
+        "maDoiTac",
+        "soTien",
+        "trangThaiDoiTac",
+        "kyDoiSoat",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Thông báo được xác thực và mã giao dịch duy nhất",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "giao_dich",
+      "khoan_thu"
+    ]
+  },
+  {
+    "uc": "UC34",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/xacNhanSoHoa",
+    "operationId": "xacNhanSoHoa",
+    "role": "Cán bộ tiếp nhận",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "thanhPhanId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "taiLieuId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "soTrang": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "nguon": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "giaTriBam": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "thanhPhanId",
+        "taiLieuId",
+        "soTrang",
+        "nguon",
+        "giaTriBam",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đọc được, đầy đủ, đúng hồ sơ và đúng quy định xác nhận",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "thanh_phan_ho_so",
+      "ho_so"
+    ]
+  },
+  {
+    "uc": "UC35",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/guiPhanAnh",
+    "operationId": "guiPhanAnh",
+    "role": "Người yêu cầu",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "loai": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "noiDung": {
+          "type": "object",
+          "description": "Có lược đồ chuyên biệt theo phiên bản thủ tục; chưa chấp nhận dữ liệu không kiểm tra"
+        },
+        "lienHe": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "taiLieuIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "loai",
+        "noiDung",
+        "lienHe",
+        "taiLieuIds",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Đúng kênh, không trùng yêu cầu cùng nội dung",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "phan_anh_kien_nghi",
+      "ho_so"
+    ]
+  },
+  {
+    "uc": "UC36",
+    "method": "POST",
+    "path": "/api/v1/nghiep-vu/nopLuu",
+    "operationId": "nopLuu",
+    "role": "Cán bộ lưu trữ",
+    "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
+    "requestSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hoSoId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "dotNopLuuId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "danhMucTep": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "minItems": 1
+        },
+        "giaTriBam": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "thoiHanBaoQuan": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "phienBanMongDoi": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "hoSoId",
+        "dotNopLuuId",
+        "danhMucTep",
+        "giaTriBam",
+        "thoiHanBaoQuan",
+        "phienBanMongDoi"
+      ]
+    },
+    "guard": "Hồ sơ kết thúc và đủ thành phần được duyệt",
+    "success": {
+      "code": 200,
+      "fields": [
+        "maTuongQuan",
+        "duLieu",
+        "phienBanMoi"
+      ],
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+    },
+    "errors": {
+      "400": "Dữ liệu không hợp lệ",
+      "401": "Chưa xác thực",
+      "403": "Thiếu quyền hoặc sai phạm vi",
+      "404": "Không tìm thấy trong phạm vi được phép",
+      "409": "Phiên bản khác hoặc khóa chống lặp khác nội dung",
+      "422": "Điều kiện nghiệp vụ chưa đạt",
+      "503": "Dịch vụ chưa sẵn sàng, không xác nhận thành công"
+    },
+    "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
+    "tables": [
+      "ho_so_nop_luu",
+      "dot_nop_luu",
+      "ho_so"
+    ]
+  }
+]

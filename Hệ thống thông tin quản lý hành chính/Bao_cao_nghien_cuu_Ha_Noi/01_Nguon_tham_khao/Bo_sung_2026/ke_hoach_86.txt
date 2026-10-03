@@ -1,0 +1,510 @@
+
+TRANG 1
+ỦY BAN NHÂN DÂN 
+THÀNH PHỐ HÀ NỘI
+Số: /KH-UBND
+CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+Độc lập - Tự do - Hạnh phúc
+Hà Nội, ngày tháng năm 2026
+KẾ HOẠCH
+Tập trung đẩy mạnh tái cấu trúc thủ tục hành chính, nâng cao tỷ lệ 
+thực hiện dịch vụ công trực tuyến toàn trình
+trên địa bàn thành phố Hà Nội
+Căn cứ Nghị định 63/2010/NĐ-CP của Chính phủ về kiểm soát thủ tục hành 
+chính; Nghị định 118/2025/NĐ- CP của Chính phủ về thực hiện thủ tục hành chính 
+theo cơ chế một cửa, một cửa liên thông tại Bộ phận Một cửa và Cổng Dịch vụ 
+công quốc gia; Nghị quyết số 66.7/2025/NQ-CP của Chính phủ Quy định cắt 
+giảm, đơn giản hóa thủ tục hành chính dựa trên dữ liệu.
+Căn cứ Thông báo số 200-TB/TU ngày 17/01/2026 của Thành ủy Hà Nội 
+thông báo kết luận của đồng chí Nguyễn Duy Ngọc, Ủy viên Bộ Chính trị, Bí thư 
+Thành ủy tại Hội nghị quán triệt và chỉ đạo nhiệm vụ trọng tâm năm 2026;
+Triển khai Kế hoạch số 38/KH-UBND ngày 26/01/2026 của UBND Thành 
+phố về việc thực hiện Kế hoạch hành động số 20-KH/BCĐ57 ngày 19/01/2026 của 
+Ban Chỉ đạo 57 Thành ủy thực hiện Nghị quyết sô 57-NQ/TW ngày 22/12/2024 của 
+Bộ Chính trị về đột phá phát triển khoa học, công nghệ, đổi mới sáng tạo và chuyển 
+đổi số trên địa bàn thành phố Hà Nội, UBND Thành phố ban hành Kế hoạch tập 
+trung đẩy mạnh tái cấu trúc thủ tục hành chính, nâng cao tỷ lệ thực hiện dịch vụ 
+công toàn trình trên địa bàn thành phố Hà Nội, cụ thể như sau:
+I. MỤC ĐÍCH, YÊU CẦU
+1. Mục đích
+- Thực hiện hiệu quả chủ trương, định hướng của Trung ương và Thành 
+phố về chuyển đổi số, cải cách hành chính, tái cấu trúc thủ tục hành chính 
+(TTHC) lấy người dân, doanh nghiệp làm trung tâm phục vụ.
+- Nâng cao tỷ lệ hồ sơ thủ tục hành chính được tiếp nhận, giải quyết trực 
+tuyến, bảo đảm người dân, doanh nghiệp có thể thực hiện đầy đủ các bước của 
+thủ tục hành chính trên môi trường số, mọi lúc, mọi nơi.
+- Giảm thời gian, chi phí thực hiện thủ tục hành chính , hạn chế việc đi 
+lại, tiếp xúc trực tiếp, góp phần nâng cao mức độ hài lòng của người dân, doanh 
+nghiệp đối với cơ quan hành chính nhà nước.
+- Chuẩn hóa, số hóa và tái cấu trúc quy trình giải quyết thủ tục hành chính 
+gắn với ứng dụng công nghệ thông tin, liên thông, kết nối và khai thác hiệu quả 
+các cơ sở dữ liệu dùng chung của Thành phố và quốc gia.
+
+TRANG 2
+2
+- Nâng cao hiệu lực, hiệu quả quản lý nhà nước, tăng tính công khai, 
+minh bạch, khả năng giám sát trong giải quyết thủ tục hành chính; góp phần 
+phòng, chống tiêu cực, nhũng nhiễu.
+- Thúc đẩy thay đổi phương thức làm việc của đội ngũ cán bộ, công chức, 
+nâng cao năng lực số, trách nhiệm trong tiếp nhận và xử lý hồ sơ trực tuyến.
+2. Yêu cầu
+- Bám sát chủ trương, chỉ đạo của Trung ương và Thành phố về chuyển đổi 
+số, cải cách hành chính, tái cấu trúc thủ tục hành chính; bảo đảm thống nhất, đồng 
+bộ với các chương trình, kế hoạch, đề án đã Thành phố phê duyệt.
+- Đẩy mạnh tái cấu trúc, chuẩn hóa quy trình giải quyết thủ tục hành chính, 
+gắn với số hóa hồ sơ, kết quả giải quyết thủ tục hành chính; bảo đảm cung cấp 
+dịch vụ công trực tuyến toàn trình ổn định, thông suốt, thuận tiện cho người dân, 
+doanh nghiệp.
+- Tăng cường liên thông, kết nối, chia sẻ dữ liệu, bảo đảm tích hợp hiệu quả 
+giữa các hệ thống thông tin của Thành phố với Cổng Dịch vụ công quốc gia, các 
+cơ sở dữ liệu quốc gia và cơ sở dữ liệu dùng chung của Thành phố; đồng thời bảo 
+đảm an toàn, an ninh thông tin.
+- Nâng cao hiệu quả tuyên truyền, hướng dẫn, hỗ trợ và nâng cao năng lực 
+thực hiện, tăng cường kiểm tra, giám sát, đánh giá kết quả; kịp thời tháo gỡ khó 
+khăn, vướng mắc, bảo đảm hoàn thành các chỉ tiêu đề ra.
+3. Mục tiêu
+Xác định rõ mục tiêu, nhiệm vụ, giải pháp và lộ trình thực hiện, có trọng 
+tâm, trọng điểm trong việc nâng cao tỷ lệ thực hiện dịch vụ công trực tuyến, tái 
+cấu trúc TTHC dựa trên cơ sở dữ liệu. Cụ thể:
+- Tối thiểu 80% thủ tục hành chính (TTHC) thuộc phạm vi quản lý của 
+UBND thành phố Hà Nội được cung cấp dịch vụ công trực tuyến toàn trình thực 
+chất. Đảm bảo tỷ lệ tiếp nhận và xử lý hồ sơ trực tuyến toàn trình đạt trên 95%.
+- Đến 30/6/2026: Đạt 80% TTHC được tái cấu trúc trên cơ sở dữ liệu.
+- Đến 31/12/2026: Đạt 95% TTHC được tái cấu trúc trên cơ sở dữ liệu.
+II. PHẠM VI, ĐỐI TƯỢNG, THỜI GIAN THỰC HIỆN
+1. Phạm vi
+- Tái cấu trúc các TTHC trên cơ sở dữ liệu theo quy định của Chính phủ và
+chỉ đạo của Thành phố;
+- Các dịch vụ công trực tuyến được cung cấp trên Hệ thống thông tin giải 
+quyết thủ tục hành chính của Thành phố, Cổng Dịch vụ công quốc gia và các hệ 
+thống thông tin liên quan;
+- Các hoạt động hỗ trợ, tuyên truyền, hướng dẫn, đào tạo, giám sát nhằm
+nâng cao tỷ lệ hồ sơ phát sinh và tỷ lệ hồ sơ được giải quyết hoàn toàn trực tuyến.
+
+TRANG 3
+3
+2. Đối tượng áp dụng
+- Các sở, ban, ngành, UBND xã, phường tham gia cung cấp dịch vụ công
+trực tuyến toàn trình.
+- Cán bộ, công chức, viên chức trực tiếp thực hiện tiếp nhận, giải quyết thủ 
+tục hành chính.
+- Người dân, doanh nghiệp và cá nhân có thực hiện thủ tục hành chính.
+3. Thời gian thực hiện
+Trong năm 2026, cao điểm là giai đoạn từ tháng 3/2026 - 6/2026.
+III. QUAN ĐIỂM TÁI CẤU TRÚC TTHC DỰA TRÊN DỮ LIỆU ĐỂ
+CUNG CẤP DỊCH VỤ CÔNG TRỰC TUYẾN TOÀN TRÌNH
+Việc tái cấu trúc TTHC trên cơ sở dữ liệu Hệ thống thông tin giải quyết thủ 
+tục hành chính, cung cấp dịch vụ công trực tuyến toàn trình được thực hiện theo 
+các quan điểm và nguyên tắc sau:
+Thứ nhất, Lấy dữ liệu làm đầu vào mặc định của thủ tục hành chính: Thông 
+tin của người dân, doanh nghiệp đã được xác thực, lưu trữ hợp pháp trong các cơ 
+sở dữ liệu quốc gia, cơ sở dữ liệu chuyên ngành và các nền tảng số tin cậy như Hệ 
+thống thông tin giải quyết TTHC của Thành phố được ưu tiên khai thác, sử dụng 
+trực tiếp trong quá trình giải quyết thủ tục hành chính, thay thế yêu cầu nộp lại 
+giấy tờ, bản sao, bản chụp.
+Thứ hai, kế thừa và tái sử dụng dữ liệu: Dữ liệu phát sinh từ quá trình giải 
+quyết một thủ tục hành chính được chuẩn hóa, lưu trữ và tái sử dụng cho các thủ 
+tục tiếp theo có liên quan, bảo đảm tính liên thông, xuyên suốt theo chuỗi sự kiện 
+của người dân và doanh nghiệp.
+Thứ ba, không làm phát sinh thêm nghĩa vụ cung cấp thông tin: Việc tích 
+hợp, khai thác dữ liệu từ nền tảng Hệ thống thông tin giải quyết TTHC của Thành 
+phố và các hệ thống liên quan phải được thực hiện theo hướng giảm tối đa thao 
+tác kê khai, nhập liệu của người dân, doanh nghiệp, không làm phát sinh thêm yêu 
+cầu về hồ sơ, giấy tờ so với quy định.
+Thứ tư, bảo đảm an toàn, an ninh thông tin và tuân thủ pháp luật:Việc khai 
+thác, chia sẻ dữ liệu tuân thủ đầy đủ các quy định về bảo vệ dữ liệu cá nhân, an 
+toàn thông tin mạng và các quy định pháp luật có liên quan; phân định rõ trách 
+nhiệm của các bên tham gia trong quản lý, vận hành và sử dụng dữ liệu.
+IV. NỘI DUNG THỰC HIỆN
+1. Xác định Danh mục TTHC cần tái cấu trúc
+Trên cơ sở tổng số 2.149 thủ tục hành chính thuộc phạm vi quản lý của 
+UBND Thành phố (số liệu được cập nhật đến ngày 12/02/2026), các Sở, ban, 
+ngành xác định danh mục 80% - 95% TTHC để thực hiện tái cấu trúc trên cơ sở 
+dữ liệu để cung cấp dịch công trực tuyến toàn trình theo chỉ tiêu, lộ trình đặt ra tại 
+Kế hoạch này.
+
+TRANG 4
+4
+2. Xây dựng phương án tái cấu trúc thủ tục hành chính để cung cấp 
+dịch vụ công trực tuyến toàn trình trên cơ sở dữ liệu
+- Xác định định hướng, phương án tái cấu trúc:
++ Thực hiện xây dựng phương án tái cấu trúc TTHC theo chuỗi, gắn với các 
+sự kiện của người dân và doanh nghiệp (vòng đời, chu kỳ kinh doanh…), trong 
+đó dữ liệu của người dân, doanh nghiệp được kế thừa, sử dụng xuyên suốt giữa 
+các thủ tục trong cùng một chuỗi. Nền tảng Hệ thống thông tin giải quyết TTHC 
+đóng vai trò hỗ trợ duy trì trạng thái giao dịch, thông báo tiến độ và kết quả xử 
+lý, bảo đảm trải nghiệm liền mạch cho người sử dụng.
++ Trong điều kiện một số hệ thống thông tin của Bộ, ngành Trung ương đang 
+hoàn thiện, việc khai thác nền tảng Hệ thống thông tin giải quyết TTHC của Thành 
+phố làm lớp trung gian giúp lưu trữ tạm thời, đồng bộ trạng thái xử lý, hỗ trợ thông 
+báo kết quả và thanh toán trực tuyến. Thông tin định danh, liên hệ, xác thực của 
+người dân, doanh nghiệp được tích hợp, kết nối với Hệ thống thông tin giải quyết 
+TTHCcủa Thành phố để tự động điền, xác nhận các trường thông tin cơ bản khi 
+người dân, doanh nghiệp thực hiện thủ tục trực tuyến.
++ Trung tâm Phục vụ hành chính công xây dựng khung định hướng tái 
+cấu cấu trúc TTHC để cung cấp DVC trực tuyến để thống nhất sử dụng chung 
+trên toàn Thành phố, đảm bảo khai thác, tái sử dụng dữ liệu.
+- Bỏ các bước xin xác nhận nội bộ khi thực hiện TTHC, thay bằng 
+dữ liệu dùng chung đã được làm sạch, số hóa, đồng bộ: Tập trung loại bỏ 
+các bước xin xác nhận nội bộ trong quy trình giải quyết TTHC, vốn mang tính 
+hình thức, trùng lặp và làm kéo dài thời gian xử lý hồ sơ; thay thế bằng việc 
+khai thác, sử dụng dữ liệu dùng chung đã được làm sạch, số hóa và đồng bộ 
+giữa các hệ thống thông tin của Thành phố và cơ sở dữ liệu quốc gia, bảo đảm 
+thông tin chính xác, thống nhất và có giá trị pháp lý.
+- Bỏ yêu cầu nộp lại giấy tờ đã có dữ liệu, ưu tiên khai thác dữ liệu 
+dùng chung đã có sẵn: Không yêu cầu tổ chức, cá nhân phải nộp lại các giấy 
+tờ, tài liệu mà cơ quan nhà nước đã có dữ liệu; ưu tiên khai thác, sử dụng dữ 
+liệu dùng chung đã được hình thành và sẵn có trong các cơ sở dữ liệu của Thành 
+phố và cơ sở dữ liệu quốc gia, giảm thành phần hồ sơ, rút ngắn thời gian giải 
+quyết, nâng cao chất lượng cung cấp dịch vụ công trực tuyến toàn trình.
+- Chuẩn hóa thành phần hồ sơ điện tử, Biểu mẫu dùng chung được sử 
+dụng đồng nhất, đảm bảo tính pháp lý. Đảm bảo 03 cấu phần khi thực hiện tái 
+cấu trúc, gồm: Dữ Liệu đầu vào - Quy trình xử lý - kết quả điện tử.
+- Thực hiện thanh toán bằng phương thức điện tử và cấp kết quả giải 
+quyết thủ tục hành chính dưới dạng điện tử hoàn toàn 100%, bảo đảm giá 
+trị pháp lý của kết quả, tạo thuận lợi cho tổ chức, cá nhân và đáp ứng yêu cầu 
+chuyển đổi số trong hoạt động của cơ quan nhà nước.
+
+TRANG 5
+5
+3. Cấu hình trên hệ thống, kiểm thử và tích hợp lên Cổng Dịch vụ 
+công quốc gia
+Thực hiện cấu hình các TTHC đã được tái cấu trúc, thống nhất quy trình 
+nghiệp vụ, biểu mẫu điện tử và các tham số kỹ thuật trên Hệ thống thông tin 
+giải quyết TTHC của Thành phố; tổ chức kiểm thử toàn diện về chức năng, dữ 
+liệu, luồng xử lý và khả năng liên thông; bảo đảm kết nối, tích hợp đồng bộ, 
+thông suốt với Cổng Dịch vụ công Quốc gia theo quy định. Trong đó:
+- Việc thực hiện cấu hình các TTHC đã được tái cấu trúc cùng với quy 
+trình nghiệp vụ, biểu mẫu điện tử và các tham số kỹ thuật trên Hệ thống thông 
+tin giải quyết TTHC của Thành phố nhằm bảo đảm các thủ tục hành chính được 
+vận hành thống nhất, đúng quy định và đúng thiết kế quy trình số.
+- Tổ chức kiểm thử toàn diện về chức năng, dữ liệu, luồng xử lý và khả 
+năng liên thông là yêu cầu bắt buộc để phát hiện, khắc phục kịp thời các lỗi kỹ 
+thuật, bất cập trong quy trình, bảo đảm hệ thống hoạt động ổn định, chính xác 
+và an toàn trước khi đưa vào khai thác chính thức.
+Trên cơ sở đó, việc kết nối, tích hợp đồng bộ và thông suốt với Cổng 
+Dịch vụ công Quốc gia giúp bảo đảm tính thống nhất trong cung cấp dịch vụ 
+công trực tuyến trên phạm vi toàn quốc, tạo điều kiện cho tổ chức, cá nhân thực 
+hiện thủ tục hành chính thuận lợi, liền mạch, đúng quy định của Chính phủ và 
+yêu cầu chuyển đổi số trong hoạt động của cơ quan nhà nước.
+4. Rà soát, làm mịn quy trình, đảm bảo cung cấp ổn định DVCTT 
+toàn trình đã cung cấp trong năm 2026
+- Thực hiện rà soát, đánh giá toàn diện các quy trình thủ tục hành chính 
+đã được cung cấp dưới hình thức dịch vụ công trực tuyến toàn trình, kịp thời 
+phát hiện những điểm chưa phù hợp, còn chồng chéo hoặc phát sinh vướng mắc 
+trong quá trình triển khai thực tế. Trên cơ sở đó, tiến hành làm mịn, hoàn thiện 
+quy trình nghiệp vụ, bảo đảm rõ ràng, thống nhất, dễ thực hiện.
+- Triển khai các giải pháp kỹ thuật và quản lý nhằm duy trì hoạt động ổn 
+định, thông suốt và hiệu quả của các dịch vụ công trực tuyến toàn trình đã được 
+cung cấp trong năm 2026, hạn chế tối đa gián đoạn hệ thống, bảo đảm việc tiếp 
+nhận, giải quyết và trả kết quả hồ sơ cho tổ chức, cá nhân đúng quy định.
+5. Đề xuất phương án nhân rộng mô hình
+Báo cáo, đề xuất bộ, ngành tham khảo triển khai nhân rộng (đặc biệt đối 
+với các TTHC bộ ngành chưa công bố toàn trình nhưng Thành phố đã có phương 
+án cung cấp toàn trình).
+V. NHIỆM VỤ, TIẾN ĐỘ TRIỂN KHAI THỰC HIỆN
+(Cụ thể theo Phụ lục 01 gửi kèm)
+
+TRANG 6
+6
+VI. TỔ CHỨC THỰC HIỆN
+1. Trung tâm Phục vụ hành chính công Thành phố
+- Chủ trì theo dõi, đôn đốc, tổng hợp, kiến nghị các giải pháp tháo gỡ khó 
+khăn, vướng mắc (nếu có) trong quá trình triển khai Kế hoạch, báo cáo UBND 
+Thành phố theo quy định.
+- Thực hiện các nhiệm vụ được phân công tại Phụ lục I kèm theo Kế hoạch.
+- Tăng cường cán bộ công chức, viên chức, người lao động, bổ sung trang 
+thiết bị tại các Điểm hỗ trợ Dịch vụ công số để thực hiện hướng dẫn người dân, 
+doanh nghiệp thực hiện thủ tục hành chính lần đầu.
+- Phối hợp với các đơn vị triển khai công tác tuyên truyền sâu rộng trên các 
+phương tiện thông tin báo chí, mạng xã hội; thúc đẩy việc hướng dẫn, hỗ trợ người 
+dân, doanh nghiệp sử dụng dịch vụ công trực tuyến toàn trình.
+3. Các Sở, ban, ngành
+- Thực hiện các nhiệm vụ được phân công tại Phụ lục I kèm theo Kế hoạch;
+- Đảm bảo tỷ lệ xây dựng phương án tái cấu trúc theo chỉ tiêu được đề ra
+(Cụ thể theo Phụ lục 02 gửi kèm).
+- Theo dõi, đánh giá và báo cáo định kỳ kết quả triển khai các nhiệm vụ 
+được giao; kịp thời phản ánh khó khăn, vướng mắc, đề xuất giải pháp, kiến nghị 
+điều chỉnh (qua Trung tâm Phục vụ hành chính công) để tổng hợp chung.
+- Trong quá trình thực hiện xây dựng phương án tái cấu trúc thủ tục hành 
+chính, đối với các thủ tục đang được thực hiện trên Hệ thống thông tin giải quyết 
+thủ tục hành chính riêng của các Bộ hoặc các thủ tục gặp vướng mắc do chồng 
+chéo giữa các quy định quy phạm, đề nghị các đơn vị thống kê, đề xuất phương 
+án xử lý, giải quyết.
+- Chỉ đạo cán bộ, công chức, viên chức nghiêm túc thực hiện việc giải quyết 
+và trả kết quả thủ tục hành chính trên môi trường điện tử; Phối hợp chặt chẽ với Trung 
+tâm Phục vụ hành chính công trong triển khai thực hiện các nhiệm vụ được giao;
+- Giám đốc, Thủ trưởng các Sở, ban, ngành chịu trách nhiệm trước Thành 
+ủy, UBND Thành phố về tiến độ xây dựng, trình phương án tái cấu trúc thủ tục 
+hành chính theo lộ trình được nêu tại Kế hoạch này.
+Trên đây là Kế hoạch tập trung đẩy mạnh tái cấu trúc thủ tục hành chính, 
+nâng cao tỷ lệ thực hiện dịch vụ công trực tuyến toàn trình trên địa bàn thành phố 
+Hà Nội, đề nghị các đơn vị khẩn trương triển khai thực hiện./.
+Nơi nhận:
+- UBND Thành phố;
+- Chủ tịch UBND Thành phố;
+- Các PCT UBND Thành phố;
+- Các Sở, ban, ngành Thành phố;
+- UBND các phường, xã;
+- VPUB: CVP, các PCVP,
+các phòng: NC, TH, ĐT, NNMT, 
+KGVX, KT;
+- Lưu: VT, NC
+TM. ỦY BAN NHÂN DÂN
+KT.CHỦ TỊCH
+PHÓ CHỦ TỊCH
+Nguyễn Xuân Lưu
+
+TRANG 7
+7
+PHỤ LỤC 01
+Các nhiệm vụ, tiến độ thực hiện các nội dung để nâng cao tỷ lệ dịch vụ công trực tuyến toàn trình
+(Kèm theo Kế hoạch số /KH-UBND ngày / /2026 của UBND Thành phố)
+STT Nhiệm vụ Nội dung Thời gian Chủ trì Phối hợp Sản phẩm
+1
+Xác định danh mục 
+TTHC tái cấu trúc trên 
+cơ sở dữ liệu.
+Xác định danh mục TTHC tái cấu trúc 
+trên cơ sở dữ liệu.
+10/3/2026 Sở, ban, 
+ngành
+Trung tâm 
+Phục vụ hành 
+chính công 
+Thành phố.
+Danh mục TTHC 
+tái cấu trúc trên cơ 
+sở dữ liệu.
+2
+Xây dựng phương án 
+tái cấu trúc đối với các 
+TTHC trong Danh mục.
+Xây dựng Phương án tái cấu trúc quy 
+trình giải quyết đối với 80% TTHC 
+thuộc phạm vi quản lý của UBND 
+thành phố Hà Nội thuộc trách nhiệm 
+của các Sở, Ban, Ngành; Gửi dự thảo 
+Quyết định phê duyệt Phương án tái 
+cấu trúc về Trung tâm Phục vụ hành 
+chính công Thành phố để thẩm định và 
+báo cáo UBND Thành phố.
+07/4/2026 Sở, ban, 
+ngành
+Trung tâm 
+Phục vụ hành 
+chính công 
+Thành phố
+Dự thảo Phương án 
+Tái cấu trúc TTHC
+3
+Phê duyệt phương án 
+tái cấu trúc quy trình 
+giải quyết TTHC thực 
+hiện toàn trình thuộc 
+phạm vi quản lý của 
+UBND thành phố Hà 
+Nội
+Trên cơ sở các phương án Tái cấu trúc 
+TTHC do các đơn vị trình, Trung tâm 
+Phục vụ hành chính công Thành phố 
+thẩm định, phê duyệt, ban hành 
+phương án tái cấu trúc quy trình giải 
+quyết TTHC thực hiện toàn trình thuộc 
+phạm vi quản lý của UBND thành phố 
+Hà Nội.
+Trước
+07/6/2026
+Trung tâm 
+Phục vụ hành 
+chính công 
+Thành phố
+Sở, ban, 
+ngành
+Quyết định phê 
+duyệt phương án tái 
+cấu trúc TTHC
+
+TRANG 8
+8
+STT Nhiệm vụ Nội dung Thời gian Chủ trì Phối hợp Sản phẩm
+4
+Cấu hình trên hệ thống, 
+kiểm thử và tích hợp 
+lên Cổng DVCQG
+Thực hiện cấu hình các TTHC đã được 
+TCT, quy trình nghiệp vụ, biểu mẫu 
+điện tử và các tham số kỹ thuật trên Hệ 
+thống thông tin giải quyết TTHC của 
+Thành phố; tổ chức kiểm thử toàn diện 
+về chức năng, dữ liệu, luồng xử lý và 
+khả năng liên thông; bảo đảm kết nối, 
+tích hợp đồng bộ, thông suốt với Cổng 
+Dịch vụ công Quốc gia theo quy định. 
+Hoàn thành sau 05 ngày Quyết định 
+phê duyệt Phương án tái cấu trúc ban 
+hành.
+Trước
+07/7/2026
+Trung tâm 
+Phục vụ hành 
+chính công 
+Thành phố.
+Sở Khoa học 
+và Công 
+nghệ; Các Sở, 
+ban,   ngành
+liên quan, 
+Tổng Công ty 
+Viễn thông 
+Mobifone.
+- Sau khi cấu hình,
+kiểm thử:
++ Chỉ tiếp nhận và
+xử lý hồ sơ online
++ Tăng hỗ trợ: Tổng 
+đài, Hỗ trợ tại quầy 
+cho lần đầu…
++ Đánh giá bằng
+dashboard dữ liệu
+5
+Rà soát, làm mịn quy 
+trình, đảm bảo cung cấp 
+ổn định DVCTT toàn 
+trình đã cung cấp trong 
+năm 2026
+Rà soát toàn bộ quy trình cung cấp 
+dịch vụ công trực tuyến toàn trình đã 
+được cung cấp, tập trung vào các nội 
+dung: luồng xử lý hồ sơ, thời gian giải 
+quyết, thành phần hồ sơ điện tử, trách 
+nhiệm các khâu, mức độ liên thông 
+giữa các hệ thống. Điều chỉnh, kiểm 
+tra việc thực hiện để đảm bảo thực hiện 
+DVC TT ổn định, thông suốt.
+Thường
+xuyên
+Trung tâm 
+Phục vụ hành 
+chính công 
+Thành phố
+Sở, ban, 
+ngành
+Báo cáo kết quả
+6
+Đẩy mạnh công tác số
+hóa hồ sơ, tài liệu
+Đẩy mạnh công tác số hóa hồ sơ, tài 
+liệu, kết quả giải quyết TTHC thuộc 
+phạm vi quản lý của UBND Thành 
+phố. Đảm bảo các hồ sơ, kết quả giải 
+quyết TTHC được tạo lập, lưu trữ dưới 
+dạng điện tử trong kho cơ sở dữ liệu và 
+có giá trị pháp lý tương đương bản 
+giấy.
+17/6/2026 Sở, ban, 
+ngành
+Sở Khoa học
+và Công nghệ
+100% hồ sơ, kết quả 
+giải quyết TTHC 
+được số hóa, trả kết 
+quả điện tử.
+
+TRANG 9
+9
+STT Nhiệm vụ Nội dung Thời gian Chủ trì Phối hợp Sản phẩm
+7
+Tiếp tục thực hiện lộ 
+trình tương tự đến hết 
+năm 2026, đảm bảo tỷ 
+lệ 95%
+Tiếp tục rà soát các Danh mục TTHC 
+còn lại, xây dựng phương án TCT để 
+tiếp tục cung cấp DVC TT đến hết năm 
+2026
+22/12/2026 Sở, ban, 
+ngành
+Trung tâm 
+Phục vụ hành 
+chính công 
+Thành phố
+Phương án, Quyết 
+định phê duyệt 
+phương án tái cấu 
+trúc TTHC.
+8
+Tuyên truyền, hướng 
+dẫn và hỗ trợ người dân 
+và doanh nghiệp thực 
+hiện TTHC toàn trình
+- Đẩy mạnh công tác tuyên truyền về 
+lợi ích của dịch vụ công trực tuyến 
+toàn trình đến người dân và cộng đồng 
+doanh nghiệp. Cập nhật, giới thiệu các 
+TTHC mới đủ điều kiện cung cấp dịch 
+vụ công trực tuyến toàn trình tới người 
+dân và doanh nghiệp;
+- Xây dựng các tài liệu hướng dẫn và 
+video hướng dẫn người dân và doanh 
+nghiệp thực hiện TTHC toàn trình.
+Thường
+xuyên
+Trung tâm 
+Phục vụ hành 
+chính công 
+Thành phố
+Sở, ban, 
+ngành
+9
+Báo cáo kết quả thực 
+hiện, và các kiến nghị 
+(nếu có) trình Ủy ban 
+nhân dân Thành phố.
+Tổng hợp và báo cáo kết quả thực hiện 
+Kế hoạch trình Ủy ban nhân dân 
+Thành phố.
+31/12/2026 Trung tâm 
+Phục vụ hành 
+chính công 
+Thành phố.
+Sở, ban, 
+ngành
+
+TRANG 10
+10
+PHỤ LỤC 02
+Chỉ tiêu tái cấu trúc thủ tục hành chính trên cơ sở dữ liệu
+(Kèm theo Kế hoạch số /KH-UBND ngày / /2026 của UBND Thành phố)
+SỐ LƯỢNG THỦ TỤC HÀNH CHÍNH
+Số lượng TTHC cần xây dựng 
+phương án tái cấu trúcSTT Sở, Ban, Ngành
+Tổng Liên thông 
+TW Cấp tỉnh Cấp xã
+Cấp 
+tỉnh; 
+cấp xã Trước 30/3 (Đạt 
+tối thiểu 80%)
+Trước 30/10
+(Đạt 95%)
+1 Ban QLKCNC&KCN 8 0 8 0 0 6 1
+2 Công thương 308 0 289 18 1 246 58
+3 Tài chính 121 0 89 31 1 97 23
+4 Y tế 168 0 139 19 10 134 32
+5 Quy hoạch và Kiến trúc 11 0 6 5 0 9 1
+6 Nội vụ 152 13 120 19 0 122 28
+7 Khoa học và Công nghệ 177 0 177 0 0 142 33
+8 Du lịch 26 0 26 0 0 21 3
+9 Văn hóa và Thể thao 172 0 137 35 0 138 33
+10 Giáo dục và Đào tạo 167 0 111 47 9 134 31
+11 Nông nghiệp và Môi trường 325 0 275 49 1 260 61
+12 Dân tộc và Tôn giáo 35 0 24 11 0 28 5
+13 Tư pháp 221 0 155 64 2 176 42
+14 Xây dựng 243 28 180 18 17 194 46
+15 Văn phòng Ủy ban 2 0 2 0 0 1 1
+16 Thanh tra Thành phố 13 0 5 4 4 10 2
+Tổng: 2.1491 41 1.743 320 45 1718 368
+1 Số TTHC có thể thay đổi tùy vào tình hình, thời điểm công bố, công khai TTHC, do đó số lượng TTHC tái cấu trúc có thể thay đổi.
+
+TRANG 11
+11

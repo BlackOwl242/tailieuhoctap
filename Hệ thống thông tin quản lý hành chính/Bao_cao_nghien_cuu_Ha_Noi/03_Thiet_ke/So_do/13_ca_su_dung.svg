@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1050" viewBox="0 0 2000 1050">
+<rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="black"/></marker></defs>
+<text x="1000.0" y="46" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="bold">Các chủ thể và ca sử dụng trọng tâm</text>
+<line x1="460" y1="170.0" x2="760" y2="170.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<line x1="1510" y1="170.0" x2="1320" y2="410.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<line x1="460" y1="650.0" x2="760" y2="650.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<line x1="1510" y1="650.0" x2="1320" y2="890.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="30" y="100" width="430" height="140" fill="white" stroke="black" stroke-width="3"/>
+<text x="245.0" y="179.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Người yêu cầu</text>
+<ellipse cx="1040.0" cy="170.0" rx="280.0" ry="70.0" fill="white" stroke="black" stroke-width="3"/>
+<text x="1040.0" y="158.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">UC01</text>
+<text x="1040.0" y="201.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Nộp yêu cầu</text>
+<rect x="1510" y="100" width="430" height="140" fill="white" stroke="black" stroke-width="3"/>
+<text x="1725.0" y="179.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Cán bộ tiếp nhận</text>
+<ellipse cx="1040.0" cy="410.0" rx="280.0" ry="70.0" fill="white" stroke="black" stroke-width="3"/>
+<text x="1040.0" y="398.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">UC02</text>
+<text x="1040.0" y="441.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Tiếp nhận</text>
+<rect x="30" y="580" width="430" height="140" fill="white" stroke="black" stroke-width="3"/>
+<text x="245.0" y="659.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Chuyên viên</text>
+<ellipse cx="1040.0" cy="650.0" rx="280.0" ry="70.0" fill="white" stroke="black" stroke-width="3"/>
+<text x="1040.0" y="638.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">UC03</text>
+<text x="1040.0" y="681.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Thẩm định</text>
+<rect x="1510" y="580" width="430" height="140" fill="white" stroke="black" stroke-width="3"/>
+<text x="1725.0" y="659.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Lãnh đạo và văn thư</text>
+<ellipse cx="1040.0" cy="890.0" rx="280.0" ry="70.0" fill="white" stroke="black" stroke-width="3"/>
+<text x="1040.0" y="878.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">UC04</text>
+<text x="1040.0" y="921.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Ký và phát hành</text>
+</svg>

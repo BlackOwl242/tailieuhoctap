@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2700" height="1824" viewBox="0 0 900 608"><rect width="900" height="608" fill="white"/>
+<text x="450" y="31.09" font-family="Arial" font-size="23" font-weight="bold" text-anchor="middle">Use case tổng thể</text>
+<rect x="270" y="49" width="605" height="545" rx="0" fill="white" stroke="#181818"/>
+<circle cx="130" cy="64" r="8" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="130,72 130,99" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="115,81 145,81" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,99 117,117" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,99 143,117" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="130" y="137.11" font-family="Arial" font-size="17" font-weight="normal" text-anchor="middle">Người nộp</text>
+<ellipse cx="582.5" cy="109" rx="267.5" ry="39" fill="white" stroke="#181818"/>
+<text x="582" y="100.77" font-family="Arial" font-size="19" font-weight="normal" text-anchor="middle">Kê khai, bổ sung, thanh toán và nhận kết quả</text>
+<polyline points="145,81 315,109" fill="none" stroke="#181818" stroke-width="1"/>
+<circle cx="130" cy="170" r="8" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="130,178 130,205" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="115,187 145,187" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,205 117,223" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,205 143,223" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="130" y="243.11" font-family="Arial" font-size="17" font-weight="normal" text-anchor="middle">Cán bộ xử lý</text>
+<ellipse cx="582.5" cy="215" rx="267.5" ry="39" fill="white" stroke="#181818"/>
+<text x="582" y="206.77" font-family="Arial" font-size="19" font-weight="normal" text-anchor="middle">Tiếp nhận, phân công, thẩm định và phát hành</text>
+<polyline points="145,187 315,215" fill="none" stroke="#181818" stroke-width="1"/>
+<circle cx="130" cy="276" r="8" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="130,284 130,311" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="115,293 145,293" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,311 117,329" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,311 143,329" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="130" y="349.11" font-family="Arial" font-size="17" font-weight="normal" text-anchor="middle">Người quản trị</text>
+<ellipse cx="582.5" cy="321" rx="267.5" ry="39" fill="white" stroke="#181818"/>
+<text x="582" y="312.77" font-family="Arial" font-size="19" font-weight="normal" text-anchor="middle">Quyền, danh mục, quy trình và kho tài liệu</text>
+<polyline points="145,293 315,321" fill="none" stroke="#181818" stroke-width="1"/>
+<circle cx="130" cy="382" r="8" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="130,390 130,417" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="115,399 145,399" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,417 117,435" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,417 143,435" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="130" y="455.11" font-family="Arial" font-size="17" font-weight="normal" text-anchor="middle">Lãnh đạo</text>
+<ellipse cx="582.5" cy="427" rx="267.5" ry="39" fill="white" stroke="#181818"/>
+<text x="582" y="418.77" font-family="Arial" font-size="19" font-weight="normal" text-anchor="middle">Chỉ đạo, thống kê và kiểm tra trách nhiệm</text>
+<polyline points="145,399 315,427" fill="none" stroke="#181818" stroke-width="1"/>
+<circle cx="130" cy="488" r="8" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="130,496 130,523" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="115,505 145,505" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,523 117,541" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="130,523 143,541" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="130" y="561.11" font-family="Arial" font-size="17" font-weight="normal" text-anchor="middle">Hệ thống đối tác</text>
+<ellipse cx="582.5" cy="533" rx="267.5" ry="39" fill="white" stroke="#181818"/>
+<text x="582" y="524.77" font-family="Arial" font-size="19" font-weight="normal" text-anchor="middle">Xác thực, ký, thanh toán và trao đổi dữ liệu</text>
+<polyline points="145,505 315,533" fill="none" stroke="#181818" stroke-width="1"/>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1310"><rect width="100%" height="100%" fill="white"/>
+<text x="1000" y="64" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Nhánh bổ sung theo giai đoạn đã ghi nhận</text>
+<rect x="80" y="180" width="660" height="155" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="410.0" y="242" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Chờ tiếp nhận</text>
+<rect x="1260" y="180" width="660" height="155" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1590.0" y="242" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Đang thụ lý</text>
+<rect x="670" y="690" width="660" height="155" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="752" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Chờ bổ sung</text>
+<polyline points="410,335 410,767 670,767" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="670,767 650.0,759.0 650.0,775.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="235" y="429" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">yêu cầu bổ</text>
+<text x="235" y="486" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">sung</text>
+<text x="235" y="543" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">[lưu giai đoạn</text>
+<text x="235" y="600" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">tiếp nhận]</text>
+<polyline points="1590,335 1590,767 1330,767" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1330,767 1350.0,775.0 1350.0,759.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="1750" y="429" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">yêu cầu bổ</text>
+<text x="1750" y="486" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">sung</text>
+<text x="1750" y="543" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">[lưu giai</text>
+<text x="1750" y="600" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">đoạn thẩm</text>
+<text x="1750" y="657" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">định]</text>
+<polyline points="850,690 850,520 740,257" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="740,257 740.3367509077632,278.5380268090213 755.0976656980502,272.364260166696" fill="black" stroke="black" stroke-width="3"/>
+<text x="570" y="389" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">bổ sung đã</text>
+<text x="570" y="446" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">đối chiếu</text>
+<text x="570" y="503" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">[giai đoạn</text>
+<text x="570" y="560" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">tiếp nhận]</text>
+<polyline points="1160,690 1160,520 1260,257" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1260,257 1245.4142161808693,272.8510223765405 1260.3696202527265,278.5374878031022" fill="black" stroke="black" stroke-width="3"/>
+<text x="1420" y="389" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">bổ sung đã</text>
+<text x="1420" y="446" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">đối chiếu</text>
+<text x="1420" y="503" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">[giai đoạn</text>
+<text x="1420" y="560" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">thẩm định]</text>
+<text x="1000" y="1084" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Hết hạn phản hồi không mặc nhiên từ chối. Hành động kết thúc phải có căn cứ của</text>
+<text x="1000" y="1141" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">từng thủ tục và người có quyền.</text>
+</svg>

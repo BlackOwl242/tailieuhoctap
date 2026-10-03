@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2850" height="2310" viewBox="0 0 950 770"><rect width="950" height="770" fill="white"/>
+<text x="475.0" y="33.09" font-family="Arial" font-size="23" font-weight="bold" text-anchor="middle">Biểu đồ hoạt động UC02 Quản lý danh mục dùng chung</text>
+<circle cx="350" cy="87" r="13" fill="#222222" stroke="#181818"/>
+<polyline points="350,100 350,120" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="354.0,110.0 350,120 346.0,110.0" fill="none" stroke="#181818" stroke-width="1"/>
+<rect x="70" y="120" width="560" height="60" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="350" y="150.43" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Quản trị chọn danh mục</text>
+<polyline points="350,180 350,215" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="354.0,205.0 350,215 346.0,205.0" fill="none" stroke="#181818" stroke-width="1"/>
+<rect x="70" y="215" width="560" height="60" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="350" y="245.43" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Nhập mã, tên và ngày áp dụng</text>
+<polyline points="350,275 350,310" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="354.0,300.0 350,310 346.0,300.0" fill="none" stroke="#181818" stroke-width="1"/>
+<rect x="70" y="310" width="560" height="60" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="350" y="340.43" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Kiểm tra mã trùng và hiệu lực</text>
+<polyline points="350,370 350,402" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="354.0,392.0 350,402 346.0,392.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="350,402 480,452 350,502 220,452" fill="#F1F1F1" stroke="#181818"/>
+<text x="350" y="457.94" font-family="Arial" font-size="18" font-weight="normal" text-anchor="middle">Mã hợp lệ?</text>
+<polyline points="480,452 800,452 800,507" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="804.0,497.0 800,507 796.0,497.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="635" y="439.77" font-family="Arial" font-size="19" font-weight="normal" text-anchor="middle">không</text>
+<rect x="680" y="507" width="240" height="75" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="800" y="536.77" font-family="Arial" font-size="19" font-weight="normal" text-anchor="middle">Trùng mã hoặc thời gian</text>
+<polyline points="350,502 350,517" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="384" y="514.77" font-family="Arial" font-size="19" font-weight="normal" text-anchor="middle">có</text>
+<polyline points="350,517 350,532" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="354.0,522.0 350,532 346.0,522.0" fill="none" stroke="#181818" stroke-width="1"/>
+<rect x="70" y="532" width="560" height="60" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="350" y="562.43" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Công bố danh mục được duyệt</text>
+<polyline points="350,592 350,652 460,652" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="450.0,648.0 460,652 450.0,656.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="800,582 800,652 490,652" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="500.0,656.0 490,652 500.0,648.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="475,637 490,652 475,667 460,652" fill="white" stroke="#181818"/>
+<polyline points="475,667 475,692" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="479.0,682.0 475,692 471.0,682.0" fill="none" stroke="#181818" stroke-width="1"/>
+<circle cx="475" cy="704" r="10" fill="white" stroke="#181818"/>
+<circle cx="475" cy="704" r="6" fill="#222222" stroke="#181818"/>
+</svg>

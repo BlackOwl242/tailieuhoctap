@@ -1,0 +1,623 @@
+
+TRANG 1
+ 
+ 
+CÔNG TY TNHH HỆ THỐNG THÔNG TIN FPT (FPT) 
+ 
+ 
+ 
+ 
+TÀI LIỆU HƯỚNG DẪN SỬ DỤNG 
+Hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội 
+DÀNH CHO CÔNG DÂN 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Hà Nội, 2023 
+  
+
+
+TRANG 2
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 2 
+MỤC LỤC 
+I. ĐĂNG KÝ, ĐĂNG NHẬP HỆ THỐNG ............................................................... 3 
+1.Đăng ký tài khoản ..................................................................................................... 3 
+1.1. Đăng ký tài khoản bằng Mã số BHXH (dành cho công dân): ...................................... 4 
+Quy trình thực hiện: ....................................................................................................................... 4 
+1.2. Đăng ký tài khoản bằng Thuê bao di động (Chỉ dành cho công dân): .......................... 8 
+Quy trình thực hiện: ....................................................................................................................... 8 
+1.3. Đăng ký tài khoản bằng Sim ký số ............................................................................. 11 
+- Đối tượng thực hiện ................................................................................................................... 11 
+Điều kiện: ..................................................................................................................................... 11 
+Quy trình thực hiện: ..................................................................................................................... 11 
+1.4. Đăng ký tài khoản bằng USB ký số ............................................................................ 15 
+a) Đối tượng thực hiện:................................................................................................................ 15 
+b) Điều kiện: ................................................................................................................................ 15 
+c) Quy trình thực hiện: ................................................................................................................. 15 
+Giao diện hiển thị thông tin đăng ký của cá nhân ....................................................................... 18 
+Giao diện hiển thị thông tin đăng ký của Doanh nghiệp ............................................................. 18 
+Đối tượng thực hiện là công chức, viên chức cơ quan nhà nước ................................................ 19 
+1.5. Đăng ký tài khoản bằng VNPT SmartCA ................................................................... 20 
+a) Đối tượng thực hiện:................................................................................................................ 20 
+b) Điều kiện: ................................................................................................................................ 20 
+c) Quy trình thực hiện: ................................................................................................................. 21 
+2.Đăng nhập tài khoản .............................................................................................. 23 
+II. công dân THỰC HIỆN ........................................... Error! Bookmark not defined. 
+1.Tra cứu danh sách dịch vụ công trực tuyến và xem chi tiết thủ tục ................. 27 
+2.Nộp hồ sơ trực tuyến, đánh giá hệ thống giải quyết thủ tục và thanh toán ..... 28 
+3.Tra cứu hồ sơ .......................................................................................................... 32 
+4.Tra cứu thủ tục hành chính .................................................................................. 34 
+5.Phản ánh kiến nghị ................................................................................................ 36 
+6.Đặt câu hỏi, tìm kiếm câu hỏi ............................................................................... 36 
+ 
+–  
+
+TRANG 3
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 3 
+I. ĐĂNG KÝ, ĐĂNG NHẬP HỆ THỐNG 
+1. Đăng ký tài khoản 
+- Bước 1: Mở trình duyệt web: Chrome, Cốc Cốc… trên máy tính  
+                                      
+- Bước 2: Gõ địa chỉ website như sau:  
+Màn hình trang chủ: 
+ 
+- Bước 3: Chọn Đăng ký 
+ 
+Công dân có thể đăng ký tài kho ản bằng Sim ký s ố, USB ký s ố hoặc Công dân 
+có thể đăng ký bằng thuê bao di động, Bảo hiểm xã hội, Bưu điện Việt Nam. 
+
+
+TRANG 4
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 4 
+ 
+1.1. Đăng ký tài khoản bằng Mã số BHXH (dành cho công dân): 
+Quy trình thực hiện: 
+- Bước 1: Tại màn hình Trang chủ click chọn “Đăng ký” tại vùng 1 
+- Bước 2: Tại màn hình “Chọn phương thức đăng ký”-> Chọn đối tượng đăng ký 
+tài khoản là “Công dân” tại vùng 3-> Công dân Chọn “Bảo hiểm xã hội” tại vùng số 4
+
+
+TRANG 5
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 5 
+ 
+ 
+- Bước 3: Tại màn hình Đăng ký bằng Bảo hiểm xã hội-> Công dân nhập hợp lệ 
+các thông tin đăng ký (Các trường có dấu * đỏ là các trường bắt buộc) tại vùng số 6 sau 
+đó nhấn “Đăng ký” tại vùng số 7. 
+Chú ý: Hệ thống sẽ kết nối với CSDL BHXH đ ể lấy ra thông tin c ủa Công dân và so 
+sánh DL từ BHXH với dữ liệu Công dân nhập vào nếu khớp thông tin, hệ thống sẽ kiểm 
+tra tài khoản có tồn tại hay chưa dựa vào CMT/CCCD được lấy tự hệ thống BHXH.  
+Trường hợp đã tồn tại tài khoản trên hệ thống-> Hệ thống sẽ hiển thị thông báo khi đăng 
+ký, người dùng có thể lấy lại mật khẩu bằng chức năng “Quên mật khẩu” tại màn hình 
+đăng nhập hoặc đến quầy giao dịch lấy lại mật khẩu hoặc khiếu nại khi không s ở hữu 
+tài khoản. Trường hợp dữ liệu nhập lên hệ thống không khớp với CSDL BHXH thì h ệ 
+thống sẽ đưa ra thông báo không đăng ký được tài khoản. 
+
+
+TRANG 6
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 6 
+ 
+- Bước 4: Công dân nhập mã OTP được gửi về số điện thoại đăng và nhấn “Xác 
+nhận” tại vùng số 8. Nếu chưa nhận được mã OTP hoặc hết thời gian nhập OTP thì Công 
+dân nhấn “Gửi lại OTP” để lấy lại mã OTP. 
+
+
+TRANG 7
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 7 
+  
+- Bước 5: Tại màn hình nhập mật khẩu, Công dân nhập và xác nhận lại mật khẩu 
+sau đó nhấn “Đăng ký” tại vùng số 10 để hoàn thành Đăng ký tài khoản.  
+Tài khoản được đăng ký bởi Mã số BHXH sẽ có mức xác minh 2 (đã được xác minh bởi 
+cơ quan BHXH) 
+ 
+
+
+TRANG 8
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 8 
+Chú ý quy tắc đặt mật khẩu: Sử dụng 8 ký tự trở lên bao gồm chữ thường, chữ in hoa, 
+số và ký tự đặc biệt 
+1.2. Đăng ký tài khoản bằng Thuê bao di động (Chỉ dành cho công dân): 
+ * Lưu ý: Thuê bao di động dùng đăng ký tài khoản phải là thuê bao đã được đăng 
+ký chính chủ 
+Quy trình thực hiện: 
+- Bước 1: Tại màn hình Trang chủ click chọn “Đăng ký” tại vùng 1 
+- Bước 2: Tại màn hình “Chọn phương thức đăng ký”-> Chọn đối tượng đăng ký 
+tài khoản là “Công dân” tại vùng 3 (Chú ý: Đăng ký bằng thuê bao di động chỉ dành cho 
+Công dân)-> Công dân Chọn “Thuê bao di động” tại vùng số 4. 
+ 
+ 
+ 
+- Bước 3: Tại màn hình Đăng ký bằng thuê bao di động-> Công dân nhập hợp lệ 
+các thông tin đăng ký ( Các trường có dấu * đỏ là các trường bắt buộc) tại vùng 
+
+
+TRANG 9
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 9 
+số 6 sau đó nhấn “Đăng ký” tại vùng số 7. 
+Chú ý: Hệ thống sẽ dùng CMT hoặc CCCD để kiểm tra tài khoản có tồn tại hay không, 
+trường hợp đã tồn tại tài khoản trên hệ thống-> Hệ thống sẽ hiển thị thông báo khi đăng 
+ký, người dùng có thể lấy lại mật khẩu bằng chức năng “Quên mật khẩu” tại màn hình 
+đăng nhập hoặc đến quầy giao dịch lấy lại mật khẩu hoặc khiếu nại khi không s ở hữu 
+tài khoản. 
+Bước 4: Công dân nhập mã OTP được gửi 
+về số điện thoại đăng và nhấn “Xác nhận” 
+tại vùng s ố 8. N ếu chưa nh ận đư ợc mã 
+OTP ho ặc h ết th ời gian nh ập OTP thì 
+Công dân nh ấn “Gửi lại OTP” đ ể lấy lại 
+mã OTP. 
+
+
+TRANG 10
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 10 
+ 
+Bước 5: Tại màn hình nhập mật khẩu, Công dân nhập và xác nhận lại mật khẩu sau đó 
+nhấn “Đăng ký” tại vùng số 10 để hoàn thành Đăng ký tài khoản.  
+ 
+Chú ý quy tắc đặt mật khẩu: Sử dụng 8 ký tự trở lên bao gồm chữ thường, chữ in hoa, 
+số và ký tự đặc biệt 
+
+
+TRANG 11
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 11 
+Tài khoản được đăng ký bởi Thuê bao di động sẽ có mức xác minh 2 (đã được xác minh 
+bởi nhà mạng) 
+ 
+1.3. Đăng ký tài khoản bằng Sim ký số 
+- Đối tượng thực hiện 
+Công dân, Doanh nghiệp 
+Điều kiện: 
+Công dân/ Doanh nghi ệp sở hữu Sim ký số. Sim ký số đang hoạt động và được 
+gắn vào điện thoại để sẵn sàng xác nhận Đăng ký 
+Quy trình thực hiện:  
+Trường hợp đối tượng thực hiện là Công dân  (với Doanh nghiệp sẽ thực hiện 
+tương tự) 
+- Bước 1: Tại vùng số 1 màn hình Trang chủ click chọn “Đăng ký”. 
+- Bước 2: Tại màn hình “Chọn phương thức đăng ký”-> Chọn đối tượng đăng ký 
+tài kho ản là “Công dân” t ại vùng 3 -> Công dân Ch ọn “Sim ký s ố” t ại vùng s ố 4
+
+TRANG 12
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 12 
+ 
+- Bước 3: Tại màn hình đăng ký b ằng Sim ký s ố, Công dân nh ập Số điện thoại 
+của Sim và nhấn Đăng ký tại vùng 5. Sau khi nh ấn Đăng ký, hệ thống gửi xác nhận về 
+Sim ký số 
+
+
+TRANG 13
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 13 
+ 
+ 
+- Bước 4: Công dân “Xác nhận” và nhập mã Pin tại Sim ký số (Vùng 6) 
+
+
+TRANG 14
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 14 
+ 
+Chú ý: Đối với Công dân, Hệ thống sẽ dùng CMT hoặc CCCD để kiểm tra tài khoản có 
+tồn tại hay không, trường hợp đã tồn tại tài khoản trên hệ thống-> Hệ thống sẽ hiển thị 
+thông báo khi đăng ký, ngư ời dùng có thể lấy lại mật khẩu bằng chức năng “Quên mật 
+khẩu” tại màn hình đăng nhập hoặc đến quầy giao dịch lấy lại mật khẩu hoặc khiếu nại 
+khi không sở hữu tài khoản. 
+Đối với Doanh nghiệp, hệ thống sẽ kiểm tra trùng tài khoản bằng Mã số thuế của Doanh 
+nghiệp 
+Tài khoản được đăng ký b ằng Sim ký s ố sẽ ở mức xác minh cao nh ất là mức 3, tương 
+đương với tài khoản đăng ký trực tiếp. 
+- Bước 5: Sau khi đư ợc xác nh ận đăng ký t ại Sim ký s ố, hệ thống hiển thị các 
+thông tin của Công dân được lấy từ Sim ký số, Công dân nhấn “Đăng ký” tại vùng 7 để 
+hoàn thành “Đăng ký” 
+
+
+TRANG 15
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 15 
+ 
+Chú ý: Đối với Công dân không bắt buộc nhập Email, đối với Doanh nghiệp bắt buộc 
+nhập email. 
+ 
+1.4. Đăng ký tài khoản bằng USB ký số 
+a) Đối tượng thực hiện: 
+Công dân, Doanh nghiệp 
+b) Điều kiện:  
+- Công dân/ Doanh nghi ệp sở hữu USB ký s ố, chứng thư trong USB ký s ố còn 
+hạn và đang được sử dụng. 
+- USB được cắm và thiết bị máy tính. 
+- Thiết bị máy tính được cài Driver USB ký số 
+c) Quy trình thực hiện: 
+- Bước 1: Tại màn hình Trang chủ click chọn “Đăng ký” tại vùng 1 
+- Bước 2: Tại màn hình “Chọn phương thức đăng ký”-> Chọn đối tượng đăng ký 
+tài kho ản là “Công dân” t ại vùng 3 -> Công dân Ch ọn “USB ký s ố” t ại vùng s ố 4 
+
+
+TRANG 16
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 16 
+ 
+- Bước 3: Tại màn hình Đăng ký bằng USB ký số -> Công dân nhấn Đăng ký tại 
+vùng số 5 
+Trường hợp thiết bị truy cập chưa được cài Plugin-> Công dân/ Doanh nghiệp click tải 
+công cụ ký điện tử plugin tương ứng với thiết bị và cài lên máy tính. 
+Trường hợp thiết bị chưa nhận USB ký s ố-> Công dân/ Doanh nghi ệp thực hiện cài 
+Driver cho USB ký số (Click vào USB-> Click Setup để thực hiện cài đặt) sau đó nhấn 
+Đăng ký. 
+
+
+TRANG 17
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 17 
+ 
+Sau khi đ ăng ký, h ệ thống hiển thị thông báo c ủa USB ký s ố tại vùng s ố 6 -> 
+Công dân click  “OK”  
+ 
+Hiển thị màn hình nhập mã Pin của USB ký số, người dùng nhập mã pin và nhấn 
+“Đăng nhập” tại vùng số 7 
+  
+- Bước 4: Tại hệ thống Cổng dịch vụ công hiển thị các thông tin của Công dân 
+được lấy từ USB ký số-> Công dân điền email và nhấn “Đăng ký” để hoàn thành đăng 
+ký tài khoản. 
+
+
+TRANG 18
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 18 
+Chú ý: Trường email bắt buộc nhập đối với tài khoản Doanh nghiệp. Tài khoản 
+được đăng ký bằng USB ký số sẽ ở mức xác minh cao nhất là mức 3, tương đương với 
+tài khoản đăng ký trực tiếp 
+Giao diện hiển thị thông tin đăng ký của cá nhân 
+ 
+Chú ý: Đ ối với Công dân h ệ thống sẽ dựa vào CMT/CCCD đ ể kiểm tra tài kho ản có 
+trùng với các tài kho ản trên hệ thống khác hay không. Đ ối với Doanh nghiệp kiểm tra 
+trùng tài khoản sẽ dựa vào Mã số thuế của Doanh nghiệp 
+Giao diện hiển thị thông tin đăng ký của Doanh nghiệp 
+
+
+TRANG 19
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 19 
+ 
+Đối tượng thực hiện là công chức, viên chức cơ quan nhà nước 
+Bước 1: Truy c ập link :  
+http://portal.ca.gov.vn/KnowledgeSharing/Pages/TaiPhanMem.aspx 
+Tải công cụ hỗ trợ tương ứng với máy tính sau đó cài đặt công cụ vào thiết bị 
+
+
+TRANG 20
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 20 
+ 
+Bước 2: Cắm USB và truy cập hệ thống Cổng dịch vụ công-> Chọn “Cơ quan nhà nước”-
+> Chọn USB ký số sau đó nhấn “Đăng ký:-> Sau khi đăng ký, người dùng xác nhận cho 
+phép đăng ký và nhập mã Pin để xác nhận-> Hệ thống load các thông tin từ USB ký số 
+Người dùng nhấn “Đăng ký “ để hoàn tất đăng ký 
+1.5. Đăng ký tài khoản bằng VNPT SmartCA 
+a) Đối tượng thực hiện: 
+Công dân, Doanh nghiệp 
+b) Điều kiện:  
+
+
+TRANG 21
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 21 
+- Công dân/ Doanh nghiệp sở hữu SmartCA, chứng thư còn hạn và đang được sử 
+dụng. 
+c) Quy trình thực hiện: 
+- Bước 1: Công dân/ Doanh nghiệp Chọn đăng ký bằng VNPT SmartCA tại vùng số 1 
+ 
+Hệ thống điều hướng đến màn hình Đăng nhập của VNPT SmartCA 
+Bước 2: Công dân/ Doanh nghiệp thực hiện nhập thông tin tài khoản SmartCA và nhấn 
+Đăng nhập tại vùng số 2 
+ 
+Hệ thống gửi yêu cầu ký số cho phép đăng ký tài khoản, người dùng xác nhận ký số trên 
+app VNPT SmartCA 
+
+
+TRANG 22
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 22 
+  
+Bước 3: Công dân/ Doanh nghiệp (xác nhận bằng vân tay hoặc mã PIN) trên ứng dụng 
+SmartCA, Hệ thống Cổng DVCQG l ấy dữ liệu ký s ố SmartCA và hi ển thị màn hình 
+thông tin đăng ký trên giao diện CDVCQG 
+ 
+Bươc 4: Người dùng nhập mã captcha và nhấn “Đăng ký” tại vùng số 3. 
+Hệ thống kiểm tra đã tồn tại tài khoản hay chưa 
++ TH đã tồn tại tài khoản -> hệ thống sẽ đề nghị add thêm phương thức xác thực cho tài 
+khoản 
+
+
+TRANG 23
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 23 
++ TH chưa tồn tại tài khoản -> hệ thống thông báo đăng ký thành công và quay về màn 
+hình Đăng nhập 
+2.Đăng nhập tài khoản 
+- Bước 1: Mở trình duyệt web: Chrome, Cốc Cốc… trên máy tính  
+ 
+- Bước 2: Gõ địa chỉ website như sau:  
+Màn hình trang chủ: 
+ 
+- Bước 3: Chọn đăng nhập, Nhấn chọn ‘Công dân đăng nhập’ 
+ 
+Điền tên đăng nhập vào ô trên và mật khẩu vào ô dưới. 
+Nhấn ‘Đăng nhập’ để vào hệ thống 
+
+
+TRANG 24
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 24 
+ 
+Khi đăng nhập vào sẽ xuất hiện giao diện như sau: 
+ 
+Sau khi đăng nhập thành công hệ thống hiển thị họ tên công dân đăng nhập tại góc trên 
+bên phải màn hình. 
+3.Chỉnh sửa, cập nhật thông tin cá nhân 
+Để thực hiện chỉnh sửa, cập nhật thông tin cá nhân, Công dân sẽ thực hiện theo các 
+bước sau:  
+- Bước 1: Người dùng truy cập và đăng nhập vào hệ thống thông tin giải quyết thủ tục 
+hành chính thành phố Hà Nội 
+
+
+TRANG 25
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 25 
+- Bước 2: Công dân tích đúp vào họ tên công dân tại góc trên bên phải màn hình 
+ 
+Hệ thống hiển thị màn hình thông tin cá nhân: 
+ 
+- Bước 3: Công dân chỉnh sửa, cập nhật thông tin vào các trường còn thiếu  
+=> Chọn ‘Cập nhật’ để lưu lại thông tin. 
+Ngoài ra công dân có thể chọn ‘cập nhật từ CSDL cư dân quốc gia’ để hệ thống tự động 
+cập nhật dữ liệu cá nhân từ CSDL cư dân quốc gia. 
+
+
+TRANG 26
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 26 
+ 
+ 
+ 
+ 
+ 
+
+
+TRANG 27
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 27 
+II. CÔNG DÂN THỰC HIỆN 
+1.Tra cứu danh sách dịch vụ công trực tuyến và xem chi tiết thủ tục 
+Để thực hiện tra cứu danh sách dịch vụ công trực tuyến Công dân sẽ thực hiện theo 
+các bước sau:  
+- Bước 1: Công dân truy cập và đăng nhập vào hệ thống thông tin giải quyết thủ tục 
+hành chính thành phố Hà Nội 
+- Bước 2: Chọn ‘Dịch vụ công trực tuyến’ => Vị trí số 1 
++ Cách1: Tra cứu danh sách dịch vụ công trực tuyến thông qua các tiêu chí tìm kiếm 
+như: tên thủ tục, cấp thực hiện, cơ quan thực hiện, lĩnh vực, mức độ… => Vị trí 2 
++ Cách 2: Tra cứu bằng cách tích chọn cơ quan thực hiện >> chọn lĩnh vực >> hệ 
+thống hiển thị danh sách dịch vụ công trực tuyến tương ứng => Vị trí 3 
+ 
+ 
+- Bước 3: Chọn thủ tục hành chính sau đó click chuột để xem thông tin chi tiết 
+ 
+ 
+Hệ thống hiển thị thông tin chi tiết thủ tục như sau: 
+
+
+TRANG 28
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 28 
+ 
+  
+2.Nộp hồ sơ trực tuyến, đánh giá hệ thống giải quyết thủ tục và thanh toán 
+Để thực hiện nộp hồ sơ trực tuyến Công dân sẽ thực hiện theo các bước sau:   
+- Bước 1: Công dân truy cập và đăng nhập vào hệ thống thông tin giải quyết thủ tục 
+hành chính thành phố Hà Nội 
+- Bước 2: Công dân tìm kiếm và tra cứu tới đúng thủ tục cần nộp hồ sơ. 
+- Bước 3: Tiếp theo công dân nhấn trực tiếp vào tên thủ tục cần nộp hồ sơ >> Chọn 
+nộp hồ sơ  
+ 
+ 
+Hoặc có thể nhấn nút ‘Nộp hồ sơ’ để thực hiện nộp hồ sơ. 
+ 
+
+
+TRANG 29
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 29 
+ 
+ 
+ 
+- Bước 4: Sau khi công dân nhấn vào nút “Nộp hồ sơ” màn hình giao diện hiển thị: 
+ 
+Công dân nhập đầy đủ thông tin vào các trường trên form (lưu ý: nhưng trường có dấu 
+* là nhưng trường bắt buộc nhập). 
+Thực hiện đính kèm hồ sơ: 
+(lưu ý: thành phần hồ sơ có dấu (*) người dùng không được phép bỏ trống). 
+ + Cách 1: Thực hiện đính kèm file từ file trong máy cá nhân 
+Nhấn nút Chọn ( ). Hệ thống hiển thị màn hình danh sách file trong máy cá 
+nhân 
+Công dân chọn file muốn tải lên, nhấn opend. Hệ thống kiểm tra file tải lên và hiển thị 
+lên màn hình  
+
+
+TRANG 30
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 30 
+ 
++ Cách 2: Thực hiện đính kèm file từ danh sách tài liệu của tôi 
+Nhấn chọn icon  . Hệ thống hiển thị popup chứa danh sách tài liệu  
+Tích chọn tài liệu muốn tải lên, nhấn nút Chọn. Hệ thống thực hiện tải file lên và hiển 
+thị lên màn hình 
+ 
+ 
+Sau khi đính kèm file công dân có thể chọn Ký số và thực hiện ký số: 
+ 
+
+
+TRANG 31
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 31 
+  
+- Bước 5: Công dân có thể tích chọn để điền thông tin người được ủy quyền (nếu có) 
+ 
+- Bước 6: Công dân có thể tích chọn nộp/trả kết quả tại nhà, điền thông tin địa chọ trả 
+kết quả: 
+ 
+- Bước 7: Nhập mã xác nhận và nhấn ‘đồng ý và tiếp tục’
+ 
+Hệ thống hiển thị màn hình: 
+Đánh giá hệ thống giải quyết thủ tục hành chính bằng cách click vào các biểu tượng 
+sau: 
+
+
+TRANG 32
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 32 
+ 
+- Bước 8: Công dân chọn ‘Gửi hồ sơ’ để thực hiện nộp hồ sơ 
+ 
+- Bước 9: Công dân chọn loại thanh toán (thanh toán trên cổng PayGov hoặc thanh 
+toán trên cổng DVC Quốc gia) và thực hiện thanh toán hồ sơ. 
+ 
+3.Tra cứu hồ sơ 
+Để thực hiện tra cứu hồ sơ Công dân sẽ thực hiện theo các bước sau:  
+- Bước 1: Người dùng truy cập và đăng nhập vào hệ thống thông tin giải quyết thủ tục 
+hành chính thành phố Hà Nội 
+- Bước 2: Công dân tra cứu tình trạng hồ sơ theo mã số hồ sơ được cấp trên Cổng Dịch 
+vụ công, để theo dõi chi tiết tiến trình xử lý, quản lý dữ liệu đầu vào, đầu ra của hồ sơ 
+thì người dân thực hiện đăng nhập để xem chi tiết.  
++ Cách 1: Tra cứu tình trạng hồ sơ không cần đăng nhập 
+
+
+TRANG 33
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 33 
+Công dân tra cứu tình trạng hồ sơ bằng cách nhập số biên nhận/mã tra cứu >> Nhấn 
+‘Tra cứu’ 
+ 
+ 
+Hệ thống hiển thị thông tin về tình trạng hồ sơ 
+ 
+ 
++ Cách 2: Tra cứu tình trạng hồ sơ khi đã đăng nhập hệ thống 
+Di chuột đến tên tài khoản, chọn “Hồ sơ của bạn” 
+
+
+TRANG 34
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 34 
+ 
+ 
+Công dân có thể tìm kiếm bằng cách điền số biên nhận >> Tìm kiếm 
+ 
+ 
+Công dân nhấn vào số biên nhận. Hệ thống hiển thị chi tiết thông tin tình trạng hồ sơ 
+ 
+  
+4.Tra cứu thủ tục hành chính 
+Để thực hiện tra cứu thủ tục hành chính Công dân sẽ thực hiện theo các bước sau:  
+- Bước 1: Công dân truy cập và đăng nhập vào hệ thống thông tin giải quyết thủ tục 
+hành chính thành phố Hà Nội 
+- Bước 2: Chọn ‘Thủ tục hành chính’ 
+
+
+TRANG 35
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 35 
+ 
+ 
+Hệ thống đi đến màn hình tra cứu của cổng dịch vụ công quốc gia 
+Công dân có thể tìm kiếm thủ tục hành chính theo các tiêu chí: từ khóa tìm kiếm, cơ 
+quan, lĩnh vực, cấp thực hiện… 
+ 
+VD: Công dân nhập từ khóa tìm kiếm “Khai sinh” >> Chọn ‘Tìm kiếm’ 
+Hệ thống hiển thị danh sách thủ tục hành chính 
+
+
+TRANG 36
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 36 
+ 
+5.Phản ánh kiến nghị 
+Để thực hiện phản ánh kiến nghị Công dân sẽ thực hiện theo các bước sau:  
+- Bước 1: Công dân truy cập và đăng nhập vào hệ thống thông tin giải quyết thủ tục 
+hành chính thành phố Hà Nội 
+- Bước 2: Chọn ‘Phản ánh kiến nghị’ 
+ 
+ 
+Hệ thống đi đến màn hình phản ánh kiến nghị của cổng dịch vụ công quốc gia 
+
+
+TRANG 37
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 37 
+ 
+Công dân đăng nhập cổng dịch vụ công quốc gia, sau đó nhập đầy đủ thông tin vào các 
+trường trên form (lưu ý: nhưng trường có dấu * là nhưng trường bắt buộc nhập). 
+Thực hiện đính kèm hồ sơ: 
+• Nhấn nút Chọn file ( ). Hệ thống hiển thị màn hình danh sách file trong 
+máy cá nhân 
+• Công dân chọn file muốn tải lên, nhấn open. 
+  
+Bước 3: Công dân điền mã bảo mật, nhấn ‘Gửi phản ánh’ 
+
+
+TRANG 38
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 38 
+ 
+6.Đặt câu hỏi, tìm kiếm câu hỏi 
+❖ Để thực hiện tìm kiếm câu hỏi Công dân sẽ thực hiện theo các bước sau:  
+- Bước 1: Công dân truy cập và đăng nhập vào hệ thống thông tin giải quyết thủ tục 
+hành chính thành phố Hà Nội 
+- Bước 2: Chọn ‘Tiện ích’ => Nhấn chọn ‘Hỏi đáp’ 
+ 
+Công dân có thể tìm kiếm câu hỏi theo các tiêu chí: Lĩnh vực, tiêu đề… 
+ 
+
+
+TRANG 39
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 39 
+ 
+ 
+❖ Để thực hiện nộp hồ sơ Công dân sẽ thực hiện theo các bước sau:  
+- Bước 1: Công dân truy cập và đăng nhập vào hệ thống thông tin giải quyết thủ tục 
+hành chính thành phố Hà Nội 
+- Bước 2: Chọn ‘Tiện ích’ => Nhấn chọn ‘Hỏi đáp’ 
+ 
+Hệ thống hiển thị màn hình:  
+ 
+ 
+- Bước 3: Tiếp theo công dân bấn ‘vào đây’ để đi đến màn hình đặt câu hỏi 
+ 
+Công dân nhập đầy đủ thông tin vào các trường trên form (lưu ý: nhưng trường có dấu 
+* là nhưng trường bắt buộc nhập). 
+
+
+TRANG 40
+Tài liệu Hướng dẫn sử dụng với người dùng cuối – Công dân v1.0 
+  Trang 40 
+ 
+- Bước 4: Người dùng nhập mã bảo mật và tích chọn ‘Tôi đồng ý với các điều kiện 
+trên’, Sau đó chọn ‘Gửi câu hỏi’ 
+ 
+ 

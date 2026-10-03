@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1150"><rect width="100%" height="100%" fill="white"/>
+<text x="1000" y="64" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Triển khai tham chiếu theo vùng kiểm soát</text>
+<polygon points="70,250 100,220 680,220 650,250" fill="white" stroke="black" stroke-width="3"/>
+<polygon points="650,250 680,220 680,660 650,690" fill="white" stroke="black" stroke-width="3"/>
+<rect x="70" y="250" width="580" height="440" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="360.0" y="312" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">«nút triển khai»</text>
+<text x="360.0" y="369" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Vùng kết nối bên ngoài</text>
+<text x="360.0" y="426" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Cổng kết nối và xác thực</text>
+<polygon points="720,250 750,220 1330,220 1300,250" fill="white" stroke="black" stroke-width="3"/>
+<polygon points="1300,250 1330,220 1330,660 1300,690" fill="white" stroke="black" stroke-width="3"/>
+<rect x="720" y="250" width="580" height="440" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1010.0" y="312" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">«nút triển khai»</text>
+<text x="1010.0" y="369" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Vùng ứng dụng</text>
+<text x="1010.0" y="426" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Tác nghiệp và tiến trình</text>
+<text x="1010.0" y="483" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">nền</text>
+<polyline points="650,470 720,470" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="720,470 700.0,462.0 700.0,478.0" fill="black" stroke="black" stroke-width="3"/>
+<polygon points="1370,250 1400,220 1980,220 1950,250" fill="white" stroke="black" stroke-width="3"/>
+<polygon points="1950,250 1980,220 1980,660 1950,690" fill="white" stroke="black" stroke-width="3"/>
+<rect x="1370" y="250" width="580" height="440" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1660.0" y="312" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">«nút triển khai»</text>
+<text x="1660.0" y="369" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Vùng dữ liệu</text>
+<text x="1660.0" y="426" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">CSDL, tệp và bản sao</text>
+<polyline points="1300,470 1370,470" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1370,470 1350.0,462.0 1350.0,478.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="300" y="850" width="1400" height="180" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="912" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Vùng quản trị riêng</text>
+<text x="1000.0" y="969" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Truy cập được cấp phép, giám sát và quản lý bí mật</text>
+<rect x="491.5" y="733" width="1017.0" height="55" fill="white"/>
+<text x="1000" y="779" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Chỉ mở giao tiếp đã được duyệt giữa các vùng.</text>
+</svg>

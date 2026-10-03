@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1050" viewBox="0 0 2000 1050">
+<rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="black"/></marker></defs>
+<text x="1000.0" y="46" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="bold">Khung phân tích chín nhóm chức năng theo quy định</text>
+<line x1="640" y1="200.0" x2="640" y2="510.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<line x1="1000.0" y1="280" x2="1000.0" y2="430" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<line x1="1360" y1="200.0" x2="1360" y2="510.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<line x1="340.0" y1="590" x2="340.0" y2="750" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<line x1="1000.0" y1="590" x2="1000.0" y2="750" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<line x1="1660.0" y1="590" x2="1660.0" y2="750" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="640" y="120" width="720" height="160" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="188.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Hệ thống giải quyết thủ tục</text>
+<text x="1000.0" y="231.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Hà Nội trong quan hệ liên thông</text>
+<rect x="40" y="430" width="600" height="160" fill="white" stroke="black" stroke-width="3"/>
+<text x="340.0" y="519.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Giao dịch và xử lý hồ sơ</text>
+<rect x="700" y="430" width="600" height="160" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="519.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Giá trị kết quả và trao đổi</text>
+<rect x="1360" y="430" width="600" height="160" fill="white" stroke="black" stroke-width="3"/>
+<text x="1660.0" y="519.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Kiểm soát và điều hành</text>
+<rect x="40" y="750" width="600" height="250" fill="white" stroke="black" stroke-width="3"/>
+<text x="340.0" y="841.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">2. Danh mục, mẫu và hồ sơ</text>
+<text x="340.0" y="884.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">4. Tiếp nhận và giải quyết</text>
+<text x="340.0" y="927.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">5. Tiện ích hỗ trợ</text>
+<rect x="700" y="750" width="600" height="250" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="841.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">3. Chữ ký số</text>
+<text x="1000.0" y="884.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">8. Kho tổ chức, cá nhân</text>
+<text x="1000.0" y="927.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">9. Tích hợp và liên thông</text>
+<rect x="1360" y="750" width="600" height="250" fill="white" stroke="black" stroke-width="3"/>
+<text x="1660.0" y="841.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">1. Tài khoản và quyền</text>
+<text x="1660.0" y="884.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">6. Thống kê và báo cáo</text>
+<text x="1660.0" y="927.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">7. Điều hành tác nghiệp</text>
+</svg>

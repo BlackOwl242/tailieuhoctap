@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1050" viewBox="0 0 2000 1050">
+<rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="black"/></marker></defs>
+<text x="1000.0" y="46" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="bold">Khóa và quan hệ kết quả, tài chính, giao nhận</text>
+<line x1="740" y1="175.0" x2="560" y2="500.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="582.0" y="283.5" width="135.0" height="39.0" fill="white"/>
+<text x="650.0" y="318.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">1 : nhiều</text>
+<line x1="1000.0" y1="250" x2="1000.0" y2="410" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="932.0" y="276.0" width="135.0" height="39.0" fill="white"/>
+<text x="1000.0" y="311.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">1 : nhiều</text>
+<line x1="1260" y1="175.0" x2="1440" y2="500.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1282.0" y="283.5" width="135.0" height="39.0" fill="white"/>
+<text x="1350.0" y="318.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">1 : nhiều</text>
+<line x1="300.0" y1="590" x2="300.0" y2="790" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="232.0" y="636.0" width="135.0" height="39.0" fill="white"/>
+<text x="300.0" y="671.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">1 : nhiều</text>
+<line x1="1000.0" y1="590" x2="1000.0" y2="790" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="932.0" y="636.0" width="135.0" height="39.0" fill="white"/>
+<text x="1000.0" y="671.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">1 : nhiều</text>
+<line x1="1260" y1="500.0" x2="1440" y2="880.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1282.0" y="636.0" width="135.0" height="39.0" fill="white"/>
+<text x="1350.0" y="671.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">1 : nhiều</text>
+<rect x="740" y="100" width="520" height="150" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="163.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">ho_so</text>
+<text x="1000.0" y="206.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">PK id</text>
+<rect x="40" y="410" width="520" height="180" fill="white" stroke="black" stroke-width="3"/>
+<text x="300.0" y="466.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">khoan_thu</text>
+<text x="300.0" y="509.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">PK id</text>
+<text x="300.0" y="552.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">FK ho_so</text>
+<rect x="740" y="410" width="520" height="180" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="466.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">ket_qua</text>
+<text x="1000.0" y="509.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">PK id</text>
+<text x="1000.0" y="552.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">FK ho_so, bản thay thế</text>
+<rect x="1440" y="410" width="520" height="180" fill="white" stroke="black" stroke-width="3"/>
+<text x="1700.0" y="466.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">hang_doi_gui</text>
+<text x="1700.0" y="509.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">PK id</text>
+<text x="1700.0" y="552.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">FK ho_so</text>
+<rect x="40" y="790" width="520" height="180" fill="white" stroke="black" stroke-width="3"/>
+<text x="300.0" y="846.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">giao_dich</text>
+<text x="300.0" y="889.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">PK id</text>
+<text x="300.0" y="932.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">FK khoan_thu</text>
+<rect x="740" y="790" width="520" height="180" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="846.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">chu_ky</text>
+<text x="1000.0" y="889.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">PK id</text>
+<text x="1000.0" y="932.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">FK ket_qua</text>
+<rect x="1440" y="790" width="520" height="180" fill="white" stroke="black" stroke-width="3"/>
+<text x="1700.0" y="846.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">giao_nhan</text>
+<text x="1700.0" y="889.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">PK id</text>
+<text x="1700.0" y="932.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">FK ket_qua, chu_the</text>
+</svg>

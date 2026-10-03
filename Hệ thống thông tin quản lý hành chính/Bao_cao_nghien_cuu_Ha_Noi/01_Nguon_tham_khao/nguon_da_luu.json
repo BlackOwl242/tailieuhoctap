@@ -1,0 +1,37 @@
+[
+  {
+    "file": "phuong_an_1811_2025.pdf",
+    "url": "https://datafiles.hanoi.gov.vn/gov-hni/6244/VanBan/2025/12/25/PAQDPVHCC-1811-2025.pdf",
+    "date": "2026-10-01",
+    "status": 200,
+    "sha256": "1d2d074bf58d4a27f70c0a86579734cc3a17e1282f9ef75784a98ab22b046695"
+  },
+  {
+    "file": "thong_tu_03_2025.pdf",
+    "url": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/9/03-tb.signed.pdf",
+    "date": "2026-10-01",
+    "status": 200,
+    "sha256": "743644233404fec4e3d3f116b4cbc1f5d17b5c473d0b61b27f86b9a7e5d48265"
+  },
+  {
+    "file": "nghi_dinh_367_2025.pdf",
+    "url": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2026/01/367-ndcp.signed.pdf",
+    "date": "2026-10-01",
+    "status": 200,
+    "sha256": "d09b3d03ea9406b974b443f031ab17fec80f4c061473fcebdbf06b139590166c"
+  },
+  {
+    "file": "thong_bao_cong_ha_noi.html",
+    "url": "https://dichvucong.hanoi.gov.vn/",
+    "date": "2026-10-01",
+    "status": 200,
+    "sha256": "d4020dc8810a4ad5e261155c6113ed2bc3733f4edab1afa2527a5fc547e0b4ce"
+  },
+  {
+    "file": "quyet_dinh_1811.html",
+    "url": "https://vanban.hanoi.gov.vn/chi-tiet-van-ban/ve-viec-phe-duyet-phuong-an-tai-cau-truc-thu-tuc-hanh-chinh-cap-ban-sao-trich-luc-ho-tich-ban-sao-g-230492",
+    "date": "2026-10-01",
+    "status": 200,
+    "sha256": "a9f2f4d354ddaa63f7b5da9882937ec4b9fb094fbc7adce5adc6b8b7386e08fd"
+  }
+]

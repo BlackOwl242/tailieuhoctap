@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "check": "Có 36 ca dùng duy nhất",
+      "passed": true
+    },
+    {
+      "check": "31 chức năng chuẩn không trùng",
+      "passed": true
+    },
+    {
+      "check": "Mỗi ca có bốn bước hướng dẫn",
+      "passed": true
+    },
+    {
+      "check": "Mọi bảng tham chiếu đều tồn tại",
+      "passed": true
+    },
+    {
+      "check": "Có hợp đồng riêng cho mọi ca",
+      "passed": true
+    },
+    {
+      "check": "Ca đọc chỉ dùng phương thức đọc",
+      "passed": true
+    },
+    {
+      "check": "Khóa ngoại tham chiếu đúng đối tượng",
+      "passed": true
+    },
+    {
+      "check": "Ca kiểm thử chưa thực hiện",
+      "passed": true
+    },
+    {
+      "check": "Mọi trạng thái có đường đến từ bản nháp",
+      "passed": true
+    },
+    {
+      "check": "Trạng thái kết thúc không có lệnh chuyển thông thường",
+      "passed": true
+    },
+    {
+      "check": "Mỗi chuyển bước có điều kiện và vai trò",
+      "passed": true
+    }
+  ],
+  "classes": 35,
+  "associations": 62,
+  "test_cases": 168,
+  "all_passed": true,
+  "meaning": "Kiểm tra tính nhất quán dữ liệu thiết kế; không phải thực thi phần mềm"
+}

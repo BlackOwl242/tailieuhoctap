@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1460"><rect width="100%" height="100%" fill="white"/>
+<text x="1000" y="64" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Phối hợp nhiều cơ quan và tổng hợp ý kiến</text>
+<circle cx="1000" cy="110" r="20" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="1000,130 1000,180" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1000,180 1008.0,160.0 992.0,160.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="500" y="180" width="1000" height="135" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="242" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Lập danh sách ý kiến bắt buộc và hạn phản</text>
+<text x="1000.0" y="299" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">hồi</text>
+<polyline points="1000,315 1000,380" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1000,380 1008.0,360.0 992.0,360.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="370" y="380" width="1260" height="16" rx="0" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="600,396 600,480" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="600,480 608.0,460.0 592.0,460.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="400" y="480" width="400" height="175" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="600.0" y="542" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Nhiệm vụ cơ</text>
+<text x="600.0" y="599" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">quan A</text>
+<polyline points="600,655 600,735" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="600,735 608.0,715.0 592.0,715.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="400" y="735" width="400" height="175" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="600.0" y="797" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Nhận và kiểm</text>
+<text x="600.0" y="854" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">tra ý kiến</text>
+<polyline points="600,910 600,985" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="600,985 608.0,965.0 592.0,965.0" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="1400,396 1400,480" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1400,480 1408.0,460.0 1392.0,460.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="1200" y="480" width="400" height="175" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1400.0" y="542" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Nhiệm vụ cơ</text>
+<text x="1400.0" y="599" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">quan B</text>
+<polyline points="1400,655 1400,735" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1400,735 1408.0,715.0 1392.0,715.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="1200" y="735" width="400" height="175" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1400.0" y="797" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Nhận và kiểm</text>
+<text x="1400.0" y="854" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">tra ý kiến</text>
+<polyline points="1400,910 1400,985" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1400,985 1408.0,965.0 1392.0,965.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="370" y="985" width="1260" height="16" rx="0" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="1000,1001 1000,1060" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1000,1060 1008.0,1040.0 992.0,1040.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="420" y="1060" width="1160" height="155" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="1122" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Tổng hợp khi mọi nhánh bắt buộc hoàn tất hoặc đã</text>
+<text x="1000.0" y="1179" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">xử lý ngoại lệ bằng căn cứ được duyệt</text>
+<polyline points="1000,1215 1000,1300" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1000,1300 1008.0,1280.0 992.0,1280.0" fill="black" stroke="black" stroke-width="3"/>
+<circle cx="1000" cy="1325" r="26" fill="white" stroke="black" stroke-width="3"/>
+<circle cx="1000" cy="1325" r="16" fill="black" stroke="black" stroke-width="3"/>
+<text x="1000" y="1429" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Sự kiện quá hạn được giám sát riêng; không tự coi cơ quan im lặng là đồng ý.</text>
+</svg>

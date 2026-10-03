@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3420" height="3774" viewBox="0 0 1140 1258"><rect width="1140" height="1258" fill="white"/>
+<text x="570.0" y="34.41" font-family="Arial" font-size="27" font-weight="bold" text-anchor="middle">Biểu đồ trình tự UC06 Luân chuyển hồ sơ</text>
+<circle cx="100.0" cy="53" r="10" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="100.0,63 100.0,91" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="83.0,73 117.0,73" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="100.0,91 85.0,112" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="100.0,91 115.0,112" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="100.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Cán bộ</text>
+<text x="100.0" y="166.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">tiếp nhận</text>
+<circle cx="335.0" cy="88" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="303.0,72 303.0,104" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="303.0,88 321.0,88" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="335.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Chuyển</text>
+<text x="335.0" y="166.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">hồ sơ</text>
+<circle cx="570.0" cy="88" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="563.0,75 569.0,71 576.0,74" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="568.3842268941361,66.38422689413609 576.0,74 565.2328725055028,73.73738713428055" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="570.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Theo dõi</text>
+<text x="570.0" y="166.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">bàn giao</text>
+<circle cx="805.0" cy="88" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="787.0,107 823.0,107" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="805.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Thông tin</text>
+<text x="805.0" y="166.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">luân chuyển</text>
+<circle cx="1040.0" cy="88" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="1033.0,75 1039.0,71 1046.0,74" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="1038.3842268941362,66.38422689413609 1046.0,74 1035.2328725055027,73.73738713428055" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="1040.0" y="136.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Cơ quan nhận</text>
+<polyline points="100.0,188 100.0,1107.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="335.0,188 335.0,1107.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="570.0,188 570.0,1107.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="805.0,188 805.0,1107.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="1040.0,188 1040.0,1107.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="18" y="579.0" width="1104" height="506.0" rx="0" fill="white" stroke="#181818"/>
+<polyline points="100.0,579.0 100.0,1085.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="335.0,579.0 335.0,1085.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="570.0,579.0 570.0,1085.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="805.0,579.0 805.0,1085.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="1040.0,579.0 1040.0,1085.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polygon points="18,579.0 87,579.0 87,599.0 71,614.0 18,614.0" fill="#F1F1F1" stroke="#181818"/>
+<text x="52" y="604.92" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">alt</text>
+<polyline points="18,860.0 1122,860.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="100.0,265.0 335.0,265.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="325.0,261.0 335.0,265.0 325.0,269.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="335.0,265.0 325.0,261.0 325.0,269.0" fill="#181818" stroke="#181818"/>
+<text x="217.5" y="216.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Chọn nơi nhận hồ</text>
+<text x="217.5" y="246.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">sơ</text>
+<polyline points="335.0,344.0 570.0,344.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="560.0,340.0 570.0,344.0 560.0,348.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="570.0,344.0 560.0,340.0 560.0,348.0" fill="#181818" stroke="#181818"/>
+<text x="452.5" y="295.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Gửi yêu cầu</text>
+<text x="452.5" y="325.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">chuyển</text>
+<polyline points="570.0,393.0 805.0,393.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="795.0,389.0 805.0,393.0 795.0,397.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="805.0,393.0 795.0,389.0 795.0,397.0" fill="#181818" stroke="#181818"/>
+<text x="687.5" y="374.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Kiểm tra tuyến</text>
+<polyline points="805.0,472.0 570.0,472.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="580.0,476.0 570.0,472.0 580.0,468.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="687.5" y="423.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Trả thông tin bàn</text>
+<text x="687.5" y="453.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">giao</text>
+<polyline points="570.0,521.0 1040.0,521.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="1030.0,517.0 1040.0,521.0 1030.0,525.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="1040.0,521.0 1030.0,517.0 1030.0,525.0" fill="#181818" stroke="#181818"/>
+<text x="805.0" y="502.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Chuyển hồ sơ và tài liệu</text>
+<polyline points="1040.0,570.0 570.0,570.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="580.0,574.0 570.0,570.0 580.0,566.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="805.0" y="551.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Xác nhận đã nhận đủ</text>
+<rect x="405.16666666666663" y="591.0" width="329.6666666666667" height="31.0" fill="white"/>
+<text x="570.0" y="611.92" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">[Cơ quan nhận đã xác nhận]</text>
+<polyline points="570.0,669.0 805.0,669.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="795.0,665.0 805.0,669.0 795.0,673.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polygon points="805.0,669.0 795.0,665.0 795.0,673.0" fill="#181818" stroke="#181818"/>
+<text x="687.5" y="650.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Lưu nơi nhận</text>
+<polyline points="805.0,748.0 570.0,748.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="580.0,752.0 570.0,748.0 580.0,744.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="687.5" y="699.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Đã xác nhận bàn</text>
+<text x="687.5" y="729.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">giao</text>
+<polyline points="570.0,797.0 335.0,797.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="345.0,801.0 335.0,797.0 345.0,793.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="452.5" y="778.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Trả nơi đang xử lý</text>
+<polyline points="335.0,846.0 100.0,846.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="110.0,850.0 100.0,846.0 110.0,842.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="217.5" y="827.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Hiển thị nơi nhận</text>
+<rect x="402.33333333333337" y="867.0" width="335.3333333333333" height="31.0" fill="white"/>
+<text x="570.0" y="887.92" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">[Chưa có xác nhận bàn giao]</text>
+<polyline points="570.0,975.0 335.0,975.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="345.0,979.0 335.0,975.0 345.0,971.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="452.5" y="926.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Chưa có xác nhận</text>
+<text x="452.5" y="956.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">bàn giao</text>
+<polyline points="335.0,1054.0 100.0,1054.0" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
+<polyline points="110.0,1058.0 100.0,1054.0 110.0,1050.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="217.5" y="1005.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Hiển thị tình trạng</text>
+<text x="217.5" y="1035.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">cần xử lý</text>
+<circle cx="100.0" cy="1128.0" r="10" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="100.0,1138.0 100.0,1166.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="83.0,1148.0 117.0,1148.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="100.0,1166.0 85.0,1187.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="100.0,1166.0 115.0,1187.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="100.0" y="1211.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Cán bộ</text>
+<text x="100.0" y="1241.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">tiếp nhận</text>
+<circle cx="335.0" cy="1163.0" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="303.0,1147.0 303.0,1179.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="303.0,1163.0 321.0,1163.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="335.0" y="1211.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Chuyển</text>
+<text x="335.0" y="1241.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">hồ sơ</text>
+<circle cx="570.0" cy="1163.0" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="563.0,1150.0 569.0,1146.0 576.0,1149.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="568.3842268941361,1141.3842268941362 576.0,1149.0 565.2328725055028,1148.7373871342807" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="570.0" y="1211.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Theo dõi</text>
+<text x="570.0" y="1241.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">bàn giao</text>
+<circle cx="805.0" cy="1163.0" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="787.0,1182.0 823.0,1182.0" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="805.0" y="1211.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Thông tin</text>
+<text x="805.0" y="1241.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">luân chuyển</text>
+<circle cx="1040.0" cy="1163.0" r="14" fill="#E2E2EF" stroke="#181818"/>
+<polyline points="1033.0,1150.0 1039.0,1146.0 1046.0,1149.0" fill="none" stroke="#181818" stroke-width="1"/>
+<polyline points="1038.3842268941362,1141.3842268941362 1046.0,1149.0 1035.2328725055027,1148.7373871342807" fill="none" stroke="#181818" stroke-width="1"/>
+<text x="1040.0" y="1211.92" font-family="Arial" font-size="24" font-weight="normal" text-anchor="middle">Cơ quan nhận</text>
+</svg>

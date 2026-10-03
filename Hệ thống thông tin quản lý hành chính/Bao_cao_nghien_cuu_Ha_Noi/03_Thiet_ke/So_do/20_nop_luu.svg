@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1050" viewBox="0 0 2000 1050">
+<rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="black"/></marker></defs>
+<text x="1000.0" y="46" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="bold">Vòng đời nộp lưu hồ sơ điện tử được đề xuất</text>
+<line x1="550" y1="265.0" x2="750" y2="265.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="544.0" y="211.0" width="211.0" height="37.0" fill="white"/>
+<text x="650.0" y="246.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Tạo danh mục</text>
+<line x1="1250" y1="265.0" x2="1450" y2="265.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1280.0" y="211.0" width="140.0" height="44.0" fill="white"/>
+<text x="1350.0" y="246.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Chuẩn bị</text>
+<line x1="1700.0" y1="360" x2="1700.0" y2="730" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1640.0" y="491.0" width="120.0" height="39.0" fill="white"/>
+<text x="1700.0" y="526.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Gửi gói</text>
+<line x1="1450" y1="825.0" x2="1250" y2="825.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1277.0" y="771.0" width="146.0" height="37.0" fill="white"/>
+<text x="1350.0" y="806.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Xác nhận</text>
+<line x1="750" y1="825.0" x2="550" y2="825.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="581.0" y="771.0" width="138.0" height="32.0" fill="white"/>
+<text x="650.0" y="806.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Theo dõi</text>
+<rect x="50" y="170" width="500" height="190" fill="white" stroke="black" stroke-width="3"/>
+<text x="300.0" y="253.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Hồ sơ kết thúc</text>
+<text x="300.0" y="296.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Chốt phiên bản và thành phần</text>
+<rect x="750" y="170" width="500" height="190" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="253.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Lập gói nộp lưu</text>
+<text x="1000.0" y="296.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Tài liệu, ý kiến, dữ liệu đặc tả</text>
+<rect x="1450" y="170" width="500" height="190" fill="white" stroke="black" stroke-width="3"/>
+<text x="1700.0" y="253.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Kiểm tra tại nơi nộp</text>
+<text x="1700.0" y="296.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Đủ thành phần và toàn vẹn</text>
+<rect x="1450" y="730" width="500" height="190" fill="white" stroke="black" stroke-width="3"/>
+<text x="1700.0" y="813.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Kho lưu trữ kiểm tra</text>
+<text x="1700.0" y="856.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Nhận hoặc yêu cầu bổ sung</text>
+<rect x="750" y="730" width="500" height="190" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="813.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Ghi biên nhận</text>
+<text x="1000.0" y="856.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Gói, phiên bản, mốc nhận</text>
+<rect x="50" y="730" width="500" height="190" fill="white" stroke="black" stroke-width="3"/>
+<text x="300.0" y="813.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Khai thác theo quyền</text>
+<text x="300.0" y="856.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Bảo quản và kiểm tra định kỳ</text>
+</svg>

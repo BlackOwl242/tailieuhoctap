@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1530"><rect width="100%" height="100%" fill="white"/>
+<text x="1100" y="64" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Biểu đồ lớp Tiện ích</text>
+<rect x="80" y="160" width="920" height="470" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<polyline points="80,250 1000,250" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="80,495 1000,495" fill="none" stroke="black" stroke-width="3"/>
+<text x="540" y="226" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">ThongBao</text>
+<text x="100" y="316" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− id: ĐịnhDanh</text>
+<text x="100" y="373" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ho_so_id: ĐịnhDanh</text>
+<text x="100" y="430" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− nguoi_nhan_id: ĐịnhDanh</text>
+<text x="100" y="487" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− kenh: Chuỗi</text>
+<text x="100" y="557" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">+ lapThongBao()</text>
+<rect x="1200" y="160" width="920" height="470" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<polyline points="1200,250 2120,250" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="1200,495 2120,495" fill="none" stroke="black" stroke-width="3"/>
+<text x="1660" y="226" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">PhanAnh</text>
+<text x="1220" y="316" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− id: ĐịnhDanh</text>
+<text x="1220" y="373" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ho_so_id: ĐịnhDanh</text>
+<text x="1220" y="430" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− chu_the_id: ĐịnhDanh</text>
+<text x="1220" y="487" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− loai: Chuỗi</text>
+<text x="1220" y="557" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">+ guiPhanAnh()</text>
+<rect x="80" y="840" width="920" height="470" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<polyline points="80,930 1000,930" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="80,1175 1000,1175" fill="none" stroke="black" stroke-width="3"/>
+<text x="540" y="906" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">TaiLieuHuongDan</text>
+<text x="100" y="996" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− id: ĐịnhDanh</text>
+<text x="100" y="1053" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ten: Chuỗi</text>
+<text x="100" y="1110" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− can_cu: Chuỗi</text>
+<text x="100" y="1167" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− so_phien_ban: SốNguyên</text>
+<text x="100" y="1237" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">+ traCuuCanCu()</text>
+<rect x="1200" y="840" width="920" height="470" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<polyline points="1200,930 2120,930" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="1200,1175 2120,1175" fill="none" stroke="black" stroke-width="3"/>
+<text x="1660" y="906" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">DiemTiepNhan</text>
+<text x="1220" y="996" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− id: ĐịnhDanh</text>
+<text x="1220" y="1053" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ma: Chuỗi</text>
+<text x="1220" y="1110" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− co_quan_id: ĐịnhDanh</text>
+<text x="1220" y="1167" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ten: Chuỗi</text>
+<text x="1220" y="1237" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">+ kiemTraHopLe()</text>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1050" viewBox="0 0 2000 1050">
+<rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="black"/></marker></defs>
+<text x="1000.0" y="46" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="bold">Phân rã tiến trình tiếp nhận và dữ liệu kiểm tra</text>
+<line x1="510" y1="175.0" x2="770" y2="175.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="575.0" y="121.0" width="129.0" height="39.0" fill="white"/>
+<text x="640.0" y="156.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Yêu cầu</text>
+<line x1="1500" y1="175.0" x2="1240" y2="175.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1276.0" y="121.0" width="187.0" height="46.0" fill="white"/>
+<text x="1370.0" y="156.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Thẩm quyền</text>
+<line x1="1005.0" y1="250" x2="1005.0" y2="450" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="932.0" y="296.0" width="145.0" height="39.0" fill="white"/>
+<text x="1005.0" y="331.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Đúng nơi</text>
+<line x1="770" y1="175.0" x2="510" y2="525.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="505.0" y="296.0" width="268.0" height="46.0" fill="white"/>
+<text x="640.0" y="331.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Ngoài thẩm quyền</text>
+<line x1="1500" y1="525.0" x2="1240" y2="525.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1295.0" y="471.0" width="149.0" height="39.0" fill="white"/>
+<text x="1370.0" y="506.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Thông tin</text>
+<line x1="770" y1="525.0" x2="510" y2="525.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="545.0" y="471.0" width="190.0" height="46.0" fill="white"/>
+<text x="640.0" y="506.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Chưa đầy đủ</text>
+<line x1="1005.0" y1="600" x2="1005.0" y2="800" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="950.0" y="646.0" width="109.0" height="39.0" fill="white"/>
+<text x="1005.0" y="681.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Hợp lệ</text>
+<line x1="770" y1="875.0" x2="510" y2="875.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="568.0" y="821.0" width="145.0" height="39.0" fill="white"/>
+<text x="640.0" y="856.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Chứng từ</text>
+<line x1="1240" y1="875.0" x2="1500" y2="875.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="1321.0" y="821.0" width="99.0" height="39.0" fill="white"/>
+<text x="1370.0" y="856.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Hồ sơ</text>
+<rect x="40" y="100" width="470" height="150" fill="white" stroke="black" stroke-width="3"/>
+<text x="275.0" y="184.5" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Yêu cầu đã gửi</text>
+<ellipse cx="1005.0" cy="175.0" rx="235.0" ry="75.0" fill="white" stroke="black" stroke-width="3"/>
+<text x="1005.0" y="163.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">1. Kiểm tra</text>
+<text x="1005.0" y="206.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">thẩm quyền</text>
+<rect x="1500" y="100" width="470" height="150" fill="white" stroke="black" stroke-width="3"/>
+<text x="1735.0" y="163.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">D1. Phiên bản</text>
+<text x="1735.0" y="206.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">thủ tục</text>
+<ellipse cx="1005.0" cy="525.0" rx="235.0" ry="75.0" fill="white" stroke="black" stroke-width="3"/>
+<text x="1005.0" y="513.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">2. Kiểm tra</text>
+<text x="1005.0" y="556.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">thành phần</text>
+<rect x="40" y="450" width="470" height="150" fill="white" stroke="black" stroke-width="3"/>
+<text x="275.0" y="513.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Phiếu bổ sung</text>
+<text x="275.0" y="556.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">hoặc từ chối</text>
+<rect x="1500" y="450" width="470" height="150" fill="white" stroke="black" stroke-width="3"/>
+<text x="1735.0" y="513.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">D2. Thành phần</text>
+<text x="1735.0" y="556.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">và căn cứ đại diện</text>
+<ellipse cx="1005.0" cy="875.0" rx="235.0" ry="75.0" fill="white" stroke="black" stroke-width="3"/>
+<text x="1005.0" y="863.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">3. Tiếp nhận</text>
+<text x="1005.0" y="906.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">và tính hạn</text>
+<rect x="40" y="800" width="470" height="150" fill="white" stroke="black" stroke-width="3"/>
+<text x="275.0" y="863.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Giấy tiếp nhận</text>
+<text x="275.0" y="906.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">và hẹn trả</text>
+<rect x="1500" y="800" width="470" height="150" fill="white" stroke="black" stroke-width="3"/>
+<text x="1735.0" y="863.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">D3. Hồ sơ</text>
+<text x="1735.0" y="906.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">và lịch sử</text>
+</svg>

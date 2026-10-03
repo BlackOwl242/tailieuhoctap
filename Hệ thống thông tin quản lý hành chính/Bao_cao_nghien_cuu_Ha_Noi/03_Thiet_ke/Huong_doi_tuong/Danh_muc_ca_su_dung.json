@@ -1,0 +1,1023 @@
+[
+  {
+    "id": "UC01",
+    "function": "CN01",
+    "group": 1,
+    "name": "Quản lý tài khoản",
+    "actor": "Quản trị được ủy quyền",
+    "entity": "TaiKhoan",
+    "tables": [
+      "tai_khoan",
+      "quyen_pham_vi"
+    ],
+    "operation": "capQuyen",
+    "inputs": "Căn cứ cấp quyền, cơ quan, vai trò, ngày hiệu lực",
+    "guard": "Người đề nghị không tự phê duyệt quyền của mình",
+    "steps": [
+      "Chọn tài khoản",
+      "Lập đề nghị cấp hoặc thu hồi quyền",
+      "Người có thẩm quyền phê duyệt",
+      "Kiểm tra quyền mới và nhật ký"
+    ],
+    "exception": "Quyền chưa được duyệt hoặc hết hiệu lực không được áp dụng",
+    "read_only": false,
+    "screen": "MH01",
+    "test": "OO01",
+    "controller": "DieuKhienTaiKhoan",
+    "route": "/nghien-cuu/chuc-nang/01",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC02",
+    "function": "CN02",
+    "group": 2,
+    "name": "Quản lý danh mục dùng chung",
+    "actor": "Quản trị nghiệp vụ",
+    "entity": "CoQuan",
+    "tables": [
+      "co_quan",
+      "diem_tiep_nhan"
+    ],
+    "operation": "congBoDanhMuc",
+    "inputs": "Mã, tên, loại đơn vị, thời gian hiệu lực",
+    "guard": "Mã không trùng và khoảng hiệu lực không chồng lấn",
+    "steps": [
+      "Chọn loại danh mục",
+      "Nhập mã và thời gian hiệu lực",
+      "Đối chiếu nguồn công bố",
+      "Công bố phiên bản được duyệt"
+    ],
+    "exception": "Đổi tên cơ quan không làm mất cơ quan gốc của hồ sơ cũ",
+    "read_only": false,
+    "screen": "MH02",
+    "test": "OO02",
+    "controller": "DieuKhienCoQuan",
+    "route": "/nghien-cuu/chuc-nang/02",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC03",
+    "function": "CN03",
+    "group": 2,
+    "name": "Công bố phiên bản thủ tục",
+    "actor": "Quản trị nghiệp vụ",
+    "entity": "PhienBanThuTuc",
+    "tables": [
+      "thu_tuc",
+      "phien_ban_thu_tuc",
+      "tuyen_xu_ly"
+    ],
+    "operation": "congBoPhienBan",
+    "inputs": "Mã quốc gia, quyết định, hiệu lực, mẫu, quy tắc hạn",
+    "guard": "Quyết định và tuyến xử lý đã được phê duyệt",
+    "steps": [
+      "Chọn mã thủ tục",
+      "Nhập phiên bản và căn cứ",
+      "Kiểm tra hạn và thành phần",
+      "Công bố theo ngày hiệu lực"
+    ],
+    "exception": "Không sửa phiên bản đã được hồ sơ sử dụng",
+    "read_only": false,
+    "screen": "MH03",
+    "test": "OO03",
+    "controller": "DieuKhienPhienBanThuTuc",
+    "route": "/nghien-cuu/chuc-nang/03",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC04",
+    "function": "CN04",
+    "group": 2,
+    "name": "Cấu hình trạng thái hồ sơ",
+    "actor": "Quản trị nghiệp vụ",
+    "entity": "PhienBanThuTuc",
+    "tables": [
+      "phien_ban_thu_tuc"
+    ],
+    "operation": "cauHinhTrangThai",
+    "inputs": "Trạng thái nguồn, đích, sự kiện, điều kiện và quyền",
+    "guard": "Nhánh xử lý có đường đến bước kết thúc; người chuyển bước có đúng quyền.",
+    "steps": [
+      "Chọn bản quy trình nháp",
+      "Khai báo trạng thái và sự kiện",
+      "Kiểm tra đường đi và điều kiện",
+      "Trình duyệt cấu hình"
+    ],
+    "exception": "Không gộp tài chính, giao nhận và đồng bộ vào trạng thái chuyên môn",
+    "read_only": false,
+    "screen": "MH04",
+    "test": "OO04",
+    "controller": "DieuKhienPhienBanThuTuc",
+    "route": "/nghien-cuu/chuc-nang/04",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC05",
+    "function": "CN05",
+    "group": 2,
+    "name": "Chuẩn bị và gửi hồ sơ điện tử",
+    "actor": "Người yêu cầu",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "chu_the",
+      "uy_quyen",
+      "thanh_phan_ho_so"
+    ],
+    "operation": "guiYeuCau",
+    "inputs": "Phiên bản thủ tục, chủ thể, tờ khai, tài liệu, mã yêu cầu",
+    "guard": "Đúng chủ thể, đủ trường bắt buộc và đúng tuyến",
+    "steps": [
+      "Chọn thủ tục và cơ quan",
+      "Kê khai và chọn tài liệu hợp lệ",
+      "Xem lại quan hệ đại diện và dữ liệu",
+      "Gửi và lưu mã giao dịch"
+    ],
+    "exception": "Mã gửi lặp trả lại kết quả cũ; thiếu kết nối giữ bản nháp",
+    "read_only": false,
+    "screen": "MH05",
+    "test": "OO05",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/05",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC06",
+    "function": "CN06",
+    "group": 2,
+    "name": "Luân chuyển hồ sơ",
+    "actor": "Cán bộ tiếp nhận",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "tuyen_xu_ly",
+      "tham_chieu_lien_thong"
+    ],
+    "operation": "chuyenTuyen",
+    "inputs": "Hồ sơ, nguồn, đích, căn cứ, phiên bản",
+    "guard": "Đích có thẩm quyền và xác nhận nhận đủ",
+    "steps": [
+      "Chọn hồ sơ cần chuyển",
+      "Xác định đích và căn cứ",
+      "Gửi gói bàn giao",
+      "Theo dõi xác nhận trước khi đóng trách nhiệm nguồn"
+    ],
+    "exception": "Giữ hạn pháp lý và mã hồ sơ; mất phản hồi không tạo hồ sơ mới",
+    "read_only": false,
+    "screen": "MH06",
+    "test": "OO06",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/06",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC07",
+    "function": "CN07",
+    "group": 2,
+    "name": "Thực hiện bước quy trình",
+    "actor": "Chuyên viên thụ lý",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "su_kien_xu_ly",
+      "phan_cong"
+    ],
+    "operation": "chuyenBuoc",
+    "inputs": "Hành động, phiên bản hồ sơ, bằng chứng xử lý",
+    "guard": "Đúng phân công, đúng trạng thái và đủ dữ liệu chuyển bước",
+    "steps": [
+      "Mở công việc được giao",
+      "Đọc bước hiện hành",
+      "Bổ sung bằng chứng xử lý",
+      "Thực hiện hành động được cho phép"
+    ],
+    "exception": "Phiên bản không khớp phải tải lại; không ghi đè ý kiến",
+    "read_only": false,
+    "screen": "MH07",
+    "test": "OO07",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/07",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC08",
+    "function": "CN08",
+    "group": 2,
+    "name": "Theo dõi tiến trình hồ sơ",
+    "actor": "Người yêu cầu",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "su_kien_xu_ly"
+    ],
+    "operation": "xemTienTrinh",
+    "inputs": "Mã hồ sơ và quan hệ truy cập",
+    "guard": "Chủ thể có quyền xem hồ sơ này",
+    "steps": [
+      "Nhập hoặc chọn mã hồ sơ",
+      "Xác nhận quan hệ truy cập",
+      "Xem mốc xử lý và hạn",
+      "Đọc thông báo cần thực hiện"
+    ],
+    "exception": "Chỉ hiển thị phần được công khai; không lộ ý kiến nội bộ",
+    "read_only": true,
+    "screen": "MH08",
+    "test": "OO08",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/08",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC09",
+    "function": "CN09",
+    "group": 2,
+    "name": "Thiết kế quy trình trực quan",
+    "actor": "Quản trị nghiệp vụ",
+    "entity": "PhienBanThuTuc",
+    "tables": [
+      "phien_ban_thu_tuc"
+    ],
+    "operation": "kiemTraDoThi",
+    "inputs": "Bước, cạnh, vai trò, điều kiện, thời hạn",
+    "guard": "Đồ thị hợp lệ, mọi nhánh có lối ra được xác định",
+    "steps": [
+      "Tạo bản nháp quy trình",
+      "Nối bước và khai báo điều kiện",
+      "Chạy kiểm tra cấu trúc",
+      "Trình duyệt trước khi áp dụng"
+    ],
+    "exception": "Nhánh song song phải có quy tắc tổng hợp; không tự đổi hồ sơ đang xử lý",
+    "read_only": false,
+    "screen": "MH09",
+    "test": "OO09",
+    "controller": "DieuKhienPhienBanThuTuc",
+    "route": "/nghien-cuu/chuc-nang/09",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC10",
+    "function": "CN10",
+    "group": 3,
+    "name": "Ký kết quả theo thẩm quyền",
+    "actor": "Lãnh đạo có thẩm quyền",
+    "entity": "KetQua",
+    "tables": [
+      "ket_qua",
+      "chu_ky"
+    ],
+    "operation": "kyBanDuThao",
+    "inputs": "Mã dự thảo, phiên bản, giá trị băm, chứng thư",
+    "guard": "Dự thảo được duyệt, chứng thư phù hợp và còn giá trị",
+    "steps": [
+      "Chọn đúng bản dự thảo",
+      "Đọc toàn bộ nội dung cần ký",
+      "Xác nhận ký trên phương tiện được cấp",
+      "Kiểm tra chữ ký trên chính tệp đã nhận"
+    ],
+    "exception": "Tệp thay đổi hoặc chứng thư không đạt thì không chuyển sang đã ký",
+    "read_only": false,
+    "screen": "MH10",
+    "test": "OO10",
+    "controller": "DieuKhienKetQua",
+    "route": "/nghien-cuu/chuc-nang/10",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC11",
+    "function": "CN11",
+    "group": 3,
+    "name": "Kết nối dịch vụ ký",
+    "actor": "Quản trị tích hợp",
+    "entity": "HeThongKetNoi",
+    "tables": [
+      "he_thong_ket_noi",
+      "chu_ky"
+    ],
+    "operation": "kiemTraKetNoiKy",
+    "inputs": "Nguồn ký, cấu hình xác thực, mã tương quan",
+    "guard": "Đúng hợp đồng và môi trường đã được cấp phép",
+    "steps": [
+      "Chọn dịch vụ ký",
+      "Khai báo cấu hình trong kho bí mật",
+      "Thử bằng tài liệu thử được phép",
+      "Đối chiếu phiên bản và kết quả ký"
+    ],
+    "exception": "Không ghi khóa bí mật vào hồ sơ hoặc nhật ký; chưa phản hồi không là ký thành công",
+    "read_only": false,
+    "screen": "MH11",
+    "test": "OO11",
+    "controller": "DieuKhienHeThongKetNoi",
+    "route": "/nghien-cuu/chuc-nang/11",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC12",
+    "function": "CN12",
+    "group": 4,
+    "name": "Kiểm tra và tiếp nhận hồ sơ",
+    "actor": "Cán bộ tiếp nhận",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "phien_ban_thu_tuc",
+      "lich_lam_viec"
+    ],
+    "operation": "tiepNhan",
+    "inputs": "Hồ sơ chờ nhận, thành phần, thẩm quyền, lịch",
+    "guard": "Đủ điều kiện theo phiên bản thủ tục đang áp dụng",
+    "steps": [
+      "Mở hồ sơ chờ tiếp nhận",
+      "Kiểm tra chủ thể và thành phần",
+      "Chọn nhận hoặc thông báo thiếu có căn cứ",
+      "Cấp mã chính thức và giấy hẹn"
+    ],
+    "exception": "Yêu cầu bổ sung khác từ chối; mốc 15 giờ chỉ áp dụng thủ tục có quy định",
+    "read_only": false,
+    "screen": "MH12",
+    "test": "OO12",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/12",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC13",
+    "function": "CN13",
+    "group": 4,
+    "name": "Yêu cầu và nhận bổ sung",
+    "actor": "Cán bộ tiếp nhận",
+    "entity": "YeuCauBoSung",
+    "tables": [
+      "ho_so",
+      "yeu_cau_bo_sung",
+      "thanh_phan_ho_so"
+    ],
+    "operation": "ghiNhanBoSung",
+    "inputs": "Hồ sơ, giai đoạn, nội dung thiếu, căn cứ, phản hồi",
+    "guard": "Bổ sung được đối chiếu với đúng yêu cầu còn mở",
+    "steps": [
+      "Chỉ rõ nội dung và căn cứ cần bổ sung",
+      "Gửi yêu cầu cho đúng người",
+      "Người yêu cầu gửi tài liệu",
+      "Kiểm tra và quay lại giai đoạn đã lưu"
+    ],
+    "exception": "Bổ sung không tự làm lại hạn; lưu giai đoạn tiếp nhận hoặc thẩm định",
+    "read_only": false,
+    "screen": "MH13",
+    "test": "OO13",
+    "controller": "DieuKhienYeuCauBoSung",
+    "route": "/nghien-cuu/chuc-nang/13",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC14",
+    "function": "CN14",
+    "group": 4,
+    "name": "Phân công xử lý",
+    "actor": "Lãnh đạo đơn vị",
+    "entity": "PhanCong",
+    "tables": [
+      "ho_so",
+      "phan_cong",
+      "tai_khoan"
+    ],
+    "operation": "giaoNhiemVu",
+    "inputs": "Hồ sơ, người nhận, phạm vi, phiên bản",
+    "guard": "Người nhận còn quyền và hồ sơ chưa kết thúc",
+    "steps": [
+      "Chọn hồ sơ đã nhận",
+      "Chọn người có thẩm quyền",
+      "Ghi trách nhiệm và căn cứ",
+      "Xác nhận phân công hiện hành"
+    ],
+    "exception": "Kết thúc phân công cũ và tạo phân công mới trong cùng giao dịch",
+    "read_only": false,
+    "screen": "MH14",
+    "test": "OO14",
+    "controller": "DieuKhienPhanCong",
+    "route": "/nghien-cuu/chuc-nang/14",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC15",
+    "function": "CN15",
+    "group": 4,
+    "name": "Thẩm định và phối hợp",
+    "actor": "Chuyên viên thụ lý",
+    "entity": "NhiemVuPhoiHop",
+    "tables": [
+      "ho_so",
+      "nhiem_vu_phoi_hop",
+      "ket_qua"
+    ],
+    "operation": "tongHopYKien",
+    "inputs": "Bằng chứng nguồn, ý kiến, dự thảo, nhiệm vụ",
+    "guard": "Đủ ý kiến bắt buộc hoặc có căn cứ xử lý thay thế",
+    "steps": [
+      "Đối chiếu dữ liệu chuyên ngành",
+      "Giao nhiệm vụ khi cần phối hợp",
+      "Kiểm tra ý kiến đã xác nhận",
+      "Lập dự thảo và trình duyệt"
+    ],
+    "exception": "Không dùng phản hồi lỗi như dữ liệu âm tính; ý kiến thay đổi phải tăng phiên bản",
+    "read_only": false,
+    "screen": "MH15",
+    "test": "OO15",
+    "controller": "DieuKhienNhiemVuPhoiHop",
+    "route": "/nghien-cuu/chuc-nang/15",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC16",
+    "function": "CN16",
+    "group": 4,
+    "name": "Phê duyệt và phát hành",
+    "actor": "Lãnh đạo có thẩm quyền",
+    "entity": "KetQua",
+    "tables": [
+      "ket_qua",
+      "chu_ky",
+      "ho_so",
+      "hang_doi_gui"
+    ],
+    "operation": "phatHanh",
+    "inputs": "Dự thảo, ý kiến, chữ ký, số văn bản",
+    "guard": "Đúng thẩm quyền, chữ ký hợp lệ và đủ căn cứ",
+    "steps": [
+      "Đọc dự thảo và căn cứ",
+      "Phê duyệt hoặc trả chỉnh sửa",
+      "Văn thư kiểm tra và cấp số",
+      "Phát hành bản bất biến cùng thông điệp gửi"
+    ],
+    "exception": "Phê duyệt khác phát hành; không sửa tệp đã ký để thêm nội dung",
+    "read_only": false,
+    "screen": "MH16",
+    "test": "OO16",
+    "controller": "DieuKhienKetQua",
+    "route": "/nghien-cuu/chuc-nang/16",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC17",
+    "function": "CN17",
+    "group": 4,
+    "name": "Dừng giải quyết theo căn cứ",
+    "actor": "Lãnh đạo có thẩm quyền",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "su_kien_xu_ly",
+      "khoan_thu"
+    ],
+    "operation": "dungGiaiQuyet",
+    "inputs": "Đề nghị dừng, căn cứ, người duyệt, nghĩa vụ còn lại",
+    "guard": "Không dừng hồ sơ đã kết thúc bằng thao tác thông thường",
+    "steps": [
+      "Mở đề nghị dừng",
+      "Kiểm tra căn cứ và tác động",
+      "Phê duyệt quyết định dừng",
+      "Thông báo và xử lý nghĩa vụ tài chính"
+    ],
+    "exception": "Yêu cầu rút của công dân chưa đồng nghĩa đã có quyết định dừng",
+    "read_only": false,
+    "screen": "MH17",
+    "test": "OO17",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/17",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC18",
+    "function": "CN18",
+    "group": 4,
+    "name": "Giao và xác nhận kết quả",
+    "actor": "Cán bộ trả kết quả",
+    "entity": "GiaoNhan",
+    "tables": [
+      "ket_qua",
+      "giao_nhan",
+      "chu_the"
+    ],
+    "operation": "xacNhanGiao",
+    "inputs": "Bản phát hành, người nhận, kênh và chứng cứ",
+    "guard": "Người nhận có quyền, kết quả đã phát hành",
+    "steps": [
+      "Chọn kết quả chính thức",
+      "Xác minh người nhận hoặc địa chỉ kho",
+      "Thực hiện giao và lấy bằng chứng",
+      "Xác nhận giao hoặc ghi lỗi giao"
+    ],
+    "exception": "Gửi thông báo không chứng minh người nhận đã nhận kết quả",
+    "read_only": false,
+    "screen": "MH18",
+    "test": "OO18",
+    "controller": "DieuKhienGiaoNhan",
+    "route": "/nghien-cuu/chuc-nang/18",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC19",
+    "function": "CN19",
+    "group": 5,
+    "name": "In và kết xuất tài liệu",
+    "actor": "Cán bộ tiếp nhận",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "ket_qua"
+    ],
+    "operation": "ketXuatTaiLieu",
+    "inputs": "Mã hồ sơ, mẫu, phiên bản và mục đích",
+    "guard": "Có quyền kết xuất và dùng đúng mẫu",
+    "steps": [
+      "Chọn chứng từ cần in",
+      "Kiểm tra phiên bản và dữ liệu",
+      "Xem trước bố cục",
+      "In hoặc tải bản được phép"
+    ],
+    "exception": "Bản dự thảo phải phân biệt bản chính thức; ghi nhật ký kết xuất",
+    "read_only": false,
+    "screen": "MH19",
+    "test": "OO19",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/19",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC20",
+    "function": "CN20",
+    "group": 5,
+    "name": "Gửi thông báo và nhắc việc",
+    "actor": "Cán bộ được giao",
+    "entity": "ThongBao",
+    "tables": [
+      "thong_bao",
+      "ho_so"
+    ],
+    "operation": "lapThongBao",
+    "inputs": "Sự kiện, người nhận, nội dung, kênh",
+    "guard": "Đúng người nhận, đúng mục đích và mức công khai",
+    "steps": [
+      "Chọn sự kiện hoặc lịch nhắc",
+      "Kiểm tra người nhận",
+      "Gửi qua kênh đã xác nhận",
+      "Theo dõi gửi thành công hoặc lỗi"
+    ],
+    "exception": "Không đưa dữ liệu nhạy cảm vào tin nhắn; thử lại giữ mã thông báo",
+    "read_only": false,
+    "screen": "MH20",
+    "test": "OO20",
+    "controller": "DieuKhienThongBao",
+    "route": "/nghien-cuu/chuc-nang/20",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC21",
+    "function": "CN21",
+    "group": 5,
+    "name": "Tra cứu theo phạm vi",
+    "actor": "Người được cấp quyền",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "ket_qua"
+    ],
+    "operation": "timKiemCoQuyen",
+    "inputs": "Từ khóa, bộ lọc, mục đích, trang kết quả",
+    "guard": "Phạm vi quyền được áp dụng trước khi trả kết quả",
+    "steps": [
+      "Nhập từ khóa và bộ lọc",
+      "Chọn phạm vi được giao",
+      "Xem kết quả đã lọc quyền",
+      "Mở hồ sơ hoặc kết xuất khi có quyền"
+    ],
+    "exception": "Không cho suy ra hồ sơ ngoài quyền từ tổng số hoặc gợi ý tìm kiếm",
+    "read_only": true,
+    "screen": "MH21",
+    "test": "OO21",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/21",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC22",
+    "function": "CN22",
+    "group": 5,
+    "name": "Tra cứu hướng dẫn cho cán bộ",
+    "actor": "Cán bộ được giao",
+    "entity": "TaiLieuHuongDan",
+    "tables": [
+      "tai_lieu_huong_dan"
+    ],
+    "operation": "traCuuCanCu",
+    "inputs": "Câu hỏi, thủ tục và ngày áp dụng",
+    "guard": "Tài liệu còn hiệu lực và có nguồn kiểm chứng",
+    "steps": [
+      "Chọn thủ tục và thời điểm",
+      "Nhập vấn đề cần hỗ trợ",
+      "Đọc hướng dẫn kèm nguồn",
+      "Đối chiếu trước khi đưa ra quyết định"
+    ],
+    "exception": "Nguồn hết hiệu lực phải cảnh báo; trợ giúp không tự phê duyệt hồ sơ",
+    "read_only": true,
+    "screen": "MH22",
+    "test": "OO22",
+    "controller": "DieuKhienTaiLieuHuongDan",
+    "route": "/nghien-cuu/chuc-nang/22",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC23",
+    "function": "CN23",
+    "group": 6,
+    "name": "Tổng hợp báo cáo theo kỳ",
+    "actor": "Người giám sát",
+    "entity": "MauBaoCao",
+    "tables": [
+      "mau_bao_cao",
+      "ho_so"
+    ],
+    "operation": "tongHopBaoCao",
+    "inputs": "Mẫu, kỳ, cơ quan, thời điểm chốt",
+    "guard": "Mẫu được duyệt và dữ liệu thuộc phạm vi được giao",
+    "steps": [
+      "Chọn mẫu và kỳ",
+      "Chốt nguồn dữ liệu",
+      "Kiểm tra tổng và ngoại lệ",
+      "Kết xuất báo cáo có dấu thời điểm"
+    ],
+    "exception": "Số liệu địa phương và bộ phải khử trùng; không cộng số khác kỳ",
+    "read_only": true,
+    "screen": "MH23",
+    "test": "OO23",
+    "controller": "DieuKhienMauBaoCao",
+    "route": "/nghien-cuu/chuc-nang/23",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC24",
+    "function": "CN24",
+    "group": 6,
+    "name": "Quản lý mẫu báo cáo",
+    "actor": "Quản trị nghiệp vụ",
+    "entity": "MauBaoCao",
+    "tables": [
+      "mau_bao_cao"
+    ],
+    "operation": "congBoMauBaoCao",
+    "inputs": "Cột, công thức, bộ lọc, hiệu lực",
+    "guard": "Công thức có mẫu đối chiếu và người phê duyệt",
+    "steps": [
+      "Tạo phiên bản mẫu",
+      "Khai báo công thức và điều kiện loại trừ",
+      "Đối chiếu dữ liệu mẫu",
+      "Phê duyệt và công bố"
+    ],
+    "exception": "Không thay công thức ngầm trong báo cáo đã chốt",
+    "read_only": false,
+    "screen": "MH24",
+    "test": "OO24",
+    "controller": "DieuKhienMauBaoCao",
+    "route": "/nghien-cuu/chuc-nang/24",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC25",
+    "function": "CN25",
+    "group": 6,
+    "name": "Thống kê hồ sơ",
+    "actor": "Người giám sát",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "tham_chieu_lien_thong"
+    ],
+    "operation": "thongKeHoSo",
+    "inputs": "Chiều phân tích, phạm vi, kỳ, mốc nguồn",
+    "guard": "Tập hồ sơ chuẩn và quy tắc mẫu số đã được xác định",
+    "steps": [
+      "Chọn chỉ tiêu cần thống kê",
+      "Chọn cơ quan và thời gian",
+      "Đọc công thức và ngoại lệ",
+      "Đối chiếu hồ sơ tạo nên kết quả"
+    ],
+    "exception": "Hiển thị dữ liệu chậm cập nhật; không suy chỉ tiêu hoàn thành từ lỗi đồng bộ",
+    "read_only": true,
+    "screen": "MH25",
+    "test": "OO25",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/25",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC26",
+    "function": "CN26",
+    "group": 7,
+    "name": "Theo dõi và truy vấn điều hành",
+    "actor": "Lãnh đạo đơn vị",
+    "entity": "HoSo",
+    "tables": [
+      "ho_so",
+      "phan_cong",
+      "lich_lam_viec"
+    ],
+    "operation": "truyVanDieuHanh",
+    "inputs": "Trách nhiệm, hạn, trạng thái và phạm vi",
+    "guard": "Chỉ truy vấn đơn vị được giao quản lý",
+    "steps": [
+      "Chọn đơn vị và mốc theo dõi",
+      "Lọc hồ sơ sắp hạn hoặc quá hạn",
+      "Xem người chịu trách nhiệm",
+      "Giao việc theo thẩm quyền"
+    ],
+    "exception": "Quá hạn là chiều tính toán; cảnh báo không tự dừng hạn pháp lý",
+    "read_only": true,
+    "screen": "MH26",
+    "test": "OO26",
+    "controller": "DieuKhienHoSo",
+    "route": "/nghien-cuu/chuc-nang/26",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC27",
+    "function": "CN27",
+    "group": 7,
+    "name": "Ban hành chỉ đạo xử lý",
+    "actor": "Lãnh đạo đơn vị",
+    "entity": "ChiDaoDieuHanh",
+    "tables": [
+      "chi_dao_dieu_hanh",
+      "ho_so"
+    ],
+    "operation": "banHanhChiDao",
+    "inputs": "Nội dung, nơi nhận, hạn và hồ sơ liên quan",
+    "guard": "Người chỉ đạo có quyền và nơi nhận được xác định",
+    "steps": [
+      "Lập chỉ đạo",
+      "Xác định trách nhiệm và hạn báo cáo",
+      "Gửi và theo dõi tiếp nhận",
+      "Đánh giá phản hồi và kết thúc"
+    ],
+    "exception": "Chỉ đạo không thay thế quyết định giải quyết của người có thẩm quyền",
+    "read_only": false,
+    "screen": "MH27",
+    "test": "OO27",
+    "controller": "DieuKhienChiDaoDieuHanh",
+    "route": "/nghien-cuu/chuc-nang/27",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC28",
+    "function": "CN28",
+    "group": 8,
+    "name": "Quản trị tài liệu trong kho",
+    "actor": "Quản trị kho được giao",
+    "entity": "TaiLieuKho",
+    "tables": [
+      "tai_lieu_kho",
+      "quyen_khai_thac_kho"
+    ],
+    "operation": "capQuyenKho",
+    "inputs": "Chủ thể, tài liệu, nguồn, phiên bản, quyền",
+    "guard": "Đúng chủ sở hữu, căn cứ quyền và hạn bảo quản",
+    "steps": [
+      "Kiểm tra nguồn tài liệu",
+      "Phân loại và ghi hiệu lực",
+      "Cấp hoặc thu hồi quyền",
+      "Theo dõi phiên bản bị thay thế"
+    ],
+    "exception": "Không cho quản trị kỹ thuật mặc nhiên đọc kho của mọi công dân",
+    "read_only": false,
+    "screen": "MH28",
+    "test": "OO28",
+    "controller": "DieuKhienTaiLieuKho",
+    "route": "/nghien-cuu/chuc-nang/28",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC29",
+    "function": "CN29",
+    "group": 8,
+    "name": "Tái sử dụng tài liệu trong kho",
+    "actor": "Người yêu cầu",
+    "entity": "TaiLieuKho",
+    "tables": [
+      "tai_lieu_kho",
+      "thanh_phan_ho_so"
+    ],
+    "operation": "dungLaiTaiLieu",
+    "inputs": "Hồ sơ đích, tài liệu, mục đích sử dụng",
+    "guard": "Tài liệu hợp lệ, đúng chủ thể và phù hợp thủ tục đích",
+    "steps": [
+      "Chọn hồ sơ đang kê khai",
+      "Chọn tài liệu được phép dùng",
+      "Đối chiếu hiệu lực và nội dung",
+      "Gắn tham chiếu nguồn vào thành phần"
+    ],
+    "exception": "Tệp đã bị thay thế hoặc thu hồi quyền không được tự coi là hợp lệ",
+    "read_only": false,
+    "screen": "MH29",
+    "test": "OO29",
+    "controller": "DieuKhienTaiLieuKho",
+    "route": "/nghien-cuu/chuc-nang/29",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC30",
+    "function": "CN30",
+    "group": 9,
+    "name": "Nhận sự kiện từ hệ thống kết nối",
+    "actor": "Hệ thống đối tác",
+    "entity": "ThongDiepNhan",
+    "tables": [
+      "thong_diep_nhan",
+      "tham_chieu_lien_thong",
+      "he_thong_ket_noi"
+    ],
+    "operation": "nhanSuKien",
+    "inputs": "Nguồn, mã sự kiện, thứ tự, chữ ký, nội dung",
+    "guard": "Nguồn hợp lệ, đúng hợp đồng và không sai thứ tự",
+    "steps": [
+      "Xác nhận hợp đồng và danh tính nguồn",
+      "Tiếp nhận thông điệp",
+      "Kiểm tra trùng và thứ tự",
+      "Áp dụng sự kiện hoặc đưa vào đối soát"
+    ],
+    "exception": "Cùng mã khác nội dung bị cách ly; sự kiện cũ không ghi lùi trạng thái",
+    "read_only": false,
+    "screen": "MH30",
+    "test": "OO30",
+    "controller": "DieuKhienThongDiepNhan",
+    "route": "/nghien-cuu/chuc-nang/30",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC31",
+    "function": "CN31",
+    "group": 9,
+    "name": "Trao đổi với cổng quốc gia",
+    "actor": "Tiến trình tích hợp",
+    "entity": "HangDoiGui",
+    "tables": [
+      "hang_doi_gui",
+      "ho_so",
+      "tham_chieu_lien_thong"
+    ],
+    "operation": "guiThongDiep",
+    "inputs": "Đích nhận, mã tương quan, hồ sơ, phiên bản",
+    "guard": "Thông điệp được tạo từ giao dịch nghiệp vụ đã lưu",
+    "steps": [
+      "Lấy thông điệp đến hạn gửi",
+      "Gửi cùng mã tương quan",
+      "Đọc biên nhận theo hợp đồng",
+      "Xác nhận thành công hoặc lập lịch thử lại"
+    ],
+    "exception": "Mất phản hồi không tạo hồ sơ mới; chưa áp dụng khác đã nhận thông điệp",
+    "read_only": false,
+    "screen": "MH31",
+    "test": "OO31",
+    "controller": "DieuKhienHangDoiGui",
+    "route": "/nghien-cuu/chuc-nang/31",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC32",
+    "function": "MR01",
+    "group": 4,
+    "name": "Thanh toán khoản thu",
+    "actor": "Người yêu cầu",
+    "entity": "KhoanThu",
+    "tables": [
+      "khoan_thu",
+      "giao_dich"
+    ],
+    "operation": "taoGiaoDichThu",
+    "inputs": "Khoản thu còn nợ, số tiền, căn cứ miễn giảm",
+    "guard": "Khoản thu thực sự áp dụng và đúng người trả",
+    "steps": [
+      "Kiểm tra thông báo thu",
+      "Chọn phương thức được hỗ trợ",
+      "Xác nhận tại đơn vị thanh toán",
+      "Theo dõi giao dịch và chứng từ"
+    ],
+    "exception": "Thủ tục không thu phí bỏ qua; không dùng ảnh màn hình thay đối soát",
+    "read_only": false,
+    "screen": "MH32",
+    "test": "OO32",
+    "controller": "DieuKhienKhoanThu",
+    "route": "/nghien-cuu/chuc-nang/32",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC33",
+    "function": "MR02",
+    "group": 6,
+    "name": "Đối soát thu và hoàn",
+    "actor": "Cán bộ tài chính",
+    "entity": "GiaoDich",
+    "tables": [
+      "giao_dich",
+      "khoan_thu"
+    ],
+    "operation": "doiSoat",
+    "inputs": "Mã đối tác, giao dịch, tiền, trạng thái, kỳ",
+    "guard": "Thông báo được xác thực và mã giao dịch duy nhất",
+    "steps": [
+      "Lấy số liệu đối tác theo kỳ",
+      "Ghép mã giao dịch và khoản thu",
+      "Xử lý chênh lệch có căn cứ",
+      "Chốt đối soát hoặc đề nghị hoàn"
+    ],
+    "exception": "Thông báo lặp không cộng tiền; giao dịch hoàn cần phê duyệt riêng",
+    "read_only": false,
+    "screen": "MH33",
+    "test": "OO33",
+    "controller": "DieuKhienGiaoDich",
+    "route": "/nghien-cuu/chuc-nang/33",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC34",
+    "function": "MR03",
+    "group": 4,
+    "name": "Số hóa hồ sơ giấy",
+    "actor": "Cán bộ tiếp nhận",
+    "entity": "ThanhPhanHoSo",
+    "tables": [
+      "thanh_phan_ho_so",
+      "ho_so"
+    ],
+    "operation": "xacNhanSoHoa",
+    "inputs": "Tệp, số trang, loại, nguồn và người đối chiếu",
+    "guard": "Đọc được, đầy đủ, đúng hồ sơ và đúng quy định xác nhận",
+    "steps": [
+      "Chọn thành phần cần số hóa",
+      "Quét đủ trang và kiểm tra hình ảnh",
+      "Đối chiếu với giấy được xuất trình",
+      "Lưu phiên bản và bằng chứng xác nhận"
+    ],
+    "exception": "Tệp mờ hoặc thiếu trang phải làm lại; không xác nhận thay người có thẩm quyền",
+    "read_only": false,
+    "screen": "MH34",
+    "test": "OO34",
+    "controller": "DieuKhienThanhPhanHoSo",
+    "route": "/nghien-cuu/chuc-nang/34",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC35",
+    "function": "MR04",
+    "group": 5,
+    "name": "Gửi phản ánh và đánh giá",
+    "actor": "Người yêu cầu",
+    "entity": "PhanAnh",
+    "tables": [
+      "phan_anh_kien_nghi",
+      "ho_so"
+    ],
+    "operation": "guiPhanAnh",
+    "inputs": "Loại phản ánh, nội dung, liên hệ, hồ sơ nếu có",
+    "guard": "Đúng kênh, không trùng yêu cầu cùng nội dung",
+    "steps": [
+      "Chọn loại phản ánh hoặc đánh giá",
+      "Nhập nội dung và tài liệu cần thiết",
+      "Gửi và lưu mã theo dõi",
+      "Đọc trả lời hoặc yêu cầu bổ sung"
+    ],
+    "exception": "Phản ánh không tự sửa quyết định hồ sơ; khiếu nại dùng quy trình pháp lý riêng",
+    "read_only": false,
+    "screen": "MH35",
+    "test": "OO35",
+    "controller": "DieuKhienPhanAnh",
+    "route": "/nghien-cuu/chuc-nang/35",
+    "status": "Thiết kế đề xuất"
+  },
+  {
+    "id": "UC36",
+    "function": "MR05",
+    "group": 8,
+    "name": "Lập gói và nộp lưu hồ sơ",
+    "actor": "Cán bộ lưu trữ",
+    "entity": "HoSoNopLuu",
+    "tables": [
+      "ho_so_nop_luu",
+      "dot_nop_luu",
+      "ho_so"
+    ],
+    "operation": "nopLuu",
+    "inputs": "Danh mục tệp, phiên bản, giá trị băm, thời hạn giữ",
+    "guard": "Hồ sơ kết thúc và đủ thành phần được duyệt",
+    "steps": [
+      "Chốt hồ sơ và phiên bản",
+      "Lập danh mục gói nộp lưu",
+      "Kiểm tra đủ tệp và toàn vẹn",
+      "Gửi gói và lưu biên nhận"
+    ],
+    "exception": "Kho công dân khác lưu trữ cơ quan; bị trả gói phải bổ sung đúng phiên bản",
+    "read_only": false,
+    "screen": "MH36",
+    "test": "OO36",
+    "controller": "DieuKhienHoSoNopLuu",
+    "route": "/nghien-cuu/chuc-nang/36",
+    "status": "Thiết kế đề xuất"
+  }
+]

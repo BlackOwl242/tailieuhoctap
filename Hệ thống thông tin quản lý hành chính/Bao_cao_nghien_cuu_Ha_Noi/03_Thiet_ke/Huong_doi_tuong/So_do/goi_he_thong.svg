@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1140"><rect width="100%" height="100%" fill="white"/>
+<text x="1000" y="64" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Các gói trách nhiệm của thiết kế</text>
+<rect x="70" y="130" width="580" height="220" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<rect x="70" y="100" width="220" height="30" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="360" y="209" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">1. Tài khoản và quyền</text>
+<rect x="720" y="130" width="580" height="220" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<rect x="720" y="100" width="220" height="30" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1010" y="209" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">2. Danh mục và quy</text>
+<text x="1010" y="266" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">trình</text>
+<rect x="1370" y="130" width="580" height="220" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<rect x="1370" y="100" width="220" height="30" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1660" y="209" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">3. Chữ ký số</text>
+<rect x="70" y="430" width="580" height="220" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<rect x="70" y="400" width="220" height="30" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="360" y="509" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">4. Tiếp nhận và giải</text>
+<text x="360" y="566" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">quyết</text>
+<polyline points="360,430 360,350" fill="none" stroke="black" stroke-width="3" stroke-dasharray="14 10"/>
+<polygon points="360,350 352.0,370.0 368.0,370.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="720" y="430" width="580" height="220" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<rect x="720" y="400" width="220" height="30" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1010" y="509" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">5. Tiện ích</text>
+<rect x="1370" y="430" width="580" height="220" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<rect x="1370" y="400" width="220" height="30" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1660" y="509" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">6. Thống kê và báo cáo</text>
+<rect x="70" y="730" width="580" height="220" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<rect x="70" y="700" width="220" height="30" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="360" y="809" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">7. Điều hành tác</text>
+<text x="360" y="866" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">nghiệp</text>
+<polyline points="360,730 360,650" fill="none" stroke="black" stroke-width="3" stroke-dasharray="14 10"/>
+<polygon points="360,650 352.0,670.0 368.0,670.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="720" y="730" width="580" height="220" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<rect x="720" y="700" width="220" height="30" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1010" y="809" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">8. Kho dữ liệu</text>
+<rect x="1370" y="730" width="580" height="220" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<rect x="1370" y="700" width="220" height="30" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1660" y="809" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">9. Tích hợp và liên</text>
+<text x="1660" y="866" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">thông</text>
+<polyline points="720,540 650,540" fill="none" stroke="black" stroke-width="3" stroke-dasharray="14 10"/>
+<polygon points="650,540 670.0,548.0 670.0,532.0" fill="black" stroke="black" stroke-width="3"/>
+</svg>

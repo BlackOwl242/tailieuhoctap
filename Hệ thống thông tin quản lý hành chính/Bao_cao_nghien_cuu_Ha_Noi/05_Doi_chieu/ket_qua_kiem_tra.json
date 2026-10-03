@@ -1,0 +1,3398 @@
+{
+  "pages": 144,
+  "tables": 134,
+  "figures": 22,
+  "checks": [
+    {
+      "criterion": "Giữ nguyên tài liệu tham chiếu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Hai phần tài liệu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Phần 1: page_width",
+      "passed": true,
+      "detail": "7560945"
+    },
+    {
+      "criterion": "Phần 1: page_height",
+      "passed": true,
+      "detail": "10692765"
+    },
+    {
+      "criterion": "Phần 1: top_margin",
+      "passed": true,
+      "detail": "720090"
+    },
+    {
+      "criterion": "Phần 1: bottom_margin",
+      "passed": true,
+      "detail": "720090"
+    },
+    {
+      "criterion": "Phần 1: left_margin",
+      "passed": true,
+      "detail": "1080135"
+    },
+    {
+      "criterion": "Phần 1: right_margin",
+      "passed": true,
+      "detail": "720090"
+    },
+    {
+      "criterion": "Phần 1: header_distance",
+      "passed": true,
+      "detail": "457200"
+    },
+    {
+      "criterion": "Phần 1: footer_distance",
+      "passed": true,
+      "detail": "457200"
+    },
+    {
+      "criterion": "Phần 2: page_width",
+      "passed": true,
+      "detail": "7560945"
+    },
+    {
+      "criterion": "Phần 2: page_height",
+      "passed": true,
+      "detail": "10692765"
+    },
+    {
+      "criterion": "Phần 2: top_margin",
+      "passed": true,
+      "detail": "720090"
+    },
+    {
+      "criterion": "Phần 2: bottom_margin",
+      "passed": true,
+      "detail": "720090"
+    },
+    {
+      "criterion": "Phần 2: left_margin",
+      "passed": true,
+      "detail": "1080135"
+    },
+    {
+      "criterion": "Phần 2: right_margin",
+      "passed": true,
+      "detail": "720090"
+    },
+    {
+      "criterion": "Phần 2: header_distance",
+      "passed": true,
+      "detail": "457200"
+    },
+    {
+      "criterion": "Phần 2: footer_distance",
+      "passed": true,
+      "detail": "457200"
+    },
+    {
+      "criterion": "Kiểu Normal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Kiểu Heading 1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Kiểu Heading 2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Kiểu Heading 3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Không có tiêu đề cấp bốn",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 1.2.1. Mục tiêu nghiên cứu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 1.2.2. Câu hỏi nghiên cứu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 1.4.1. Phân tích tài liệu và khảo sát công khai",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 1.4.2. Phân loại độ chắc chắn của thông tin",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 1.4.3. Phương pháp mô hình hóa và truy vết",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.1.1. Bằng chứng về sự tồn tại và quá trình vận hành",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.2.1. Căn cứ cho cơ chế một cửa và giao dịch điện tử",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.2.2. Biểu mẫu hành chính và giới hạn suy diễn",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.2.3. Căn cứ kỹ thuật và thay đổi pháp luật năm 2026",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.3.1. Đặc điểm được xác nhận từ phương án công khai",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.3.2. Đọc số liệu lịch sử và đánh giá tác động",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.6.1. Chín nhóm chức năng và mức độ chứng cứ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.6.2. Tiếp nhận đa kênh và thay đổi tổ chức",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.10.1. Xác định đúng đối tượng và đường dẫn",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.10.2. Ba cách phân nhánh cần được phân biệt",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.10.3. Luồng hoạt động và các nhánh có điều kiện",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 2.10.4. Phạm vi xác nhận hiện trạng và chiều sâu phân tích",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.3.1. Quy tắc về thành phần hồ sơ và dữ liệu dùng lại",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.3.2. Quy tắc thời hạn và quá hạn",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.4.1. Nộp yêu cầu trực tuyến",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.4.2. Kiểm tra và tiếp nhận",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.4.3. Thẩm định và trình ký",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.4.4. Ký, phát hành và giao kết quả",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.4.5. Đối soát tài chính và dừng yêu cầu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.7.1. Phân biệt quy trình dùng chung và nghiệp vụ chuyên ngành",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.7.2. Luồng phối hợp và điều kiện tổng hợp",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.7.3. Kho, phản ánh và trợ giúp nghiệp vụ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.9.1. Nhánh tài khoản",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.9.2. Nhánh danh mục, biểu mẫu và hồ sơ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.9.3. Nhánh chữ ký số",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.9.4. Nhánh tiếp nhận và giải quyết",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.9.5. Nhánh tiện ích hỗ trợ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.9.6. Nhánh thống kê và báo cáo",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.9.7. Nhánh điều hành tác nghiệp",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.9.8. Nhánh kho dữ liệu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 3.9.9. Nhánh tích hợp và liên thông",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.1.1. Phân tách các tầng trách nhiệm",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.1.2. So sánh phương án triển khai thành phần",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.2.1. Mô hình trạng thái hồ sơ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.2.2. Bất biến và điều kiện chuyển bước",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.3.1. Thực thể và quan hệ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.3.2. Chuẩn hóa, chỉ mục và lịch sử",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.3.3. Từ điển dữ liệu chi tiết",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.3.4. Vòng đời tài liệu và dữ liệu cá nhân",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.4.1. Hợp đồng giao tiếp đề xuất",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.4.2. Nhất quán và thử lại khi tích hợp thất bại",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.5.1. Danh sách và chi tiết hồ sơ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.5.2. Tiếp cận và phòng ngừa sai sót",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.7.1. Định tuyến và quyền xác nhận trạng thái",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.7.2. Nhận sự kiện và phục hồi sau lỗi",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.7.3. Giao tiếp bổ sung và phạm vi đặc tả",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.8.1. Kho phục vụ công dân và lưu trữ cơ quan",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.8.2. Phân loại và quyết định bảo quản",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.8.3. Ranh giới an toàn và kiểm soát truy cập đặc quyền",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.9.1. Dữ liệu quản lý nhánh và nguồn hướng dẫn",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.9.2. Cấu hình quy trình có thể kiểm tra",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 4.9.3. Ranh giới giao tiếp và thiết kế chức năng",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.1.1. Phân chia môi trường",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.1.2. Phân vùng và quản lý cấu hình",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.2.1. Lộ trình thử nghiệm và mở rộng",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.2.2. Chuyển dữ liệu và kiểm tra toàn vẹn",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.2.3. Quy trình quay lui",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.3.1. Giám sát kỹ thuật và nghiệp vụ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.3.2. Tiếp nhận và xử lý sự cố",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.4.1. Phạm vi và chiến lược sao lưu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.4.2. Diễn tập phục hồi",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.6.1. Phương pháp xác định tải",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.6.2. Khả năng phục hồi tải và ưu tiên dịch vụ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.7.1. Sổ tay xử lý sự cố theo điểm phụ thuộc",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 5.7.2. Chuyển đơn vị, tuyến và nhà cung cấp",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 6.3.1. Phiên bản và quyền hồ sơ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 6.3.2. Kê khai và tiếp nhận",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 6.3.3. Ngoại lệ, phân công và thẩm định",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 6.3.4. Ký, phát hành và tài chính",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 6.3.5. Trả kết quả và thời hạn",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 6.3.6. Dừng, đồng thời và quản trị",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 6.8.1. Dữ liệu và ma trận lựa chọn thủ tục",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 6.8.2. Kiểm chứng từ đầu đến cuối và quyết định nghiệm thu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 7.3.1. Quy trình thay đổi cấu hình",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 7.3.2. Chất lượng và bảo vệ dữ liệu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 7.5.1. Giá trị của phương án nghiên cứu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 7.5.2. Kiến nghị theo thứ tự ưu tiên",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 7.6.1. Đánh giá chi phí và lợi ích",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 7.6.2. Quản trị nhà cung cấp và khả năng tiếp quản",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 7.6.3. Danh mục rủi ro và chủ thể xử lý",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 7.7.1. Hai mươi khía cạnh của toàn hệ thống",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cấp ba không đậm và có chữ nghiêng: 7.7.2. Điều kiện khép kín nghiên cứu thực địa",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Mục lục chỉ hai cấp",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Không có mục lục cấp ba",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Có danh mục bảng",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Có danh mục hình",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Không dấu gạch ngang kép",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Không từ đề tài cũ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Không chú giải tiếng Anh trong ngoặc",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Không tiêu đề bốn số",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Không còn trường chưa cập nhật",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 1 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 1 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 1 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 1 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 2 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 2 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 2 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 2 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 3 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 3 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 3 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 3 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 4 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 4 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 4 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 4 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 5 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 5 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 5 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 5 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 6 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 6 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 6 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 6 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 7 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 7 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 7 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 7 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 8 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 8 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 8 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 8 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 9 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 9 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 9 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 9 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 10 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 10 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 10 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 10 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 11 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 11 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 11 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 11 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 12 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 12 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 12 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 12 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 13 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 13 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 13 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 13 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 14 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 14 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 14 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 14 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 15 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 15 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 15 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 15 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 16 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 16 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 16 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 16 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 17 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 17 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 17 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 17 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 18 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 18 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 18 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 18 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 19 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 19 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 19 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 19 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 20 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 20 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 20 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 20 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 21 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 21 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 21 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 21 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 22 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 22 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 22 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 22 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 23 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 23 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 23 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 23 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 24 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 24 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 24 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 24 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 25 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 25 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 25 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 25 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 26 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 26 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 26 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 26 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 27 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 27 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 27 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 27 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 28 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 28 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 28 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 28 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 29 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 29 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 29 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 29 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 30 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 30 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 30 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 30 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 31 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 31 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 31 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 31 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 32 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 32 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 32 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 32 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 33 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 33 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 33 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 33 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 34 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 34 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 34 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 34 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 35 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 35 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 35 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 35 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 36 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 36 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 36 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 36 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 37 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 37 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 37 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 37 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 38 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 38 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 38 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 38 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 39 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 39 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 39 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 39 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 40 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 40 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 40 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 40 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 41 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 41 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 41 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 41 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 42 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 42 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 42 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 42 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 43 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 43 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 43 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 43 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 44 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 44 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 44 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 44 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 45 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 45 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 45 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 45 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 46 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 46 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 46 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 46 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 47 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 47 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 47 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 47 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 48 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 48 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 48 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 48 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 49 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 49 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 49 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 49 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 50 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 50 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 50 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 50 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 51 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 51 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 51 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 51 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 52 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 52 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 52 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 52 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 53 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 53 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 53 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 53 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 54 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 54 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 54 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 54 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 55 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 55 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 55 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 55 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 56 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 56 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 56 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 56 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 57 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 57 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 57 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 57 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 58 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 58 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 58 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 58 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 59 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 59 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 59 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 59 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 60 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 60 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 60 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 60 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 61 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 61 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 61 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 61 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 62 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 62 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 62 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 62 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 63 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 63 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 63 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 63 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 64 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 64 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 64 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 64 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 65 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 65 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 65 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 65 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 66 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 66 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 66 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 66 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 67 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 67 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 67 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 67 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 68 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 68 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 68 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 68 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 69 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 69 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 69 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 69 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 70 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 70 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 70 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 70 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 71 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 71 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 71 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 71 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 72 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 72 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 72 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 72 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 73 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 73 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 73 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 73 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 74 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 74 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 74 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 74 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 75 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 75 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 75 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 75 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 76 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 76 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 76 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 76 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 77 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 77 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 77 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 77 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 78 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 78 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 78 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 78 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 79 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 79 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 79 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 79 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 80 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 80 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 80 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 80 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 81 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 81 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 81 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 81 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 82 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 82 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 82 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 82 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 83 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 83 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 83 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 83 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 84 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 84 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 84 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 84 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 85 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 85 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 85 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 85 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 86 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 86 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 86 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 86 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 87 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 87 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 87 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 87 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 88 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 88 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 88 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 88 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 89 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 89 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 89 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 89 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 90 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 90 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 90 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 90 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 91 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 91 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 91 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 91 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 92 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 92 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 92 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 92 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 93 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 93 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 93 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 93 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 94 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 94 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 94 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 94 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 95 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 95 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 95 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 95 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 96 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 96 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 96 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 96 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 97 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 97 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 97 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 97 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 98 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 98 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 98 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 98 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 99 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 99 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 99 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 99 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 100 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 100 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 100 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 100 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 101 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 101 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 101 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 101 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 102 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 102 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 102 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 102 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 103 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 103 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 103 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 103 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 104 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 104 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 104 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 104 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 105 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 105 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 105 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 105 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 106 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 106 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 106 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 106 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 107 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 107 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 107 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 107 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 108 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 108 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 108 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 108 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 109 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 109 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 109 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 109 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 110 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 110 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 110 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 110 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 111 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 111 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 111 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 111 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 112 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 112 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 112 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 112 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 113 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 113 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 113 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 113 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 114 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 114 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 114 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 114 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 115 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 115 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 115 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 115 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 116 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 116 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 116 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 116 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 117 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 117 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 117 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 117 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 118 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 118 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 118 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 118 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 119 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 119 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 119 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 119 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 120 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 120 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 120 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 120 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 121 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 121 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 121 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 121 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 122 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 122 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 122 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 122 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 123 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 123 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 123 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 123 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 124 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 124 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 124 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 124 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 125 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 125 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 125 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 125 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 126 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 126 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 126 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 126 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 127 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 127 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 127 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 127 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 128 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 128 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 128 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 128 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 129 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 129 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 129 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 129 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 130 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 130 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 130 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 130 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 131 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 131 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 131 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 131 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 132 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 132 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 132 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 132 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 133 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 133 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 133 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 133 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 134 giữ đường viền và lề ô",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 134 lặp hàng tiêu đề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 134 không chia hàng qua trang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảng 134 không vượt lề",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Từ điển có đủ 35 thực thể",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Cột rỗng của từ điển đủ rộng",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Ma trận quyền có các cột đọc được",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Khóa ngoại có bảng đích",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Có 10 giao tiếp tham chiếu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Có 95 ca và không ghi kết quả thử chưa thực hiện",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Giảng viên đúng yêu cầu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Sinh viên duy nhất đúng yêu cầu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Tác giả tài liệu đúng yêu cầu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Có ma trận hai mươi khía cạnh",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảy giao tiếp mở rộng",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Ba mươi mốt nguồn và viện dẫn có đối tượng",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Chủ thể hộ tịch chỉ bắt buộc có điều kiện",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Không trùng mã ca",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Có ca cho đủ 31 chức năng",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Đặc tả đủ 31 chức năng",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Trường dữ liệu không trùng trong thực thể",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Có cấu hình quy trình theo phiên bản",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Đường dẫn hệ thống công khai dùng được trong tài liệu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Tên đơn vị biên soạn đã đối chiếu nguồn",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bảo toàn thành phần mẫu",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "criterion": "PDF không có trang trắng",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "criterion": "Bìa chính đúng đề tài",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "count_correction": "02/10/2026: loại hình trong danh mục khỏi phép đếm"
+}

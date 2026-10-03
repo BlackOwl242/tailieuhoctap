@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1530"><rect width="100%" height="100%" fill="white"/>
+<text x="1100" y="64" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Biểu đồ lớp Tiếp nhận và giải quyết phần 1</text>
+<rect x="80" y="160" width="920" height="470" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<polyline points="80,250 1000,250" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="80,495 1000,495" fill="none" stroke="black" stroke-width="3"/>
+<text x="540" y="226" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">HoSo</text>
+<text x="100" y="316" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− id: ĐịnhDanh</text>
+<text x="100" y="373" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ma_yeu_cau: Chuỗi</text>
+<text x="100" y="430" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ma_ho_so: Chuỗi</text>
+<text x="100" y="487" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− phien_ban_id: ĐịnhDanh</text>
+<text x="100" y="557" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">+ guiYeuCau()</text>
+<text x="100" y="614" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">+ chuyenTuyen()</text>
+<rect x="1200" y="160" width="920" height="470" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<polyline points="1200,250 2120,250" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="1200,495 2120,495" fill="none" stroke="black" stroke-width="3"/>
+<text x="1660" y="226" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">UyQuyen</text>
+<text x="1220" y="316" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− id: ĐịnhDanh</text>
+<text x="1220" y="373" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ho_so_id: ĐịnhDanh</text>
+<text x="1220" y="430" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− nguoi_uy_quyen_id: ĐịnhDanh</text>
+<text x="1220" y="487" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− nguoi_dai_dien_id: ĐịnhDanh</text>
+<text x="1220" y="557" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">+ kiemTraHopLe()</text>
+<rect x="80" y="840" width="920" height="470" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<polyline points="80,930 1000,930" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="80,1175 1000,1175" fill="none" stroke="black" stroke-width="3"/>
+<text x="540" y="906" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">ThanhPhanHoSo</text>
+<text x="100" y="996" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− id: ĐịnhDanh</text>
+<text x="100" y="1053" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ho_so_id: ĐịnhDanh</text>
+<text x="100" y="1110" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− loai: Chuỗi</text>
+<text x="100" y="1167" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− khoa_doi_tuong: Chuỗi</text>
+<text x="100" y="1237" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">+ xacNhanSoHoa()</text>
+<rect x="1200" y="840" width="920" height="470" rx="0" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<polyline points="1200,930 2120,930" fill="none" stroke="black" stroke-width="3"/>
+<polyline points="1200,1175 2120,1175" fill="none" stroke="black" stroke-width="3"/>
+<text x="1660" y="906" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">PhanCong</text>
+<text x="1220" y="996" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− id: ĐịnhDanh</text>
+<text x="1220" y="1053" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− ho_so_id: ĐịnhDanh</text>
+<text x="1220" y="1110" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− tai_khoan_id: ĐịnhDanh</text>
+<text x="1220" y="1167" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">− giao_luc: ThờiĐiểm</text>
+<text x="1220" y="1237" font-family="Arial" font-size="48" font-weight="normal" text-anchor="start">+ giaoNhiemVu()</text>
+<polyline points="1200,460 1000,460" fill="none" stroke="black" stroke-width="3"/>
+<text x="1155" y="524" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">0..*</text>
+<text x="1045" y="439" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">1</text>
+<polyline points="580,840 580,735.0 580,735.0 580,630" fill="none" stroke="black" stroke-width="3"/>
+<text x="680" y="824" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">0..*</text>
+<text x="680" y="686" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">1</text>
+<polyline points="1700,840 1700,735.0 580,735.0 580,630" fill="none" stroke="black" stroke-width="3"/>
+<text x="1800" y="824" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">0..*</text>
+<text x="680" y="686" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">1</text>
+</svg>

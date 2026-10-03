@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2850" height="1560" viewBox="0 0 950 520"><rect width="950" height="520" fill="white"/>
+<rect x="16" y="16" width="918" height="484" rx="0" fill="white" stroke="#181818"/>
+<rect x="16" y="16" width="918" height="64" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="475" y="54.92" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">MH16 Phê duyệt và phát hành</text>
+<rect x="36" y="108" width="190" height="335" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="131" y="144.6" font-family="Arial" font-size="20" font-weight="normal" text-anchor="middle">Thông tin hồ sơ</text>
+<text x="131" y="169.6" font-family="Arial" font-size="20" font-weight="normal" text-anchor="middle">Cơ quan xử lý</text>
+<text x="131" y="194.6" font-family="Arial" font-size="20" font-weight="normal" text-anchor="middle">Người được giao</text>
+<text x="131" y="219.6" font-family="Arial" font-size="20" font-weight="normal" text-anchor="middle">Lịch sử thao tác</text>
+<rect x="248" y="108" width="664" height="174" rx="0" fill="white" stroke="#181818"/>
+<text x="580" y="141.43" font-family="Arial" font-size="21" font-weight="bold" text-anchor="middle">Thông tin cần nhập hoặc xem</text>
+<text x="580" y="184.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Dự thảo, ý kiến, chữ ký, số văn bản</text>
+<rect x="248" y="305" width="664" height="83" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="580" y="346.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Bản đã ký đủ điều kiện phát hành</text>
+<rect x="248" y="410" width="414" height="55" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="455" y="442.43" font-family="Arial" font-size="21" font-weight="bold" text-anchor="middle">Phát hành bản đã ký</text>
+<rect x="684" y="410" width="228" height="55" rx="0" fill="#F1F1F1" stroke="#181818"/>
+<text x="798" y="442.43" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Quay lại</text>
+<text x="475" y="492.94" font-family="Arial" font-size="18" font-weight="normal" text-anchor="middle">Màn hình đề xuất cho bản thiết kế</text>
+</svg>

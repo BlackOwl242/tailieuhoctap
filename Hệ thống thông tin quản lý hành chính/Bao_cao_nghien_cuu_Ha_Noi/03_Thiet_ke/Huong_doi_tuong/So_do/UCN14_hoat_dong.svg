@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1490"><rect width="100%" height="100%" fill="white"/>
+<text x="1000" y="62" font-family="Times New Roman" font-size="48" font-weight="bold" text-anchor="middle">UC14 Phân công xử lý</text>
+<circle cx="680" cy="110" r="20" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="680,130 680,175" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="680,175 688.0,155.0 672.0,155.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="160" y="175" width="1040" height="135" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="680.0" y="237" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Chọn hồ sơ đã nhận</text>
+<polyline points="680,310 680,360" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="680,360 688.0,340.0 672.0,340.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="160" y="360" width="1040" height="135" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="680.0" y="422" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Chọn người có thẩm quyền</text>
+<polyline points="680,495 680,550" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="680,550 688.0,530.0 672.0,530.0" fill="black" stroke="black" stroke-width="3"/>
+<polygon points="680,550 840,640 680,730 520,640" fill="white" stroke="black" stroke-width="3"/>
+<text x="680" y="649" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Đủ điều kiện?</text>
+<polyline points="840,640 1570,640 1570,760" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1570,760 1578.0,740.0 1562.0,740.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="1100" y="624" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">[Không đạt]</text>
+<rect x="1280" y="760" width="570" height="215" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1565.0" y="822" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Thông báo lý do</text>
+<text x="1565.0" y="879" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Giữ dữ liệu đầu vào</text>
+<text x="1565.0" y="936" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Không ghi thay đổi</text>
+<polyline points="1570,975 1570,1360 1080,1360" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1080,1360 1100.0,1368.0 1100.0,1352.0" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="680,730 680,810" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="680,810 688.0,790.0 672.0,790.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="855" y="792" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">[Đạt]</text>
+<rect x="160" y="810" width="1040" height="160" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="680.0" y="872" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Ghi trách nhiệm và căn cứ</text>
+<polyline points="680,970 680,1040" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="680,1040 688.0,1020.0 672.0,1020.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="160" y="1040" width="1040" height="185" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="680.0" y="1102" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Xác nhận phân công hiện hành</text>
+<text x="680.0" y="1159" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Xác nhận kết quả và nhật ký</text>
+<polyline points="680,1225 680,1360 1040,1360" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1040,1360 1020.0,1352.0 1020.0,1368.0" fill="black" stroke="black" stroke-width="3"/>
+<circle cx="1060" cy="1360" r="26" fill="white" stroke="black" stroke-width="3"/>
+<circle cx="1060" cy="1360" r="16" fill="black" stroke="black" stroke-width="3"/>
+<text x="1000" y="1464" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Điều kiện chi tiết và ngoại lệ nằm trong đặc tả UC14.</text>
+</svg>

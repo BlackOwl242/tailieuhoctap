@@ -1,0 +1,498 @@
+[
+  {
+    "source": "phien_ban_thu_tuc",
+    "target": "thu_tuc",
+    "field": "thu_tuc_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Thủ tục gốc"
+  },
+  {
+    "source": "phien_ban_thu_tuc",
+    "target": "co_quan",
+    "field": "co_quan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Cơ quan có thẩm quyền"
+  },
+  {
+    "source": "tai_khoan",
+    "target": "chu_the",
+    "field": "chu_the_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người sử dụng"
+  },
+  {
+    "source": "tai_khoan",
+    "target": "co_quan",
+    "field": "co_quan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Cơ quan công tác"
+  },
+  {
+    "source": "quyen_pham_vi",
+    "target": "tai_khoan",
+    "field": "tai_khoan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Tài khoản được cấp"
+  },
+  {
+    "source": "quyen_pham_vi",
+    "target": "co_quan",
+    "field": "co_quan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Phạm vi cơ quan"
+  },
+  {
+    "source": "ho_so",
+    "target": "phien_ban_thu_tuc",
+    "field": "phien_ban_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Phiên bản áp dụng"
+  },
+  {
+    "source": "ho_so",
+    "target": "chu_the",
+    "field": "nguoi_yeu_cau_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người giao dịch"
+  },
+  {
+    "source": "ho_so",
+    "target": "chu_the",
+    "field": "chu_the_ho_tich_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Chủ thể sự kiện hộ tịch khi thủ tục yêu cầu"
+  },
+  {
+    "source": "ho_so",
+    "target": "tai_khoan",
+    "field": "nguoi_ho_tro_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Người hỗ trợ; không thay người giao dịch"
+  },
+  {
+    "source": "uy_quyen",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ áp dụng"
+  },
+  {
+    "source": "uy_quyen",
+    "target": "chu_the",
+    "field": "nguoi_uy_quyen_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người được đại diện"
+  },
+  {
+    "source": "uy_quyen",
+    "target": "chu_the",
+    "field": "nguoi_dai_dien_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người giao dịch"
+  },
+  {
+    "source": "thanh_phan_ho_so",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ chủ quản"
+  },
+  {
+    "source": "phan_cong",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ chịu trách nhiệm"
+  },
+  {
+    "source": "phan_cong",
+    "target": "tai_khoan",
+    "field": "tai_khoan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Cán bộ được giao"
+  },
+  {
+    "source": "phan_cong",
+    "target": "tai_khoan",
+    "field": "nguoi_giao_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người quyết định"
+  },
+  {
+    "source": "su_kien_xu_ly",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ liên quan"
+  },
+  {
+    "source": "su_kien_xu_ly",
+    "target": "tai_khoan",
+    "field": "tai_khoan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Cán bộ nếu có"
+  },
+  {
+    "source": "yeu_cau_bo_sung",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ liên quan"
+  },
+  {
+    "source": "yeu_cau_bo_sung",
+    "target": "tai_khoan",
+    "field": "nguoi_lap_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người lập"
+  },
+  {
+    "source": "ket_qua",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ chủ quản"
+  },
+  {
+    "source": "ket_qua",
+    "target": "ket_qua",
+    "field": "thay_the_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Bản được thay thế"
+  },
+  {
+    "source": "chu_ky",
+    "target": "ket_qua",
+    "field": "ket_qua_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Bản có chữ ký"
+  },
+  {
+    "source": "khoan_thu",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ liên quan"
+  },
+  {
+    "source": "giao_dich",
+    "target": "khoan_thu",
+    "field": "khoan_thu_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Khoản thu liên quan"
+  },
+  {
+    "source": "giao_nhan",
+    "target": "ket_qua",
+    "field": "ket_qua_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Kết quả được giao"
+  },
+  {
+    "source": "giao_nhan",
+    "target": "chu_the",
+    "field": "nguoi_nhan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Chủ thể có quyền nhận"
+  },
+  {
+    "source": "hang_doi_gui",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ liên quan"
+  },
+  {
+    "source": "lich_lam_viec",
+    "target": "co_quan",
+    "field": "co_quan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Cơ quan áp dụng"
+  },
+  {
+    "source": "nhat_ky",
+    "target": "tai_khoan",
+    "field": "tai_khoan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Tài khoản tác động"
+  },
+  {
+    "source": "tuyen_xu_ly",
+    "target": "phien_ban_thu_tuc",
+    "field": "phien_ban_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Phiên bản thủ tục"
+  },
+  {
+    "source": "tuyen_xu_ly",
+    "target": "he_thong_ket_noi",
+    "field": "he_thong_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hệ thống được xử lý"
+  },
+  {
+    "source": "tuyen_xu_ly",
+    "target": "tai_khoan",
+    "field": "phe_duyet_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người phê duyệt"
+  },
+  {
+    "source": "tham_chieu_lien_thong",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ dùng chung"
+  },
+  {
+    "source": "tham_chieu_lien_thong",
+    "target": "he_thong_ket_noi",
+    "field": "he_thong_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hệ thống nguồn"
+  },
+  {
+    "source": "nhiem_vu_phoi_hop",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ cần ý kiến"
+  },
+  {
+    "source": "nhiem_vu_phoi_hop",
+    "target": "co_quan",
+    "field": "co_quan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Cơ quan được hỏi"
+  },
+  {
+    "source": "thong_bao",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ liên quan"
+  },
+  {
+    "source": "thong_bao",
+    "target": "chu_the",
+    "field": "nguoi_nhan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Chủ thể có quyền nhận"
+  },
+  {
+    "source": "dot_nop_luu",
+    "target": "co_quan",
+    "field": "co_quan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Đơn vị nộp"
+  },
+  {
+    "source": "dot_nop_luu",
+    "target": "tai_khoan",
+    "field": "phe_duyet_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Người duyệt nộp"
+  },
+  {
+    "source": "ho_so_nop_luu",
+    "target": "dot_nop_luu",
+    "field": "dot_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Đợt nộp lưu"
+  },
+  {
+    "source": "ho_so_nop_luu",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ được nộp"
+  },
+  {
+    "source": "phan_anh_kien_nghi",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Hồ sơ nếu có quan hệ"
+  },
+  {
+    "source": "phan_anh_kien_nghi",
+    "target": "chu_the",
+    "field": "chu_the_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Chủ thể nếu có thông tin hợp lệ"
+  },
+  {
+    "source": "phan_anh_kien_nghi",
+    "target": "co_quan",
+    "field": "co_quan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Đơn vị được giao trả lời"
+  },
+  {
+    "source": "thong_diep_nhan",
+    "target": "he_thong_ket_noi",
+    "field": "he_thong_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Nguồn đã xác thực"
+  },
+  {
+    "source": "thong_diep_nhan",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Liên kết sau khi xác định hồ sơ"
+  },
+  {
+    "source": "diem_tiep_nhan",
+    "target": "co_quan",
+    "field": "co_quan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Đơn vị quản lý điểm"
+  },
+  {
+    "source": "mau_bao_cao",
+    "target": "tai_khoan",
+    "field": "phe_duyet_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người duyệt định nghĩa"
+  },
+  {
+    "source": "tai_lieu_huong_dan",
+    "target": "tai_khoan",
+    "field": "phe_duyet_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người duyệt dùng hướng dẫn"
+  },
+  {
+    "source": "tai_lieu_kho",
+    "target": "chu_the",
+    "field": "chu_the_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Chủ thể sở hữu quyền khai thác"
+  },
+  {
+    "source": "tai_lieu_kho",
+    "target": "ket_qua",
+    "field": "ket_qua_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Bản kết quả nếu có"
+  },
+  {
+    "source": "tai_lieu_kho",
+    "target": "thanh_phan_ho_so",
+    "field": "thanh_phan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Thành phần nếu có"
+  },
+  {
+    "source": "tai_lieu_kho",
+    "target": "tai_lieu_kho",
+    "field": "thay_the_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Bản được thay thế"
+  },
+  {
+    "source": "quyen_khai_thac_kho",
+    "target": "tai_lieu_kho",
+    "field": "tai_lieu_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Tài liệu được khai thác"
+  },
+  {
+    "source": "quyen_khai_thac_kho",
+    "target": "chu_the",
+    "field": "chu_the_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Chủ thể được phép"
+  },
+  {
+    "source": "chi_dao_dieu_hanh",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Hồ sơ liên quan nếu có"
+  },
+  {
+    "source": "chi_dao_dieu_hanh",
+    "target": "co_quan",
+    "field": "co_quan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Phạm vi điều hành"
+  },
+  {
+    "source": "chi_dao_dieu_hanh",
+    "target": "tai_khoan",
+    "field": "nguoi_giao_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Người ra chỉ đạo"
+  },
+  {
+    "source": "chi_dao_dieu_hanh",
+    "target": "tai_khoan",
+    "field": "nguoi_nhan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Người thực hiện"
+  }
+]

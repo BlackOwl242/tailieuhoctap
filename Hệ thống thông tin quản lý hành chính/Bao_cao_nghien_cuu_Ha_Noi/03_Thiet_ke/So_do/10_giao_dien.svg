@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1050" viewBox="0 0 2000 1050">
+<rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="black"/></marker></defs>
+<text x="1000.0" y="46" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="bold">Bố cục giao diện phục vụ tác nghiệp</text>
+<line x1="800" y1="400.0" x2="970" y2="400.0" stroke="black" stroke-width="3" marker-end="url(#a)"/>
+<rect x="50" y="100" width="1900" height="130" fill="white" stroke="black" stroke-width="3"/>
+<text x="1000.0" y="153.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">BÀN LÀM VIỆC CÁN BỘ</text>
+<text x="1000.0" y="196.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Thiết kế đề xuất, sử dụng dữ liệu minh họa</text>
+<rect x="50" y="320" width="750" height="160" fill="white" stroke="black" stroke-width="3"/>
+<text x="425.0" y="388.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">DANH SÁCH HỒ SƠ</text>
+<text x="425.0" y="431.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Cơ quan • Người xử lý • Trạng thái</text>
+<rect x="50" y="570" width="750" height="350" fill="white" stroke="black" stroke-width="3"/>
+<text x="425.0" y="690.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Mã hồ sơ • Thủ tục • Hạn</text>
+<text x="425.0" y="733.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Hồ sơ cần tiếp nhận</text>
+<text x="425.0" y="776.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Hồ sơ đang thụ lý</text>
+<text x="425.0" y="819.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Kết quả cần giao</text>
+<rect x="970" y="320" width="980" height="160" fill="white" stroke="black" stroke-width="3"/>
+<text x="1460.0" y="388.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">CHI TIẾT HỒ SƠ</text>
+<text x="1460.0" y="431.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Chủ thể • Thành phần • Thời hạn</text>
+<rect x="970" y="570" width="980" height="350" fill="white" stroke="black" stroke-width="3"/>
+<text x="1460.0" y="690.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Ý kiến và nguồn tra cứu</text>
+<text x="1460.0" y="733.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Dự thảo và bản phát hành</text>
+<text x="1460.0" y="776.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Lịch sử và chứng cứ giao</text>
+<text x="1460.0" y="819.0" text-anchor="middle" font-family="Times New Roman" font-size="34" font-weight="normal">Hành động theo quyền</text>
+</svg>

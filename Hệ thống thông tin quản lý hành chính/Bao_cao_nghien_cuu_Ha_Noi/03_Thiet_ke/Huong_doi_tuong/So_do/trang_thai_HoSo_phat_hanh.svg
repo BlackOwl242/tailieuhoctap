@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1430"><rect width="100%" height="100%" fill="white"/>
+<text x="1000" y="64" font-family="Arial" font-size="48" font-weight="bold" text-anchor="middle">Phê duyệt, phát hành và giao kết quả</text>
+<rect x="100" y="160" width="700" height="155" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="450.0" y="222" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Đang thụ lý</text>
+<rect x="1160" y="160" width="700" height="155" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1510.0" y="222" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Chờ phê duyệt</text>
+<rect x="1160" y="620" width="700" height="155" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="1510.0" y="682" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Đã ký duyệt</text>
+<rect x="100" y="620" width="700" height="155" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="450.0" y="682" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Đã phát hành</text>
+<rect x="100" y="1090" width="700" height="155" rx="25" fill="#F1F1F1" stroke="black" stroke-width="3"/>
+<text x="450.0" y="1152" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Hoàn thành</text>
+<polyline points="800,237 1160,237" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1160,237 1140.0,229.0 1140.0,245.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="970" y="389" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">trình [đủ căn cứ]</text>
+<polyline points="1510,315 1510,620" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1510,620 1518.0,600.0 1502.0,600.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="1730" y="469" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">ký duyệt</text>
+<text x="1730" y="526" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">[đúng quyền và</text>
+<text x="1730" y="583" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">bản]</text>
+<polyline points="1160,697 800,697" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="800,697 820.0,705.0 820.0,689.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="990" y="484" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">phát hành</text>
+<text x="990" y="541" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">[chữ ký hợp lệ]</text>
+<polyline points="450,775 450,1090" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="450,1090 458.0,1070.0 442.0,1070.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="830" y="919" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">xác nhận giao</text>
+<text x="830" y="976" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">[có bằng chứng]</text>
+<polyline points="1510,160 1510,140 450,140 450,160" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="450,160 458.0,140.0 442.0,140.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="1020" y="119" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">trả chỉnh sửa [có ý kiến]</text>
+<circle cx="1450" cy="1167" r="26" fill="white" stroke="black" stroke-width="3"/>
+<circle cx="1450" cy="1167" r="16" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="800,1167 1424,1167" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1424,1167 1404.0,1159.0 1404.0,1175.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="1550" y="944" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Bản đã ký được giữ nguyên.</text>
+<text x="1550" y="1001" font-family="Arial" font-size="48" font-weight="normal" text-anchor="middle">Giao kết quả được xác nhận riêng.</text>
+</svg>

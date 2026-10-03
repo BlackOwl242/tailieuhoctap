@@ -1,0 +1,676 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Giao tiếp mở rộng của thiết kế nghiên cứu",
+    "version": "2.0.0",
+    "description": "Không phải địa chỉ giao tiếp đang vận hành của Hà Nội. Cần thống nhất hợp đồng, nguồn trạng thái, xác thực thông điệp và chữ ký trước phát triển."
+  },
+  "paths": {
+    "/v1/routes": {
+      "get": {
+        "operationId": "extended1",
+        "summary": "Tra cứu tuyến tác nghiệp",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kết quả tiếp nhận hoặc tra cứu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nguồn hoặc danh tính không hợp lệ"
+          },
+          "403": {
+            "description": "Ngoài phạm vi quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
+          },
+          "422": {
+            "description": "Không đủ điều kiện nghiệp vụ"
+          }
+        },
+        "parameters": [
+          {
+            "name": "asOf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "procedureVersionId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "extended7",
+        "summary": "Đề nghị cấu hình tuyến",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kết quả tiếp nhận hoặc tra cứu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nguồn hoặc danh tính không hợp lệ"
+          },
+          "403": {
+            "description": "Ngoài phạm vi quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
+          },
+          "422": {
+            "description": "Không đủ điều kiện nghiệp vụ"
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Route"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/external-events": {
+      "post": {
+        "operationId": "extended2",
+        "summary": "Nhận sự kiện từ hệ thống được phép",
+        "security": [
+          {
+            "serviceAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kết quả tiếp nhận hoặc tra cứu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nguồn hoặc danh tính không hợp lệ"
+          },
+          "403": {
+            "description": "Ngoài phạm vi quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
+          },
+          "422": {
+            "description": "Không đủ điều kiện nghiệp vụ"
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalEvent"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/coordination-tasks": {
+      "post": {
+        "operationId": "extended3",
+        "summary": "Tạo nhiệm vụ phối hợp",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kết quả tiếp nhận hoặc tra cứu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nguồn hoặc danh tính không hợp lệ"
+          },
+          "403": {
+            "description": "Ngoài phạm vi quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
+          },
+          "422": {
+            "description": "Không đủ điều kiện nghiệp vụ"
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Task"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/archive-packages": {
+      "post": {
+        "operationId": "extended4",
+        "summary": "Gửi gói nộp lưu",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kết quả tiếp nhận hoặc tra cứu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nguồn hoặc danh tính không hợp lệ"
+          },
+          "403": {
+            "description": "Ngoài phạm vi quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
+          },
+          "422": {
+            "description": "Không đủ điều kiện nghiệp vụ"
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArchivePackage"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/feedback": {
+      "post": {
+        "operationId": "extended5",
+        "summary": "Tiếp nhận phản ánh, đánh giá",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kết quả tiếp nhận hoặc tra cứu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nguồn hoặc danh tính không hợp lệ"
+          },
+          "403": {
+            "description": "Ngoài phạm vi quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
+          },
+          "422": {
+            "description": "Không đủ điều kiện nghiệp vụ"
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Feedback"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/reconciliation": {
+      "get": {
+        "operationId": "extended6",
+        "summary": "Đối chiếu số liệu theo nguồn",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kết quả tiếp nhận hoặc tra cứu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reconciliation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nguồn hoặc danh tính không hợp lệ"
+          },
+          "403": {
+            "description": "Ngoài phạm vi quyền"
+          },
+          "409": {
+            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
+          },
+          "422": {
+            "description": "Không đủ điều kiện nghiệp vụ"
+          }
+        },
+        "parameters": [
+          {
+            "name": "asOf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "sourceSystem",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Route": {
+        "type": "object",
+        "required": [
+          "procedureVersionId",
+          "systemId",
+          "effectiveFrom",
+          "legalBasis"
+        ],
+        "properties": {
+          "procedureVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "systemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effectiveTo": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "legalBasis": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "ExternalEvent": {
+        "type": "object",
+        "required": [
+          "sourceSystem",
+          "eventId",
+          "externalCaseId",
+          "occurredAt",
+          "sequence",
+          "eventType",
+          "payload"
+        ],
+        "properties": {
+          "sourceSystem": {
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "externalCaseId": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "RECEIVED",
+              "ACCEPTED",
+              "ASSESSMENT",
+              "ISSUED",
+              "DELIVERED",
+              "STOPPED"
+            ]
+          },
+          "payload": {
+            "type": "object",
+            "description": "Dữ liệu theo hợp đồng được duyệt, không nhận trường tùy ý"
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "required": [
+          "caseId",
+          "recipientAgencyId",
+          "scope",
+          "mandatory",
+          "dueAt",
+          "version"
+        ],
+        "properties": {
+          "caseId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipientAgencyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mandatory": {
+            "type": "boolean"
+          },
+          "dueAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "ArchivePackage": {
+        "type": "object",
+        "required": [
+          "packageId",
+          "caseId",
+          "manifestHash",
+          "items"
+        ],
+        "properties": {
+          "packageId": {
+            "type": "string"
+          },
+          "caseId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "manifestHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "documentId",
+                "version",
+                "sha256"
+              ],
+              "properties": {
+                "documentId": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Feedback": {
+        "type": "object",
+        "required": [
+          "type",
+          "content"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "SERVICE_FEEDBACK",
+              "SATISFACTION",
+              "OTHER_PROCESS"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000
+          },
+          "caseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "Receipt": {
+        "type": "object",
+        "required": [
+          "id",
+          "correlationId",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "Nhận thông điệp khác với áp dụng thành công nghiệp vụ"
+          }
+        }
+      },
+      "RouteList": {
+        "type": "object",
+        "required": [
+          "asOf",
+          "items"
+        ],
+        "properties": {
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Route"
+            }
+          }
+        }
+      },
+      "Reconciliation": {
+        "type": "object",
+        "required": [
+          "asOf",
+          "sourceSystem",
+          "caseCount",
+          "excludedDuplicates",
+          "pendingEvents"
+        ],
+        "properties": {
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sourceSystem": {
+            "type": "string"
+          },
+          "caseCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "excludedDuplicates": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "pendingEvents": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lastSourceAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "serviceAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Danh tính dịch vụ đã cấp riêng; kiểm tra TLS hai chiều và chữ ký thông điệp theo hợp đồng ở tầng tích hợp"
+      }
+    }
+  }
+}
