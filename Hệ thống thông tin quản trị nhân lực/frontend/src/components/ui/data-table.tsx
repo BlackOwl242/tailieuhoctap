@@ -33,9 +33,22 @@ export interface DataColumn<T> {
   sortValue?: (row: T) => string | number;
   sortable?: boolean;
   className?: string;
+  /** Minimum readable width in pixels. The table scrolls instead of crushing columns. */
+  minWidth?: number;
   noPrint?: boolean;
   /** Giá trị xuất Excel (mặc định: trường thô theo key) — dùng cho cột render phức tạp. */
   exportValue?: (row: T) => string | number;
+}
+
+function defaultColumnMinWidth(column: { minWidth?: number; key: string; header: string }) {
+  if (column.minWidth) return column.minWidth;
+  const key = column.key.toLowerCase();
+  const label = column.header.toLocaleLowerCase('vi');
+  if (/name|department|orgunit|title|description|address|email|employee/.test(key) || /nhân sự|họ và tên|phòng ban|đơn vị|chức danh|mô tả|địa chỉ|nội dung/.test(label)) return 176;
+  if (/salary|amount|total|deduction|income|payment|balance|rate|money|cost|price/.test(key) || /lương|tiền|khấu trừ|thu nhập|thực lĩnh|đơn giá|số tiền/.test(label)) return 132;
+  if (/status|state|type|category/.test(key) || /trạng thái|loại|tình trạng/.test(label)) return 126;
+  if (/date|time|created|updated/.test(key) || /ngày|thời điểm|thời gian/.test(label)) return 126;
+  return Math.max(104, Math.min(168, column.header.length * 8 + 40));
 }
 
 export interface DataFilterDef<T> {
@@ -243,6 +256,7 @@ export function DataTable<T>({
   }
 
   const hasToolbar = searchFields || filters.length > 0 || toolbarExtra || exportFilename || showPrint || printLabel;
+  const tableMinWidth = columns.reduce((width, column) => width + defaultColumnMinWidth(column), actions ? 72 : 0);
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
@@ -312,12 +326,12 @@ export function DataTable<T>({
       ) : null}
 
       {/* --------------------------------- Bảng --------------------------------- */}
-      <div className="overflow-x-auto rounded-lg border bg-card">
-        <table className="w-full min-w-[640px] text-sm">
+      <div tabIndex={0} aria-label="Bảng dữ liệu; cuộn ngang để xem thêm cột" className="max-w-full overflow-x-auto rounded-lg border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [overscroll-behavior-x:contain]">
+        <table className="w-full text-sm" style={{ minWidth: `max(100%, ${tableMinWidth}px)` }}>
           <thead>
             <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
               {columns.map((c) => (
-                <th key={c.key} className={cn('whitespace-nowrap print:whitespace-normal px-3 py-2.5 font-semibold first:pl-4 last:pr-4 sm:first:pl-5 sm:last:pr-5', c.noPrint && 'no-print', c.className)}>
+                <th key={c.key} style={{ minWidth: defaultColumnMinWidth(c) }} className={cn('whitespace-nowrap print:whitespace-normal px-3 py-2.5 font-semibold first:pl-4 last:pr-4 sm:first:pl-5 sm:last:pr-5', c.noPrint && 'no-print', c.className)}>
                   {c.sortable ? (
                     <button type="button" onClick={() => toggleSort(c)} className="inline-flex items-center gap-1 hover:text-foreground print:inline print:p-0">
                       <span>{c.header}</span>
@@ -356,7 +370,7 @@ export function DataTable<T>({
               pageRows.map((row) => (
                 <tr key={rowKey(row)} className="border-b transition-colors last:border-0 hover:bg-accent/40">
                   {columns.map((c) => (
-                    <td key={c.key} className={cn('px-3 py-2.5 align-middle first:pl-4 last:pr-4 sm:first:pl-5 sm:last:pr-5', c.noPrint && 'no-print', c.className)}>
+                    <td key={c.key} style={{ minWidth: defaultColumnMinWidth(c) }} className={cn('px-3 py-2.5 align-middle first:pl-4 last:pr-4 sm:first:pl-5 sm:last:pr-5', c.noPrint && 'no-print', c.className)}>
                       {c.render ? c.render(row) : String((row as Record<string, unknown>)[c.key] ?? 'Chưa cập nhật')}
                     </td>
                   ))}

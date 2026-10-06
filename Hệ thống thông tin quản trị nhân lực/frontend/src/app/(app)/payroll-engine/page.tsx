@@ -735,14 +735,14 @@ export default function PayrollEnginePage() {
           ) : (
             <>
               {/* Minimalist Run Selector & Summary Toolbar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border border-border bg-card text-xs">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">Kỳ lương:</span>
+              <div className="grid min-w-0 grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 text-xs 2xl:grid-cols-[minmax(0,1fr)_auto] 2xl:items-center">
+                <div className="grid min-w-0 grid-cols-1 gap-3 2xl:grid-cols-[minmax(15rem,0.9fr)_minmax(0,1.7fr)] 2xl:items-center">
+                  <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
+                    <span className="whitespace-nowrap text-muted-foreground">Kỳ lương:</span>
                     <Select
                       value={currentRun?.id || ''}
                       onChange={(e) => setSelectedRunId(e.target.value)}
-                      className="w-[240px] text-xs font-medium"
+                      className="min-w-0 w-full text-xs font-medium md:max-w-[340px]"
                     >
                       {runs.map((r) => (
                         <option key={r.id} value={r.id}>
@@ -753,20 +753,32 @@ export default function PayrollEnginePage() {
                   </div>
 
                   {currentRun && (
-                    <div className="flex items-center gap-3 text-muted-foreground border-l border-border pl-3">
-                      <span>Nhân sự: <b className="text-foreground">{currentRun.totalEmployees}</b></span>
-                      <span>Khấu trừ: <b className="text-foreground">{currentRun.totalDeduction.toLocaleString('vi-VN')} đ</b></span>
-                      <span>Tổng thực lĩnh: <b className="text-foreground font-mono">{currentRun.totalNetPay.toLocaleString('vi-VN')} đ</b></span>
+                    <div className="grid min-w-0 grid-cols-2 gap-2 text-muted-foreground xl:grid-cols-3">
+                      <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5">
+                        <span className="block">Nhân sự</span>
+                        <b className="block whitespace-nowrap text-foreground">{currentRun.totalEmployees}</b>
+                      </div>
+                      <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5">
+                        <span className="block">Khấu trừ</span>
+                        <b className="block whitespace-nowrap text-foreground">{currentRun.totalDeduction.toLocaleString('vi-VN')} đ</b>
+                      </div>
+                      <div className="col-span-2 min-w-0 rounded-md bg-muted/30 px-2 py-1.5 xl:col-span-1">
+                        <span className="block">Tổng thực lĩnh</span>
+                        <b className="block whitespace-nowrap font-mono text-foreground">{currentRun.totalNetPay.toLocaleString('vi-VN')} đ</b>
+                      </div>
                     </div>
                   )}
                 </div>
 
                 {currentRun && (
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{currentRun.status}</span>
-                    {currentRun.status === 'PAID' && currentRun.paymentReference && (
-                      <span className="text-xs text-muted-foreground">Chứng từ: {currentRun.paymentReference}</span>
-                    )}
+                  <div className="flex min-w-0 flex-col gap-2 xl:items-end">
+                    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 xl:justify-end">
+                      <span className="font-medium">{currentRun.status}</span>
+                      {currentRun.status === 'PAID' && currentRun.paymentReference && (
+                        <span className="max-w-full truncate text-xs text-muted-foreground" title={`Chứng từ: ${currentRun.paymentReference}`}>Chứng từ: {currentRun.paymentReference}</span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 xl:justify-end">
                     {[
                       { status: 'PROCESSED', action: 'review', label: 'Đối soát', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT'] },
                       { status: 'REVIEWED', action: 'approve', label: 'Phê duyệt', roles: ['ADMIN', 'BOD'] },
@@ -806,6 +818,7 @@ export default function PayrollEnginePage() {
                     >
                       Xóa đợt này
                     </Button>}
+                    </div>
                   </div>
                 )}
               </div>

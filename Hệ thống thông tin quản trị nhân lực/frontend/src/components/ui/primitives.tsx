@@ -465,9 +465,17 @@ export function Select({
   const selectedOption = allOptions.find((o) => String(o.value) === String(currentVal));
   const displayLabel = selectedOption?.label || (currentVal ? String(currentVal) : placeholder);
 
-  // Nhận diện kiểu inline và kích thước từ className
-  const isInline = className?.includes('w-auto') || className?.includes('inline');
-  const widthMatches = className?.match(/\b(w-\[\S+\]|w-\d+|min-w-\[\S+\]|max-w-\[\S+\]|flex-1)\b/g);
+  // Chỉ đọc các utility nguyên vẹn: regex theo word-boundary trước đây biến `min-w-0` thành `w-0`,
+  // khiến wrapper của Select trong layout flex/grid bị co về 0px.
+  const selectClassTokens = className?.trim().split(/\s+/).filter(Boolean) ?? [];
+  const selectUtilities = selectClassTokens.map((token) => token.split(':').at(-1) ?? token);
+  const isInline = selectUtilities.some((utility) =>
+    utility === 'w-auto' || utility === 'inline-block' || utility === 'inline-flex' || utility === 'inline-grid'
+  );
+  const widthMatches = selectClassTokens.filter((token) => {
+    const utility = token.split(':').at(-1) ?? token;
+    return /^(?:w|min-w|max-w)-(?:\[[^\]]+\]|[\w./-]+)$/.test(utility) || utility === 'flex-1';
+  });
 
   // Kiểm tra xem Select có nằm trong Modal / Dialog không để chọn tầng z-index tương ứng
   // Nội dung popover (render qua portal)

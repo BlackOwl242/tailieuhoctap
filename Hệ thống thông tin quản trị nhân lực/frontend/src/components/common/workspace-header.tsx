@@ -51,9 +51,9 @@ export function WorkspaceHeader({
         </nav>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
-        {actions && <div className="flex flex-wrap items-center gap-2 shrink-0">{actions}</div>}
+      <div className="grid min-w-0 grid-cols-1 gap-3 2xl:grid-cols-[minmax(0,1fr)_auto] 2xl:items-center">
+        <h1 className="min-w-0 text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
+        {actions && <div className="min-w-0 max-w-full">{actions}</div>}
       </div>
 
       {description && (

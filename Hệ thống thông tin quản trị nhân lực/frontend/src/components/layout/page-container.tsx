@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
  */
 export function PageContainer({ children, className, wide }: { children: React.ReactNode; className?: string; wide?: boolean }) {
   return (
-    <div className={cn('mx-auto w-full', wide ? 'max-w-[96rem]' : 'max-w-7xl', 'px-0 sm:px-2 lg:px-4', className)}>
+    <div className={cn('mx-auto min-w-0 w-full', wide ? 'max-w-[96rem]' : 'max-w-7xl', 'px-0 sm:px-2 lg:px-4', className)}>
       {children}
     </div>
   );

@@ -951,7 +951,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
           subSidebarOpen ? 'md:pl-[320px]' : 'md:pl-16'
         )}
       >
-        <div className="px-4 py-5 sm:px-6 lg:px-8 pb-20 md:pb-12">
+        <div className="min-w-0 px-4 py-5 sm:px-6 lg:px-8 pb-20 md:pb-12">
           <PageContainer>{children}</PageContainer>
         </div>
       </main>
