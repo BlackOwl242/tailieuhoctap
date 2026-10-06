@@ -30,6 +30,7 @@ import { DocumentsModule } from './modules/documents/documents.module';
 import { PersonnelProfilesModule } from './modules/personnel-profiles/personnel-profiles.module';
 import { ProfileChangeRequestsModule } from './modules/profile-change-requests/profile-change-requests.module';
 import { PersonnelRanksModule } from './modules/personnel-ranks/personnel-ranks.module';
+import { SalaryBandsModule } from './modules/salary-bands/salary-bands.module';
 import { PersonnelReportsModule } from './modules/personnel-reports/personnel-reports.module';
 import { HrmsShiftsModule } from './modules/hrms-shifts/hrms-shifts.module';
 import { HrmsPayrollModule } from './modules/hrms-payroll/hrms-payroll.module';
@@ -42,6 +43,8 @@ import { HrmsLoansModule } from './modules/hrms-loans/hrms-loans.module';
 import { HrmsAssetsModule } from './modules/hrms-assets/hrms-assets.module';
 import { HrmsRegularizationModule } from './modules/hrms-regularization/hrms-regularization.module';
 import { CatalogsModule } from './modules/catalogs/catalogs.module';
+import { HrWorkflowsModule } from './modules/hr-workflows/hr-workflows.module';
+import { FilesModule } from './modules/files/files.module';
 
 @Module({
   imports: [
@@ -75,6 +78,7 @@ import { CatalogsModule } from './modules/catalogs/catalogs.module';
     PersonnelProfilesModule,
     ProfileChangeRequestsModule,
     PersonnelRanksModule,
+    SalaryBandsModule,
     PersonnelReportsModule,
     HrmsShiftsModule,
     HrmsPayrollModule,
@@ -87,6 +91,8 @@ import { CatalogsModule } from './modules/catalogs/catalogs.module';
     HrmsAssetsModule,
     HrmsRegularizationModule,
     CatalogsModule,
+    HrWorkflowsModule,
+    FilesModule,
   ],
 })
 export class AppModule {}

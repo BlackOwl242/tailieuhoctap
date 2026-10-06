@@ -143,8 +143,28 @@ function transliterate(name) {
     .join('.');
 }
 
+const UNIT_CODE_ALIASES = {
+  'TC-HC-NS': 'HR-OPS',
+  'HR-1': 'HR-TA',
+  'HR-2': 'HR-OPS',
+  'HR-3': 'HR-CB',
+  'HR-4': 'OPS-ADMIN',
+  'SQ-S1': 'SQ-BE-SGN',
+  'SQ-S2': 'SQ-BE-SGN',
+  'SQ-S3': 'SQ-WEB-SGN',
+  'SQ-S4': 'SQ-MOB-SGN',
+  'SQ-S5': 'QA-AUTO',
+  'SQ-S6': 'SQ-DEVOPS-SGN',
+  'SQ-D1': 'SQ-ENT-DAD',
+  'SQ-D2': 'SQ-ENT-DAD',
+  'SQ-D3': 'SQ-WEB-DAD',
+  'SQ-D4': 'SQ-MOB-DAD',
+  'SQ-D5': 'QA-AUTO',
+  'SQ-D6': 'SQ-DEVOPS-DAD',
+};
+
 async function seedAll() {
-  console.log('Seeding full enterprise personnel tree across all 21 units...');
+  console.log('Seeding demo employees into the configured organization units...');
 
   const units = await prisma.orgUnit.findMany();
   const unitMap = new Map();
@@ -158,7 +178,8 @@ async function seedAll() {
   let count = 0;
   for (const [idx, s] of ALL_STAFF.entries()) {
     const email = `${transliterate(s.name)}.${idx + 1}@saigontechnology.vn`;
-    const unitId = unitMap.get(s.unitCode) || null;
+    const unitCode = UNIT_CODE_ALIASES[s.unitCode] || s.unitCode;
+    const unitId = unitMap.get(unitCode) || null;
     const employeeCode = `NV${String(idx + 1).padStart(4, '0')}`;
 
     // Upsert User
@@ -210,10 +231,10 @@ async function seedAll() {
     count++;
   }
 
-  console.log(`Successfully seeded/updated ${count} employees across all 21 organizational units!`);
+  console.log(`Successfully seeded/updated ${count} demo employees in the configured organization tree.`);
 }
 
-module.exports = { seedAll, ALL_STAFF };
+module.exports = { seedAll, ALL_STAFF, UNIT_CODE_ALIASES };
 
 if (require.main === module) {
   seedAll()

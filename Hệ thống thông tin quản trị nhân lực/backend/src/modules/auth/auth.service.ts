@@ -5,6 +5,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from '../../common/prisma.service';
 import { BusinessException, ErrorCodes } from '../../common/errors/business.exception';
 import { LoginDto } from './dto';
+import { RuntimeSettingsService } from '../../common/services/runtime-settings.service';
 
 // Tham số khóa tài khoản theo UC01 của tài liệu thiết kế:
 // sai 5 lần liên tiếp → khóa 15 phút
@@ -19,6 +20,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly settings: RuntimeSettingsService,
   ) {}
 
   /**
@@ -39,7 +41,7 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    if (user.status === 'DISABLED') {
+    if (user.status === 'DISABLED' || ['RESIGNED', 'RETIRED'].includes(user.employmentStatus)) {
       throw new BusinessException(
         ErrorCodes.ACCOUNT_DISABLED,
         'Tài khoản đã bị vô hiệu hóa',
@@ -57,19 +59,21 @@ export class AuthService {
 
     const passwordOk = await bcrypt.compare(dto.password, user.passwordHash);
     if (!passwordOk) {
+      const maxAttempts = Number(await this.settings.get('LOGIN_MAX_ATTEMPTS', MAX_FAILED_ATTEMPTS));
+      const lockMinutes = Number(await this.settings.get('LOCK_MINUTES', LOCK_MINUTES));
       const attempts = user.failedLoginAttempts + 1;
-      const justLocked = attempts >= MAX_FAILED_ATTEMPTS;
+      const justLocked = attempts >= maxAttempts;
       await this.prisma.user.update({
         where: { id: user.id },
         data: {
           failedLoginAttempts: justLocked ? 0 : attempts,
-          lockedUntil: justLocked ? new Date(Date.now() + LOCK_MINUTES * 60_000) : null,
+          lockedUntil: justLocked ? new Date(Date.now() + lockMinutes * 60_000) : null,
         },
       });
       throw new BusinessException(
         ErrorCodes.INVALID_CREDENTIALS,
         justLocked
-          ? `Bạn đã nhập sai ${MAX_FAILED_ATTEMPTS} lần liên tiếp — tài khoản bị khóa ${LOCK_MINUTES} phút`
+          ? `Bạn đã nhập sai ${maxAttempts} lần liên tiếp — tài khoản bị khóa ${lockMinutes} phút`
           : 'Email hoặc mật khẩu không đúng',
         HttpStatus.UNAUTHORIZED,
       );
@@ -157,6 +161,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
+      bankAccount: user.bankAccount, bankName: user.bankName, taxDependentCount: user.taxDependentCount,
       jobTitle: user.jobTitle,
       expertise: user.expertise,
       bio: user.bio,

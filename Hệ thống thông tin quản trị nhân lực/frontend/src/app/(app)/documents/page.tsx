@@ -1,10 +1,11 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowRightLeft, Download, Eye, FileDown, FileText, FolderOpen, Plus, Trash2 } from 'lucide-react';
-import { api, errorMessage } from '@/lib/api';
+import { api, errorMessage, openProtectedFile } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
@@ -17,7 +18,7 @@ import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 import { MarkdownViewer } from '@/components/common/markdown-viewer';
 
 interface DocumentRow {
-  id: string; title: string;
+  id: string; title: string; status: string;
   category: keyof typeof DOCUMENT_CATEGORY_LABEL;
   processArea: string | null; version: string; description: string | null;
   contentMd: string | null;
@@ -39,6 +40,7 @@ function downloadContentMd(doc: DocumentRow) {
 
 /** Mục 8 — Kho tài liệu quy trình nhân sự: chính sách, biểu mẫu, quyết định, quy trình. */
 export default function DocumentsPage() {
+  const searchParams = useSearchParams();
   const qc = useQueryClient();
   const toast = useToast();
   const roles = useAuthStore((s) => s.user?.roles ?? []);
@@ -46,7 +48,7 @@ export default function DocumentsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [detail, setDetail] = useState<DocumentRow | null>(null);
-  const [form, setForm] = useState({ title: '', category: 'POLICY', processArea: '', version: '1.0', description: '', tags: '' });
+  const [form, setForm] = useState({ title: '', category: 'POLICY', processArea: '', version: '1.0', description: '', tags: '', contentMd: '' });
   const [file, setFile] = useState<{ name: string; mimeType: string; sizeBytes: number; dataBase64: string } | null>(null);
 
   const q = useQuery({
@@ -54,6 +56,14 @@ export default function DocumentsPage() {
     queryFn: async () => (await api.get<DocumentRow[]>('/documents')).data,
   });
 
+  useEffect(() => {
+    const requestedId = searchParams.get('document');
+    const selected = q.data?.find((doc) => doc.id === requestedId);
+    if (selected && detail?.id !== selected.id) setDetail(selected);
+  }, [q.data, searchParams, detail?.id]);
+  const history = useQuery<{id:string;revision:number;snapshot:DocumentRow}[]>({queryKey:['document-history',detail?.id],queryFn:async()=>(await api.get(`/documents/${detail!.id}/history`)).data,enabled:!!detail&&isHr});
+  const publish = useMutation({mutationFn:(id:string)=>api.post(`/documents/${id}/publish`),onSuccess:()=>{toast('Đã công bố tài liệu','success');setDetail(null);invalidate();},onError:e=>toast(errorMessage(e),'error')});
+  const revise = useMutation({mutationFn:({doc,contentMd}:{doc:DocumentRow;contentMd:string})=>api.put(`/documents/${doc.id}`,{title:doc.title,category:doc.category,processArea:doc.processArea??undefined,description:doc.description??undefined,tags:doc.tags,contentMd}),onSuccess:()=>{setDetail(null);invalidate();toast('Đã lưu bản sửa; cần công bố lại','success');},onError:e=>toast(errorMessage(e),'error')});
   const invalidate = () => qc.invalidateQueries({ queryKey: ['documents'] });
 
   const create = useMutation({
@@ -63,6 +73,7 @@ export default function DocumentsPage() {
       processArea: form.processArea || undefined,
       version: form.version || undefined,
       description: form.description || undefined,
+      contentMd: form.contentMd || undefined,
       tags: form.tags ? form.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
       file: file ?? undefined,
     }),
@@ -97,7 +108,7 @@ export default function DocumentsPage() {
             {r.title}
           </span>
           <span className="block text-xs text-muted-foreground">
-            Phiên bản {r.version} · {r.uploader?.fullName ?? ''} · {formatDate(r.updatedAt)}
+            {r.status} · Phiên bản {r.version} · {r.uploader?.fullName ?? ''} · {formatDate(r.updatedAt)}
           </span>
         </span>
       ),
@@ -110,14 +121,14 @@ export default function DocumentsPage() {
       render: (r) => <span className="text-xs font-semibold text-foreground">{DOCUMENT_CATEGORY_LABEL[r.category] ?? r.category}</span>,
       exportValue: (r) => DOCUMENT_CATEGORY_LABEL[r.category] ?? r.category,
     },
-    { key: 'processArea', header: 'Quy trình', sortable: true, render: (r) => r.processArea ?? '—' },
+    { key: 'processArea', header: 'Quy trình', sortable: true, render: (r) => r.processArea ?? 'Chưa cập nhật' },
     {
       key: 'tags',
       header: 'Thẻ',
       noPrint: true,
       render: (r) => (
         <span className="text-xs text-muted-foreground">
-          {r.tags.length > 0 ? r.tags.join(', ') : '—'}
+          {r.tags.length > 0 ? r.tags.join(', ') : 'Chưa cập nhật'}
         </span>
       ),
     },
@@ -127,15 +138,15 @@ export default function DocumentsPage() {
       noPrint: true,
       render: (r) =>
         r.fileUrl ? (
-          <a href={r.fileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+          <button type="button" onClick={() => void openProtectedFile(r.fileUrl!)} className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
             <Download className="h-4 w-4" /> Tải xuống
-          </a>
+          </button>
         ) : r.contentMd ? (
           <button type="button" onClick={() => setDetail(r)} className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
             <FileText className="h-4 w-4" /> Nội dung số
           </button>
         ) : (
-          '—'
+          'Chưa cập nhật'
         ),
     },
   ];
@@ -194,7 +205,7 @@ export default function DocumentsPage() {
             emptyHint="Thêm chính sách, biểu mẫu, quy trình để toàn công ty dùng chung một nguồn."
             actions={(r): RowActionItem[] => [
               { label: 'Xem chi tiết tài liệu', icon: Eye, onSelect: () => setDetail(r) },
-              ...(r.fileUrl ? [{ label: 'Tải tập tin đính kèm', icon: Download, onSelect: () => window.open(r.fileUrl!, '_blank') }] : []),
+              ...(r.fileUrl ? [{ label: 'Tải tập tin đính kèm', icon: Download, onSelect: () => void openProtectedFile(r.fileUrl!) }] : []),
               ...(r.contentMd ? [{ label: 'Tải nội dung (.md)', icon: FileDown, onSelect: () => downloadContentMd(r) }] : []),
               ...(isHr ? ['separator' as const, { label: 'Xóa tài liệu', icon: Trash2, danger: true, onSelect: () => remove.mutate(r.id) }] : []),
             ]}
@@ -213,7 +224,7 @@ export default function DocumentsPage() {
             </div>
             <div>
               <dt className="text-xs uppercase tracking-wide text-muted-foreground">Thuộc quy trình</dt>
-              <dd className="font-medium">{detail.processArea ?? '—'}</dd>
+              <dd className="font-medium">{detail.processArea ?? 'Chưa cập nhật'}</dd>
             </div>
             <div>
               <dt className="text-xs uppercase tracking-wide text-muted-foreground">Phiên bản</dt>
@@ -221,11 +232,11 @@ export default function DocumentsPage() {
             </div>
             <div>
               <dt className="text-xs uppercase tracking-wide text-muted-foreground">Người đăng</dt>
-              <dd className="font-medium">{detail.uploader?.fullName ?? '—'} · {formatDate(detail.updatedAt)}</dd>
+              <dd className="font-medium">{detail.uploader?.fullName ?? 'Chưa cập nhật'} · {formatDate(detail.updatedAt)}</dd>
             </div>
             <div className="sm:col-span-2">
               <dt className="text-xs uppercase tracking-wide text-muted-foreground">Mô tả</dt>
-              <dd className="font-medium">{detail.description ?? '—'}</dd>
+              <dd className="font-medium">{detail.description ?? 'Chưa cập nhật'}</dd>
             </div>
             {detail.tags.length > 0 ? (
               <div className="sm:col-span-2">
@@ -237,12 +248,13 @@ export default function DocumentsPage() {
               <div className="sm:col-span-2">
                 <dt className="text-xs uppercase tracking-wide text-muted-foreground">Tập tin đính kèm</dt>
                 <dd>
-                  <a href={detail.fileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                  <button type="button" onClick={() => void openProtectedFile(detail.fileUrl!)} className="inline-flex items-center gap-1 text-primary hover:underline">
                     <Download className="h-4 w-4" /> {detail.fileName} ({Math.ceil((detail.fileSize ?? 0) / 1024)} KB)
-                  </a>
+                  </button>
                 </dd>
               </div>
             ) : null}
+            {isHr&&<div className="space-y-3"><div className="flex gap-2">{detail.status==='DRAFT'&&<Button disabled={publish.isPending} onClick={()=>publish.mutate(detail.id)}>Kiểm tra & công bố</Button>}<Button variant="outline" onClick={()=>{const contentMd=prompt('Nội dung bản sửa (Markdown)',detail.contentMd??'');if(contentMd)revise.mutate({doc:detail,contentMd});}}>Lưu phiên bản mới</Button></div><details><summary>Lịch sử phiên bản</summary>{history.data?.map(v=><div className="border-t p-2" key={v.id}><b>v{v.revision} — {v.snapshot.title}</b><MarkdownViewer content={v.snapshot.contentMd??'Bản đính kèm: '+(v.snapshot.fileName??'')} /></div>)}</details></div>}
             {detail.contentMd ? (
               <div className="sm:col-span-2">
                 <div className="mb-2 flex items-center justify-between">
@@ -276,6 +288,7 @@ export default function DocumentsPage() {
             <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="nghỉ-phép, biểu-mẫu" /></div>
           <div className="space-y-1.5 sm:col-span-2"><Label>Mô tả</Label>
             <Textarea className="min-h-[60px]" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+          <div><Label>Nội dung Markdown</Label><Textarea rows={8} value={form.contentMd} onChange={e=>setForm({...form,contentMd:e.target.value})} placeholder="Mục đích, phạm vi, người phụ trách, các bước, ngoại lệ, minh chứng và nguồn"/></div>
           <div className="space-y-1.5 sm:col-span-2">
             <Label>Tập tin đính kèm (PDF/DOC/XLS/ảnh — tối đa 8MB)</Label>
             <input ref={fileRef} type="file" className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-2 file:text-sm hover:file:bg-secondary/80"

@@ -1,7 +1,7 @@
 /**
- * Seed 184 Ngạch bậc lương tiêu chuẩn (NĐ 204) và Hồ sơ Toàn diện cho nhân sự.
+ * Seed danh mục mẫu Ngạch bậc lương tiêu chuẩn (NĐ 204) và Hồ sơ Toàn diện cho nhân sự.
  * Áp dụng linh hoạt cho cả Doanh nghiệp Tư nhân lẫn Cơ quan, Đơn vị sự nghiệp.
- * Idempotent: chạy lại nhiều lần an toàn.
+ * Chỉ bổ sung hồ sơ chưa có; không ghi đè hồ sơ hiện hữu.
  */
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
@@ -274,20 +274,21 @@ async function seedPersonnelData() {
     }
 
     const profileData = {
+      historyNotes: "DỮ LIỆU MÔ PHỎNG cho bài tập; chưa xác minh hồ sơ và bằng cấp. Ngạch bậc là ví dụ tham khảo, không xác lập chế độ lương doanh nghiệp.",
       userId: u.id,
       aliasName: null,
-      gender: u.fullName.includes('Thị') || u.fullName.includes('Nữ') || u.fullName.includes('Ngọc') ? 'Nữ' : 'Nam',
-      birthPlace: 'Hà Nội',
-      hometown: 'Việt Nam',
-      permanentAddress: u.address || 'Quận 1, TP. Hồ Chí Minh',
+      gender: null,
+      birthPlace: null,
+      hometown: null,
+      permanentAddress: null,
       currentAddress: u.address || 'Quận 1, TP. Hồ Chí Minh',
-      idCardNo: '079' + Math.floor(100000000 + Math.random() * 900000000),
-      idCardIssueDate: new Date('2018-05-10'),
-      idCardIssuePlace: 'Cục Cảnh sát QLHC về TTXH',
-      ethnicity: 'Kinh',
-      religion: 'Không',
-      familyOrigin: 'Viên chức',
-      priorJob: 'Kỹ sư tự do',
+      idCardNo: null, // chưa có giấy tờ xác minh
+      idCardIssueDate: null,
+      idCardIssuePlace: null,
+      ethnicity: null,
+      religion: null,
+      familyOrigin: null,
+      priorJob: null,
       recruitDate: u.hireDate || new Date('2020-01-01'),
       recruitOrg: 'Hội đồng Tuyển dụng',
       currentOrgDate: u.hireDate || new Date('2020-01-01'),
@@ -301,24 +302,25 @@ async function seedPersonnelData() {
       overGradePercent: 0,
       positionAllowance: u.jobTitle?.includes('Giám đốc') ? 0.8 : (u.jobTitle?.includes('Trưởng') ? 0.4 : 0),
       otherAllowance: 0,
-      socialInsuranceNo: '79' + Math.floor(10000000 + Math.random() * 90000000),
-      socialInsuranceDate: u.hireDate || new Date('2020-01-01'),
-      generalEducation: '12/12',
-      highestDegree: highestDegree,
-      majorName: 'Công nghệ thông tin / Quản trị',
+      socialInsuranceNo: null,
+      socialInsuranceDate: null,
+      generalEducation: null,
+      highestDegree: null,
+      majorName: null,
       academicTitle: null,
-      politicalTheory: polTheory,
-      stateManagement: 'Chuyên viên',
-      foreignLanguage: 'Tiếng Anh B2 / IELTS 6.5',
-      informaticsLevel: 'Kỹ năng CNTT nâng cao',
-      healthStatus: 'Tốt',
-      heightCm: 170,
-      weightKg: 65,
-      bloodType: 'O',
+      politicalTheory: null,
+      stateManagement: null,
+      foreignLanguage: null,
+      informaticsLevel: null,
+      healthStatus: null,
+      heightCm: null,
+      weightKg: null,
+      bloodType: null,
       strengths: 'Quản lý dự án, Nghiên cứu phát triển công nghệ',
       longestJob: u.jobTitle || 'Chuyên viên chuyên môn',
     };
 
+    if (await prisma.personnelComprehensiveProfile.findUnique({ where: { userId: u.id } })) continue;
     const profile = await prisma.personnelComprehensiveProfile.upsert({
       where: { userId: u.id },
       update: profileData,
@@ -343,7 +345,7 @@ async function seedPersonnelData() {
       data: {
         profileId: profile.id,
         schoolName: 'Đại học Quốc gia',
-        majorName: 'Khoa học Máy tính & Quản trị',
+        majorName: null,
         degreeName: highestDegree,
         studyForm: 'Chính quy',
         graduationYear: 2018,

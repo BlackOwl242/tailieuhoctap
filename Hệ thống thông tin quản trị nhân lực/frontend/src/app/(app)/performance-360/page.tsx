@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -11,8 +11,9 @@ import {
   ArrowRight, CheckCheck, FileSpreadsheet, BookOpen, FileText,
   Printer, Calculator, BarChart3, HelpCircle, Eye, Sliders,
   ChevronRight, Bookmark, ArrowUpRight, CheckSquare, ShieldCheck,
-  Percent, Info, ExternalLink
+  Percent, Info, ExternalLink, Scale
 } from 'lucide-react';
+import { useAuthStore } from '@/lib/auth-store';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
@@ -23,6 +24,7 @@ import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/components/ui/toaster';
 import { printDocumentElement } from '@/components/ui/print';
 import { Portal } from '@/components/ui/portal';
+import { isEnterpriseSector, useOrgConfig } from '@/lib/org-config';
 
 interface AppraisalCycle {
   id: string;
@@ -32,6 +34,14 @@ interface AppraisalCycle {
   endDate: string;
   status: string;
   description?: string;
+  organizationSector?: 'enterprise' | 'state';
+  publicPersonnelType?: 'CIVIL_SERVANT' | 'PUBLIC_EMPLOYEE' | null;
+  selfWeight?: number;
+  peerWeight?: number;
+  managerWeight?: number;
+  subordinateWeight?: number;
+  generalCriteriaWeight?: number;
+  taskCriteriaWeight?: number;
   _count?: { goals: number; reviews: number };
 }
 
@@ -43,12 +53,14 @@ interface AppraisalGoal {
   kraTitle: string;
   description: string;
   weightage: number;
+  criteriaGroup?: 'GENERAL' | 'RESULT';
   targetMetric: string;
   selfScore?: number;
   managerScore?: number;
   finalScore?: number;
   status: string;
   cycle?: AppraisalCycle;
+  evidences?: { id: string; description: string; metricValue?: string | null; evidenceUrl?: string | null; createdAt: string }[];
 }
 
 interface AppraisalReview {
@@ -70,6 +82,43 @@ interface EmployeeItem {
   jobTitle?: string;
   orgUnit?: { name: string };
 }
+
+interface PublicDecisionRow {
+  userId: string;
+  employeeName: string;
+  jobTitle?: string | null;
+  orgUnitName: string;
+  score: number | null;
+  scoreClassification: 'EXCELLENT' | 'GOOD' | 'SATISFACTORY' | 'UNSATISFACTORY' | null;
+  complete: boolean;
+  missingTaskEvidence?: boolean;
+  comparableGroup: string;
+  finalClassification: 'EXCELLENT' | 'GOOD' | 'SATISFACTORY' | 'UNSATISFACTORY' | null;
+  excellentCriteriaConfirmed: boolean;
+  quotaExceptionApproved: boolean;
+  exceptionDecisionNo: string;
+  decisionNote: string;
+  decided: boolean;
+}
+
+type PublicDecisionDraft = {
+  userId: string;
+  comparableGroup: string;
+  finalClassification: 'EXCELLENT' | 'GOOD' | 'SATISFACTORY' | 'UNSATISFACTORY';
+  excellentCriteriaConfirmed: boolean;
+  quotaExceptionApproved: boolean;
+  exceptionDecisionNo: string;
+  decisionNote: string;
+};
+
+const PUBLIC_CLASSIFICATIONS = [
+  { value: 'EXCELLENT', label: 'Hoàn thành xuất sắc nhiệm vụ' },
+  { value: 'GOOD', label: 'Hoàn thành tốt nhiệm vụ' },
+  { value: 'SATISFACTORY', label: 'Hoàn thành nhiệm vụ' },
+  { value: 'UNSATISFACTORY', label: 'Không hoàn thành nhiệm vụ' },
+] as const;
+
+const publicClassificationRank = (value?: string | null) => ({ UNSATISFACTORY: 0, SATISFACTORY: 1, GOOD: 2, EXCELLENT: 3 }[value ?? ''] ?? -1);
 
 // Thư viện Mục tiêu KPI Mẫu theo Khối Phòng Ban
 const KPI_LIBRARY = [
@@ -196,12 +245,20 @@ const KPI_LIBRARY = [
 ];
 
 export default function Performance360Page() {
+  const currentUser = useAuthStore(state => state.user);
   const router = useRouter();
   const queryClient = useQueryClient();
   const toast = useToast();
+  const [printConfig] = useOrgConfig();
+  const isEnterprise = isEnterpriseSector(printConfig);
+  const publicEmployee = printConfig.publicPersonnelType === 'PUBLIC_EMPLOYEE';
+  const canCalibrate = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD'].includes(role)));
+  const canManageGoals = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD'].includes(role)));
+  const canManageCycles = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'BOD'].includes(role)));
+  const canAdministerGoals = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(role)));
 
   const searchParams = useSearchParams();
-  const validTabs = ['goals', 'reviews', 'templates', 'rubrics', 'cycles'] as const;
+  const validTabs = useMemo(() => isEnterprise ? ['goals', 'reviews', 'templates', 'rubrics', 'cycles'] : canCalibrate ? ['goals', 'templates', 'rubrics', 'calibration', 'cycles'] : ['goals', 'templates', 'rubrics', 'cycles'], [isEnterprise, canCalibrate]);
   type TabType = typeof validTabs[number];
 
   const paramTab = searchParams.get('tab');
@@ -213,10 +270,10 @@ export default function Performance360Page() {
     const currentTab = searchParams.get('tab');
     if (currentTab && (validTabs as readonly string[]).includes(currentTab)) {
       setActiveTab(currentTab as TabType);
-    } else if (!currentTab) {
+    } else {
       setActiveTab('goals');
     }
-  }, [searchParams]);
+  }, [searchParams, validTabs]);
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
@@ -235,10 +292,14 @@ export default function Performance360Page() {
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [evidenceGoal, setEvidenceGoal] = useState<AppraisalGoal | null>(null);
+  const [evidenceForm, setEvidenceForm] = useState({ description: '', metricValue: '', evidenceUrl: '' });
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
+  const [calibrationCycleId, setCalibrationCycleId] = useState('');
+  const [publicDecisionDrafts, setPublicDecisionDrafts] = useState<Record<string, PublicDecisionDraft>>({});
   const [isKpiLibraryOpen, setIsKpiLibraryOpen] = useState(false);
   const [selectedKpiDept, setSelectedKpiDept] = useState<'tech' | 'sales' | 'finance' | 'hr'>('tech');
-  const [selectedTemplateForPrint, setSelectedTemplateForPrint] = useState<'kra' | 'bars' | 'survey360' | 'nd90' | null>(null);
+  const [selectedTemplateForPrint, setSelectedTemplateForPrint] = useState<'kra' | 'bars' | 'survey360' | 'internalDevelopment' | null>(null);
 
   // Active items for modals
   const [selectedGoal, setSelectedGoal] = useState<AppraisalGoal | null>(null);
@@ -249,7 +310,7 @@ export default function Performance360Page() {
     year: 2026,
     startDate: '2026-01-01',
     endDate: '2026-12-31',
-    description: 'Chu kỳ đánh giá năng lực, KRA/KPI và phản hồi 360 độ toàn diện toàn cơ quan/doanh nghiệp.',
+    description: 'Chu kỳ đánh giá theo chế độ tổ chức đã cấu hình.',
   });
 
   // Form Goal
@@ -260,12 +321,13 @@ export default function Performance360Page() {
     kraTitle: '',
     targetMetric: '',
     weightage: 25,
+    criteriaGroup: 'RESULT' as 'GENERAL' | 'RESULT',
     description: '',
   });
 
   // Form Score
-  const [selfScore, setSelfScore] = useState(90);
-  const [managerScore, setManagerScore] = useState(95);
+  const [selfScore, setSelfScore] = useState<number | null>(null);
+  const [managerScore, setManagerScore] = useState<number | null>(null);
 
   // Form Review 360
   const [reviewForm, setReviewForm] = useState({
@@ -281,8 +343,7 @@ export default function Performance360Page() {
   const [syncForm, setSyncForm] = useState({
     userId: '',
     year: 2026,
-    classification: 'EXCELLENT' as 'EXCELLENT' | 'GOOD' | 'SATISFACTORY' | 'UNSATISFACTORY',
-    comment: 'Hoàn thành xuất sắc nhiệm vụ theo kỳ đánh giá hiệu suất 360 độ',
+    comment: 'Kết quả đánh giá nhiệm vụ theo kỳ và căn cứ áp dụng',
     decisionNo: 'QĐ-ĐGCB/2026',
   });
 
@@ -291,6 +352,8 @@ export default function Performance360Page() {
     queryKey: ['hrms-performance-cycles'],
     queryFn: async () => (await api.get('/hrms/performance/cycles')).data,
   });
+  const stateCycles = cycles.filter(cycle => cycle.organizationSector === 'state');
+  const effectiveCalibrationCycleId = calibrationCycleId || stateCycles[0]?.id || '';
 
   const { data: goals = [], isLoading: isLoadingGoals } = useQuery<AppraisalGoal[]>({
     queryKey: ['hrms-performance-goals', selectedCycleFilter, selectedEmpFilter],
@@ -315,6 +378,34 @@ export default function Performance360Page() {
     queryKey: ['employees-simple-list'],
     queryFn: async () => (await api.get('/employees')).data,
   });
+
+  const { data: publicDecisions = [], isLoading: isLoadingPublicDecisions } = useQuery<PublicDecisionRow[]>({
+    queryKey: ['hrms-performance-public-decisions', effectiveCalibrationCycleId],
+    queryFn: async () => (await api.get('/hrms/performance/public-decisions', { params: { cycleId: effectiveCalibrationCycleId } })).data,
+    enabled: Boolean(effectiveCalibrationCycleId),
+  });
+
+  const savePublicDecisionMutation = useMutation({
+    mutationFn: async (draft: PublicDecisionDraft) => (await api.post('/hrms/performance/public-decisions', { cycleId: effectiveCalibrationCycleId, ...draft })).data,
+    onSuccess: () => {
+      toast('Đã lưu kết luận hiệu chuẩn công vụ.', 'success');
+      queryClient.invalidateQueries({ queryKey: ['hrms-performance-public-decisions', effectiveCalibrationCycleId] });
+    },
+    onError: (err) => toast('Không lưu được kết luận: ' + errorMessage(err), 'error'),
+  });
+
+  const updatePublicDecisionDraft = (row: PublicDecisionRow, patch: Partial<PublicDecisionDraft>) => {
+    const current = publicDecisionDrafts[row.userId] ?? {
+      userId: row.userId,
+      comparableGroup: row.comparableGroup,
+      finalClassification: row.finalClassification ?? row.scoreClassification ?? 'UNSATISFACTORY',
+      excellentCriteriaConfirmed: row.excellentCriteriaConfirmed,
+      quotaExceptionApproved: row.quotaExceptionApproved,
+      exceptionDecisionNo: row.exceptionDecisionNo,
+      decisionNote: row.decisionNote,
+    };
+    setPublicDecisionDrafts(previous => ({ ...previous, [row.userId]: { ...current, ...patch } }));
+  };
 
   // Mutations
   const createCycleMutation = useMutation({
@@ -371,6 +462,7 @@ export default function Performance360Page() {
         kraTitle: goalForm.kraTitle,
         targetMetric: goalForm.targetMetric,
         weightage: Number(goalForm.weightage) || 20,
+        criteriaGroup: goalForm.criteriaGroup,
         description: goalForm.description,
       })).data;
     },
@@ -385,6 +477,7 @@ export default function Performance360Page() {
         kraTitle: '',
         targetMetric: '',
         weightage: 25,
+        criteriaGroup: 'RESULT',
         description: '',
       });
     },
@@ -394,10 +487,12 @@ export default function Performance360Page() {
   const scoreGoalMutation = useMutation({
     mutationFn: async () => {
       if (!selectedGoal) return;
-      return (await api.patch(`/hrms/performance/goals/${selectedGoal.id}/score`, {
-        selfScore: Number(selfScore),
-        managerScore: Number(managerScore),
-      })).data;
+      if (selectedGoal.userId === currentUser?.id) {
+        if (selfScore === null) throw new Error('Nhập điểm tự đánh giá');
+        return (await api.patch(`/hrms/performance/goals/${selectedGoal.id}/score`, { selfScore })).data;
+      }
+      if (managerScore === null) throw new Error('Nhập điểm quản lý đánh giá');
+      return (await api.patch(`/hrms/performance/goals/${selectedGoal.id}/score`, { managerScore })).data;
     },
     onSuccess: () => {
       toast('Đã cập nhật điểm đánh giá KRA!', 'success');
@@ -416,6 +511,25 @@ export default function Performance360Page() {
       queryClient.invalidateQueries({ queryKey: ['hrms-performance-goals'] });
     },
     onError: (err) => toast('Lỗi: ' + errorMessage(err), 'error'),
+  });
+
+  const addEvidenceMutation = useMutation({
+    mutationFn: async () => {
+      if (!evidenceGoal) throw new Error('Chưa chọn mục tiêu');
+      if (evidenceForm.description.trim().length < 3) throw new Error('Nhập mô tả kết quả hoặc minh chứng');
+      return (await api.post(`/hrms/performance/goals/${evidenceGoal.id}/evidence`, {
+        description: evidenceForm.description.trim(),
+        metricValue: evidenceForm.metricValue.trim() || undefined,
+        evidenceUrl: evidenceForm.evidenceUrl.trim() || undefined,
+      })).data;
+    },
+    onSuccess: () => {
+      toast('Đã lưu kết quả và minh chứng.', 'success');
+      queryClient.invalidateQueries({ queryKey: ['hrms-performance-goals'] });
+      setEvidenceGoal(null);
+      setEvidenceForm({ description: '', metricValue: '', evidenceUrl: '' });
+    },
+    onError: (err) => toast('Không lưu được minh chứng: ' + errorMessage(err), 'error'),
   });
 
   const createReviewMutation = useMutation({
@@ -470,15 +584,35 @@ export default function Performance360Page() {
 
   const avgRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-    : '5.0';
+    : null;
 
   const activeCycle = cycles.find((c) => c.status === 'ACTIVE') || cycles[0];
+  const goalSetupCycles = cycles.filter((cycle) => cycle.status === 'ACTIVE' && cycle.organizationSector === (isEnterprise ? 'enterprise' : 'state'));
+  const goalWeightTotal = (goal: AppraisalGoal) => goals
+    .filter((item) => item.userId === goal.userId && item.cycleId === goal.cycleId)
+    .reduce((sum, item) => sum + item.weightage, 0);
+  const incompleteGoalWeightCount = Array.from(goals.reduce((totals, goal) => {
+    const key = `${goal.cycleId}:${goal.userId}`;
+    totals.set(key, (totals.get(key) ?? 0) + goal.weightage);
+    return totals;
+  }, new Map<string, number>()).values()).filter((total) => Math.abs(total - 100) > 0.001).length;
+  const openGoalSetup = () => {
+    if (!goalSetupCycles.length) {
+      toast('Chưa có chu kỳ đang mở cho chế độ tổ chức hiện tại. Hãy khởi tạo chu kỳ trước khi giao mục tiêu.', 'error');
+      if (canManageCycles) setIsCycleModalOpen(true);
+      return;
+    }
+    setGoalForm((form) => ({ ...form, cycleId: goalSetupCycles[0].id }));
+    setIsGoalModalOpen(true);
+  };
 
   return (
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
         title="Đánh giá KPI"
-        description="Thiết lập mục tiêu KPI theo trọng số, quy trình tự đánh giá và phản hồi đa chiều."
+        description={isEnterprise
+          ? 'Quy trình quản lý hiệu suất: nhân viên và quản lý thống nhất KRA/KPI có trọng số, sau đó đánh giá và dùng phản hồi 360. Điểm không tự động chuyển thành lương thưởng.'
+          : `Đánh giá nhiệm vụ theo tiêu chí chung 30% và kết quả công việc 70% (${printConfig.publicPersonnelType === 'PUBLIC_EMPLOYEE' ? 'NĐ 233/2026' : 'NĐ 335/2025'}).`}
         breadcrumbs={[{ label: 'Phát triển' }, { label: 'Đánh giá KPI' }]}
         actions={
           <div className="flex flex-wrap items-center gap-2">
@@ -492,7 +626,13 @@ export default function Performance360Page() {
                 Sổ tay Quy ước C&amp;B
               </Button>
             </Link>
-            <Button
+            <Link href="/performance-guide">
+              <Button variant="outline" size="sm" className="text-xs h-8">
+                <HelpCircle className="h-3.5 w-3.5 mr-1.5" />
+                Cách đánh giá
+              </Button>
+            </Link>
+            {canManageCycles && <Button
               variant="outline"
               size="sm"
               onClick={() => setIsCycleModalOpen(true)}
@@ -500,8 +640,8 @@ export default function Performance360Page() {
             >
               <Calendar className="h-3.5 w-3.5 mr-1.5" />
               Khởi tạo chu kỳ
-            </Button>
-            <Button
+            </Button>}
+            {isEnterprise && <Button
               variant="outline"
               size="sm"
               onClick={() => {
@@ -516,22 +656,15 @@ export default function Performance360Page() {
             >
               <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
               Gửi phản hồi 360
-            </Button>
-            <Button
+            </Button>}
+            {canManageGoals && <Button
               size="sm"
-              onClick={() => {
-                if (cycles.length === 0) {
-                  toast('Vui lòng tạo ít nhất 1 chu kỳ đánh giá trước!', 'error');
-                  setIsCycleModalOpen(true);
-                  return;
-                }
-                setIsGoalModalOpen(true);
-              }}
+              onClick={openGoalSetup}
               className="text-xs h-8"
             >
               <Plus className="h-3.5 w-3.5 mr-1.5" />
               Thiết lập mục tiêu KRA
-            </Button>
+            </Button>}
           </div>
         }
       />
@@ -550,20 +683,25 @@ export default function Performance360Page() {
           subtitle={`Đã giao cho nhân sự (${goals.filter(g => g.managerScore != null).length} đã chấm)`}
           icon={Target}
         />
-        <NumberCard
+        {isEnterprise && <NumberCard
           title="Phản Hồi 360 Độ"
           value={reviews.length}
           subtitle="Từ cấp trên, đồng nghiệp & cấp dưới"
           icon={MessageSquare}
-        />
-        <NumberCard
-          title="Điểm Đánh Giá TB"
-          value={`${avgRating} / 5.0`}
-          subtitle="Mức đánh giá tích lũy"
+        />}
+        {isEnterprise && <NumberCard
+          title="Điểm phản hồi 360 trung bình"
+          value={avgRating === null ? 'Chưa có phản hồi' : `${avgRating} / 5.0`}
+          subtitle={avgRating === null ? 'Chưa có phiếu trong chu kỳ đang lọc' : 'Trung bình các phiếu phản hồi 360'}
           icon={Star}
-          trend={{ value: '+0.2', isPositive: true, label: 'chu kỳ này' }}
-        />
+        />}
       </div>
+
+      {isEnterprise && <div className="rounded-lg border border-border bg-card px-4 py-3 text-sm leading-6">
+        <p className="font-semibold text-foreground">Đây là quy trình kết hợp KPI và phản hồi 360</p>
+        <p className="text-muted-foreground">Quản lý hoặc HR giao mục tiêu cho nhân viên; từng KPI cần chỉ số, ngưỡng đạt, thời hạn và nguồn đối chiếu. Nhân viên tự chấm, quản lý chấm kết quả, còn đồng nghiệp/cấp dưới gửi phản hồi 360. Hệ thống ghép các nguồn theo trọng số của chu kỳ và chỉ hoàn tất điểm chu kỳ khi tổng trọng số KPI của mỗi người đủ 100%.</p>
+        {incompleteGoalWeightCount > 0 && <p className="mt-1 text-foreground">Hiện có {incompleteGoalWeightCount} nhóm nhân sự/chu kỳ chưa đủ 100% trọng số mục tiêu.</p>}
+      </div>}
 
       {/* Navigation Tabs (Đồng bộ chuẩn hệ thống) */}
       <div className="flex flex-wrap items-center justify-between border-b border-border gap-4">
@@ -579,7 +717,7 @@ export default function Performance360Page() {
             <Target className="h-4 w-4" />
             Mục tiêu KRA ({goals.length})
           </button>
-          <button
+          {isEnterprise && <button
             onClick={() => handleTabChange('reviews')}
             className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'reviews'
@@ -589,7 +727,7 @@ export default function Performance360Page() {
           >
             <MessageSquare className="h-4 w-4" />
             Phản hồi 360 ({reviews.length})
-          </button>
+          </button>}
           <button
             onClick={() => handleTabChange('templates')}
             className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
@@ -612,6 +750,17 @@ export default function Performance360Page() {
             <Sliders className="h-4 w-4" />
             Quy ước xếp loại
           </button>
+          {!isEnterprise && canCalibrate && <button
+            onClick={() => handleTabChange('calibration')}
+            className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+              activeTab === 'calibration'
+                ? 'border-foreground text-foreground font-semibold'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Scale className="h-4 w-4" />
+            Hiệu chuẩn công vụ
+          </button>}
           <button
             onClick={() => handleTabChange('cycles')}
             className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
@@ -649,11 +798,13 @@ export default function Performance360Page() {
               <Target className="w-10 h-10 text-muted-foreground/40 mx-auto" />
               <div className="text-sm font-bold text-foreground">Chưa có mục tiêu KRA/KPI nào trong chu kỳ này</div>
               <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                Bấm nút &quot;Thiết Lập Mục Tiêu KRA&quot; để giao chỉ tiêu cụ thể, trọng số phần trăm và phương pháp đo lường cho cán bộ nhân viên.
+                {canManageGoals
+                  ? 'Quản lý thiết lập mục tiêu theo định hướng của đơn vị và thống nhất chỉ tiêu với nhân viên trước khi giao.'
+                  : 'Mục tiêu được quản lý thiết lập và thống nhất với nhân viên. Tại đây, nhân viên theo dõi mục tiêu, tự đánh giá và nộp minh chứng.'}
               </p>
-              <Button size="sm" onClick={() => setIsGoalModalOpen(true)}>
+              {canManageGoals && <Button size="sm" onClick={openGoalSetup}>
                 <Plus className="w-4 h-4 mr-1.5" /> Thiết Lập Mục Tiêu KRA Đầu Tiên
-              </Button>
+              </Button>}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -673,7 +824,7 @@ export default function Performance360Page() {
                       <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border border-border bg-muted/40 text-foreground">
                         Trọng số: {g.weightage}%
                       </span>
-                      <button
+                      {canAdministerGoals && <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -685,7 +836,7 @@ export default function Performance360Page() {
                         title="Xóa mục tiêu"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      </button>}
                     </div>
                   </div>
 
@@ -696,24 +847,43 @@ export default function Performance360Page() {
                     <p className="font-semibold text-foreground text-sm">{g.targetMetric || 'Chưa thiết lập'}</p>
                   </div>
 
+                  {isEnterprise && <p className="text-xs text-muted-foreground">Tổng trọng số mục tiêu của nhân sự trong kỳ: <b className="text-foreground">{goalWeightTotal(g)}% / 100%</b>{goalWeightTotal(g) < 100 ? ` · Còn ${100 - goalWeightTotal(g)}% chưa phân bổ` : goalWeightTotal(g) > 100 ? ' · Vượt 100%, cần điều chỉnh' : ''}</p>}
+
+                  {g.evidences?.length ? <div className="space-y-1 border-t pt-2 text-xs">
+                    <p className="font-medium text-foreground">Kết quả / minh chứng đã ghi ({g.evidences.length})</p>
+                    {g.evidences.map((evidence) => <div key={evidence.id} className="text-muted-foreground">
+                      <span>{evidence.metricValue ? `${evidence.metricValue} · ` : ''}{evidence.description}</span>
+                      {evidence.evidenceUrl && <a href={evidence.evidenceUrl} target="_blank" rel="noreferrer" className="ml-2 text-primary underline">Mở tài liệu</a>}
+                    </div>)}
+                  </div> : null}
+
                   <div className="pt-3 border-t flex items-center justify-between text-sm">
                     <div className="space-x-2">
-                      <span>Tự chấm: <b>{g.selfScore != null ? `${g.selfScore}/100` : '—'}</b></span>
+                      <span>Tự chấm: <b>{g.selfScore != null ? `${g.selfScore}/100` : 'Chưa cập nhật'}</b></span>
                       <span>•</span>
-                      <span>Quản lý: <b className="font-bold text-foreground">{g.managerScore != null ? `${g.managerScore}/100` : '—'}</b></span>
+                      <span>Quản lý: <b className="font-bold text-foreground">{g.managerScore != null ? `${g.managerScore}/100` : 'Chưa cập nhật'}</b></span>
                     </div>
-                    <button
-                      onClick={() => {
-                        setSelectedGoal(g);
-                        setSelfScore(g.selfScore ?? 90);
-                        setManagerScore(g.managerScore ?? 95);
-                        setIsScoreModalOpen(true);
-                      }}
-                      className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
-                    >
-                      <span>Chấm Điểm</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-3">
+                      {(g.userId === currentUser?.id || canManageGoals) && <button
+                        onClick={() => {
+                          setEvidenceGoal(g);
+                          setEvidenceForm({ description: '', metricValue: '', evidenceUrl: '' });
+                        }}
+                        className="font-medium text-muted-foreground hover:text-foreground"
+                      >Ghi kết quả / minh chứng</button>}
+                      <button
+                        onClick={() => {
+                          setSelectedGoal(g);
+                          setSelfScore(g.selfScore ?? null);
+                          setManagerScore(g.managerScore ?? null);
+                          setIsScoreModalOpen(true);
+                        }}
+                        className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
+                      >
+                        <span>Chấm điểm</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -805,14 +975,21 @@ export default function Performance360Page() {
                   <FileText className="w-5 h-5" />
                 </span>
                 <h3 className="font-bold text-foreground text-base">
-                  Bộ Biểu Mẫu Đánh Giá Nhân Sự Chuẩn Quốc Tế & Quy Định Nhà Nước
+                  Bộ mẫu đánh giá hiệu suất nội bộ
                 </h3>
               </div>
               <p className="text-xs text-muted-foreground max-w-2xl leading-relaxed">
-                Hệ thống chuẩn hóa 4 bộ form mẫu đánh giá toàn diện: KRA/KPI trọng số định lượng, Khung năng lực hành vi BARS 1-5 sao, Khảo sát đa chiều 360 độ và Mẫu phân loại cán bộ theo Nghị định 90/2020/NĐ-CP. Hỗ trợ xem trước và in ấn A4 chuẩn văn bản hành chính.
+                {isEnterprise
+                  ? 'Các mẫu ở chế độ doanh nghiệp là biểu mẫu nội bộ; trọng số thay đổi theo vai trò và không áp dụng hạn ngạch xếp loại công vụ. Kết quả KPI không tự tạo thưởng, điều chỉnh lương hoặc kết nối P3.'
+                  : 'Kỳ khu vực công chấm tiêu chí chung 30 điểm và kết quả nhiệm vụ 70 điểm. Màn hình hiệu chuẩn lưu kết luận có thẩm quyền, phân nhóm nhiệm vụ và kiểm tra tỷ lệ 20% hoặc ngoại lệ đến 25% khi có quyết định; biểu mẫu pháp quy và quy trình ký duyệt chính thức vẫn cần cấu hình theo cơ quan.'}
               </p>
+              {!isEnterprise && <p className="text-xs text-muted-foreground max-w-2xl leading-relaxed">
+                Căn cứ: công chức theo Nghị định 335/2025/NĐ-CP; viên chức theo Nghị định 233/2026/NĐ-CP. Tỷ lệ hoàn thành xuất sắc và trường hợp ngoại lệ chỉ áp dụng đúng phạm vi khu vực công, không áp dụng cho doanh nghiệp.
+                {' '}<a className="underline" href="https://vanban.chinhphu.vn/?classid=1&docid=216292&pageid=27160&typegroupid=4" target="_blank" rel="noreferrer">Nghị định 335/2025</a>
+                {' '}·{' '}<a className="underline" href="https://vanban.chinhphu.vn/?docid=218616&pageid=27160&typegroupid=4" target="_blank" rel="noreferrer">Nghị định 233/2026</a>.
+              </p>}
             </div>
-            <div className="flex items-center gap-2">
+            {isEnterprise && <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setIsKpiLibraryOpen(true)}
@@ -821,11 +998,11 @@ export default function Performance360Page() {
                 <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
                 Thư Viện KPI Mẫu
               </button>
-            </div>
+            </div>}
           </div>
 
-          {/* Grid 4 Form Mẫu Đánh Giá Chuẩn */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {/* Mỗi mẫu chiếm trọn một hàng để phần mô tả và bảng xem trước không bị ép hẹp */}
+          <div className="grid grid-cols-1 gap-5">
             {/* MẪU 1: PHIẾU ĐÁNH GIÁ KRA / KPI TRỌNG SỐ */}
             <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4 hover:border-border/80 transition-colors flex flex-col justify-between">
               <div className="space-y-3">
@@ -835,8 +1012,8 @@ export default function Performance360Page() {
                       <Target className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
-                        Mẫu 01 • Định Lượng
+              <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
+                        {isEnterprise ? 'Mẫu 01 • KPI doanh nghiệp' : 'Mẫu 01 • Tiêu chí nhiệm vụ công vụ'}
                       </div>
                       <h4 className="font-bold text-foreground text-base mt-0.5">
                         Phiếu Đánh Giá Mục Tiêu Hiệu Suất Theo Trọng Số
@@ -853,34 +1030,35 @@ export default function Performance360Page() {
                 <div className="border border-border/70 rounded-lg overflow-hidden text-sm">
                   <div className="bg-muted/40 px-3.5 py-2.5 font-semibold text-foreground border-b border-border/70 flex justify-between items-center text-xs">
                     <span>Cấu trúc bảng mục tiêu mẫu (Tổng 100%)</span>
-                    <span className="text-muted-foreground">Công thức: Σ(Điểm × Trọng số)</span>
+                  <span className="text-muted-foreground">Công thức: Σ(Điểm × Trọng số)</span>
                   </div>
+                {!isEnterprise && <p className="border-b border-border/70 bg-muted/20 px-3.5 py-2 text-xs leading-5 text-muted-foreground">Khung kỳ: tiêu chí chung 30 điểm + kết quả nhiệm vụ 70 điểm. Các tiêu chí trong từng nhóm phải có tổng trọng số riêng bằng 100%. Đây là minh họa nhập liệu, không phải biểu mẫu pháp quy.</p>}
                   <div className="divide-y divide-border/50 bg-card">
                     <div className="px-3.5 py-2.5 flex items-center justify-between text-sm">
                       <div>
-                        <b className="text-foreground">Mục tiêu 1: Doanh số &amp; Nghiệp vụ cốt lõi</b>
-                        <span className="block text-xs text-muted-foreground mt-0.5">Đích: Hoàn thành 100% hạn mức cam kết</span>
+                        <b className="text-foreground">{isEnterprise ? 'Mục tiêu 1: Doanh số & Nghiệp vụ cốt lõi' : 'Nhiệm vụ 1: Sản phẩm đầu ra được giao'}</b>
+                        <span className="block text-xs text-muted-foreground mt-0.5">{isEnterprise ? 'Đích: Hoàn thành 100% hạn mức cam kết' : 'Đích: Đúng sản phẩm, thời hạn và yêu cầu chất lượng được giao'}</span>
                       </div>
                       <span className="font-semibold text-foreground text-sm shrink-0 ml-3">Trọng số 35%</span>
                     </div>
                     <div className="px-3.5 py-2.5 flex items-center justify-between text-sm">
                       <div>
-                        <b className="text-foreground">Mục tiêu 2: Tiến độ &amp; Chất lượng dịch vụ</b>
-                        <span className="block text-xs text-muted-foreground mt-0.5">Đích: Tỷ lệ hoạt động ổn định &gt;= 99.9%, bàn giao đúng hẹn</span>
+                        <b className="text-foreground">{isEnterprise ? 'Mục tiêu 2: Tiến độ & Chất lượng dịch vụ' : 'Nhiệm vụ 2: Tiến độ và chất lượng xử lý'}</b>
+                        <span className="block text-xs text-muted-foreground mt-0.5">{isEnterprise ? 'Đích: Tỷ lệ hoạt động ổn định &gt;= 99.9%, bàn giao đúng hẹn' : 'Đích: Hồ sơ hoặc sản phẩm được xử lý đúng hạn, đúng quy trình'}</span>
                       </div>
                       <span className="font-semibold text-foreground text-sm shrink-0 ml-3">Trọng số 25%</span>
                     </div>
                     <div className="px-3.5 py-2.5 flex items-center justify-between text-sm">
                       <div>
-                        <b className="text-foreground">Mục tiêu 3: Cải tiến kỹ thuật &amp; Tiết kiệm chi phí</b>
-                        <span className="block text-xs text-muted-foreground mt-0.5">Đích: Tiết kiệm &gt;= 15% thời gian hoặc kinh phí</span>
+                        <b className="text-foreground">{isEnterprise ? 'Mục tiêu 3: Cải tiến kỹ thuật & Tiết kiệm chi phí' : 'Nhiệm vụ 3: Phối hợp và xử lý phát sinh'}</b>
+                        <span className="block text-xs text-muted-foreground mt-0.5">{isEnterprise ? 'Đích: Tiết kiệm &gt;= 15% thời gian hoặc kinh phí' : 'Đích: Phối hợp đúng đầu mối, xử lý phát sinh có căn cứ'}</span>
                       </div>
                       <span className="font-semibold text-foreground text-sm shrink-0 ml-3">Trọng số 20%</span>
                     </div>
                     <div className="px-3.5 py-2.5 flex items-center justify-between text-sm">
                       <div>
-                        <b className="text-foreground">Mục tiêu 4: Báo cáo &amp; Tuân thủ kỷ luật quy trình</b>
-                        <span className="block text-xs text-muted-foreground mt-0.5">Đích: 100% báo cáo đúng hạn, không vi phạm nội quy</span>
+                        <b className="text-foreground">{isEnterprise ? 'Mục tiêu 4: Báo cáo & Tuân thủ quy trình' : 'Nhiệm vụ 4: Chất lượng tham mưu và báo cáo'}</b>
+                        <span className="block text-xs text-muted-foreground mt-0.5">{isEnterprise ? 'Đích: 100% báo cáo đúng hạn, không vi phạm nội quy' : 'Đích: Báo cáo đầy đủ, chính xác, đúng hạn và có minh chứng'}</span>
                       </div>
                       <span className="font-semibold text-foreground text-sm shrink-0 ml-3">Trọng số 20%</span>
                     </div>
@@ -897,16 +1075,14 @@ export default function Performance360Page() {
                   <Eye className="w-4 h-4" />
                   Xem và In Biểu Mẫu A4
                 </button>
-                <button
+                {canManageGoals && <button
                   type="button"
-                  onClick={() => {
-                    setIsGoalModalOpen(true);
-                  }}
+                  onClick={openGoalSetup}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors shadow-2xs"
                 >
                   <Plus className="w-4 h-4" />
                   Giao Mục Tiêu Ngay
-                </button>
+                </button>}
               </div>
             </div>
 
@@ -977,6 +1153,7 @@ export default function Performance360Page() {
               </div>
             </div>
 
+            {isEnterprise && <>
             {/* MẪU 3: PHIẾU KHẢO SÁT ĐÁNH GIÁ ĐA CHIỀU 360 ĐỘ */}
             <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4 hover:border-border/80 transition-colors flex flex-col justify-between">
               <div className="space-y-3">
@@ -1037,8 +1214,10 @@ export default function Performance360Page() {
                 </button>
               </div>
             </div>
+            </>}
 
-            {/* MẪU 4: PHIẾU ĐÁNH GIÁ PHÂN LOẠI CÁN BỘ THEO NGHỊ ĐỊNH 90 */}
+            {isEnterprise && <>
+            {/* MẪU 4: PHIẾU ĐÁNH GIÁ NỘI BỘ DOANH NGHIỆP */}
             <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4 hover:border-border/80 transition-colors flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
@@ -1048,44 +1227,44 @@ export default function Performance360Page() {
                     </div>
                     <div>
                       <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
-                        Mẫu 04 • Quy Chuẩn Nhà Nước
+                        Mẫu 04 • Nội bộ doanh nghiệp
                       </div>
                       <h4 className="font-bold text-foreground text-base mt-0.5">
-                        Phiếu Đánh Giá &amp; Xếp Loại Cán Bộ (Nghị định 90/2020/NĐ-CP)
+                        Phiếu đánh giá hiệu suất và kế hoạch phát triển
                       </h4>
                     </div>
                   </div>
                 </div>
 
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Áp dụng cho khối Cơ quan Nhà nước, Đơn vị sự nghiệp công lập và Doanh nghiệp Nhà nước theo Nghị định 90/2020/NĐ-CP và Hướng dẫn 89-HD/BTCTW của Ban Tổ chức Trung ương.
+                  Mẫu tham khảo để nhân viên và quản lý ghi nhận kết quả, điểm mạnh, điểm cần cải thiện và mục tiêu phát triển. Không phải biểu mẫu pháp quy.
                 </p>
 
                 {/* Bảng xem trước 4 tiêu chuẩn chính */}
                 <div className="border border-border/70 rounded-lg overflow-hidden text-sm">
                   <div className="bg-muted/40 px-3.5 py-2.5 font-semibold text-foreground border-b border-border/70 flex justify-between items-center text-xs">
-                    <span>4 Tiêu chuẩn chung &amp; Kết quả chức trách</span>
-                    <span className="text-muted-foreground">Quy định NĐ 90/2020</span>
+                    <span>Kết quả, năng lực và kế hoạch cải thiện</span>
+                    <span className="text-muted-foreground">Mẫu nội bộ</span>
                   </div>
                   <div className="divide-y divide-border/50 bg-card p-3.5 space-y-2 text-sm">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground">1. Chính trị tư tưởng:</span>
-                      <span className="text-xs text-muted-foreground">Chấp hành đường lối, chủ trương Đảng &amp; Nhà nước</span>
+                      <span className="font-medium text-foreground">1. Kết quả mục tiêu:</span>
+                      <span className="text-xs text-muted-foreground">KPI, chất lượng, thời hạn và minh chứng</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground">2. Đạo đức, lối sống:</span>
-                      <span className="text-xs text-muted-foreground">Giữ gìn phẩm chất, không tham nhũng, lãng phí</span>
+                      <span className="font-medium text-foreground">2. Năng lực:</span>
+                      <span className="text-xs text-muted-foreground">Năng lực chuyên môn và hành vi theo vị trí</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground">3. Tác phong lề lối làm việc:</span>
-                      <span className="text-xs text-muted-foreground">Tinh thần trách nhiệm, thái độ phục vụ nhân dân</span>
+                      <span className="font-medium text-foreground">3. Phản hồi:</span>
+                      <span className="text-xs text-muted-foreground">Ý kiến nhân viên, quản lý và bên liên quan</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground">4. Ý thức tổ chức kỷ luật:</span>
-                      <span className="text-xs text-muted-foreground">Chấp hành phân công, quy chế văn hóa công sở</span>
+                      <span className="font-medium text-foreground">4. Phát triển:</span>
+                      <span className="text-xs text-muted-foreground">Mục tiêu, hoạt động, mốc thời gian và minh chứng</span>
                     </div>
                     <div className="pt-1.5 border-t border-border/70 text-foreground font-semibold text-xs">
-                      ★ Định mức phân bổ: Hoàn thành Xuất sắc (≤ 20%) • Tốt • Hoàn thành • Không hoàn thành
+                      Mức đánh giá theo quy chế và thang điểm doanh nghiệp đã phê duyệt.
                     </div>
                   </div>
                 </div>
@@ -1094,22 +1273,23 @@ export default function Performance360Page() {
               <div className="pt-3 border-t border-border flex items-center justify-between gap-2">
                 <button
                   type="button"
-                  onClick={() => setSelectedTemplateForPrint('nd90')}
+                  onClick={() => setSelectedTemplateForPrint('internalDevelopment')}
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:underline"
                 >
                   <Eye className="w-4 h-4" />
-                  Xem và In Mẫu NĐ 90 A4
+                  Xem và In Mẫu Nội Bộ A4
                 </button>
-                <button
+                {!isEnterprise && <button
                   type="button"
                   onClick={() => setIsSyncModalOpen(true)}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-muted transition-colors shadow-2xs"
                 >
                   <Medal className="w-4 h-4 text-muted-foreground" />
                   Đồng Bộ Vào Hồ Sơ (QT ĐGCB)
-                </button>
+                </button>}
               </div>
             </div>
+            </>}
           </div>
         </div>
       )}
@@ -1127,228 +1307,52 @@ export default function Performance360Page() {
                   Bảng Quy Ước Thang Điểm, Xếp Loại Thi Đua &amp; Cơ Chế Tính Lương - Thưởng Hiệu Suất
                 </h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Quy định khung đánh giá hiệu suất nhân sự, công thức trọng số đa chiều và ma trận liên kết trực tiếp sang Bảng tính lương tự động.
+                  {isEnterprise ? 'Khung đánh giá nội bộ theo vai trò; kết quả KPI chưa tự liên kết sang lương P3.' : 'Khung đánh giá công chức hoặc viên chức theo chế độ đã cấu hình; hạn ngạch chỉ áp dụng trong khu vực công.'}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* QUY ƯỚC 1: XẾP LOẠI THI ĐUA & ĐỊNH MỨC PHÂN BỔ CHẤT LƯỢNG */}
           <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-border/70 pb-3">
-              <h4 className="font-bold text-foreground text-base flex items-center gap-2">
-                <Award className="w-5 h-5 text-foreground" />
-                1. QUY ƯỚC XẾP LOẠI THI ĐUA &amp; ĐỊNH MỨC PHÂN BỔ CHẤT LƯỢNG
-              </h4>
-              <span className="text-xs text-muted-foreground font-medium">
-                Căn cứ Nghị định 90/2020/NĐ-CP &amp; Tiêu chuẩn Quản trị Nhân sự
-              </span>
+            <div className="border-b border-border/70 pb-3">
+              <h4 className="font-bold text-foreground text-base">1. Ngưỡng điểm đang được hệ thống tính</h4>
+              <p className="mt-1 text-xs text-muted-foreground">{isEnterprise ? 'Ngưỡng xếp loại nội bộ của HRMS; doanh nghiệp cần ban hành quy chế riêng. Không áp dụng hạn ngạch công vụ.' : `Ngưỡng điểm tham chiếu theo ${publicEmployee ? 'Nghị định 233/2026/NĐ-CP (viên chức)' : 'Nghị định 335/2025/NĐ-CP (công chức)'}. Kết luận vẫn cần điều kiện và thẩm quyền theo quy định.`}</p>
             </div>
-
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Nhằm đảm bảo tính công bằng, thực chất và phản ánh đúng hiệu quả đóng góp (tránh xu hướng cào bằng), hệ thống áp dụng hạn mức phân bổ tối đa cho mức Hoàn thành xuất sắc nhiệm vụ là <b className="text-foreground">không quá 20%</b> tổng số cán bộ nhân viên trong đơn vị theo quy chuẩn quản trị.
-            </p>
-
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left border border-border/80 rounded-lg overflow-hidden">
-                <thead className="bg-muted/50 text-foreground font-semibold border-b border-border/80">
-                  <tr>
-                    <th className="py-3 px-4">Xếp Loại Thi Đua</th>
-                    <th className="py-3 px-4">Thang Điểm Tổng Hợp</th>
-                    <th className="py-3 px-4 text-center">Hạn Mức Phân Bổ Tối Đa</th>
-                    <th className="py-3 px-4 text-center">Hệ Số Thưởng Hiệu Suất</th>
-                    <th className="py-3 px-4">Quyền Lợi &amp; Biện Pháp Quản Trị</th>
-                  </tr>
-                </thead>
+                <thead className="bg-muted/50 text-foreground font-semibold border-b border-border/80"><tr><th className="py-3 px-4">Mã xếp loại</th><th className="py-3 px-4">Điểm chu kỳ</th><th className="py-3 px-4">Hệ thống lưu kết quả</th></tr></thead>
                 <tbody className="divide-y divide-border/60">
-                  <tr className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-4 font-medium text-foreground">
-                      <span className="font-bold text-foreground mr-1.5">Loại A:</span>
-                      Hoàn thành xuất sắc nhiệm vụ
-                    </td>
-                    <td className="py-3 px-4 font-medium text-foreground">90 - 100 điểm</td>
-                    <td className="py-3 px-4 text-center font-medium text-muted-foreground">≤ 20% tổng số nhân sự</td>
-                    <td className="py-3 px-4 text-center font-bold text-foreground">
-                      1.15 (+15%)
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground">
-                      Ưu tiên xét nâng lương trước thời hạn, quy hoạch bổ nhiệm cán bộ nguồn, vinh danh cấp toàn đơn vị.
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-4 font-medium text-foreground">
-                      <span className="font-bold text-foreground mr-1.5">Loại B:</span>
-                      Hoàn thành tốt nhiệm vụ
-                    </td>
-                    <td className="py-3 px-4 font-medium text-foreground">75 - 89 điểm</td>
-                    <td className="py-3 px-4 text-center text-muted-foreground">Phân bổ tự nhiên (khoảng 60 - 75%)</td>
-                    <td className="py-3 px-4 text-center font-bold text-foreground">
-                      1.10 (+10%)
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground">
-                      Đạt chuẩn nâng bậc lương thường xuyên định kỳ, hưởng đầy đủ thưởng hiệu suất và phúc lợi năm.
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-4 font-medium text-foreground">
-                      <span className="font-bold text-foreground mr-1.5">Loại C:</span>
-                      Hoàn thành nhiệm vụ
-                    </td>
-                    <td className="py-3 px-4 font-medium text-foreground">50 - 74 điểm</td>
-                    <td className="py-3 px-4 text-center text-muted-foreground">Hạn mức khuyến nghị ≤ 15%</td>
-                    <td className="py-3 px-4 text-center font-bold text-foreground">
-                      1.05 (+5%)
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground">
-                      Giữ nguyên bậc lương, yêu cầu tham gia khóa đào tạo bồi dưỡng nâng cao năng lực chuyên môn.
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-4 font-medium text-foreground">
-                      <span className="font-bold text-foreground mr-1.5">Loại D:</span>
-                      Không hoàn thành nhiệm vụ
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground">&lt; 50 điểm (hoặc vi phạm kỷ luật)</td>
-                    <td className="py-3 px-4 text-center text-muted-foreground">Phát sinh theo thực tế đánh giá</td>
-                    <td className="py-3 px-4 text-center font-bold text-foreground">
-                      1.00 (0%)
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground">
-                      Không xét thưởng hiệu suất. Đưa vào diện Kế hoạch cải thiện hiệu suất 90 ngày (PIP).
-                    </td>
-                  </tr>
+                  <tr><td className="py-3 px-4">EXCELLENT</td><td className="py-3 px-4">{isEnterprise ? '90–100' : '90–100 (đồng thời đủ điều kiện)'}</td><td className="py-3 px-4">{isEnterprise ? 'Xếp loại hiệu suất nội bộ' : 'Đề xuất mức xuất sắc; phải qua kết luận có thẩm quyền và kiểm tra tỷ lệ'}</td></tr>
+                  <tr><td className="py-3 px-4">GOOD</td><td className="py-3 px-4">{isEnterprise ? '75–<90' : '70–<90'}</td><td className="py-3 px-4">{isEnterprise ? 'Xếp loại hiệu suất nội bộ' : 'Đề xuất mức tốt; phải qua kết luận có thẩm quyền'}</td></tr>
+                  <tr><td className="py-3 px-4">SATISFACTORY</td><td className="py-3 px-4">{isEnterprise ? '50–<75' : '50–<70'}</td><td className="py-3 px-4">{isEnterprise ? 'Xếp loại hiệu suất nội bộ' : 'Đề xuất mức hoàn thành; phải qua kết luận có thẩm quyền'}</td></tr>
+                  <tr><td className="py-3 px-4">UNSATISFACTORY</td><td className="py-3 px-4">&lt;50</td><td className="py-3 px-4">{isEnterprise ? 'Xếp loại hiệu suất nội bộ' : 'Đề xuất mức không hoàn thành; phải qua kết luận có thẩm quyền'}</td></tr>
                 </tbody>
               </table>
             </div>
+            <p className="text-sm text-muted-foreground">{isEnterprise ? 'Không áp dụng hạn ngạch công vụ. Thưởng, điều chỉnh lương hoặc PIP cần quy chế và phê duyệt riêng của doanh nghiệp.' : 'Trong khu vực công, tỷ lệ xuất sắc được kiểm tra theo cùng đơn vị và nhóm nhiệm vụ theo quy định áp dụng; tỷ lệ này không áp dụng cho doanh nghiệp tư nhân.'}</p>
           </div>
 
-          {/* QUY ƯỚC 2: MA TRẬN TRỌNG SỐ TÍNH ĐIỂM TỔNG HỢP CHU KỲ */}
           <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-border/70 pb-3">
-              <h4 className="font-bold text-foreground text-base flex items-center gap-2">
-                <Calculator className="w-5 h-5 text-foreground" />
-                2. CÔNG THỨC TRỌNG SỐ TÍNH ĐIỂM HIỆU SUẤT TỔNG HỢP
-              </h4>
-              <span className="text-xs text-muted-foreground font-medium">Mô hình 60 - 20 - 20</span>
+            <div className="border-b border-border/70 pb-3">
+              <h4 className="font-bold text-foreground text-base">2. Công thức theo chế độ và vai trò</h4>
+              <p className="mt-1 text-xs text-muted-foreground">{isEnterprise ? 'Trọng số phản hồi áp dụng cho từng mục tiêu; trọng số mục tiêu của cả kỳ cộng đủ 100%.' : 'Điểm từng nhóm tiêu chí được nhân với tỷ lệ 30/70 của kỳ công vụ.'}</p>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-              <div className="p-4 rounded-lg border border-border bg-card space-y-2">
-                <span className="text-sm font-bold text-foreground block">
-                  1. Mục Tiêu Định Lượng (60%)
-                </span>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Điểm trung bình có trọng số của các chỉ tiêu định lượng (Doanh số, Dự án, Chất lượng dịch vụ) do Quản lý trực tiếp chấm.
-                </p>
-                <div className="font-semibold text-foreground text-sm pt-2 border-t border-border/50">
-                  Đóng góp: Điểm mục tiêu × 0.60
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg border border-border bg-card space-y-2">
-                <span className="text-sm font-bold text-foreground block">
-                  2. Năng Lực Hành Vi Cốt Lõi (20%)
-                </span>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Đánh giá 5 năng lực cốt lõi theo thang 1 - 5 sao. Quy đổi thang 100: (Tổng điểm 5 năng lực / 25) × 100.
-                </p>
-                <div className="font-semibold text-foreground text-sm pt-2 border-t border-border/50">
-                  Đóng góp: Điểm năng lực × 0.20
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg border border-border bg-card space-y-2">
-                <span className="text-sm font-bold text-foreground block">
-                  3. Đánh Giá Đa Chiều 360° (20%)
-                </span>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Điểm bình quân thu thập từ Quản lý, Đồng nghiệp ngang cấp và Cấp dưới. Quy đổi thang 100: Điểm sao TB × 20.
-                </p>
-                <div className="font-semibold text-foreground text-sm pt-2 border-t border-border/50">
-                  Đóng góp: Điểm đa chiều × 0.20
-                </div>
-              </div>
-            </div>
-
-            {/* Khung công thức toán học và ví dụ minh họa */}
-            <div className="p-4 rounded-lg bg-muted/30 border border-border/80 space-y-3">
-              <div className="text-foreground font-bold text-base">
-                Công thức tổng hợp: Điểm Tổng = (Điểm Mục Tiêu × 60%) + (Điểm Năng Lực × 20%) + (Điểm Đa Chiều × 20%)
-              </div>
-              <div className="text-sm text-muted-foreground leading-relaxed space-y-2 pt-2 border-t border-border/60">
-                <p className="font-semibold text-foreground">Ví dụ minh họa chi tiết:</p>
-                <p>
-                  Nhân sự Nguyễn Văn A có Điểm Mục Tiêu KRA đạt <b className="text-foreground">92/100</b>; Điểm Năng Lực Cốt Lõi đạt 22/25 sao (quy đổi tương đương <b className="text-foreground">88/100</b>); Điểm Phản Hồi Đa Chiều 360° đạt 4.6/5.0 sao (quy đổi tương đương <b className="text-foreground">92/100</b>).
-                </p>
-                <div className="font-medium text-foreground text-sm bg-card p-3 rounded-md border border-border/70">
-                  ➔ Điểm Tổng Hợp = (92 × 0.60) + (88 × 0.20) + (92 × 0.20) = 55.2 + 17.6 + 18.4 = <b className="text-base text-foreground font-bold">91.2 điểm</b>.
-                </div>
-                <p>
-                  ➔ Kết luận xếp loại: <b className="text-foreground font-semibold">Loại A (Hoàn thành xuất sắc nhiệm vụ)</b> • Chế độ thụ hưởng: Hệ số thưởng hiệu suất <b className="text-foreground font-semibold">+15%</b> lương vị trí.
-                </p>
-              </div>
+            {isEnterprise ? <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <div className="p-4 rounded-lg border border-border bg-card"><b>Nhân viên không có cấp dưới</b><p className="mt-2 text-sm text-muted-foreground">20% tự đánh giá + 30% đồng nghiệp + 50% quản lý trực tiếp.</p></div>
+              <div className="p-4 rounded-lg border border-border bg-card"><b>Quản lý có cấp dưới</b><p className="mt-2 text-sm text-muted-foreground">20% tự đánh giá + 20% đồng nghiệp + 50% cấp trên + 10% cấp dưới.</p></div>
+            </div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <div className="p-4 rounded-lg border border-border bg-card"><b>Tiêu chí chung · 30 điểm</b><p className="mt-2 text-sm text-muted-foreground">Tổng trọng số nội bộ nhóm bằng 100%; điểm nhóm được quy đổi vào tỷ lệ 30%.</p></div>
+              <div className="p-4 rounded-lg border border-border bg-card"><b>Kết quả nhiệm vụ · 70 điểm</b><p className="mt-2 text-sm text-muted-foreground">Tổng trọng số nội bộ nhóm bằng 100%; điểm nhóm được quy đổi vào tỷ lệ 70%.</p></div>
+            </div>}
+            <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2 text-sm">
+              {isEnterprise ? <><p><b>Điểm mục tiêu</b> = tổng điểm phản hồi × trọng số theo vai trò.</p><p><b>Điểm chu kỳ</b> = tổng (điểm mục tiêu × trọng số mục tiêu); trọng số mục tiêu cộng đủ 100%.</p><p className="text-muted-foreground">Kỳ chỉ hoàn tất khi đủ nguồn phản hồi bắt buộc và trọng số mục tiêu. Kết quả không tự nối sang P3 hoặc bảng lương.</p></> : <><p><b>Điểm kỳ</b> = điểm tiêu chí chung × 30% + điểm kết quả nhiệm vụ × 70%.</p><p><b>Xếp loại cuối</b> cần ghi nhận kết luận có thẩm quyền; chỉ đóng kỳ sau khi lưu quyết định cho từng người và qua kiểm tra tỷ lệ khu vực công.</p><p className="text-muted-foreground">Ngưỡng điểm không thay thế các điều kiện định tính, hồ sơ và quy trình phê duyệt theo chế độ công chức/viên chức.</p></>}
             </div>
           </div>
 
-          {/* QUY ƯỚC 3: MA TRẬN LIÊN KẾT ĐIỂM SANG CÁCH TÍNH LƯƠNG & THƯỞNG */}
-          <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-border/70 pb-3">
-              <h4 className="font-bold text-foreground text-base flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-foreground" />
-                3. MA TRẬN LIÊN KẾT ĐIỂM HIỆU SUẤT SANG CÁCH TÍNH LƯƠNG &amp; THƯỞNG
-              </h4>
-              <span className="text-xs text-muted-foreground font-medium">
-                Đồng bộ tự động sang Bảng tính lương
-              </span>
-            </div>
-
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Điểm đánh giá hiệu suất chu kỳ không chỉ là thước đo xếp loại thi đua mà được tự động kết xuất sang phân hệ <b className="text-foreground">Bảng Lương</b> để làm căn cứ tính khoản <b className="text-foreground">&ldquo;Thưởng hiệu suất&rdquo;</b> trong tổng thu nhập của cán bộ nhân viên.
-            </p>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border border-border/80 rounded-lg overflow-hidden">
-                <thead className="bg-muted/50 text-foreground font-semibold border-b border-border/80">
-                  <tr>
-                    <th className="py-3 px-4">Xếp Loại Hiệu Suất</th>
-                    <th className="py-3 px-4 text-center">Hệ Số Thưởng</th>
-                    <th className="py-3 px-4">Công Thức Tính Tiền Thưởng Hiệu Suất</th>
-                    <th className="py-3 px-4">Ví Dụ Mẫu (Lương Vị Trí 20 Triệu)</th>
-                    <th className="py-3 px-4">Xử Lý Trên Phiếu Lương</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  <tr className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-4 font-medium text-foreground">Loại A (Xuất sắc)</td>
-                    <td className="py-3 px-4 text-center font-bold text-foreground">1.15 (+15%)</td>
-                    <td className="py-3 px-4 text-foreground">Lương vị trí × 15%</td>
-                    <td className="py-3 px-4 font-medium text-foreground">+3.000.000 đ</td>
-                    <td className="py-3 px-4 text-muted-foreground">Cộng vào Tổng thu nhập, chịu thuế TNCN</td>
-                  </tr>
-                  <tr className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-4 font-medium text-foreground">Loại B (Tốt)</td>
-                    <td className="py-3 px-4 text-center font-bold text-foreground">1.10 (+10%)</td>
-                    <td className="py-3 px-4 text-foreground">Lương vị trí × 10%</td>
-                    <td className="py-3 px-4 font-medium text-foreground">+2.000.000 đ</td>
-                    <td className="py-3 px-4 text-muted-foreground">Cộng vào Tổng thu nhập, chịu thuế TNCN</td>
-                  </tr>
-                  <tr className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-4 font-medium text-foreground">Loại C (Hoàn thành)</td>
-                    <td className="py-3 px-4 text-center font-bold text-foreground">1.05 (+5%)</td>
-                    <td className="py-3 px-4 text-foreground">Lương vị trí × 5%</td>
-                    <td className="py-3 px-4 font-medium text-foreground">+1.000.000 đ</td>
-                    <td className="py-3 px-4 text-muted-foreground">Cộng vào Tổng thu nhập, chịu thuế TNCN</td>
-                  </tr>
-                  <tr className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-4 font-medium text-foreground">Loại D (Không đạt)</td>
-                    <td className="py-3 px-4 text-center font-bold text-muted-foreground">1.00 (0%)</td>
-                    <td className="py-3 px-4 text-muted-foreground">0 đ</td>
-                    <td className="py-3 px-4 font-medium text-muted-foreground">0 đ</td>
-                    <td className="py-3 px-4 text-muted-foreground">Không có khoản thưởng hiệu suất trong kỳ</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-3">
+            <h4 className="font-bold text-foreground text-base">3. Tác động tới lương và hồ sơ</h4>
+            <p className="text-sm text-muted-foreground">Hệ thống có thao tác đồng bộ xếp loại đã hoàn tất vào hồ sơ đánh giá nhân sự khi người có quyền thực hiện. Điểm hiện chưa tự tạo khoản thưởng trong bảng lương; chưa có hệ số thưởng được cấu hình và phê duyệt trong bài tập.</p>
+            <p className="text-sm text-muted-foreground">{isEnterprise ? 'Các mức thưởng, thay đổi lương, điều kiện thăng chức hoặc kế hoạch cải thiện hiệu suất phải theo chính sách doanh nghiệp. Màn hình này không tự phát sinh các quyết định đó.' : 'Kết luận công vụ chỉ được đồng bộ sau khi kỳ đã hoàn tất và có quyết định cuối cùng. Biểu mẫu pháp quy, ký số và luồng phê duyệt nhiều cấp chưa được tích hợp đầy đủ.'}</p>
           </div>
 
           {/* QUY ƯỚC 4: THANG ĐO NĂNG LỰC HÀNH VI 5 MỨC */}
@@ -1443,21 +1447,71 @@ export default function Performance360Page() {
 
               <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-1.5 relative">
                 <span className="text-xs uppercase font-bold text-primary block">Giai đoạn 3 • Cuối kỳ</span>
-                <h5 className="font-bold text-foreground text-sm">Tự Chấm &amp; Đánh Giá 360°</h5>
+                <h5 className="font-bold text-foreground text-sm">{isEnterprise ? 'Tự chấm & đánh giá nhiều nguồn' : 'Tự đánh giá & thẩm định nhiệm vụ'}</h5>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Nhân viên tự chấm điểm KRA, đồng nghiệp và cấp dưới gửi phiếu phản hồi 360 độ bí mật kèm nhận xét định tính.
+                  {isEnterprise ? 'Nhân viên tự chấm KRA; quản lý, đồng nghiệp và cấp dưới gửi phản hồi theo hồ sơ vai trò.' : 'Người được đánh giá tự báo cáo kết quả và minh chứng; người có thẩm quyền chấm tiêu chí chung và kết quả nhiệm vụ theo thang điểm.'}
                 </p>
               </div>
 
               <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-1.5 relative">
                 <span className="text-xs uppercase font-bold text-primary block">Giai đoạn 4 • Kết luận</span>
-                <h5 className="font-bold text-foreground text-sm">Bình Xét, Phê Duyệt &amp; Trả Thưởng</h5>
+                <h5 className="font-bold text-foreground text-sm">{isEnterprise ? 'Hiệu chuẩn và quyết định đãi ngộ' : 'Xếp loại theo quy trình công vụ'}</h5>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Hội đồng họp xét, áp dụng hạn mức xuất sắc ≤ 20%, ra quyết định xếp loại, tự động liên kết Bảng lương và Hồ sơ cán bộ.
+                  {isEnterprise ? 'Không áp dụng hạn ngạch công vụ. Điểm KPI không tự liên kết bảng lương P3; quyết định thưởng hoặc lương cần quy trình riêng.' : 'HRMS tính điểm theo chế độ 30/70, ghi kết luận và kiểm tra tỷ lệ 20%/ngoại lệ tối đa 25% theo nhóm nhiệm vụ. Biểu mẫu pháp quy đầy đủ, chữ ký số và quy trình phê duyệt của cơ quan chưa được tích hợp đầy đủ.'}
                 </p>
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === 'calibration' && !isEnterprise && canCalibrate && (
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-bold text-foreground">Rà soát kết quả và tỷ lệ xếp loại công vụ</h3>
+              <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">Mỗi người cần quyết định cuối cùng của cấp có thẩm quyền. Tỷ lệ xuất sắc được kiểm tra trong cùng đơn vị và nhóm nhiệm vụ tương đồng; mức 25% chỉ mở khi ghi số quyết định ngoại lệ. Kết luận này tách biệt hoàn toàn với KPI doanh nghiệp.</p>
+            </div>
+            <Select value={effectiveCalibrationCycleId} onChange={event => setCalibrationCycleId(event.target.value)} className="min-w-[260px]">
+              {stateCycles.map(cycle => <option key={cycle.id} value={cycle.id}>{cycle.name} ({cycle.year})</option>)}
+            </Select>
+          </div>
+          {!stateCycles.length ? <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">Chưa có chu kỳ khu vực công. Hãy chọn chế độ tổ chức tại Cấu hình tổ chức và tạo kỳ đánh giá mới.</div>
+            : isLoadingPublicDecisions ? <LoadingState text="Đang tải danh sách cần hiệu chuẩn..." />
+            : <div className="grid gap-3 xl:grid-cols-2">
+              {publicDecisions.map(row => {
+                const draft = publicDecisionDrafts[row.userId] ?? {
+                  userId: row.userId,
+                  comparableGroup: row.comparableGroup,
+                  finalClassification: row.finalClassification ?? row.scoreClassification ?? 'UNSATISFACTORY',
+                  excellentCriteriaConfirmed: row.excellentCriteriaConfirmed,
+                  quotaExceptionApproved: row.quotaExceptionApproved,
+                  exceptionDecisionNo: row.exceptionDecisionNo,
+                  decisionNote: row.decisionNote,
+                };
+                const maximumRank = publicClassificationRank(row.scoreClassification);
+                return <article key={row.userId} className="space-y-3 rounded-lg border border-border bg-card p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div><h4 className="font-semibold">{row.employeeName}</h4><p className="text-xs text-muted-foreground">{row.jobTitle || 'Chưa có chức danh'} · {row.orgUnitName || 'Chưa gán đơn vị'}</p></div>
+                    <Badge variant={row.complete ? 'default' : 'outline'}>{row.complete ? `${row.score ?? 0} điểm · ${PUBLIC_CLASSIFICATIONS.find(item => item.value === row.scoreClassification)?.label ?? row.scoreClassification}` : row.missingTaskEvidence ? 'Thiếu minh chứng nhiệm vụ' : 'Chưa đủ điểm hoặc trọng số'}</Badge>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="space-y-1 text-xs"><span className="font-medium">Nhóm nhiệm vụ tương đồng</span><Input value={draft.comparableGroup} onChange={event => updatePublicDecisionDraft(row, { comparableGroup: event.target.value })} placeholder="Ví dụ: Chuyên viên thẩm định hồ sơ" /></label>
+                    <label className="space-y-1 text-xs"><span className="font-medium">Xếp loại do cấp có thẩm quyền kết luận</span><Select value={draft.finalClassification} onChange={event => updatePublicDecisionDraft(row, { finalClassification: event.target.value as PublicDecisionDraft['finalClassification'] })}>{PUBLIC_CLASSIFICATIONS.filter(item => publicClassificationRank(item.value) <= maximumRank).map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</Select></label>
+                  </div>
+                  {draft.finalClassification === 'EXCELLENT' && <div className="space-y-2 rounded-md bg-muted/30 p-3">
+                    <label className="flex items-start gap-2 text-xs leading-5"><input type="checkbox" checked={draft.excellentCriteriaConfirmed} onChange={event => updatePublicDecisionDraft(row, { excellentCriteriaConfirmed: event.target.checked })} className="mt-1" /><span>Đã đối chiếu đủ điều kiện ngoài điểm số theo nghị định và quy chế áp dụng, gồm kết quả nhiệm vụ, tiến độ, chất lượng và điều kiện của vị trí.</span></label>
+                    <label className="flex items-start gap-2 text-xs leading-5"><input type="checkbox" checked={draft.quotaExceptionApproved} onChange={event => updatePublicDecisionDraft(row, { quotaExceptionApproved: event.target.checked })} className="mt-1" /><span>Quyết định của cấp có thẩm quyền cho phép nhóm áp dụng tỷ lệ ngoại lệ đến 25%.</span></label>
+                    {draft.quotaExceptionApproved && <Input value={draft.exceptionDecisionNo} onChange={event => updatePublicDecisionDraft(row, { exceptionDecisionNo: event.target.value })} placeholder="Số quyết định ngoại lệ" />}
+                  </div>}
+                  <label className="block space-y-1 text-xs"><span className="font-medium">{draft.finalClassification === 'EXCELLENT' ? 'Căn cứ và minh chứng xếp loại xuất sắc (bắt buộc)' : 'Căn cứ kết luận hoặc thay đổi mức điểm'}</span><textarea value={draft.decisionNote} onChange={event => updatePublicDecisionDraft(row, { decisionNote: event.target.value })} rows={2} maxLength={2000} className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" placeholder={draft.finalClassification === 'EXCELLENT' ? 'Ghi rõ minh chứng về nhiệm vụ hoàn thành vượt mức, đúng hạn và các điều kiện áp dụng.' : 'Ghi căn cứ đánh giá, quyết định của người có thẩm quyền hoặc lý do kết luận thấp hơn mức điểm.'} /></label>
+                  <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
+                    <span className="text-xs text-muted-foreground">{row.decided ? 'Đã có kết luận lưu; có thể cập nhật trước khi khóa kỳ.' : 'Chưa có kết luận cuối cùng.'}</span>
+                    <Button size="sm" disabled={!row.complete || !draft.comparableGroup.trim() || (draft.finalClassification === 'EXCELLENT' && !draft.decisionNote.trim()) || savePublicDecisionMutation.isPending} onClick={() => savePublicDecisionMutation.mutate(draft)}><Check className="h-4 w-4" />Lưu kết luận</Button>
+                  </div>
+                </article>;
+              })}
+            </div>}
         </div>
       )}
 
@@ -1470,14 +1524,14 @@ export default function Performance360Page() {
               Danh sách các Chu kỳ Đánh giá Hiệu suất Toàn diện
             </h3>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => setIsSyncModalOpen(true)}>
+              {!isEnterprise && <Button size="sm" variant="outline" onClick={() => setIsSyncModalOpen(true)}>
                 <Medal className="w-4 h-4 mr-1.5 text-amber-500" />
                 Đồng Bộ Kết Quả Vào Hồ Sơ Cán Bộ (QT ĐGCB)
-              </Button>
-              <Button size="sm" onClick={() => setIsCycleModalOpen(true)}>
+              </Button>}
+              {canManageCycles && <Button size="sm" onClick={() => setIsCycleModalOpen(true)}>
                 <Plus className="w-4 h-4 mr-1.5" />
                 Tạo chu kỳ mới
-              </Button>
+              </Button>}
             </div>
           </div>
 
@@ -1503,12 +1557,12 @@ export default function Performance360Page() {
 
                 <div className="grid grid-cols-2 gap-2 bg-muted/20 p-3 rounded-lg text-sm">
                   <div>Mục tiêu KRA: <b className="text-primary font-bold">{c._count?.goals ?? 0}</b></div>
-                  <div>Phản hồi 360: <b className="text-foreground font-bold">{c._count?.reviews ?? 0}</b></div>
+                  <div>{c.organizationSector === 'state' ? 'Khung đánh giá' : 'Phản hồi 360'}: <b className="text-foreground font-bold">{c.organizationSector === 'state' ? `${c.generalCriteriaWeight ?? 30} điểm chung + ${c.taskCriteriaWeight ?? 70} điểm nhiệm vụ` : `${c._count?.reviews ?? 0} phiếu`}</b></div>
                 </div>
 
                 <div className="pt-3 border-t flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
-                    <button
+                    {canManageCycles && <button
                       onClick={() => {
                         const newStatus = c.status === 'ACTIVE' ? 'COMPLETED' : 'ACTIVE';
                         toggleCycleStatusMutation.mutate({ id: c.id, newStatus });
@@ -1517,10 +1571,10 @@ export default function Performance360Page() {
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                       {c.status === 'ACTIVE' ? 'Đóng chu kỳ' : 'Kích hoạt lại'}
-                    </button>
+                    </button>}
                   </div>
 
-                  <button
+                  {canManageCycles && <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -1532,7 +1586,7 @@ export default function Performance360Page() {
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Xóa chu kỳ
-                  </button>
+                  </button>}
                 </div>
               </div>
             ))}
@@ -1606,6 +1660,15 @@ export default function Performance360Page() {
                     placeholder="Tiêu chí đánh giá, đối tượng tham gia..."
                   />
                 </div>
+                <div className="rounded-lg border border-border bg-muted/30 p-3">
+                  {isEnterprise ? <>
+                    <p className="font-medium">Trọng số cố định theo vai trò người được đánh giá</p>
+                    <p className="mt-1 text-muted-foreground">Nhân viên: tự đánh giá 20%, đồng nghiệp 30%, quản lý 50%. Quản lý có cấp dưới: tự đánh giá 20%, đồng nghiệp 20%, cấp trên 50%, cấp dưới 10%.</p>
+                  </> : <>
+                    <p className="font-medium">Khung đánh giá khu vực nhà nước</p>
+                    <p className="mt-1 text-muted-foreground">Tiêu chí chung 30 điểm; kết quả nhiệm vụ 70 điểm. Ngưỡng tham chiếu 90 / 70 / 50; mỗi nhóm tiêu chí phân bổ đủ 100% trọng số.</p>
+                  </>}
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t">
@@ -1638,8 +1701,8 @@ export default function Performance360Page() {
                 </button>
               </div>
 
-              {/* Thanh gợi ý chọn từ thư viện KPI mẫu */}
-              <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-between gap-3">
+              {/* Thư viện ví dụ chỉ dành cho kỳ KPI doanh nghiệp */}
+              {isEnterprise && <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span className="text-sm text-foreground leading-normal">
@@ -1653,7 +1716,7 @@ export default function Performance360Page() {
                 >
                   Mở Thư Viện
                 </button>
-              </div>
+              </div>}
 
               <div className="space-y-3 text-xs">
                 <div className="grid grid-cols-2 gap-2">
@@ -1670,7 +1733,7 @@ export default function Performance360Page() {
                     </Select>
                   </div>
                   <div>
-                    <label className="font-medium text-foreground block mb-1">Trọng số đề xuất (%):</label>
+                    <label className="font-medium text-foreground block mb-1">Trọng số trong nhóm (%):</label>
                     <Input
                       type="number"
                       min="5"
@@ -1681,6 +1744,18 @@ export default function Performance360Page() {
                     />
                   </div>
                 </div>
+
+                {(() => {
+                  const selectedCycle = cycles.find(c => c.id === (goalForm.cycleId || cycles[0]?.id));
+                  return selectedCycle?.organizationSector === 'state' ? <div>
+                    <label className="font-medium text-foreground block mb-1">Nhóm tiêu chí:</label>
+                    <Select value={goalForm.criteriaGroup} onChange={e => setGoalForm({ ...goalForm, criteriaGroup: e.target.value as 'GENERAL' | 'RESULT' })} className="w-full text-xs">
+                      <option value="GENERAL">Tiêu chí chung (30 điểm)</option>
+                      <option value="RESULT">Kết quả thực hiện nhiệm vụ (70 điểm)</option>
+                    </Select>
+                    <p className="mt-1 text-muted-foreground">Phân bổ trọng số đủ 100% riêng trong từng nhóm.</p>
+                  </div> : null;
+                })()}
 
                 <div>
                   <label className="font-medium text-foreground block mb-1">Chọn Nhân sự thực hiện (Cơ sở dữ liệu):</label>
@@ -1760,7 +1835,7 @@ export default function Performance360Page() {
               <div className="flex justify-between items-center border-b pb-3">
                 <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  Chấm Điểm &amp; Dự Báo Thưởng KPI
+                  Chấm điểm mục tiêu
                 </h3>
                 <button onClick={() => setIsScoreModalOpen(false)} className="text-muted-foreground hover:text-foreground">
                   <X className="w-5 h-5" />
@@ -1774,79 +1849,30 @@ export default function Performance360Page() {
                   <div className="text-xs text-primary font-bold mt-1">Trọng số: {selectedGoal.weightage}%</div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="font-medium text-foreground block mb-1">Điểm nhân sự tự chấm (Thang 100):</label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={selfScore}
-                      onChange={(e) => setSelfScore(Number(e.target.value))}
-                    />
-                  </div>
-                  <div>
-                    <label className="font-medium text-foreground block mb-1">Điểm cấp quản lý đánh giá (Thang 100):</label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={managerScore}
-                      onChange={(e) => setManagerScore(Number(e.target.value))}
-                    />
-                  </div>
+                <div className="grid grid-cols-1 gap-3">
+                  {selectedGoal.userId === currentUser?.id ? (
+                    <div>
+                      <label className="font-medium text-foreground block mb-1">Điểm tự đánh giá (thang 0–100):</label>
+                      <Input type="number" min="0" max="100" value={selfScore ?? ''} onChange={(e) => setSelfScore(e.target.value === '' ? null : Number(e.target.value))} />
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="font-medium text-foreground block mb-1">Điểm quản lý đánh giá (thang 0–100):</label>
+                      <Input type="number" min="0" max="100" value={managerScore ?? ''} onChange={(e) => setManagerScore(e.target.value === '' ? null : Number(e.target.value))} />
+                    </div>
+                  )}
                 </div>
 
-                {/* DỰ BÁO XẾP LOẠI & THƯỞNG HIỆU SUẤT THEO QUY ƯỚC */}
-                {(() => {
-                  const weightedPoints = ((managerScore * selectedGoal.weightage) / 100).toFixed(1);
-                  let classification = 'Loại B — Hoàn thành tốt';
-                  let bonusFactor = '+10%';
-
-                  if (managerScore >= 90) {
-                    classification = 'Loại A — Hoàn thành xuất sắc';
-                    bonusFactor = '+15%';
-                  } else if (managerScore >= 75) {
-                    classification = 'Loại B — Hoàn thành tốt';
-                    bonusFactor = '+10%';
-                  } else if (managerScore >= 50) {
-                    classification = 'Loại C — Hoàn thành nhiệm vụ';
-                    bonusFactor = '+5%';
-                  } else {
-                    classification = 'Loại D — Không hoàn thành';
-                    bonusFactor = '0% (Cần cải thiện)';
-                  }
-
-                  return (
-                    <div className="rounded-lg border border-border/80 bg-muted/20 p-3 space-y-2 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground font-medium">Điểm quy đổi trọng số:</span>
-                        <span className="text-foreground">
-                          {managerScore} × {selectedGoal.weightage}% = <strong className="font-semibold text-foreground">{weightedPoints} điểm</strong>
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-1.5 border-t border-border/50">
-                        <span className="text-muted-foreground font-medium">Xếp loại dự kiến:</span>
-                        <span className="font-semibold text-foreground">
-                          {classification}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-1.5 border-t border-border/50">
-                        <span className="text-muted-foreground font-medium">Điều chỉnh lương hiệu quả:</span>
-                        <span className="text-foreground">
-                          Hệ số: <strong className="font-semibold text-foreground">{bonusFactor}</strong> lương vị trí
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })()}
+                <div className="rounded-lg border border-border/80 bg-muted/20 p-3 space-y-2 text-xs">
+                  <p className="font-semibold text-foreground">Cách tính đang dùng:</p>
+                  <p className="text-muted-foreground">{selectedGoal.cycle?.organizationSector === 'state' ? 'Kỳ khu vực công: tiêu chí chung chiếm 30 điểm và kết quả nhiệm vụ 70 điểm. Điểm quản lý là căn cứ nhập liệu; kết luận xếp loại cần qua bước hiệu chuẩn có thẩm quyền.' : 'Kỳ doanh nghiệp: nhân viên 20% tự đánh giá, 30% đồng nghiệp và 50% quản lý. Với quản lý có cấp dưới, mô hình là 20% tự đánh giá, 20% đồng nghiệp, 50% cấp trên và 10% cấp dưới. Điểm chu kỳ cộng điểm mục tiêu theo trọng số; tổng trọng số phải bằng 100%.'}</p>
+                  <p className="text-muted-foreground">{selectedGoal.finalScore != null ? `Điểm tổng hợp hiện đã lưu: ${selectedGoal.finalScore}/100.` : 'Chưa đủ dữ liệu để hiển thị điểm tổng hợp của mục tiêu.'} Điểm này không tự tạo thưởng hoặc thay đổi lương; quyết định đã duyệt phải được ghi riêng.</p>
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t">
                 <Button variant="outline" size="sm" onClick={() => setIsScoreModalOpen(false)}>Hủy</Button>
-                <Button size="sm" onClick={() => scoreGoalMutation.mutate()} disabled={scoreGoalMutation.isPending}>
+                <Button size="sm" onClick={() => scoreGoalMutation.mutate()} disabled={scoreGoalMutation.isPending || (selectedGoal?.userId === currentUser?.id ? selfScore === null : managerScore === null)}>
                   {scoreGoalMutation.isPending ? 'Đang lưu...' : 'Lưu Điểm Đánh Giá'}
                 </Button>
               </div>
@@ -1923,7 +1949,6 @@ export default function Performance360Page() {
                       <option value="MANAGER">Cấp Quản lý</option>
                       <option value="PEER">Đồng nghiệp</option>
                       <option value="SUBORDINATE">Cấp dưới</option>
-                      <option value="SELF">Tự đánh giá</option>
                     </Select>
                   </div>
                 </div>
@@ -2027,19 +2052,7 @@ export default function Performance360Page() {
                     />
                   </div>
 
-                  <div>
-                    <label className="font-medium text-foreground block mb-1">Xếp loại chất lượng:</label>
-                    <Select
-                      value={syncForm.classification}
-                      onChange={(e: any) => setSyncForm({ ...syncForm, classification: e.target.value })}
-                      className="w-full text-xs font-semibold"
-                    >
-                      <option value="EXCELLENT">Hoàn thành xuất sắc</option>
-                      <option value="GOOD">Hoàn thành tốt</option>
-                      <option value="SATISFACTORY">Hoàn thành nhiệm vụ</option>
-                      <option value="UNSATISFACTORY">Không hoàn thành</option>
-                    </Select>
-                  </div>
+                  <div className="flex items-center rounded-lg border border-border bg-muted/20 p-3 text-xs leading-5 text-muted-foreground">Mức xếp loại được lấy từ kết luận hiệu chuẩn đã lưu trong chu kỳ công vụ đã khóa; biểu mẫu này không cho ghi đè kết quả.</div>
                 </div>
 
                 <div>
@@ -2144,7 +2157,7 @@ export default function Performance360Page() {
                       </p>
 
                       <div className="pt-2 border-t border-border/50 flex justify-end">
-                        <button
+                        {canManageGoals && <button
                           type="button"
                           onClick={() => {
                             setGoalForm({
@@ -2155,14 +2168,14 @@ export default function Performance360Page() {
                               description: item.description,
                             });
                             setIsKpiLibraryOpen(false);
-                            setIsGoalModalOpen(true);
+                            openGoalSetup();
                             toast(`Đã chọn mục tiêu: "${item.kraTitle.slice(0, 35)}..."`, 'success');
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors shadow-2xs"
                         >
                           <Check className="w-3.5 h-3.5" />
                           Sử Dụng Mục Tiêu Này
-                        </button>
+                        </button>}
                       </div>
                     </div>
                   ));
@@ -2219,13 +2232,12 @@ export default function Performance360Page() {
             <div className="overflow-y-auto p-6 flex-1 text-sm">
               <div
                 id="print-evaluation-template"
-                className="print-area font-times bg-card text-foreground p-6 rounded-lg border border-border/80 shadow-xs space-y-5 print:text-black print:p-0 print:border-0 print:m-0 print:shadow-none"
-                style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                className="print-area print-a4-clean-template font-times bg-card text-foreground p-6 rounded-lg border border-border/80 shadow-xs space-y-5 print:text-black print:p-0 print:border-0 print:m-0 print:shadow-none"
               >
                 {/* 1. MẪU KRA TRỌNG SỐ */}
                 {selectedTemplateForPrint === 'kra' && (
                   <div className="space-y-4">
-                    <div className="border-b-2 border-foreground/30 pb-3 flex justify-between items-start">
+                    <div className="pb-3 flex justify-between items-start">
                       <div>
                         <p className="font-bold text-sm uppercase tracking-wider">CÔNG TY CỔ PHẦN CÔNG NGHỆ HRMIS PRO</p>
                         <p className="text-xs text-muted-foreground">BAN NHÂN SỰ &amp; QUẢN TRỊ HIỆU SUẤT</p>
@@ -2246,13 +2258,13 @@ export default function Performance360Page() {
                     </div>
 
                     {/* Khung thông tin cá nhân */}
-                    <div className="grid grid-cols-2 gap-2 p-3 rounded-lg border border-border/70 text-sm bg-muted/10">
-                      <div>Họ và tên nhân sự: <b className="text-foreground">................................................................</b></div>
-                      <div>Mã số nhân viên: <b className="text-foreground">...................................</b></div>
-                      <div>Chức vụ / Vị trí: <b className="text-foreground">................................................................</b></div>
-                      <div>Phòng ban / Đơn vị: <b className="text-foreground">...................................</b></div>
-                      <div>Người quản lý trực tiếp: <b className="text-foreground">............................................................</b></div>
-                      <div>Kỳ đánh giá: <b className="text-foreground">Năm 2026 (Từ 01/01 đến 31/12/2026)</b></div>
+                    <div className="grid grid-cols-2 gap-x-5 gap-y-2 text-sm">
+                      {['Họ và tên nhân sự', 'Mã số nhân viên', 'Chức vụ / Vị trí', 'Phòng ban / Đơn vị', 'Người quản lý trực tiếp', 'Kỳ đánh giá'].map((label) => (
+                        <div className="print-field" key={label}>
+                          <p className="font-medium">{label}</p>
+                          <div className="print-write-area print-write-area-identity min-h-[9mm]" />
+                        </div>
+                      ))}
                     </div>
 
                     {/* Bảng mục tiêu KRA */}
@@ -2277,9 +2289,9 @@ export default function Performance360Page() {
                           </td>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">35%</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Đạt &gt;= 100% hạn mức doanh số cam kết theo quý</td>
-                          <td className="p-2.5 text-center border-r border-border/60">... / 100</td>
-                          <td className="p-2.5 text-center border-r border-border/60">... / 100</td>
-                          <td className="p-2.5 text-center">....... đ</td>
+                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="p-2.5 text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-money" /> đ</span></td>
                         </tr>
                         <tr>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">2</td>
@@ -2289,9 +2301,9 @@ export default function Performance360Page() {
                           </td>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">25%</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">SLA Uptime &gt;= 99.9%, bàn giao đúng hạn &gt;= 95%</td>
-                          <td className="p-2.5 text-center border-r border-border/60">... / 100</td>
-                          <td className="p-2.5 text-center border-r border-border/60">... / 100</td>
-                          <td className="p-2.5 text-center">....... đ</td>
+                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="p-2.5 text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-money" /> đ</span></td>
                         </tr>
                         <tr>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">3</td>
@@ -2301,9 +2313,9 @@ export default function Performance360Page() {
                           </td>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">20%</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Tiết kiệm &gt;= 15% thời gian xử lý hoặc ngân sách</td>
-                          <td className="p-2.5 text-center border-r border-border/60">... / 100</td>
-                          <td className="p-2.5 text-center border-r border-border/60">... / 100</td>
-                          <td className="p-2.5 text-center">....... đ</td>
+                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="p-2.5 text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-money" /> đ</span></td>
                         </tr>
                         <tr>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">4</td>
@@ -2313,9 +2325,9 @@ export default function Performance360Page() {
                           </td>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">20%</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">100% báo cáo đúng hạn, 0 sai phạm quy chế</td>
-                          <td className="p-2.5 text-center border-r border-border/60">... / 100</td>
-                          <td className="p-2.5 text-center border-r border-border/60">... / 100</td>
-                          <td className="p-2.5 text-center">....... đ</td>
+                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="p-2.5 text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-money" /> đ</span></td>
                         </tr>
                       </tbody>
                       <tfoot className="bg-muted/30 font-bold border-t border-border/80">
@@ -2323,18 +2335,20 @@ export default function Performance360Page() {
                           <td colSpan={2} className="p-2.5 text-right">TỔNG CỘNG TRỌNG SỐ:</td>
                           <td className="p-2.5 text-center">100%</td>
                           <td colSpan={3} className="p-2.5 text-right">ĐIỂM KRA TỔNG HỢP:</td>
-                          <td className="p-2.5 text-center text-primary">....... / 100</td>
+                          <td className="p-2.5 text-center text-primary"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
                         </tr>
                       </tfoot>
                     </table>
 
                     {/* Nhận xét & Đánh giá */}
-                    <div className="space-y-2 border border-border/70 p-3 rounded-lg text-sm">
-                      <div><b>Ý kiến tự nhận xét của nhân sự:</b> ....................................................................................................................................................</div>
-                      <div><b>Nhận xét &amp; Đề xuất của Quản lý trực tiếp:</b> ............................................................................................................................................</div>
-                      <div><b>Xếp loại dự kiến:</b> [  ] Loại A (Xuất sắc)    [  ] Loại B (Tốt)    [  ] Loại C (Hoàn thành)    [  ] Loại D (Không đạt)</div>
-                      <div><b>Hệ số thưởng KPI Bảng lương liên kết:</b> [  ] +15%    [  ] +10%    [  ] +5%    [  ] 0%</div>
+                    <div className="space-y-3 text-sm">
+                      <div><b>Ý kiến tự nhận xét của nhân sự:</b><div className="print-write-area print-write-area-response min-h-[16mm]" /></div>
+                      <div><b>Nhận xét &amp; Đề xuất của Quản lý trực tiếp:</b><div className="print-write-area print-write-area-response min-h-[16mm]" /></div>
+                      <div><b>Xếp loại chu kỳ dự kiến:</b> [  ] Xuất sắc    [  ] Tốt    [  ] Đạt    [  ] Chưa đạt</div>
+                      <div><b>Thưởng / điều chỉnh lương:</b> theo chính sách và quyết định riêng đã được duyệt.</div>
                     </div>
+
+                    <p className="pt-3 text-xs italic text-muted-foreground">Biểu mẫu nội bộ tham khảo. {isEnterprise ? 'Nhân viên: 20% tự đánh giá, 30% đồng nghiệp, 50% quản lý; quản lý có cấp dưới: 20% tự đánh giá, 20% đồng nghiệp, 50% cấp trên, 10% cấp dưới.' : 'Khu vực công: tiêu chí chung 30 điểm và kết quả nhiệm vụ 70 điểm; kết luận cần qua bước có thẩm quyền.'} Trọng số mục tiêu lấy theo kỳ đánh giá. Không tự động quy đổi điểm thành tiền thưởng hoặc lương.</p>
 
                     {/* 3 Khung chữ ký */}
                     <div className="grid grid-cols-3 gap-4 pt-6 text-center text-sm">
@@ -2342,19 +2356,19 @@ export default function Performance360Page() {
                         <p className="font-bold uppercase">NGƯỜI LAO ĐỘNG</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên)</p>
                         <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
+                        <div className="print-signature-rule" />
                       </div>
                       <div>
                         <p className="font-bold uppercase">QUẢN LÝ TRỰC TIẾP</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên)</p>
                         <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
+                        <div className="print-signature-rule" />
                       </div>
                       <div>
                         <p className="font-bold uppercase">LÃNH ĐẠO ĐƠN VỊ DUYỆT</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, đóng dấu)</p>
                         <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
+                        <div className="print-signature-rule" />
                       </div>
                     </div>
                   </div>
@@ -2363,7 +2377,7 @@ export default function Performance360Page() {
                 {/* 2. MẪU NĂNG LỰC HÀNH VI BARS */}
                 {selectedTemplateForPrint === 'bars' && (
                   <div className="space-y-4">
-                    <div className="border-b-2 border-foreground/30 pb-3 flex justify-between items-start">
+                    <div className="pb-3 flex justify-between items-start">
                       <div>
                         <p className="font-bold text-sm uppercase tracking-wider">HỆ THỐNG QUẢN TRỊ NĂNG LỰC NHÂN SỰ</p>
                         <p className="text-xs text-muted-foreground">KHUNG ĐÁNH GIÁ NĂNG LỰC HÀNH VI CỐT LÕI (BARS)</p>
@@ -2400,41 +2414,41 @@ export default function Performance360Page() {
                           <td className="p-2.5 font-semibold border-r border-border/60">Trách nhiệm &amp; Kỷ luật lao động</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Tuân thủ nội quy, hoàn thành công việc đúng cam kết, không đùn đẩy trách nhiệm</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Tận tâm vượt bậc, chủ động nhận lỗi và giải pháp, làm gương cho toàn đơn vị</td>
-                          <td className="p-2.5 text-center font-bold">....... / 5★</td>
+                          <td className="p-2.5 text-center font-bold"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                         </tr>
                         <tr>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">2</td>
                           <td className="p-2.5 font-semibold border-r border-border/60">Tư duy giải quyết vấn đề &amp; Sáng tạo</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Xử lý tốt sự cố thông thường, phân tích nguyên nhân gốc rễ rõ ràng</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Đột phá, biến khủng hoảng thành cơ hội cải tiến quy trình vượt trội</td>
-                          <td className="p-2.5 text-center font-bold">....... / 5★</td>
+                          <td className="p-2.5 text-center font-bold"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                         </tr>
                         <tr>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">3</td>
                           <td className="p-2.5 font-semibold border-r border-border/60">Giao tiếp &amp; Phối hợp đội ngũ</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Giao tiếp mạch lạc, tôn trọng ý kiến đồng nghiệp, hợp tác nội bộ tốt</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Truyền cảm hứng, hóa giải mâu thuẫn, xây dựng văn hóa gắn kết tập thể</td>
-                          <td className="p-2.5 text-center font-bold">....... / 5★</td>
+                          <td className="p-2.5 text-center font-bold"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                         </tr>
                         <tr>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">4</td>
                           <td className="p-2.5 font-semibold border-r border-border/60">Chuyên môn &amp; Tốc độ thực thi</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Làm chủ công việc chuyên trách, năng suất ổn định, ít sai sót nghiệp vụ</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Chuyên gia đầu ngành, tốc độ xử lý nhanh, đào tạo và dẫn dắt đội ngũ</td>
-                          <td className="p-2.5 text-center font-bold">....... / 5★</td>
+                          <td className="p-2.5 text-center font-bold"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                         </tr>
                         <tr>
                           <td className="p-2.5 text-center font-bold border-r border-border/60">5</td>
                           <td className="p-2.5 font-semibold border-r border-border/60">Tính chủ động &amp; Năng lực dẫn dắt</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Tự giác trong công việc, sẵn sàng nhận nhiệm vụ mới khi được phân công</td>
                           <td className="p-2.5 border-r border-border/60 text-sm">Đề xuất sáng kiến chiến lược, hướng dẫn và kèm cặp nhân viên mới tận tình</td>
-                          <td className="p-2.5 text-center font-bold">....... / 5★</td>
+                          <td className="p-2.5 text-center font-bold"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                         </tr>
                       </tbody>
                       <tfoot className="bg-muted/30 font-bold border-t border-border/80">
                         <tr>
                           <td colSpan={4} className="p-2.5 text-right">TỔNG ĐIỂM BARS (QUY ĐỔI THANG 100):</td>
-                          <td className="p-2.5 text-center text-purple-700 dark:text-purple-400 font-bold">....... / 100</td>
+                          <td className="p-2.5 text-center text-purple-700 dark:text-purple-400 font-bold"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
                         </tr>
                       </tfoot>
                     </table>
@@ -2445,28 +2459,28 @@ export default function Performance360Page() {
                         <p className="font-bold uppercase">CÁN BỘ ĐƯỢC ĐÁNH GIÁ</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên)</p>
                         <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
+                        <div className="print-signature-rule" />
                       </div>
                       <div>
                         <p className="font-bold uppercase">HỘI ĐỒNG ĐÁNH GIÁ NĂNG LỰC</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên)</p>
                         <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
+                        <div className="print-signature-rule" />
                       </div>
                       <div>
                         <p className="font-bold uppercase">GIÁM ĐỐC NHÂN SỰ</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, đóng dấu)</p>
                         <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
+                        <div className="print-signature-rule" />
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* 3. MẪU KHẢO SÁT 360 ĐỘ */}
-                {selectedTemplateForPrint === 'survey360' && (
+                {isEnterprise && selectedTemplateForPrint === 'survey360' && (
                   <div className="space-y-4">
-                    <div className="border-b-2 border-foreground/30 pb-3 flex justify-between items-start">
+                    <div className="pb-3 flex justify-between items-start">
                       <div>
                         <p className="font-bold text-sm uppercase tracking-wider">HỆ THỐNG ĐÁNH GIÁ ĐA CHIỀU 360 ĐỘ</p>
                         <p className="text-xs text-muted-foreground">PHIẾU KHẢO SÁT &amp; PHẢN HỒI KÍN ĐỊNH KỲ</p>
@@ -2500,47 +2514,47 @@ export default function Performance360Page() {
                           <tr>
                             <td className="p-2.5 text-center font-bold border-r border-border/60">1</td>
                             <td className="p-2.5 border-r border-border/60">Nhân sự luôn giữ đúng cam kết về chất lượng, số lượng và thời hạn hoàn thành công việc.</td>
-                            <td className="p-2.5 text-center font-medium">....... / 5★</td>
+                            <td className="p-2.5 text-center font-medium"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                           </tr>
                           <tr>
                             <td className="p-2.5 text-center font-bold border-r border-border/60">2</td>
                             <td className="p-2.5 border-r border-border/60">Thái độ hợp tác tích cực, tôn trọng ý kiến khác biệt và lắng nghe phản hồi của người khác.</td>
-                            <td className="p-2.5 text-center font-medium">....... / 5★</td>
+                            <td className="p-2.5 text-center font-medium"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                           </tr>
                           <tr>
                             <td className="p-2.5 text-center font-bold border-r border-border/60">3</td>
                             <td className="p-2.5 border-r border-border/60">Tốc độ phản hồi nhanh, sẵn sàng tương trợ đồng nghiệp trong các tình huống khẩn cấp, quá tải.</td>
-                            <td className="p-2.5 text-center font-medium">....... / 5★</td>
+                            <td className="p-2.5 text-center font-medium"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                           </tr>
                           <tr>
                             <td className="p-2.5 text-center font-bold border-r border-border/60">4</td>
                             <td className="p-2.5 border-r border-border/60">Sự trung thực, minh bạch, liêm chính và luôn đặt lợi ích chung của đơn vị lên trên lợi ích riêng.</td>
-                            <td className="p-2.5 text-center font-medium">....... / 5★</td>
+                            <td className="p-2.5 text-center font-medium"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                           </tr>
                           <tr>
                             <td className="p-2.5 text-center font-bold border-r border-border/60">5</td>
                             <td className="p-2.5 border-r border-border/60">Khả năng thích ứng linh hoạt trước sự thay đổi về công nghệ, quy trình hoặc định hướng của đơn vị.</td>
-                            <td className="p-2.5 text-center font-medium">....... / 5★</td>
+                            <td className="p-2.5 text-center font-medium"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                           </tr>
                           <tr>
                             <td className="p-2.5 text-center font-bold border-r border-border/60">6</td>
                             <td className="p-2.5 border-r border-border/60">Tinh thần chủ động đóng góp sáng kiến, tích cực tham gia các phong trào, hoạt động của cơ quan.</td>
-                            <td className="p-2.5 text-center font-medium">....... / 5★</td>
+                            <td className="p-2.5 text-center font-medium"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5★</span></td>
                           </tr>
                         </tbody>
                         <tfoot className="bg-muted/30 font-bold border-t border-border/80">
                           <tr>
                             <td colSpan={2} className="p-2.5 text-right">ĐIỂM ĐÁNH GIÁ 360 ĐỘ BÌNH QUÂN:</td>
-                            <td className="p-2.5 text-center text-emerald-700 dark:text-emerald-400 font-bold">....... / 5.0★</td>
+                            <td className="p-2.5 text-center text-emerald-700 dark:text-emerald-400 font-bold"><span className="print-score-entry"><span className="print-score-slot print-score-slot-5" /> / 5.0★</span></td>
                           </tr>
                         </tfoot>
                       </table>
 
                       {/* Nhận xét mở */}
-                      <div className="p-3.5 border border-border/70 rounded-lg space-y-2.5 text-sm">
-                        <div><b>1. Ba điểm mạnh nổi bật nhất của nhân sự:</b> ....................................................................................................................................</div>
-                        <div><b>2. Hai điểm cần nỗ lực cải thiện trong chu kỳ tới:</b> .................................................................................................................................</div>
-                        <div><b>3. Đề xuất kế hoạch đào tạo &amp; phát triển cá nhân (IDP):</b> ...................................................................................................................</div>
+                      <div className="space-y-3 text-sm">
+                        <div><b>1. Ba điểm mạnh nổi bật nhất của nhân sự:</b><div className="print-write-area print-write-area-response min-h-[16mm]" /></div>
+                        <div><b>2. Hai điểm cần nỗ lực cải thiện trong chu kỳ tới:</b><div className="print-write-area print-write-area-response min-h-[16mm]" /></div>
+                        <div><b>3. Đề xuất kế hoạch đào tạo &amp; phát triển cá nhân (IDP):</b><div className="print-write-area print-write-area-response min-h-[16mm]" /></div>
                       </div>
                     </div>
 
@@ -2550,83 +2564,66 @@ export default function Performance360Page() {
                         <p className="font-bold uppercase">NGƯỜI LẬP PHIẾU PHẢN HỒI</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên - Thông tin được bảo mật)</p>
                         <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
+                        <div className="print-signature-rule" />
                       </div>
                       <div>
                         <p className="font-bold uppercase">BỘ PHẬN NHÂN SỰ XÁC NHẬN</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên)</p>
                         <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
+                        <div className="print-signature-rule" />
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* 4. MẪU NGHỊ ĐỊNH 90/2020 */}
-                {selectedTemplateForPrint === 'nd90' && (
-                  <div className="space-y-4">
-                    <div className="text-center space-y-1 border-b pb-3">
-                      <p className="font-bold text-sm uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-                      <p className="font-bold text-sm underline">Độc lập - Tự do - Hạnh phúc</p>
-                      <p className="text-xs italic text-muted-foreground pt-1">Hà Nội, ngày ...... tháng ...... năm 2026</p>
+                {/* Mẫu đánh giá nội bộ; không dùng làm mẫu pháp quy */}
+                {isEnterprise && selectedTemplateForPrint === 'internalDevelopment' && (
+                  <div className="print-a4-compact space-y-3 text-sm">
+                    <div className="text-center space-y-1 pb-2">
+                      <p className="font-bold text-sm uppercase">{printConfig.orgName || 'TÊN DOANH NGHIỆP'}</p>
+                      <p className="font-bold text-base uppercase">PHIẾU ĐÁNH GIÁ HIỆU SUẤT VÀ KẾ HOẠCH PHÁT TRIỂN</p>
+                      <p className="text-xs italic">Mẫu nội bộ · Kỳ đánh giá:</p>
                     </div>
-
-                    <div className="text-center space-y-1">
-                      <h2 className="font-bold text-lg uppercase text-foreground">
-                        PHIẾU ĐÁNH GIÁ, XẾP LOẠI CHẤT LƯỢNG CÁN BỘ, CÔNG CHỨC, VIÊN CHỨC
-                      </h2>
-                      <p className="text-xs text-muted-foreground italic">
-                        (Ban hành kèm theo Nghị định số 90/2020/NĐ-CP ngày 13 tháng 8 năm 2020 của Chính phủ)
-                      </p>
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                      {['Họ và tên', 'Chức danh', 'Đơn vị', 'Quản lý đánh giá'].map((label) => (
+                        <div className="print-field" key={label}>
+                          <p className="font-medium">{label}</p>
+                          <div className="print-write-area print-write-area-identity min-h-[9mm]" />
+                        </div>
+                      ))}
                     </div>
-
-                    <div className="space-y-2 text-sm">
-                      <div>Họ và tên: <b className="text-foreground">................................................................................</b> Chức vụ, chức danh: <b className="text-foreground">................................................................</b></div>
-                      <div>Cơ quan, tổ chức, đơn vị công tác: <b className="text-foreground">........................................................................................................................................</b></div>
+                    <div className="print-section space-y-2">
+                      <p className="font-bold uppercase">I. Kết quả mục tiêu và minh chứng</p>
+                      {['Mục tiêu / chỉ số', 'Kết quả, chất lượng và thời hạn', 'Minh chứng / liên kết hồ sơ'].map((label) => (
+                        <div className="print-field" key={label}>
+                          <p>{label}</p>
+                          <div className="print-write-area print-write-area-response min-h-[16mm]" />
+                        </div>
+                      ))}
                     </div>
-
-                    {/* Phần I: Tự đánh giá */}
-                    <div className="space-y-2.5 text-sm border border-border/70 p-3.5 rounded-lg">
-                      <p className="font-bold uppercase text-foreground">I. KẾT QUẢ TỰ ĐÁNH GIÁ CỦA CÁN BỘ, CÔNG CHỨC, VIÊN CHỨC</p>
-                      <p><b>1. Chính trị tư tưởng:</b> Chấp hành nghiêm chỉnh chủ trương, đường lối của Đảng, chính sách, pháp luật của Nhà nước .........................</p>
-                      <p><b>2. Đạo đức, lối sống:</b> Giữ gìn phẩm chất đạo đức, không tham nhũng, lãng phí, có lối sống lành mạnh, trung thực ..................................</p>
-                      <p><b>3. Tác phong, lề lối làm việc:</b> Tinh thần trách nhiệm, thái độ phục vụ tận tụy, tôn trọng nhân dân và đồng nghiệp .................................</p>
-                      <p><b>4. Ý thức tổ chức kỷ luật:</b> Chấp hành sự phân công của tổ chức, thực hiện nghiêm quy chế văn hóa công sở .........................................</p>
-                      <p><b>5. Kết quả thực hiện chức trách, nhiệm vụ:</b> Đạt tiến độ 100%, đảm bảo chất lượng, hiệu quả công tác năm .........................................</p>
-                      <p className="pt-1 font-medium"><b>Tự nhận mức xếp loại chất lượng:</b> [  ] Xuất sắc (≤ 20%)    [  ] Tốt    [  ] Hoàn thành    [  ] Không hoàn thành</p>
+                    <div className="print-section space-y-2">
+                      <p className="font-bold uppercase">II. Năng lực và phản hồi</p>
+                      {['Năng lực nổi bật, có ví dụ minh chứng', 'Năng lực cần cải thiện', 'Phản hồi của nhân viên / quản lý / bên liên quan'].map((label) => (
+                        <div className="print-field" key={label}>
+                          <p>{label}</p>
+                          <div className="print-write-area print-write-area-response min-h-[16mm]" />
+                        </div>
+                      ))}
                     </div>
-
-                    {/* Phần II: Ý kiến nhận xét */}
-                    <div className="space-y-2.5 text-sm border border-border/70 p-3.5 rounded-lg">
-                      <p className="font-bold uppercase text-foreground">II. Ý KIẾN NHẬN XÉT CỦA TẬP THỂ VÀ CẤP ỦY NƠI CÔNG TÁC</p>
-                      <p>Ý kiến nhận xét của Cấp ủy đơn vị: ................................................................................................................................................................</p>
-                      <p>Ý kiến của tập thể lãnh đạo cơ quan, đơn vị: ................................................................................................................................................</p>
+                    <div className="print-section space-y-2">
+                      <p className="font-bold uppercase">III. Kế hoạch phát triển kỳ tiếp theo</p>
+                      {['Mục tiêu cải thiện', 'Hoạt động, người hỗ trợ và hạn hoàn thành', 'Tiêu chí xác nhận hoàn thành'].map((label) => (
+                        <div className="print-field" key={label}>
+                          <p>{label}</p>
+                          <div className="print-write-area print-write-area-response min-h-[16mm]" />
+                        </div>
+                      ))}
                     </div>
-
-                    {/* Phần III: Kết luận */}
-                    <div className="space-y-2.5 text-sm border border-border/70 p-3.5 rounded-lg bg-muted/10">
-                      <p className="font-bold uppercase text-foreground">III. KẾT LUẬN VÀ QUYẾT ĐỊNH XẾP LOẠI CỦA CẤP CÓ THẨM QUYỀN</p>
-                      <p>Người đứng đầu cơ quan, đơn vị quyết định xếp loại chất lượng cán bộ, công chức, viên chức năm 2026 ở mức:</p>
-                      <p className="font-bold text-foreground">
-                        [  ] Hoàn thành xuất sắc nhiệm vụ (≤ 20%) &nbsp;&nbsp;&nbsp;&nbsp; [  ] Hoàn thành tốt nhiệm vụ &nbsp;&nbsp;&nbsp;&nbsp; [  ] Hoàn thành nhiệm vụ &nbsp;&nbsp;&nbsp;&nbsp; [  ] Không hoàn thành nhiệm vụ
-                      </p>
+                    <div className="print-signatures grid grid-cols-2 gap-4 pt-3 text-center">
+                      <div><p className="font-bold uppercase">NHÂN VIÊN</p><p className="text-xs italic">(Xác nhận nội bộ)</p><div className="h-16" /><div className="print-signature-rule mx-auto" /></div>
+                      <div><p className="font-bold uppercase">QUẢN LÝ</p><p className="text-xs italic">(Xác nhận nội bộ)</p><div className="h-16" /><div className="print-signature-rule mx-auto" /></div>
                     </div>
-
-                    {/* 2 Khung chữ ký */}
-                    <div className="grid grid-cols-2 gap-4 pt-6 text-center text-sm">
-                      <div>
-                        <p className="font-bold uppercase">CÁ NHÂN TỰ ĐÁNH GIÁ</p>
-                        <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên)</p>
-                        <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
-                      </div>
-                      <div>
-                        <p className="font-bold uppercase">THỦ TRƯỞNG CƠ QUAN, ĐƠN VỊ</p>
-                        <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên và đóng dấu)</p>
-                        <div className="h-14" />
-                        <p className="font-medium">....................................................</p>
-                      </div>
-                    </div>
+                    <p className="pt-2 text-xs italic text-muted-foreground">Biểu mẫu nội bộ. Với công chức hoặc viên chức, cần dùng đúng mẫu và quy trình hiện hành theo đối tượng; hệ thống chưa tích hợp các mẫu pháp quy đó.</p>
                   </div>
                 )}
               </div>

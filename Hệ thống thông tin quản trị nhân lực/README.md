@@ -5,6 +5,9 @@ và bộ biểu đồ thiết kế UML 47 Use Case tại [`doc/PTTK_OOP_HR_DIAGR
 
 > **Clone-and-run:** `git clone` → `docker compose up -d` → mở **http://localhost:8080** → đăng nhập bằng tài khoản demo. Không cần tạo file hay sửa cấu hình gì thêm.
 
+
+> **Cập nhật 04/10/2026:** các luồng quyền, chấm công/lương, nhân sự theo ngày hiệu lực, tài sản, hoàn ứng và phát triển năng lực đã được nối thêm. Migration mới đã thử trên DB sạch và áp dụng lên PostgreSQL đang chạy sau khi sao lưu. E2E DB cô lập đạt luồng ghi công → duyệt giải trình → chốt công → tính/duyệt/khóa/chi lương, xác nhận tài sản và hoàn ứng. Lương là baseline tham chiếu 2026 cho bài tập; các giới hạn trước vận hành thật được ghi trong [quy trình lương tham chiếu 2026](doc/QUY_TRINH_TINH_LUONG_VN_THAM_CHIEU_2026.md) và [báo cáo trạng thái](doc/BAO_CAO_TRANG_THAI_SAU_SUA_20261004.md).
+
 ---
 
 ## 1. Khởi động nhanh
@@ -19,12 +22,23 @@ Mở **http://localhost:8080** và đăng nhập:
 
 | Vai trò                       | Họ tên & Chức danh / Đơn vị | Email                    | Mật khẩu      |
 | ----------------------------- | --------------------------- | ------------------------ | ------------- |
-| Ban Giám Đốc (BOD)            | Trần Minh Hoàng (Tổng Giám đốc / CEO - BGD) | `ceo@saigontechnology.vn` | `Admin@123`   |
-| Cổ đông & HĐQT (SHAREHOLDER)  | Phạm Tiến Thành (Chủ tịch HĐQT / ĐHCĐ) | `chairman@saigontechnology.vn` | `Admin@123`   |
-| Quản trị viên CNTT (ADMIN)    | Nguyễn Hoàng Nam (IT SysAdmin / Phòng IT) | `admin@demo.local`       | `Admin@123`   |
-| Cán bộ Nhân sự (KM_MANAGER)   | Dương Khánh Chi (HR Manager / Nhân sự) | `km.manager@demo.local`  | `Manager@123` |
-| Trưởng nhóm Java (LINE_MGR)   | Đỗ Hoàng Nam (PM Lead kỹ thuật) | `pm.java@demo.local`     | `Pm@123456`   |
-| Kỹ sư phần mềm (USER)         | Phan Quốc Huy (Fresher / Cổng ESS) | `dev.fresher@demo.local` | `Fresher@123` |
+| Cấp / vai trò | Đại diện | Email | Mật khẩu |
+| --- | --- | --- | --- |
+| Quản trị CNTT — `ADMIN` | Nguyễn Hoàng Nam, Phòng CNTT | `admin@demo.local` | `Admin@123` |
+| Ban điều hành — `BOD` | Trần Minh Hoàng, Tổng Giám đốc | `ceo@saigontechnology.vn` | `Admin@123` |
+| Cổ đông / HĐQT — `SHAREHOLDER` + `BOD` | Phạm Tiến Thành, Chủ tịch HĐQT | `chairman@saigontechnology.vn` | `Admin@123` |
+| Quản lý nhân sự — `KM_MANAGER` | Dương Khánh Chi, Trưởng ban Nhân sự | `km.manager@demo.local` | `Manager@123` |
+| Quản lý trực tiếp — `LINE_MANAGER` | Lê Minh Tuấn, Trưởng nhóm Java | `pm.java@demo.local` | `Pm@123456` |
+| Chuyên viên C&B — `HR_CB` | Trần Thu Trang | `cb.demo@demo.local` | `Cb@123456` |
+| Kế toán — `ACCOUNTANT` | Nguyễn Thị Hồng | `accountant.demo@demo.local` | `Acc@123456` |
+| Tuyển dụng — `HR_RECRUITER` | Phạm Ngọc Mai | `recruiter.demo@demo.local` | `Recruit@123` |
+| Đào tạo — `HR_TRAINER` | Lê Hoàng Anh | `trainer.demo@demo.local` | `Trainer@123` |
+| Kiểm toán / Pháp chế — `AUDITOR` | Vũ Minh Đức | `auditor.demo@demo.local` | `Audit@123` |
+| Nhân viên — `USER` | Đỗ Gia Hân, Lập trình viên Java | `dev.fresher@demo.local` | `Fresher@123` |
+
+Tài khoản trình diễn thể hiện vai trò và đơn vị đại diện; quan hệ quản lý trực tiếp
+giữa các hồ sơ chỉ được mô phỏng theo cây tổ chức vì mô hình người dùng hiện chưa lưu
+trường người quản lý trực tiếp.
 
 Lần đầu chạy, hệ thống **tự động** áp dụng migration và seed dữ liệu mô phỏng
 (cây tổ chức Saigon Technology, 6 Space, ~12 bài viết tiếng Việt, onboarding path,
@@ -56,7 +70,7 @@ Trình duyệt ──► web (Next.js 14 standalone, cổng 8080 duy nhất)
                  ▼
                api (NestJS 10 + Prisma 5, Node 20-alpine)
                  ▼
-               db (PostgreSQL 16-alpine, 87 model quan hệ qua Prisma ORM, FTS pg_trgm)
+               db (PostgreSQL 16-alpine, 95 model trong schema Prisma hiện tại, FTS pg_trgm)
 ```
 
 - **Backend:** NestJS phân tầng Controller → Service → Prisma; JWT access 15' + refresh xoay vòng;
@@ -66,7 +80,7 @@ Trình duyệt ──► web (Next.js 14 standalone, cổng 8080 duy nhất)
   mobile-first (sidebar desktop / bottom-nav mobile); token z-index cố định
   (content < sticky < dropdown < overlay < modal < toast); xử lý đầy đủ trạng thái loading/rỗng/lỗi.
 - **Chấm công đa nguồn:** QR kiosk xoay 30s (token HMAC + jti one-time), khuôn mặt trên trình duyệt
-  (vector mã hóa AES-256-GCM), webhook HMAC + CSV import cho máy chấm công, bộ mô phỏng tích hợp.
+  (vector mã hóa AES-256-GCM), webhook HMAC + CSV import cho máy chấm công, bộ mô phỏng tích hợp. Nhận diện khuôn mặt hiện chỉ là demo; không có cảm biến IR/3D liveness hoặc kết nối SDK máy chấm công thật.
 
 Chi tiết đầy đủ: [`doc/PTTK_OOP_HR.md`](doc/PTTK_OOP_HR.md) và [`plans/ke-hoach-cai-thien-hrms.md`](plans/ke-hoach-cai-thien-hrms.md).
 
@@ -91,7 +105,7 @@ Toàn bộ biến nằm trong [`.env.example`](.env.example). Compose có sẵn 
 
 ```bash
 cd backend
-npm test                 # unit test (12 test: auth lockout UC01, QR token, face crypto)
+npm test                 # unit test và hồi quy; bộ kiểm tra cô lập hiện tại gồm 38 trường hợp (chi tiết tại báo cáo trạng thái)
 RUN_E2E=1 DATABASE_URL=... npm run test:e2e   # e2e cần DB đang chạy
 node scripts/smoke.mjs   # smoke 25 bước qua web proxy (stack phải đang chạy)
 ```
@@ -119,3 +133,7 @@ CI (GitHub Actions): `.github/workflows/ci.yml` — backend test/build với Pos
 3. **Máy chấm công thật** chưa nối SDK độc quyền (ZKTeco…) — thay bằng webhook HMAC + CSV + simulator; adapter mở rộng đã chừa sẵn.
 4. **Tệp đính kèm** phục vụ qua `/uploads` tĩnh với tên ngẫu nhiên uuid (không xác thực download) — chấp nhận cho demo nội bộ.
 5. Mật khẩu demo để nguyên trong seed phục vụ trình diễn; bắt buộc đổi trước khi dùng thật.
+
+
+
+

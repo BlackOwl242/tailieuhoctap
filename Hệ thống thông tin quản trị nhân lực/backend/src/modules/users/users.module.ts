@@ -1,8 +1,8 @@
 import {
-  Body, Controller, Delete, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
+  Body, ConflictException, Controller, Delete, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsDateString, IsEmail, IsEnum, IsIn, IsInt, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsDateString, IsEmail, IsEnum, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../common/prisma.service';
@@ -30,7 +30,6 @@ class CreateUserDto {
   @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() phone?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() employeeCode?: string;
-  @ApiPropertyOptional() @IsOptional() @IsNumber() baseSalary?: number;
   @ApiPropertyOptional() @IsOptional() @IsDateString() hireDate?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() employmentStatus?: string;
   @ApiPropertyOptional({ type: [String], isArray: true })
@@ -114,7 +113,6 @@ export class UsersService {
         orgUnitId: dto.orgUnitId,
         phone: dto.phone,
         employeeCode: code,
-        baseSalary: dto.baseSalary,
         hireDate: dto.hireDate ? new Date(dto.hireDate) : new Date(),
         employmentStatus: (dto.employmentStatus as never) || 'ACTIVE',
         expertise: dto.expertise ?? [],
@@ -133,6 +131,9 @@ export class UsersService {
       include: { roles: true },
     });
     if (!before) throw new NotFoundException('Không tìm thấy người dùng');
+    if ((dto.jobTitle !== undefined && dto.jobTitle !== (before.jobTitle ?? '')) || (dto.orgUnitId !== undefined && dto.orgUnitId !== (before.orgUnitId ?? ''))) {
+      throw new ConflictException('Thay đổi chức danh hoặc đơn vị phải đi qua quyết định nhân sự để có phê duyệt và ngày hiệu lực. Trang này chỉ quản lý tài khoản và quyền truy cập.');
+    }
 
     const data: Record<string, unknown> = {};
     if (dto.fullName !== undefined) data.fullName = dto.fullName;

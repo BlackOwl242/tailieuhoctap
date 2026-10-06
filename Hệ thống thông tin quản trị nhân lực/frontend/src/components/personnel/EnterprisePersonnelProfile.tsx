@@ -26,11 +26,9 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
   const parentGroup = orgConfig.parentOrgName || '';
   const deptName = orgConfig.deptName || 'PHÒNG NHÂN SỰ';
   const location = orgConfig.location || 'TP. Hồ Chí Minh';
+  const printedDate = formatDate(meta?.exportedAt || new Date().toISOString());
 
-  // Format mức lương ước tính (VNĐ)
-  const baseSalaryVnd = page2?.salaryCoefficient
-    ? (Number(page2.salaryCoefficient) * 2340000 * 3.5).toLocaleString('vi-VN') + ' VNĐ'
-    : '25.000.000 VNĐ';
+  const notProvided = 'Chưa cập nhật';
 
   const cellStyle = { border: '1px solid #000000', padding: '6px 8px' };
   const labelCellStyle = {
@@ -44,12 +42,17 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
   return (
     <div className="enterprise-personnel-profile font-times text-black text-[11pt] leading-normal space-y-4 max-w-4xl mx-auto bg-white p-4 sm:p-8">
       {/* CSS Scoped đảm bảo 100% thuần màu đen và toàn bộ bảng có đường kẻ 1px */}
-      <style jsx>{`
+      <style jsx global>{`
         .enterprise-personnel-profile,
         .enterprise-personnel-profile * {
           color: #000000 !important;
           border-color: #000000 !important;
-          font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
+        }
+        @media print {
+          .enterprise-personnel-profile,
+          .enterprise-personnel-profile * {
+            font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
+          }
         }
         .enterprise-personnel-profile table {
           border-collapse: collapse !important;
@@ -60,6 +63,62 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
         .enterprise-personnel-profile td {
           border: 1px solid #000000 !important;
           color: #000000 !important;
+          vertical-align: top;
+          word-break: normal;
+          overflow-wrap: anywhere;
+        }
+        @media print {
+          @page { size: A4 portrait; margin: 0; }
+          .print-area.enterprise-personnel-print-area {
+            position: absolute !important;
+            inset: 0 auto auto 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 14mm 15mm !important;
+            overflow: visible !important;
+          }
+          .enterprise-personnel-print-area > div > div,
+          .enterprise-personnel-print-area [class*="bg-muted"],
+          .enterprise-personnel-print-area [class*="bg-card"] {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: #fff !important;
+            overflow: visible !important;
+          }
+          .enterprise-personnel-profile {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            font-size: 10pt !important;
+            line-height: 1.25 !important;
+          }
+          .print-area .enterprise-personnel-profile table {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            table-layout: auto !important;
+            margin: 2mm 0 4mm !important;
+            font-size: 9.5pt !important;
+            page-break-inside: auto !important;
+          }
+          .enterprise-personnel-profile th,
+          .enterprise-personnel-profile td {
+            padding: 2mm 2.2mm !important;
+            line-height: 1.25 !important;
+            word-break: normal !important;
+            overflow-wrap: anywhere !important;
+          }
+          .enterprise-personnel-profile tr { page-break-inside: avoid !important; }
+          .enterprise-personnel-profile .profile-section-title { page-break-after: avoid !important; }
+          .enterprise-personnel-profile .profile-signatures { page-break-inside: avoid !important; }
         }
       `}</style>
 
@@ -86,7 +145,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
               {deptName}
             </p>
             <div className="mt-2 text-[10pt] font-mono font-bold text-black border border-black px-2 py-0.5 rounded-xs w-fit">
-              MÃ NHÂN VIÊN: {meta?.employeeCode || 'EMP-2026'}
+              MÃ NHÂN VIÊN: {meta?.employeeCode || notProvided}
             </div>
           </div>
         </div>
@@ -94,10 +153,10 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
         {/* Góc phải: Mã tài liệu & Ngày kết xuất */}
         <div className="flex flex-col items-end text-right shrink-0 max-w-[38%] leading-normal text-black">
           <p className="text-[10pt] font-mono uppercase tracking-wider text-black">
-            MÃ HỒ SƠ: HR-{meta?.employeeCode || '001'}
+            MÃ HỒ SƠ: HR-{meta?.employeeCode || notProvided}
           </p>
           <p className="text-[10pt] italic mt-1 text-black">
-            {location}, ngày … tháng … năm 2026
+            {location}, ngày {printedDate}
           </p>
           <div className="mt-2 px-2.5 py-1 border border-black text-center text-black">
             <span className="text-[9.5pt] font-bold uppercase tracking-wide block">
@@ -120,7 +179,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
 
       {/* ================= BẢNG I: THÔNG TIN CÁ NHÂN & ĐỊNH DANH ================= */}
       <div className="space-y-1.5">
-        <p className="font-bold text-[11pt] uppercase text-black">
+        <p className="profile-section-title font-bold text-[11pt] uppercase text-black">
           I. THÔNG TIN ĐỊNH DANH & CÁ NHÂN
         </p>
         <table className="w-full border-collapse text-[10pt] text-black" style={{ border: '1px solid #000000', borderCollapse: 'collapse' }}>
@@ -135,35 +194,37 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
             </tr>
             <tr>
               <td style={labelCellStyle}>Ngày, tháng, năm sinh</td>
-              <td style={cellStyle}>{page1.birthDate ? formatDate(page1.birthDate) : '—'}</td>
+              <td style={cellStyle}>{page1.birthDate ? formatDate(page1.birthDate) : 'Chưa cập nhật'}</td>
               <td style={labelCellStyle}>Nơi sinh</td>
-              <td style={cellStyle}>{page1.birthPlace || '—'}</td>
+              <td style={cellStyle}>{page1.birthPlace || 'Chưa cập nhật'}</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Số CCCD / Hộ chiếu</td>
-              <td style={cellStyle} className="font-mono font-bold">{page1.idCardNo || '—'}</td>
+              <td style={cellStyle} className="font-mono font-bold">{page1.idCardNo || 'Chưa cập nhật'}</td>
               <td style={labelCellStyle}>Ngày cấp</td>
-              <td style={cellStyle}>{page1.idCardIssueDate ? formatDate(page1.idCardIssueDate) : '—'}</td>
+              <td style={cellStyle}>{page1.idCardIssueDate ? formatDate(page1.idCardIssueDate) : 'Chưa cập nhật'}</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Nơi cấp CCCD</td>
-              <td style={cellStyle}>Cục CSQLHC về TTXH</td>
+              <td style={cellStyle}>{page1.idCardIssuePlace || notProvided}</td>
               <td style={labelCellStyle}>Tình trạng hôn nhân</td>
-              <td style={cellStyle}>Đã kết hôn</td>
+              <td style={cellStyle}>{page1.maritalStatus || notProvided}</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Số điện thoại di động</td>
-              <td style={cellStyle} className="font-mono font-semibold">0903 112 233</td>
+              <td colSpan={3} style={cellStyle} className="font-mono font-semibold">{meta?.phone || notProvided}</td>
+            </tr>
+            <tr>
               <td style={labelCellStyle}>Email cá nhân / Cty</td>
-              <td style={cellStyle} className="font-mono">{data.meta?.fullName?.toLowerCase().replace(/\s+/g, '.') || 'user'}@company.com</td>
+              <td colSpan={3} style={cellStyle} className="font-mono">{meta?.email || notProvided}</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Hộ khẩu thường trú</td>
-              <td colSpan={3} style={cellStyle}>{page1.permanentAddress || '—'}</td>
+              <td colSpan={3} style={cellStyle}>{page1.permanentAddress || 'Chưa cập nhật'}</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Nơi ở hiện nay</td>
-              <td colSpan={3} style={cellStyle}>{page1.currentAddress || page1.permanentAddress || '—'}</td>
+              <td colSpan={3} style={cellStyle}>{page1.currentAddress || page1.permanentAddress || 'Chưa cập nhật'}</td>
             </tr>
           </tbody>
         </table>
@@ -171,32 +232,36 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
 
       {/* ================= BẢNG II: VỊ TRÍ CÔNG TÁC & HỢP ĐỒNG LAO ĐỘNG ================= */}
       <div className="space-y-1.5 pt-2">
-        <p className="font-bold text-[11pt] uppercase text-black">
+        <p className="profile-section-title font-bold text-[11pt] uppercase text-black">
           II. VỊ TRÍ CÔNG TÁC & HỢP ĐỒNG LAO ĐỘNG
         </p>
         <table className="w-full border-collapse text-[10pt] text-black" style={{ border: '1px solid #000000', borderCollapse: 'collapse' }}>
           <tbody>
             <tr>
               <td style={{ ...labelCellStyle, width: '22%' }}>Chức danh công việc</td>
-              <td style={{ ...cellStyle, width: '40%' }} className="font-bold uppercase">
-                {meta?.jobTitle || page2.govPosition || 'Chuyên viên chuyên môn'}
+              <td colSpan={3} style={{ ...cellStyle, width: '78%' }} className="font-bold uppercase">
+                {meta?.jobTitle || page2.govPosition || notProvided}
               </td>
-              <td style={{ ...labelCellStyle, width: '18%' }}>Khối / Phòng ban</td>
-              <td style={{ ...cellStyle, width: '20%' }}>{meta?.orgUnitName || deptName}</td>
+            </tr>
+            <tr>
+              <td style={labelCellStyle}>Khối / Phòng ban</td>
+              <td colSpan={3} style={cellStyle}>{meta?.orgUnitName || deptName}</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Cấp bậc chuyên môn</td>
-              <td style={cellStyle}>Senior Professional / Quản lý chuyên môn</td>
+              <td colSpan={3} style={cellStyle}>{page2.professionalGrade || notProvided}</td>
+            </tr>
+            <tr>
               <td style={labelCellStyle}>Quản lý trực tiếp</td>
-              <td style={cellStyle}>Trưởng bộ phận / Giám đốc Khối</td>
+              <td colSpan={3} style={cellStyle}>{meta?.managerName || notProvided}</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Loại hợp đồng lao động</td>
-              <td style={cellStyle} className="font-semibold">
-                Hợp đồng lao động không xác định thời hạn
-              </td>
+              <td colSpan={3} style={cellStyle} className="font-semibold">{page2.contractType || notProvided}</td>
+            </tr>
+            <tr>
               <td style={labelCellStyle}>Ngày vào công ty</td>
-              <td style={cellStyle}>{page2.recruitDate ? formatDate(page2.recruitDate) : '01/09/2020'}</td>
+              <td colSpan={3} style={cellStyle}>{page2.recruitDate ? formatDate(page2.recruitDate) : notProvided}</td>
             </tr>
           </tbody>
         </table>
@@ -204,7 +269,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
 
       {/* ================= BẢNG III: CHẾ ĐỘ ĐÃI NGỘ, LƯƠNG & BẢO HIỂM ================= */}
       <div className="space-y-1.5 pt-2">
-        <p className="font-bold text-[11pt] uppercase text-black">
+        <p className="profile-section-title font-bold text-[11pt] uppercase text-black">
           III. CHẾ ĐỘ ĐÃI NGỘ, LƯƠNG & BẢO HIỂM XÃ HỘI
         </p>
         <table className="w-full border-collapse text-[10pt] text-black" style={{ border: '1px solid #000000', borderCollapse: 'collapse' }}>
@@ -212,27 +277,27 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
             <tr>
               <td style={{ ...labelCellStyle, width: '22%' }}>Mức lương cơ bản thỏa thuận</td>
               <td style={{ ...cellStyle, width: '40%' }} className="font-bold font-mono text-[10.5pt]">
-                {baseSalaryVnd}
+                {page2.contractSalary ? `${Number(page2.contractSalary).toLocaleString('vi-VN')} VNĐ` : notProvided}
               </td>
               <td style={{ ...labelCellStyle, width: '18%' }}>Hình thức chi trả</td>
               <td style={{ ...cellStyle, width: '20%' }}>Chuyển khoản ngày 05 hàng tháng</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Mã số thuế cá nhân (MST)</td>
-              <td style={cellStyle} className="font-mono font-semibold">8492019482</td>
+              <td style={cellStyle} className="font-mono font-semibold">{page2.taxCode || notProvided}</td>
               <td style={labelCellStyle}>Số sổ BHXH</td>
               <td style={cellStyle} className="font-mono font-semibold">{page2.socialInsuranceNo || '7918294829'}</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Tài khoản ngân hàng</td>
-              <td style={cellStyle} className="font-mono font-semibold">1903.8829.192.019</td>
+              <td style={cellStyle} className="font-mono font-semibold">{page2.bankAccount || notProvided}</td>
               <td style={labelCellStyle}>Ngân hàng & CN</td>
-              <td style={cellStyle}>Techcombank — CN TP.HCM</td>
+              <td style={cellStyle}>{page2.bankName || notProvided}</td>
             </tr>
             <tr>
               <td style={labelCellStyle}>Các khoản phụ cấp đãi ngộ</td>
               <td colSpan={3} style={cellStyle}>
-                Phụ cấp ăn trưa: 1.000.000 VNĐ · Điện thoại & Xăng xe: 800.000 VNĐ · Thưởng KPI/OKR định kỳ theo quý
+                {page2.allowances || notProvided}
               </td>
             </tr>
           </tbody>
@@ -241,7 +306,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
 
       {/* ================= BẢNG IV: TRÌNH ĐỘ HỌC VẤN & BẰNG CẤP ================= */}
       <div className="space-y-1.5 pt-2">
-        <p className="font-bold text-[11pt] uppercase text-black">
+        <p className="profile-section-title font-bold text-[11pt] uppercase text-black">
           IV. TRÌNH ĐỘ HỌC VẤN, CHỨNG CHỈ & KỸ NĂNG CHUYÊN MÔN
         </p>
         <table className="w-full border-collapse text-[10pt] text-black" style={{ border: '1px solid #000000', borderCollapse: 'collapse' }}>
@@ -259,22 +324,19 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
                 <tr key={idx}>
                   <td style={cellStyle} className="font-medium">{edu.schoolName}</td>
                   <td style={cellStyle}>{edu.majorName} ({edu.degreeName})</td>
-                  <td style={{ ...cellStyle, textAlign: 'center' }}>{edu.graduationYear || '—'}</td>
+                  <td style={{ ...cellStyle, textAlign: 'center' }}>{edu.graduationYear || 'Chưa cập nhật'}</td>
                   <td style={{ ...cellStyle, textAlign: 'center' }}>{edu.ranking || 'Giỏi / Xuất sắc'}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td style={cellStyle} className="font-medium">Đại học Bách Khoa / ĐH Quốc Gia</td>
-                <td style={cellStyle}>Công nghệ Thông tin & Khoa học Quản lý (Cử nhân)</td>
-                <td style={{ ...cellStyle, textAlign: 'center' }}>2018</td>
-                <td style={{ ...cellStyle, textAlign: 'center' }}>Giỏi</td>
+                <td style={cellStyle} colSpan={4} className="font-medium">{notProvided}</td>
               </tr>
             )}
             <tr>
               <td style={labelCellStyle}>Kỹ năng chuyên môn</td>
               <td colSpan={3} style={cellStyle}>
-                Ngoại ngữ: {page2.foreignLanguage || 'Tiếng Anh (B2 / IELTS 6.5)'} · Quản trị cơ sở dữ liệu, Kiến trúc hệ thống phần mềm, Quản lý dự án Agile/Scrum.
+                Ngoại ngữ: {page2.foreignLanguage || notProvided} · Tin học: {page2.informaticsLevel || notProvided}
               </td>
             </tr>
           </tbody>
@@ -283,7 +345,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
 
       {/* ================= BẢNG V: QUÁ TRÌNH KINH NGHIỆM LÀM VIỆC ================= */}
       <div className="space-y-1.5 pt-2">
-        <p className="font-bold text-[11pt] uppercase text-black">
+        <p className="profile-section-title font-bold text-[11pt] uppercase text-black">
           V. QUÁ TRÌNH KINH NGHIỆM LÀM VIỆC & DỰ ÁN TIÊU BIỂU
         </p>
         <table className="w-full border-collapse text-[10pt] text-black" style={{ border: '1px solid #000000', borderCollapse: 'collapse' }}>
@@ -299,7 +361,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
               workHistories.map((wh: any, idx: number) => (
                 <tr key={idx}>
                   <td style={{ ...cellStyle, textAlign: 'center' }} className="font-medium">
-                    {wh.fromDate ? formatDate(wh.fromDate) : '—'} đến {wh.toDate ? formatDate(wh.toDate) : 'Nay'}
+                    {wh.fromDate ? formatDate(wh.fromDate) : 'Chưa cập nhật'} đến {wh.toDate ? formatDate(wh.toDate) : 'Nay'}
                   </td>
                   <td style={cellStyle} className="font-medium">{wh.organization}</td>
                   <td style={cellStyle}>
@@ -310,11 +372,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
               ))
             ) : (
               <tr>
-                <td style={{ ...cellStyle, textAlign: 'center' }} className="font-medium">08/2020 đến Nay</td>
-                <td style={cellStyle} className="font-medium">{companyName}</td>
-                <td style={cellStyle}>
-                  <span className="font-semibold">{meta?.jobTitle || 'Chuyên viên cấp cao'}</span> — Quản trị và triển khai các hệ thống phần mềm nghiệp vụ doanh nghiệp.
-                </td>
+                <td style={cellStyle} colSpan={3} className="font-medium">{notProvided}</td>
               </tr>
             )}
           </tbody>
@@ -323,7 +381,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
 
       {/* ================= BẢNG VI: NGƯỜI PHỤ THUỘC & LIÊN HỆ KHẨN CẤP ================= */}
       <div className="space-y-1.5 pt-2">
-        <p className="font-bold text-[11pt] uppercase text-black">
+        <p className="profile-section-title font-bold text-[11pt] uppercase text-black">
           VI. NGƯỜI PHỤ THUỘC GIẢM TRỪ GIA CẢNH & LIÊN HỆ KHẨN CẤP
         </p>
         <table className="w-full border-collapse text-[10pt] text-black" style={{ border: '1px solid #000000', borderCollapse: 'collapse' }}>
@@ -341,24 +399,13 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
                 <tr key={idx}>
                   <td style={cellStyle} className="font-semibold">{rel.relationType}</td>
                   <td style={cellStyle} className="font-medium">{rel.fullName}</td>
-                  <td style={{ ...cellStyle, textAlign: 'center' }}>{rel.birthYear || '—'}</td>
-                  <td style={cellStyle}>{rel.details || 'Cư trú tại TP.HCM'}</td>
+                  <td style={{ ...cellStyle, textAlign: 'center' }}>{rel.birthYear || 'Chưa cập nhật'}</td>
+                  <td style={cellStyle}>{rel.details || notProvided}</td>
                 </tr>
               ))
             ) : (
               <>
-                <tr>
-                  <td style={cellStyle} className="font-semibold">Vợ / Chồng</td>
-                  <td style={cellStyle} className="font-medium">Nguyễn Thị Thu Hà</td>
-                  <td style={{ ...cellStyle, textAlign: 'center' }}>1992</td>
-                  <td style={cellStyle}>SĐT: 0988 234 567 (Người liên hệ khẩn cấp)</td>
-                </tr>
-                <tr>
-                  <td style={cellStyle} className="font-semibold">Con ruột</td>
-                  <td style={cellStyle} className="font-medium">Nguyễn Minh Khang</td>
-                  <td style={{ ...cellStyle, textAlign: 'center' }}>2020</td>
-                  <td style={cellStyle}>Người phụ thuộc giảm trừ gia cảnh (MST: 8920194821)</td>
-                </tr>
+                <tr><td style={cellStyle} colSpan={4}>{notProvided}</td></tr>
               </>
             )}
           </tbody>
@@ -389,7 +436,7 @@ export function EnterprisePersonnelProfile({ data, orgConfig }: EnterprisePerson
           {/* Bên phải: Đại diện Doanh nghiệp */}
           <div className="flex flex-col items-center">
             <p className="text-[10pt] italic text-black mb-1">
-              {location}, ngày … tháng … năm 2026
+              {location}, ngày {printedDate}
             </p>
             <p className="text-[11.5pt] font-bold uppercase text-black leading-snug">
               Đại diện Doanh nghiệp / Trưởng phòng Nhân sự

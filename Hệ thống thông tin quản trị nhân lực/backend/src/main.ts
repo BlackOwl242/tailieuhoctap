@@ -37,8 +37,8 @@ async function bootstrap(): Promise<void> {
   const origins = cfg.corsOrigin === '*' ? true : cfg.corsOrigin.split(',').map((o) => o.trim());
   app.enableCors({ origin: origins, credentials: true, maxAge: 86400 });
 
-  // Static attachment storage (random uuid filenames; see README assumptions)
-  app.use('/uploads', express.static(cfg.uploadDir, { maxAge: '7d', immutable: true }));
+  // Private employee and knowledge attachments are served only through /api/v1/files/:key,
+  // which checks the owning record and current user's access before opening the file.
 
   app.setGlobalPrefix('api/v1');
 

@@ -337,6 +337,14 @@ export class RolesController {
       throw new BadRequestException('Dữ liệu ma trận phân quyền không hợp lệ');
     }
 
+    const moduleKeys = new Set(DEFAULT_RBAC_MATRIX.map(row=>row.moduleKey));
+    const knownRoles = new Set((await this.prisma.role.findMany({ select:{code:true} })).map(r=>r.code));
+    const seen = new Set<string>();
+    for (const row of body.matrix) {
+      if (!row || !moduleKeys.has(row.moduleKey) || seen.has(row.moduleKey) || !row.permissions || typeof row.permissions !== 'object') throw new BadRequestException('Phân hệ ma trận không hợp lệ hoặc trùng');
+      seen.add(row.moduleKey);
+      for (const [role,value] of Object.entries(row.permissions)) if (!knownRoles.has(role) || typeof value !== 'string' || value.length > 500) throw new BadRequestException('Vai trò/nội dung quyền không hợp lệ');
+    }
     await this.prisma.setting.upsert({
       where: { key: 'RBAC_PERMISSIONS_MATRIX' },
       create: {

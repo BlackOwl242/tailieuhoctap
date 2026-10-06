@@ -66,6 +66,7 @@ export const TIER_2_VERIFIED_FIELDS = new Set([
   'bloodType',
   'socialInsuranceNo',
   'socialInsuranceDate',
+  'bankAccount', 'bankName', 'taxDependentCount',
 ]);
 
 export const TIER_3_RESTRICTED_ORG_FIELDS = new Set([
@@ -186,13 +187,21 @@ export class ProfileChangeRequestsService {
 
     // Kiểm tra tính hợp lệ của các trường: CẤM TUYỆT ĐỐI trường Mức 3 (Tier 3)
     for (const fieldName of Object.keys(dto.changes)) {
-      if (TIER_3_RESTRICTED_ORG_FIELDS.has(fieldName)) {
+      if (!TIER_2_VERIFIED_FIELDS.has(fieldName)) {
         throw new BadRequestException(
           `Trường [${dto.changes[fieldName]?.label || fieldName}] thuộc Mức 3 (Tổ chức quản lý) — Cán bộ/nhân viên không được tự đề xuất chỉnh sửa trực tiếp. Vui lòng liên hệ Ban Lãnh đạo hoặc theo quy trình biến động nhân sự.`,
         );
       }
     }
 
+    for (const [field, item] of Object.entries(dto.changes)) {
+      if (!item || !Object.prototype.hasOwnProperty.call(item, 'newValue')) throw new BadRequestException('Thiếu giá trị đề xuất');
+      if (field === 'taxDependentCount' && (!Number.isInteger(item.newValue) || item.newValue < 0 || item.newValue > 30)) throw new BadRequestException('Số người phụ thuộc phải trong 0–30');
+      if (field !== 'taxDependentCount' && !['heightCm', 'weightKg'].includes(field) && item.newValue != null && typeof item.newValue !== 'string') throw new BadRequestException(`Giá trị ${field} phải là chuỗi`);
+      if (['heightCm','weightKg'].includes(field) && item.newValue != null && (!Number.isFinite(item.newValue) || item.newValue <= 0)) throw new BadRequestException('Số đo không hợp lệ');
+      if ((field.endsWith('Date') || field === 'birthDate') && item.newValue && !Number.isFinite(Date.parse(item.newValue))) throw new BadRequestException('Ngày không hợp lệ');
+    }
+    if (!dto.attachmentUrls?.length || dto.attachmentUrls.some(url => typeof url !== 'string' || !url.trim())) throw new BadRequestException('Cần minh chứng để thẩm định dữ liệu mức 2');
     const request = await this.prisma.profileChangeRequest.create({
       data: {
         userId,
@@ -328,7 +337,7 @@ export class ProfileChangeRequestsService {
 
     // Chỉ chính chủ hoặc HR/Admin được xem
     const isOwner = req.userId === viewer.id;
-    const isHr = viewer.roles.includes('ADMIN') || viewer.roles.includes('KM_MANAGER');
+    const isHr = viewer.roles.includes('ADMIN') || viewer.roles.includes('KM_MANAGER') || viewer.roles.includes('HR_CB');
     if (!isOwner && !isHr) {
       throw new ForbiddenException('Bạn không có quyền xem yêu cầu này');
     }
@@ -348,6 +357,7 @@ export class ProfileChangeRequestsService {
       throw new BadRequestException(`Yêu cầu đã ở trạng thái ${request.status}, không thể phê duyệt lại`);
     }
 
+    if (request.userId === reviewer.id) throw new ForbiddenException('Không được tự phê duyệt hồ sơ');
     const changes = (request.changes ?? {}) as unknown as Record<string, FieldChangeItemDto>;
     const userUpdates: Record<string, any> = {};
     const profileUpdates: Record<string, any> = {};
@@ -357,6 +367,8 @@ export class ProfileChangeRequestsService {
       const val = item.newValue;
 
       // Map trường User cơ bản
+      if (!TIER_2_VERIFIED_FIELDS.has(key)) throw new BadRequestException('Yêu cầu có trường ngoài danh sách mức 2');
+      if (['bankAccount', 'bankName', 'taxDependentCount'].includes(key)) userUpdates[key] = val;
       if (key === 'fullName') userUpdates.fullName = val;
       if (key === 'phone') userUpdates.phone = val;
       if (key === 'currentAddress') {
@@ -375,13 +387,22 @@ export class ProfileChangeRequestsService {
       ];
       if (profileDateKeys.includes(key)) {
         profileUpdates[key] = val ? new Date(val) : null;
-      } else if (key !== 'phone' && key !== 'currentAddress') {
+      } else if (!['phone', 'currentAddress', 'fullName', 'birthDate', 'bankAccount', 'bankName', 'taxDependentCount'].includes(key)) {
         profileUpdates[key] = val;
       }
     }
 
     // Thực hiện cập nhật giao dịch
     await this.prisma.$transaction(async (tx) => {
+      const current = await tx.profileChangeRequest.findUniqueOrThrow({ where: { id } });
+      if (current.status !== 'PENDING') throw new BadRequestException('Yêu cầu đã được xử lý');
+      const currentUser = await tx.user.findUniqueOrThrow({ where: { id: request.userId } });
+      const currentProfile = await tx.personnelComprehensiveProfile.findUnique({ where: { userId: request.userId } });
+      for (const [key, item] of Object.entries(changes)) {
+        const currentValue = ['fullName','birthDate','bankAccount','bankName','taxDependentCount'].includes(key) ? (currentUser as any)[key] : (currentProfile as any)?.[key];
+        const normalize = (v: any) => v instanceof Date ? v.toISOString().slice(0,10) : v == null ? '' : String(v);
+        if (normalize(currentValue) !== normalize(item.oldValue)) throw new BadRequestException(`Dữ liệu ${key} đã thay đổi; cần gửi yêu cầu mới`);
+      }
       // 1. Cập nhật bảng User nếu có trường liên quan
       if (Object.keys(userUpdates).length > 0) {
         await tx.user.update({
@@ -404,7 +425,7 @@ export class ProfileChangeRequestsService {
 
       // 3. Cập nhật trạng thái ProfileChangeRequest -> APPROVED
       await tx.profileChangeRequest.update({
-        where: { id },
+        where: { id, status: 'PENDING' },
         data: {
           status: 'APPROVED',
           reviewerId: reviewer.id,
@@ -422,7 +443,7 @@ export class ProfileChangeRequestsService {
           linkPath: '/profile',
         },
       });
-    });
+    }, { isolationLevel: 'Serializable' });
 
     await this.audit.log({
       actorId: reviewer.id,
@@ -450,7 +471,7 @@ export class ProfileChangeRequestsService {
 
     await this.prisma.$transaction(async (tx) => {
       await tx.profileChangeRequest.update({
-        where: { id },
+        where: { id, status: 'PENDING' },
         data: {
           status: 'REJECTED',
           reviewerId: reviewer.id,
@@ -468,7 +489,7 @@ export class ProfileChangeRequestsService {
           linkPath: '/profile',
         },
       });
-    });
+    }, { isolationLevel: 'Serializable' });
 
     await this.audit.log({
       actorId: reviewer.id,
@@ -497,7 +518,7 @@ export class ProfileChangeRequestsService {
     }
 
     await this.prisma.profileChangeRequest.update({
-      where: { id },
+      where: { id, status: 'PENDING' },
       data: { status: 'CANCELLED' },
     });
 
@@ -523,13 +544,13 @@ export class ProfileChangeRequestsController {
   constructor(private readonly service: ProfileChangeRequestsService) {}
 
   @Post()
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')
   create(@CurrentUser() user: AuthUser, @Body() dto: CreateProfileChangeRequestDto) {
     return this.service.createRequest(user.id, dto);
   }
 
   @Get('my')
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')
   listMy(
     @CurrentUser() user: AuthUser,
     @Query('status') status?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED',
@@ -538,19 +559,19 @@ export class ProfileChangeRequestsController {
   }
 
   @Get()
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   listAll(@Query() query: ListProfileChangeRequestsQueryDto) {
     return this.service.listAllRequests(query);
   }
 
   @Get(':id')
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')
   getOne(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.service.getRequestDetail(id, user);
   }
 
   @Post(':id/approve')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   approve(
     @Param('id') id: string,
     @Body() dto: ReviewProfileChangeRequestDto,
@@ -560,7 +581,7 @@ export class ProfileChangeRequestsController {
   }
 
   @Post(':id/reject')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   reject(
     @Param('id') id: string,
     @Body() dto: RejectProfileChangeRequestDto,
@@ -570,7 +591,7 @@ export class ProfileChangeRequestsController {
   }
 
   @Post(':id/cancel')
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')
   cancel(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.service.cancelRequest(id, user);
   }

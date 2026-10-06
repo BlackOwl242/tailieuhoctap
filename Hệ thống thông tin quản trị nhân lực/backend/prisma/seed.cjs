@@ -17,7 +17,7 @@ async function main() {
     const existingUsers = await prisma.user.count();
     if (existingUsers > 0 && !process.argv.includes('--force')) {
       console.log(`[seed] Database already has ${existingUsers} users — skipping.`);
-      return;
+      return false;
     }
 
     console.log('[seed] Seeding demo data...');
@@ -35,23 +35,66 @@ async function main() {
       const passwordHash = await bcrypt.hash('Admin@123', 12);
       const hashOf = (pw) => bcrypt.hashSync(pw, 12);
 
-      // ---------------------------------------------------------------- tổ chức
-      const bod = await tx.orgUnit.create({ data: { name: 'Ban Giám đốc', code: 'BGD' } });
-      const hr = await tx.orgUnit.create({ data: { name: 'Ban Tổ chức – Hành chính – Nhân sự', code: 'TC-HC-NS', parentId: bod.id, path: `/${bod.id}/` } });
-      for (const [i, name] of ['Tổ Tuyển dụng', 'Tổ Hồ sơ & Hợp đồng', 'Tổ Tiền lương – Bảo hiểm', 'Tổ Hành chính – Văn thư'].entries()) {
-        await tx.orgUnit.create({ data: { name, code: `HR-${i + 1}`, parentId: hr.id, path: `/${bod.id}/${hr.id}/`, sortOrder: i } });
-      }
-      const delivery = await tx.orgUnit.create({ data: { name: 'Khối Chuyển giao Dự án', code: 'DELIVERY', parentId: bod.id, path: `/${bod.id}/` } });
-      let javaSquadId = null;
-      for (const city of ['TP.HCM', 'Đà Nẵng']) {
-        const center = await tx.orgUnit.create({ data: { name: `Trung tâm ${city}`, code: `DEV-${city === 'TP.HCM' ? 'SGN' : 'DAD'}`, parentId: delivery.id, path: `/${bod.id}/${delivery.id}/` } });
-        let i = 0;
-        for (const squad of ['Nhóm Java', 'Nhóm .NET', 'Nhóm PHP/NodeJS', 'Nhóm Ứng dụng di động', 'Nhóm Kiểm thử', 'Nhóm DevOps']) {
-          i++;
-          const sq = await tx.orgUnit.create({ data: { name: `${squad} (${city})`, code: `SQ-${city === 'TP.HCM' ? 'S' : 'D'}${i}`, parentId: center.id, path: `/${bod.id}/${delivery.id}/${center.id}/`, sortOrder: i } });
-          if (city === 'TP.HCM' && squad === 'Nhóm Java') javaSquadId = sq.id;
-        }
-      }
+      // ---------------------------------------------------------------- cơ cấu tổ chức theo báo cáo PTTK_OOP_HR
+      const createUnit = (name, code, parent = null, sortOrder = 0) => tx.orgUnit.create({
+        data: {
+          name,
+          code,
+          parentId: parent?.id ?? null,
+          path: parent ? `${parent.path}${parent.id}/` : '/',
+          sortOrder,
+        },
+      });
+      const company = await createUnit('CÔNG TY CỔ PHẦN SAIGON TECHNOLOGY', 'SG-TECH');
+      await createUnit('Đại hội đồng Cổ đông', 'ĐHCĐ', company, 0);
+      await createUnit('Ban Kiểm soát', 'BKS', company, 1);
+      const bod = await createUnit('Ban Tổng Giám đốc', 'BGD', company, 2);
+      const core = await createUnit('Khối Sản xuất và Kinh doanh (doanh thu cốt lõi)', 'CORE-REVENUE', bod, 0);
+      const support = await createUnit('Khối Điều phối, Quản trị Nguồn lực và Hỗ trợ Vận hành Nội bộ', 'SUPPORT-OPERATIONS', bod, 1);
+
+      const delivery = await createUnit('Khối Kỹ thuật và Sản xuất Phần mềm (Delivery)', 'DELIVERY', core, 0);
+      const biz = await createUnit('Khối Phát triển Kinh doanh', 'BIZ', core, 1);
+      const hr = await createUnit('Khối Quản trị Nhân lực', 'HR', support, 0);
+      const ops = await createUnit('Khối Vận hành và Pháp chế', 'OPS', support, 1);
+      const fin = await createUnit('Khối Tài chính - Kế toán', 'FIN', support, 2);
+
+      await createUnit('Phòng Tuyển dụng Công nghệ', 'HR-TA', hr, 0);
+      await createUnit('Phòng Tiền lương & Phúc lợi (C&B)', 'HR-CB', hr, 1);
+      await createUnit('Phòng Đào tạo & Phát triển', 'HR-LD', hr, 2);
+      const hrOps = await createUnit('Phòng Nhân sự Vận hành & Văn hóa', 'HR-OPS', hr, 3);
+
+      const opsIt = await createUnit('Phòng IT & An ninh mạng', 'OPS-IT', ops, 0);
+      await createUnit('Phòng Hành chính & Cơ sở vật chất', 'OPS-ADMIN', ops, 1);
+      await createUnit('Phòng Pháp chế & Tuân thủ', 'OPS-LEGAL', ops, 2);
+      await createUnit('Điều phối Vận hành', 'OPS-COORD', ops, 3);
+
+      await createUnit('Phòng Kế toán Doanh nghiệp & Thuế', 'FIN-ACC', fin, 0);
+      await createUnit('Phòng Thanh toán & Dòng tiền', 'FIN-TREASURY', fin, 1);
+      await createUnit('Phòng Kế hoạch Tài chính (FP&A)', 'FIN-FPA', fin, 2);
+      await createUnit('Kiểm soát Quỹ lương', 'FIN-PAYROLL', fin, 3);
+
+      await createUnit('Phòng Quản lý Dự án (PMO)', 'PMO', delivery, 0);
+      await createUnit('Phòng Phân tích Nghiệp vụ (BA & UI/UX)', 'BA-UIUX', delivery, 1);
+      const centerSgn = await createUnit('Trung tâm Phần mềm TP.HCM', 'DEV-SGN', delivery, 2);
+      await createUnit('Nhóm Web Frontend & Fullstack', 'SQ-WEB-SGN', centerSgn, 0);
+      const javaSquad = await createUnit('Nhóm Backend Microservices', 'SQ-BE-SGN', centerSgn, 1);
+      await createUnit('Nhóm Ứng dụng Di động', 'SQ-MOB-SGN', centerSgn, 2);
+      await createUnit('Nhóm DevOps & Cloud', 'SQ-DEVOPS-SGN', centerSgn, 3);
+      await createUnit('Nhóm AI & Data Engineering', 'SQ-AI-SGN', centerSgn, 4);
+      const centerDad = await createUnit('Trung tâm Phần mềm Đà Nẵng', 'DEV-DAD', delivery, 3);
+      await createUnit('Nhóm Ứng dụng Doanh nghiệp', 'SQ-ENT-DAD', centerDad, 0);
+      await createUnit('Nhóm Web & Cloud Solutions', 'SQ-WEB-DAD', centerDad, 1);
+      await createUnit('Nhóm Mobile & IoT Solutions', 'SQ-MOB-DAD', centerDad, 2);
+      await createUnit('Nhóm Hạ tầng & DevOps', 'SQ-DEVOPS-DAD', centerDad, 3);
+      const qa = await createUnit('Phòng Đảm bảo Chất lượng (QA/QC)', 'QA-QC', delivery, 4);
+      const qaAuto = await createUnit('Nhóm Kiểm thử Tự động (Automation QA)', 'QA-AUTO', qa, 0);
+      await createUnit('Nhóm Kiểm thử Thủ công & Bảo mật', 'QA-MANUAL', qa, 1);
+
+      await createUnit('Phòng Kinh doanh Quốc tế', 'BIZ-GLOBAL', biz, 0);
+      await createUnit('Phòng Kinh doanh Doanh nghiệp', 'BIZ-DOMESTIC', biz, 1);
+      await createUnit('Phòng Khách hàng Chiến lược (KAM)', 'BIZ-KAM', biz, 2);
+      await createUnit('Phòng Marketing & Truyền thông', 'BIZ-MKT', biz, 3);
+      const javaSquadId = javaSquad.id;
 
       // ---------------------------------------------------------------- vai trò
       await tx.role.createMany({
@@ -68,7 +111,7 @@ async function main() {
       const admin = await tx.user.create({
         data: {
           email: 'admin@demo.local', passwordHash, fullName: 'Nguyễn Hoàng Nam',
-          jobTitle: 'Quản trị hệ thống', orgUnitId: bod.id,
+          jobTitle: 'Quản trị hệ thống', orgUnitId: opsIt.id,
           employeeCode: 'NV0001', hireDate: new Date('2019-03-01'), employmentStatus: 'ACTIVE', baseSalary: 35000000,
           roles: { create: [{ roleCode: 'ADMIN' }] },
         },
@@ -76,7 +119,7 @@ async function main() {
       const km = await tx.user.create({
         data: {
           email: 'km.manager@demo.local', passwordHash: hashOf('Manager@123'), fullName: 'Võ Thị Thanh Hà',
-          jobTitle: 'Chuyên viên chính Ban TC-HC-NS', orgUnitId: hr.id,
+          jobTitle: 'Chuyên viên chính Nhân sự Vận hành', orgUnitId: hrOps.id,
           employeeCode: 'NV0002', hireDate: new Date('2018-06-11'), employmentStatus: 'ACTIVE', baseSalary: 32000000,
           expertise: ['quy-trình', 'chính-sách', 'onboarding'],
           roles: { create: [{ roleCode: 'KM_MANAGER' }] },
@@ -103,7 +146,7 @@ async function main() {
       const editor = await tx.user.create({
         data: {
           email: 'editor.qa@demo.local', passwordHash: hashOf('Editor@123'), fullName: 'Hồ Ngọc Sơn',
-          jobTitle: 'Trưởng nhóm Kiểm thử', expertise: ['qa', 'automation'],
+          jobTitle: 'Trưởng nhóm Kiểm thử', expertise: ['qa', 'automation'], orgUnitId: qaAuto.id,
           employeeCode: 'NV0005', hireDate: new Date('2021-02-22'), employmentStatus: 'ACTIVE', baseSalary: 30000000,
           roles: { create: [{ roleCode: 'USER' }] },
         },
@@ -368,13 +411,15 @@ async function main() {
     console.log('  pm.java@demo.local / Pm@123456        (USER — Trưởng nhóm)');
     console.log('  dev.fresher@demo.local / Fresher@123  (USER — Nhân viên mới)');
     console.log('  editor.qa@demo.local / Editor@123     (USER — EDITOR Space QA)');
+    return true;
   } finally {
     await prisma.$executeRawUnsafe(`SELECT pg_advisory_unlock(727101)`).catch(() => undefined);
   }
 }
 
 main()
-  .then(async () => {
+  .then(async (created) => {
+    if (!created) return;
     // Seed thêm 43 nhân viên demo tên Việt thực tế (idempotent — Mục 3)
     const { seedEmployees } = require('./seed-employees.cjs');
     const { seedAll } = require('./seed-all-employees.cjs');

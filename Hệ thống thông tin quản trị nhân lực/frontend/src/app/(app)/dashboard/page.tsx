@@ -224,20 +224,20 @@ export default function FrappeHrmsDeskDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           <NumberCard
             title="Tổng Nhân sự"
-            value={hr ? String(hr.totalEmployees) : '—'}
+            value={hr ? String(hr.totalEmployees) : 'Chưa cập nhật'}
             subtitle="100% hồ sơ đã định danh"
             icon={Users}
           />
           <NumberCard
             title="Có mặt hôm nay"
-            value={hr ? String(hr.presentToday) : '—'}
+            value={hr ? String(hr.presentToday) : 'Chưa cập nhật'}
             subtitle={hr && hr.onLeaveToday > 0 ? `${hr.onLeaveToday} người nghỉ phép` : 'Tất cả đúng giờ'}
             icon={ShieldCheck}
             trend={hr ? { value: `${hr.totalEmployees > 0 ? ((hr.presentToday / hr.totalEmployees) * 100).toFixed(1) : 0}%`, isPositive: true, label: 'chuyên cần' } : undefined}
           />
           <NumberCard
             title="Quỹ lương chu kỳ"
-            value={latestRun ? `${(latestRun.totalNetPay / 1_000_000).toFixed(1)} Tr` : '—'}
+            value={latestRun ? `${(latestRun.totalNetPay / 1_000_000).toFixed(1)} Tr` : 'Chưa cập nhật'}
             subtitle="Bảng lương chu kỳ gần nhất"
             icon={Wallet}
           />

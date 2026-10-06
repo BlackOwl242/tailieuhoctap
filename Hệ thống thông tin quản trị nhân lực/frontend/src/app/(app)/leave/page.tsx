@@ -78,7 +78,7 @@ export default function LeavePage() {
       key: 'user', header: 'Nhân viên', sortable: true,
       render: (r: LeaveRow) => (
         <span>
-          <span className="block font-medium">{r.user?.fullName ?? '—'}</span>
+          <span className="block font-medium">{r.user?.fullName ?? 'Chưa cập nhật'}</span>
           <span className="block text-xs text-muted-foreground">{r.user?.employeeCode ?? ''} {r.user?.orgUnit ? `· ${r.user.orgUnit.name}` : ''}</span>
         </span>
       ),

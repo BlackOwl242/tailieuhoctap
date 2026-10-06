@@ -50,11 +50,11 @@ export class OrgUnitsService {
     private readonly audit: AuditService,
   ) {}
 
-  /** Trả về cây tổ chức dạng lồng nhau để frontend vẽ trực quan kèm cấp bậc và tổng số nhân sự đệ quy. */
+  /** Trả về cây tổ chức kèm số nhân sự được gán trực tiếp tại từng đơn vị. */
   async tree(): Promise<TreeNode[]> {
     const units = await this.prisma.orgUnit.findMany({
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      include: { _count: { select: { users: true } } },
+      include: { _count: { select: { users: { where: { deletedAt: null } } } } },
     });
     const byId = new Map<string, TreeNode>();
     for (const u of units) {
@@ -65,6 +65,8 @@ export class OrgUnitsService {
         parentId: u.parentId,
         sortOrder: u.sortOrder,
         memberCount: u._count.users,
+        // Giữ trường cũ để tương thích các client, nhưng nó cùng nghĩa với
+        // memberCount; số của đơn vị cha không cộng dồn nhân sự của đơn vị con.
         totalMembers: u._count.users,
         level: 1,
         levelLabel: 'Cấp 1: Doanh nghiệp',
@@ -80,24 +82,23 @@ export class OrgUnitsService {
     const levelLabels = [
       '',
       'Cấp 1: Doanh nghiệp',
-      'Cấp 2: Khối / Ban Điều hành',
-      'Cấp 3: Phòng / Trung tâm',
-      'Cấp 4: Tổ / Nhóm chuyên môn',
+      'Cấp 2: Quản trị / Ban Điều hành',
+      'Cấp 3: Khối tổng hợp',
+      'Cấp 4: Khối chức năng',
+      'Cấp 5: Phòng / Trung tâm',
+      'Cấp 6: Tổ / Nhóm chuyên môn',
     ];
 
-    function computeTotals(node: TreeNode, lvl: number): number {
+    function setLevels(node: TreeNode, lvl: number): void {
       node.level = lvl;
       node.levelLabel = levelLabels[lvl] || `Cấp ${lvl}: Đơn vị trực thuộc`;
-      let sum = node.memberCount;
       for (const child of node.children) {
-        sum += computeTotals(child, lvl + 1);
+        setLevels(child, lvl + 1);
       }
-      node.totalMembers = sum;
-      return sum;
     }
 
     for (const root of roots) {
-      computeTotals(root, 1);
+      setLevels(root, 1);
     }
 
     return roots;
@@ -130,7 +131,7 @@ export class OrgUnitsService {
     if (dto.parentId !== undefined && dto.parentId !== unit.parentId) {
       if (dto.parentId === id) throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Không thể chọn chính nó làm đơn vị cha');
       // Chặn di chuyển vào bên trong cây con của chính nó (tránh vòng lặp)
-      if (dto.parentId && unit.path.includes(`/${dto.parentId}/`)) {
+      if (dto.parentId && (await this.prisma.orgUnit.findUnique({ where: { id: dto.parentId } }))?.path.startsWith(`${unit.path}${id}/`)) {
         throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Không thể di chuyển vào cây con của chính nó');
       }
       if (dto.parentId) {

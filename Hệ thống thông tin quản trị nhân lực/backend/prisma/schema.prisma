@@ -6,9 +6,9 @@
 // ============================================================================
 
 generator client {
-  provider        = "prisma-client-js"
+  provider      = "prisma-client-js"
   // Thêm target Alpine (musl + OpenSSL 3) cho image Docker production
-  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -27,85 +27,92 @@ enum UserStatus {
 }
 
 model User {
-  id                   String     @id @default(uuid())
-  email                String     @unique
-  passwordHash         String
-  fullName             String
-  orgUnitId            String?
-  jobTitle             String?
-  expertise            String[]   @default([])
-  bio                  String?
-  avatarUrl            String?
-  faceConsentAt        DateTime?
-  status               UserStatus @default(ACTIVE)
-  failedLoginAttempts  Int        @default(0)
-  lockedUntil          DateTime?
-  lastLoginAt          DateTime?
-  createdAt            DateTime   @default(now())
-  updatedAt            DateTime   @updatedAt
-  deletedAt            DateTime?
+  id                  String     @id @default(uuid())
+  email               String     @unique
+  passwordHash        String
+  fullName            String
+  orgUnitId           String?
+  jobTitle            String?
+  salaryBandId        String?
+  expertise           String[]   @default([])
+  bio                 String?
+  avatarUrl           String?
+  faceConsentAt       DateTime?
+  status              UserStatus @default(ACTIVE)
+  failedLoginAttempts Int        @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  deletedAt           DateTime?
 
   // --- Mở rộng HRMIS (Mục 4): hồ sơ nhân sự ---
-  employeeCode         String?  @unique // mã nhân viên NV0001
-  hireDate             DateTime?        // ngày vào làm việc
-  employmentStatus     EmploymentStatus @default(PROBATION)
-  baseSalary           Float?           // lương cơ bản theo tháng (VND)
-  birthDate            DateTime?
-  phone                String?
-  address              String?
+  employeeCode      String?          @unique // mã nhân viên NV0001
+  bankAccount       String?
+  bankName          String?
+  taxDependentCount Int              @default(0)
+  taxResidency      String           @default("RESIDENT") // RESIDENT/NON_RESIDENT; verify from actual residence facts
+  minimumWageRegion String           @default("I") // I/II/III/IV, based on work location
+  hireDate          DateTime? // ngày vào làm việc
+  employmentStatus  EmploymentStatus @default(PROBATION)
+  baseSalary        Float? // lương cơ bản theo tháng (VND)
+  birthDate         DateTime?
+  phone             String?
+  address           String?
 
-  orgUnit              OrgUnit?                    @relation("UserOrgUnit", fields: [orgUnitId], references: [id])
-  roles                UserRole[]
-  refreshTokens        RefreshToken[]
-  authoredArticles     Article[]                   @relation("ArticleAuthor")
-  articleVersions      ArticleVersion[]            @relation("VersionAuthor")
-  attachments          Attachment[]                @relation("AttachmentUploader")
-  reviews              ArticleReview[]             @relation("ReviewReviewer")
-  comments             Comment[]                   @relation("CommentAuthor")
-  reactions            Reaction[]
-  views                ArticleView[]
-  bookmarks            Bookmark[]
-  spaceFollows         SpaceFollow[]
-  spaceMemberships     SpaceMember[]
-  createdSpaces        Space[]                     @relation("SpaceCreator")
-  notifications        Notification[]
-  audits               AuditLog[]                  @relation("AuditActor")
-  onboardingAssignments OnboardingAssignment[]     @relation("AssignmentUser")
-  createdPaths         OnboardingPath[]            @relation("PathCreator")
-  handoverChecklists   HandoverChecklist[]         @relation("HandoverOwner")
-  handoverItemsDone    HandoverItem[]              @relation("HandoverAssignee")
-  settingsUpdated      Setting[]                   @relation("SettingUpdater")
-  attendanceEvents     AttendanceEvent[]
-  attendanceDays       AttendanceDay[]
-  attendanceCorrections AttendanceCorrection[]    @relation("CorrectionBy")
-  faceEmbeddings       FaceEmbedding[]
-  managedDevices       AttendanceDevice[]          @relation("DeviceCreator")
-  correctionsMade      AttendanceCorrection[]      @relation("CorrectionCorrector")
+  orgUnit               OrgUnit?               @relation("UserOrgUnit", fields: [orgUnitId], references: [id])
+  salaryBand            HrmsSalaryBand?        @relation("EmployeeSalaryBand", fields: [salaryBandId], references: [id], onDelete: SetNull)
+  roles                 UserRole[]
+  refreshTokens         RefreshToken[]
+  authoredArticles      Article[]              @relation("ArticleAuthor")
+  articleVersions       ArticleVersion[]       @relation("VersionAuthor")
+  attachments           Attachment[]           @relation("AttachmentUploader")
+  reviews               ArticleReview[]        @relation("ReviewReviewer")
+  comments              Comment[]              @relation("CommentAuthor")
+  reactions             Reaction[]
+  views                 ArticleView[]
+  bookmarks             Bookmark[]
+  spaceFollows          SpaceFollow[]
+  spaceMemberships      SpaceMember[]
+  createdSpaces         Space[]                @relation("SpaceCreator")
+  notifications         Notification[]
+  audits                AuditLog[]             @relation("AuditActor")
+  onboardingAssignments OnboardingAssignment[] @relation("AssignmentUser")
+  createdPaths          OnboardingPath[]       @relation("PathCreator")
+  handoverChecklists    HandoverChecklist[]    @relation("HandoverOwner")
+  handoverItemsDone     HandoverItem[]         @relation("HandoverAssignee")
+  settingsUpdated       Setting[]              @relation("SettingUpdater")
+  attendanceEvents      AttendanceEvent[]
+  attendanceDays        AttendanceDay[]
+  attendanceCorrections AttendanceCorrection[] @relation("CorrectionBy")
+  faceEmbeddings        FaceEmbedding[]
+  managedDevices        AttendanceDevice[]     @relation("DeviceCreator")
+  correctionsMade       AttendanceCorrection[] @relation("CorrectionCorrector")
 
   // --- Quan hệ HRMIS ---
-  contracts            Contract[]
-  contractsCreated     Contract[]                  @relation("ContractCreator")
-  certificates         Certificate[]
-  leaveRequests        LeaveRequest[]
-  leaveApproved        LeaveRequest[]              @relation("LeaveApprover")
-  leaveBalances        LeaveBalance[]
-  overtimeRequests     OvertimeRequest[]
-  overtimeApproved     OvertimeRequest[]           @relation("OvertimeApprover")
-  payslips             Payslip[]
-  periodsLocked        PayrollPeriod[]             @relation("PeriodLocker")
-  perfReviews          PerformanceReview[]         @relation("ReviewEmployee")
-  perfReviewsGiven     PerformanceReview[]         @relation("ReviewReviewerHr")
-  enrollments          TrainingEnrollment[]
-  coursesCreated       TrainingCourse[]            @relation("CourseCreator")
-  actionsOnMe          PersonnelAction[]           @relation("ActionSubject")
-  actionsRequested     PersonnelAction[]           @relation("ActionRequester")
-  actionsDecided       PersonnelAction[]           @relation("ActionDecider")
-  requisitions         JobRequisition[]            @relation("RequisitionRequester")
-  requisitionsDecided  JobRequisition[]            @relation("RequisitionDecider")
-  documentsUploaded    HrDocument[]                @relation("DocumentUploader")
-  comprehensiveProfile PersonnelComprehensiveProfile?
-  profileChangeRequests ProfileChangeRequest[]     @relation("UserChangeRequests")
-  reviewedProfileChanges ProfileChangeRequest[]    @relation("ReviewerChangeRequests")
+  contracts              Contract[]
+  contractsCreated       Contract[]                     @relation("ContractCreator")
+  certificates           Certificate[]
+  leaveRequests          LeaveRequest[]
+  leaveApproved          LeaveRequest[]                 @relation("LeaveApprover")
+  leaveBalances          LeaveBalance[]
+  overtimeRequests       OvertimeRequest[]
+  overtimeApproved       OvertimeRequest[]              @relation("OvertimeApprover")
+  payslips               Payslip[]
+  periodsLocked          PayrollPeriod[]                @relation("PeriodLocker")
+  perfReviews            PerformanceReview[]            @relation("ReviewEmployee")
+  perfReviewsGiven       PerformanceReview[]            @relation("ReviewReviewerHr")
+  enrollments            TrainingEnrollment[]
+  coursesCreated         TrainingCourse[]               @relation("CourseCreator")
+  actionsOnMe            PersonnelAction[]              @relation("ActionSubject")
+  actionsRequested       PersonnelAction[]              @relation("ActionRequester")
+  actionsDecided         PersonnelAction[]              @relation("ActionDecider")
+  requisitions           JobRequisition[]               @relation("RequisitionRequester")
+  requisitionsDecided    JobRequisition[]               @relation("RequisitionDecider")
+  documentsUploaded      HrDocument[]                   @relation("DocumentUploader")
+  comprehensiveProfile   PersonnelComprehensiveProfile?
+  profileChangeRequests  ProfileChangeRequest[]         @relation("UserChangeRequests")
+  reviewedProfileChanges ProfileChangeRequest[]         @relation("ReviewerChangeRequests")
 
   @@index([orgUnitId])
   @@index([status])
@@ -125,42 +132,42 @@ model Role {
 model UserRole {
   userId   String
   roleCode String
-  user     User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role     Role  @relation(fields: [roleCode], references: [code])
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     Role   @relation(fields: [roleCode], references: [code])
 
   @@id([userId, roleCode])
   @@map("user_roles")
 }
 
 model RefreshToken {
-  id         String    @id @default(uuid())
-  userId     String
-  tokenHash  String    @unique
-  expiresAt  DateTime
-  revokedAt  DateTime?
-  ip         String?
-  userAgent  String?
-  createdAt  DateTime  @default(now())
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  ip        String?
+  userAgent String?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("refresh_tokens")
 }
 
 model OrgUnit {
-  id        String     @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  code      String     @unique
+  code      String   @unique
   parentId  String?
-  path      String     @default("") // materialized "/rootId/childId/"
-  sortOrder Int        @default(0)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  path      String   @default("") // materialized "/rootId/childId/"
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  parent   OrgUnit?   @relation("OrgUnitTree", fields: [parentId], references: [id])
-  children OrgUnit[]  @relation("OrgUnitTree")
-  users    User[]     @relation("UserOrgUnit")
-  spaces   Space[]
+  parent          OrgUnit?         @relation("OrgUnitTree", fields: [parentId], references: [id])
+  children        OrgUnit[]        @relation("OrgUnitTree")
+  users           User[]           @relation("UserOrgUnit")
+  spaces          Space[]
   onboardingPaths OnboardingPath[]
 
   @@index([parentId])
@@ -185,18 +192,18 @@ enum SpaceRole {
 }
 
 model Space {
-  id          String         @id @default(uuid())
-  slug        String         @unique
+  id          String          @id @default(uuid())
+  slug        String          @unique
   name        String
   description String?
-  icon        String         @default("book-open")
-  color       String         @default("#2563eb")
+  icon        String          @default("book-open")
+  color       String          @default("#2563eb")
   parentId    String?
   orgUnitId   String?
   visibility  SpaceVisibility @default(PUBLIC)
   createdBy   String
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   deletedAt   DateTime?
 
   parent    Space?        @relation("SpaceTree", fields: [parentId], references: [id])
@@ -225,11 +232,11 @@ model SpaceMember {
 }
 
 model Category {
-  id       String    @id @default(uuid())
+  id       String     @id @default(uuid())
   name     String
-  slug     String    @unique
+  slug     String     @unique
   parentId String?
-  parent   Category? @relation("CategoryTree", fields: [parentId], references: [id])
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
   children Category[] @relation("CategoryTree")
   articles Article[]
 
@@ -237,9 +244,9 @@ model Category {
 }
 
 model Tag {
-  id       String        @id @default(uuid())
+  id       String       @id @default(uuid())
   name     String
-  slug     String        @unique
+  slug     String       @unique
   articles ArticleTag[]
 
   @@map("tags")
@@ -271,19 +278,19 @@ model Article {
   updatedAt        DateTime      @updatedAt
   deletedAt        DateTime?
 
-  space          Space            @relation(fields: [spaceId], references: [id])
-  category       Category?        @relation(fields: [categoryId], references: [id])
-  author         User             @relation("ArticleAuthor", fields: [authorId], references: [id])
-  versions       ArticleVersion[] @relation("ArticleVersions")
-  currentVersion ArticleVersion?  @relation("ArticleCurrentVersion", fields: [currentVersionId], references: [id])
-  tags           ArticleTag[]
-  reviews        ArticleReview[]
-  comments       Comment[]
-  reactions      Reaction[]
-  views          ArticleView[]
-  bookmarks      Bookmark[]
+  space           Space                @relation(fields: [spaceId], references: [id])
+  category        Category?            @relation(fields: [categoryId], references: [id])
+  author          User                 @relation("ArticleAuthor", fields: [authorId], references: [id])
+  versions        ArticleVersion[]     @relation("ArticleVersions")
+  currentVersion  ArticleVersion?      @relation("ArticleCurrentVersion", fields: [currentVersionId], references: [id])
+  tags            ArticleTag[]
+  reviews         ArticleReview[]
+  comments        Comment[]
+  reactions       Reaction[]
+  views           ArticleView[]
+  bookmarks       Bookmark[]
   onboardingItems OnboardingPathItem[]
-  handoverItems  HandoverItem[]
+  handoverItems   HandoverItem[]
 
   @@unique([spaceId, slug])
   @@index([status, publishedAt])
@@ -302,9 +309,9 @@ model ArticleVersion {
   authorId   String
   createdAt  DateTime @default(now())
 
-  article    Article  @relation("ArticleVersions", fields: [articleId], references: [id], onDelete: Cascade)
-  author     User     @relation("VersionAuthor", fields: [authorId], references: [id])
-  currentOf  Article? @relation("ArticleCurrentVersion")
+  article     Article      @relation("ArticleVersions", fields: [articleId], references: [id], onDelete: Cascade)
+  author      User         @relation("VersionAuthor", fields: [authorId], references: [id])
+  currentOf   Article?     @relation("ArticleCurrentVersion")
   attachments Attachment[]
 
   @@unique([articleId, versionNo])
@@ -332,8 +339,8 @@ model Attachment {
   checksumSha256   String?
   createdAt        DateTime @default(now())
 
-  version ArticleVersion? @relation(fields: [articleVersionId], references: [id])
-  uploader User           @relation("AttachmentUploader", fields: [uploaderId], references: [id])
+  version  ArticleVersion? @relation(fields: [articleVersionId], references: [id])
+  uploader User            @relation("AttachmentUploader", fields: [uploaderId], references: [id])
 
   @@index([articleVersionId])
   @@map("attachments")
@@ -382,9 +389,9 @@ model Comment {
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
 
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  author  User     @relation("CommentAuthor", fields: [authorId], references: [id])
-  parent  Comment? @relation("CommentThread", fields: [parentId], references: [id])
+  article Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author  User      @relation("CommentAuthor", fields: [authorId], references: [id])
+  parent  Comment?  @relation("CommentThread", fields: [parentId], references: [id])
   replies Comment[] @relation("CommentThread")
 
   @@index([articleId])
@@ -394,10 +401,10 @@ model Comment {
 model Reaction {
   articleId String
   userId    String
-  value     String  @default("HELPFUL")
+  value     String   @default("HELPFUL")
   createdAt DateTime @default(now())
-  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([articleId, userId])
   @@map("reactions")
@@ -448,14 +455,14 @@ enum AssignmentStatus {
 }
 
 model OnboardingPath {
-  id            String   @id @default(uuid())
-  title         String
-  description   String?
+  id             String   @id @default(uuid())
+  title          String
+  description    String?
   targetJobTitle String?
-  orgUnitId     String?
-  createdBy     String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  orgUnitId      String?
+  createdBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   orgUnit     OrgUnit?               @relation(fields: [orgUnitId], references: [id])
   creator     User                   @relation("PathCreator", fields: [createdBy], references: [id])
@@ -472,24 +479,24 @@ model OnboardingPathItem {
   sortOrder  Int     @default(0)
   isRequired Boolean @default(true)
 
-  path       OnboardingPath          @relation(fields: [pathId], references: [id], onDelete: Cascade)
-  article    Article                 @relation(fields: [articleId], references: [id])
-  progress   OnboardingItemProgress[]
+  path     OnboardingPath           @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  article  Article                  @relation(fields: [articleId], references: [id])
+  progress OnboardingItemProgress[]
 
   @@index([pathId])
   @@map("onboarding_path_items")
 }
 
 model OnboardingAssignment {
-  id        String           @id @default(uuid())
-  pathId    String
-  userId    String
-  dueDate   DateTime?
-  status    AssignmentStatus @default(IN_PROGRESS)
-  assignedAt DateTime        @default(now())
+  id         String           @id @default(uuid())
+  pathId     String
+  userId     String
+  dueDate    DateTime?
+  status     AssignmentStatus @default(IN_PROGRESS)
+  assignedAt DateTime         @default(now())
 
-  path     OnboardingPath            @relation(fields: [pathId], references: [id], onDelete: Cascade)
-  user     User                      @relation("AssignmentUser", fields: [userId], references: [id], onDelete: Cascade)
+  path     OnboardingPath           @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  user     User                     @relation("AssignmentUser", fields: [userId], references: [id], onDelete: Cascade)
   progress OnboardingItemProgress[]
 
   @@unique([pathId, userId])
@@ -533,13 +540,14 @@ model HandoverChecklist {
 }
 
 model HandoverItem {
-  id          String     @id @default(uuid())
-  checklistId String
-  title       String
-  articleId   String?
-  assigneeId  String?
-  status      ItemStatus @default(PENDING)
-  completedAt DateTime?
+  responsibleRole String?
+  id              String     @id @default(uuid())
+  checklistId     String
+  title           String
+  articleId       String?
+  assigneeId      String?
+  status          ItemStatus @default(PENDING)
+  completedAt     DateTime?
 
   checklist HandoverChecklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
   article   Article?          @relation(fields: [articleId], references: [id])
@@ -620,17 +628,17 @@ enum DeviceType {
 }
 
 model AttendanceDevice {
-  id             String     @id @default(uuid())
-  name           String
-  type           DeviceType
-  location       String?
-  secretHash     String?
-  status         String     @default("ACTIVE")
-  lastSeenAt     DateTime?
-  createdById    String
-  createdAt      DateTime   @default(now())
+  id          String     @id @default(uuid())
+  name        String
+  type        DeviceType
+  location    String?
+  secretHash  String?
+  status      String     @default("ACTIVE")
+  lastSeenAt  DateTime?
+  createdById String
+  createdAt   DateTime   @default(now())
 
-  creator User             @relation("DeviceCreator", fields: [createdById], references: [id])
+  creator User              @relation("DeviceCreator", fields: [createdById], references: [id])
   events  AttendanceEvent[]
 
   @@map("attendance_devices")
@@ -655,6 +663,7 @@ model AttendanceEvent {
 }
 
 enum DayStatus {
+  ABSENT
   PRESENT
   LATE
   EARLY_LEAVE
@@ -664,18 +673,21 @@ enum DayStatus {
 }
 
 model AttendanceDay {
-  userId        String
-  workDate      DateTime   @db.Date
-  firstInAt     DateTime?
-  lastOutAt     DateTime?
-  workedMinutes Int        @default(0)
-  lateMinutes   Int        @default(0)
-  earlyMinutes  Int        @default(0)
-  status        DayStatus  @default(PRESENT)
-  eventCount    Int        @default(0)
-  updatedAt     DateTime   @updatedAt
+  scheduledMinutes   Int       @default(480)
+  paidLeave          Boolean   @default(false)
+  userId             String
+  workDate           DateTime  @db.Date
+  firstInAt          DateTime?
+  lastOutAt          DateTime?
+  workedMinutes      Int       @default(0)
+  nightWorkedMinutes Int       @default(0)
+  lateMinutes        Int       @default(0)
+  earlyMinutes       Int       @default(0)
+  status             DayStatus @default(PRESENT)
+  eventCount         Int       @default(0)
+  updatedAt          DateTime  @updatedAt
 
-  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, workDate])
   @@map("attendance_days")
@@ -692,7 +704,7 @@ model AttendanceCorrection {
   correctedBy String
   createdAt   DateTime @default(now())
 
-  user        User @relation("CorrectionBy", fields: [userId], references: [id])
+  user            User @relation("CorrectionBy", fields: [userId], references: [id])
   correctedByUser User @relation("CorrectionCorrector", fields: [correctedBy], references: [id])
 
   @@index([userId, workDate])
@@ -727,6 +739,7 @@ enum EmploymentStatus {
 }
 
 enum ContractType {
+  AMENDMENT
   PROBATION
   FIXED_TERM
   INDEFINITE
@@ -739,22 +752,29 @@ enum ContractStatus {
   TERMINATED
 }
 
+enum CompensationBasis {
+  MONTHLY
+  DAILY
+  HOURLY
+}
+
 model Contract {
-  id              String         @id @default(uuid())
-  userId          String
-  contractNo      String         @unique
-  type            ContractType
-  startDate       DateTime       @db.Date
-  endDate         DateTime?      @db.Date
-  baseSalary      Float
-  insuranceSalary Float?
-  status          ContractStatus @default(ACTIVE)
-  note            String?
-  fileUrl         String? // bản mềm hợp đồng (PDF/scan) upload lên /uploads
-  fileName        String?
-  createdById     String
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id                String            @id @default(uuid())
+  userId            String
+  contractNo        String            @unique
+  type              ContractType
+  startDate         DateTime          @db.Date
+  endDate           DateTime?         @db.Date
+  baseSalary        Float
+  compensationBasis CompensationBasis @default(MONTHLY)
+  insuranceSalary   Float?
+  status            ContractStatus    @default(ACTIVE)
+  note              String?
+  fileUrl           String? // bản mềm hợp đồng (PDF/scan) upload lên /uploads
+  fileName          String?
+  createdById       String
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
   user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
   creator User @relation("ContractCreator", fields: [createdById], references: [id])
@@ -809,7 +829,7 @@ model LeaveRequest {
   decisionNote String?
   createdAt    DateTime      @default(now())
 
-  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   approver User? @relation("LeaveApprover", fields: [approverId], references: [id])
 
   @@index([userId, status])
@@ -818,10 +838,10 @@ model LeaveRequest {
 }
 
 model LeaveBalance {
-  userId    String
-  year      Int
-  entitled  Float @default(12) // phép năm luật định 12 ngày (+ thâm niên)
-  used      Float @default(0) // trừ NGAY khi duyệt (UC20)
+  userId   String
+  year     Int
+  entitled Float  @default(12) // phép năm luật định 12 ngày (+ thâm niên)
+  used     Float  @default(0) // trừ NGAY khi duyệt (UC20)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -834,6 +854,8 @@ model OvertimeRequest {
   userId       String
   workDate     DateTime      @db.Date
   hours        Float
+  nightHours   Float         @default(0)
+  dayCategory  String        @default("WEEKDAY") // WEEKDAY/WEEKLY_REST/PUBLIC_HOLIDAY
   reason       String
   status       RequestStatus @default(PENDING)
   approverId   String?
@@ -875,21 +897,21 @@ model PayrollPeriod {
 }
 
 model Payslip {
-  id            String  @id @default(uuid())
-  periodId      String
-  userId        String
-  workingDays   Float   @default(0) // công hữu hiệu trong kỳ
-  otHours       Float   @default(0) // giờ làm thêm ĐÃ DUYỆT
-  baseSalary    Float   @default(0)
-  otAmount      Float   @default(0) // hệ số 150% ngày thường (Điều 98 BLĐ)
-  allowance     Float   @default(0) // phụ cấp cố định (ăn trưa, đi lại…)
-  bonus         Float   @default(0)
-  insurance     Float   @default(0) // BHXH 10,5% người lao động đóng
-  incomeTax     Float   @default(0) // thuế TNCN lũy tiến giản lược
-  otherDeduct   Float   @default(0)
-  netSalary     Float   @default(0)
-  note          String?
-  createdAt     DateTime @default(now())
+  id          String   @id @default(uuid())
+  periodId    String
+  userId      String
+  workingDays Float    @default(0) // công hữu hiệu trong kỳ
+  otHours     Float    @default(0) // giờ làm thêm ĐÃ DUYỆT
+  baseSalary  Float    @default(0)
+  otAmount    Float    @default(0) // hệ số 150% ngày thường (Điều 98 BLĐ)
+  allowance   Float    @default(0) // phụ cấp cố định (ăn trưa, đi lại…)
+  bonus       Float    @default(0)
+  insurance   Float    @default(0) // BHXH 10,5% người lao động đóng
+  incomeTax   Float    @default(0) // thuế TNCN lũy tiến giản lược
+  otherDeduct Float    @default(0)
+  netSalary   Float    @default(0)
+  note        String?
+  createdAt   DateTime @default(now())
 
   period PayrollPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
   user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -900,6 +922,7 @@ model Payslip {
 }
 
 enum RequisitionStatus {
+  REVIEWED
   DRAFT
   PENDING_REVIEW // chờ thẩm định của HR
   APPROVED // đã duyệt — mở kế hoạch tuyển
@@ -908,21 +931,26 @@ enum RequisitionStatus {
 }
 
 model JobRequisition {
-  id            String            @id @default(uuid())
-  title         String
-  position      String
-  headcount     Int               @default(1)
-  reason        String?
-  status        RequisitionStatus @default(DRAFT)
-  requestedById String
-  decidedById   String?
-  decidedAt     DateTime?
-  decisionNote  String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  budgetMonthly     Float             @default(0)
+  orgUnitId         String?
+  hrAssessedBy      String?
+  financeAssessedBy String?
+  assessmentNote    String?
+  id                String            @id @default(uuid())
+  title             String
+  position          String
+  headcount         Int               @default(1)
+  reason            String?
+  status            RequisitionStatus @default(DRAFT)
+  requestedById     String
+  decidedById       String?
+  decidedAt         DateTime?
+  decisionNote      String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
-  requester User        @relation("RequisitionRequester", fields: [requestedById], references: [id])
-  decider   User?       @relation("RequisitionDecider", fields: [decidedById], references: [id])
+  requester  User        @relation("RequisitionRequester", fields: [requestedById], references: [id])
+  decider    User?       @relation("RequisitionDecider", fields: [decidedById], references: [id])
   candidates Candidate[]
 
   @@index([status])
@@ -965,7 +993,7 @@ enum PerfReviewStatus {
 }
 
 model PerformanceReview {
-  id           String          @id @default(uuid())
+  id           String           @id @default(uuid())
   userId       String // người được đánh giá
   reviewerId   String // người đánh giá (trưởng nhóm)
   period       String // ví dụ "2026-H1"
@@ -974,8 +1002,8 @@ model PerformanceReview {
   improvements String?
   comment      String?
   status       PerfReviewStatus @default(DRAFT)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
   user     User @relation("ReviewEmployee", fields: [userId], references: [id], onDelete: Cascade)
   reviewer User @relation("ReviewReviewerHr", fields: [reviewerId], references: [id])
@@ -992,16 +1020,16 @@ enum CourseStatus {
 }
 
 model TrainingCourse {
-  id          String      @id @default(uuid())
+  id          String       @id @default(uuid())
   title       String
   description String?
-  startDate   DateTime    @db.Date
-  endDate     DateTime    @db.Date
+  startDate   DateTime     @db.Date
+  endDate     DateTime     @db.Date
   capacity    Int?
   status      CourseStatus @default(PLANNED)
   createdById String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   creator     User                 @relation("CourseCreator", fields: [createdById], references: [id])
   enrollments TrainingEnrollment[]
@@ -1034,6 +1062,7 @@ model TrainingEnrollment {
 // (thuyên chuyển / điều chỉnh lương / khen thưởng / kỷ luật / thôi việc),
 // đúng mẫu hình ApprovalEngine trong tài liệu thiết kế.
 enum PersonnelActionType {
+  PROBATION_PASS
   TRANSFER // thuyên chuyển
   SALARY_ADJUST // điều chỉnh lương
   AWARD // khen thưởng
@@ -1057,6 +1086,8 @@ model PersonnelAction {
   status        PersonnelActionStatus @default(PENDING)
   decisionNote  String?
   decidedAt     DateTime?
+  effectiveAt   DateTime?
+  appliedAt     DateTime?
   createdAt     DateTime              @default(now())
 
   subject   User  @relation("ActionSubject", fields: [subjectId], references: [id])
@@ -1081,13 +1112,13 @@ enum ProfileChangeStatus {
 
 model ProfileChangeRequest {
   id             String              @id @default(uuid())
-  userId         String              // Cán bộ / Nhân viên đề xuất
-  changes        Json                // Bản ghi các trường xin sửa: { fieldKey: { label, oldValue, newValue, tier } }
-  reason         String              // Lý do đề xuất điều chỉnh
+  userId         String // Cán bộ / Nhân viên đề xuất
+  changes        Json // Bản ghi các trường xin sửa: { fieldKey: { label, oldValue, newValue, tier } }
+  reason         String // Lý do đề xuất điều chỉnh
   attachmentUrls String[]            @default([]) // Minh chứng (ảnh CCCD, bằng cấp, giấy xác nhận...)
   status         ProfileChangeStatus @default(PENDING)
-  reviewerId     String?             // Cán bộ Nhân sự / Ban Tổ chức thẩm định
-  reviewerNote   String?             // Ý kiến phê duyệt / Lý do từ chối
+  reviewerId     String? // Cán bộ Nhân sự / Ban Tổ chức thẩm định
+  reviewerNote   String? // Ý kiến phê duyệt / Lý do từ chối
   reviewedAt     DateTime?
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
@@ -1111,20 +1142,23 @@ enum DocumentCategory {
 }
 
 model HrDocument {
-  id           String           @id @default(uuid())
+  status       String               @default("DRAFT")
+  reviewedBy   String?
+  revisions    HrDocumentRevision[]
+  id           String               @id @default(uuid())
   title        String
-  category     DocumentCategory @default(OTHER)
+  category     DocumentCategory     @default(OTHER)
   processArea  String? // tuyển dụng / hồ sơ / chấm công / lương…
-  version      String           @default("1.0")
+  version      String               @default("1.0")
   description  String?
-  contentMd    String?          @db.Text // nội dung dạng markdown (nếu có)
+  contentMd    String?              @db.Text // nội dung dạng markdown (nếu có)
   fileUrl      String? // tập tin đính kèm (đã upload lên /uploads)
   fileName     String?
   fileSize     Int?
-  tags         String[]         @default([])
+  tags         String[]             @default([])
   uploadedById String
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
 
   uploader User @relation("DocumentUploader", fields: [uploadedById], references: [id])
 
@@ -1139,12 +1173,12 @@ model HrDocument {
 
 model PersonnelRank {
   code         String   @id // Mã ngạch (ví dụ: "01.003", "01.002", "01.001", "06.031"...)
-  name         String   // Tên ngạch (Chuyên viên cao cấp, Chuyên viên chính, Chuyên viên, Kỹ sư, Bác sĩ...)
-  groupCode    String   // Phân loại nhóm ngạch: A3, A2, A1, B, C
-  field        String?  // Lĩnh vực chuyên môn (Hành chính, Y tế, Giáo dục, Kỹ thuật...)
+  name         String // Tên ngạch (Chuyên viên cao cấp, Chuyên viên chính, Chuyên viên, Kỹ sư, Bác sĩ...)
+  groupCode    String // Phân loại nhóm ngạch: A3, A2, A1, B, C
+  field        String? // Lĩnh vực chuyên môn (Hành chính, Y tế, Giáo dục, Kỹ thuật...)
   totalSteps   Int      @default(9) // Số bậc tối đa trong ngạch (6 đến 16 bậc)
   stepMonths   Int      @default(36) // Thời gian giữ bậc nâng lương thường xuyên (24 hoặc 36 tháng)
-  coefficients Json     // Mảng các hệ số lương từ bậc 1..N: [2.34, 2.67, 3.00, ...]
+  coefficients Json // Mảng các hệ số lương từ bậc 1..N: [2.34, 2.67, 3.00, ...]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -1156,167 +1190,168 @@ model PersonnelRank {
 }
 
 model PersonnelComprehensiveProfile {
-  id                  String    @id @default(uuid())
-  userId              String    @unique
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // 1. Thông tin cá nhân & Lý lịch
-  aliasName           String?   // Tên gọi khác
-  gender              String?   // Nam / Nữ
-  birthPlace          String?   // Nơi sinh
-  hometown            String?   // Quê quán
-  permanentAddress    String?   // Hộ khẩu thường trú
-  currentAddress      String?   // Nơi ở hiện nay
-  idCardNo            String?   // Số CMND / CCCD
-  idCardIssueDate     DateTime? // Ngày cấp
-  idCardIssuePlace    String?   // Nơi cấp
-  ethnicity           String?   @default("Kinh") // Dân tộc
-  religion            String?   @default("Không") // Tôn giáo
-  familyOrigin        String?   // Thành phần gia đình xuất thân
-  priorJob            String?   // Nghề nghiệp trước khi được tuyển dụng
+  aliasName        String? // Tên gọi khác
+  gender           String? // Nam / Nữ
+  birthPlace       String? // Nơi sinh
+  hometown         String? // Quê quán
+  permanentAddress String? // Hộ khẩu thường trú
+  currentAddress   String? // Nơi ở hiện nay
+  idCardNo         String? // Số CMND / CCCD
+  idCardIssueDate  DateTime? // Ngày cấp
+  idCardIssuePlace String? // Nơi cấp
+  ethnicity        String?   @default("Kinh") // Dân tộc
+  religion         String?   @default("Không") // Tôn giáo
+  familyOrigin     String? // Thành phần gia đình xuất thân
+  priorJob         String? // Nghề nghiệp trước khi được tuyển dụng
 
   // 2. Tuyển dụng & Chức danh
-  recruitDate         DateTime? // Ngày tuyển dụng
-  recruitOrg          String?   // Cơ quan tuyển dụng
-  currentOrgDate      DateTime? // Ngày vào cơ quan/đơn vị hiện tại
-  officialDate        DateTime? // Ngày vào biên chế / chính thức
-  govPosition         String?   // Chức vụ chính quyền / Chức danh quản lý
-  mainDuty            String?   // Công việc chính đảm nhiệm
+  recruitDate    DateTime? // Ngày tuyển dụng
+  recruitOrg     String? // Cơ quan tuyển dụng
+  currentOrgDate DateTime? // Ngày vào cơ quan/đơn vị hiện tại
+  officialDate   DateTime? // Ngày vào biên chế / chính thức
+  govPosition    String? // Chức vụ chính quyền / Chức danh quản lý
+  mainDuty       String? // Công việc chính đảm nhiệm
 
   // 3. Ngạch bậc, Tiền lương & Phụ cấp
   rankCode            String?
   rank                PersonnelRank? @relation(fields: [rankCode], references: [code])
-  salaryStep          Int?      // Bậc lương hiện hưởng (1..16)
-  salaryCoefficient   Float?    // Hệ số lương
+  salaryStep          Int? // Bậc lương hiện hưởng (1..16)
+  salaryCoefficient   Float? // Hệ số lương
   salaryStepDate      DateTime? // Ngày hưởng bậc lương
-  overGradePercent    Float?    @default(0) // % Phụ cấp thâm niên vượt khung
-  positionAllowance   Float?    @default(0) // Hệ số phụ cấp chức vụ
-  otherAllowance      Float?    @default(0) // Hệ số phụ cấp khác
-  socialInsuranceNo   String?   // Mã số BHXH
+  overGradePercent    Float?         @default(0) // % Phụ cấp thâm niên vượt khung
+  positionAllowance   Float?         @default(0) // Hệ số phụ cấp chức vụ
+  otherAllowance      Float?         @default(0) // Hệ số phụ cấp khác
+  socialInsuranceNo   String? // Mã số BHXH
   socialInsuranceDate DateTime? // Ngày bắt đầu đóng BHXH
 
   // 4. Trình độ học vấn, chuyên môn & lý luận
-  generalEducation    String?   @default("12/12") // Giáo dục phổ thông
-  highestDegree       String?   // Học vị/Trình độ chuyên môn cao nhất
-  majorCode           String?   // Mã ngành đào tạo
-  majorName           String?   // Tên ngành đào tạo
-  academicTitle       String?   // Học hàm (Giáo sư, Phó Giáo sư)
-  academicTitleDate   DateTime? // Ngày phong học hàm
-  politicalTheory     String?   // Lý luận chính trị (Cử nhân, Cao cấp, Trung cấp, Sơ cấp)
-  stateManagement     String?   // Quản lý nhà nước (CVCC, CVC, Chuyên viên...)
-  foreignLanguage     String?   // Ngoại ngữ chính
-  informaticsLevel    String?   // Tin học
-  ethnicLanguage      String?   // Tiếng dân tộc thiểu số
+  generalEducation  String?   @default("12/12") // Giáo dục phổ thông
+  highestDegree     String? // Học vị/Trình độ chuyên môn cao nhất
+  majorCode         String? // Mã ngành đào tạo
+  majorName         String? // Tên ngành đào tạo
+  academicTitle     String? // Học hàm (Giáo sư, Phó Giáo sư)
+  academicTitleDate DateTime? // Ngày phong học hàm
+  politicalTheory   String? // Lý luận chính trị (Cử nhân, Cao cấp, Trung cấp, Sơ cấp)
+  stateManagement   String? // Quản lý nhà nước (CVCC, CVC, Chuyên viên...)
+  foreignLanguage   String? // Ngoại ngữ chính
+  informaticsLevel  String? // Tin học
+  ethnicLanguage    String? // Tiếng dân tộc thiểu số
 
   // 5. Tổ chức Đoàn - Đảng - Quân ngũ
-  unionJoinDate       DateTime? // Ngày vào Đoàn TNCS HCM
-  partyJoinDate       DateTime? // Ngày vào Đảng CSVN (dự bị)
-  partyOfficialDate   DateTime? // Ngày chính thức vào Đảng
-  partyPosition       String?   // Chức vụ Đảng hiện giữ
-  partyJoinPlace      String?   // Nơi kết nạp Đảng
-  enlistmentDate      DateTime? // Ngày nhập ngũ
-  dischargeDate       DateTime? // Ngày xuất ngũ
-  militaryRank        String?   // Quân hàm / cấp bậc cao nhất
-  honorTitle          String?   // Danh hiệu được phong tặng cao nhất
+  unionJoinDate     DateTime? // Ngày vào Đoàn TNCS HCM
+  partyJoinDate     DateTime? // Ngày vào Đảng CSVN (dự bị)
+  partyOfficialDate DateTime? // Ngày chính thức vào Đảng
+  partyPosition     String? // Chức vụ Đảng hiện giữ
+  partyJoinPlace    String? // Nơi kết nạp Đảng
+  enlistmentDate    DateTime? // Ngày nhập ngũ
+  dischargeDate     DateTime? // Ngày xuất ngũ
+  militaryRank      String? // Quân hàm / cấp bậc cao nhất
+  honorTitle        String? // Danh hiệu được phong tặng cao nhất
 
   // 6. Sức khỏe & Diện chính sách
-  healthStatus        String?   @default("Tốt") // Tình trạng sức khỏe
-  heightCm            Float?    // Chiều cao (cm)
-  weightKg            Float?    // Cân nặng (kg)
-  bloodType           String?   // Nhóm máu (A, B, AB, O)
-  woundedClass        String?   // Hạng thương binh / bệnh binh
-  policyFamily        String?   // Gia đình diện chính sách
+  healthStatus String? @default("Tốt") // Tình trạng sức khỏe
+  heightCm     Float? // Chiều cao (cm)
+  weightKg     Float? // Cân nặng (kg)
+  bloodType    String? // Nhóm máu (A, B, AB, O)
+  woundedClass String? // Hạng thương binh / bệnh binh
+  policyFamily String? // Gia đình diện chính sách
 
   // 7. Sở trường & Lịch sử bản thân
-  strengths           String?   // Sở trường công tác
-  longestJob          String?   // Công việc làm lâu nhất
-  historyNotes        Json?     // Ghi chú lịch sử bản thân (JSON)
+  strengths    String? // Sở trường công tác
+  longestJob   String? // Công việc làm lâu nhất
+  historyNotes Json? // Ghi chú lịch sử bản thân (JSON)
 
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // 8 Quá trình lịch sử con
-  salaryHistories     PersonnelSalaryHistory[]
-  appointments        PersonnelAppointment[]
-  educations          PersonnelEducation[]
-  workHistories       PersonnelWorkHistory[]
-  rewardDisciplines   PersonnelRewardDiscipline[]
-  familyRelations     PersonnelFamilyRelation[]
-  appraisals          PersonnelAppraisal[]
-  socialActivities    PersonnelSocialActivity[]
+  salaryHistories   PersonnelSalaryHistory[]
+  appointments      PersonnelAppointment[]
+  educations        PersonnelEducation[]
+  workHistories     PersonnelWorkHistory[]
+  rewardDisciplines PersonnelRewardDiscipline[]
+  familyRelations   PersonnelFamilyRelation[]
+  appraisals        PersonnelAppraisal[]
+  socialActivities  PersonnelSocialActivity[]
 
   @@index([rankCode])
   @@map("personnel_comprehensive_profiles")
 }
 
 model PersonnelSalaryHistory {
-  id            String   @id @default(uuid())
+  id            String                        @id @default(uuid())
   profileId     String
   profile       PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   rankCode      String?
-  rank          PersonnelRank? @relation(fields: [rankCode], references: [code])
-  step          Int      // Bậc lương
-  coefficient   Float    // Hệ số
-  overGradeRate Float?   @default(0) // % Vượt khung
+  rank          PersonnelRank?                @relation(fields: [rankCode], references: [code])
+  step          Int // Bậc lương
+  coefficient   Float // Hệ số
+  baseAmount    Float?
+  overGradeRate Float?                        @default(0) // % Vượt khung
   fromDate      DateTime // Từ ngày
   toDate        DateTime? // Đến ngày
-  decisionNo    String?  // Số quyết định
+  decisionNo    String? // Số quyết định
   decisionDate  DateTime? // Ngày ký quyết định
-  signer        String?  // Người ký
-  createdAt     DateTime @default(now())
+  signer        String? // Người ký
+  createdAt     DateTime                      @default(now())
 
   @@index([profileId])
   @@map("personnel_salary_histories")
 }
 
 model PersonnelAppointment {
-  id             String    @id @default(uuid())
+  id             String                        @id @default(uuid())
   profileId      String
   profile        PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  positionTitle  String    // Chức danh bổ nhiệm
-  orgUnitName    String    // Đơn vị
-  departmentName String?   // Phòng ban / Tổ
-  effectiveDate  DateTime  // Ngày có hiệu lực
+  positionTitle  String // Chức danh bổ nhiệm
+  orgUnitName    String // Đơn vị
+  departmentName String? // Phòng ban / Tổ
+  effectiveDate  DateTime // Ngày có hiệu lực
   expirationDate DateTime? // Ngày hết hiệu lực
-  decisionNo     String?   // Số quyết định
+  decisionNo     String? // Số quyết định
   decisionDate   DateTime?
   signer         String?
-  isCurrent      Boolean   @default(false)
-  createdAt      DateTime  @default(now())
+  isCurrent      Boolean                       @default(false)
+  createdAt      DateTime                      @default(now())
 
   @@index([profileId])
   @@map("personnel_appointments")
 }
 
 model PersonnelEducation {
-  id             String    @id @default(uuid())
+  id             String                        @id @default(uuid())
   profileId      String
   profile        PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  schoolName     String    // Cơ sở đào tạo
-  majorName      String    // Chuyên ngành
-  degreeName     String    // Văn bằng / Chứng chỉ
-  studyForm      String    @default("Chính quy") // Hình thức đào tạo
+  schoolName     String // Cơ sở đào tạo
+  majorName      String // Chuyên ngành
+  degreeName     String // Văn bằng / Chứng chỉ
+  studyForm      String                        @default("Chính quy") // Hình thức đào tạo
   fromDate       DateTime?
   toDate         DateTime?
   graduationYear Int?
-  ranking        String?   // Xếp loại
-  createdAt      DateTime  @default(now())
+  ranking        String? // Xếp loại
+  createdAt      DateTime                      @default(now())
 
   @@index([profileId])
   @@map("personnel_educations")
 }
 
 model PersonnelWorkHistory {
-  id             String    @id @default(uuid())
-  profileId      String
-  profile        PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  fromDate       DateTime  // Từ tháng/năm
-  toDate         DateTime? // Đến tháng/năm
-  position       String    // Chức vụ / Công việc
-  unitName       String    // Cơ quan / Đơn vị
-  departmentName String?   // Bộ phận
-  referencePerson String?  // Người xác nhận
-  createdAt      DateTime  @default(now())
+  id              String                        @id @default(uuid())
+  profileId       String
+  profile         PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  fromDate        DateTime // Từ tháng/năm
+  toDate          DateTime? // Đến tháng/năm
+  position        String // Chức vụ / Công việc
+  unitName        String // Cơ quan / Đơn vị
+  departmentName  String? // Bộ phận
+  referencePerson String? // Người xác nhận
+  createdAt       DateTime                      @default(now())
 
   @@index([profileId])
   @@map("personnel_work_histories")
@@ -1328,71 +1363,71 @@ enum RewardDisciplineType {
 }
 
 model PersonnelRewardDiscipline {
-  id               String               @id @default(uuid())
+  id               String                        @id @default(uuid())
   profileId        String
   profile          PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   type             RewardDisciplineType
-  title            String               // Tên hình thức khen thưởng / kỷ luật
-  eventDate        DateTime             // Ngày quyết định / sự kiện
-  decisionNo       String?              // Số quyết định
-  issuingAuthority String?              // Cơ quan ký
-  reason           String?              // Lý do
-  createdAt        DateTime             @default(now())
+  title            String // Tên hình thức khen thưởng / kỷ luật
+  eventDate        DateTime // Ngày quyết định / sự kiện
+  decisionNo       String? // Số quyết định
+  issuingAuthority String? // Cơ quan ký
+  reason           String? // Lý do
+  createdAt        DateTime                      @default(now())
 
   @@index([profileId, type])
   @@map("personnel_reward_disciplines")
 }
 
 enum FamilyCategory {
-  SELF   // Gia đình bản thân (Bố, Mẹ, Vợ/Chồng, Con, Anh/Chị/Em ruột)
+  SELF // Gia đình bản thân (Bố, Mẹ, Vợ/Chồng, Con, Anh/Chị/Em ruột)
   SPOUSE // Gia đình bên Vợ / Chồng (Bố mẹ vợ/chồng...)
 }
 
 model PersonnelFamilyRelation {
-  id           String         @id @default(uuid())
+  id           String                        @id @default(uuid())
   profileId    String
   profile      PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  category     FamilyCategory @default(SELF)
-  relationType String         // Mối quan hệ: Bố, Mẹ, Vợ, Chồng, Con, Anh, Chị, Em
-  fullName     String         // Họ và tên
-  birthYear    Int?           // Năm sinh
-  details      String?        // Quê quán, nghề nghiệp, nơi cư trú...
-  createdAt    DateTime       @default(now())
+  category     FamilyCategory                @default(SELF)
+  relationType String // Mối quan hệ: Bố, Mẹ, Vợ, Chồng, Con, Anh, Chị, Em
+  fullName     String // Họ và tên
+  birthYear    Int? // Năm sinh
+  details      String? // Quê quán, nghề nghiệp, nơi cư trú...
+  createdAt    DateTime                      @default(now())
 
   @@index([profileId, category])
   @@map("personnel_family_relations")
 }
 
 enum AppraisalClassification {
-  EXCELLENT    // Hoàn thành xuất sắc nhiệm vụ
-  GOOD         // Hoàn thành tốt nhiệm vụ
+  EXCELLENT // Hoàn thành xuất sắc nhiệm vụ
+  GOOD // Hoàn thành tốt nhiệm vụ
   SATISFACTORY // Hoàn thành nhiệm vụ
   UNSATISFACTORY // Không hoàn thành nhiệm vụ
 }
 
 model PersonnelAppraisal {
-  id             String                  @id @default(uuid())
+  id             String                        @id @default(uuid())
   profileId      String
   profile        PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  year           Int                     // Năm đánh giá
+  year           Int // Năm đánh giá
   classification AppraisalClassification
-  comment        String?                 // Nhận xét / Đánh giá
-  decisionNo     String?                 // Quyết định công nhận
-  createdAt      DateTime                @default(now())
+  comment        String? // Nhận xét / Đánh giá
+  decisionNo     String? // Quyết định công nhận
+  createdAt      DateTime                      @default(now())
 
   @@index([profileId, year])
   @@map("personnel_appraisals")
 }
 
 model PersonnelSocialActivity {
-  id               String    @id @default(uuid())
+  id               String                        @id @default(uuid())
   profileId        String
   profile          PersonnelComprehensiveProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  fromDate         DateTime  // Từ ngày
+  fromDate         DateTime // Từ ngày
   toDate           DateTime? // Đến ngày
-  organizationName String    // Tên tổ chức chính trị - xã hội / đoàn thể
-  positionTitle    String?   // Chức danh tham gia
-  createdAt        DateTime  @default(now())
+  organizationName String // Tên tổ chức chính trị - xã hội / đoàn thể
+  positionTitle    String? // Chức danh tham gia
+  createdAt        DateTime                      @default(now())
 
   @@index([profileId])
   @@map("personnel_social_activities")
@@ -1408,9 +1443,9 @@ model PersonnelSocialActivity {
 
 model HrmsShiftType {
   id                        String                @id @default(uuid())
-  name                      String                // Ca hành chính, Ca sáng, Ca chiều, Ca đêm
-  startTime                 String                // "08:00"
-  endTime                   String                // "17:00"
+  name                      String // Ca hành chính, Ca sáng, Ca chiều, Ca đêm
+  startTime                 String // "08:00"
+  endTime                   String // "17:00"
   lateToleranceMinutes      Int                   @default(15)
   earlyExitToleranceMinutes Int                   @default(15)
   color                     String                @default("#3b82f6")
@@ -1435,12 +1470,13 @@ model HrmsShiftAssignment {
   shiftTypeId String
   startDate   DateTime
   endDate     DateTime?
+  workDays    Int[]                 @default([1, 2, 3, 4, 5]) // ISO-like JS weekdays: Sun=0 ... Sat=6
   status      ShiftAssignmentStatus @default(ACTIVE)
   assignedBy  String?
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
 
-  shiftType   HrmsShiftType         @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
+  shiftType HrmsShiftType @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
 
   @@index([userId, startDate])
   @@map("hrms_shift_assignments")
@@ -1455,26 +1491,63 @@ enum SalaryComponentType {
   DEDUCTION
 }
 
+enum SalaryBandStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+}
+
+model HrmsSalaryBand {
+  id                String            @id @default(uuid())
+  code              String
+  name              String
+  levelTitle        String
+  minSalary         Float
+  midSalary         Float
+  maxSalary         Float
+  compensationBasis CompensationBasis @default(MONTHLY)
+  reviewCycleMonths Int               @default(12)
+  jobTitles         String[]          @default([])
+  criteria          String            @db.Text
+  benchmarkSource   String            @db.Text
+  effectiveFrom     DateTime          @db.Date
+  effectiveTo       DateTime?         @db.Date
+  status            SalaryBandStatus  @default(DRAFT)
+  createdById       String
+  approvedById      String?
+  approvedAt        DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  employees         User[]            @relation("EmployeeSalaryBand")
+  openings          HrmsJobOpening[]
+
+  @@unique([code, effectiveFrom])
+  @@index([status, effectiveFrom, effectiveTo])
+  @@map("hrms_salary_bands")
+}
+
 model HrmsSalaryComponent {
-  id              String                    @id @default(uuid())
-  code            String                    @unique // BASIC, LUNCH_ALLOW, POSITION_ALLOW, BHXH, PIT
-  name            String                    // Lương cơ bản, Phụ cấp ăn trưa, Trừ BHXH...
-  type            SalaryComponentType
-  isTaxApplicable Boolean                   @default(true)
-  isFormulaBased  Boolean                   @default(false)
-  formula         String?                   // VD: "baseSalary * 0.08"
-  defaultAmount   Float                     @default(0)
-  description     String?
-  createdAt       DateTime                  @default(now())
-  updatedAt       DateTime                  @updatedAt
-  structureItems  HrmsSalaryStructureItem[]
+  id                    String                    @id @default(uuid())
+  code                  String                    @unique // BASIC, LUNCH_ALLOW, POSITION_ALLOW, BHXH, PIT
+  name                  String // Lương cơ bản, Phụ cấp ăn trưa, Trừ BHXH...
+  type                  SalaryComponentType
+  isTaxApplicable       Boolean                   @default(true)
+  isInsuranceApplicable Boolean                   @default(false)
+  isOvertimeApplicable  Boolean                   @default(false)
+  isFormulaBased        Boolean                   @default(false)
+  formula               String? // VD: "baseSalary * 0.08"
+  defaultAmount         Float                     @default(0)
+  description           String?
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  structureItems        HrmsSalaryStructureItem[]
 
   @@map("hrms_salary_components")
 }
 
 model HrmsSalaryStructure {
   id               String                          @id @default(uuid())
-  name             String                          // Cấu trúc lương Cán sự, Cấu trúc lương Quản lý...
+  name             String // Cấu trúc lương Cán sự, Cấu trúc lương Quản lý...
   payrollFrequency String                          @default("MONTHLY")
   isActive         Boolean                         @default(true)
   description      String?
@@ -1487,30 +1560,30 @@ model HrmsSalaryStructure {
 }
 
 model HrmsSalaryStructureItem {
-  id          String              @id @default(uuid())
+  id          String   @id @default(uuid())
   structureId String
   componentId String
-  amount      Float               @default(0)
+  amount      Float    @default(0)
   formula     String?
-  createdAt   DateTime            @default(now())
+  createdAt   DateTime @default(now())
 
-  structure   HrmsSalaryStructure @relation(fields: [structureId], references: [id], onDelete: Cascade)
-  component   HrmsSalaryComponent @relation(fields: [componentId], references: [id], onDelete: Cascade)
+  structure HrmsSalaryStructure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  component HrmsSalaryComponent @relation(fields: [componentId], references: [id], onDelete: Cascade)
 
   @@index([structureId])
   @@map("hrms_salary_structure_items")
 }
 
 model HrmsSalaryStructureAssignment {
-  id          String              @id @default(uuid())
+  id          String   @id @default(uuid())
   userId      String
   structureId String
   fromDate    DateTime
   baseSalary  Float
-  isActive    Boolean             @default(true)
-  createdAt   DateTime            @default(now())
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
 
-  structure   HrmsSalaryStructure @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  structure HrmsSalaryStructure @relation(fields: [structureId], references: [id], onDelete: Cascade)
 
   @@index([userId, isActive])
   @@map("hrms_salary_structure_assignments")
@@ -1519,51 +1592,68 @@ model HrmsSalaryStructureAssignment {
 enum PayrollRunStatus {
   DRAFT
   PROCESSED
+  REVIEWED
   APPROVED
+  LOCKED
   PAID
   CANCELLED
 }
 
 model HrmsPayrollRun {
-  id              String            @id @default(uuid())
-  periodName      String            // Lương Tháng 08/2026
-  fromDate        DateTime
-  toDate          DateTime
-  status          PayrollRunStatus  @default(DRAFT)
-  totalEmployees  Int               @default(0)
-  totalGrossPay   Float             @default(0)
-  totalDeduction  Float             @default(0)
-  totalNetPay     Float             @default(0)
-  processedBy     String?
-  processedAt     DateTime?
-  notes           String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  slips           HrmsPayrollSlip[]
+  id                 String                 @id @default(uuid())
+  periodName         String // Lương Tháng 08/2026
+  fromDate           DateTime
+  toDate             DateTime
+  status             PayrollRunStatus       @default(DRAFT)
+  totalEmployees     Int                    @default(0)
+  totalGrossPay      Float                  @default(0)
+  totalDeduction     Float                  @default(0)
+  totalNetPay        Float                  @default(0)
+  processedBy        String?
+  processedAt        DateTime?
+  legacyPeriodId     String?                @unique
+  attendancePeriodId String?
+  policySnapshot     Json                   @default("{}")
+  reviewedBy         String?
+  reviewedAt         DateTime?
+  lockedBy           String?
+  lockedAt           DateTime?
+  paidBy             String?
+  paidAt             DateTime?
+  paymentMethod      String?
+  paymentReference   String?
+  loanDeductions     PayrollLoanDeduction[]
+  notes              String?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  slips              HrmsPayrollSlip[]
 
   @@map("hrms_payroll_runs")
 }
 
 model HrmsPayrollSlip {
-  id             String          @id @default(uuid())
+  id             String   @id @default(uuid())
   payrollRunId   String
   userId         String
   employeeName   String
+  bankAccount    String?
+  bankName       String?
   employeeCode   String?
   department     String?
   jobTitle       String?
-  workingDays    Float           @default(22)
-  actualWorkDays Float           @default(22)
-  baseSalary     Float           @default(0)
-  grossPay       Float           @default(0)
-  totalDeduction Float           @default(0)
-  netPay         Float           @default(0)
-  breakdown      Json            @default("{}") // Mảng chi tiết từng khoản cộng/trừ
-  status         String          @default("DRAFT") // DRAFT, APPROVED, PAID
-  createdAt      DateTime        @default(now())
+  workingDays    Float    @default(22)
+  actualWorkDays Float    @default(22)
+  baseSalary     Float    @default(0)
+  grossPay       Float    @default(0)
+  totalDeduction Float    @default(0)
+  netPay         Float    @default(0)
+  breakdown      Json     @default("{}") // Mảng chi tiết từng khoản cộng/trừ
+  status         String   @default("DRAFT") // DRAFT, APPROVED, PAID
+  createdAt      DateTime @default(now())
 
-  payrollRun     HrmsPayrollRun  @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  payrollRun HrmsPayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
 
+  @@unique([payrollRunId, userId])
   @@index([payrollRunId, userId])
   @@map("hrms_payroll_slips")
 }
@@ -1581,20 +1671,25 @@ enum JobOpeningStatus {
 }
 
 model HrmsJobOpening {
-  id            String             @id @default(uuid())
-  title         String             // Tuyển dụng Kỹ sư Phần mềm Senior, Chuyên viên Nhân sự...
-  department    String?
-  designation   String?
-  vacancies     Int                @default(1)
-  minExperience Int                @default(1) // Năm kinh nghiệm
-  salaryRange   String?            // VD: 15.000.000 - 25.000.000 VND
-  description   String             @db.Text
-  requirements  String?            @db.Text
-  closingDate   DateTime?
-  status        JobOpeningStatus   @default(OPEN)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  applicants    HrmsJobApplicant[]
+  requisitionId          String?            @unique
+  id                     String             @id @default(uuid())
+  title                  String // Tuyển dụng Kỹ sư Phần mềm Senior, Chuyên viên Nhân sự...
+  department             String?
+  designation            String?
+  vacancies              Int                @default(1)
+  minExperience          Int                @default(1) // Năm kinh nghiệm
+  salaryRange            String? // VD: 15.000.000 - 25.000.000 VND
+  description            String             @db.Text
+  requirements           String?            @db.Text
+  salaryBandId           String?
+  minimumInterviewRounds Int                @default(1)
+  probationDays          Int?
+  closingDate            DateTime?
+  status                 JobOpeningStatus   @default(OPEN)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  applicants             HrmsJobApplicant[]
+  salaryBand             HrmsSalaryBand?    @relation(fields: [salaryBandId], references: [id], onDelete: SetNull)
 
   @@map("hrms_job_openings")
 }
@@ -1610,22 +1705,22 @@ enum ApplicantStage {
 }
 
 model HrmsJobApplicant {
-  id             String               @id @default(uuid())
-  jobOpeningId   String
-  candidateName  String
-  email          String
-  phone          String?
-  stage          ApplicantStage       @default(APPLIED)
-  rating         Int                  @default(0) // 1-5 sao
-  resumeUrl      String?
-  coverLetter    String?              @db.Text
-  notes          String?              @db.Text
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  id            String         @id @default(uuid())
+  jobOpeningId  String
+  candidateName String
+  email         String
+  phone         String?
+  stage         ApplicantStage @default(APPLIED)
+  rating        Int            @default(0) // 1-5 sao
+  resumeUrl     String?
+  coverLetter   String?        @db.Text
+  notes         String?        @db.Text
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
-  jobOpening     HrmsJobOpening       @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
-  interviews     HrmsInterviewRound[]
-  offers         HrmsJobOffer[]
+  jobOpening HrmsJobOpening       @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
+  interviews HrmsInterviewRound[]
+  offers     HrmsJobOffer[]
 
   @@index([jobOpeningId, stage])
   @@map("hrms_job_applicants")
@@ -1641,16 +1736,16 @@ enum InterviewRecommendation {
 model HrmsInterviewRound {
   id              String                  @id @default(uuid())
   applicantId     String
-  roundName       String                  // Phỏng vấn Kỹ thuật, Phỏng vấn Văn hóa
-  interviewerName String                  // Người phỏng vấn
+  roundName       String // Phỏng vấn Kỹ thuật, Phỏng vấn Văn hóa
+  interviewerName String // Người phỏng vấn
   scheduledAt     DateTime
   status          String                  @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
-  score           Float?                  // Thang điểm 100
+  score           Float? // Thang điểm 100
   recommendation  InterviewRecommendation @default(HOLD)
   feedback        String?                 @db.Text
   createdAt       DateTime                @default(now())
 
-  applicant       HrmsJobApplicant        @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  applicant HrmsJobApplicant @relation(fields: [applicantId], references: [id], onDelete: Cascade)
 
   @@index([applicantId])
   @@map("hrms_interview_rounds")
@@ -1665,18 +1760,20 @@ enum OfferStatus {
 }
 
 model HrmsJobOffer {
-  id            String           @id @default(uuid())
-  applicantId   String
-  offerDate     DateTime         @default(now())
-  designation   String
-  offeredSalary Float
-  joiningDate   DateTime
-  status        OfferStatus      @default(DRAFT)
-  terms         String?          @db.Text
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  acceptedEvidenceUrl String?
+  respondedAt         DateTime?
+  id                  String      @id @default(uuid())
+  applicantId         String
+  offerDate           DateTime    @default(now())
+  designation         String
+  offeredSalary       Float
+  joiningDate         DateTime
+  status              OfferStatus @default(DRAFT)
+  terms               String?     @db.Text
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
 
-  applicant     HrmsJobApplicant @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  applicant HrmsJobApplicant @relation(fields: [applicantId], references: [id], onDelete: Cascade)
 
   @@index([applicantId])
   @@map("hrms_job_offers")
@@ -1703,33 +1800,36 @@ enum LifecycleEventStatus {
 }
 
 model HrmsLifecycleEvent {
-  id            String               @id @default(uuid())
-  userId        String
-  employeeName  String
-  type          LifecycleEventType
-  status        LifecycleEventStatus @default(PENDING)
-  title         String               // Quyết định điều chuyển công tác, Tiếp nhận thử việc...
-  decisionNo    String?
-  effectiveDate DateTime
-  details       Json                 @default("{}") // Chi tiết công việc bàn giao, phòng ban mới...
-  notes         String?              @db.Text
-  createdBy     String?
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
+  personnelActionId String?              @unique
+  id                String               @id @default(uuid())
+  userId            String
+  employeeName      String
+  type              LifecycleEventType
+  status            LifecycleEventStatus @default(PENDING)
+  title             String // Quyết định điều chuyển công tác, Tiếp nhận thử việc...
+  decisionNo        String?
+  effectiveDate     DateTime
+  details           Json                 @default("{}") // Chi tiết công việc bàn giao, phòng ban mới...
+  notes             String?              @db.Text
+  createdBy         String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
 
   @@index([userId, type])
   @@map("hrms_lifecycle_events")
 }
 
 model HrmsOnboardingTask {
-  id          String   @id @default(uuid())
-  title       String   // Cấp email & tài khoản, Bàn giao máy tính, Ký hợp đồng lao động...
-  category    String   @default("IT") // IT, HR, ADMIN, DEPARTMENT
+  userId      String?
+  completedBy String?
+  id          String    @id @default(uuid())
+  title       String // Cấp email & tài khoản, Bàn giao máy tính, Ký hợp đồng lao động...
+  category    String    @default("IT") // IT, HR, ADMIN, DEPARTMENT
   assignee    String?
-  isCompleted Boolean  @default(false)
+  isCompleted Boolean   @default(false)
   completedAt DateTime?
   notes       String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   @@map("hrms_onboarding_tasks")
 }
@@ -1739,54 +1839,176 @@ model HrmsOnboardingTask {
 // ---------------------------------------------------------------------------
 
 model HrmsAppraisalCycle {
-  id          String               @id @default(uuid())
-  name        String               // Đánh giá Hiệu suất Q3/2026, Đánh giá Thường niên 2026
-  year        Int
-  startDate   DateTime
-  endDate     DateTime
-  status      String               @default("ACTIVE") // PLANNED, ACTIVE, COMPLETED
-  description String?
-  createdAt   DateTime             @default(now())
-  goals       HrmsAppraisalGoal[]
-  reviews     HrmsAppraisalReview[]
+  id                    String                        @id @default(uuid())
+  name                  String // Đánh giá Hiệu suất Q3/2026, Đánh giá Thường niên 2026
+  year                  Int
+  startDate             DateTime
+  endDate               DateTime
+  status                String                        @default("ACTIVE") // PLANNED, ACTIVE, COMPLETED
+  description           String?
+  organizationSector    String                        @default("enterprise") // enterprise | state; snapshot when cycle is created
+  publicPersonnelType   String? // CIVIL_SERVANT | PUBLIC_EMPLOYEE
+  selfWeight            Float                         @default(20)
+  peerWeight            Float                         @default(30)
+  managerWeight         Float                         @default(50)
+  subordinateWeight     Float                         @default(10)
+  generalCriteriaWeight Float                         @default(30) // public-sector general criteria
+  taskCriteriaWeight    Float                         @default(70) // public-sector assigned work results
+  createdAt             DateTime                      @default(now())
+  goals                 HrmsAppraisalGoal[]
+  reviews               HrmsAppraisalReview[]
+  publicDecisions       HrmsPublicAppraisalDecision[]
+  competencies          HrmsCompetencyAssessment[]
+  developmentPlans      HrmsDevelopmentPlan[]
 
+  @@index([organizationSector, year])
   @@map("hrms_appraisal_cycles")
 }
 
 model HrmsAppraisalGoal {
-  id            String             @id @default(uuid())
+  id            String   @id @default(uuid())
   cycleId       String
   userId        String
   employeeName  String
-  kraTitle      String             // Vùng kết quả then chốt (KRA)
-  description   String             @db.Text
-  weightage     Float              @default(20) // Trọng số %
-  targetMetric  String             // KPI mục tiêu: "Hoàn thành 100% sprint đúng hạn"
-  selfScore     Float?             // Tự chấm (thang 100)
-  managerScore  Float?             // Quản lý chấm
+  kraTitle      String // Vùng kết quả then chốt (KRA)
+  description   String   @db.Text
+  weightage     Float    @default(20) // Trọng số %
+  targetMetric  String // KPI mục tiêu: "Hoàn thành 100% sprint đúng hạn"
+  criteriaGroup String   @default("RESULT") // RESULT for enterprise KPIs; GENERAL or RESULT in public-sector assessment
+  selfScore     Float? // Tự chấm (thang 100)
+  managerScore  Float? // Quản lý chấm
   finalScore    Float?
-  status        String             @default("DRAFT") // DRAFT, SUBMITTED, APPROVED
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  status        String   @default("DRAFT") // DRAFT, SUBMITTED, APPROVED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  cycle         HrmsAppraisalCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  cycle     HrmsAppraisalCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  evidences HrmsKraEvidence[]
 
   @@index([cycleId, userId])
   @@map("hrms_appraisal_goals")
 }
 
+model HrmsPublicAppraisalDecision {
+  id                         String                  @id @default(uuid())
+  cycleId                    String
+  userId                     String
+  orgUnitId                  String
+  comparableGroup            String
+  finalClassification        AppraisalClassification
+  excellentCriteriaConfirmed Boolean                 @default(false)
+  quotaExceptionApproved     Boolean                 @default(false)
+  exceptionDecisionNo        String?
+  decisionNote               String?                 @db.Text
+  reviewedById               String
+  reviewedAt                 DateTime                @updatedAt
+  cycle                      HrmsAppraisalCycle      @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+
+  @@unique([cycleId, userId])
+  @@index([cycleId, orgUnitId, comparableGroup, finalClassification])
+  @@map("hrms_public_appraisal_decisions")
+}
+
+model HrmsKraEvidence {
+  id          String            @id @default(uuid())
+  goalId      String
+  submittedBy String
+  description String            @db.Text
+  metricValue String?
+  evidenceUrl String?
+  createdAt   DateTime          @default(now())
+  goal        HrmsAppraisalGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId, createdAt])
+  @@map("hrms_kra_evidences")
+}
+
+model HrmsCompetencyStandard {
+  id                  String   @id @default(uuid())
+  code                String   @unique
+  name                String
+  description         String   @db.Text
+  applicableJobTitles String[] @default([])
+  behavioralAnchors   Json
+  isActive            Boolean  @default(true)
+  createdById         String?
+  version             Int      @default(1)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([isActive, code])
+  @@map("hrms_competency_standards")
+}
+
+model HrmsCompetencyAssessment {
+  id                 String                @id @default(uuid())
+  cycleId            String
+  userId             String
+  competencyCode     String
+  competencyName     String
+  currentLevel       Int
+  managerLevel       Int?
+  targetLevel        Int?
+  selfNotes          String?               @db.Text
+  evidenceUrl        String?
+  managerNotes       String?               @db.Text
+  managerEvidenceUrl String?
+  managerAssessedBy  String?
+  managerAssessedAt  DateTime?
+  status             String                @default("SELF_SUBMITTED")
+  evidence           Json                  @default("[]")
+  assessedBy         String?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  cycle              HrmsAppraisalCycle    @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  developmentPlans   HrmsDevelopmentPlan[]
+
+  @@unique([cycleId, userId, competencyCode])
+  @@index([userId, competencyCode])
+  @@map("hrms_competency_assessments")
+}
+
+model HrmsDevelopmentPlan {
+  id              String                    @id @default(uuid())
+  cycleId         String
+  assessmentId    String?
+  userId          String
+  competencyCode  String
+  objective       String                    @db.Text
+  successCriteria String                    @db.Text
+  actions         Json                      @default("[]")
+  dueDate         DateTime                  @db.Date
+  status          String                    @default("PROPOSED") // PROPOSED/IN_PROGRESS/COMPLETED/CANCELLED
+  evidence        Json                      @default("[]")
+  resultLevel     Int?
+  employeeNotes   String?                   @db.Text
+  managerNotes    String?                   @db.Text
+  createdBy       String
+  reviewedBy      String?
+  completedAt     DateTime?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  cycle           HrmsAppraisalCycle        @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  assessment      HrmsCompetencyAssessment? @relation(fields: [assessmentId], references: [id], onDelete: SetNull)
+
+  @@index([userId, competencyCode, status])
+  @@map("hrms_development_plans")
+}
+
 model HrmsAppraisalReview {
-  id           String             @id @default(uuid())
+  reviewerId   String?
+  id           String   @id @default(uuid())
   cycleId      String
   userId       String
   reviewerName String
-  relationship String             @default("MANAGER") // SELF, MANAGER, PEER, SUBORDINATE
-  rating       Float              @default(0) // 1-5 sao hoặc thang 100
-  feedback     String             @db.Text
-  submittedAt  DateTime           @default(now())
+  relationship String   @default("MANAGER") // SELF, MANAGER, PEER, SUBORDINATE
+  rating       Float    @default(0) // 1-5 sao hoặc thang 100
+  feedback     String   @db.Text
+  submittedAt  DateTime @default(now())
 
-  cycle        HrmsAppraisalCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  cycle HrmsAppraisalCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
 
+  @@unique([cycleId, userId, reviewerId])
   @@index([cycleId, userId])
   @@map("hrms_appraisal_reviews")
 }
@@ -1804,61 +2026,67 @@ enum ClaimStatus {
 }
 
 model HrmsTravelRequest {
-  id              String              @id @default(uuid())
-  userId          String
-  employeeName    String
-  purpose         String              // Công tác triển khai dự án chi nhánh Đà Nẵng
-  fromLocation    String
-  toLocation      String
-  departureDate   DateTime
-  returnDate      DateTime
-  estimatedBudget Float               @default(0)
-  status          ClaimStatus         @default(DRAFT)
-  notes           String?
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-  advances        HrmsEmployeeAdvance[]
-  claims          HrmsExpenseClaim[]
+  id                 String                @id @default(uuid())
+  userId             String
+  employeeName       String
+  purpose            String // Công tác triển khai dự án chi nhánh Đà Nẵng
+  fromLocation       String
+  toLocation         String
+  departureDate      DateTime
+  returnDate         DateTime
+  estimatedBudget    Float                 @default(0)
+  status             ClaimStatus           @default(DRAFT)
+  notes              String?
+  settlementClosedAt DateTime?
+  settlementClosedBy String?
+  advanceRefundDue   Float                 @default(0)
+  advanceRefundPaid  Float                 @default(0)
+  refundStatus       String                @default("NONE") // NONE/DUE/PARTIAL/REPAID
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  advances           HrmsEmployeeAdvance[]
+  claims             HrmsExpenseClaim[]
 
   @@index([userId])
   @@map("hrms_travel_requests")
 }
 
 model HrmsEmployeeAdvance {
-  id              String             @id @default(uuid())
+  id              String      @id @default(uuid())
   userId          String
   employeeName    String
   travelRequestId String?
   amount          Float
   purpose         String
-  status          ClaimStatus        @default(DRAFT)
+  status          ClaimStatus @default(DRAFT)
   disbursedAt     DateTime?
-  createdAt       DateTime           @default(now())
+  paymentMethod   String? // CASH/BANK; required when status becomes PAID
+  createdAt       DateTime    @default(now())
 
-  travelRequest   HrmsTravelRequest? @relation(fields: [travelRequestId], references: [id], onDelete: SetNull)
+  travelRequest HrmsTravelRequest? @relation(fields: [travelRequestId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@map("hrms_employee_advances")
 }
 
 model HrmsExpenseClaim {
-  id              String             @id @default(uuid())
+  id              String      @id @default(uuid())
   userId          String
   employeeName    String
   travelRequestId String?
-  title           String             // Thanh toán vé máy bay, hóa đơn tiếp khách...
-  category        String             @default("TRAVEL") // TRAVEL, MEAL, LODGING, EQUIPMENT, OTHER
+  title           String // Thanh toán vé máy bay, hóa đơn tiếp khách...
+  category        String      @default("TRAVEL") // TRAVEL, MEAL, LODGING, EQUIPMENT, OTHER
   totalAmount     Float
   approvedAmount  Float?
-  status          ClaimStatus        @default(DRAFT)
-  items           Json               @default("[]") // Chi tiết từng khoản chi
-  receiptUrls     String[]           @default([])
+  status          ClaimStatus @default(DRAFT)
+  items           Json        @default("[]") // Chi tiết từng khoản chi
+  receiptUrls     String[]    @default([])
   submittedAt     DateTime?
   approvedBy      String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 
-  travelRequest   HrmsTravelRequest? @relation(fields: [travelRequestId], references: [id], onDelete: SetNull)
+  travelRequest HrmsTravelRequest? @relation(fields: [travelRequestId], references: [id], onDelete: SetNull)
 
   @@index([userId, status])
   @@map("hrms_expense_claims")
@@ -1870,7 +2098,7 @@ model HrmsExpenseClaim {
 
 model HrmsTrainingProgram {
   id              String                 @id @default(uuid())
-  name            String                 // Đào tạo Quy chuẩn Bảo mật, Nâng cao Nghiệp vụ Quản trị...
+  name            String // Đào tạo Quy chuẩn Bảo mật, Nâng cao Nghiệp vụ Quản trị...
   trainerName     String
   location        String?
   startDate       DateTime
@@ -1886,16 +2114,16 @@ model HrmsTrainingProgram {
 }
 
 model HrmsTrainingFeedback {
-  id                String              @id @default(uuid())
+  id                String   @id @default(uuid())
   programId         String
   userId            String
   employeeName      String
-  rating            Int                 @default(5) // 1-5 sao
-  comments          String?             @db.Text
-  certificateIssued Boolean             @default(false)
-  createdAt         DateTime            @default(now())
+  rating            Int      @default(5) // 1-5 sao
+  comments          String?  @db.Text
+  certificateIssued Boolean  @default(false)
+  createdAt         DateTime @default(now())
 
-  program           HrmsTrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  program HrmsTrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
 
   @@index([programId])
   @@map("hrms_training_feedbacks")
@@ -1912,7 +2140,7 @@ model HrmsGrievance {
   id           String          @id @default(uuid())
   userId       String
   employeeName String
-  subject      String          // Kiến nghị về điều kiện làm việc / Môi trường công sở
+  subject      String // Kiến nghị về điều kiện làm việc / Môi trường công sở
   category     String          @default("WORK_ENVIRONMENT") // WORK_ENVIRONMENT, HARASSMENT, COMPENSATION, DISPUTE
   description  String          @db.Text
   status       GrievanceStatus @default(OPEN)
@@ -1931,22 +2159,26 @@ model HrmsGrievance {
 // ---------------------------------------------------------------------------
 
 model HrmsEmployeeLoan {
-  id              String    @id @default(uuid())
-  userId          String
-  employeeName    String
-  loanType        String    // Tạm ứng khẩn cấp, Vay mua thiết bị/nhà, Vay đào tạo
-  principalAmount Float     // Số tiền vay gốc (VND)
-  interestRate    Float     @default(0) // % Lãi suất hàng năm
-  termMonths      Int       @default(12) // Thời hạn vay (tháng)
-  monthlyEmi      Float     // Số tiền trả góp gốc + lãi mỗi tháng
-  totalRepaid     Float     @default(0) // Số tiền đã hoàn trả
-  remainingAmount Float     // Dư nợ còn lại
-  status          String    @default("PENDING") // PENDING, APPROVED, DISBURSED, COMPLETED, REJECTED
-  disbursedAt     DateTime?
-  reason          String?   @db.Text
-  approvedBy      String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                           String    @id @default(uuid())
+  userId                       String
+  employeeName                 String
+  loanType                     String // Tạm ứng khẩn cấp, Vay mua thiết bị/nhà, Vay đào tạo
+  principalAmount              Float // Số tiền vay gốc (VND)
+  interestRate                 Float     @default(0) // % Lãi suất hàng năm
+  termMonths                   Int       @default(12) // Thời hạn vay (tháng)
+  monthlyEmi                   Float // Số tiền trả góp gốc + lãi mỗi tháng
+  totalRepaid                  Float     @default(0) // Số tiền đã hoàn trả
+  remainingAmount              Float // Dư nợ còn lại
+  status                       String    @default("PENDING") // PENDING, APPROVED, DISBURSED, COMPLETED, REJECTED
+  disbursedAt                  DateTime?
+  disbursementMethod           String?
+  disbursementReference        String?
+  payrollDeductionAuthorizedAt DateTime?
+  deductionConsentVersion      String?
+  reason                       String?   @db.Text
+  approvedBy                   String?
+  createdAt                    DateTime  @default(now())
+  updatedAt                    DateTime  @updatedAt
 
   @@index([userId, status])
   @@map("hrms_employee_loans")
@@ -1959,7 +2191,7 @@ model HrmsEmployeeLoan {
 model HrmsAssetAllocation {
   id                   String    @id @default(uuid())
   assetCode            String    @unique // AST-001, AST-002...
-  name                 String    // MacBook Pro 16" M3 Max, Dell UltraSharp 27", Ghế Ergonomic...
+  name                 String // MacBook Pro 16" M3 Max, Dell UltraSharp 27", Ghế Ergonomic...
   category             String    @default("IT_EQUIPMENT") // IT_EQUIPMENT, VEHICLE, FURNITURE, OFFICE_DEVICE
   serialNumber         String?
   assignedUserId       String?
@@ -1982,21 +2214,65 @@ model HrmsAssetAllocation {
 // ---------------------------------------------------------------------------
 
 model HrmsAttendanceRegularization {
-  id                String    @id @default(uuid())
+  id                String   @id @default(uuid())
   userId            String
   employeeName      String
-  workDate          DateTime  @db.Date
-  requestedCheckIn  String?   // "08:30"
-  requestedCheckOut String?   // "17:30"
-  reason            String    @db.Text // Quên quẹt thẻ, Đi gặp khách hàng, Lỗi thiết bị kiosk
-  status            String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  workDate          DateTime @db.Date
+  requestedCheckIn  String? // "08:30"
+  requestedCheckOut String? // "17:30"
+  reason            String   @db.Text // Quên quẹt thẻ, Đi gặp khách hàng, Lỗi thiết bị kiosk
+  status            String   @default("PENDING") // PENDING, APPROVED, REJECTED
   approvedBy        String?
   decisionNote      String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@index([userId, status])
   @@map("hrms_attendance_regularizations")
+}
+
+model AttendancePeriod {
+  id        String    @id @default(uuid())
+  month     Int
+  year      Int
+  status    String    @default("OPEN")
+  version   Int       @default(1)
+  closedBy  String?
+  closedAt  DateTime?
+  reason    String?
+  snapshot  Json      @default("[]")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([month, year])
+  @@map("attendance_periods")
+}
+
+model PayrollLoanDeduction {
+  id           String         @id @default(uuid())
+  payrollRunId String
+  loanId       String
+  userId       String
+  amount       Float
+  appliedAt    DateTime?
+  payrollRun   HrmsPayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+
+  @@unique([payrollRunId, loanId])
+  @@map("payroll_loan_deductions")
+}
+
+model AssetCustodyEvent {
+  id             String    @id @default(uuid())
+  assetId        String
+  userId         String
+  actorId        String
+  action         String
+  notes          String?
+  acknowledgedAt DateTime?
+  at             DateTime  @default(now())
+
+  @@index([assetId, at])
+  @@map("asset_custody_events")
 }
 
 // ---------------------------------------------------------------------------
@@ -2004,23 +2280,23 @@ model HrmsAttendanceRegularization {
 // ---------------------------------------------------------------------------
 
 model MasterCatalogGroup {
-  id          String               @id           // e.g. "personal_politics"
-  title       String                              // "Nhân thân & Chính trị"
-  description String               @db.Text
-  sortOrder   Int                  @default(0)
+  id          String          @id // e.g. "personal_politics"
+  title       String // "Nhân thân & Chính trị"
+  description String          @db.Text
+  sortOrder   Int             @default(0)
   catalogs    MasterCatalog[]
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
   @@map("master_catalog_groups")
 }
 
 model MasterCatalog {
-  id       String               @id           // e.g. "dan_toc"
-  name     String                              // "Danh mục Dân tộc"
-  groupId  String
-  group    MasterCatalogGroup   @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  items    MasterCatalogItem[]
+  id        String              @id // e.g. "dan_toc"
+  name      String // "Danh mục Dân tộc"
+  groupId   String
+  group     MasterCatalogGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  items     MasterCatalogItem[]
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
 
@@ -2029,17 +2305,105 @@ model MasterCatalog {
 }
 
 model MasterCatalogItem {
-  id          String         @id @default(uuid())
-  catalogId   String
-  catalog     MasterCatalog  @relation(fields: [catalogId], references: [id], onDelete: Cascade)
-  code        String                              // "KH" (Kinh)
-  name        String                              // "Kinh"
-  extra       Json?                               // { sector, maxStep, salarySteps, payTable, ... }
-  sortOrder   Int            @default(0)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id        String        @id @default(uuid())
+  catalogId String
+  catalog   MasterCatalog @relation(fields: [catalogId], references: [id], onDelete: Cascade)
+  code      String // "KH" (Kinh)
+  name      String // "Kinh"
+  extra     Json? // { sector, maxStep, salarySteps, payTable, ... }
+  sortOrder Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   @@unique([catalogId, code])
   @@index([catalogId])
   @@map("master_catalog_items")
+}
+
+model ExpenseSettlement {
+  id                String   @id @default(uuid())
+  claimId           String   @unique
+  travelRequestId   String?
+  userId            String
+  advanceApplied    Float
+  payableAmount     Float
+  advanceRefundDue  Float    @default(0)
+  advanceRefundPaid Float    @default(0)
+  refundStatus      String   @default("NONE")
+  actorId           String
+  settledAt         DateTime @default(now())
+
+  @@index([travelRequestId])
+  @@map("expense_settlements")
+}
+
+model PhysicalRecordLoan {
+  id              String    @id @default(uuid())
+  userId          String
+  itemKey         String
+  itemDescription String
+  reason          String
+  dueDate         DateTime  @db.Date
+  status          String    @default("REQUESTED")
+  approvedBy      String?
+  issuedBy        String?
+  returnedBy      String?
+  issuedAt        DateTime?
+  returnedAt      DateTime?
+  evidenceUrl     String?
+  createdAt       DateTime  @default(now())
+
+  @@index([itemKey, status])
+  @@map("physical_record_loans")
+}
+
+model ProbationReview {
+  id              String       @id @default(uuid())
+  userId          String
+  managerId       String
+  hrVerifiedBy    String?
+  decidedBy       String?
+  score           Float
+  assessment      String       @db.Text
+  evidenceUrl     String
+  recommendation  String
+  status          String       @default("SUBMITTED")
+  decisionNote    String?
+  contractSalary  Float
+  contractType    ContractType @default(FIXED_TERM)
+  effectiveDate   DateTime     @db.Date
+  contractEndDate DateTime?    @db.Date
+  createdAt       DateTime     @default(now())
+
+  @@index([userId, status])
+  @@map("probation_reviews")
+}
+
+model HrmsTrainingEnrollment {
+  id            String    @id @default(uuid())
+  programId     String
+  userId        String
+  status        String    @default("ENROLLED")
+  score         Float?
+  evidenceUrl   String?
+  certificateId String?
+  verifiedBy    String?
+  enrolledAt    DateTime  @default(now())
+  completedAt   DateTime?
+
+  @@unique([programId, userId])
+  @@map("hrms_training_enrollments")
+}
+
+model HrDocumentRevision {
+  id         String     @id @default(uuid())
+  documentId String
+  document   HrDocument @relation(fields: [documentId], references: [id])
+  revision   Int
+  snapshot   Json
+  createdBy  String
+  createdAt  DateTime   @default(now())
+
+  @@unique([documentId, revision])
+  @@map("hr_document_revisions")
 }

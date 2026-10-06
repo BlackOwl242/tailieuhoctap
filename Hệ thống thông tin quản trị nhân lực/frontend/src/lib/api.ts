@@ -88,3 +88,30 @@ export function errorMessage(error: unknown): string {
   }
   return 'Đã xảy ra lỗi không xác định';
 }
+
+/** Opens an attachment through the authenticated API; private uploads have no public static URL. */
+export async function openProtectedFile(fileUrl: string): Promise<void> {
+  if (!fileUrl.startsWith('/uploads/')) {
+    const external = new URL(fileUrl, window.location.origin);
+    if (external.protocol === 'https:' || external.protocol === 'http:') window.open(external.href, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  const key = fileUrl.slice('/uploads/'.length);
+  const tab = window.open('about:blank', '_blank');
+  if (tab) tab.opener = null;
+  try {
+    const response = await api.get(`/files/${encodeURIComponent(key)}`, { responseType: 'blob' });
+    const objectUrl = URL.createObjectURL(response.data as Blob);
+    if (tab) tab.location.href = objectUrl;
+    else {
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = key.split('.').slice(0, -1).join('.') || key;
+      link.click();
+    }
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+  } catch (error) {
+    tab?.close();
+    window.alert(errorMessage(error));
+  }
+}

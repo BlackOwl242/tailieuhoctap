@@ -336,7 +336,7 @@ export default function ProfilePage() {
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
                   <span className="text-xs text-muted-foreground block">Ngày sinh:</span>
                   <p className="font-medium text-foreground">
-                    {profile?.user?.birthDate || me.birthDate ? formatDate(profile?.user?.birthDate || me.birthDate) : '—'}
+                    {profile?.user?.birthDate || me.birthDate ? formatDate(profile?.user?.birthDate || me.birthDate) : 'Chưa cập nhật'}
                   </p>
                 </div>
 
@@ -347,29 +347,29 @@ export default function ProfilePage() {
 
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
                   <span className="text-xs text-muted-foreground block">Số CCCD / Hộ chiếu:</span>
-                  <p className="font-mono font-medium text-foreground">{profile?.idCardNo || '—'}</p>
+                  <p className="font-mono font-medium text-foreground">{profile?.idCardNo || 'Chưa cập nhật'}</p>
                 </div>
 
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
                   <span className="text-xs text-muted-foreground block">Ngày cấp & Nơi cấp:</span>
                   <p className="font-medium text-foreground">
-                    {profile?.idCardIssueDate ? formatDate(profile.idCardIssueDate) : '—'} · {profile?.idCardIssuePlace || 'Cục CSQLHC về TTXH'}
+                    {profile?.idCardIssueDate ? formatDate(profile.idCardIssueDate) : 'Chưa cập nhật'} · {profile?.idCardIssuePlace || 'Cục CSQLHC về TTXH'}
                   </p>
                 </div>
 
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
                   <span className="text-xs text-muted-foreground block">Quê quán / Nơi sinh:</span>
-                  <p className="font-medium text-foreground">{profile?.hometown || profile?.birthPlace || '—'}</p>
+                  <p className="font-medium text-foreground">{profile?.hometown || profile?.birthPlace || 'Chưa cập nhật'}</p>
                 </div>
 
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1 sm:col-span-2">
                   <span className="text-xs text-muted-foreground block">Hộ khẩu thường trú:</span>
-                  <p className="font-medium text-foreground">{profile?.permanentAddress || '—'}</p>
+                  <p className="font-medium text-foreground">{profile?.permanentAddress || 'Chưa cập nhật'}</p>
                 </div>
 
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
                   <span className="text-xs text-muted-foreground block">Mã số BHXH:</span>
-                  <p className="font-mono font-medium text-foreground">{profile?.socialInsuranceNo || '—'}</p>
+                  <p className="font-mono font-medium text-foreground">{profile?.socialInsuranceNo || 'Chưa cập nhật'}</p>
                 </div>
 
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
@@ -410,7 +410,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
                   <span className="text-xs text-muted-foreground block">Mã nhân viên:</span>
-                  <p className="font-mono font-medium text-foreground">{profile?.user?.employeeCode || me.employeeCode || '—'}</p>
+                  <p className="font-mono font-medium text-foreground">{profile?.user?.employeeCode || me.employeeCode || 'Chưa cập nhật'}</p>
                 </div>
 
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
@@ -425,7 +425,7 @@ export default function ProfilePage() {
 
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
                   <span className="text-xs text-muted-foreground block">Ngày tuyển dụng:</span>
-                  <p className="font-medium text-foreground">{me.hireDate ? formatDate(me.hireDate) : '—'}</p>
+                  <p className="font-medium text-foreground">{me.hireDate ? formatDate(me.hireDate) : 'Chưa cập nhật'}</p>
                 </div>
 
                 <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">

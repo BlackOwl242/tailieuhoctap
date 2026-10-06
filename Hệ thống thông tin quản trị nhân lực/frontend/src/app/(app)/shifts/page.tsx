@@ -34,9 +34,15 @@ interface ShiftAssignment {
   userId: string;
   startDate: string;
   endDate?: string;
+  workDays?: number[];
   status: string;
   shiftType: ShiftType;
 }
+
+const WEEK_DAYS = [
+  { value: 1, label: 'T2' }, { value: 2, label: 'T3' }, { value: 3, label: 'T4' },
+  { value: 4, label: 'T5' }, { value: 5, label: 'T6' }, { value: 6, label: 'T7' }, { value: 0, label: 'CN' },
+];
 
 export default function ShiftsPage() {
   const queryClient = useQueryClient();
@@ -44,6 +50,14 @@ export default function ShiftsPage() {
 
   const [activeTab, setActiveTab] = useState<'roster' | 'types' | 'assignments'>('roster');
   const [searchTerm, setSearchTerm] = useState('');
+  const [weekStart, setWeekStart] = useState(() => {
+    const today = new Date(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date()) + 'T00:00:00Z');
+    today.setUTCDate(today.getUTCDate() - (today.getUTCDay() + 6) % 7);
+    return today.toISOString().slice(0,10);
+  });
+  const weekDates = useMemo(() => Array.from({ length: 7 }, (_, i) => new Date(new Date(weekStart + 'T00:00:00Z').getTime() + i * 86400000).toISOString().slice(0,10)), [weekStart]);
+  const { data: settings } = useQuery<{ WORK_START: string; WORK_END: string }>({ queryKey: ['runtime-settings'], queryFn: async () => (await api.get('/settings/effective')).data });
+
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -72,8 +86,9 @@ export default function ShiftsPage() {
   // Form state phân ca
   const [selectedUserId, setSelectedUserId] = useState('');
   const [selectedShiftId, setSelectedShiftId] = useState('');
-  const [startDate, setStartDate] = useState('2026-09-01');
-  const [endDate, setEndDate] = useState('2026-09-30');
+  const [startDate, setStartDate] = useState(weekStart);
+  const [endDate, setEndDate] = useState(weekDates[6]);
+  const [selectedWorkDays, setSelectedWorkDays] = useState([1, 2, 3, 4, 5]);
 
   const { data: shiftTypes = [], isLoading: isLoadingTypes } = useQuery<ShiftType[]>({
     queryKey: ['hrms-shift-types'],
@@ -85,8 +100,8 @@ export default function ShiftsPage() {
     assignments: ShiftAssignment[];
     users: { id: string; fullName: string; employeeCode: string; jobTitle: string; orgUnit?: { name: string } }[];
   }>({
-    queryKey: ['hrms-roster'],
-    queryFn: async () => (await api.get('/hrms/shifts/roster')).data,
+    queryKey: ['hrms-roster', weekStart],
+    queryFn: async () => (await api.get('/hrms/shifts/roster', { params: { from: weekDates[0], to: weekDates[6] } })).data,
   });
 
   const { data: assignments = [], isLoading: isLoadingAssignments } = useQuery<ShiftAssignment[]>({
@@ -94,6 +109,21 @@ export default function ShiftsPage() {
     queryFn: async () => (await api.get('/hrms/shifts/assignments')).data,
   });
 
+  const assignmentAt = (userId: string, date: string) => rosterData?.assignments.find(a => a.userId === userId && a.status === 'ACTIVE' && a.startDate.slice(0,10) <= date && (!a.endDate || a.endDate.slice(0,10) >= date));
+  const shiftAt = (userId: string, date: string) => {
+    const assignment = assignmentAt(userId, date);
+    const weekday = new Date(date + 'T00:00:00Z').getUTCDay();
+    return assignment && (assignment.workDays ?? [1, 2, 3, 4, 5]).includes(weekday) ? assignment.shiftType : undefined;
+  };
+  const labelAt = (userId: string, date: string) => {
+    const assignment = assignmentAt(userId, date);
+    const weekday = new Date(date + 'T00:00:00Z').getUTCDay();
+    if (assignment && !(assignment.workDays ?? [1, 2, 3, 4, 5]).includes(weekday)) return 'Nghỉ';
+    const shift = shiftAt(userId, date);
+    if (shift) return `${shift.startTime} - ${shift.endTime}`;
+    if ([0,6].includes(new Date(date + 'T00:00:00Z').getUTCDay())) return 'Nghỉ';
+    return `${settings?.WORK_START ?? '08:00'} - ${settings?.WORK_END ?? '17:30'} (mặc định)`;
+  };
   // Mutations
   const createTypeMutation = useMutation({
     mutationFn: async (payload: {
@@ -145,7 +175,7 @@ export default function ShiftsPage() {
   });
 
   const assignShiftMutation = useMutation({
-    mutationFn: async (payload: { userId: string; shiftTypeId: string; startDate: string; endDate?: string }) => {
+    mutationFn: async (payload: { userId: string; shiftTypeId: string; startDate: string; endDate?: string; workDays?: number[] }) => {
       return (await api.post('/hrms/shifts/assignments', payload)).data;
     },
     onSuccess: () => {
@@ -445,6 +475,7 @@ export default function ShiftsPage() {
       {/* ================= TAB 1: MA TRẬN PHÂN CA TUẦN ================= */}
       {activeTab === 'roster' && (
         <div className="space-y-3">
+          <label className="flex items-center gap-2 text-sm">Tuần bắt đầu <input className="rounded border p-2" type="date" value={weekStart} onChange={event => setWeekStart(event.target.value)} /></label>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-lg border border-border bg-card text-xs">
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
@@ -475,7 +506,7 @@ export default function ShiftsPage() {
                   const csvContent =
                     'STT,Ma_NV,Ho_Va_Ten,Phong_Ban,Chuc_Danh,Thu_2,Thu_3,Thu_4,Thu_5,Thu_6,Thu_7,Chu_Nhat\n' +
                     (filteredUsers || []).map((u, idx) =>
-                      `${idx + 1},${u.employeeCode || 'NV'},${u.fullName},${u.orgUnit?.name || 'Phong ban'},${u.jobTitle || 'Chuyen vien'},08:00-17:00,08:00-17:00,08:00-17:00,08:00-17:00,08:00-17:00,Nghi tuan,Nghi tuan`
+                      [idx + 1, u.employeeCode, u.fullName, u.orgUnit?.name, u.jobTitle, ...weekDates.map(date => labelAt(u.id, date))].map(value => '"' + String(value ?? '').replaceAll('"', '""') + '"').join(',')
                     ).join('\n');
                   const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
                   const url = URL.createObjectURL(blob);
@@ -505,7 +536,7 @@ export default function ShiftsPage() {
                     <th className="py-2.5 px-3 min-w-[130px]">Phòng ban</th>
                     {['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'].map((day, dIdx) => (
                       <th key={dIdx} className="py-2.5 px-2 text-center min-w-[95px]">
-                        {day}
+                        {day}<br />{weekDates[dIdx].slice(5)}
                       </th>
                     ))}
                   </tr>
@@ -522,7 +553,8 @@ export default function ShiftsPage() {
 
                         {/* 7 Days of the week — CLICK TO EDIT/CHANGE SHIFT */}
                         {['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'].map((day, dIdx) => {
-                          const isWeekend = dIdx >= 5;
+                          const assignedShift = shiftAt(u.id, weekDates[dIdx]);
+                          const isWeekend = dIdx >= 5 && !assignedShift;
                           return (
                             <td
                               key={dIdx}
@@ -531,9 +563,9 @@ export default function ShiftsPage() {
                                   userId: u.id,
                                   userName: u.fullName,
                                   dayLabel: day,
-                                  dateStr: `2026-09-${String(15 + dIdx).padStart(2, '0')}`,
+                                  dateStr: weekDates[dIdx],
                                 });
-                                setCellSelectedShiftId(shiftTypes[0]?.id || '');
+                                setCellSelectedShiftId(assignedShift?.id ?? shiftTypes[0]?.id ?? '');
                               }}
                               className="py-2 px-1 text-center cursor-pointer hover:bg-muted/50 transition-colors"
                               title={`Bấm để đổi ca: ${day} cho ${u.fullName}`}
@@ -544,7 +576,7 @@ export default function ShiftsPage() {
                                 </span>
                               ) : (
                                 <span className="font-mono text-xs text-foreground hover:underline">
-                                  08:00 - 17:00
+                                  {labelAt(u.id, weekDates[dIdx])}
                                 </span>
                               )}
                             </td>
@@ -685,6 +717,23 @@ export default function ShiftsPage() {
               />
             </div>
           </div>
+          <fieldset>
+            <legend className="font-semibold text-foreground">Ngày làm việc theo tuần *</legend>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {WEEK_DAYS.map(day => (
+                <label key={day.value} className="flex items-center gap-1.5 rounded-md border border-border px-2 py-1.5">
+                  <input
+                    type="checkbox"
+                    checked={selectedWorkDays.includes(day.value)}
+                    onChange={event => setSelectedWorkDays(current => event.target.checked
+                      ? [...current, day.value]
+                      : current.filter(value => value !== day.value))}
+                  />
+                  {day.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -857,8 +906,8 @@ export default function ShiftsPage() {
           onCancel={() => setIsAssignModalOpen(false)}
           confirmLabel="Lưu & Phân Ca"
           onConfirm={() => {
-            if (!selectedUserId || !selectedShiftId) {
-              toast('Vui lòng chọn nhân sự và ca làm việc', 'error');
+            if (!selectedUserId || !selectedShiftId || !selectedWorkDays.length) {
+              toast('Vui lòng chọn nhân sự, ca làm việc và ít nhất một ngày trong tuần', 'error');
               return;
             }
             assignShiftMutation.mutate({
@@ -866,6 +915,7 @@ export default function ShiftsPage() {
               shiftTypeId: selectedShiftId,
               startDate: new Date(startDate).toISOString(),
               endDate: endDate ? new Date(endDate).toISOString() : undefined,
+              workDays: selectedWorkDays,
             });
           }}
           disabled={assignShiftMutation.isPending}
@@ -924,7 +974,9 @@ export default function ShiftsPage() {
             assignShiftMutation.mutate({
               userId: cellAssignmentTarget.userId,
               shiftTypeId: cellSelectedShiftId,
-              startDate: new Date(cellAssignmentTarget.dateStr).toISOString(),
+              startDate: cellAssignmentTarget.dateStr,
+              endDate: cellAssignmentTarget.dateStr,
+              workDays: [new Date(cellAssignmentTarget.dateStr + 'T00:00:00Z').getUTCDay()],
             });
           }}
           disabled={assignShiftMutation.isPending}

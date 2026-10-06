@@ -11,53 +11,47 @@ import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { Button, Badge, Card, CardHeader, CardTitle, CardContent, Input, Select } from '@/components/ui/primitives';
 import { printDocumentElement } from '@/components/ui/print';
+import { isEnterpriseSector, useOrgConfig } from '@/lib/org-config';
 
 // ----------------------------------------------------------------------
-// DỮ LIỆU: 5 BẢNG QUY ƯỚC TIỀN LƯƠNG & PHÚC LỢI CHUẨN
+// Các bảng tham chiếu và giả định mô phỏng; không thay thế chính sách doanh nghiệp.
 // ----------------------------------------------------------------------
 
 const ATTENDANCE_REGULATIONS = [
   { code: 'X', label: 'Có mặt đúng giờ (Đủ ngày công)', rate: '100% lương ngày', deduct: '0%', note: 'Chấm đủ 2 lượt vào/ra, đúng khung giờ quy định' },
-  { code: 'M/S', label: 'Đi muộn hoặc Về sớm', rate: 'Tính công theo giờ', deduct: 'Trừ thời gian thiếu', note: 'Vi phạm sau 15 phút trừ 0.25 công, sau 60 phút trừ 0.5 công' },
+  { code: 'M/S', label: 'Đi muộn hoặc về sớm', rate: 'Tính theo thời gian làm việc được xác nhận', deduct: 'Không phạt tiền/cắt lương thay kỷ luật', note: 'Đối chiếu giờ thực tế, lịch làm và giải trình được duyệt.' },
   { code: 'P', label: 'Nghỉ phép năm hưởng nguyên lương', rate: '100% lương ngày', deduct: '0%', note: 'Theo Điều 113 Bộ luật Lao động 2019, có đơn duyệt trước' },
-  { code: 'L', label: 'Nghỉ Lễ / Tết theo luật', rate: '100% lương ngày', deduct: '0%', note: '11 ngày lễ tết chính thức theo quy định Nhà nước' },
-  { code: 'TS', label: 'Nghỉ ốm đau / Thai sản', rate: '75% BHXH chi trả', deduct: '100% lương cty', note: 'Cơ quan Bảo hiểm xã hội chi trả trợ cấp, Công ty không trả lương' },
+  { code: 'L', label: 'Nghỉ Lễ / Tết theo luật', rate: 'Hưởng nguyên lương theo căn cứ áp dụng', deduct: '0%', note: 'Năm 2026 có 12 ngày hưởng lương: 11 ngày theo Bộ luật Lao động và Ngày Văn hóa Việt Nam 24/11 theo Nghị quyết 28/2026/QH16.' },
+  { code: 'TS', label: 'Nghỉ ốm đau / Thai sản', rate: 'Theo căn cứ và tỷ lệ riêng từng chế độ', deduct: 'Đối soát thời gian không hưởng lương', note: 'BHXH giải quyết theo hồ sơ và quy tắc từng chế độ; không dùng một tỷ lệ 75% chung cho ốm đau và thai sản.' },
   { code: 'KL', label: 'Nghỉ không hưởng lương (Có phép)', rate: '0% lương ngày', deduct: 'Trừ 1 công/ngày', note: 'Có đơn xin nghỉ không hưởng lương được phê duyệt' },
-  { code: 'KP', label: 'Vắng mặt không phép (Vô kỷ luật)', rate: '0% lương ngày', deduct: 'Trừ 1 công + Vi phạm', note: 'Trừ 1 ngày lương và xem xét xử lý kỷ luật lao động' },
+  { code: 'KP', label: 'Vắng mặt không phép', rate: 'Không tính lương thời gian không làm việc theo căn cứ thực tế', deduct: 'Không phạt tiền/cắt lương thay kỷ luật', note: 'Xử lý kỷ luật, nếu có, phải theo đúng trình tự và căn cứ áp dụng.' },
 ];
 
 const SOCIAL_INSURANCE_RATES = [
-  { fund: 'Bảo hiểm Xã hội (BHXH)', employee: '8.0%', company: '17.5%', total: '25.5%', ceiling: 'Mức trần: 20 lần mức lương cơ sở' },
+  { fund: 'Bảo hiểm Xã hội (BHXH)', employee: '8.0%', company: '17.0%', total: '25.0%', ceiling: 'Mức trần theo đối tượng; năm 2026 tối đa 20 lần mức tham chiếu' },
+  { fund: 'Tai nạn lao động, bệnh nghề nghiệp', employee: '0.0%', company: '0.5%*', total: '0.5%*', ceiling: '*Có thể có tỷ lệ khác theo điều kiện áp dụng' },
   { fund: 'Bảo hiểm Y tế (BHYT)', employee: '1.5%', company: '3.0%', total: '4.5%', ceiling: 'Mức trần: 20 lần mức lương cơ sở' },
-  { fund: 'Bảo hiểm Thất nghiệp (BHTN)', employee: '1.0%', company: '1.0%', total: '2.0%', ceiling: 'Mức trần: 20 lần mức lương tối thiểu vùng' },
+  { fund: 'Bảo hiểm Thất nghiệp (BHTN)', employee: '1.0%', company: '1.0%', total: '2.0%', ceiling: 'Mức trần: 20 lần mức lương tối thiểu vùng tương ứng' },
   { fund: 'Kinh phí Công đoàn', employee: '0.0%', company: '2.0%', total: '2.0%', ceiling: 'NSDLĐ đóng trên toàn bộ quỹ lương đóng BHXH' },
 ];
 
 const TAX_BRACKETS = [
-  { level: 1, range: 'Đến 5 triệu đ', rate: '5%', fastCalc: 'Thu nhập tính thuế × 5%', maxDeduct: '0 đ' },
-  { level: 2, range: 'Trên 5 đến 10 triệu đ', rate: '10%', fastCalc: 'Thu nhập tính thuế × 10% - 0.25 triệu đ', maxDeduct: '250.000 đ' },
-  { level: 3, range: 'Trên 10 đến 18 triệu đ', rate: '15%', fastCalc: 'Thu nhập tính thuế × 15% - 0.75 triệu đ', maxDeduct: '750.000 đ' },
-  { level: 4, range: 'Trên 18 đến 32 triệu đ', rate: '20%', fastCalc: 'Thu nhập tính thuế × 20% - 1.65 triệu đ', maxDeduct: '1.650.000 đ' },
-  { level: 5, range: 'Trên 32 đến 52 triệu đ', rate: '25%', fastCalc: 'Thu nhập tính thuế × 25% - 3.25 triệu đ', maxDeduct: '3.250.000 đ' },
-  { level: 6, range: 'Trên 52 đến 80 triệu đ', rate: '30%', fastCalc: 'Thu nhập tính thuế × 30% - 5.85 triệu đ', maxDeduct: '5.850.000 đ' },
-  { level: 7, range: 'Trên 80 triệu đ', rate: '35%', fastCalc: 'Thu nhập tính thuế × 35% - 9.85 triệu đ', maxDeduct: '9.850.000 đ' },
-];
-
-// Khớp 100% với hệ thống phân loại bên Performance-360
-const KPI_BONUS_RATES = [
-  { grade: 'Loại A (Xuất sắc)', score: 'Từ 90 đến 100 điểm', bonus: '1.15 (+15%)', formula: 'Lương vị trí × 15%', status: 'Hoàn thành xuất sắc (≤ 20% NV)' },
-  { grade: 'Loại B (Tốt)', score: 'Từ 75 đến 89 điểm', bonus: '1.10 (+10%)', formula: 'Lương vị trí × 10%', status: 'Đạt chuẩn nâng bậc thường xuyên' },
-  { grade: 'Loại C (Hoàn thành)', score: 'Từ 50 đến 74 điểm', bonus: '1.05 (+5%)', formula: 'Lương vị trí × 5%', status: 'Giữ nguyên bậc lương hiện tại' },
-  { grade: 'Loại D (Không đạt)', score: 'Dưới 50 điểm (hoặc kỷ luật)', bonus: '1.00 (0%)', formula: '0 đ', status: 'Kế hoạch cải thiện hiệu suất 90 ngày' },
+  { level: 1, range: 'Đến 10 triệu đ', rate: '5%', fastCalc: 'Thu nhập tính thuế × 5%', maxDeduct: '0 đ' },
+  { level: 2, range: 'Trên 10 đến 30 triệu đ', rate: '10%', fastCalc: 'Thu nhập tính thuế × 10% - 0.5 triệu đ', maxDeduct: '500.000 đ' },
+  { level: 3, range: 'Trên 30 đến 60 triệu đ', rate: '20%', fastCalc: 'Thu nhập tính thuế × 20% - 3.5 triệu đ', maxDeduct: '3.500.000 đ' },
+  { level: 4, range: 'Trên 60 đến 100 triệu đ', rate: '30%', fastCalc: 'Thu nhập tính thuế × 30% - 9.5 triệu đ', maxDeduct: '9.500.000 đ' },
+  { level: 5, range: 'Trên 100 triệu đ', rate: '35%', fastCalc: 'Thu nhập tính thuế × 35% - 14.5 triệu đ', maxDeduct: '14.500.000 đ' },
 ];
 
 const OVERTIME_RATES = [
-  { type: 'Làm thêm ngày làm việc bình thường', factor: '150% (Hệ số 1.5)', nightAdd: '+30% nếu làm ca đêm (Tổng 210%)', lawRef: 'Khoản 1 Điều 98 Bộ luật Lao động' },
-  { type: 'Làm thêm ngày nghỉ hằng tuần (Thứ 7, CN)', factor: '200% (Hệ số 2.0)', nightAdd: '+30% nếu làm ca đêm (Tổng 270%)', lawRef: 'Khoản 1 Điều 98 Bộ luật Lao động' },
-  { type: 'Làm thêm ngày Lễ, Tết hưởng lương', factor: '300% (Hệ số 3.0)', nightAdd: '+30% nếu làm ca đêm (Tổng 390%)', lawRef: 'Chưa kể tiền lương ngày lễ hưởng 100%' },
+  { type: 'Làm thêm ngày làm việc bình thường', factor: '150% (Hệ số 1.5)', nightAdd: '+30% tiền lương đêm + 20% × mức OT ban ngày (Tổng tối thiểu 200%)', lawRef: 'Khoản 1–3 Điều 98 Bộ luật Lao động' },
+  { type: 'Làm thêm ngày nghỉ hằng tuần', factor: '200% (Hệ số 2.0)', nightAdd: '+30% tiền lương đêm + 20% × mức OT ban ngày (Tổng tối thiểu 270%)', lawRef: 'Khoản 1–3 Điều 98 Bộ luật Lao động' },
+  { type: 'Làm thêm ngày Lễ, Tết hưởng lương', factor: '300% (Hệ số 3.0)', nightAdd: '+30% tiền lương đêm + 20% × mức OT ban ngày (Tổng tối thiểu 390%)', lawRef: 'Khoản 1–3 Điều 98 Bộ luật Lao động; ngoài ra còn lương ngày lễ' },
 ];
 
 export default function RegulationsPage() {
+  const [orgConfig] = useOrgConfig();
+  const isEnterprise = isEnterpriseSector(orgConfig);
   const [activeTab, setActiveTab] = useState<'tables' | 'simulator'>('tables');
 
   // State Máy tính mô phỏng lương tương tác
@@ -66,7 +60,8 @@ export default function RegulationsPage() {
   const [calcActualDays, setCalcActualDays] = useState(22);
   const [calcDependents, setCalcDependents] = useState(1);
   const [calcOtHours, setCalcOtHours] = useState(4);
-  const [calcKpiGrade, setCalcKpiGrade] = useState<'A' | 'B' | 'C' | 'D'>('A');
+  const [calcNightHours, setCalcNightHours] = useState(0);
+  const [calcOtCategory, setCalcOtCategory] = useState<'WEEKDAY' | 'WEEKLY_REST' | 'PUBLIC_HOLIDAY'>('WEEKDAY');
 
   // Tính toán mô phỏng C&B
   const simulation = useMemo(() => {
@@ -76,43 +71,37 @@ export default function RegulationsPage() {
     const missingDays = Math.max(0, calcStdDays - calcActualDays);
     const deductedAbsent = Math.round(dailyWage * missingDays);
 
-    // OT (150% ngày thường)
-    const otPay = Math.round(calcOtHours * hourlyWage * 1.5);
+    const otFactor = calcOtCategory === 'PUBLIC_HOLIDAY' ? 3 : calcOtCategory === 'WEEKLY_REST' ? 2 : 1.5;
+    const otNightAdditional = 0.3 + 0.2 * (calcOtCategory === 'WEEKDAY' ? 1 : otFactor);
+    const otPay = Math.round(calcOtHours * hourlyWage * otFactor + Math.min(calcNightHours, calcOtHours) * hourlyWage * otNightAdditional);
 
-    // KPI Bonus theo chuẩn A, B, C, D
-    let kpiBonusRate = 0;
-    if (calcKpiGrade === 'A') kpiBonusRate = 0.15;
-    else if (calcKpiGrade === 'B') kpiBonusRate = 0.10;
-    else if (calcKpiGrade === 'C') kpiBonusRate = 0.05;
-    const kpiBonus = Math.round(calcBaseSalary * kpiBonusRate);
+    // Thưởng KPI không được suy ra tự động từ xếp loại; chỉ tính khoản có quyết định riêng.
+    const gross = paidSalary + otPay;
 
-    // Tổng thu nhập trước giảm trừ (Gross Pay)
-    const gross = paidSalary + otPay + kpiBonus;
-
-    // BHXH (10.5%)
-    const maxInsuranceBase = 2340000 * 20; // 46.8tr
-    const insuranceBase = Math.min(calcBaseSalary, maxInsuranceBase);
-    const bhxh = Math.round(insuranceBase * 0.08);
-    const bhyt = Math.round(insuranceBase * 0.015);
-    const bhtn = Math.round(insuranceBase * 0.01);
+    // Scenario: resident employee in Region I, reference-salary cap from 01/07/2026.
+    const socialInsuranceBase = Math.min(calcBaseSalary, 2530000 * 20);
+    const unemploymentBase = Math.min(calcBaseSalary, 5310000 * 20);
+    const bhxh = Math.round(socialInsuranceBase * 0.08);
+    const bhyt = Math.round(socialInsuranceBase * 0.015);
+    const bhtn = Math.round(unemploymentBase * 0.01);
     const totalInsurance = bhxh + bhyt + bhtn;
 
     // Thuế TNCN
-    const personalDeduct = 11000000;
-    const dependentDeduct = calcDependents * 4400000;
-    const taxableIncome = Math.max(0, gross - totalInsurance - personalDeduct - dependentDeduct);
+    const personalDeduct = 15500000;
+    const dependentDeduct = calcDependents * 6200000;
+    const taxableIncome = Math.max(0, gross - otPay - totalInsurance - personalDeduct - dependentDeduct);
 
     let pit = 0;
-    if (taxableIncome <= 5000000) {
+    if (taxableIncome <= 10000000) {
       pit = Math.round(taxableIncome * 0.05);
-    } else if (taxableIncome <= 10000000) {
-      pit = Math.round(taxableIncome * 0.10 - 250000);
-    } else if (taxableIncome <= 18000000) {
-      pit = Math.round(taxableIncome * 0.15 - 750000);
-    } else if (taxableIncome <= 32000000) {
-      pit = Math.round(taxableIncome * 0.20 - 1650000);
+    } else if (taxableIncome <= 30000000) {
+      pit = Math.round(taxableIncome * 0.10 - 500000);
+    } else if (taxableIncome <= 60000000) {
+      pit = Math.round(taxableIncome * 0.20 - 3500000);
+    } else if (taxableIncome <= 100000000) {
+      pit = Math.round(taxableIncome * 0.30 - 9500000);
     } else {
-      pit = Math.round(taxableIncome * 0.25 - 3250000);
+      pit = Math.round(taxableIncome * 0.35 - 14500000);
     }
 
     const netPay = gross - totalInsurance - pit;
@@ -123,14 +112,14 @@ export default function RegulationsPage() {
       paidSalary,
       deductedAbsent,
       otPay,
-      kpiBonus,
+      otNightAdditional,
       gross,
       totalInsurance,
       taxableIncome,
       pit,
       netPay,
     };
-  }, [calcBaseSalary, calcStdDays, calcActualDays, calcDependents, calcOtHours, calcKpiGrade]);
+  }, [calcBaseSalary, calcStdDays, calcActualDays, calcDependents, calcOtHours, calcNightHours, calcOtCategory]);
 
   return (
     <div className="space-y-6 pb-12">
@@ -170,14 +159,14 @@ export default function RegulationsPage() {
         />
         <NumberCard
           title="Tỷ lệ trích BHXH"
-          value="10.5% / 21.5%"
-          subtitle="NLĐ đóng 10.5% - Doanh nghiệp 21.5%"
+          value="10.5% / 23.5%*"
+          subtitle="NLĐ 10.5%; DN 21.5% BH bắt buộc + 2% KPCĐ*"
           icon={ShieldCheck}
         />
         <NumberCard
           title="Biểu thuế TNCN"
-          value="7 Bậc"
-          subtitle="Lũy tiến từ 5% đến tối đa 35%"
+          value="5 bậc (2026)"
+          subtitle="Năm 2025: 7 bậc; giảm trừ theo kỳ tính thuế"
           icon={Percent}
         />
         <NumberCard
@@ -300,9 +289,9 @@ export default function RegulationsPage() {
                     <tr className="bg-muted/30 font-semibold">
                       <td className="py-2.5 px-4 text-foreground">TỔNG CỘNG TRÍCH NỘP</td>
                       <td className="py-2.5 px-4 font-mono text-foreground">10.5% (Trừ lương)</td>
-                      <td className="py-2.5 px-4 font-mono text-foreground">21.5% (Chi phí DN)</td>
-                      <td className="py-2.5 px-4 font-mono text-foreground">32.0%</td>
-                      <td className="py-2.5 px-4 text-muted-foreground">Theo quy định hiện hành</td>
+                      <td className="py-2.5 px-4 font-mono text-foreground">21.5% BH + 2.0% KPCĐ</td>
+                      <td className="py-2.5 px-4 font-mono text-foreground">34.0%*</td>
+                      <td className="py-2.5 px-4 text-muted-foreground">*Căn cứ/trần khác nhau; tỷ lệ có thể đổi theo đối tượng</td>
                     </tr>
                   </tbody>
                 </table>
@@ -315,16 +304,16 @@ export default function RegulationsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold px-2 py-0.5 rounded bg-muted text-foreground font-mono">BẢNG 3</span>
-                    <CardTitle className="text-sm">Biểu thuế Thu nhập cá nhân (TNCN) 7 bậc lũy tiến từng phần</CardTitle>
+                    <CardTitle className="text-sm">Biểu thuế TNCN cư trú năm 2026 — 5 bậc</CardTitle>
                   </div>
                   <Badge variant="outline" className="text-xs">Điều 22 Luật Thuế TNCN</Badge>
                 </div>
               </CardHeader>
               <CardContent className="pt-0 p-0 overflow-x-auto">
                 <div className="p-3 bg-muted/10 border-b border-border/60 text-xs text-muted-foreground flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                  <span>Mức giảm trừ gia cảnh hiện hành:</span>
+                  <span>Kỳ tính thuế 2026 (kỳ 2025 tiếp tục dùng biểu 7 bậc và mức giảm trừ cũ):</span>
                   <span className="font-semibold text-foreground">
-                    Bản thân: 11.000.000 đ/tháng · Người phụ thuộc: 4.400.000 đ/người/tháng
+                    Bản thân: 15.500.000 đ/tháng · Người phụ thuộc: 6.200.000 đ/người/tháng
                   </span>
                 </div>
                 <table className="w-full text-xs">
@@ -354,41 +343,27 @@ export default function RegulationsPage() {
 
             {/* BẢNG 4 & BẢNG 5: THƯỞNG KPI VÀ LÀM THÊM GIỜ OT */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* BẢNG 4 */}
               <Card>
                 <CardHeader className="pb-3 border-b border-border">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-muted text-foreground font-mono">BẢNG 4</span>
-                      <CardTitle className="text-sm">Hệ số Thưởng Hiệu Suất trong Bảng lương</CardTitle>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-muted text-foreground font-mono">KPI</span>
+                      <CardTitle className="text-sm">Đánh giá hiệu suất và phát triển năng lực</CardTitle>
                     </div>
-                    <Badge variant="outline" className="text-xs">Quy chế tiền lương</Badge>
+                    <Badge variant="outline" className="text-xs">Quy tắc của hệ thống</Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0 p-0 overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead className="bg-muted/40 border-b border-border text-muted-foreground text-left">
-                      <tr>
-                        <th className="py-2.5 px-3 font-semibold">Xếp loại thi đua</th>
-                        <th className="py-2.5 px-3 font-semibold">Khung điểm</th>
-                        <th className="py-2.5 px-3 font-semibold">Hệ số thưởng</th>
-                        <th className="py-2.5 px-3 font-semibold">Xử lý lương</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/60">
-                      {KPI_BONUS_RATES.map((row) => (
-                        <tr key={row.grade} className="hover:bg-muted/20 transition-colors">
-                          <td className="py-2.5 px-3 font-medium text-foreground">{row.grade}</td>
-                          <td className="py-2.5 px-3 font-mono text-muted-foreground">{row.score}</td>
-                          <td className="py-2.5 px-3 font-mono font-semibold text-foreground">{row.bonus}</td>
-                          <td className="py-2.5 px-3 text-muted-foreground text-[11px]">{row.formula}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <div className="p-3 bg-muted/10 border-t border-border/60 text-2xs text-muted-foreground">
-                    ★ Kết quả xếp loại nhân sự được đồng bộ tự động từ <Link href="/performance-360" className="underline font-medium text-foreground">Phân hệ Đánh giá Hiệu suất 360°</Link>.
-                  </div>
+                <CardContent className="space-y-3 p-4 text-xs">
+                  {isEnterprise ? <>
+                    <p className="font-semibold text-foreground">Nhân viên: tự đánh giá 20% + đồng nghiệp 30% + quản lý 50%. Quản lý có cấp dưới: tự đánh giá 20% + đồng nghiệp 20% + cấp trên 50% + cấp dưới 10%.</p>
+                    <p className="text-muted-foreground">Tỷ trọng mục tiêu KPI cộng thành 100%. Ngưỡng nội bộ: Xuất sắc từ 90; Tốt từ 75; Đạt từ 50. Không áp dụng hạn ngạch xếp loại công vụ cho doanh nghiệp.</p>
+                    <p className="rounded-md border border-border bg-muted/30 p-3 text-muted-foreground">Điểm đánh giá chưa tự tạo thưởng, điều chỉnh lương hoặc kết nối P3. Đãi ngộ cần chính sách và quyết định riêng được duyệt.</p>
+                  </> : <>
+                    <p className="font-semibold text-foreground">Khung đánh giá: tiêu chí chung 30 điểm + kết quả thực hiện nhiệm vụ 70 điểm.</p>
+                    <p className="text-muted-foreground">Ngưỡng điểm tham chiếu: Hoàn thành xuất sắc từ 90; tốt từ 70; hoàn thành từ 50. Công chức theo NĐ 335/2025/NĐ-CP, viên chức theo NĐ 233/2026/NĐ-CP. Hạn ngạch 20% và trường hợp ngoại lệ đến 25% chỉ áp dụng khi đúng điều kiện/phạm vi khu vực công; HRMS đã có bước hiệu chuẩn và kiểm tra tỷ lệ, nhưng chưa tích hợp biểu mẫu pháp quy, chữ ký số và quy trình đầy đủ của từng cơ quan.</p>
+                    <p className="rounded-md border border-border bg-muted/30 p-3 text-muted-foreground">Chế độ nhà nước không dùng trọng số phản hồi 360 của doanh nghiệp. Kết quả xếp loại phải qua thẩm quyền và căn cứ áp dụng; không đồng bộ sang lương P3.</p>
+                  </>}
+                  <Link href="/performance-360" className="inline-flex font-medium text-primary underline">Mở phân hệ đánh giá</Link>
                 </CardContent>
               </Card>
 
@@ -425,7 +400,7 @@ export default function RegulationsPage() {
                     </tbody>
                   </table>
                   <div className="p-3 bg-muted/10 border-t border-border/60 text-2xs text-muted-foreground">
-                    ★ Tiền lương làm thêm giờ được miễn thuế TNCN đối với phần chênh lệch vượt quá 100% lương giờ bình thường.
+                    ★ Theo quy định thuế áp dụng cho kỳ tính thuế 2026, tiền lương làm việc ban đêm và làm thêm giờ thuộc khoản thu nhập được miễn thuế; hệ thống phải lưu tách riêng giờ/tiền đủ điều kiện để giải trình.
                   </div>
                 </CardContent>
               </Card>
@@ -448,7 +423,7 @@ export default function RegulationsPage() {
               </CardHeader>
               <CardContent className="pt-4 space-y-5">
                 {/* Form nhập tham số tính thử */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3">
                   <div>
                     <label className="text-xs text-muted-foreground font-medium block mb-1">Lương vị trí (đ)</label>
                     <Input
@@ -487,6 +462,16 @@ export default function RegulationsPage() {
                     />
                   </div>
                   <div>
+                    <label className="text-xs text-muted-foreground font-medium block mb-1">Loại ngày OT</label>
+                    <Select value={calcOtCategory} onChange={(e) => setCalcOtCategory(e.target.value as typeof calcOtCategory)} className="text-xs h-8">
+                      <option value="WEEKDAY">Ngày thường</option><option value="WEEKLY_REST">Ngày nghỉ tuần</option><option value="PUBLIC_HOLIDAY">Lễ, Tết</option>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground font-medium block mb-1">Giờ OT ban đêm</label>
+                    <Input type="number" min={0} max={calcOtHours} value={calcNightHours} onChange={(e) => setCalcNightHours(Number(e.target.value))} className="text-xs font-mono h-8" />
+                  </div>
+                  <div>
                     <label className="text-xs text-muted-foreground font-medium block mb-1">Người phụ thuộc</label>
                     <Input
                       type="number"
@@ -494,19 +479,6 @@ export default function RegulationsPage() {
                       onChange={(e) => setCalcDependents(Number(e.target.value))}
                       className="text-xs font-mono h-8"
                     />
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground font-medium block mb-1">Xếp loại hiệu suất</label>
-                    <Select
-                      value={calcKpiGrade}
-                      onChange={(e) => setCalcKpiGrade(e.target.value as any)}
-                      className="text-xs h-8"
-                    >
-                      <option value="A">Loại A (+15%)</option>
-                      <option value="B">Loại B (+10%)</option>
-                      <option value="C">Loại C (+5%)</option>
-                      <option value="D">Loại D (0%)</option>
-                    </Select>
                   </div>
                 </div>
 
@@ -519,7 +491,7 @@ export default function RegulationsPage() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                     <div className="p-2.5 rounded-md border border-border bg-card">
                       <span className="text-muted-foreground block text-[11px]">1. Lương ngày công</span>
                       <span className="font-semibold font-mono text-foreground block mt-0.5">
@@ -535,29 +507,20 @@ export default function RegulationsPage() {
                         +{simulation.otPay.toLocaleString('vi-VN')} đ
                       </span>
                       <span className="text-[10px] text-muted-foreground block">
-                        {calcOtHours} giờ × {simulation.hourlyWage.toLocaleString('vi-VN')}đ × 1.5
+                        {calcOtHours} giờ × {simulation.hourlyWage.toLocaleString('vi-VN')}đ × {calcOtCategory === 'PUBLIC_HOLIDAY' ? '3.0' : calcOtCategory === 'WEEKLY_REST' ? '2.0' : '1.5'}{calcNightHours > 0 ? ` (phụ trội đêm ${(simulation.otNightAdditional * 100).toFixed(0)}% × ${Math.min(calcNightHours, calcOtHours)}h)` : ''}
                       </span>
                     </div>
                     <div className="p-2.5 rounded-md border border-border bg-card">
-                      <span className="text-muted-foreground block text-[11px]">3. Thưởng hiệu suất</span>
-                      <span className="font-semibold font-mono text-foreground block mt-0.5">
-                        +{simulation.kpiBonus.toLocaleString('vi-VN')} đ
-                      </span>
-                      <span className="text-[10px] text-muted-foreground block">
-                        Xếp loại {calcKpiGrade} theo kết quả chu kỳ
-                      </span>
-                    </div>
-                    <div className="p-2.5 rounded-md border border-border bg-card">
-                      <span className="text-muted-foreground block text-[11px]">4. Khấu trừ bảo hiểm (10.5%)</span>
+                      <span className="text-muted-foreground block text-[11px]">3. BH bắt buộc NLĐ</span>
                       <span className="font-semibold font-mono text-muted-foreground block mt-0.5">
                         -{simulation.totalInsurance.toLocaleString('vi-VN')} đ
                       </span>
                       <span className="text-[10px] text-muted-foreground block">
-                        BHXH 8%, BHYT 1.5%, BHTN 1%
+                        BHXH 8%, BHYT 1.5%, BHTN 1% (căn cứ/trần có thể khác)
                       </span>
                     </div>
                     <div className="p-2.5 rounded-md border border-border bg-card">
-                      <span className="text-muted-foreground block text-[11px]">5. Thuế TNCN lũy tiến</span>
+                      <span className="text-muted-foreground block text-[11px]">4. Thuế TNCN lũy tiến</span>
                       <span className="font-semibold font-mono text-muted-foreground block mt-0.5">
                         -{simulation.pit.toLocaleString('vi-VN')} đ
                       </span>
@@ -567,6 +530,7 @@ export default function RegulationsPage() {
                     </div>
                   </div>
                 </div>
+                <p className="text-[11px] text-muted-foreground">Mô phỏng giả định người lao động cư trú, đủ điều kiện tham gia bảo hiểm, ở vùng I và được hưởng OT đã duyệt. Năm 2026 miễn thuế thu nhập làm ban đêm/làm thêm giờ; trần BHXH/BHYT lấy mức tham chiếu từ 01/07/2026, BHTN lấy trần vùng I. Chưa tính khoản giảm trừ y tế/giáo dục, khoản đãi ngộ phải có quyết định riêng, kinh phí công đoàn của doanh nghiệp hoặc các trường hợp thuế/bảo hiểm ngoại lệ. Kết quả chỉ minh họa, không thay thế bảng lương đã khóa theo hồ sơ và chính sách thực tế.</p>
               </CardContent>
             </Card>
           </div>
@@ -578,10 +542,12 @@ export default function RegulationsPage() {
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-foreground" />
-                <span className="font-semibold text-foreground text-sm">Phân hệ Đánh giá Hiệu suất & Năng lực 360°</span>
+                <span className="font-semibold text-foreground text-sm">{isEnterprise ? 'Đánh giá KPI và năng lực doanh nghiệp' : 'Đánh giá công chức, viên chức'}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Hệ thống chỉ tiêu công việc định lượng, khung năng lực hành vi 1-5 sao, khảo sát đa chiều 360 độ và 4 bộ biểu mẫu A4 chuẩn (Nghị định 90/2020/NĐ-CP) được quản lý tập trung tại phân hệ Đánh giá.
+                {isEnterprise
+                  ? 'KPI theo mục tiêu, phản hồi theo vai trò (20/30/50 hoặc 20/20/50/10) và phát triển năng lực. Không áp dụng hạn ngạch công vụ; điểm chưa tự kết nối P3 hoặc phát sinh khoản lương.'
+                  : `Khung tiêu chí chung 30% và kết quả nhiệm vụ 70%; căn cứ ${orgConfig.publicPersonnelType === 'PUBLIC_EMPLOYEE' ? 'Nghị định 233/2026/NĐ-CP' : 'Nghị định 335/2025/NĐ-CP'}. Có lưu kết luận và kiểm tra tỷ lệ khu vực công; biểu mẫu pháp quy, chữ ký số và quy trình phê duyệt đầy đủ theo cơ quan chưa tích hợp.`}
               </p>
             </div>
             <Link href="/performance-360">

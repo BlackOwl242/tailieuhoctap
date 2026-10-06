@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../../common/prisma.service';
+import { RuntimeSettingsService } from '../../common/services/runtime-settings.service';
 
 /**
  * Unit test UC01 — Đăng nhập:
@@ -31,6 +32,7 @@ describe('AuthService (login lockout per UC01)', () => {
         AuthService,
         { provide: PrismaService, useValue: prismaMock },
         { provide: JwtService, useValue: jwtMock },
+        { provide: RuntimeSettingsService, useValue: { get: async (_key: string, fallback: unknown) => fallback } },
       ],
     }).compile();
     service = moduleRef.get(AuthService);

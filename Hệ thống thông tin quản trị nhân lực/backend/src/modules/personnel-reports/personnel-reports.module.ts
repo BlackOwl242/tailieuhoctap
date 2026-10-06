@@ -1,9 +1,11 @@
+import { HrAccessService } from '../../common/services/hr-access.service';
 import {
   Controller, Get, Injectable, Module, NotFoundException, Param,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../../common/prisma.service';
-import { Roles } from '../../common/decorators';
+import { CurrentUser, Roles } from '../../common/decorators';
+import type { AuthUser } from '../../common/types/auth-user';
 
 @Injectable()
 export class PersonnelReportsService {
@@ -56,6 +58,8 @@ export class PersonnelReportsService {
       meta: {
         employeeCode: profile.user.employeeCode,
         fullName: profile.user.fullName,
+        email: profile.user.email,
+        phone: profile.user.phone,
         jobTitle: profile.user.jobTitle,
         orgUnitName: profile.user.orgUnit?.name,
         exportedAt: new Date().toISOString(),
@@ -306,34 +310,35 @@ export class PersonnelReportsService {
 @ApiBearerAuth()
 @Controller('personnel-reports')
 export class PersonnelReportsController {
-  constructor(private readonly service: PersonnelReportsService) {}
+  constructor(private readonly access: HrAccessService, private readonly service: PersonnelReportsService) {}
 
   @Get('2c-profile/:userId')
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
-  get2cProfile(@Param('userId') userId: string) {
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'USER', 'LINE_MANAGER', 'HR_TRAINER', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD', 'AUDITOR')
+  get2cProfile(@Param('userId') userId: string, @CurrentUser() actor: AuthUser) {
+    this.access.assertOwnOrHr(actor, userId);
     return this.service.get2cProfileData(userId);
   }
 
   @Get('bieu-01-age-rank')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   getAgeByRank() {
     return this.service.getAgeByRankReport();
   }
 
   @Get('bieu-02-languages')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   getLanguages() {
     return this.service.getLanguageReport();
   }
 
   @Get('bieu-03-education-unit')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   getEducationByUnit() {
     return this.service.getEducationByUnitReport();
   }
 
   @Get('bieu-03-education-org')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   getEducationByOrg() {
     return this.service.getEducationByUnitReport();
   }

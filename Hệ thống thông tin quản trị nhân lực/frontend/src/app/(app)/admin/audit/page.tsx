@@ -27,7 +27,7 @@ export default function AdminAuditPage() {
     { key: 'entityType', header: 'Đối tượng', sortable: true, render: (r) => (
       <span className="text-xs text-muted-foreground">{r.entityType}{r.entityId ? ` · ${r.entityId.slice(0, 8)}…` : ''}</span>
     ), exportValue: (r) => `${r.entityType} (${r.entityId ?? ''})` },
-    { key: 'ip', header: 'IP', render: (r) => r.ip ?? '—' },
+    { key: 'ip', header: 'IP', render: (r) => r.ip && !['-', '—', '–'].includes(r.ip.trim()) ? r.ip : 'Chưa cập nhật' },
   ];
 
   return (

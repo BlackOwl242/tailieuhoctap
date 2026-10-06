@@ -10,14 +10,34 @@ import { useAuthStore } from '@/lib/auth-store';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from '@/components/ui/primitives';
 import type { AuthUser } from '@/lib/types';
 
-// Tài khoản demo hiển thị ngay trên màn hình đăng nhập — Phân định rõ Ban Giám Đốc, Cổ đông ĐHCĐ và Quản trị Hệ thống CNTT
-const DEMO_ACCOUNTS = [
-  { label: 'Tổng Giám đốc (CEO - Ban Giám Đốc)', email: 'ceo@saigontechnology.vn', password: 'Admin@123' },
-  { label: 'Chủ tịch HĐQT / Cổ đông (ĐHCĐ)', email: 'chairman@saigontechnology.vn', password: 'Admin@123' },
-  { label: 'Quản trị viên Hệ thống CNTT (SysAdmin)', email: 'admin@demo.local', password: 'Admin@123' },
-  { label: 'Cán bộ Quản trị Nhân sự (HR C&B)', email: 'km.manager@demo.local', password: 'Manager@123' },
-  { label: 'Trưởng nhóm kỹ thuật (PM / Lead)', email: 'pm.java@demo.local', password: 'Pm@123456' },
-  { label: 'Kỹ sư Phần mềm (Cổng ESS)', email: 'dev.fresher@demo.local', password: 'Fresher@123' },
+// Tài khoản demo đại diện cho vai trò và cấp quản lý trong ma trận RBAC.
+const DEMO_ACCOUNT_GROUPS = [
+  {
+    label: 'Quản trị và lãnh đạo',
+    accounts: [
+      { label: 'Quản trị viên CNTT', email: 'admin@demo.local', password: 'Admin@123' },
+      { label: 'Tổng Giám đốc (Ban điều hành)', email: 'ceo@saigontechnology.vn', password: 'Admin@123' },
+      { label: 'Chủ tịch HĐQT / Cổ đông', email: 'chairman@saigontechnology.vn', password: 'Admin@123' },
+    ],
+  },
+  {
+    label: 'Quản lý trực tiếp và nhân sự',
+    accounts: [
+      { label: 'Trưởng nhóm kỹ thuật', email: 'pm.java@demo.local', password: 'Pm@123456' },
+      { label: 'Cán bộ Quản trị Nhân sự', email: 'km.manager@demo.local', password: 'Manager@123' },
+    ],
+  },
+  {
+    label: 'Vai trò nghiệp vụ và nhân viên',
+    accounts: [
+      { label: 'Chuyên viên C&B', email: 'cb.demo@demo.local', password: 'Cb@123456' },
+      { label: 'Kế toán doanh nghiệp', email: 'accountant.demo@demo.local', password: 'Acc@123456' },
+      { label: 'Chuyên viên Tuyển dụng', email: 'recruiter.demo@demo.local', password: 'Recruit@123' },
+      { label: 'Chuyên viên Đào tạo (L&D)', email: 'trainer.demo@demo.local', password: 'Trainer@123' },
+      { label: 'Kiểm toán nội bộ / Pháp chế', email: 'auditor.demo@demo.local', password: 'Audit@123' },
+      { label: 'Nhân viên (Cổng ESS)', email: 'dev.fresher@demo.local', password: 'Fresher@123' },
+    ],
+  },
 ];
 
 /** Chỉ nhận đường dẫn nội bộ — chống open-redirect. */
@@ -69,7 +89,7 @@ function LoginInner() {
     queryClient.clear();
   }
 
-  function quickFill(account: (typeof DEMO_ACCOUNTS)[number]) {
+  function quickFill(account: (typeof DEMO_ACCOUNT_GROUPS)[number]['accounts'][number]) {
     setEmail(account.email);
     setPassword(account.password);
     setError(null);
@@ -138,23 +158,28 @@ function LoginInner() {
         </Card>
 
         {/* Đăng nhập nhanh bằng tài khoản demo — chỉ phục vụ trình diễn */}
-        <div className="mt-5 space-y-2">
+        <div className="mt-5 space-y-4">
           <p className="text-center text-xs uppercase tracking-wide text-muted-foreground">
-            Tài khoản demo (bấm để điền sẵn)
+            Tài khoản demo theo vai trò (bấm để điền sẵn)
           </p>
-          <div className="grid grid-cols-2 gap-2">
-            {DEMO_ACCOUNTS.map((acc) => (
-              <button
-                key={acc.email}
-                type="button"
-                onClick={() => quickFill(acc)}
-                className="rounded-md border bg-card px-2 py-2 text-left text-xs hover:bg-accent"
-              >
-                <span className="block font-medium">{acc.label}</span>
-                <span className="block truncate text-muted-foreground">{acc.email}</span>
-              </button>
-            ))}
-          </div>
+          {DEMO_ACCOUNT_GROUPS.map((group) => (
+            <section key={group.label} className="space-y-2">
+              <h2 className="text-xs font-medium text-muted-foreground">{group.label}</h2>
+              <div className="grid grid-cols-2 gap-2">
+                {group.accounts.map((acc) => (
+                  <button
+                    key={acc.email}
+                    type="button"
+                    onClick={() => quickFill(acc)}
+                    className="rounded-md border bg-card px-2 py-2 text-left text-xs hover:bg-accent"
+                  >
+                    <span className="block font-medium">{acc.label}</span>
+                    <span className="block truncate text-muted-foreground">{acc.email}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
 
         {/* Mục 2 — mở màn hình điểm danh ngay từ trang đăng nhập (không cần đăng nhập) */}

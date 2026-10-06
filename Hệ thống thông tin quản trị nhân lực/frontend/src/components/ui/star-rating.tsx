@@ -35,7 +35,7 @@ export function StarRating({
         {[1, 2, 3, 4, 5].map((i) => (
           <Star key={i} className={cn(px, i <= (value ?? 0) ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/30')} />
         ))}
-        {showLabel ? <span className="text-xs text-muted-foreground">{RATING_LABELS[value ?? 0] ?? '—'}</span> : null}
+        {showLabel ? <span className="text-xs text-muted-foreground">{RATING_LABELS[value ?? 0] ?? 'Chưa cập nhật'}</span> : null}
       </span>
     );
   }

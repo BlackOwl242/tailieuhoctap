@@ -1,11 +1,12 @@
 /**
- * Quản lý Cấu hình Thông tin Cơ quan, Đơn vị & Tiêu đề Văn bản In ấn
- * Tuân thủ Nghị định 30/2020/NĐ-CP về công tác văn thư
+ * Quản lý tên tổ chức, địa danh và chữ ký hiển thị trên tài liệu nội bộ.
  */
 
 import { useState, useEffect } from 'react';
+import { api } from './api';
 
 export type OrgSectorType = 'state' | 'enterprise';
+export type PublicPersonnelType = 'CIVIL_SERVANT' | 'PUBLIC_EMPLOYEE';
 
 export interface OrgPrintConfig {
   parentOrgName: string; // Tên cơ quan, tổ chức cấp trên trực tiếp (VD: UBND TỈNH LÂM ĐỒNG, BỘ NỘI VỤ, TẬP ĐOÀN...)
@@ -13,6 +14,7 @@ export interface OrgPrintConfig {
   deptName: string;      // Tên phòng ban / bộ phận chuyên trách tham mưu nhân sự (VD: PHÒNG TỔ CHỨC - CÁN BỘ)
   orgLevel: string;      // Cấp quản lý: DV_TW | DV_TINH | DV_HUYEN | DV_XA | DV_SNCL | DV_DNTN
   orgSector?: OrgSectorType; // Phân hệ: 'state' (Cơ quan Nhà nước / Đơn vị SNCL) | 'enterprise' (Doanh nghiệp tư nhân)
+  publicPersonnelType?: PublicPersonnelType | null;
   location: string;      // Địa danh ban hành văn bản (VD: Hà Nội, TP. Hồ Chí Minh, Đà Nẵng, Lâm Đồng...)
   signerTitle1: string;  // Tiêu đề người ký 1 (mặc định: Người lập biểu)
   signerTitle2: string;  // Tiêu đề người ký 2 (mặc định: Trưởng phòng Tổ chức - Cán bộ)
@@ -33,7 +35,8 @@ export const DEFAULT_ORG_CONFIG: OrgPrintConfig = {
   orgName: 'CÔNG TY CỔ PHẦN SAIGON TECHNOLOGY',
   deptName: 'BAN TỔ CHỨC - HÀNH CHÍNH - NHÂN SỰ',
   orgLevel: 'DV_DNTN',
-  orgSector: 'state',
+  orgSector: 'enterprise',
+  publicPersonnelType: null,
   location: 'TP. Hồ Chí Minh',
   signerTitle1: 'Người lập biểu',
   signerTitle2: 'Trưởng phòng Nhân sự',
@@ -91,12 +94,23 @@ export function saveOrgConfig(config: OrgPrintConfig): void {
 /**
  * React hook tự động lắng nghe và cập nhật thông tin cơ quan in ấn
  */
-export function useOrgConfig(): [OrgPrintConfig, (cfg: OrgPrintConfig) => void] {
+export function useOrgConfig(): [OrgPrintConfig, (cfg: OrgPrintConfig) => Promise<void>] {
   const [config, setConfig] = useState<OrgPrintConfig>(DEFAULT_ORG_CONFIG);
 
   useEffect(() => {
-    // Đọc lần đầu sau khi mount
+    // Cache cục bộ chỉ là dữ liệu tạm; hồ sơ dùng chung trên máy chủ mới là cấu hình có thẩm quyền.
     setConfig(getOrgConfig());
+    let cancelled = false;
+    api.get<Record<string, unknown>>('/settings/effective').then(({ data }) => {
+      const serverProfile = data.ORG_PROFILE;
+      if (!cancelled && serverProfile && typeof serverProfile === 'object' && !Array.isArray(serverProfile)) {
+        const next = { ...DEFAULT_ORG_CONFIG, ...(serverProfile as Partial<OrgPrintConfig>) };
+        saveOrgConfig(next);
+        setConfig(next);
+      }
+    }).catch(() => {
+      // Dùng bản cache nếu máy chủ chưa có hồ sơ cấu hình.
+    });
 
     const handleUpdate = (e: Event) => {
       const customEvent = e as CustomEvent<OrgPrintConfig>;
@@ -110,14 +124,17 @@ export function useOrgConfig(): [OrgPrintConfig, (cfg: OrgPrintConfig) => void] 
     window.addEventListener(EVENT_NAME, handleUpdate);
     window.addEventListener('storage', handleUpdate);
     return () => {
+      cancelled = true;
       window.removeEventListener(EVENT_NAME, handleUpdate);
       window.removeEventListener('storage', handleUpdate);
     };
   }, []);
 
-  const update = (newConfig: OrgPrintConfig) => {
-    saveOrgConfig(newConfig);
-    setConfig(newConfig);
+  const update = async (newConfig: OrgPrintConfig) => {
+    const normalized = { ...DEFAULT_ORG_CONFIG, ...newConfig };
+    await api.patch('/admin/settings', { values: { ORG_PROFILE: normalized } });
+    saveOrgConfig(normalized);
+    setConfig(normalized);
   };
 
   return [config, update];

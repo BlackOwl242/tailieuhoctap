@@ -2,7 +2,7 @@ import {
   Body, Controller, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsDateString, IsOptional, IsString, MaxLength } from 'class-validator';
+import { ArrayMinSize, IsArray, IsBoolean, IsDateString, IsOptional, IsString, MaxLength } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { NotificationsService } from '../../common/services/notifications.service';
@@ -19,7 +19,7 @@ class CreatePathDto {
   @ApiPropertyOptional() @IsOptional() @IsString() description?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() targetJobTitle?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
-  @ApiProperty({ type: [String] }) @IsArray() @IsString({ each: true }) articleIds!: string[];
+  @ApiProperty({ type: [String] }) @IsArray() @ArrayMinSize(1) @IsString({ each: true }) articleIds!: string[];
 }
 
 class AssignPathDto {
@@ -87,11 +87,15 @@ export class OnboardingService {
   /** Giao lộ trình cho một nhân viên mới + gửi thông báo. */
   async assign(pathId: string, dto: AssignPathDto, actor: AuthUser, requestId?: string) {
     const path = await this.loadPath(pathId);
+    if (!path.items.length) throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Lộ trình hội nhập cần ít nhất một nội dung trước khi giao cho nhân viên');
     const assignment = await this.prisma.onboardingAssignment.upsert({
       where: { pathId_userId: { pathId, userId: dto.userId } },
       create: { pathId, userId: dto.userId, dueDate: dto.dueDate ? new Date(dto.dueDate) : null },
       update: { dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined },
     });
+    if (assignment.status === 'IN_PROGRESS') {
+      await this.prisma.hrmsLifecycleEvent.updateMany({ where: { userId: dto.userId, type: 'ONBOARDING', status: 'COMPLETED' }, data: { status: 'IN_PROGRESS' } });
+    }
     await this.notifications.notify({
       userIds: [dto.userId],
       type: 'ONBOARDING_ASSIGNED',
@@ -132,6 +136,8 @@ export class OnboardingService {
     if (!assignment || assignment.userId !== user.id) {
       throw new BusinessException(ErrorCodes.FORBIDDEN, 'Không phải lộ trình của bạn', HttpStatus.FORBIDDEN);
     }
+    const pathItem = await this.prisma.onboardingPathItem.findFirst({ where: { id: itemId, pathId: assignment.pathId } });
+    if (!pathItem) throw new NotFoundException('Mục đọc không thuộc lộ trình');
     await this.prisma.onboardingItemProgress.upsert({
       where: { assignmentId_itemId: { assignmentId, itemId } },
       create: { assignmentId, itemId },
@@ -143,6 +149,13 @@ export class OnboardingService {
     if (pathItems.length > 0 && done >= pathItems.length) {
       await this.prisma.onboardingAssignment.update({ where: { id: assignmentId }, data: { status: 'COMPLETED' } });
     }
+    const [pendingAssignments, pendingSetupTasks] = await Promise.all([
+      this.prisma.onboardingAssignment.count({ where: { userId: user.id, status: 'IN_PROGRESS' } }),
+      this.prisma.hrmsOnboardingTask.count({ where: { userId: user.id, isCompleted: false } }),
+    ]);
+    if (!pendingAssignments && !pendingSetupTasks) {
+      await this.prisma.hrmsLifecycleEvent.updateMany({ where: { userId: user.id, type: 'ONBOARDING', status: 'IN_PROGRESS' }, data: { status: 'COMPLETED' } });
+    }
     return { success: true };
   }
 
@@ -152,7 +165,7 @@ export class OnboardingService {
     const roles = await this.globalRoles(user.id);
     const privileged = roles.includes('ADMIN') || roles.includes('KM_MANAGER');
     const rows = await this.prisma.handoverChecklist.findMany({
-      where: privileged ? {} : { ownerUserId: user.id },
+      where: privileged ? {} : { OR: [{ ownerUserId: user.id }, { items: { some: { responsibleRole: { in: roles } } } }] },
       include: {
         owner: { select: { id: true, fullName: true, email: true, jobTitle: true } },
         items: true,
@@ -199,11 +212,15 @@ export class OnboardingService {
     const item = await this.prisma.handoverItem.findFirst({ where: { id: itemId, checklistId: handoverId } });
     if (!item) throw new NotFoundException('Không tìm thấy mục chuyển giao');
     const roles = await this.globalRoles(user.id);
-    const privileged = roles.includes('ADMIN') || roles.includes('KM_MANAGER');
+    const privileged = roles.includes('ADMIN') || roles.includes('KM_MANAGER') || Boolean(item.responsibleRole && roles.includes(item.responsibleRole));
     const checklist = await this.prisma.handoverChecklist.findUnique({ where: { id: handoverId } });
     if (!privileged && checklist?.ownerUserId !== user.id && item.assigneeId !== user.id) {
       throw new BusinessException(ErrorCodes.FORBIDDEN, 'Không có quyền cập nhật mục này', HttpStatus.FORBIDDEN);
     }
+    if (item.responsibleRole && !roles.includes('ADMIN') && !roles.includes(item.responsibleRole)) throw new BusinessException(ErrorCodes.FORBIDDEN, 'Mục bàn giao phải do bộ phận phụ trách xác nhận', HttpStatus.FORBIDDEN);
+    if (item.responsibleRole && checklist?.ownerUserId === user.id) throw new BusinessException(ErrorCodes.FORBIDDEN, 'Không được tự xác nhận bàn giao của mình', HttpStatus.FORBIDDEN);
+    if (checklist?.status === 'CLOSED') throw new BusinessException(ErrorCodes.CONFLICT, 'Checklist đã đóng', HttpStatus.CONFLICT);
+    if (item.responsibleRole === 'LINE_MANAGER' && !roles.includes('ADMIN')) { const [manager,owner] = await Promise.all([this.prisma.user.findUniqueOrThrow({where:{id:user.id}}),this.prisma.user.findUniqueOrThrow({where:{id:checklist!.ownerUserId}})]); if (!manager.orgUnitId || manager.orgUnitId !== owner.orgUnitId) throw new BusinessException(ErrorCodes.FORBIDDEN,'Chỉ quản lý cùng đơn vị được xác nhận bàn giao',HttpStatus.FORBIDDEN); }
     const done = dto.done ?? true;
 
     // Ràng buộc UC17: Nếu là mục Thu hồi tài sản, kiểm tra xem nhân viên còn tài sản chưa trả không
@@ -236,6 +253,10 @@ export class OnboardingService {
     if (pending > 0) {
       throw new BusinessException(ErrorCodes.HANDOVER_NOT_CLOSABLE, `Còn ${pending} mục chưa hoàn thành`, HttpStatus.CONFLICT);
     }
+    const checklist = await this.prisma.handoverChecklist.findUniqueOrThrow({ where: { id } });
+    const debts = await this.prisma.hrmsEmployeeLoan.count({ where: { userId: checklist.ownerUserId, status: 'APPROVED', remainingAmount: { gt: 0 } } });
+    const assets = await this.prisma.hrmsAssetAllocation.count({ where: { assignedUserId: checklist.ownerUserId, status: 'ALLOCATED' } });
+    if (debts || assets) throw new BusinessException(ErrorCodes.HANDOVER_NOT_CLOSABLE, 'Cần thu hồi tài sản và tất toán khoản vay trước khi đóng bàn giao', HttpStatus.CONFLICT);
     await this.prisma.handoverChecklist.update({ where: { id }, data: { status: 'CLOSED', closedAt: new Date() } });
     await this.audit.log({ actorId: actor.id, action: 'HANDOVER_CLOSED', entityType: 'HandoverChecklist', entityId: id, requestId });
     return { success: true };
@@ -246,7 +267,7 @@ export class OnboardingService {
   }
 
   private loadPath(id: string) {
-    return this.prisma.onboardingPath.findUnique({ where: { id } })
+    return this.prisma.onboardingPath.findUnique({ where: { id }, include: { items: { select: { id: true } } } })
       .then((p) => { if (!p) throw new NotFoundException('Không tìm thấy lộ trình'); return p; });
   }
 }

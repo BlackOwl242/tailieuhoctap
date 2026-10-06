@@ -116,7 +116,7 @@ export default function AdminUsersPage() {
         <span className="block text-xs text-muted-foreground">{u.email}{u.jobTitle ? ` · ${u.jobTitle}` : ''}</span>
       </span>
     ) },
-    { key: 'orgUnit', header: 'Đơn vị', sortable: true, sortValue: (u) => u.orgUnit?.name ?? '', render: (u) => u.orgUnit?.name ?? '—' },
+    { key: 'orgUnit', header: 'Đơn vị', sortable: true, sortValue: (u) => u.orgUnit?.name ?? '', render: (u) => u.orgUnit?.name ?? 'Chưa cập nhật' },
     { key: 'roles', header: 'Vai trò', render: (u) => (
       <span className="text-xs text-muted-foreground">
         {u.roles.map((r) => ROLE_LABEL[r] ?? r).join(', ')}

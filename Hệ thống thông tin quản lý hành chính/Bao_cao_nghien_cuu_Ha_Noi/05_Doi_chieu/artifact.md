@@ -50,3 +50,26 @@ Bản cuối sau gộp đã cập nhật trường trong Word và kết xuất 2
 Đã đọc cấu trúc của hai tài liệu tham chiếu và đặt tên chương theo nhiệm vụ chính của nội dung, giữ cách gộp thành bốn chương. Tên mới: Tổng quan về hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội; Phân tích hệ thống; Thiết kế hệ thống; Đề xuất triển khai và quản trị hệ thống.
 Đã cập nhật mục lục. Giữ nguyên toàn bộ nội dung ngoài bốn tên chương, 98 bảng và hình ảnh. Báo cáo vẫn có 204 trang. Năm kiểm tra bảo toàn nội dung và 29 kiểm tra định dạng đều đạt. Đã xem 32 trang có thay đổi; 172 trang còn lại trùng khớp từng điểm ảnh với bản đã kiểm tra đầy đủ trước đó.
 SHA256: 134f3ff1a0b0b668e9afea0e7c374346c93a481dd7669162a07014d02e04931d
+
+## Bỏ phụ lục ngày 03/10/2026
+Đã bỏ phần phụ lục Tệp bàn giao và nội dung còn thiếu, bảng A.1 và các dòng danh mục tương ứng. Giữ nguyên nội dung các chương và tài liệu tham khảo, chỉ sửa một đường dẫn tới báo cáo đã ngừng dùng. Báo cáo còn 203 trang, 160 hình, 97 bảng. Bốn kiểm tra bảo toàn và 29 kiểm tra định dạng đều đạt. Đã xem 48 trang thay đổi và trang cuối; 155 trang trùng khớp với bản đã kiểm tra. Biểu đồ lớp hiện có sơ đồ cốt lõi và 10 hình theo nhóm; chưa có biểu đồ lớp tổng hoặc ERD tổng. SHA256: 7eb58838ade5d45b5dac0a68409f52938388ea627dc8a37ba52aeb85f30769c0
+
+## Bổ sung hai sơ đồ tổng và căn danh mục ngày 03/10/2026
+Biểu đồ lớp và ERD đều có đủ 35 nút, 62 quan hệ; các trường tham chiếu và tính bắt buộc khớp đặc tả. Đã giữ nguyên 97 bảng, các đoạn nội dung cũ và nội dung ảnh cũ. Word tự đổi tên 12 phần ảnh; đối chiếu bằng hàm băm xác nhận không thay đổi nội dung ảnh. Đã xem 80 trang thay đổi qua 20 bảng ảnh và hai trang sơ đồ lớn; 125 trang còn lại trùng khớp từng điểm ảnh với bản đã kiểm tra. Báo cáo 205 trang, 162 hình. Danh mục bảng và hình dùng tab phải 9072, lề trái 0, dấu chấm dẫn, chữ đen và không gạch chân. Hai trang 166 và 167 dùng khổ 420 x 550 mm để đọc sơ đồ tổng; các phần nội dung giữ khổ A4. Ảnh kiểm tra và bản sao đều đặt trong thư mục tạm ngoài kho tài liệu. SHA256: fa0c48ee64c21c4f350ad1e3158f60ab321bfba65e737cfa8ef9af767bef3695
+
+
+## Sửa bố cục biểu đồ ngày 03/10/2026
+
+Thay hai sơ đồ khổ lớn bằng các hình phân nhóm và liên kết nối tiếp trong mục 3.2. Bản hiện hành có 232 trang A4, 188 hình có chú thích và 97 bảng. Mô hình lớp giữ 35 lớp và 62 quan hệ; ERD giữ 35 bảng và 62 khóa ngoại. Các đối tượng lặp tên trong từng liên kết chỉ cùng một đối tượng, không phát sinh lớp hoặc bảng.
+
+Đã xuất lại bằng Word, kết xuất toàn bộ 232 trang và rà các trang đối chiếu; mở riêng trang hình phân nhóm, quan hệ lớp và ERD để kiểm tra chữ, đường nối, chú thích và lề. Đối chiếu khóa ngoại, bảng đích và khả năng để trống với từ điển dữ liệu đạt ở 62 liên kết. Hai phân đoạn đều A4; 28 hình thay thế nằm trong lề; nội dung 97 bảng và toàn bộ ảnh gốc được giữ; các thành phần kiểu chữ, đầu trang và chân trang trùng bản gốc. Mục lục và danh mục đã cập nhật số trang. Ảnh kiểm tra, bản sao trước sửa và bản xuất PDF chỉ lưu ngoài kho tài liệu.
+
+## Hoàn thiện phần mở đầu và sơ đồ ngày 04/10/2026
+
+Theo yêu cầu mới nhất, giữ nguyên bốn tên chương và nội dung phân tích, thiết kế, triển khai, kiểm thử, vận hành và quản trị. Bổ sung phần mở đầu riêng gồm sáu mục. Bỏ 36 hình màn hình đề xuất cùng chú thích và các dẫn chiếu MH không còn sử dụng; giữ các ảnh khảo sát hệ thống thực tế. Nội dung 97 bảng được đối chiếu với bản trước sửa, chỉ bỏ tiền tố dẫn chiếu màn hình trong ô Truy vết và dòng viết tắt MH.
+
+Thay 28 hình phân nhóm và liên kết rời bằng 34 sơ đồ có đường quan hệ: 17 phần biểu đồ lớp và 17 phần ERD, mỗi mô hình bao phủ 35 đối tượng và 62 quan hệ. Biểu đồ lớp có ngăn tên, thuộc tính, phương thức và số lượng liên kết; ERD có thực thể, khóa chính, khóa ngoại, hình thoi quan hệ và số lượng liên kết. Các đối tượng tham chiếu sang phần khác có chỉ dẫn ngay dưới hình. Toàn bộ sơ đồ đặt trong khổ A4, không dùng trang khổ lớn.
+
+Bản cuối được Word cập nhật trường và kết xuất thành 235 trang A4. Đã kết xuất đủ 235 ảnh trang, rà toàn bộ qua 20 bảng ảnh và mở riêng 34 trang sơ đồ mới cùng các trang mở đầu, danh mục để kiểm tra. Không có trang trắng. Đối chiếu đủ 254 mục danh mục bảng và hình với vị trí chú thích trong bản xuất PDF: số trang đều khớp. Danh mục dùng tab phải 9072 twip, dấu dẫn chấm, lề trái 0; giữ nguyên các thành phần kiểu, đầu trang và chân trang của bản trước sửa. Tài liệu tham chiếu không thay đổi. Các ảnh kiểm tra, PDF và bản sao chỉ lưu trong thư mục tạm ngoài kho tài liệu.
+
+SHA256 bản cuối: 6a38ec21943bd6905ee58e39aca4964fa92b5e25f7d7abd75a5332de858e252e.

@@ -1,8 +1,9 @@
+import { BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
 import {
   Body, Controller, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { IsEmail, IsEnum, IsInt, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { CurrentUser, Roles } from '../../common/decorators';
@@ -14,6 +15,8 @@ import type { AuthUser } from '../../common/types/auth-user';
 // ---------------------------------------------------------------------------
 
 class CreateRequisitionDto {
+  @ApiProperty() @IsNumber() @Min(1) budgetMonthly!: number;
+  @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
   @ApiProperty() @IsString() @MaxLength(160) title!: string;
   @ApiProperty() @IsString() @MaxLength(120) position!: string;
   @ApiProperty() @IsInt() @Min(1) headcount!: number;
@@ -77,11 +80,12 @@ export class RecruitmentService {
   async decideRequisition(id: string, approve: boolean, actor: AuthUser, note?: string, requestId?: string) {
     const requisition = await this.prisma.jobRequisition.findUnique({ where: { id } });
     if (!requisition) throw new NotFoundException('Không tìm thấy phiếu đề xuất tuyển dụng');
-    if (requisition.status !== 'PENDING_REVIEW') {
+    if (requisition.status !== (approve ? 'REVIEWED' : 'PENDING_REVIEW') && !( !approve && requisition.status === 'REVIEWED')) {
       throw new BusinessException(ErrorCodes.INVALID_STATE_TRANSITION, 'Phiếu đã được xử lý', HttpStatus.CONFLICT);
     }
+    if (actor.id === requisition.requestedById || actor.id === requisition.hrAssessedBy || actor.id === requisition.financeAssessedBy) throw new ForbiddenException('Người đề nghị/thẩm định không được tự phê duyệt chỉ tiêu');
     const updated = await this.prisma.jobRequisition.update({
-      where: { id },
+      where: { id, status: requisition.status },
       data: {
         status: approve ? 'APPROVED' : 'REJECTED',
         decidedById: actor.id,
@@ -96,13 +100,36 @@ export class RecruitmentService {
     return updated;
   }
 
+  async assess(id: string, kind: 'HR' | 'FINANCE', note: string, actor: AuthUser) {
+    const roles = kind === 'HR' ? ['ADMIN', 'KM_MANAGER', 'HR_RECRUITER'] : ['ADMIN', 'ACCOUNTANT'];
+    if (!roles.some(role => actor.roles.includes(role)) || !['HR','FINANCE'].includes(kind)) throw new ForbiddenException('Không có quyền thẩm định bước này');
+    return this.prisma.$transaction(async tx => {
+      const request = await tx.jobRequisition.findUniqueOrThrow({ where: { id } });
+      if (request.status !== 'PENDING_REVIEW' || request.budgetMonthly <= 0) throw new ConflictException('Phiếu phải chờ thẩm định và có ngân sách dương');
+      if (actor.id === request.requestedById) throw new ForbiddenException('Không được tự thẩm định');
+      const hrAssessedBy = kind === 'HR' ? actor.id : request.hrAssessedBy;
+      const financeAssessedBy = kind === 'FINANCE' ? actor.id : request.financeAssessedBy;
+      if (hrAssessedBy && financeAssessedBy && hrAssessedBy === financeAssessedBy) throw new ForbiddenException('Thẩm định HR và tài chính phải do hai người khác nhau');
+      await tx.auditLog.create({ data: { actorId: actor.id, action: `REQUISITION_ASSESSED_${kind}`, entityType: 'JobRequisition', entityId: id } });
+      return tx.jobRequisition.update({ where: { id }, data: { hrAssessedBy, financeAssessedBy, assessmentNote: note, status: hrAssessedBy && financeAssessedBy ? 'REVIEWED' : 'PENDING_REVIEW' } });
+    }, { isolationLevel: 'Serializable' });
+  }
+
   async closeRequisition(id: string, actor: AuthUser, requestId?: string) {
-    const requisition = await this.prisma.jobRequisition.findUnique({ where: { id } });
-    if (!requisition) throw new NotFoundException('Không tìm thấy phiếu đề xuất tuyển dụng');
-    const updated = await this.prisma.jobRequisition.update({
-      where: { id },
-      data: { status: 'CLOSED' },
-    });
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const requisition = await tx.jobRequisition.findUnique({ where: { id } });
+      if (!requisition) throw new NotFoundException('Không tìm thấy phiếu đề xuất tuyển dụng');
+      if (requisition.status === 'CLOSED') return requisition;
+      const opening = await tx.hrmsJobOpening.findUnique({ where: { requisitionId: id } });
+      if (opening) {
+        const activeApplicants = await tx.hrmsJobApplicant.count({ where: { jobOpeningId: opening.id, stage: { notIn: ['HIRED', 'REJECTED'] } } });
+        if (activeApplicants > 0) throw new ConflictException('Cần hoàn tất hoặc từ chối các ứng viên/offer đang xử lý trước khi đóng phiếu tuyển');
+        await tx.hrmsJobOpening.updateMany({ where: { id: opening.id, status: { in: ['DRAFT', 'OPEN', 'IN_PROGRESS'] } }, data: { status: 'CLOSED' } });
+      }
+      const changed = await tx.jobRequisition.updateMany({ where: { id, status: requisition.status }, data: { status: 'CLOSED' } });
+      if (changed.count !== 1) throw new ConflictException('Phiếu tuyển vừa được cập nhật; hãy tải lại rồi thử lại');
+      return tx.jobRequisition.findUniqueOrThrow({ where: { id } });
+    }, { isolationLevel: 'Serializable' });
     await this.audit.log({
       actorId: actor.id, action: 'REQUISITION_CLOSED', entityType: 'JobRequisition', entityId: id, requestId,
     });
@@ -132,6 +159,7 @@ export class RecruitmentService {
 
   /** Chuyển stage ống dẫn ứng viên (UC07) — HIRED là trạng thái kết thúc. */
   async updateCandidate(id: string, dto: UpdateCandidateDto, actor: AuthUser, requestId?: string) {
+    if (dto.stage && ['OFFER','HIRED'].includes(dto.stage)) throw new ConflictException('Offer/nhận việc thực hiện ở Tuyển dụng ATS thống nhất');
     const candidate = await this.prisma.candidate.findUnique({ where: { id } });
     if (!candidate) throw new NotFoundException('Không tìm thấy ứng viên');
     if (candidate.stage === 'HIRED' || candidate.stage === 'REJECTED') {
@@ -161,6 +189,7 @@ export class RecruitmentService {
 @ApiTags('recruitment')
 @ApiBearerAuth()
 @Controller('recruitment')
+@Roles('ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER')
 export class RecruitmentController {
   constructor(private readonly service: RecruitmentService) {}
 
@@ -174,13 +203,16 @@ export class RecruitmentController {
     return this.service.createRequisition(dto, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Post('requisitions/:id/assess')
+  assess(@Param('id') id: string, @Body() body: { kind: 'HR' | 'FINANCE'; note: string }, @CurrentUser() actor: AuthUser) { return this.service.assess(id, body.kind, body.note, actor); }
+
+  @Roles('ADMIN', 'BOD')
   @Post('requisitions/:id/approve')
   approveRequisition(@Param('id') id: string, @Body() dto: DecideRequisitionDto, @CurrentUser() user: AuthUser) {
     return this.service.decideRequisition(id, true, user, dto.note);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'BOD')
   @Post('requisitions/:id/reject')
   rejectRequisition(@Param('id') id: string, @Body() dto: DecideRequisitionDto, @CurrentUser() user: AuthUser) {
     return this.service.decideRequisition(id, false, user, dto.note);
@@ -192,6 +224,7 @@ export class RecruitmentController {
     return this.service.closeRequisition(id, user);
   }
 
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
   @Get('candidates')
   candidates() {
     return this.service.candidates();
@@ -199,12 +232,14 @@ export class RecruitmentController {
 
   /** Mục 5 — siết quyền: chỉ HR/quản lý mới được thêm ứng viên và chuyển stage. */
   @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
   @Post('candidates')
   createCandidate(@Body() dto: CreateCandidateDto, @CurrentUser() user: AuthUser) {
     return this.service.createCandidate(dto, user);
   }
 
   @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
   @Patch('candidates/:id')
   updateCandidate(@Param('id') id: string, @Body() dto: UpdateCandidateDto, @CurrentUser() user: AuthUser) {
     return this.service.updateCandidate(id, dto, user);

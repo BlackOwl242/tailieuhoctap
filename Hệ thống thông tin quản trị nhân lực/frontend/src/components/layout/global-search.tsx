@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
  * - Điều hướng bàn phím: ↑/↓ di chuyển, Enter mở, Esc đóng.
  */
 interface SearchHit {
-  group: 'Nhân viên' | 'Tài liệu';
+  group: 'Nhân viên' | 'Tài liệu' | 'Tri thức';
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   subtitle: string;
@@ -42,9 +42,10 @@ export function GlobalSearch() {
     setLoading(true);
     const t = setTimeout(async () => {
       try {
-        const [emps, docs] = await Promise.all([
+        const [emps, docs, articles] = await Promise.all([
           api.get<Array<{ id: string; fullName: string; employeeCode: string | null; jobTitle: string | null }>>('/employees').then((r) => r.data).catch(() => []),
-          api.get<Array<{ id: string; title: string; processArea: string | null }>>('/documents').then((r) => r.data).catch(() => []),
+          api.get<Array<{ id: string; title: string; processArea: string | null }>>('/documents', { params: { q } }).then((r) => r.data).catch(() => []),
+          api.get('/search', { params: { q, limit: 5 } }).then(r => r.data.items ?? []).catch(() => []),
         ]);
         const ql = q.toLowerCase();
         const out: SearchHit[] = [];
@@ -56,10 +57,9 @@ export function GlobalSearch() {
         }
         for (const d of docs) {
           if (out.filter((h) => h.group === 'Tài liệu').length >= 5) break;
-          if (`${d.title} ${d.processArea ?? ''}`.toLowerCase().includes(ql)) {
-            out.push({ group: 'Tài liệu', icon: FolderOpen, title: d.title, subtitle: d.processArea ?? 'Tài liệu nội bộ', href: '/documents' });
-          }
+          out.push({ group: 'Tài liệu', icon: FolderOpen, title: d.title, subtitle: d.processArea ?? 'Tài liệu nội bộ', href: `/documents?document=${d.id}` });
         }
+        for (const a of articles) out.push({ group: 'Tri thức', icon: FileText, title: a.title, subtitle: a.space?.name ?? '', href: `/knowledge?article=${a.id}` });
         setHits(out);
         setActive(0);
         setOpen(true);

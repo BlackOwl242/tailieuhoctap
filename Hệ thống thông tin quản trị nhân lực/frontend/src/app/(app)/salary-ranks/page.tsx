@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Layers, Search, Eye, TrendingUp, CheckCircle2, ShieldAlert, Building2,
-  Briefcase, RefreshCw, AlertTriangle, ArrowUpRight, Award, Calendar,
+  Layers, Search, Eye, TrendingUp, CheckCircle2, ShieldAlert,
+  RefreshCw, AlertTriangle, ArrowUpRight, Award, Calendar,
   Clock, User, Check, X,
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
@@ -63,76 +63,10 @@ interface ProgressionItem {
   suggestedOverGradePercent: number;
 }
 
-const ENTERPRISE_SALARY_BANDS: EnterpriseSalaryBand[] = [
-  {
-    bandCode: 'BAND-1',
-    bandName: 'Bậc 1: Tập sự & Thực tập',
-    levelTitle: 'Intern / Fresher / Trainee',
-    minSalary: 6000000,
-    midSalary: 8500000,
-    maxSalary: 11000000,
-    reviewCycleMonths: 6,
-    roles: 'Thực tập sinh, Nhân viên thử việc, Kỹ sư mới tốt nghiệp',
-    criteria: 'Hoàn thành thời gian thử việc, nắm vững quy trình cơ bản',
-  },
-  {
-    bandCode: 'BAND-2',
-    bandName: 'Bậc 2: Chuyên viên / Kỹ sư',
-    levelTitle: 'Junior / Associate',
-    minSalary: 12000000,
-    midSalary: 17000000,
-    maxSalary: 22000000,
-    reviewCycleMonths: 12,
-    roles: 'Chuyên viên Nhân sự, Kỹ sư Phần mềm, Kế toán viên, Chuyên viên Kinh doanh',
-    criteria: 'Độc lập xử lý công việc chuyên môn, đạt KPI định kỳ',
-  },
-  {
-    bandCode: 'BAND-3',
-    bandName: 'Bậc 3: Chuyên viên chính',
-    levelTitle: 'Senior Professional / Specialist',
-    minSalary: 24000000,
-    midSalary: 32000000,
-    maxSalary: 40000000,
-    reviewCycleMonths: 12,
-    roles: 'Senior Developer, Chuyên viên C&B Cao cấp, Kế toán tổng hợp, Key Account Manager',
-    criteria: 'Giải quyết bài toán phức tạp, cố vấn chuyên môn cho cấp dưới',
-  },
-  {
-    bandCode: 'BAND-4',
-    bandName: 'Bậc 4: Trưởng nhóm chuyên môn',
-    levelTitle: 'Lead / Principal / Assistant Manager',
-    minSalary: 42000000,
-    midSalary: 52000000,
-    maxSalary: 62000000,
-    reviewCycleMonths: 12,
-    roles: 'Tech Lead, Team Leader Tuyển dụng, Trưởng nhóm Kiểm soát Tài chính, Scrum Master',
-    criteria: 'Lãnh đạo nhóm từ 5-15 nhân sự, chịu trách nhiệm KPI đầu ra của đội ngũ',
-  },
-  {
-    bandCode: 'BAND-5',
-    bandName: 'Bậc 5: Trưởng phòng / Quản lý cấp trung',
-    levelTitle: 'Department Head / Manager',
-    minSalary: 65000000,
-    midSalary: 80000000,
-    maxSalary: 95000000,
-    reviewCycleMonths: 12,
-    roles: 'Trưởng phòng Nhân sự, Giám đốc Dự án (PMO), Trưởng phòng Kinh doanh, Kế toán trưởng',
-    criteria: 'Quản trị ngân sách phòng ban, hoạch định chiến lược chức năng, quản trị rủi ro',
-  },
-  {
-    bandCode: 'BAND-6',
-    bandName: 'Bậc 6: Giám đốc Khối & Điều hành',
-    levelTitle: 'Director / C-Level Executive',
-    minSalary: 100000000,
-    midSalary: 135000000,
-    maxSalary: 180000000,
-    reviewCycleMonths: 12,
-    roles: 'Giám đốc Khối Kỹ thuật (VP Delivery), Giám đốc Tài chính (CFO), Giám đốc Nhân sự (CHRO)',
-    criteria: 'Chịu trách nhiệm P&L toàn khối, định hướng chiến lược doanh nghiệp',
-  },
-];
+const ENTERPRISE_SALARY_BANDS: EnterpriseSalaryBand[] = [];
 
 export default function SalaryRanksPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') === 'progression' ? 'progression' : 'ranks';
   const [mainTab, setMainTab] = useState<'ranks' | 'progression'>(initialTab);
@@ -140,9 +74,15 @@ export default function SalaryRanksPage() {
   const queryClient = useQueryClient();
   const toast = useToast();
   const [orgConfig] = useOrgConfig();
-  const [viewMode, setViewMode] = useState<'state' | 'enterprise'>(() => {
-    return isEnterpriseSector(orgConfig) ? 'enterprise' : 'state';
-  });
+  const viewMode = isEnterpriseSector(orgConfig) ? 'enterprise' : 'state';
+  const canReviewPublicProgression = viewMode === 'state' && orgConfig.publicPersonnelType !== 'PUBLIC_EMPLOYEE';
+  useEffect(() => {
+    if (!canReviewPublicProgression && mainTab === 'progression') setMainTab('ranks');
+  }, [canReviewPublicProgression, mainTab]);
+
+  useEffect(() => {
+    if (viewMode === 'enterprise') router.replace('/salary-bands');
+  }, [viewMode, router]);
 
   const [selectedRank, setSelectedRank] = useState<PersonnelRankRow | null>(null);
   const [selectedBand, setSelectedBand] = useState<EnterpriseSalaryBand | null>(null);
@@ -154,7 +94,7 @@ export default function SalaryRanksPage() {
   const qRanks = useQuery({
     queryKey: ['personnel-ranks'],
     queryFn: async () => (await api.get<PersonnelRankRow[]>('/personnel-ranks')).data,
-    enabled: mainTab === 'ranks',
+    enabled: mainTab === 'ranks' && viewMode === 'state',
   });
 
   const qScan = useQuery({
@@ -163,7 +103,7 @@ export default function SalaryRanksPage() {
       const res = await api.get('/personnel-ranks/progression/scan');
       return res.data;
     },
-    enabled: mainTab === 'progression',
+    enabled: mainTab === 'progression' && canReviewPublicProgression,
   });
 
   const applyMutation = useMutation({
@@ -175,7 +115,7 @@ export default function SalaryRanksPage() {
       queryClient.invalidateQueries({ queryKey: ['personnel-profiles'] });
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       setSelectedPerson(null);
-      toast('Đã phê duyệt nâng bậc lương thành công!', 'success');
+      toast('Đã gửi đề xuất nâng bậc; Ban Giám đốc duyệt tại Biến động nhân sự.', 'success');
     },
     onError: (err) => {
       toast('Lỗi phê duyệt: ' + errorMessage(err), 'error');
@@ -245,10 +185,10 @@ export default function SalaryRanksPage() {
       header: 'Dải hệ số (Khởi điểm - Trần)',
       render: (r) => (
         <div className="text-xs font-mono">
-          <span className="text-muted-foreground">{r.coefficients[0]?.toFixed(2) || '—'}</span>
+          <span className="text-muted-foreground">{r.coefficients[0]?.toFixed(2) || 'Chưa cập nhật'}</span>
           <span className="text-muted-foreground/60 mx-1.5">➔</span>
           <span className="font-semibold text-emerald-700">
-            {r.coefficients[r.coefficients.length - 1]?.toFixed(2) || '—'}
+            {r.coefficients[r.coefficients.length - 1]?.toFixed(2) || 'Chưa cập nhật'}
           </span>
         </div>
       ),
@@ -337,7 +277,7 @@ export default function SalaryRanksPage() {
       sortable: true,
       render: (r) => (
         <span className="font-mono text-xs font-semibold text-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
-          {r.employeeCode || '—'}
+          {r.employeeCode || 'Chưa cập nhật'}
         </span>
       ),
     },
@@ -408,13 +348,23 @@ export default function SalaryRanksPage() {
     },
   ];
 
+  if (viewMode === 'enterprise') {
+    return (
+      <div className="mx-auto max-w-2xl space-y-4 py-12 text-center">
+        <h1 className="text-xl font-semibold">Khung lương doanh nghiệp</h1>
+        <p className="text-sm text-muted-foreground">Danh mục ngạch bậc công vụ không áp dụng trong chế độ doanh nghiệp. Đang chuyển đến nơi cấu hình khung lương theo vị trí.</p>
+        <Button onClick={() => router.replace('/salary-bands')}>Mở khung lương theo vị trí</Button>
+      </div>
+    );
+  }
+
   return (
     <>
       <PageHeader
         title="Ngạch bậc lương"
-        description="Khung ngạch bậc lương tiêu chuẩn Nhà nước (NĐ 204) và thang bảng lương doanh nghiệp."
+        description="Danh mục ngạch bậc khu vực công là dữ liệu tham chiếu; cơ quan phải xác minh căn cứ, nhóm nhân sự và ngày hiệu lực trước khi áp dụng."
         actions={
-          mainTab === 'progression' ? (
+          mainTab === 'progression' && canReviewPublicProgression ? (
             <Button
               onClick={() => qScan.refetch()}
               disabled={qScan.isFetching}
@@ -440,7 +390,7 @@ export default function SalaryRanksPage() {
           <Layers className="h-3.5 w-3.5" />
           Thang bảng lương & Ngạch bậc
         </button>
-        <button
+        {canReviewPublicProgression && <button
           onClick={() => setMainTab('progression')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
             mainTab === 'progression'
@@ -449,49 +399,23 @@ export default function SalaryRanksPage() {
           }`}
         >
           <TrendingUp className="h-3.5 w-3.5" />
-          Xét & Phê duyệt nâng bậc lương
+          Xét nâng bậc theo ngạch công chức
           {qScan.data?.eligibleCount ? (
             <span className="ml-1 px-1.5 py-0.5 rounded-md bg-muted text-foreground border border-border font-mono text-xs font-medium">
               {qScan.data.eligibleCount}
             </span>
           ) : null}
-        </button>
+        </button>}
       </div>
 
-      {mainTab === 'ranks' ? (
+      {mainTab === 'ranks' || !canReviewPublicProgression ? (
         <>
-          {/* Dual Mode Switcher Tabs (Nhà nước vs Doanh nghiệp) */}
-          <div className="flex items-center gap-2 pb-3 mb-4">
-            <button
-              onClick={() => setViewMode('state')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-                viewMode === 'state'
-                  ? 'bg-primary text-primary-foreground shadow-2xs'
-                  : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
-              }`}
-            >
-              <Building2 className="h-3.5 w-3.5" />
-              Cơ quan Nhà nước: 184 Ngạch bậc lương (Nghị định 204)
-            </button>
-            <button
-              onClick={() => setViewMode('enterprise')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-                viewMode === 'enterprise'
-                  ? 'bg-primary text-primary-foreground shadow-2xs'
-                  : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
-              }`}
-            >
-              <Briefcase className="h-3.5 w-3.5" />
-              Doanh nghiệp: Khung Thang bảng lương theo Vị trí (Job Bands)
-            </button>
-          </div>
-
           <div className="print-area">
             {viewMode === 'state' ? (
               <>
                 <PrintFrame
-                  title="DANH MỤC NGẠCH BẬC LƯƠNG TIÊU CHUẨN CÔNG CHỨC, VIÊN CHỨC (NĐ 204)"
-                  subtitle={`Tổng số ${qRanks.data?.length || 0} ngạch bậc được cấu hình`}
+                  title="DANH MỤC THAM CHIẾU NGẠCH BẬC KHU VỰC CÔNG"
+                  subtitle={`Có ${qRanks.data?.length || 0} dòng dữ liệu; cần đối chiếu căn cứ và ngày hiệu lực trước khi dùng chính thức.`}
                 />
 
                 {qRanks.isError ? (
@@ -511,11 +435,11 @@ export default function SalaryRanksPage() {
                         label: 'Nhóm ngạch',
                         value: (r) => r.groupCode,
                         options: [
-                          { value: 'A3', label: 'Nhóm A3 (Cao cấp: 6 bậc, 36 tháng)' },
-                          { value: 'A2', label: 'Nhóm A2 (Chính: 8 bậc, 36 tháng)' },
-                          { value: 'A1', label: 'Nhóm A1 (Chuyên viên/Kỹ sư: 9 bậc, 36 tháng)' },
-                          { value: 'B', label: 'Nhóm B (Cán sự/Kỹ thuật viên: 12 bậc, 24 tháng)' },
-                          { value: 'C', label: 'Nhóm C (Nhân viên/Phục vụ: 12 bậc, 24 tháng)' },
+                          { value: 'A3', label: 'Nhóm A3 (tham chiếu)' },
+                          { value: 'A2', label: 'Nhóm A2 (tham chiếu)' },
+                          { value: 'A1', label: 'Nhóm A1 (tham chiếu)' },
+                          { value: 'B', label: 'Nhóm B (tham chiếu)' },
+                          { value: 'C', label: 'Nhóm C (tham chiếu)' },
                         ],
                       },
                     ]}
@@ -535,8 +459,11 @@ export default function SalaryRanksPage() {
               <>
                 <PrintFrame
                   title="KHUNG THANG BẢNG LƯƠNG DOANH NGHIỆP THEO VỊ TRÍ VIỆC LÀM (BLLĐ 2019)"
-                  subtitle="6 Khung Bậc Lương chuẩn hóa toàn hệ thống"
+                  subtitle="Các mức lương phải do doanh nghiệp khảo sát, cấu hình và phê duyệt"
                 />
+                <div className="my-3 rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm">
+                  Các mức mẫu đã được bỏ vì không dựa trên dữ liệu công ty bạn. Hãy <a className="font-semibold text-primary underline" href="/salary-bands">mở cấu hình khung lương theo vị trí</a> để nhập số liệu khảo sát thật và gửi duyệt.
+                </div>
 
                 <DataTable
                   columns={enterpriseColumns}
@@ -572,7 +499,7 @@ export default function SalaryRanksPage() {
             <Card className="p-4 border border-border bg-card shadow-2xs">
               <div className="text-xs font-medium text-muted-foreground uppercase">Đủ điều kiện nâng bậc</div>
               <div className="text-2xl font-bold text-foreground mt-1">{qScan.data?.eligibleCount || 0}</div>
-              <div className="text-xs text-muted-foreground mt-1">Đạt đủ 24/36 tháng giữ bậc</div>
+              <div className="text-xs text-muted-foreground mt-1">Theo căn cứ và thời hạn đã cấu hình cho từng hồ sơ</div>
             </Card>
             <Card className="p-4 border border-border bg-card shadow-2xs">
               <div className="text-xs font-medium text-muted-foreground uppercase">Quá hạn chưa duyệt</div>
@@ -833,20 +760,23 @@ export default function SalaryRanksPage() {
                 </Button>
                 <Button
                   size="sm"
-                  onClick={() =>
+                  onClick={() => {
+                    const salary = prompt('Mức lương mới theo thỏa thuận doanh nghiệp (VND)');
+                    if (!salary || Number(salary)<=0) return;
                     applyMutation.mutate({
+                      newSalary: Number(salary),
                       userId: selectedPerson.userId,
                       nextStep: selectedPerson.nextStep,
                       nextCoefficient: selectedPerson.nextCoefficient,
                       overGradePercent: selectedPerson.suggestedOverGradePercent,
                       decisionNo: approvalDecisionNo,
-                    })
-                  }
+                    });
+                  }}
                   disabled={applyMutation.isPending}
                   className="flex items-center gap-1.5"
                 >
                   <Check className="w-4 h-4" />
-                  {applyMutation.isPending ? 'Đang duyệt...' : 'Xác nhận Nâng bậc'}
+                  {applyMutation.isPending ? 'Đang duyệt...' : 'Gửi đề xuất Nâng bậc'}
                 </Button>
               </div>
             </div>

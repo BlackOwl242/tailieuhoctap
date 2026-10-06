@@ -1,3 +1,4 @@
+import { HrAccessService } from '../../common/services/hr-access.service';
 import {
   Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Put, Query,
 } from '@nestjs/common';
@@ -261,6 +262,7 @@ export class PersonnelProfilesService {
             employeeCode: true,
             hireDate: true,
             employmentStatus: true,
+            bankAccount: true, bankName: true, taxDependentCount: true,
             birthDate: true,
             phone: true,
             address: true,
@@ -289,7 +291,7 @@ export class PersonnelProfilesService {
       const created = await this.prisma.personnelComprehensiveProfile.create({
         data: {
           userId: user.id,
-          gender: user.fullName.includes('Thị') || user.fullName.includes('Nữ') ? 'Nữ' : 'Nam',
+          gender: null,
           currentAddress: user.address,
           recruitDate: user.hireDate,
           govPosition: user.jobTitle,
@@ -331,22 +333,26 @@ export class PersonnelProfilesService {
     if (dto.dischargeDate) data.dischargeDate = new Date(dto.dischargeDate);
     if (dto.idCardIssueDate) data.idCardIssueDate = new Date(dto.idCardIssueDate);
 
+    await this.prisma.$transaction(async tx => {
+      await tx.user.update({where:{id:userId},data:{...(dto.currentAddress !== undefined ? {address:dto.currentAddress}:{}),...(dto.govPosition !== undefined ? {jobTitle:dto.govPosition}:{})}});
     if (!profile) {
-      profile = await this.prisma.personnelComprehensiveProfile.create({
+      profile = await tx.personnelComprehensiveProfile.create({
         data: { userId, ...data },
       });
     } else {
-      profile = await this.prisma.personnelComprehensiveProfile.update({
+      profile = await tx.personnelComprehensiveProfile.update({
         where: { id: profile.id },
         data,
       });
     }
 
+    }, {isolationLevel:'Serializable'});
+
     await this.audit.log({
       actorId: actor.id,
       action: 'UPDATE_COMPREHENSIVE_PROFILE',
       entityType: 'PersonnelComprehensiveProfile',
-      entityId: profile.id,
+      entityId: profile!.id,
       after: { userId, updatedFields: Object.keys(dto) },
     });
 
@@ -652,22 +658,22 @@ export class PersonnelProfilesService {
 @ApiBearerAuth()
 @Controller('personnel-profiles')
 export class PersonnelProfilesController {
-  constructor(private readonly service: PersonnelProfilesService) {}
+  constructor(private readonly access: HrAccessService, private readonly service: PersonnelProfilesService) {}
 
   @Get()
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   list(@Query() query: { q?: string; orgUnitId?: string; rankCode?: string; page?: number; limit?: number }) {
     return this.service.listProfiles(query);
   }
 
   @Get('field-tiers')
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'USER', 'LINE_MANAGER', 'HR_TRAINER', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD', 'AUDITOR')
   getFieldTiers() {
     return this.service.getFieldTiers();
   }
 
   @Patch('me/self-update')
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'USER', 'LINE_MANAGER', 'HR_TRAINER', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD', 'AUDITOR')
   selfUpdateTier1(
     @CurrentUser() user: AuthUser,
     @Body() dto: SelfUpdateProfileDto,
@@ -676,14 +682,15 @@ export class PersonnelProfilesController {
   }
 
   @Get(':userId')
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
-  getOne(@Param('userId') userId: string) {
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'USER', 'LINE_MANAGER', 'HR_TRAINER', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD', 'AUDITOR')
+  getOne(@Param('userId') userId: string, @CurrentUser() actor: AuthUser) {
+    this.access.assertOwnOrHr(actor, userId);
     return this.service.getProfile(userId);
   }
 
   @Patch(':userId')
   @Put(':userId')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   update(
     @Param('userId') userId: string,
     @Body() dto: UpdateComprehensiveProfileDto,
@@ -695,97 +702,97 @@ export class PersonnelProfilesController {
   // --- Endpoints 8 Quá trình con ---
 
   @Post(':userId/salary-histories')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   addSalaryHistory(@Param('userId') userId: string, @Body() dto: CreateSalaryHistoryDto) {
     return this.service.addSalaryHistory(userId, dto);
   }
 
   @Delete(':userId/salary-histories/:id')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   deleteSalaryHistory(@Param('id') id: string) {
     return this.service.deleteSalaryHistory(id);
   }
 
   @Post(':userId/appointments')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   addAppointment(@Param('userId') userId: string, @Body() dto: CreateAppointmentDto) {
     return this.service.addAppointment(userId, dto);
   }
 
   @Delete(':userId/appointments/:id')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   deleteAppointment(@Param('id') id: string) {
     return this.service.deleteAppointment(id);
   }
 
   @Post(':userId/educations')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   addEducation(@Param('userId') userId: string, @Body() dto: CreateEducationDto) {
     return this.service.addEducation(userId, dto);
   }
 
   @Delete(':userId/educations/:id')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   deleteEducation(@Param('id') id: string) {
     return this.service.deleteEducation(id);
   }
 
   @Post(':userId/work-histories')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   addWorkHistory(@Param('userId') userId: string, @Body() dto: CreateWorkHistoryDto) {
     return this.service.addWorkHistory(userId, dto);
   }
 
   @Delete(':userId/work-histories/:id')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   deleteWorkHistory(@Param('id') id: string) {
     return this.service.deleteWorkHistory(id);
   }
 
   @Post(':userId/rewards-disciplines')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   addRewardDiscipline(@Param('userId') userId: string, @Body() dto: CreateRewardDisciplineDto) {
     return this.service.addRewardDiscipline(userId, dto);
   }
 
   @Delete(':userId/rewards-disciplines/:id')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   deleteRewardDiscipline(@Param('id') id: string) {
     return this.service.deleteRewardDiscipline(id);
   }
 
   @Post(':userId/family-relations')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   addFamilyRelation(@Param('userId') userId: string, @Body() dto: CreateFamilyRelationDto) {
     return this.service.addFamilyRelation(userId, dto);
   }
 
   @Delete(':userId/family-relations/:id')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   deleteFamilyRelation(@Param('id') id: string) {
     return this.service.deleteFamilyRelation(id);
   }
 
   @Post(':userId/appraisals')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   addAppraisal(@Param('userId') userId: string, @Body() dto: CreateAppraisalDto) {
     return this.service.addAppraisal(userId, dto);
   }
 
   @Delete(':userId/appraisals/:id')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   deleteAppraisal(@Param('id') id: string) {
     return this.service.deleteAppraisal(id);
   }
 
   @Post(':userId/social-activities')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   addSocialActivity(@Param('userId') userId: string, @Body() dto: CreateSocialActivityDto) {
     return this.service.addSocialActivity(userId, dto);
   }
 
   @Delete(':userId/social-activities/:id')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   deleteSocialActivity(@Param('id') id: string) {
     return this.service.deleteSocialActivity(id);
   }

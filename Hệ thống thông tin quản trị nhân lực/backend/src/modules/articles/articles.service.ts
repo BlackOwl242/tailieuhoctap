@@ -229,6 +229,7 @@ export class ArticlesService {
           title: dto.title ?? article.title,
           summary: dto.summary !== undefined ? dto.summary : article.summary,
           categoryId: dto.categoryId !== undefined ? dto.categoryId : article.categoryId,
+          status: 'DRAFT', publishedAt: null,
           currentVersionId: version.id,
           ...(dto.tagIds ? { tags: { deleteMany: {}, create: dto.tagIds.map((tagId) => ({ tagId })) } } : {}),
         },
@@ -271,7 +272,7 @@ export class ArticlesService {
           authorId: user.id,
         },
       });
-      await tx.article.update({ where: { id: article.id }, data: { title: source.title, currentVersionId: version.id } });
+      await tx.article.update({ where: { id: article.id }, data: { status: 'DRAFT', publishedAt: null, title: source.title, currentVersionId: version.id } });
     });
     await this.audit.log({ actorId: user.id, action: 'ARTICLE_VERSION_RESTORED', entityType: 'Article', entityId: article.id, after: { restoredFrom: versionNo }, requestId });
     return this.getDetail(article.id, user);
@@ -438,7 +439,7 @@ export class ArticlesService {
   private loadArticle(idOrSlug: string) {
     return this.prisma.article.findFirst({
       where: { OR: [{ id: idOrSlug }, { slug: idOrSlug }], deletedAt: null },
-      include: { currentVersion: { select: { contentMd: true } } },
+      include: { currentVersion: { select: { contentMd: true } }, space: { select: { visibility: true } } },
     }).then((a) => {
       if (!a) throw new BusinessException(ErrorCodes.NOT_FOUND, 'Không tìm thấy bài viết', HttpStatus.NOT_FOUND);
       return a;
@@ -450,8 +451,18 @@ export class ArticlesService {
     const privileged = this.access.isPrivileged(roles);
     const memberRole = await this.access.memberRole(article.spaceId, user.id);
     if (privileged || memberRole) return { privileged, memberRole };
-    if (article.status === 'PUBLISHED') return { privileged, memberRole }; // Space PUBLIC cho đọc bài đã xuất bản
+    if (article.status === 'PUBLISHED' && article.space?.visibility === 'PUBLIC') return { privileged, memberRole };
     throw new BusinessException(ErrorCodes.FORBIDDEN, 'Bạn không có quyền xem bài viết này', HttpStatus.FORBIDDEN);
+  }
+
+  async assertCanReadAttachment(storageKey: string, user: AuthUser) {
+    const attachment = await this.prisma.attachment.findFirst({
+      where: { storageKey },
+      include: { version: { include: { article: { include: { space: { select: { visibility: true } } } } } } },
+    });
+    const article = attachment?.version?.article;
+    if (!article || article.deletedAt) throw new BusinessException(ErrorCodes.NOT_FOUND, 'Không tìm thấy tập tin', HttpStatus.NOT_FOUND);
+    await this.assertCanRead(article, user);
   }
 
   private async assertCanEdit(article: { id: string; spaceId: string; authorId: string; status: ArticleStatus }, user: AuthUser) {

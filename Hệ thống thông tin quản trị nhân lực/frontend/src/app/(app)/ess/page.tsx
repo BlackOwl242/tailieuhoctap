@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   User, CheckCircle2, Clock, Calendar, FileText, Plane,
@@ -45,22 +45,40 @@ export default function EssPage() {
     queryFn: async () => (await api.get('/hrms/loans/my')).data,
   });
 
-  const { data: myLeaveBalance } = useQuery<{ total: number; used: number; remaining: number }>({
+  const { data: myLeaveBalance } = useQuery<{ entitled: number; used: number; remaining: number }>({
     queryKey: ['my-leave-balance'],
     queryFn: async () => (await api.get('/hrms/leave/my-balance')).data,
   });
 
+  const { data: attendanceSummary } = useQuery<{
+    days: { workDate: string; firstInAt?: string; eventCount: number }[];
+    todayEvents: unknown[];
+  }>({
+    queryKey: ['ess-attendance'],
+    queryFn: async () => (await api.get('/attendance/me')).data,
+  });
+  useEffect(() => {
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date());
+    const days = Array.isArray(attendanceSummary?.days) ? attendanceSummary.days : [];
+    const day = days.find(d => d.workDate.slice(0, 10) === today);
+    setIsCheckedIn(Boolean(day && day.eventCount % 2));
+    setCheckInTime(day?.firstInAt ? new Date(day.firstInAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : null);
+  }, [attendanceSummary]);
   const checkInMutation = useMutation({
-    mutationFn: async () => (await api.post('/hrms/attendance/check-in')).data,
+    mutationFn: async () => (await api.post('/attendance/check-in', { method: 'WEB' })).data,
+    onError: (error) => alert(errorMessage(error)),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ess-attendance'] });
       setIsCheckedIn(true);
       setCheckInTime(new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }));
     },
   });
 
   const checkOutMutation = useMutation({
-    mutationFn: async () => (await api.post('/hrms/attendance/check-out')).data,
+    mutationFn: async () => (await api.post('/attendance/check-in', { method: 'WEB' })).data,
+    onError: (error) => alert(errorMessage(error)),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ess-attendance'] });
       setIsCheckedIn(false);
       setCheckInTime(null);
     },
@@ -129,6 +147,7 @@ export default function EssPage() {
           </div>
 
           <button
+            disabled={checkInMutation.isPending || checkOutMutation.isPending}
             onClick={handleCheckIn}
             className={`w-full py-2.5 rounded-md font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all ${
               isCheckedIn
@@ -165,15 +184,15 @@ export default function EssPage() {
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="bg-muted/20 p-3 rounded-md border border-border">
               <span className="text-xs text-muted-foreground">Tổng ngày phép</span>
-              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.total?.toFixed(1) ?? '—'}</p>
+              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.entitled?.toFixed(1) ?? 'Chưa cập nhật'}</p>
             </div>
             <div className="bg-muted/20 p-3 rounded-md border border-border">
               <span className="text-xs text-muted-foreground">Đã sử dụng</span>
-              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.used?.toFixed(1) ?? '—'}</p>
+              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.used?.toFixed(1) ?? 'Chưa cập nhật'}</p>
             </div>
             <div className="bg-muted/20 p-3 rounded-md border border-border">
               <span className="text-xs text-muted-foreground">Còn lại khả dụng</span>
-              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.remaining?.toFixed(1) ?? '—'}</p>
+              <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{myLeaveBalance?.remaining?.toFixed(1) ?? 'Chưa cập nhật'}</p>
             </div>
           </div>
 

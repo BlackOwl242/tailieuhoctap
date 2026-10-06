@@ -3,8 +3,8 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Building2, Users, UserPlus, Network, Search, Filter,
-  Printer, ArrowRight, ShieldCheck, Mail, Phone, Briefcase,
+  Building2, Users, Network, Search, Filter,
+  Printer, ArrowRight, Mail, Phone, Briefcase, ShieldCheck,
   Table as TableIcon, LayoutGrid, Eye, CheckCircle2, AlertCircle, ChevronRight
 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -13,7 +13,6 @@ import { NumberCard } from '@/components/common/number-card';
 import { LoadingState, ErrorState } from '@/components/common/states';
 import { InteractiveOrgChart, type OrgNode } from '@/components/ui/org-chart';
 import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/data-table';
-import { Badge } from '@/components/ui/primitives';
 import { Modal } from '@/components/ui/modal';
 import { PrintFrame, PrintSignatureBlock, PrintExportDropdown } from '@/components/ui/print';
 import { exportRowsToExcel } from '@/lib/export';
@@ -31,9 +30,6 @@ interface UnitTableRow {
   headName: string;
   headTitle: string;
   currentCount: number;
-  targetCount: number;
-  fillRate: number;
-  status: 'FULL' | 'LACK' | 'SURPLUS';
 }
 
 export default function OrgChartPage() {
@@ -71,57 +67,26 @@ export default function OrgChartPage() {
     }));
   }, [rawEmployees]);
 
-  // Enrich tree with accurate headcount from employee list & manager names
+  // The API count is the number of employees assigned directly to this unit.
   const enrichedTree: OrgNode[] = useMemo(() => {
     if (!orgTree || orgTree.length === 0) return [];
 
     const enrichNode = (node: any, level = 1): OrgNode => {
       const unitEmps = employeeList.filter((e) => e.orgUnitId === node.id);
 
-      // Phân định chuẩn theo tài liệu doc/PTTK_OOP_HR.md
       let headTitle = node.headTitle;
       let headName = node.headName;
-
-      if (node.code === 'SG-TECH') {
-        headTitle = 'Tổng Giám đốc (CEO & Đại diện Pháp luật)';
-        headName = 'Trần Minh Hoàng';
-      } else if (node.code === 'ĐHCĐ' || node.code === 'DHCD') {
-        headTitle = 'Chủ tịch Hội đồng Quản trị';
-        headName = 'Phạm Tiến Thành';
-      } else if (node.code === 'BGD') {
-        headTitle = 'Tổng Giám đốc (CEO)';
-        headName = 'Trần Minh Hoàng';
-      } else {
-        const manager =
-          unitEmps.find((e) => {
-            const t = e.jobTitle.toLowerCase();
-            return t.includes('tổng giám đốc') || t.includes('giám đốc') || t.includes('trưởng') || t.includes('lead');
-          }) || unitEmps[0];
-
-        if (!headTitle) {
-          headTitle = manager
-            ? manager.jobTitle
-            : level === 1
-            ? 'Tổng Giám đốc (CEO)'
-            : level === 2
-            ? 'Giám đốc Khối'
-            : 'Trưởng phòng / Trưởng nhóm';
-        }
-        if (!headName) {
-          headName = manager ? manager.fullName : level === 1 ? 'Ban Giám đốc' : 'Chưa bổ nhiệm';
-        }
-      }
+      const manager = unitEmps.find((e) => {
+        const title = e.jobTitle.toLowerCase();
+        return title.includes('tổng giám đốc') || title.includes('giám đốc') || title.includes('trưởng') || title.includes('lead');
+      });
+      headTitle = headTitle || manager?.jobTitle || 'Chưa xác định';
+      headName = headName || manager?.fullName || 'Chưa xác định';
 
       const children =
         node.children && node.children.length > 0
           ? node.children.map((c: any) => enrichNode(c, level + 1))
           : undefined;
-
-      const childrenHeadcount = children
-        ? children.reduce((acc: number, c: OrgNode) => acc + (c.headcount || 0), 0)
-        : 0;
-
-      const totalHeadcount = unitEmps.length + childrenHeadcount;
 
       return {
         id: node.id,
@@ -129,7 +94,7 @@ export default function OrgChartPage() {
         code: node.code,
         headTitle,
         headName,
-        headcount: totalHeadcount || unitEmps.length || node.memberCount || 0,
+        headcount: node.memberCount ?? unitEmps.length,
         children,
       };
     };
@@ -142,25 +107,19 @@ export default function OrgChartPage() {
     const rows: UnitTableRow[] = [];
 
     const traverse = (node: OrgNode, level = 1, parentName = 'Ban Lãnh đạo') => {
-      const directCount = employeeList.filter((e) => e.orgUnitId === node.id).length;
-      const current = directCount || node.headcount || 0;
-      const target = current > 0 ? current + 2 : 5;
-      const fill = Math.min(100, Math.round((current / target) * 100));
+      const current = node.headcount;
 
-      let levelLabel = 'Cấp 3: Trung tâm / Phòng';
-      if (node.code === 'SG-TECH') {
-        levelLabel = 'Cấp 1: Ban Lãnh đạo Công ty';
-      } else if (node.code === 'ĐHCĐ' || node.code === 'DHCD') {
-        levelLabel = 'Cấp 1: Quản trị Sở hữu (ĐHCĐ & HĐQT)';
-      } else if (node.code === 'BGD') {
-        levelLabel = 'Cấp 1: Ban Giám đốc Điều hành';
-      } else if (level === 2 || ['DELIVERY', 'HR', 'OPS', 'BIZ', 'FIN'].includes(node.code)) {
-        levelLabel = 'Cấp 2: Khối chức năng';
-      } else if (level === 3) {
-        levelLabel = 'Cấp 3: Trung tâm / Phòng';
-      } else {
-        levelLabel = 'Cấp 4: Tổ / Nhóm / Squad';
-      }
+      const levelLabel = level === 1
+        ? 'Cấp 1: Doanh nghiệp'
+        : level === 2
+        ? 'Cấp 2: Quản trị / Ban Điều hành'
+        : level === 3
+        ? 'Cấp 3: Khối tổng hợp'
+        : level === 4
+        ? 'Cấp 4: Khối chức năng'
+        : level === 5
+        ? 'Cấp 5: Phòng / Trung tâm'
+        : 'Cấp 6: Tổ / Nhóm chuyên môn';
 
       rows.push({
         id: node.id,
@@ -170,12 +129,9 @@ export default function OrgChartPage() {
         levelLabel,
         parentId: node.parentId || null,
         parentName: level === 1 ? '— (Cấp cao nhất)' : parentName,
-        headName: node.headName || 'Chưa bổ nhiệm',
-        headTitle: node.headTitle || 'Trưởng đơn vị',
+        headName: node.headName || 'Chưa xác định',
+        headTitle: node.headTitle || 'Chưa xác định',
         currentCount: current,
-        targetCount: target,
-        fillRate: fill,
-        status: current >= target ? 'FULL' : current === 0 ? 'LACK' : 'LACK',
       });
 
       if (node.children) {
@@ -185,7 +141,7 @@ export default function OrgChartPage() {
 
     enrichedTree.forEach((r) => traverse(r, 1, 'Tổng Công ty'));
     return rows;
-  }, [enrichedTree, employeeList]);
+  }, [enrichedTree]);
 
   // Active selected node or default first root
   const activeNode: OrgNode = useMemo(() => {
@@ -195,37 +151,21 @@ export default function OrgChartPage() {
         id: 'root-company',
         name: 'Saigon Technology',
         code: 'SG-TECH',
-        headName: 'Trần Minh Hoàng',
-        headTitle: 'Tổng Giám đốc (CEO & Đại diện Pháp luật)',
-        headcount: 384,
+        headName: 'Chưa xác định',
+        headTitle: 'Chưa xác định',
+        headcount: 0,
       }
     );
   }, [selectedNode, enrichedTree]);
 
   const deptEmployees = useMemo(() => {
     if (!activeNode) return [];
-    const getSubtreeUnitIds = (node: OrgNode | null): string[] => {
-      if (!node) return [];
-      const ids = [node.id];
-      if (node.children) {
-        node.children.forEach((c) => ids.push(...getSubtreeUnitIds(c)));
-      }
-      return ids;
-    };
-    const targetUnitIds = new Set(getSubtreeUnitIds(activeNode));
-
-    const matching = employeeList.filter((e) => {
-      const uId = e.orgUnitId || e.orgUnit?.id;
-      return uId ? targetUnitIds.has(uId) : false;
-    });
-
-    if (matching.length > 0) return matching;
-    if (activeNode.id === 'root-company' || activeNode.code === 'BGD') return employeeList;
-    return [];
+    return employeeList.filter((e) => (e.orgUnitId || e.orgUnit?.id) === activeNode.id);
   }, [employeeList, activeNode]);
 
-  const activeCurrentCount = deptEmployees.length || activeNode.headcount || 0;
-  const activeTargetCount = activeCurrentCount > 0 ? activeCurrentCount + 2 : 5;
+  const assignedDirectCount = tableRows.reduce((sum, row) => sum + row.currentCount, 0);
+  const populatedUnitCount = tableRows.filter((row) => row.currentCount > 0).length;
+  const orgUnitCount = tableRows.filter((row) => row.code !== 'SG-TECH').length;
 
   // Columns for Table View & Print Document
   const columns: DataColumn<UnitTableRow>[] = [
@@ -235,11 +175,7 @@ export default function OrgChartPage() {
       sortable: true,
       className: 'w-[10%] text-center',
       exportValue: (r) => r.code,
-      render: (r) => (
-        <span className="font-mono text-xs font-semibold text-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
-          {r.code}
-        </span>
-      ),
+      render: (r) => <span className="font-mono text-xs font-semibold text-muted-foreground">{r.code}</span>,
     },
     {
       key: 'name',
@@ -281,44 +217,17 @@ export default function OrgChartPage() {
     },
     {
       key: 'currentCount',
-      header: 'Hiện có',
+      header: 'Nhân sự trực tiếp',
       sortable: true,
-      className: 'w-[9%] text-center',
+      className: 'w-[12%] text-center',
       exportValue: (r) => `${r.currentCount} người`,
       render: (r) => (
         <span className="font-bold text-foreground">{r.currentCount}</span>
       ),
     },
-    {
-      key: 'targetCount',
-      header: 'Định biên',
-      sortable: true,
-      className: 'w-[9%] text-center',
-      exportValue: (r) => `${r.targetCount} người`,
-      render: (r) => (
-        <span className="font-semibold text-primary">{r.targetCount}</span>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'Tỷ lệ lấp đầy',
-      sortable: true,
-      className: 'w-[9%] text-center',
-      exportValue: (r) => `${r.fillRate}% (${r.status === 'FULL' ? 'Đủ định biên' : 'Thiếu ' + (r.targetCount - r.currentCount) + ' NS'})`,
-      render: (r) => (
-        <div className="flex flex-col items-center gap-1">
-          <Badge variant={r.fillRate >= 80 ? 'success' : r.fillRate >= 50 ? 'warning' : 'destructive'}>
-            {r.fillRate}%
-          </Badge>
-          <span className="text-xs text-muted-foreground no-print">
-            {r.currentCount >= r.targetCount ? 'Đủ biên chế' : `Thiếu ${r.targetCount - r.currentCount} NS`}
-          </span>
-        </div>
-      ),
-    },
   ];
 
-  if (isLoading) return <LoadingState text="Đang tải sơ đồ cơ cấu tổ chức & định biên..." />;
+  if (isLoading) return <LoadingState text="Đang tải sơ đồ cơ cấu tổ chức..." />;
   if (isError) return <ErrorState message="Không thể tải dữ liệu cơ cấu tổ chức" onRetry={() => refetch()} />;
 
   return (
@@ -326,12 +235,12 @@ export default function OrgChartPage() {
       {/* Page Header */}
       <WorkspaceHeader
         title="Sơ đồ tổ chức"
-        description="Trực quan hóa cây phả hệ tổ chức phòng ban và theo dõi tỷ lệ lấp đầy định biên nhân sự."
+        description="Cơ cấu theo báo cáo. Số cạnh đơn vị là nhân sự được gán trực tiếp; nhân sự thuộc đơn vị con không bị cộng vào cấp cha."
         breadcrumbs={[{ label: 'Nhân sự' }, { label: 'Sơ đồ tổ chức' }]}
         actions={
           <div className="flex items-center gap-2">
             <PrintExportDropdown
-              printLabel="In Bảng Định biên"
+              printLabel="In Cơ cấu tổ chức"
               exportLabel="Xuất file Excel"
               onPrint={() => {
                 setActiveTab('table');
@@ -343,7 +252,7 @@ export default function OrgChartPage() {
                 const rowsData = tableRows.map((r) =>
                   exportableCols.map((c) => (c.exportValue ? c.exportValue(r) : String((r as any)[c.key] ?? '')))
                 );
-                exportRowsToExcel('co-cau-to-chuc-dinh-bien', headers, rowsData);
+                exportRowsToExcel('co-cau-to-chuc', headers, rowsData);
               }}
             />
             <Link
@@ -358,31 +267,24 @@ export default function OrgChartPage() {
       />
 
       {/* KPI Top Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
         <NumberCard
-          title="Tổng Đơn vị / Phòng ban"
-          value={String(tableRows.length)}
-          subtitle="4 cấp bậc quản lý trực tiếp"
+          title="Đơn vị trực thuộc doanh nghiệp"
+          value={String(orgUnitCount)}
+          subtitle={`${tableRows.length} nút nếu tính cả doanh nghiệp SG-TECH`}
           icon={Building2}
         />
         <NumberCard
-          title="Tổng Biên chế Hiện hữu"
-          value={String(employeeList.length || 48)}
-          subtitle="100% đã phân bổ đơn vị"
+          title="Nhân sự đã gán đơn vị"
+          value={String(assignedDirectCount)}
+          subtitle="Tổng số trực tiếp tại các đơn vị"
           icon={Users}
-          trend={{ value: '+4', isPositive: true, label: 'tháng này' }}
         />
         <NumberCard
-          title="Tỷ lệ Bổ nhiệm Trưởng đơn vị"
-          value="92%"
-          subtitle="11/12 đơn vị đã có Trưởng phòng"
+          title="Đơn vị có nhân sự trực tiếp"
+          value={String(populatedUnitCount)}
+          subtitle="Đếm theo hồ sơ đang gán đơn vị"
           icon={ShieldCheck}
-        />
-        <NumberCard
-          title="Nhu cầu Tuyển dụng Định biên"
-          value={String(tableRows.reduce((acc, r) => acc + Math.max(0, r.targetCount - r.currentCount), 0))}
-          subtitle="Chỉ tiêu cần bổ sung năm 2026"
-          icon={UserPlus}
         />
       </div>
 
@@ -411,12 +313,12 @@ export default function OrgChartPage() {
             }`}
           >
             <TableIcon className="h-3.5 w-3.5 text-muted-foreground" />
-            Bảng Cơ cấu & Định biên (Table View)
+            Bảng Cơ cấu tổ chức (Table View)
           </button>
         </div>
 
         <span className="text-xs text-muted-foreground hidden sm:inline">
-          {activeTab === 'tree' ? 'Hỗ trợ phóng to, thu nhỏ và mở rộng đa cấp' : `Hiển thị đầy đủ ${tableRows.length} đơn vị tổ chức`}
+          {activeTab === 'tree' ? 'Phóng to, thu nhỏ hoặc mở rộng các cấp' : `Hiển thị ${orgUnitCount} đơn vị và nút gốc doanh nghiệp`}
         </span>
       </div>
 
@@ -435,8 +337,8 @@ export default function OrgChartPage() {
       <div className={activeTab === 'table' ? 'block' : 'hidden print:block'}>
         <div className="print-area">
           <PrintFrame
-            title="DANH MỤC CƠ CẤU TỔ CHỨC & ĐỊNH BIÊN NHÂN SỰ"
-            subtitle={`Tổng số ${tableRows.length} đơn vị tổ chức · ${employeeList.length} nhân sự chuẩn hóa`}
+            title="DANH MỤC CƠ CẤU TỔ CHỨC"
+            subtitle={`${orgUnitCount} đơn vị trực thuộc · ${assignedDirectCount} nhân sự đã gán đơn vị`}
           />
 
           <DataTable
@@ -444,7 +346,7 @@ export default function OrgChartPage() {
             rows={tableRows}
             rowKey={(r) => r.id}
             loading={isLoading}
-            exportFilename="co-cau-to-chuc-dinh-bien"
+            exportFilename="co-cau-to-chuc"
             printLabel="In Bảng Cơ cấu"
             searchFields={(r) => [r.name, r.code, r.parentName, r.headName, r.headTitle]}
             filters={[
@@ -453,10 +355,12 @@ export default function OrgChartPage() {
                 label: 'Cấp bậc',
                 value: (r) => String(r.level),
                 options: [
-                  { value: '1', label: 'Cấp 1: Ban Lãnh đạo' },
-                  { value: '2', label: 'Cấp 2: Khối / Ban' },
-                  { value: '3', label: 'Cấp 3: Trung tâm / Phòng' },
-                  { value: '4', label: 'Cấp 4: Tổ / Nhóm' },
+                  { value: '1', label: 'Cấp 1: Doanh nghiệp' },
+                  { value: '2', label: 'Cấp 2: Quản trị / Ban Điều hành' },
+                  { value: '3', label: 'Cấp 3: Khối tổng hợp' },
+                  { value: '4', label: 'Cấp 4: Khối chức năng' },
+                  { value: '5', label: 'Cấp 5: Phòng / Trung tâm' },
+                  { value: '6', label: 'Cấp 6: Tổ / Nhóm chuyên môn' },
                 ],
               },
             ]}
@@ -489,30 +393,26 @@ export default function OrgChartPage() {
         onOpenChange={(o) => !o && setSelectedNode(null)}
         title={selectedNode?.name ?? ''}
         size="lg"
-        description={selectedNode ? `Mã đơn vị: ${selectedNode.code} · Quy mô: ${activeCurrentCount} nhân sự` : undefined}
+        description={selectedNode ? `Mã đơn vị: ${selectedNode.code} · ${activeNode.headcount} nhân sự trực thuộc trực tiếp` : undefined}
       >
         {selectedNode && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div className="p-3 rounded-md bg-muted/40 border border-border">
                 <p className="text-xs uppercase text-muted-foreground font-semibold">Phụ trách đơn vị</p>
                 <p className="font-bold text-foreground mt-0.5">{selectedNode.headName ?? 'Chưa bổ nhiệm'}</p>
                 <p className="text-xs text-muted-foreground">{selectedNode.headTitle ?? 'Trưởng đơn vị'}</p>
               </div>
               <div className="p-3 rounded-md bg-muted/40 border border-border">
-                <p className="text-xs uppercase text-muted-foreground font-semibold">Nhân sự hiện hữu</p>
-                <p className="font-bold text-primary font-mono mt-0.5">{activeCurrentCount} NS</p>
-              </div>
-              <div className="p-3 rounded-md bg-muted/40 border border-border">
-                <p className="text-xs uppercase text-muted-foreground font-semibold">Định biên kế hoạch</p>
-                <p className="font-bold text-emerald-700 font-mono mt-0.5">{activeTargetCount} chỉ tiêu</p>
+                <p className="text-xs uppercase text-muted-foreground font-semibold">Nhân sự gán trực tiếp</p>
+                <p className="font-bold text-primary font-mono mt-0.5">{activeNode.headcount} người</p>
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Danh sách nhân sự trực thuộc ({deptEmployees.length})
+                  Danh sách nhân sự gán trực tiếp ({deptEmployees.length})
                 </p>
                 <Link href="/employees" className="text-xs font-semibold text-primary hover:underline">
                   Xem tất cả

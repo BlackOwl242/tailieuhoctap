@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, BadgeCheck, FileText, Plus, Printer, Trash2 } from 'lucide-react';
-import { api, errorMessage } from '@/lib/api';
+import { ArrowLeft, BadgeCheck, FileText, Plus, Printer, Trash2, ArrowRightLeft } from 'lucide-react';
+import { api, errorMessage, openProtectedFile } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
@@ -16,7 +16,7 @@ import { PageHeader, ErrorState } from '@/components/common/states';
 
 interface ContractRow {
   id: string; contractNo: string; type: keyof typeof CONTRACT_TYPE_LABEL;
-  startDate: string; endDate: string | null; baseSalary: number;
+  startDate: string; endDate: string | null; baseSalary: number; compensationBasis: 'MONTHLY' | 'DAILY' | 'HOURLY';
   status: keyof typeof CONTRACT_STATUS_LABEL; note: string | null;
   fileUrl: string | null; fileName: string | null;
 }
@@ -55,7 +55,7 @@ export default function EmployeeDetailPage() {
   const [contractOpen, setContractOpen] = useState(false);
   const [certOpen, setCertOpen] = useState(false);
   const [profileForm, setProfileForm] = useState<Record<string, string>>({});
-  const [contractForm, setContractForm] = useState({ contractNo: '', type: 'FIXED_TERM', startDate: '', endDate: '', baseSalary: '', note: '' });
+  const [contractForm, setContractForm] = useState({ contractNo: '', type: 'FIXED_TERM', startDate: '', endDate: '', baseSalary: '', compensationBasis: 'MONTHLY', note: '' });
   const [certForm, setCertForm] = useState({ name: '', certNo: '', issuedBy: '', issuedDate: '', expiryDate: '', storageSpot: '' });
   const [contractFile, setContractFile] = useState<{ name: string; mimeType: string; sizeBytes: number; dataBase64: string } | null>(null);
   const [certFile, setCertFile] = useState<{ name: string; mimeType: string; sizeBytes: number; dataBase64: string } | null>(null);
@@ -79,7 +79,6 @@ export default function EmployeeDetailPage() {
       if (profileForm.employeeCode) body.employeeCode = profileForm.employeeCode;
       if (profileForm.hireDate) body.hireDate = profileForm.hireDate;
       if (profileForm.employmentStatus) body.employmentStatus = profileForm.employmentStatus;
-      if (profileForm.baseSalary) body.baseSalary = Number(profileForm.baseSalary);
       if (profileForm.phone) body.phone = profileForm.phone;
       if (profileForm.address) body.address = profileForm.address;
       if (profileForm.jobTitle) body.jobTitle = profileForm.jobTitle;
@@ -96,6 +95,7 @@ export default function EmployeeDetailPage() {
       startDate: contractForm.startDate,
       endDate: contractForm.endDate || undefined,
       baseSalary: Number(contractForm.baseSalary),
+      compensationBasis: contractForm.compensationBasis,
       note: contractForm.note || undefined,
       file: contractFile ?? undefined,
     }),
@@ -132,11 +132,12 @@ export default function EmployeeDetailPage() {
     <>
       <PageHeader
         title={emp.fullName}
-        description={`${emp.employeeCode ?? 'Chưa có mã NV'} · ${emp.jobTitle ?? '—'} · ${emp.orgUnit?.name ?? 'Chưa gắn đơn vị'}`}
+        description={`${emp.employeeCode ?? 'Chưa có mã NV'} · ${emp.jobTitle ?? 'Chưa cập nhật'} · ${emp.orgUnit?.name ?? 'Chưa gắn đơn vị'}`}
         actions={
           <>
             <Link href="/employees"><Button variant="ghost" size="sm"><ArrowLeft className="h-4 w-4" /> Danh sách</Button></Link>
-            {isHr ? <Button variant="outline" size="sm" onClick={() => { setProfileForm({}); setProfileOpen(true); }}>Sửa hồ sơ</Button> : null}
+            {isHr ? <Button variant="outline" size="sm" onClick={() => { setProfileForm({}); setProfileOpen(true); }}>Sửa thông tin liên hệ</Button> : null}
+            {isHr ? <Link href={`/personnel?createFor=${id}&type=TRANSFER`}><Button variant="outline" size="sm"><ArrowRightLeft className="h-4 w-4" /> Đề xuất đổi đơn vị/chức danh</Button></Link> : null}
             <Link href={`/personnel-reports?userId=${id}`}>
               <Button variant="outline" size="sm" className="gap-1.5">
                 <Printer className="h-4 w-4" /> In lý lịch cá nhân
@@ -155,14 +156,14 @@ export default function EmployeeDetailPage() {
             <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
               {([
                 ['Email', emp.email],
-                ['Điện thoại', emp.phone ?? '—'],
-                ['Ngày sinh', emp.birthDate ? formatDate(emp.birthDate) : '—'],
-                ['Địa chỉ', emp.address ?? '—'],
-                ['Ngày vào làm', emp.hireDate ? formatDate(emp.hireDate) : '—'],
+                ['Điện thoại', emp.phone ?? 'Chưa cập nhật'],
+                ['Ngày sinh', emp.birthDate ? formatDate(emp.birthDate) : 'Chưa cập nhật'],
+                ['Địa chỉ', emp.address ?? 'Chưa cập nhật'],
+                ['Ngày vào làm', emp.hireDate ? formatDate(emp.hireDate) : 'Chưa cập nhật'],
                 ['Trạng thái', EMPLOYMENT_STATUS_LABEL[emp.employmentStatus] ?? emp.employmentStatus],
                 // RBAC: lương cơ bản chỉ hiển thị cho HR/Quản trị viên
                 ...(isHr ? [['Lương cơ bản', vnd(emp.baseSalary)] as [string, string]] : []),
-                ['Phép năm còn lại', balance ? `${balance.entitled - balance.used}/${balance.entitled} ngày (${balance.year})` : '—'],
+                ['Phép năm còn lại', balance ? `${balance.entitled - balance.used}/${balance.entitled} ngày (${balance.year})` : 'Chưa cập nhật'],
               ] as [string, string][]).map(([k, v]) => (
                 <div key={k as string}>
                   <dt className="text-xs uppercase tracking-wide text-muted-foreground">{k}</dt>
@@ -200,7 +201,7 @@ export default function EmployeeDetailPage() {
                         <td className="px-3 py-2 font-medium">{c.contractNo}</td>
                         <td className="px-3 py-2">{CONTRACT_TYPE_LABEL[c.type] ?? c.type}</td>
                         <td className="px-3 py-2">{formatDate(c.startDate)}{c.endDate ? ` → ${formatDate(c.endDate)}` : ''}</td>
-                        <td className="px-3 py-2">{vnd(c.baseSalary)}</td>
+                        <td className="px-3 py-2">{vnd(c.baseSalary)} / {c.compensationBasis === 'HOURLY' ? 'giờ' : c.compensationBasis === 'DAILY' ? 'ngày' : 'tháng'}</td>
                         <td className="px-3 py-2">
                           <span className="inline-flex items-center gap-1.5 text-xs font-medium">
                             <span
@@ -213,8 +214,8 @@ export default function EmployeeDetailPage() {
                         </td>
                         <td className="px-3 py-2">
                           {c.fileUrl ? (
-                            <a href={c.fileUrl} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline">Tải bản mềm</a>
-                          ) : '—'}
+                            <button type="button" onClick={() => void openProtectedFile(c.fileUrl!)} className="text-xs text-primary hover:underline">Tải bản mềm</button>
+                          ) : 'Chưa cập nhật'}
                         </td>
                       </tr>
                     ))}
@@ -245,10 +246,10 @@ export default function EmployeeDetailPage() {
                     <div className="min-w-0">
                       <p className="font-medium">
                         {c.name} {c.certNo ? <span className="text-muted-foreground">· Số {c.certNo}</span> : null}
-                        {c.fileUrl ? <a href={c.fileUrl} target="_blank" rel="noreferrer" className="no-print ml-2 text-xs text-primary hover:underline">[Tải bản scan]</a> : null}
+                        {c.fileUrl ? <button type="button" onClick={() => void openProtectedFile(c.fileUrl!)} className="no-print ml-2 text-xs text-primary hover:underline">[Tải bản scan]</button> : null}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {c.issuedBy ?? '—'}{c.issuedDate ? ` · Cấp ${formatDate(c.issuedDate)}` : ''}
+                        {c.issuedBy ?? 'Chưa cập nhật'}{c.issuedDate ? ` · Cấp ${formatDate(c.issuedDate)}` : ''}
                         {c.expiryDate ? ` · Hết hạn ${formatDate(c.expiryDate)}` : ''}
                         {c.storageSpot ? ` · Vị trí tủ: ${c.storageSpot}` : ''}
                       </p>
@@ -272,23 +273,14 @@ export default function EmployeeDetailPage() {
       </div>
 
       {/* ------------------------------- Modals ------------------------------- */}
-      <Modal open={profileOpen} onOpenChange={setProfileOpen} title="Sửa hồ sơ nhân sự" size="lg">
+      <Modal open={profileOpen} onOpenChange={setProfileOpen} title="Sửa thông tin liên hệ" size="lg">
         <form
           onSubmit={(e) => { e.preventDefault(); updateProfile.mutate(); }}
           className="grid grid-cols-1 gap-3 sm:grid-cols-2"
         >
           <div className="space-y-1.5"><Label>Mã NV</Label>
             <Input value={profileForm.employeeCode ?? emp.employeeCode ?? ''} onChange={(e) => setProfileForm({ ...profileForm, employeeCode: e.target.value })} /></div>
-          <div className="space-y-1.5"><Label>Chức danh</Label>
-            <Input value={profileForm.jobTitle ?? emp.jobTitle ?? ''} onChange={(e) => setProfileForm({ ...profileForm, jobTitle: e.target.value })} /></div>
-          <div className="space-y-1.5"><Label>Ngày vào làm</Label>
-            <Input type="date" value={profileForm.hireDate ?? emp.hireDate?.slice(0, 10) ?? ''} onChange={(e) => setProfileForm({ ...profileForm, hireDate: e.target.value })} /></div>
-          <div className="space-y-1.5"><Label>Trạng thái</Label>
-            <Select value={profileForm.employmentStatus ?? emp.employmentStatus} onChange={(e) => setProfileForm({ ...profileForm, employmentStatus: e.target.value })}>
-              {Object.entries(EMPLOYMENT_STATUS_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </Select></div>
-          <div className="space-y-1.5"><Label>Lương cơ bản (VND)</Label>
-            <Input type="number" value={profileForm.baseSalary ?? emp.baseSalary ?? ''} onChange={(e) => setProfileForm({ ...profileForm, baseSalary: e.target.value })} /></div>
+          <p className="sm:col-span-2 rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">Chức danh, đơn vị, ngày vào làm và tình trạng công tác được cập nhật theo quyết định đã duyệt hoặc quy trình tuyển dụng/thử việc.</p>
           <div className="space-y-1.5"><Label>Điện thoại</Label>
             <Input value={profileForm.phone ?? emp.phone ?? ''} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} /></div>
           <div className="space-y-1.5 sm:col-span-2"><Label>Địa chỉ</Label>
@@ -314,7 +306,11 @@ export default function EmployeeDetailPage() {
             <Input required type="date" value={contractForm.startDate} onChange={(e) => setContractForm({ ...contractForm, startDate: e.target.value })} /></div>
           <div className="space-y-1.5"><Label>Ngày hết hạn</Label>
             <Input type="date" value={contractForm.endDate} onChange={(e) => setContractForm({ ...contractForm, endDate: e.target.value })} /></div>
-          <div className="space-y-1.5"><Label>Lương cơ bản (VND) *</Label>
+          <div className="space-y-1.5"><Label>Cách trả lương *</Label>
+            <Select value={contractForm.compensationBasis} onChange={(e) => setContractForm({ ...contractForm, compensationBasis: e.target.value })}>
+              <option value="MONTHLY">Theo tháng</option><option value="DAILY">Theo ngày công</option><option value="HOURLY">Theo giờ</option>
+            </Select></div>
+          <div className="space-y-1.5"><Label>Mức trả theo đơn vị đã chọn (VND) *</Label>
             <Input required type="number" min={0} value={contractForm.baseSalary} onChange={(e) => setContractForm({ ...contractForm, baseSalary: e.target.value })} /></div>
           <div className="space-y-1.5 sm:col-span-2"><Label>Ghi chú</Label>
             <Textarea className="min-h-[60px]" value={contractForm.note} onChange={(e) => setContractForm({ ...contractForm, note: e.target.value })} /></div>

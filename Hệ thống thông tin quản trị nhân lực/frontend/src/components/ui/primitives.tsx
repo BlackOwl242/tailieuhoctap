@@ -144,7 +144,24 @@ const badgeVariants = cva(
 );
 
 export function Badge({ className, variant, ...props }: React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof badgeVariants>) {
-  return <span className={cn(badgeVariants({ variant }), className)} {...props} />;
+  const { style, ...spanProps } = props;
+  return (
+    <span
+      className={cn('inline-flex items-center text-xs font-normal text-inherit', className)}
+      data-variant={variant}
+      style={{
+        background: 'transparent',
+        border: 0,
+        borderRadius: 0,
+        boxShadow: 'none',
+        color: 'inherit',
+        fontWeight: 'normal',
+        padding: 0,
+        ...style,
+      }}
+      {...spanProps}
+    />
+  );
 }
 
 export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -453,7 +470,8 @@ export function Select({
         top: coords.top,
         bottom: coords.bottom,
         maxHeight: coords.maxHeight,
-        zIndex: isInsideModal ? 80 : 35,
+        // Modal overlay/content use z-index 100/101; a portaled picker must sit above both.
+        zIndex: isInsideModal ? 120 : 35,
       }}
     >
       {/* Ô tìm kiếm nếu danh sách >= 6 mục hoặc có cờ searchable */}
@@ -494,7 +512,12 @@ export function Select({
       )}
 
       {/* Danh sách cuộn các lựa chọn — co giãn theo maxHeight của popover */}
-      <div ref={listRef} className="overflow-y-auto flex-1 py-1 divide-y divide-border/20">
+      <div
+        ref={listRef}
+        className="min-h-0 overflow-y-auto overscroll-contain flex-1 py-1 divide-y divide-border/20"
+        onWheelCapture={(event) => event.stopPropagation()}
+        onTouchMoveCapture={(event) => event.stopPropagation()}
+      >
         {filteredOptions.length > 0 ? (
           filteredOptions.map((opt, idx) => {
             const isSelected = String(opt.value) === String(currentVal);

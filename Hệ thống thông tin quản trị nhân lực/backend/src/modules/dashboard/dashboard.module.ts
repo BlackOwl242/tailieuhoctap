@@ -1,3 +1,4 @@
+import { workDate } from '../../common/hr-time';
 import { Controller, Get, Injectable, Module } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../../common/prisma.service';
@@ -43,7 +44,7 @@ export class DashboardService {
     }
 
     // Chấm công hôm nay + 7 ngày gần nhất
-    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+    const todayStart = workDate();
     const weekAgo = new Date(todayStart.getTime() - 6 * 86_400_000);
     const [todayAttendance, weekDays] = await Promise.all([
       this.prisma.attendanceDay.findUnique({
@@ -88,7 +89,7 @@ export class DashboardService {
       this.prisma.leaveRequest.count({ where: { status: 'PENDING' } }),
       this.prisma.overtimeRequest.count({ where: { status: 'PENDING' } }),
       this.prisma.personnelAction.count({ where: { status: 'PENDING' } }),
-      this.prisma.payrollPeriod.findFirst({ orderBy: [{ year: 'desc' }, { month: 'desc' }], select: { month: true, year: true, status: true } }),
+      this.prisma.hrmsPayrollRun.findFirst({ orderBy: { fromDate: 'desc' }, select: { id: true, fromDate: true, status: true } }).then(run => run ? { ...run, month: run.fromDate.getUTCMonth() + 1, year: run.fromDate.getUTCFullYear() } : null),
     ]);
 
     return {

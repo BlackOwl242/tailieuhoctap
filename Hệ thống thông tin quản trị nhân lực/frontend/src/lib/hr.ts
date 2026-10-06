@@ -106,6 +106,6 @@ export const REQUEST_STATUS_TONE: Record<string, string> = {
 
 /** Định dạng tiền Việt Nam đồng gọn gàng. */
 export function vnd(amount: number | null | undefined): string {
-  if (amount == null) return '—';
+  if (amount == null) return 'Chưa cập nhật';
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(amount);
 }

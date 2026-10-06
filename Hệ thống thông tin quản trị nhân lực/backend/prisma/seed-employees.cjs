@@ -58,6 +58,16 @@ const EMPLOYEES = [
   { name: 'Ông Thị Bốn', title: 'Nhân viên hành chính (đã thôi việc)', unit: 'Ban Tổ chức – Hành chính – Nhân sự', salary: 0, hire: '2018-08-08', status: 'RESIGNED' },
 ];
 
+const UNIT_CODE_BY_LABEL = {
+  'Ban Giám đốc': 'BGD',
+  'Ban Tổ chức – Hành chính – Nhân sự': 'HR-OPS',
+  'Trung tâm TP.HCM': 'DEV-SGN',
+  'Trung tâm Đà Nẵng': 'DEV-DAD',
+  'Kinh doanh & Marketing': 'BIZ',
+  'Công nghệ & Hạ tầng': 'OPS-IT',
+  'Tài chính – Kế toán': 'FIN-ACC',
+};
+
 /** Khớp đơn vị theo số từ trùng giữa nhãn nhân viên và tên đơn vị trong DB. */
 function findUnit(units, label) {
   const words = (s) => s.toLowerCase().split(/[^a-zà-ỹ0-9.]+/i).filter((w) => w.length > 2);
@@ -74,6 +84,7 @@ function findUnit(units, label) {
 
 async function seedEmployees(prisma, hashOf) {
   const units = await prisma.orgUnit.findMany();
+  const unitByCode = new Map(units.map((unit) => [unit.code, unit]));
   const userRole = await prisma.role.findUnique({ where: { code: 'USER' } });
   const year = new Date().getFullYear();
   let created = 0;
@@ -84,7 +95,7 @@ async function seedEmployees(prisma, hashOf) {
     const exists = await prisma.user.findUnique({ where: { email } });
     if (exists) { skipped += 1; continue; }
 
-    const unit = findUnit(units, e.unit);
+    const unit = unitByCode.get(UNIT_CODE_BY_LABEL[e.unit]) || findUnit(units, e.unit);
 
     const user = await prisma.user.create({
       data: {
@@ -129,7 +140,7 @@ function transliterate(name) {
     .join('.');
 }
 
-module.exports = { seedEmployees, EMPLOYEES };
+module.exports = { seedEmployees, EMPLOYEES, UNIT_CODE_BY_LABEL };
 
 // Chạy standalone: node prisma/seed-employees.cjs
 if (require.main === module) {

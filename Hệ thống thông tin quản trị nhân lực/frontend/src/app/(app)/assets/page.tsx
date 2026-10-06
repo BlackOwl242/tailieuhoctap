@@ -13,6 +13,8 @@ import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
 import { Button, Input, Select } from '@/components/ui/primitives';
 import { Modal } from '@/components/ui/modal';
+import { useAuthStore } from '@/lib/auth-store';
+import { useToast } from '@/components/ui/toaster';
 
 interface AssetItem {
   id: string;
@@ -24,7 +26,7 @@ interface AssetItem {
   assignedEmployeeName?: string;
   allocatedDate?: string;
   returnedDate?: string;
-  status: 'AVAILABLE' | 'ALLOCATED' | 'MAINTENANCE' | 'DISPOSED';
+  status: 'AVAILABLE' | 'PENDING_ACK' | 'ALLOCATED' | 'MAINTENANCE' | 'DISPOSED';
   condition: string;
   value: number;
   notes?: string;
@@ -40,13 +42,12 @@ interface EmployeeOption {
 }
 
 /**
- * Danh mục phân loại tài sản chuẩn, bao quát cả:
- * - Đơn vị sự nghiệp công lập / Cơ quan Nhà nước (Thông tư 23/2023/TT-BTC)
- * - Doanh nghiệp / Tập đoàn kinh tế (Thông tư 45/2013/TT-BTC)
+ * Danh mục nội bộ minh họa các nhóm tài sản. Chưa cấu hình đầy đủ sổ sách,
+ * phân loại và khấu hao theo từng chế độ kế toán/ngành áp dụng.
  */
 const ASSET_CATEGORIES: { key: string; label: string; desc: string }[] = [
   { key: 'ALL', label: 'Tất cả phân loại', desc: 'Toàn bộ danh mục' },
-  { key: 'REAL_ESTATE', label: 'Trụ sở, nhà làm việc & công trình', desc: 'Nhà làm việc, giảng đường, hội trường, phòng thí nghiệm (TT 23)' },
+  { key: 'REAL_ESTATE', label: 'Trụ sở, nhà làm việc & công trình', desc: 'Nhà làm việc, cơ sở và công trình thuộc đơn vị' },
   { key: 'SPECIALIZED', label: 'Máy móc, thiết bị chuyên dùng', desc: 'Thiết bị y tế, nghiên cứu, thực hành, sản xuất chuyên ngành' },
   { key: 'VEHICLE', label: 'Phương tiện vận tải & xe công tác', desc: 'Xe ô tô phục vụ công tác, xe chuyên dùng' },
   { key: 'OFFICE_DEVICE', label: 'Thiết bị văn phòng', desc: 'Máy in, máy scan, photocopy, máy fax' },
@@ -70,11 +71,16 @@ const ASSET_CATEGORY_LABEL: Record<string, string> = {
 
 export default function AssetsPage() {
   const queryClient = useQueryClient();
+  const toast = useToast();
+  const roles = useAuthStore((s) => s.user?.roles ?? []);
+  const canManage = roles.some((role) => ['ADMIN', 'KM_MANAGER', 'HR_CB'].includes(role));
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAllocateModalOpen, setIsAllocateModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<AssetItem | null>(null);
+  const [receiptAsset, setReceiptAsset] = useState<AssetItem | null>(null);
+  const [receiptCondition, setReceiptCondition] = useState('GOOD');
 
   // Form State Tạo Mới
   const [assetCode, setAssetCode] = useState('');
@@ -90,12 +96,13 @@ export default function AssetsPage() {
 
   const { data: assets, isLoading, isError, error, refetch } = useQuery<AssetItem[]>({
     queryKey: ['hrms-assets'],
-    queryFn: async () => (await api.get('/hrms/assets')).data,
+    queryFn: async () => (await api.get(canManage ? '/hrms/assets' : '/hrms/assets/my')).data,
   });
 
   const { data: employeeList } = useQuery<EmployeeOption[]>({
     queryKey: ['employees-for-assets'],
     queryFn: async () => (await api.get('/employees')).data,
+    enabled: canManage,
   });
 
   const createMutation = useMutation({
@@ -140,6 +147,16 @@ export default function AssetsPage() {
     },
   });
 
+  const acknowledgeMutation = useMutation({
+    mutationFn: async () => api.post(`/hrms/assets/${receiptAsset!.id}/acknowledge`, { accepted: true, condition: receiptCondition }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hrms-assets'] });
+      setReceiptAsset(null);
+      toast('Đã lưu xác nhận nhận tài sản điện tử', 'success');
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
   if (isLoading) return <LoadingState text="Đang tải danh mục tài sản & thiết bị..." />;
   if (isError) return <ErrorState message={errorMessage(error)} onRetry={() => refetch()} />;
 
@@ -165,6 +182,7 @@ export default function AssetsPage() {
   const totalValue = assetList.reduce((acc, cur) => acc + (cur.value || 0), 0);
   const allocatedCount = assetList.filter((a) => a.status === 'ALLOCATED').length;
   const availableCount = assetList.filter((a) => a.status === 'AVAILABLE').length;
+  const pendingAckCount = assetList.filter((a) => a.status === 'PENDING_ACK').length;
 
   return (
     <div className="space-y-6 pb-12">
@@ -181,7 +199,7 @@ export default function AssetsPage() {
               <Printer className="h-3.5 w-3.5 text-muted-foreground" />
               In Biên Bản Bàn Giao
             </button>
-            <button
+            {canManage ? <button
               onClick={() => {
                 const nextNum = (assetList.length + 1).toString().padStart(3, '0');
                 setAssetCode(`AST-${nextNum}`);
@@ -191,7 +209,7 @@ export default function AssetsPage() {
             >
               <Plus className="h-4 w-4" />
               Khai Báo Tài Sản Mới
-            </button>
+            </button> : null}
           </div>
         }
       />
@@ -312,16 +330,22 @@ export default function AssetsPage() {
                           className={`h-1.5 w-1.5 rounded-full ${
                             asset.status === 'ALLOCATED'
                               ? 'bg-blue-600'
+                              : asset.status === 'PENDING_ACK'
+                              ? 'bg-amber-600'
                               : asset.status === 'AVAILABLE'
                               ? 'bg-emerald-600'
                               : 'bg-amber-600'
                           }`}
                         />
-                        {asset.status === 'ALLOCATED' ? 'Đang cấp phát' : asset.status === 'AVAILABLE' ? 'Sẵn sàng' : 'Bảo trì'}
+                        {asset.status === 'ALLOCATED' ? 'Đã xác nhận' : asset.status === 'PENDING_ACK' ? 'Chờ xác nhận' : asset.status === 'AVAILABLE' ? 'Sẵn sàng' : 'Bảo trì'}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      {asset.status === 'AVAILABLE' ? (
+                      {!canManage && asset.status === 'PENDING_ACK' ? (
+                        <button onClick={() => { setReceiptAsset(asset); setReceiptCondition(asset.condition || 'GOOD'); }} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/10 text-primary font-semibold hover:bg-primary/20 transition-colors text-xs">
+                          <Check className="h-3 w-3" /> Xác nhận đã nhận
+                        </button>
+                      ) : canManage && asset.status === 'AVAILABLE' ? (
                         <button
                           onClick={() => {
                             setSelectedAsset(asset);
@@ -334,7 +358,7 @@ export default function AssetsPage() {
                           <UserCheck className="h-3 w-3" />
                           Cấp phát
                         </button>
-                      ) : (
+                      ) : canManage && asset.status === 'ALLOCATED' ? (
                         <button
                           onClick={() => returnMutation.mutate(asset.id)}
                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-600 font-semibold hover:bg-rose-500/20 transition-colors text-xs"
@@ -343,7 +367,7 @@ export default function AssetsPage() {
                           <RotateCcw className="h-3 w-3" />
                           Thu hồi
                         </button>
-                      )}
+                      ) : null}
                     </td>
                   </tr>
                 ))}
@@ -537,6 +561,17 @@ export default function AssetsPage() {
           </div>
         </Modal>
       )}
+      <Modal open={!!receiptAsset} onOpenChange={(open) => !open && setReceiptAsset(null)} title="Xác nhận nhận tài sản" description={receiptAsset ? `${receiptAsset.assetCode} · ${receiptAsset.name}` : undefined}>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">Xác nhận điện tử này ghi nhận tài khoản của bạn đã tiếp nhận tài sản. Hãy kiểm tra tình trạng trước khi xác nhận.</p>
+          <div className="space-y-1.5"><label className="text-sm font-medium">Tình trạng khi nhận</label>
+            <Select value={receiptCondition} onChange={(e) => setReceiptCondition(e.target.value)}>
+              <option value="NEW">Mới</option><option value="EXCELLENT">Rất tốt</option><option value="GOOD">Tốt</option><option value="DAMAGED">Có hư hỏng</option>
+            </Select>
+          </div>
+          <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setReceiptAsset(null)}>Hủy</Button><Button onClick={() => acknowledgeMutation.mutate()} disabled={acknowledgeMutation.isPending}>Tôi xác nhận đã nhận</Button></div>
+        </div>
+      </Modal>
     </div>
   );
 }

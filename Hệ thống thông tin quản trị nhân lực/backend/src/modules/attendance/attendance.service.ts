@@ -1,3 +1,6 @@
+import { AttendanceLedgerService } from '../../common/services/attendance-ledger.service';
+import { RuntimeSettingsService } from '../../common/services/runtime-settings.service';
+import { atClock, dateKey, workDate, VN_OFFSET, DAY_MS } from '../../common/hr-time';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import * as crypto from 'node:crypto';
 import { PrismaService } from '../../common/prisma.service';
@@ -18,6 +21,8 @@ export class AttendanceService {
     private readonly access: SpaceAccessService,
     private readonly qrToken: QrTokenService,
     private readonly faceCrypto: FaceCryptoService,
+    private readonly ledger: AttendanceLedgerService,
+    private readonly settings: RuntimeSettingsService,
   ) {}
 
   // ------------------------------------------------------------------ kiosk
@@ -51,7 +56,7 @@ export class AttendanceService {
     if (!device.secretHash) {
       throw new BusinessException(ErrorCodes.NOT_FOUND, 'Kiosk chưa có khóa ký', HttpStatus.NOT_FOUND);
     }
-    const ttlSec = Number(process.env.QR_TOKEN_TTL_SEC || 30);
+    const ttlSec = Number(await this.settings.get('QR_TTL_SEC', Number(process.env.QR_TOKEN_TTL_SEC || 30)));
     // secretHash lưu bản băm — dùng chính nó làm khóa ký (không lưu plaintext)
     const { token, payload } = this.qrToken.issue(device.id, device.secretHash, ttlSec);
     await this.prisma.attendanceDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });
@@ -110,7 +115,7 @@ export class AttendanceService {
       if (embeddings.length === 0) {
         throw new BusinessException(ErrorCodes.FACE_NOT_ENROLLED, 'Bạn chưa đăng ký khuôn mặt', HttpStatus.BAD_REQUEST);
       }
-      const threshold = Number(process.env.FACE_MATCH_THRESHOLD || 0.95);
+      const threshold = Number(await this.settings.get('FACE_THRESHOLD', Number(process.env.FACE_MATCH_THRESHOLD || 0.95)));
       for (const row of embeddings) {
         const stored = this.faceCrypto.decryptEmbedding(row.encryptedData);
         const sim = FaceCryptoService.cosineSimilarity(stored, dto.descriptor!);
@@ -119,44 +124,41 @@ export class AttendanceService {
       if (maxSimilarity < threshold) {
         throw new BusinessException(
           ErrorCodes.FACE_NOT_MATCHED,
-          `Khuôn mặt không khớp (Độ tương đồng: ${(maxSimilarity * 100).toFixed(1)}% < ${(threshold * 100).toFixed(0)}%). Yêu cầu đạt tối thiểu 95% để bảo đảm an ninh sinh trắc học. Vui lòng căn chỉnh lại góc nhìn.`,
+          `Khuôn mặt không khớp (Độ tương đồng: ${(maxSimilarity * 100).toFixed(1)}% < ${(threshold * 100).toFixed(0)}%). Ngưỡng được cấu hình trong tham số hệ thống. Vui lòng căn chỉnh lại góc nhìn.`,
           HttpStatus.UNAUTHORIZED,
         );
       }
-    } else if (dto.method === 'WINDOWS_HELLO' || dto.method === 'FACE_ID' || dto.method === 'BIOMETRIC_3D') {
-      const me = await this.prisma.user.findUnique({ where: { id: user.id } });
-      if (!me?.faceConsentAt) {
-        throw new BusinessException(ErrorCodes.FACE_CONSENT_REQUIRED, 'Bạn chưa đồng ý thu thập dữ liệu sinh trắc học', HttpStatus.FORBIDDEN);
-      }
-      // Điểm danh qua cảm biến 3D phần cứng Windows Hello (Camera hồng ngoại IR) hoặc Apple Face ID (TrueDepth)
-      maxSimilarity = 0.9995;
+    } else if (['WINDOWS_HELLO', 'FACE_ID', 'BIOMETRIC_3D'].includes(dto.method)) {
+      throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Xác thực phần cứng chưa được triển khai; hãy dùng QR hoặc điểm danh web', HttpStatus.BAD_REQUEST);
     }
 
     // Xác định loại lần chấm kế tiếp: số sự kiện hôm nay chẵn → VÀO, lẻ → RA
     const now = new Date();
-    const dayStart = startOfDay(now);
-    const todaysEvents = await this.prisma.attendanceEvent.findMany({
-      where: { userId: user.id, occurredAt: { gte: dayStart, lte: now } },
+    const dayStart = await this.ledger.dayForPunch(user.id, now);
+    return this.prisma.$transaction(async tx => {
+    await this.ledger.assertMutable(dayStart, tx);
+    const todaysEvents = await tx.attendanceEvent.findMany({
+      where: { userId: user.id, occurredAt: { gte: new Date(dayStart.getTime() - VN_OFFSET), lte: now } },
       orderBy: { occurredAt: 'asc' },
     });
     const punchType = todaysEvents.length % 2 === 0 ? 'IN' : 'OUT';
 
     // Chống trùng: lần chấm cùng loại trong 2 phút vừa qua bị từ chối
-    const lastSame = [...todaysEvents].reverse().find((e) => (e.payload as { punch?: string } | null)?.punch === punchType);
+    const lastSame = todaysEvents[todaysEvents.length - 1];
     if (lastSame && now.getTime() - lastSame.occurredAt.getTime() < DEDUPE_WINDOW_MS) {
       throw new BusinessException(ErrorCodes.ALREADY_CHECKED_IN, 'Bạn vừa điểm danh rồi, thử lại sau ít phút', HttpStatus.CONFLICT);
     }
 
-    await this.prisma.attendanceEvent.create({
+    await tx.attendanceEvent.create({
       data: {
         userId: user.id,
         deviceId,
         source: dto.method,
         occurredAt: now,
-        payload: { punch: punchType },
+        payload: { punch: punchType, workDate: dayStart.toISOString().slice(0, 10) },
       },
     });
-    const day = await this.recomputeDay(user.id, dayStart);
+    const day = await this.ledger.recompute(user.id, dayStart, tx);
 
     return {
       punch: punchType,
@@ -166,6 +168,7 @@ export class AttendanceService {
       workedMinutes: day.workedMinutes,
       similarity: maxSimilarity > 0 ? Number(maxSimilarity.toFixed(4)) : undefined,
     };
+    }, { isolationLevel: 'Serializable' });
   }
 
   // ------------------------------------------------------------------- face
@@ -214,41 +217,12 @@ export class AttendanceService {
       where: { userId, active: true, source: 'BROWSER' },
     });
     const templates = rows.map((r) => this.faceCrypto.decryptEmbedding(r.encryptedData));
-    return { count: templates.length, templates, threshold: Number(process.env.FACE_MATCH_THRESHOLD || 0.95) };
+    return { count: templates.length, templates, threshold: Number(await this.settings.get('FACE_THRESHOLD', Number(process.env.FACE_MATCH_THRESHOLD || 0.95))) };
   }
 
   // ----------------------------------------------------------- 3D Biometrics
-  getBiometricChallenge(userId: string) {
-    const challenge = crypto.randomBytes(32).toString('base64url');
-    return {
-      challenge,
-      timeout: 60000,
-      userId,
-    };
-  }
-
-  async enrollBiometric3D(userId: string, dto: { credentialId: string; clientDataJSON?: string; attestationObject?: string; source?: string }) {
-    const me = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!me?.faceConsentAt) {
-      await this.prisma.user.update({ where: { id: userId }, data: { faceConsentAt: new Date() } });
-    }
-    const source = dto.source || 'WINDOWS_HELLO';
-    await this.prisma.faceEmbedding.updateMany({
-      where: { userId, source, active: true },
-      data: { active: false },
-    });
-    const encrypted = this.faceCrypto.encryptEmbedding([1, 0, 1, 0]);
-    await this.prisma.faceEmbedding.create({
-      data: {
-        userId,
-        encryptedData: encrypted,
-        dimensions: 256,
-        source,
-        active: true,
-      },
-    });
-    return { success: true, source, credentialId: dto.credentialId };
-  }
+  getBiometricChallenge(_userId: string) { throw new BusinessException(ErrorCodes.INVALID_STATE_TRANSITION, 'WebAuthn/Windows Hello chưa được tích hợp và xác minh phía máy chủ', HttpStatus.NOT_IMPLEMENTED); }
+  async enrollBiometric3D(_userId: string, _dto: unknown) { throw new BusinessException(ErrorCodes.INVALID_STATE_TRANSITION, 'Chưa hỗ trợ đăng ký sinh trắc học 3D', HttpStatus.NOT_IMPLEMENTED); }
 
   /** Xóa mẫu khuôn mặt (quyền riêng tư — cũng là mục mặc định của handover). */
   async deleteFaceEnrollment(userId: string, embeddingId?: string) {
@@ -461,40 +435,17 @@ export class AttendanceService {
     admin: AuthUser,
     requestId?: string,
   ) {
-    const date = startOfDay(new Date(dateIso));
-    const before = await this.prisma.attendanceDay.findUnique({
-      where: { userId_workDate: { userId, workDate: date } },
-    });
+    const date = dateKey(dateIso);
+    await this.ledger.assertMutable(date);
+    const before = await this.prisma.attendanceDay.findUnique({ where: { userId_workDate: { userId, workDate: date } } });
+    if (dto.field !== 'status') atClock(date, dto.newValue);
+    else if (!['PRESENT', 'LATE', 'EARLY_LEAVE', 'MISSING_PAIR', 'ON_LEAVE', 'HOLIDAY', 'ABSENT'].includes(dto.newValue)) throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Trạng thái công không hợp lệ');
+    const after = await this.prisma.$transaction(async tx => {
+      await this.ledger.assertMutable(date, tx);
+      await tx.attendanceCorrection.create({ data: { userId, workDate: date, field: dto.field, oldValue: before ? String(before[dto.field] ?? '') : null, newValue: dto.newValue, reason: dto.reason, correctedBy: admin.id } });
+      return this.ledger.recompute(userId, date, tx);
+    }, { isolationLevel: 'Serializable' });
 
-    if (dto.field === 'status') {
-      await this.prisma.attendanceDay.update({
-        where: { userId_workDate: { userId, workDate: date } },
-        data: { status: dto.newValue as never },
-      });
-    } else {
-      // Giờ hiệu chỉnh dạng "HH:MM" — ghép với ngày đang xét rồi ghi sự kiện MANUAL
-      const [h, m] = dto.newValue.split(':').map(Number);
-      if (Number.isNaN(h) || Number.isNaN(m)) {
-        throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Giờ hiệu chỉnh phải dạng HH:MM');
-      }
-      const at = new Date(date);
-      at.setHours(h, m, 0, 0);
-      await this.prisma.attendanceEvent.create({
-        data: { userId, source: 'MANUAL', occurredAt: at, payload: { punch: dto.field === 'firstInAt' ? 'IN' : 'OUT', manual: true } },
-      });
-      await this.recomputeDay(userId, date);
-    }
-
-    const after = await this.prisma.attendanceDay.findUnique({
-      where: { userId_workDate: { userId, workDate: date } },
-    });
-    await this.prisma.attendanceCorrection.create({
-      data: {
-        userId, workDate: date, field: dto.field,
-        oldValue: before ? String(before[dto.field as 'firstInAt' | 'lastOutAt' | 'status'] ?? '') : '',
-        newValue: dto.newValue, reason: dto.reason, correctedBy: admin.id,
-      },
-    });
     await this.audit.log({ actorId: admin.id, action: 'ATTENDANCE_CORRECTED', entityType: 'AttendanceDay', entityId: `${userId}@${dateIso}`, before, after, requestId });
     return after;
   }
@@ -505,56 +456,16 @@ export class AttendanceService {
    * giờ vào/ra, phút đi muộn/về sớm, trạng thái (thiếu cặp > đi muộn > về sớm).
    */
   private async recomputeDay(userId: string, dayStart: Date) {
-    const dayEnd = new Date(dayStart.getTime() + 86_400_000);
-    const events = await this.prisma.attendanceEvent.findMany({
-      where: { userId, occurredAt: { gte: dayStart, lt: dayEnd } },
-      orderBy: { occurredAt: 'asc' },
-    });
-
-    const workStart = workMinutes(process.env.ATTENDANCE_WORK_START || '08:00');
-    const workEnd = workMinutes(process.env.ATTENDANCE_WORK_END || '17:30');
-
-    let firstIn: Date | null = null;
-    let lastOut: Date | null = null;
-    for (const e of events) {
-      const punch = (e.payload as { punch?: string } | null)?.punch ?? guessPunch(e.occurredAt);
-      if (punch === 'IN') firstIn = firstIn ?? e.occurredAt;
-      else lastOut = e.occurredAt;
-    }
-
-    const lateMinutes = firstIn ? Math.max(0, minutesOfDay(firstIn) - workStart) : 0;
-    const earlyMinutes = lastOut ? Math.max(0, workEnd - minutesOfDay(lastOut)) : 0;
-    const workedMinutes = firstIn && lastOut ? Math.max(0, Math.round((lastOut.getTime() - firstIn.getTime()) / 60000)) : 0;
-
-    let status: 'PRESENT' | 'LATE' | 'EARLY_LEAVE' | 'MISSING_PAIR' = 'PRESENT';
-    if (events.length % 2 !== 0) status = 'MISSING_PAIR';
-    else if (lateMinutes > 0) status = 'LATE';
-    else if (earlyMinutes > 15) status = 'EARLY_LEAVE';
-
-    const saved = await this.prisma.attendanceDay.upsert({
-      where: { userId_workDate: { userId, workDate: dayStart } },
-      create: {
-        userId, workDate: dayStart, firstInAt: firstIn, lastOutAt: lastOut,
-        workedMinutes, lateMinutes, earlyMinutes, status, eventCount: events.length,
-      },
-      update: {
-        firstInAt: firstIn, lastOutAt: lastOut,
-        workedMinutes, lateMinutes, earlyMinutes, status, eventCount: events.length,
-      },
-    });
-    return saved;
+    return this.ledger.recompute(userId, dateKey(dayStart));
   }
+
 }
 
 // ---------------------------------------------------------------------------
 // Helpers thuần chức năng
 // ---------------------------------------------------------------------------
 
-function startOfDay(d: Date): Date {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
+function startOfDay(d: Date): Date { return workDate(d); }
 
 function minutesOfDay(d: Date): number {
   return d.getHours() * 60 + d.getMinutes();

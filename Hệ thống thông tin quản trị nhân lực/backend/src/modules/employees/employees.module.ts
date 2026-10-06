@@ -1,9 +1,9 @@
 import {
-  BadRequestException, Body, Controller, Delete, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post,
+  BadRequestException, Body, ConflictException, Controller, Delete, ForbiddenException, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import {
-  IsDateString, IsEnum, IsNumber, IsObject, IsOptional, IsString, MaxLength, Min,
+  IsDateString, IsEnum, IsIn, IsInt, IsNumber, IsObject, IsOptional, IsString, Max, MaxLength, Min,
 } from 'class-validator';
 import { randomUUID } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
@@ -14,6 +14,7 @@ import { AuditService } from '../../common/services/audit.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { BusinessException, ErrorCodes } from '../../common/errors/business.exception';
 import type { AuthUser } from '../../common/types/auth-user';
+import { dateKey, workDate } from '../../common/hr-time';
 
 // ---------------------------------------------------------------------------
 // DTOs
@@ -23,12 +24,14 @@ class UpdateProfileDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(40) employeeCode?: string;
   @ApiPropertyOptional() @IsOptional() @IsDateString() hireDate?: string;
   @ApiPropertyOptional() @IsOptional() @IsEnum(['PROBATION', 'ACTIVE', 'RESIGNED', 'RETIRED']) employmentStatus?: 'PROBATION' | 'ACTIVE' | 'RESIGNED' | 'RETIRED';
-  @ApiPropertyOptional() @IsOptional() @IsNumber() @Min(0) baseSalary?: number;
   @ApiPropertyOptional() @IsOptional() @IsDateString() birthDate?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(20) phone?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(200) address?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(120) jobTitle?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
+  @ApiPropertyOptional({ enum: ['RESIDENT', 'NON_RESIDENT'] }) @IsOptional() @IsIn(['RESIDENT', 'NON_RESIDENT']) taxResidency?: 'RESIDENT' | 'NON_RESIDENT';
+  @ApiPropertyOptional({ enum: ['I', 'II', 'III', 'IV'] }) @IsOptional() @IsIn(['I', 'II', 'III', 'IV']) minimumWageRegion?: 'I' | 'II' | 'III' | 'IV';
+  @ApiPropertyOptional() @IsOptional() @IsInt() @Min(0) @Max(20) taxDependentCount?: number;
 }
 
 class CreateContractDto {
@@ -37,6 +40,7 @@ class CreateContractDto {
   @ApiProperty() @IsDateString() startDate!: string;
   @ApiPropertyOptional() @IsOptional() @IsDateString() endDate?: string;
   @ApiProperty() @IsNumber() @Min(0) baseSalary!: number;
+  @ApiPropertyOptional({ enum: ['MONTHLY', 'DAILY', 'HOURLY'], default: 'MONTHLY' }) @IsOptional() @IsIn(['MONTHLY', 'DAILY', 'HOURLY']) compensationBasis?: 'MONTHLY' | 'DAILY' | 'HOURLY';
   @ApiPropertyOptional() @IsOptional() @IsNumber() @Min(0) insuranceSalary?: number;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(500) note?: string;
   /** Bản mềm hợp đồng đính kèm: { name, mimeType, sizeBytes, dataBase64 } ≤ 8MB. */
@@ -46,7 +50,6 @@ class CreateContractDto {
 class UpdateContractDto {
   @ApiPropertyOptional() @IsOptional() @IsEnum(['ACTIVE', 'EXPIRED', 'TERMINATED']) status?: 'ACTIVE' | 'EXPIRED' | 'TERMINATED';
   @ApiPropertyOptional() @IsOptional() @IsDateString() endDate?: string;
-  @ApiPropertyOptional() @IsOptional() @IsNumber() @Min(0) baseSalary?: number;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(500) note?: string;
 }
 
@@ -69,7 +72,7 @@ class CreateCertificateDto {
 const EMPLOYEE_SELECT = {
   id: true, email: true, fullName: true, employeeCode: true, hireDate: true,
   employmentStatus: true, baseSalary: true, birthDate: true, phone: true,
-  address: true, jobTitle: true, status: true, orgUnitId: true,
+  address: true, jobTitle: true, status: true, orgUnitId: true, taxResidency: true, minimumWageRegion: true, taxDependentCount: true,
   orgUnit: { select: { id: true, name: true, code: true } },
 } as const;
 
@@ -77,8 +80,7 @@ const EMPLOYEE_SELECT = {
 // lương/hợp đồng chỉ ADMIN + KM_MANAGER được xem).
 const EMPLOYEE_SELECT_PUBLIC = {
   id: true, email: true, fullName: true, employeeCode: true, hireDate: true,
-  employmentStatus: true, birthDate: true, phone: true,
-  address: true, jobTitle: true, status: true, orgUnitId: true,
+  employmentStatus: true, jobTitle: true, status: true, orgUnitId: true,
   orgUnit: { select: { id: true, name: true, code: true } },
 } as const;
 
@@ -120,8 +122,17 @@ export class EmployeesService {
    */
   async list(viewer: AuthUser) {
     const privileged = isPrivilegedHr(viewer);
+    const orgWideReader = viewer.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR'].includes(role));
+    let scope: { id?: string; orgUnitId?: string } = {};
+    if (!orgWideReader && viewer.roles.includes('LINE_MANAGER')) {
+      const manager = await this.prisma.user.findUnique({ where: { id: viewer.id }, select: { orgUnitId: true } });
+      if (!manager?.orgUnitId) return [];
+      scope = { orgUnitId: manager.orgUnitId };
+    } else if (!orgWideReader) {
+      scope = { id: viewer.id };
+    }
     const users = await this.prisma.user.findMany({
-      where: { deletedAt: null },
+      where: { deletedAt: null, ...scope },
       select: privileged ? EMPLOYEE_SELECT : EMPLOYEE_SELECT_PUBLIC,
       orderBy: [{ employeeCode: 'asc' }, { fullName: 'asc' }],
     });
@@ -145,13 +156,52 @@ export class EmployeesService {
       },
     });
     if (!user) throw new NotFoundException('Không tìm thấy nhân viên');
+    const orgWideReader = viewer.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR'].includes(role));
+    if (viewer.id !== id && !orgWideReader) {
+      if (!viewer.roles.includes('LINE_MANAGER')) throw new ForbiddenException('Chỉ được xem hồ sơ cá nhân của mình');
+      const [manager, employee] = await Promise.all([
+        this.prisma.user.findUnique({ where: { id: viewer.id }, select: { orgUnitId: true } }),
+        this.prisma.user.findUnique({ where: { id }, select: { orgUnitId: true } }),
+      ]);
+      if (!manager?.orgUnitId || manager.orgUnitId !== employee?.orgUnitId) throw new ForbiddenException('Chỉ được xem hồ sơ trong đơn vị phụ trách');
+    }
     return user;
+  }
+
+  async compensationBasis(id: string, effectiveDate?: string) {
+    const today = dateKey(effectiveDate ?? workDate());
+    const user = await this.prisma.user.findFirst({
+      where: { id, deletedAt: null },
+      select: {
+        salaryBandId: true,
+        contracts: {
+          where: { status: 'ACTIVE', startDate: { lte: today }, OR: [{ endDate: null }, { endDate: { gte: today } }] },
+          orderBy: { startDate: 'desc' },
+          take: 1,
+          select: { compensationBasis: true, contractNo: true },
+        },
+      },
+    });
+    if (!user) throw new NotFoundException('Không tìm thấy nhân viên');
+    const activeContract = user.contracts[0];
+    return {
+      salaryBandId: user.salaryBandId,
+      compensationBasis: activeContract?.compensationBasis ?? null,
+      contractNo: activeContract?.contractNo ?? null,
+      hasActiveContract: Boolean(activeContract),
+    };
   }
 
   /** Cập nhật hồ sơ HR — mỗi thay đổi để lại dấu vết kiểm toán (tính pháp lý). */
   async updateProfile(id: string, dto: UpdateProfileDto, actor: AuthUser, requestId?: string) {
     const user = await this.prisma.user.findFirst({ where: { id, deletedAt: null } });
     if (!user) throw new NotFoundException('Không tìm thấy nhân viên');
+    const controlledChange =
+      (dto.hireDate !== undefined && dateKey(dto.hireDate).getTime() !== dateKey(user.hireDate ?? new Date(0)).getTime()) ||
+      (dto.employmentStatus !== undefined && dto.employmentStatus !== user.employmentStatus) ||
+      (dto.jobTitle !== undefined && dto.jobTitle !== (user.jobTitle ?? '')) ||
+      (dto.orgUnitId !== undefined && dto.orgUnitId !== (user.orgUnitId ?? ''));
+    if (controlledChange) throw new ConflictException('Ngày vào làm, chức danh, đơn vị và trạng thái nhân sự phải thay đổi qua quy trình tuyển dụng/thử việc hoặc quyết định nhân sự để có người duyệt và ngày hiệu lực.');
     if (dto.employeeCode && dto.employeeCode !== user.employeeCode) {
       const dup = await this.prisma.user.findUnique({ where: { employeeCode: dto.employeeCode } });
       if (dup) throw new BusinessException(ErrorCodes.CONFLICT, 'Mã nhân viên đã tồn tại', HttpStatus.CONFLICT);
@@ -163,12 +213,14 @@ export class EmployeesService {
         employeeCode,
         hireDate: dto.hireDate ? new Date(dto.hireDate) : undefined,
         employmentStatus: dto.employmentStatus,
-        baseSalary: dto.baseSalary,
         birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
         phone: dto.phone,
         address: dto.address,
         jobTitle: dto.jobTitle,
         orgUnitId: dto.orgUnitId,
+        taxResidency: dto.taxResidency,
+        minimumWageRegion: dto.minimumWageRegion,
+        taxDependentCount: dto.taxDependentCount,
       },
       select: EMPLOYEE_SELECT,
     });
@@ -198,30 +250,47 @@ export class EmployeesService {
   async createContract(userId: string, dto: CreateContractDto, actor: AuthUser, requestId?: string) {
     const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
     if (!user) throw new NotFoundException('Không tìm thấy nhân viên');
+    const contractStart = dateKey(dto.startDate);
+    const existingContracts = await this.prisma.contract.count({ where: { userId } });
+    const activeAtStart = await this.prisma.contract.findFirst({ where: { userId, status: 'ACTIVE', startDate: { lte: contractStart }, OR: [{ endDate: null }, { endDate: { gte: contractStart } }] }, orderBy: { startDate: 'desc' } });
+    if (existingContracts > 0 && !activeAtStart) throw new ConflictException('Không thể tạo hợp đồng mới tạo khoảng trống sau hợp đồng cũ; cần hoàn tất gia hạn hoặc quyết định nhân sự trước.');
+    const compensationBasis = dto.compensationBasis ?? 'MONTHLY';
+    const changesPayTerms = activeAtStart
+      ? dto.baseSalary !== activeAtStart.baseSalary || compensationBasis !== activeAtStart.compensationBasis || (dto.insuranceSalary !== undefined && dto.insuranceSalary !== activeAtStart.insuranceSalary)
+      : dto.baseSalary !== (user.baseSalary ?? 0);
+    if (changesPayTerms && existingContracts > 0) throw new ConflictException('Thay đổi lương, cách trả hoặc căn cứ bảo hiểm phải lập đề xuất ở mục Biến động nhân sự để được duyệt trước khi cập nhật hợp đồng.');
+    if (changesPayTerms) {
+      const band = user.salaryBandId ? await this.prisma.hrmsSalaryBand.findUnique({ where: { id: user.salaryBandId } }) : null;
+      if (!band || band.status !== 'ACTIVE' || band.effectiveFrom > contractStart || (band.effectiveTo && band.effectiveTo < contractStart) || band.compensationBasis !== compensationBasis || dto.baseSalary < band.minSalary || dto.baseSalary > band.maxSalary) {
+        throw new ConflictException('Hợp đồng đầu tiên cần mức lương nằm trong khung lương đã duyệt và còn hiệu lực vào ngày bắt đầu.');
+      }
+    }
     const dup = await this.prisma.contract.findUnique({ where: { contractNo: dto.contractNo } });
     if (dup) throw new BusinessException(ErrorCodes.CONFLICT, 'Số hợp đồng đã tồn tại', HttpStatus.CONFLICT);
 
     let fileMeta: { fileUrl: string; fileName: string } | undefined;
     if (dto.file) fileMeta = await this.saveFile(dto.file);
-    const contract = await this.prisma.contract.create({
-      data: {
+    const contract = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.contract.create({ data: {
         userId,
         contractNo: dto.contractNo,
         type: dto.type,
         startDate: new Date(dto.startDate),
         endDate: dto.endDate ? new Date(dto.endDate) : null,
         baseSalary: dto.baseSalary,
-        insuranceSalary: dto.insuranceSalary,
+        compensationBasis: dto.compensationBasis,
+        insuranceSalary: dto.insuranceSalary ?? activeAtStart?.insuranceSalary,
         note: dto.note,
         fileUrl: fileMeta?.fileUrl,
         fileName: fileMeta?.fileName,
         createdById: actor.id,
-      },
-    });
-    // Hợp đồng mới ACTIVE → đồng bộ lương cơ bản của hồ sơ (nguồn tính lương)
-    if (contract.status === 'ACTIVE') {
-      await this.prisma.user.update({ where: { id: userId }, data: { baseSalary: dto.baseSalary } });
-    }
+      } });
+      // Chỉ đồng bộ mức hiện hành khi hợp đồng đã tới ngày có hiệu lực.
+      if (created.status === 'ACTIVE' && dateKey(created.startDate) <= dateKey(workDate())) {
+        await tx.user.update({ where: { id: userId }, data: { baseSalary: dto.baseSalary } });
+      }
+      return created;
+    }, { isolationLevel: 'Serializable' });
     await this.audit.log({
       actorId: actor.id, action: 'CONTRACT_CREATED', entityType: 'Contract', entityId: contract.id,
       after: { contractNo: contract.contractNo, type: contract.type }, requestId,
@@ -232,18 +301,16 @@ export class EmployeesService {
   async updateContract(userId: string, contractId: string, dto: UpdateContractDto, actor: AuthUser, requestId?: string) {
     const contract = await this.prisma.contract.findFirst({ where: { id: contractId, userId } });
     if (!contract) throw new NotFoundException('Không tìm thấy hợp đồng');
+    if (contract.status === 'ACTIVE' && dto.status === 'TERMINATED') throw new ConflictException('Chấm dứt quan hệ lao động phải đi qua đề xuất thôi việc và checklist bàn giao; không kết thúc hợp đồng trực tiếp ở đây.');
+    if (contract.status === 'ACTIVE' && dto.endDate && dateKey(dto.endDate) < dateKey(workDate())) throw new ConflictException('Không thể kết thúc hồi tố hợp đồng đang hoạt động; hãy lập quyết định thôi việc với ngày hiệu lực phù hợp.');
     const updated = await this.prisma.contract.update({
       where: { id: contractId },
       data: {
         status: dto.status,
         endDate: dto.endDate ? new Date(dto.endDate) : contract.endDate,
-        baseSalary: dto.baseSalary,
         note: dto.note,
       },
     });
-    if (dto.baseSalary !== undefined && updated.status === 'ACTIVE') {
-      await this.prisma.user.update({ where: { id: userId }, data: { baseSalary: dto.baseSalary } });
-    }
     await this.audit.log({
       actorId: actor.id, action: 'CONTRACT_UPDATED', entityType: 'Contract', entityId: contractId,
       after: { status: updated.status, baseSalary: updated.baseSalary }, requestId,
@@ -305,6 +372,12 @@ export class EmployeesController {
   @Get(':id')
   detail(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.service.detail(id, user);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER')
+  @Get(':id/compensation-basis')
+  compensationBasis(@Param('id') id: string, @Query('effectiveDate') effectiveDate?: string) {
+    return this.service.compensationBasis(id, effectiveDate);
   }
 
   @Roles('ADMIN', 'KM_MANAGER')

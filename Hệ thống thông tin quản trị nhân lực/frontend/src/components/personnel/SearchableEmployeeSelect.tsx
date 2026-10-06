@@ -113,7 +113,7 @@ export function SearchableEmployeeSelect({
 
     // Chỉ mở lên trên khi phía dưới chật VÀ phía trên có tối thiểu 160px để không đè lên topbar
     const shouldOpenUp = spaceBelow < 260 && spaceAbove > spaceBelow && spaceAbove >= 160;
-    const maxHeight = shouldOpenUp ? Math.min(340, spaceAbove - 8) : Math.min(340, spaceBelow - 12);
+    const maxHeight = Math.max(120, shouldOpenUp ? Math.min(340, spaceAbove - 8) : Math.min(340, spaceBelow - 12));
 
     const leftPos = Math.min(r.left, window.innerWidth - popoverWidth - 12);
     setCoords({
@@ -223,11 +223,6 @@ export function SearchableEmployeeSelect({
     return `${code}${cleanName} — ${role}`;
   }, [selectedEmp, placeholder]);
 
-  // Kiểm tra xem có đang nằm trong Modal không để chọn z-index phù hợp
-  const isInsideModal = Boolean(
-    containerRef.current?.closest('[role="dialog"], [aria-modal="true"], .fixed')
-  );
-
   // Nội dung popover (render qua portal)
   const popoverContent = isOpen && coords ? (
     <div
@@ -240,7 +235,8 @@ export function SearchableEmployeeSelect({
         top: coords.top,
         bottom: coords.bottom,
         maxHeight: coords.maxHeight,
-        zIndex: isInsideModal ? 80 : 35,
+        // The popover is portalled to body and must sit above the modal overlay/dialog.
+        zIndex: 1200,
       }}
     >
       {/* Hộp gõ tìm kiếm */}
@@ -280,7 +276,12 @@ export function SearchableEmployeeSelect({
       </div>
 
       {/* Danh sách cuộn các cán bộ — co giãn linh hoạt theo maxHeight */}
-      <div ref={listRef} className="overflow-y-auto flex-1 py-1 divide-y divide-border/20 font-sans">
+      <div
+        ref={listRef}
+        onWheelCapture={(event) => event.stopPropagation()}
+        onTouchMoveCapture={(event) => event.stopPropagation()}
+        className="min-h-0 overflow-y-auto overscroll-contain flex-1 py-1 divide-y divide-border/20 font-sans"
+      >
         {filteredEmployees.length > 0 ? (
           filteredEmployees.map((emp, idx) => {
             const isSelected = emp.id === value;

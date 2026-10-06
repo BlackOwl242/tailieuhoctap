@@ -25,6 +25,9 @@ interface JobOpening {
   vacancies: number;
   minExperience: number;
   salaryRange?: string;
+  salaryBandId?: string | null;
+  minimumInterviewRounds: number;
+  probationDays: number | null;
   description: string;
   status: string;
   _count?: { applicants: number };
@@ -91,12 +94,18 @@ export default function RecruitmentAtsPage() {
   const [isCreateApplicantModalOpen, setIsCreateApplicantModalOpen] = useState(false);
 
   // Form tạo tin tuyển dụng
+  const [openingRequisitionId, setOpeningRequisitionId] = useState('');
+  const requisitions = useQuery<{id:string;title:string;status:string}[]>({ queryKey:['requisitions'], queryFn:async()=>(await api.get('/recruitment/requisitions')).data });
+  const salaryBands = useQuery<{id:string;code:string;name:string;minSalary:number;maxSalary:number;compensationBasis:'MONTHLY'|'DAILY'|'HOURLY';status:string}[]>({ queryKey:['salary-bands'], queryFn:async()=>(await api.get('/salary-bands')).data });
   const [openingTitle, setOpeningTitle] = useState('');
   const [openingDept, setOpeningDept] = useState('Phòng Phát triển Phần mềm');
   const [openingDesignation, setOpeningDesignation] = useState('');
   const [openingVacancies, setOpeningVacancies] = useState(1);
   const [openingMinExp, setOpeningMinExp] = useState(1);
-  const [openingSalary, setOpeningSalary] = useState('20.000.000 - 35.000.000 VND');
+  const [openingSalary, setOpeningSalary] = useState('');
+  const [openingSalaryBandId, setOpeningSalaryBandId] = useState('');
+  const [openingInterviewRounds, setOpeningInterviewRounds] = useState(1);
+  const [openingProbationDays, setOpeningProbationDays] = useState('');
   const [openingClosingDate, setOpeningClosingDate] = useState('');
   const [openingDesc, setOpeningDesc] = useState('');
   const [openingReqs, setOpeningReqs] = useState('');
@@ -137,12 +146,16 @@ export default function RecruitmentAtsPage() {
 
   const createOpeningMutation = useMutation({
     mutationFn: async (payload: {
+      requisitionId: string;
       title: string;
       department?: string;
       designation?: string;
       vacancies: number;
       minExperience: number;
       salaryRange?: string;
+      salaryBandId?: string;
+      minimumInterviewRounds: number;
+      probationDays: number;
       description: string;
       requirements?: string;
       closingDate?: string;
@@ -156,6 +169,8 @@ export default function RecruitmentAtsPage() {
       setOpeningDesignation('');
       setOpeningDesc('');
       setOpeningReqs('');
+      setOpeningSalaryBandId('');
+      setOpeningProbationDays('');
       toast('Đã đăng tin tuyển dụng mới thành công!', 'success');
     },
     onError: (e) => toast(errorMessage(e), 'error'),
@@ -200,6 +215,7 @@ export default function RecruitmentAtsPage() {
       return { previous };
     },
     onError: (_err, _vars, context) => {
+      toast(errorMessage(_err), 'error');
       if (context?.previous) {
         queryClient.setQueryData(['hrms-job-applicants'], context.previous);
       }
@@ -236,11 +252,12 @@ export default function RecruitmentAtsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hrms-job-applicants'] });
       queryClient.invalidateQueries({ queryKey: ['employees'] });
-      toast('Đã tiếp nhận và chuyển đổi ứng viên thành Nhân sự chính thức thành công!', 'success');
+      toast('Đã tiếp nhận và chuyển đổi ứng viên thành nhân viên thử việc; chờ IT kích hoạt tài khoản!', 'success');
     },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
 
+  const offerResponse = useMutation({ mutationFn: async({id,accepted,evidenceUrl}:{id:string;accepted:boolean;evidenceUrl:string})=>api.patch(`/hrms/recruitment/offers/${id}/respond`,{accepted,evidenceUrl}), onSuccess:()=>{queryClient.invalidateQueries({queryKey:['hrms-job-applicants']});setIsApplicantDetailModalOpen(false);toast('Đã ghi nhận phản hồi ứng viên','success');},onError:e=>toast(errorMessage(e),'error') });
   if (isLoadingOpenings || isLoadingApps) return <LoadingState text="Đang tải Đường ống Tuyển dụng ATS..." />;
 
   const filteredApplicants = filterOpeningId === 'ALL'
@@ -566,7 +583,7 @@ export default function RecruitmentAtsPage() {
                                   className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                                 >
                                   <Sparkles className="h-3 w-3" />
-                                  1-Click Nhận việc
+                                  Nhận việc thử việc
                                 </button>
                               )}
                               {col.key === 'HIRED' && (
@@ -750,6 +767,7 @@ export default function RecruitmentAtsPage() {
 
             <div className="space-y-3 text-xs">
               <div>
+                <label>Chỉ tiêu đã duyệt</label><select className="w-full border rounded p-2 mb-3" value={openingRequisitionId} onChange={e=>setOpeningRequisitionId(e.target.value)}><option value="">Chọn chỉ tiêu</option>{requisitions.data?.filter(q=>q.status==='APPROVED').map(q=><option key={q.id} value={q.id}>{q.title}</option>)}</select><a href="/hr-workflows" className="text-sm underline">Đề nghị / thẩm định chỉ tiêu tuyển dụng</a>
                 <label className="font-medium text-foreground">Tiêu đề tin tuyển dụng <span className="text-rose-500">*</span></label>
                 <Input
                   placeholder="VD: Kỹ sư Phần mềm Senior Full-Stack..."
@@ -813,13 +831,19 @@ export default function RecruitmentAtsPage() {
               </div>
 
               <div>
-                <label className="font-medium text-foreground">Khung lương công bố</label>
-                <Input
-                  placeholder="VD: 25.000.000 - 45.000.000 VND hoặc Thỏa thuận"
-                  value={openingSalary}
-                  onChange={(e) => setOpeningSalary(e.target.value)}
-                  className="mt-1 h-9 text-xs"
-                />
+                <label className="font-medium text-foreground">Khung lương đã được duyệt</label>
+                {(salaryBands.data ?? []).some(b => b.status === 'ACTIVE' && b.compensationBasis === 'MONTHLY') ? <>
+                  <Select value={openingSalaryBandId} onChange={(e) => setOpeningSalaryBandId(e.target.value)} className="mt-1 h-9 text-xs">
+                    <option value="">— Chọn khung theo vị trí —</option>
+                    {(salaryBands.data ?? []).filter(b => b.status === 'ACTIVE' && b.compensationBasis === 'MONTHLY').map(b => <option key={b.id} value={b.id}>{b.code} · {b.name} · {b.minSalary.toLocaleString('vi-VN')}–{b.maxSalary.toLocaleString('vi-VN')} đ/tháng</option>)}
+                  </Select>
+                  <p className="mt-1 text-[11px] text-muted-foreground">Offer bị chặn nếu nằm ngoài khung lương đã duyệt.</p>
+                </> : <p className="mt-1 rounded border border-amber-300 bg-amber-50 p-2 text-xs text-amber-900">Chưa có khung lương được duyệt. Hãy <a className="font-semibold underline" href="/salary-bands">tạo khung lương theo vị trí</a> trước khi mở tin tuyển dụng.</p>}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><label className="font-medium text-foreground">Số vòng phỏng vấn</label><Select value={openingInterviewRounds} onChange={e => setOpeningInterviewRounds(Number(e.target.value))} className="mt-1 h-9 text-xs"><option value={1}>1 vòng</option><option value={2}>2 vòng</option></Select></div>
+                <div><label className="font-medium text-foreground">Thử việc bao nhiêu ngày theo vị trí?</label><Input required type="number" min={1} max={180} value={openingProbationDays} onChange={e => setOpeningProbationDays(e.target.value)} className="mt-1 h-9 text-xs" placeholder="Nhập theo tính chất công việc" /></div>
               </div>
 
               <div>
@@ -834,8 +858,8 @@ export default function RecruitmentAtsPage() {
               </div>
 
               <div>
-                <label className="font-medium text-foreground">Yêu cầu đối với ứng viên</label>
-                <Textarea
+                <label className="font-medium text-foreground">Tiêu chí bắt buộc để chọn ứng viên <span className="text-rose-500">*</span></label>
+                <Textarea required
                   rows={2}
                   placeholder="Kỹ năng bắt buộc, trình độ học vấn, ngoại ngữ..."
                   value={openingReqs}
@@ -856,15 +880,19 @@ export default function RecruitmentAtsPage() {
               </Button>
               <Button
                 size="sm"
-                disabled={!openingTitle.trim() || !openingDesc.trim() || createOpeningMutation.isPending}
+                disabled={!openingRequisitionId || !openingTitle.trim() || !openingDesc.trim() || !openingReqs.trim() || !openingProbationDays || !(salaryBands.data ?? []).some(b => b.status === 'ACTIVE' && b.compensationBasis === 'MONTHLY') || !openingSalaryBandId || createOpeningMutation.isPending}
                 onClick={() =>
                   createOpeningMutation.mutate({
+                    requisitionId: openingRequisitionId,
                     title: openingTitle.trim(),
                     department: openingDept.trim() || undefined,
                     designation: openingDesignation.trim() || undefined,
                     vacancies: Number(openingVacancies) || 1,
                     minExperience: Number(openingMinExp) || 0,
                     salaryRange: openingSalary.trim() || undefined,
+                    salaryBandId: openingSalaryBandId || undefined,
+                    minimumInterviewRounds: openingInterviewRounds,
+                    probationDays: Number(openingProbationDays),
                     description: openingDesc.trim(),
                     requirements: openingReqs.trim() || undefined,
                     closingDate: openingClosingDate ? new Date(openingClosingDate).toISOString() : undefined,
@@ -1100,17 +1128,19 @@ export default function RecruitmentAtsPage() {
               >
                 Tạo Thư Mời (Offer)
               </Button>
-              <Button
+              <Button disabled={!selectedApplicant.offers?.some(o=>o.status==='ACCEPTED')}
                 size="sm"
                 onClick={() => {
+                  if (!selectedApplicant.offers?.some(o=>o.status === 'ACCEPTED')) { toast('Cần ghi nhận ứng viên chấp thuận offer trước khi nhận việc', 'error'); return; }
                   convertToEmployeeMutation.mutate(selectedApplicant.id);
                   setIsApplicantDetailModalOpen(false);
                 }}
                 className="text-xs h-9"
               >
-                1-Click Nhận việc
+                Nhận việc thử việc
               </Button>
             </div>
+            {selectedApplicant?.offers?.filter(o=>o.status==='SENT').map(o=><div key={o.id} className="flex gap-2 p-3"><Button onClick={()=>{const evidenceUrl=prompt('Minh chứng ứng viên chấp thuận (đường dẫn)');if(evidenceUrl)offerResponse.mutate({id:o.id,accepted:true,evidenceUrl});}}>Ghi nhận chấp thuận offer</Button><Button variant="outline" onClick={()=>{const evidenceUrl=prompt('Minh chứng ứng viên từ chối');if(evidenceUrl)offerResponse.mutate({id:o.id,accepted:false,evidenceUrl});}}>Ghi nhận từ chối</Button></div>)}
           </div>
         </div>,
         document.body

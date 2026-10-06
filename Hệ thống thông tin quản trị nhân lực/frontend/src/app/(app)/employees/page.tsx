@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -18,8 +18,10 @@ import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 import { Button, Input, Label, Select } from '@/components/ui/primitives';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
+import { useAuthStore } from '@/lib/auth-store';
 import { ComprehensivePersonnelModal } from '@/components/personnel/ComprehensivePersonnelModal';
 import { ProfileChangeReviewQueue } from '@/components/personnel/ProfileChangeReviewQueue';
+import { isEnterpriseSector, useOrgConfig } from '@/lib/org-config';
 
 interface EmployeeRow {
   id: string;
@@ -27,10 +29,13 @@ interface EmployeeRow {
   fullName: string;
   email: string;
   jobTitle: string | null;
-  orgUnit?: { name: string } | null;
+  orgUnit?: { id: string; name: string } | null;
   hireDate: string | null;
   employmentStatus: keyof typeof EMPLOYMENT_STATUS_LABEL;
   baseSalary: number | null;
+  taxResidency?: 'RESIDENT' | 'NON_RESIDENT';
+  minimumWageRegion?: 'I' | 'II' | 'III' | 'IV';
+  taxDependentCount?: number;
 }
 
 interface ComprehensiveProfileRow {
@@ -43,7 +48,7 @@ interface ComprehensiveProfileRow {
     employeeCode: string | null;
     jobTitle: string | null;
     hireDate: string | null;
-    orgUnit?: { name: string; code: string } | null;
+    orgUnit?: { id: string; name: string; code: string } | null;
   };
   gender: string | null;
   rankCode: string | null;
@@ -61,11 +66,19 @@ interface ComprehensiveProfileRow {
 export default function EmployeesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [orgConfig] = useOrgConfig();
+  const enterpriseMode = isEnterpriseSector(orgConfig);
   const initialTab = searchParams.get('tab') === 'civil-servant' ? 'civil-servant' : searchParams.get('tab') === 'approvals' ? 'approvals' : 'standard';
   const [activeTab, setActiveTab] = useState<'standard' | 'civil-servant' | 'approvals'>(initialTab);
 
+  useEffect(() => {
+    if (enterpriseMode && activeTab === 'civil-servant') setActiveTab('standard');
+  }, [enterpriseMode, activeTab]);
+
   const qc = useQueryClient();
   const toast = useToast();
+  const viewerRoles = useAuthStore((s) => s.user?.roles ?? []);
+  const canEditTaxProfile = viewerRoles.some((role) => ['ADMIN', 'KM_MANAGER'].includes(role));
 
   const qPendingApprovals = useQuery({
     queryKey: ['profile-change-requests-count'],
@@ -79,6 +92,7 @@ export default function EmployeesPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isComprehensiveOpen, setIsComprehensiveOpen] = useState(false);
   const [selectedEditUserId, setSelectedEditUserId] = useState<string | null>(null);
+  const [taxEdit, setTaxEdit] = useState<{ userId: string; fullName: string; taxResidency: 'RESIDENT' | 'NON_RESIDENT'; minimumWageRegion: 'I' | 'II' | 'III' | 'IV'; taxDependentCount: number } | null>(null);
 
   const [form, setForm] = useState({
     fullName: '',
@@ -89,7 +103,6 @@ export default function EmployeesPage() {
     jobTitle: '',
     orgUnitId: '',
     employmentStatus: 'PROBATION',
-    baseSalary: 12000000,
     hireDate: new Date().toISOString().split('T')[0],
   });
 
@@ -114,6 +127,8 @@ export default function EmployeesPage() {
     queryKey: ['org-units'],
     queryFn: async () => (await api.get<{ id: string; name: string; code: string }[]>('/org-units')).data,
   });
+  const employeeRows = qEmployees.data ?? [];
+  const employeesWithOrgUnit = employeeRows.filter((employee) => Boolean(employee.orgUnit?.id)).length;
 
   const createEmployee = useMutation({
     mutationFn: async () => {
@@ -126,7 +141,6 @@ export default function EmployeesPage() {
         jobTitle: form.jobTitle || undefined,
         orgUnitId: form.orgUnitId || undefined,
         employmentStatus: form.employmentStatus,
-        baseSalary: Number(form.baseSalary) || undefined,
         hireDate: form.hireDate || undefined,
         roleCodes: ['USER'],
       });
@@ -143,11 +157,24 @@ export default function EmployeesPage() {
         jobTitle: '',
         orgUnitId: '',
         employmentStatus: 'PROBATION',
-        baseSalary: 12000000,
         hireDate: new Date().toISOString().split('T')[0],
       });
       qc.invalidateQueries({ queryKey: ['employees'] });
       qc.invalidateQueries({ queryKey: ['personnel-profiles'] });
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const saveTaxProfile = useMutation({
+    mutationFn: async () => api.patch(`/employees/${taxEdit!.userId}/profile`, {
+      taxResidency: taxEdit!.taxResidency,
+      minimumWageRegion: taxEdit!.minimumWageRegion,
+      taxDependentCount: taxEdit!.taxDependentCount,
+    }),
+    onSuccess: () => {
+      toast('Đã cập nhật thông tin tính thuế và bảo hiểm', 'success');
+      setTaxEdit(null);
+      qc.invalidateQueries({ queryKey: ['employees'] });
     },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
@@ -161,7 +188,7 @@ export default function EmployeesPage() {
       className: 'w-[12%] text-center font-mono',
       render: (r) => (
         <span className="font-mono text-xs font-medium text-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
-          {r.employeeCode ?? '—'}
+          {r.employeeCode ?? 'Chưa cập nhật'}
         </span>
       ),
     },
@@ -181,9 +208,9 @@ export default function EmployeesPage() {
         </>
       ),
     },
-    { key: 'jobTitle', header: 'Chức danh', sortable: true, className: 'w-[20%]', render: (r) => r.jobTitle ?? '—' },
-    { key: 'orgUnit', header: 'Đơn vị công tác', className: 'w-[20%]', render: (r) => r.orgUnit?.name ?? '—', exportValue: (r) => r.orgUnit?.name ?? '' },
-    { key: 'hireDate', header: 'Ngày vào', sortable: true, className: 'w-[13%] text-center', render: (r) => (r.hireDate ? formatDate(r.hireDate) : '—'), exportValue: (r) => (r.hireDate ? formatDate(r.hireDate) : '') },
+    { key: 'jobTitle', header: 'Chức danh', sortable: true, className: 'w-[20%]', render: (r) => r.jobTitle ?? 'Chưa cập nhật' },
+    { key: 'orgUnit', header: 'Đơn vị công tác', className: 'w-[20%]', render: (r) => r.orgUnit?.name ?? 'Chưa cập nhật', exportValue: (r) => r.orgUnit?.name ?? '' },
+    { key: 'hireDate', header: 'Ngày vào', sortable: true, className: 'w-[13%] text-center', render: (r) => (r.hireDate ? formatDate(r.hireDate) : 'Chưa cập nhật'), exportValue: (r) => (r.hireDate ? formatDate(r.hireDate) : '') },
     {
       key: 'employmentStatus',
       header: 'Trạng thái',
@@ -217,7 +244,7 @@ export default function EmployeesPage() {
       exportValue: (r) => r.user.employeeCode || '',
       render: (r) => (
         <span className="font-mono text-xs font-semibold text-foreground">
-          {r.user.employeeCode || '—'}
+          {r.user.employeeCode || 'Chưa cập nhật'}
         </span>
       ),
     },
@@ -249,15 +276,15 @@ export default function EmployeesPage() {
       header: 'Đơn vị / Phòng ban',
       sortable: true,
       className: 'w-[18%]',
-      exportValue: (r) => r.user.orgUnit?.name || '—',
-      render: (r) => r.user.orgUnit?.name || '—',
+      exportValue: (r) => r.user.orgUnit?.name || 'Chưa cập nhật',
+      render: (r) => r.user.orgUnit?.name || 'Chưa cập nhật',
     },
     {
       key: 'govPosition',
       header: 'Chức danh / Vị trí',
       className: 'w-[17%]',
-      exportValue: (r) => r.govPosition || r.user.jobTitle || '—',
-      render: (r) => r.govPosition || r.user.jobTitle || '—',
+      exportValue: (r) => r.govPosition || r.user.jobTitle || 'Chưa cập nhật',
+      render: (r) => r.govPosition || r.user.jobTitle || 'Chưa cập nhật',
     },
     {
       key: 'rank',
@@ -282,8 +309,8 @@ export default function EmployeesPage() {
       key: 'highestDegree',
       header: 'Trình độ chuyên môn',
       className: 'w-[12%]',
-      exportValue: (r) => r.highestDegree || '—',
-      render: (r) => r.highestDegree || '—',
+      exportValue: (r) => r.highestDegree || 'Chưa cập nhật',
+      render: (r) => r.highestDegree || 'Chưa cập nhật',
     },
     {
       key: 'politicalTheory',
@@ -292,7 +319,7 @@ export default function EmployeesPage() {
       exportValue: (r) => r.politicalTheory || 'Không',
       render: (r) => (
         <span className="text-xs text-foreground">
-          {r.politicalTheory || '—'}
+          {r.politicalTheory || 'Chưa cập nhật'}
         </span>
       ),
     },
@@ -302,7 +329,9 @@ export default function EmployeesPage() {
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
         title="Hồ sơ nhân sự"
-        description="Quản lý danh bạ nhân sự và hồ sơ cán bộ, công chức, viên chức chuẩn Mẫu 2C-BNV."
+        description={enterpriseMode
+          ? 'Quản lý danh bạ nhân sự doanh nghiệp. Hồ sơ 2C khu vực công được ẩn trong chế độ này.'
+          : 'Danh bạ là danh sách nhân sự gốc; hồ sơ 2C là phần thông tin công vụ bổ sung cho người đã khai báo, không phải một danh sách nhân viên khác.'}
         breadcrumbs={[{ label: 'Nhân sự' }, { label: 'Hồ sơ nhân sự' }]}
         actions={
           <div className="flex items-center gap-2">
@@ -314,22 +343,24 @@ export default function EmployeesPage() {
             >
               <Plus className="h-4 w-4" /> Tiếp nhận nhanh
             </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                setSelectedEditUserId(null);
-                setIsComprehensiveOpen(true);
-              }}
-              className="gap-1.5 shadow-2xs font-bold"
-            >
-              <FileText className="h-4 w-4 text-primary-foreground" /> Khai báo hồ sơ 2C (111 trường)
-            </Button>
+            {!enterpriseMode ? (
+              <Button
+                size="sm"
+                onClick={() => {
+                  setSelectedEditUserId(null);
+                  setIsComprehensiveOpen(true);
+                }}
+                className="gap-1.5 shadow-2xs font-bold"
+              >
+                <FileText className="h-4 w-4 text-primary-foreground" /> Khai báo hồ sơ 2C (111 trường)
+              </Button>
+            ) : null}
           </div>
         }
       />
 
-      {/* Chế độ xem: Danh sách Doanh nghiệp vs Hồ sơ Cán bộ Nhà nước */}
-      <div className="flex items-center gap-2 border-b border-border pb-3">
+      {/* Danh bạ là hồ sơ nhân sự gốc; hồ sơ 2C là phần bổ sung chỉ có ở khu vực công. */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
         <button
           onClick={() => setActiveTab('standard')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
@@ -339,30 +370,24 @@ export default function EmployeesPage() {
           }`}
         >
           <Users className="h-3.5 w-3.5" />
-          Danh sách Nhân sự (Chuẩn Doanh nghiệp)
-          {qEmployees.data ? (
-            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-primary/20 text-foreground text-xs font-mono">
-              {qEmployees.data.length}
-            </span>
-          ) : null}
+          {enterpriseMode ? 'Danh bạ Nhân sự' : 'Danh bạ Nhân sự (toàn bộ)'}
+          {qEmployees.data ? <span className="font-normal">({qEmployees.data.length})</span> : null}
         </button>
 
-        <button
-          onClick={() => setActiveTab('civil-servant')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-            activeTab === 'civil-servant'
-              ? 'bg-primary text-primary-foreground shadow-2xs'
-              : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
-          }`}
-        >
-          <Building2 className="h-3.5 w-3.5" />
-          Hồ sơ Cán bộ, Công chức, Viên chức (Mẫu 2C-BNV)
-          {qProfiles.data ? (
-            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-primary/20 text-foreground text-xs font-mono">
-              {qProfiles.data.length}
-            </span>
-          ) : null}
-        </button>
+        {!enterpriseMode ? (
+          <button
+            onClick={() => setActiveTab('civil-servant')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+              activeTab === 'civil-servant'
+                ? 'bg-primary text-primary-foreground shadow-2xs'
+                : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
+            }`}
+          >
+            <Building2 className="h-3.5 w-3.5" />
+            Hồ sơ công chức / viên chức 2C (bổ sung)
+            {qProfiles.data ? <span className="font-normal">({qProfiles.data.length})</span> : null}
+          </button>
+        ) : null}
 
         <button
           onClick={() => setActiveTab('approvals')}
@@ -374,13 +399,15 @@ export default function EmployeesPage() {
         >
           <ShieldCheck className="h-3.5 w-3.5 text-amber-500" />
           Xét duyệt Hồ sơ Cá nhân
-          {pendingCount > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-600 dark:text-amber-400 font-mono text-xs font-bold">
-              {pendingCount}
-            </span>
-          )}
+          {pendingCount > 0 && <span className="font-normal">({pendingCount} chờ duyệt)</span>}
         </button>
       </div>
+
+      {activeTab === 'standard' && qEmployees.data ? (
+        <p className="text-xs text-muted-foreground">
+          {employeeRows.length} hồ sơ trong danh bạ · {employeesWithOrgUnit} đã gán đơn vị · {employeeRows.length - employeesWithOrgUnit} chưa gán đơn vị.
+        </p>
+      ) : null}
 
       <div className="print-area">
         {activeTab === 'standard' ? (
@@ -403,6 +430,14 @@ export default function EmployeesPage() {
                     value: (r) => r.employmentStatus,
                     options: Object.entries(EMPLOYMENT_STATUS_LABEL).map(([value, label]) => ({ value, label })),
                   },
+                  {
+                    key: 'orgUnitId', label: 'Đơn vị',
+                    value: (r) => r.orgUnit?.id ?? 'UNASSIGNED',
+                    options: [
+                      ...((orgUnitsQ.data ?? []).map((unit: { id: string; name: string }) => ({ value: unit.id, label: unit.name }))),
+                      { value: 'UNASSIGNED', label: 'Chưa gán đơn vị' },
+                    ],
+                  },
                 ]}
                 emptyTitle="Chưa có hồ sơ nhân sự"
                 actions={(r): RowActionItem[] => [
@@ -411,16 +446,27 @@ export default function EmployeesPage() {
                     icon: Eye,
                     onSelect: () => router.push(`/employees/${r.id}`),
                   },
-                  {
+                  ...(!enterpriseMode ? [{
                     label: 'Khai báo hồ sơ chuyên sâu (2C)',
                     icon: FileText,
                     onSelect: () => {
                       setSelectedEditUserId(r.id);
                       setIsComprehensiveOpen(true);
                     },
-                  },
+                  }] : []),
+                  ...(canEditTaxProfile ? [{
+                    label: 'Cập nhật cư trú thuế, vùng lương tối thiểu và người phụ thuộc',
+                    icon: PencilLine,
+                    onSelect: () => setTaxEdit({
+                      userId: r.id,
+                      fullName: r.fullName,
+                      taxResidency: r.taxResidency ?? 'RESIDENT',
+                      minimumWageRegion: r.minimumWageRegion ?? 'I',
+                      taxDependentCount: r.taxDependentCount ?? 0,
+                    }),
+                  }] : []),
                   {
-                    label: 'Xem Sơ yếu lý lịch 4 trang',
+                    label: enterpriseMode ? 'In hồ sơ nhân sự' : 'Xem Sơ yếu lý lịch (bìa + 4 trang)',
                     icon: Printer,
                     onSelect: () => router.push(`/personnel-reports?userId=${r.id}`),
                   },
@@ -460,6 +506,15 @@ export default function EmployeesPage() {
                   r.highestDegree || '',
                 ]}
                 filters={[
+                  {
+                    key: 'orgUnitId',
+                    label: 'Đơn vị',
+                    value: (r) => r.user.orgUnit?.id ?? 'UNASSIGNED',
+                    options: [
+                      ...((orgUnitsQ.data ?? []).map((unit: { id: string; name: string }) => ({ value: unit.id, label: unit.name }))),
+                      { value: 'UNASSIGNED', label: 'Chưa gán đơn vị' },
+                    ],
+                  },
                   {
                     key: 'groupCode',
                     label: 'Nhóm ngạch',
@@ -516,9 +571,10 @@ export default function EmployeesPage() {
         open={isCreateOpen}
         onOpenChange={setIsCreateOpen}
         title="Tiếp nhận nhân sự mới"
-        description="Khởi tạo tài khoản và hồ sơ nhân sự cơ bản vào hệ thống."
+        description="Dùng để nhập hồ sơ nhân sự hiện có. Nhân sự mới tuyển phải đi qua phiếu tuyển, phỏng vấn, đề nghị tuyển dụng và offer đã duyệt. Lương được ghi nhận từ hợp đồng đã ký."
       >
         <div className="space-y-4 py-2">
+          <p className="rounded-lg bg-muted p-3 text-sm">Với nhân sự mới tuyển, hãy hoàn tất quy trình tại mục <b>Tuyển dụng</b> rồi dùng chức năng chuyển ứng viên trúng tuyển thành hồ sơ nhân viên. Màn này chỉ dành cho nhập hồ sơ có sẵn hoặc cấp tài khoản nội bộ.</p>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Họ và tên *</Label>
@@ -581,7 +637,7 @@ export default function EmployeesPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Hình thức làm việc</Label>
               <Select
@@ -591,14 +647,6 @@ export default function EmployeesPage() {
                 <option value="PROBATION">Thử việc</option>
                 <option value="ACTIVE">Chính thức</option>
               </Select>
-            </div>
-            <div>
-              <Label>Lương cơ bản (VNĐ)</Label>
-              <Input
-                type="number"
-                value={form.baseSalary}
-                onChange={(e) => setForm({ ...form, baseSalary: Number(e.target.value) })}
-              />
             </div>
             <div>
               <Label>Ngày vào làm</Label>
@@ -619,6 +667,16 @@ export default function EmployeesPage() {
             />
           </div>
         </div>
+      </Modal>
+
+      <Modal open={!!taxEdit} onOpenChange={(open) => !open && setTaxEdit(null)} title="Thông tin khấu trừ và bảo hiểm" description={taxEdit?.fullName}>
+        {taxEdit ? <div className="space-y-4">
+          <p className="text-xs text-muted-foreground">Nhập theo hồ sơ cư trú, nơi làm việc và giấy tờ người phụ thuộc đã được xác minh. Thông tin này được dùng trong lần tính lương tiếp theo.</p>
+          <div className="space-y-1.5"><Label>Tình trạng cư trú thuế</Label><Select value={taxEdit.taxResidency} onChange={(e) => setTaxEdit({ ...taxEdit, taxResidency: e.target.value as 'RESIDENT' | 'NON_RESIDENT' })}><option value="RESIDENT">Cá nhân cư trú</option><option value="NON_RESIDENT">Cá nhân không cư trú</option></Select></div>
+          <div className="space-y-1.5"><Label>Vùng lương tối thiểu tại nơi làm việc</Label><Select value={taxEdit.minimumWageRegion} onChange={(e) => setTaxEdit({ ...taxEdit, minimumWageRegion: e.target.value as 'I' | 'II' | 'III' | 'IV' })}><option value="I">Vùng I</option><option value="II">Vùng II</option><option value="III">Vùng III</option><option value="IV">Vùng IV</option></Select></div>
+          <div className="space-y-1.5"><Label>Số người phụ thuộc đủ điều kiện</Label><Input type="number" min={0} max={20} value={taxEdit.taxDependentCount} onChange={(e) => setTaxEdit({ ...taxEdit, taxDependentCount: Number(e.target.value) })} /></div>
+          <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setTaxEdit(null)}>Hủy</Button><Button onClick={() => saveTaxProfile.mutate()} disabled={saveTaxProfile.isPending}>Lưu thông tin</Button></div>
+        </div> : null}
       </Modal>
 
       {/* Modal Khai báo hồ sơ chuyên sâu Mẫu 2C-BNV */}

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import { Badge, Button, Card, Input, Select } from '@/components/ui/primitives';
+import { Badge, Button, Card, Input } from '@/components/ui/primitives';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock, PrintExportDropdown } from '@/components/ui/print';
@@ -26,7 +26,11 @@ export default function PersonnelReportsPage() {
   const [orgConfig] = useOrgConfig();
   const [activeReport, setActiveReport] = useState<'2c' | 'bieu01' | 'bieu02' | 'bieu03'>('2c');
   const [selectedUserId, setSelectedUserId] = useState<string>(initialUserId || '');
-  const [cvMode, setCvMode] = useState<'state' | 'enterprise'>('state');
+  const [cvMode, setCvMode] = useState<'enterprise' | 'state'>(isEnterpriseSector(orgConfig) ? 'enterprise' : 'state');
+
+  useEffect(() => {
+    setCvMode(isEnterpriseSector(orgConfig) ? 'enterprise' : 'state');
+  }, [orgConfig]);
 
   useEffect(() => {
     if (initialUserId) {
@@ -84,7 +88,7 @@ export default function PersonnelReportsPage() {
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
         title="Báo cáo nhân sự"
-        description="Mẫu biểu báo cáo nhân lực chuẩn hóa: Sơ yếu lý lịch (Mẫu 2C-BNV), Thống kê Độ tuổi theo Ngạch bậc (Biểu 01), Ngoại ngữ (Biểu 02) và Chuyên môn (Biểu 03)."
+        description="Mẫu 2C là sơ yếu lý lịch; Báo cáo 01–03 là báo cáo quản trị nội bộ, chưa được xác định là biểu mẫu pháp quy."
         breadcrumbs={[{ label: 'Báo cáo' }, { label: 'Báo cáo nhân sự' }]}
       />
 
@@ -92,9 +96,9 @@ export default function PersonnelReportsPage() {
       <div className="flex border-b border-border/60 gap-2 mb-6 overflow-x-auto pb-1 no-print">
         {[
           { id: '2c', label: '1. Sơ yếu Lý lịch (2C-BNV & Doanh nghiệp)', icon: FileText },
-          { id: 'bieu01', label: '2. Biểu 01: Độ tuổi × Ngạch bậc', icon: Award },
-          { id: 'bieu02', label: '3. Biểu 02: Ngoại ngữ & Tin học', icon: Globe },
-          { id: 'bieu03', label: '4. Biểu 03: Trình độ CM & LLCT × Đơn vị', icon: Building },
+          { id: 'bieu01', label: '2. Nội bộ 01: Độ tuổi × Ngạch bậc', icon: Award },
+          { id: 'bieu02', label: '3. Nội bộ 02: Ngoại ngữ & Tin học', icon: Globe },
+          { id: 'bieu03', label: '4. Nội bộ 03: Trình độ CM & LLCT × Đơn vị', icon: Building },
         ].map((tab) => {
           const Icon = tab.icon;
           const active = activeReport === tab.id;
@@ -118,8 +122,15 @@ export default function PersonnelReportsPage() {
       {/* BÁO CÁO 1: SƠ YẾU LÝ LỊCH KÉP (NHÀ NƯỚC 2C-BNV / 2008 & DOANH NGHIỆP TƯ NHÂN) */}
       {activeReport === '2c' && (
         <div className="space-y-6">
+          <div className="no-print flex flex-wrap items-center gap-2 text-sm" role="note">
+            <span className="font-semibold text-foreground">Mẫu hồ sơ theo cấu hình tổ chức:</span>
+            <span className="text-foreground">
+              {cvMode === 'enterprise' ? 'Doanh nghiệp tư nhân' : 'Khu vực công — bìa và 4 trang nội dung'}
+            </span>
+            <span className="text-xs text-muted-foreground">Đổi loại hình tại Cấu hình tổ chức để chuyển sang mẫu còn lại.</span>
+          </div>
           {/* Vùng Bản In Sơ Yếu Lý Lịch Chuẩn A4 */}
-          <div className="print-area max-w-6xl mx-auto text-black">
+          <div className={`print-area max-w-6xl mx-auto text-black ${cvMode === 'enterprise' ? 'enterprise-personnel-print-area' : 'state-civil-servant-print-area'}`}>
             {q2c.isLoading ? (
               <div className="text-center py-20 text-muted-foreground font-sans bg-card border border-border rounded-lg shadow-xs">
                 <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
@@ -133,8 +144,6 @@ export default function PersonnelReportsPage() {
                   employees={employees}
                   currentUserId={currentUserId}
                   onSelectUser={setSelectedUserId}
-                  cvMode={cvMode}
-                  onSelectCvMode={setCvMode}
                 />
               ) : (
                 <div className="space-y-4">
@@ -151,17 +160,6 @@ export default function PersonnelReportsPage() {
                         />
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-foreground">Định dạng:</span>
-                        <Select
-                          value={cvMode}
-                          onChange={(e) => setCvMode(e.target.value as 'state' | 'enterprise')}
-                          className="w-[280px] text-xs"
-                        >
-                          <option value="state">Mẫu 2C-BNV/2008 (Cơ quan Nhà nước - Trọn bộ 5 trang)</option>
-                          <option value="enterprise">Mẫu Doanh nghiệp tư nhân (Hồ sơ trích ngang)</option>
-                        </Select>
-                      </div>
                     </div>
 
                     <Button
@@ -172,8 +170,8 @@ export default function PersonnelReportsPage() {
                     </Button>
                   </div>
 
-                  <div className="bg-muted/80 p-4 sm:p-10 rounded-lg shadow-inner border border-border flex justify-center">
-                    <div className="bg-card border border-border rounded-lg p-6 sm:p-10 shadow-xl w-full max-w-4xl">
+                  <div className="bg-muted/30 p-4 sm:p-8 rounded-lg border border-border flex justify-center">
+                    <div className="bg-card border border-border rounded-md p-4 sm:p-8 shadow-sm w-full max-w-4xl">
                       <EnterprisePersonnelProfile data={q2c.data} orgConfig={orgConfig} />
                     </div>
                   </div>
@@ -193,7 +191,7 @@ export default function PersonnelReportsPage() {
         <div className="print-area font-times space-y-4">
           <PrintFrame
             title="THỐNG KÊ CƠ CẤU ĐỘ TUỔI THEO NGẠCH BẬC LƯƠNG"
-            subtitle={`Biểu 01 — Xuất ngày ${formatDate(new Date().toISOString())}`}
+            subtitle={`Báo cáo quản trị nội bộ 01 — không phải biểu mẫu pháp quy — Xuất ngày ${formatDate(new Date().toISOString())}`}
           />
           <Card className="p-5 bg-card border border-border shadow-xs overflow-x-auto">
             <table className="w-full border-collapse border border-black text-[11pt]">
@@ -233,18 +231,18 @@ export default function PersonnelReportsPage() {
                       <td className="border border-border p-2 text-left font-medium text-foreground">{row.rank.name}</td>
                       <td className="border border-border p-2 font-bold">{row.rank.code}</td>
                       <td className="border border-border p-2 font-bold bg-muted/30">{row.total}</td>
-                      <td className="border border-black p-1">{row.ageGroups.under30.male || '—'}</td>
-                      <td className="border border-black p-1">{row.ageGroups.under30.female || '—'}</td>
-                      <td className="border border-black p-1 font-semibold">{row.ageGroups.age30to39.male || '—'}</td>
-                      <td className="border border-black p-1 font-semibold">{row.ageGroups.age30to39.female || '—'}</td>
-                      <td className="border border-black p-1">{row.ageGroups.age40to49.male || '—'}</td>
-                      <td className="border border-black p-1">{row.ageGroups.age40to49.female || '—'}</td>
-                      <td className="border border-black p-1">{row.ageGroups.age50to54.male || '—'}</td>
-                      <td className="border border-black p-1">{row.ageGroups.age50to54.female || '—'}</td>
-                      <td className="border border-black p-1">{row.ageGroups.age55to59.male || '—'}</td>
-                      <td className="border border-black p-1">{row.ageGroups.age55to59.female || '—'}</td>
-                      <td className="border border-black p-1">{row.ageGroups.above60.male || '—'}</td>
-                      <td className="border border-black p-1">{row.ageGroups.above60.female || '—'}</td>
+                      <td className="border border-black p-1">{row.ageGroups.under30.male ?? 0}</td>
+                      <td className="border border-black p-1">{row.ageGroups.under30.female ?? 0}</td>
+                      <td className="border border-black p-1 font-semibold">{row.ageGroups.age30to39.male ?? 0}</td>
+                      <td className="border border-black p-1 font-semibold">{row.ageGroups.age30to39.female ?? 0}</td>
+                      <td className="border border-black p-1">{row.ageGroups.age40to49.male ?? 0}</td>
+                      <td className="border border-black p-1">{row.ageGroups.age40to49.female ?? 0}</td>
+                      <td className="border border-black p-1">{row.ageGroups.age50to54.male ?? 0}</td>
+                      <td className="border border-black p-1">{row.ageGroups.age50to54.female ?? 0}</td>
+                      <td className="border border-black p-1">{row.ageGroups.age55to59.male ?? 0}</td>
+                      <td className="border border-black p-1">{row.ageGroups.age55to59.female ?? 0}</td>
+                      <td className="border border-black p-1">{row.ageGroups.above60.male ?? 0}</td>
+                      <td className="border border-black p-1">{row.ageGroups.above60.female ?? 0}</td>
                     </tr>
                   ))
                 )}
@@ -260,7 +258,7 @@ export default function PersonnelReportsPage() {
         <div className="print-area font-times space-y-4">
           <PrintFrame
             title="THỐNG KÊ TRÌNH ĐỘ NGOẠI NGỮ & TIN HỌC"
-            subtitle={`Biểu 02 — Tổng số ${qBieu02.data?.totalPersonnel || 0} nhân sự`}
+            subtitle={`Báo cáo quản trị nội bộ 02 — không phải biểu mẫu pháp quy — Tổng số ${qBieu02.data?.totalPersonnel || 0} nhân sự`}
           />
           <Card className="p-5 bg-card border border-border shadow-xs overflow-x-auto">
             <table className="w-full border-collapse border border-black text-[11pt]">
@@ -282,9 +280,9 @@ export default function PersonnelReportsPage() {
                   qBieu02.data?.items?.map((item: any, idx: number) => (
                     <tr key={idx} className="hover:bg-muted/30">
                       <td className="border border-border p-2 text-center">{idx + 1}</td>
-                      <td className="border border-border p-2 font-bold">{item.employeeCode || '—'}</td>
+                      <td className="border border-border p-2 font-bold">{item.employeeCode || 'Chưa cập nhật'}</td>
                       <td className="border border-black p-2 font-bold">{item.fullName}</td>
-                      <td className="border border-black p-2">{item.orgUnitName || '—'}</td>
+                      <td className="border border-black p-2">{item.orgUnitName || 'Chưa cập nhật'}</td>
                       <td className="border border-black p-2">{item.rankName || 'Theo HĐLĐ'}</td>
                       <td className="border border-black p-2 font-medium">{item.foreignLanguage}</td>
                       <td className="border border-black p-2 font-medium">{item.informaticsLevel}</td>
@@ -303,7 +301,7 @@ export default function PersonnelReportsPage() {
         <div className="print-area font-times space-y-4">
           <PrintFrame
             title="THỐNG KÊ TRÌNH ĐỘ CHUYÊN MÔN & LÝ LUẬN CHÍNH TRỊ THEO ĐƠN VỊ"
-            subtitle={`Biểu 03 — Xuất ngày ${formatDate(new Date().toISOString())}`}
+            subtitle={`Báo cáo quản trị nội bộ 03 — không phải biểu mẫu pháp quy — Xuất ngày ${formatDate(new Date().toISOString())}`}
           />
           <Card className="p-5 bg-card border border-border shadow-xs overflow-x-auto">
             <table className="w-full border-collapse border border-black text-[11pt]">
@@ -332,13 +330,13 @@ export default function PersonnelReportsPage() {
                     <tr key={idx} className="hover:bg-muted/30 text-center">
                       <td className="border border-border p-2 text-left font-bold text-foreground">{row.orgUnitName}</td>
                       <td className="border border-border p-2 font-bold bg-muted/30">{row.total}</td>
-                      <td className="border border-black p-1 font-semibold">{row.doctorate || '—'}</td>
-                      <td className="border border-black p-1 font-semibold">{row.master || '—'}</td>
-                      <td className="border border-black p-1 font-semibold">{row.bachelor || '—'}</td>
-                      <td className="border border-black p-1">{row.college + row.intermediate || '—'}</td>
-                      <td className="border border-black p-1 font-semibold">{row.polHigh || '—'}</td>
-                      <td className="border border-black p-1">{row.polMid || '—'}</td>
-                      <td className="border border-black p-1">{row.polBasic || '—'}</td>
+                      <td className="border border-black p-1 font-semibold">{row.doctorate ?? 0}</td>
+                      <td className="border border-black p-1 font-semibold">{row.master ?? 0}</td>
+                      <td className="border border-black p-1 font-semibold">{row.bachelor ?? 0}</td>
+                      <td className="border border-black p-1">{row.college + row.intermediate}</td>
+                      <td className="border border-black p-1 font-semibold">{row.polHigh ?? 0}</td>
+                      <td className="border border-black p-1">{row.polMid ?? 0}</td>
+                      <td className="border border-black p-1">{row.polBasic ?? 0}</td>
                     </tr>
                   ))
                 )}

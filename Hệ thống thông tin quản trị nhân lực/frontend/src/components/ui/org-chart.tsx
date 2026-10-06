@@ -14,6 +14,7 @@ export interface OrgNode {
   headTitle?: string;
   headName?: string;
   headAvatar?: string;
+  /** Số nhân sự được gán trực tiếp vào đơn vị, không gồm đơn vị con. */
   headcount: number;
   parentId?: string | null;
   sortOrder?: number;
@@ -21,14 +22,15 @@ export interface OrgNode {
 }
 
 export function getOrgNodeLevelLabel(node: OrgNode, level: number): string {
-  if (node.code === 'SG-TECH') return 'Cấp 1: Ban Lãnh đạo Công ty';
-  if (node.code === 'BGD') return 'Cấp 1: Ban Giám đốc Điều hành';
-  if (node.code === 'ĐHCĐ') return 'Cấp 1: Quản trị Sở hữu (ĐHCĐ)';
-  if (['DELIVERY', 'HR', 'OPS', 'BIZ', 'FIN'].includes(node.code)) return 'Cấp 2: Khối chức năng';
-  if (node.code.startsWith('SQ-') || node.code.startsWith('QA-')) return 'Cấp 4: Tổ / Nhóm chuyên môn';
-  if (level >= 3) return 'Cấp 3: Trung tâm / Phòng';
-  if (level === 2) return 'Cấp 2: Khối / Ban';
-  return 'Cấp 1: Ban Lãnh đạo';
+  if (node.code === 'SG-TECH') return 'Cấp 1: Doanh nghiệp';
+  if (['BGD', 'ĐHCĐ', 'DHCD', 'BKS'].includes(node.code)) return 'Cấp 2: Quản trị / điều hành';
+  if (['CORE-REVENUE', 'SUPPORT-OPERATIONS'].includes(node.code)) return 'Cấp 3: Khối tổng hợp';
+  if (['DELIVERY', 'HR', 'OPS', 'BIZ', 'FIN'].includes(node.code)) return 'Cấp 4: Khối chức năng';
+  if (node.code.startsWith('SQ-') || ['QA-AUTO', 'QA-MANUAL'].includes(node.code) || level >= 5) return 'Cấp 6: Tổ / Nhóm chuyên môn';
+  if (level >= 4) return 'Cấp 5: Phòng / Trung tâm';
+  if (level >= 3) return 'Cấp 4: Khối chức năng';
+  if (level === 2) return 'Cấp 2: Quản trị / điều hành';
+  return `Cấp ${level + 1}: Đơn vị trực thuộc`;
 }
 
 export function OrgChartNode({
@@ -89,19 +91,19 @@ export function OrgChartNode({
         )}
       >
         {/* Top Meta */}
-        <div className="flex items-center justify-between gap-1.5 mb-2 pb-1.5 border-b border-border">
-          <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border uppercase tracking-wider">
+        <div className="flex items-center justify-between gap-1.5 mb-2 pb-1.5 border-b border-border text-xs">
+          <span className="font-mono font-semibold text-muted-foreground uppercase tracking-wider">
             {node.code}
           </span>
-          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-muted text-foreground border border-border">
-            <Users className="h-3.5 w-3.5 text-muted-foreground" />
-            <span>{node.headcount} NS</span>
+          <span className="inline-flex items-center gap-1 text-muted-foreground">
+            <Users className="h-3.5 w-3.5" />
+            <span>{node.headcount} nhân sự trực tiếp</span>
           </span>
         </div>
 
         {/* Level Indicator */}
         <div className="mb-1.5">
-          <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-md border border-border bg-muted/40 text-muted-foreground">
+          <span className="text-xs font-medium text-muted-foreground">
             {levelLabelText}
           </span>
         </div>
@@ -192,7 +194,7 @@ export function InteractiveOrgChart({
           code: 'ORGANIZATION',
           headName: 'Ban Lãnh Đạo / Ban Giám Đốc',
           headTitle: 'Cơ quan Quản lý & Điều hành',
-          headcount: nodes.reduce((sum, n) => sum + (n.headcount || 0), 0),
+          headcount: 0,
           children: nodes,
         };
 
@@ -202,7 +204,7 @@ export function InteractiveOrgChart({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3 mb-4">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="font-bold text-foreground">Thao tác cây:</span>
-          <span>Click vào thẻ để xem danh sách nhân viên trực thuộc</span>
+          <span>Chọn đơn vị để xem nhân sự được gán trực tiếp</span>
         </div>
 
         <div className="flex items-center gap-1.5 rounded-md border border-border bg-card p-1 shadow-2xs">

@@ -210,7 +210,7 @@ function extractAdvancedFaceDescriptor(video: HTMLVideoElement): { vector: numbe
     }
   }
 
-  const livenessScore = isIRFeed ? 0.99 : 0.96;
+  const livenessScore = 0; // chưa triển khai kiểm tra sống, không tạo điểm giả
   return { vector, isIRFeed, livenessScore };
 }
 
@@ -471,14 +471,14 @@ function CheckInInner() {
       const res = await api.post('/attendance/check-in', { method: 'FACE', descriptor: vector });
       const punch = res.data?.punch === 'IN' ? 'GIỜ VÀO (CHECK-IN)' : 'GIỜ RA (CHECK-OUT)';
       const time = new Date().toLocaleTimeString('vi-VN');
-      const sim = res.data?.similarity ? Number(res.data.similarity) : (liveSimilarity ?? 0.96);
+      const sim = res.data?.similarity ? Number(res.data.similarity) : (liveSimilarity ?? 0);
       if (soundEnabled) playChime('success');
       setFaceResult({
         ok: true,
         punch,
         time,
         similarity: sim,
-        sensorType: isIRFeed ? 'Camera Hồng ngoại IR (Chống giả mạo quang học)' : 'Camera RGB 2D AI Matching',
+        sensorType: isIRFeed ? 'Camera Hồng ngoại IR (chưa xác minh phần cứng)' : 'Camera RGB demo',
         status: res.data?.status,
         message: `Xác thực khuôn mặt thành công (${punch}) lúc ${time}`,
       });
@@ -603,6 +603,7 @@ function CheckInInner() {
 
       {/* ================= MAIN CONTAINER ================= */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+        <div role="note" className="rounded-lg border border-amber-500 p-4 text-sm">Nhận diện khuôn mặt ở chế độ mô phỏng bằng vector ảnh. Chưa kiểm tra sống, chưa xác minh camera IR và chưa tích hợp WebAuthn/Windows Hello/Face ID. Các phương thức 3D bị máy chủ từ chối; QR và điểm danh web vẫn sử dụng được.</div>
         {/* CỔNG ĐIỂM DANH & NHẬN DIỆN KHUÔN MẶT 2D / HỒNG NGOẠI IR */}
         <div className="flex flex-col gap-6">
           {/* Thanh công cụ phương thức */}
@@ -705,7 +706,7 @@ function CheckInInner() {
                           <div className={`absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 rounded-bl-md ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
                           <div className={`absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 rounded-br-md ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
 
-                          <div className="absolute -bottom-8 rounded-full bg-slate-900/80 border border-white/10 px-3.5 py-1 text-xs font-medium text-white backdrop-blur-xs">
+                          <div className="absolute -bottom-8 text-xs font-medium text-white">
                             {isLiveMatch ? 'Khuôn mặt hợp lệ' : 'Giữ khuôn mặt trong khung hình'}
                           </div>
                         </div>
@@ -749,7 +750,7 @@ function CheckInInner() {
                         <div className="max-w-xs">
                           <h3 className="text-base font-bold text-white">Yêu cầu bật Camera</h3>
                           <p className="text-xs text-slate-300 mt-1">
-                            Bật camera hoặc cảm biến hồng ngoại IR để hệ thống nhận diện khuôn mặt 2D chống giả mạo.
+                            Bật camera hoặc cảm biến hồng ngoại IR để hệ thống nhận diện khuôn mặt 2D chưa có kiểm tra sống.
                           </p>
                         </div>
                         <Button
@@ -916,7 +917,7 @@ function CheckInInner() {
                       <div className="flex items-center justify-between text-xs text-muted-foreground mt-1.5 font-medium">
                         <span>0%</span>
                         <span className="font-bold text-foreground">| Ngưỡng tối thiểu: 95.0%</span>
-                        <span>100%</span>
+                        <span>chưa xác minh</span>
                       </div>
                     </div>
                   ) : null}
@@ -1140,10 +1141,10 @@ function CheckInInner() {
 
                         <div className="p-3 rounded-md bg-muted/20 border border-border space-y-1">
                           <p className="font-bold text-foreground flex items-center gap-1.5">
-                            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> 2. Chống giả mạo quang học (Optical Liveness)
+                            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> 2. chưa xác minh phần cứng (Optical Liveness)
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Cảm biến IR phát quang phổ 850nm/940nm đo độ phản xạ nhiệt của da người thật. Màn hình điện thoại/iPad và ảnh in trên giấy sẽ bị triệt tiêu phản xạ, ngăn chặn 100% việc gian lận.
+                            Cảm biến IR phát quang phổ 850nm/940nm đo độ phản xạ nhiệt của da người thật. Màn hình điện thoại/iPad và ảnh in trên giấy sẽ bị triệt tiêu phản xạ, ngăn chặn chưa xác minh việc gian lận.
                           </p>
                         </div>
 

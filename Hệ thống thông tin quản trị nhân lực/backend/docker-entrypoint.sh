@@ -9,6 +9,8 @@ npx prisma migrate deploy
 if [ "${SEED_ON_FIRST_RUN}" = "true" ]; then
   echo "[entrypoint] seeding demo data if database is empty..."
   node prisma/seed.cjs
+  echo "[entrypoint] syncing demo role accounts..."
+  node scripts/seed-demo-role-accounts.cjs
 fi
 
 echo "[entrypoint] starting API..."

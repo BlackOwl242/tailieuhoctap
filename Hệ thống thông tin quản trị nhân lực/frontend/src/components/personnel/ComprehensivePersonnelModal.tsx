@@ -12,6 +12,7 @@ import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { Button, Badge, Card, Input, Select } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toaster';
+import { isEnterpriseSector, useOrgConfig } from '@/lib/org-config';
 
 interface Props {
   isOpen: boolean;
@@ -24,8 +25,8 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  // Chế độ: 'STATE' (Cơ quan Nhà nước - Chuẩn 2C/HUHA) hoặc 'ENTERPRISE' (Doanh nghiệp tư nhân)
-  const [profileMode, setProfileMode] = useState<'STATE' | 'ENTERPRISE'>('STATE');
+  const [orgConfig] = useOrgConfig();
+  const profileMode = isEnterpriseSector(orgConfig) ? 'ENTERPRISE' : 'STATE';
   const [activeTab, setActiveTab] = useState<'p1' | 'p2' | 'p3' | 'history'>('p1');
   const [subTab, setSubTab] = useState<'work' | 'edu' | 'salary' | 'family' | 'reward' | 'appraisal' | 'appointment'>('work');
 
@@ -137,6 +138,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
   const ranksQ = useQuery({
     queryKey: ['personnel-ranks'],
     queryFn: async () => (await api.get<any[]>('/personnel-ranks')).data,
+    enabled: isOpen && profileMode === 'STATE',
   });
 
   // Nạp dữ liệu nếu có userId
@@ -430,37 +432,21 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-foreground">
-                  {userId ? 'Chỉnh sửa Hồ sơ Cán bộ Toàn diện' : 'Khai báo Hồ sơ Cán bộ Chuyên sâu'}
+                  {userId ? 'Chỉnh sửa Hồ sơ Nhân sự' : 'Khai báo Hồ sơ Nhân sự'}
                 </h2>
                 <Badge variant={profileMode === 'STATE' ? 'default' : 'secondary'} className="text-xs font-medium">
-                  {profileMode === 'STATE' ? 'Chuẩn BNV / NĐ 204' : 'Doanh nghiệp Tư nhân'}
+                  {profileMode === 'STATE'
+                    ? `Khu vực công · ${orgConfig.publicPersonnelType === 'PUBLIC_EMPLOYEE' ? 'Viên chức' : 'Công chức'} (cấu hình tham chiếu)`
+                    : 'Doanh nghiệp tư nhân'}
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Hồ sơ lý lịch chuyên sâu chuẩn hóa (3 trang khai báo & 7 quá trình lịch sử)
+                Chế độ hồ sơ lấy từ Cấu hình tổ chức; biểu mẫu công vụ và dữ liệu tham chiếu cần được cơ quan xác minh trước khi dùng chính thức.
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Chuyển đổi Hoàn cảnh Nhà nước vs Doanh nghiệp */}
-            <div className="flex items-center bg-background border border-border rounded-lg p-1 text-xs font-semibold shadow-xs">
-              <button
-                type="button"
-                onClick={() => setProfileMode('STATE')}
-                className={`px-3 py-1.5 rounded-md transition-all ${profileMode === 'STATE' ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                Cơ quan Nhà nước
-              </button>
-              <button
-                type="button"
-                onClick={() => setProfileMode('ENTERPRISE')}
-                className={`px-3 py-1.5 rounded-md transition-all ${profileMode === 'ENTERPRISE' ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                Doanh nghiệp Tư nhân
-              </button>
-            </div>
-
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -800,10 +786,10 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               <div className="p-4 rounded-lg border border-primary/20 bg-primary/5 space-y-4">
                 <div className="flex items-center justify-between text-xs font-bold text-foreground uppercase tracking-wider">
                   <div className="flex items-center gap-2">
-                    <Award className="w-4 h-4 text-primary" /> Khối 4: Ngạch bậc Lương & Chế độ Đãi ngộ
+                    <Award className="w-4 h-4 text-primary" /> {profileMode === 'STATE' ? 'Ngạch, bậc và chế độ lương khu vực công' : 'Khung lương và chế độ đãi ngộ doanh nghiệp'}
                   </div>
                   <Badge variant="outline" className="text-xs">
-                    {profileMode === 'STATE' ? 'Chuẩn Nghị định 204/2004/NĐ-CP' : 'Bảng lương thỏa thuận'}
+                    {profileMode === 'STATE' ? 'Dữ liệu tham chiếu; cần xác minh căn cứ' : 'Theo hợp đồng và quy chế doanh nghiệp'}
                   </Badge>
                 </div>
 
@@ -1345,7 +1331,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                               Chuyên ngành: <span className="text-foreground font-medium">{e.majorName}</span> • Văn bằng: <span className="text-primary font-bold">{e.degreeName}</span> ({e.studyForm})
                             </div>
                             <div className="text-muted-foreground text-xs mt-1 font-mono">
-                              Năm tốt nghiệp: {e.graduationYear || '—'}
+                              Năm tốt nghiệp: {e.graduationYear || 'Chưa cập nhật'}
                             </div>
                           </div>
                           <Button variant="ghost" size="sm" onClick={() => deleteSubRecord('educations', e.id)} className="text-destructive hover:bg-destructive/10">
@@ -1368,7 +1354,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                               Ngạch: {s.rankCode || 'Tiêu chuẩn'} • Bậc {s.step} (Hệ số: {s.coefficient})
                             </div>
                             <div className="text-muted-foreground mt-0.5">
-                              Ngày hưởng: {formatDate(s.fromDate)} • Số QĐ: {s.decisionNo || '—'}
+                              Ngày hưởng: {formatDate(s.fromDate)} • Số QĐ: {s.decisionNo || 'Chưa cập nhật'}
                             </div>
                           </div>
                           <Button variant="ghost" size="sm" onClick={() => deleteSubRecord('salary-histories', s.id)} className="text-destructive hover:bg-destructive/10">
@@ -1388,9 +1374,9 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                         <div key={f.id} className="p-3.5 rounded-lg border border-border bg-card flex justify-between items-center text-xs">
                           <div>
                             <div className="font-bold text-foreground text-sm">
-                              <span className="text-primary mr-2">[{f.relationType}]</span> {f.fullName} ({f.birthYear || '—'})
+                              <span className="text-primary mr-2">[{f.relationType}]</span> {f.fullName} ({f.birthYear || 'Chưa cập nhật'})
                             </div>
-                            <div className="text-muted-foreground mt-0.5">{f.details || '—'}</div>
+                            <div className="text-muted-foreground mt-0.5">{f.details || 'Chưa cập nhật'}</div>
                             <span className="text-xs text-muted-foreground font-medium">
                               {f.category === 'SELF' ? 'Gia đình bản thân' : 'Bên Vợ/Chồng'}
                             </span>
@@ -1418,7 +1404,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                               {r.title}
                             </div>
                             <div className="text-muted-foreground mt-1">
-                              Ngày: {formatDate(r.eventDate)} • QĐ: {r.decisionNo || '—'}
+                              Ngày: {formatDate(r.eventDate)} • QĐ: {r.decisionNo || 'Chưa cập nhật'}
                             </div>
                           </div>
                           <Button variant="ghost" size="sm" onClick={() => deleteSubRecord('rewards-disciplines', r.id)} className="text-destructive hover:bg-destructive/10">
@@ -1440,7 +1426,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                             <div className="font-bold text-foreground text-sm">
                               Năm {a.year}: Xếp loại <span className="text-primary font-bold">{a.classification}</span>
                             </div>
-                            <div className="text-muted-foreground mt-0.5">{a.comment || '—'}</div>
+                            <div className="text-muted-foreground mt-0.5">{a.comment || 'Chưa cập nhật'}</div>
                           </div>
                           <Button variant="ghost" size="sm" onClick={() => deleteSubRecord('appraisals', a.id)} className="text-destructive hover:bg-destructive/10">
                             <Trash2 className="w-4 h-4" />

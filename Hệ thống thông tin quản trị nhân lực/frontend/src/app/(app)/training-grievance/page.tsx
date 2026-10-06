@@ -1,4 +1,6 @@
 'use client';
+import { useAuthStore } from '@/lib/auth-store';
+
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +11,7 @@ import {
   Trash2, Edit3, Eye, Printer, AlertTriangle, ArrowRight,
   Sparkles, Check, X, FileText, Star,
 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, errorMessage } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
@@ -18,6 +20,7 @@ import { DataTable, DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
 import { printDocumentElement } from '@/components/ui/print';
+import { useOrgConfig } from '@/lib/org-config';
 
 interface TrainingFeedback {
   id: string;
@@ -38,6 +41,8 @@ interface TrainingProgram {
   maxParticipants: number;
   status: 'UPCOMING' | 'ONGOING' | 'COMPLETED';
   description?: string;
+  enrollments?: { id: string; userId: string; employeeName?: string; status: string; score?: number; certificateId?: string }[];
+  participantCount?: number;
   feedbacks?: TrainingFeedback[];
   _count?: { feedbacks: number };
 }
@@ -66,6 +71,7 @@ const CATEGORY_MAP: Record<string, { label: string; badgeColor: string }> = {
 export default function TrainingGrievancePage() {
   const queryClient = useQueryClient();
   const toast = useToast();
+  const [printConfig] = useOrgConfig();
 
   const [activeTab, setActiveTab] = useState<'training' | 'grievance'>('training');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('table');
@@ -111,6 +117,12 @@ export default function TrainingGrievancePage() {
     queryKey: ['hrms-training-programs'],
     queryFn: async () => (await api.get('/hrms/training/programs')).data,
   });
+  const enrollmentRecords = programs.flatMap((program) => program.enrollments ?? []);
+  const completedEnrollmentCount = enrollmentRecords.filter((enrollment) => enrollment.status === 'COMPLETED').length;
+  const recordedRatings = programs.flatMap((program) => program.feedbacks ?? []).map((feedback) => feedback.rating);
+  const averageRating = recordedRatings.length
+    ? (recordedRatings.reduce((total, rating) => total + rating, 0) / recordedRatings.length).toFixed(1)
+    : null;
 
   const { data: grievances = [], isLoading: isLoadingGrievances } = useQuery<Grievance[]>({
     queryKey: ['hrms-grievances'],
@@ -277,6 +289,9 @@ export default function TrainingGrievancePage() {
       return matchSearch && matchStatus;
     });
   }, [grievances, searchTerm, grievanceStatusFilter]);
+
+  const canVerifyTraining = useAuthStore(s=>s.user?.roles.some(r=>['ADMIN','KM_MANAGER','HR_TRAINER'].includes(r)) ?? false);
+  const enrollMutation = useMutation({ mutationFn: async (id: string) => (await api.post(`/hrms/training/programs/${id}/enroll`)).data, onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['hrms-training-programs'] }); toast('Đã ghi danh', 'success'); }, onError: error => toast(errorMessage(error), 'error') });
 
   if (isLoadingPrograms || isLoadingGrievances) {
     return <LoadingState text="Đang tải dữ liệu Đào tạo & Khiếu nại..." />;
@@ -528,6 +543,8 @@ export default function TrainingGrievancePage() {
         }
       />
 
+      {activeTab === 'training' && <div className="grid gap-3 md:grid-cols-2">{programs.map(program => <div key={program.id} className="rounded border bg-card p-3 text-sm"><b>{program.name}</b><p>{program.participantCount ?? 0}/{program.maxParticipants} học viên</p><Button size="sm" disabled={enrollMutation.isPending || program.status === 'COMPLETED'} onClick={() => enrollMutation.mutate(program.id)}>Ghi danh</Button>{program.enrollments?.map(enrollment => <div key={enrollment.id} className="flex items-center justify-between mt-2"><span>{enrollment.employeeName??'Học viên'} · {enrollment.status}{enrollment.score != null ? ` · ${enrollment.score}/100` : ''}</span>{canVerifyTraining && ['ENROLLED', 'ATTENDED'].includes(enrollment.status) && <Button size="sm" onClick={async () => { const score = prompt('Điểm kết quả 0–100'); const evidenceUrl = prompt('Đường dẫn minh chứng hoàn thành'); if (score === null || !evidenceUrl) return; try { await api.patch(`/hrms/training/programs/${program.id}/enrollments/${enrollment.userId}`, { score: Number(score), evidenceUrl }); queryClient.invalidateQueries({ queryKey: ['hrms-training-programs'] }); } catch (error) { toast(errorMessage(error), 'error'); } }}>Xác nhận kết quả</Button>}</div>)}</div>)}</div>}
+
       {/* Standard KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <NumberCard
@@ -543,15 +560,15 @@ export default function TrainingGrievancePage() {
           icon={MessageSquareWarning}
         />
         <NumberCard
-          title="Tỷ lệ tham gia"
-          value="94.2%"
-          subtitle="Chỉ tiêu hoàn thành mục tiêu"
+          title="Lượt ghi danh"
+          value={enrollmentRecords.length}
+          subtitle={`${completedEnrollmentCount} lượt được ghi nhận hoàn thành`}
           icon={Users}
         />
         <NumberCard
-          title="Đánh giá hài lòng"
-          value="4.9 / 5.0"
-          subtitle="Khảo sát chất lượng đào tạo"
+          title="Đánh giá đào tạo"
+          value={averageRating ? `${averageRating} / 5` : 'Chưa cập nhật'}
+          subtitle={`${recordedRatings.length} phản hồi đã lưu`}
           icon={Star}
         />
       </div>
@@ -1102,7 +1119,7 @@ export default function TrainingGrievancePage() {
             <div className="space-y-1.5">
               <span className="font-bold text-foreground uppercase text-xs">Đề cương & Mục tiêu đào tạo:</span>
               <p className="p-3 rounded-lg bg-muted/30 border border-border text-foreground leading-relaxed">
-                {selectedProgram.description || 'Chương trình đào tạo nâng cao chuyên môn, quy chuẩn vận hành và bảo mật số theo kế hoạch phát triển nhân tài nội bộ.'}
+                {selectedProgram.description || 'Chưa cập nhật'}
               </p>
             </div>
 
@@ -1110,7 +1127,7 @@ export default function TrainingGrievancePage() {
             <div className="space-y-2 border-t border-border pt-3">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-foreground uppercase text-xs">
-                  Danh sách Học viên & Điểm danh mẫu ({Math.min(selectedProgram.maxParticipants, 5)} / {selectedProgram.maxParticipants})
+                  Danh sách ghi danh ({selectedProgram.participantCount ?? selectedProgram.enrollments?.length ?? 0} / {selectedProgram.maxParticipants})
                 </span>
                 <Button
                   variant="outline"
@@ -1128,32 +1145,25 @@ export default function TrainingGrievancePage() {
                   <thead className="bg-muted/40 border-b border-border text-muted-foreground uppercase text-xs">
                     <tr>
                       <th className="p-2.5">Học viên</th>
-                      <th className="p-2.5">Mã NV</th>
-                      <th className="p-2.5">Phòng ban</th>
-                      <th className="p-2.5 text-center">Chuyên cần</th>
-                      <th className="p-2.5 text-center">Khảo sát</th>
+                      <th className="p-2.5">Mã ghi danh</th>
+                      <th className="p-2.5 text-center">Trạng thái</th>
+                      <th className="p-2.5 text-center">Kết quả</th>
                       <th className="p-2.5 text-center">Chứng chỉ</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {employees.slice(0, 5).map((e, idx) => (
-                      <tr key={e.id} className="hover:bg-muted/30">
-                        <td className="p-2.5 font-medium text-foreground">{e.fullName}</td>
-                        <td className="p-2.5 text-muted-foreground font-mono">{e.employeeCode || `NV000${idx + 1}`}</td>
-                        <td className="p-2.5 text-muted-foreground">{e.orgUnit?.name || 'Phòng Kỹ thuật'}</td>
-                        <td className="p-2.5 text-center font-medium text-foreground">100%</td>
+                    {(selectedProgram.enrollments ?? []).map((enrollment) => (
+                      <tr key={enrollment.id} className="hover:bg-muted/30">
+                        <td className="p-2.5 font-medium text-foreground">{enrollment.employeeName || enrollment.userId}</td>
+                        <td className="p-2.5 text-muted-foreground font-mono">{enrollment.id}</td>
+                        <td className="p-2.5 text-center text-muted-foreground">{enrollment.status}</td>
+                        <td className="p-2.5 text-center">{enrollment.score == null ? 'Chưa ghi nhận' : `${enrollment.score}/100`}</td>
                         <td className="p-2.5 text-center">
-                          <span className="inline-flex items-center text-foreground font-medium gap-0.5">
-                            <Star className="h-3 w-3 fill-foreground/70 text-foreground/70" /> 5.0
-                          </span>
-                        </td>
-                        <td className="p-2.5 text-center">
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
-                            <Check className="h-3 w-3 text-muted-foreground" /> Đã cấp
-                          </span>
+                          {enrollment.certificateId || 'Chưa ghi nhận'}
                         </td>
                       </tr>
                     ))}
+                    {(selectedProgram.enrollments ?? []).length === 0 && <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">Chưa có bản ghi ghi danh.</td></tr>}
                   </tbody>
                 </table>
               </div>
@@ -1303,275 +1313,100 @@ export default function TrainingGrievancePage() {
         />
       </Modal>
 
-      {/* ================= MODAL IN: DANH SÁCH ĐÀO TẠO & CHỨNG CHỈ (CHUẨN NĐ 30/2020/NĐ-CP) ================= */}
+      {/* Bản in nội bộ: chỉ liệt kê kết quả đào tạo đã được ghi nhận trong hệ thống. */}
       <Modal
         open={isPrintCertOpen}
-        onOpenChange={(open) => setIsPrintCertOpen(open)}
-        title="Biểu Mẫu In Chứng Nhận Đào Tạo (Chuẩn Nghị định 30/2020/NĐ-CP)"
+        onOpenChange={setIsPrintCertOpen}
+        title="Báo cáo kết quả đào tạo nội bộ"
         size="lg"
       >
         {selectedProgram && (
-          <div
-            id="print-training-cert-doc"
-            className="print-area font-times bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[13pt] print:p-0 print:border-0 print:shadow-none print:m-0 print:max-w-none"
-            style={{ fontFamily: "'Times New Roman', Times, serif" }}
-          >
-            {/* Header Thể thức Văn bản Hành chính theo NĐ 30/2020/NĐ-CP */}
+          <div id="print-training-cert-doc" className="print-area font-times bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[13pt] print:p-0 print:border-0 print:shadow-none print:m-0 print:max-w-none">
             <div className="flex justify-between items-start pb-4 border-b border-black">
-              {/* Bên trái: Tên cơ quan, tổ chức ban hành & Số văn bản */}
-              <div className="w-[45%] text-center leading-tight">
-                <p className="font-normal text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  CÔNG TY CỔ PHẦN PHẦN MỀM SAIGON TECHNOLOGY
-                </p>
-                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  HỘI ĐỒNG ĐÀO TẠO & PHÁT TRIỂN
-                </p>
-                <div className="w-28 border-b border-black mx-auto mt-1 mb-1.5" />
-                <p className="text-[11pt] text-black">
-                  Số: {selectedProgram.id?.slice(0, 4).toUpperCase() || '01'}/DS-HĐĐT
-                </p>
+              <div className="w-[48%] text-center leading-tight">
+                <p className="font-bold text-[12pt] uppercase">{printConfig.orgName}</p>
+                <p className="text-[11pt] uppercase">{printConfig.deptName}</p>
               </div>
-
-              {/* Bên phải: Quốc hiệu, Tiêu ngữ & Địa danh, ngày tháng năm */}
-              <div className="w-[55%] text-center leading-tight">
-                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
-                </p>
-                <p className="font-bold text-[12pt] sm:text-[13pt] text-black">
-                  Độc lập - Tự do - Hạnh phúc
-                </p>
-                <div className="w-40 border-b-[1.5px] border-black mx-auto mt-1 mb-1.5" />
-                <p className="text-[11.5pt] sm:text-[12pt] italic text-black">
-                  Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
-                </p>
+              <div className="w-[52%] text-center leading-tight">
+                <p className="font-bold text-[12pt] uppercase">TÀI LIỆU NỘI BỘ</p>
+                <p className="text-[11pt]">Mã chương trình: {selectedProgram.id}</p>
+                <p className="text-[11pt] italic">{printConfig.location}, ngày in {new Date().toLocaleDateString('vi-VN')}</p>
               </div>
             </div>
-
-            {/* Tiêu đề văn bản */}
-            <div className="text-center my-6 space-y-1">
-              <h1 className="text-[14pt] sm:text-[15pt] font-bold uppercase tracking-wide text-black">
-                DANH SÁCH HỌC VIÊN HOÀN THÀNH CHƯƠNG TRÌNH ĐÀO TẠO
-              </h1>
-              <p className="text-[12.5pt] sm:text-[13pt] font-bold italic text-black">
-                Khóa đào tạo: {selectedProgram.name}
-              </p>
-              <p className="text-[11.5pt] sm:text-[12pt] italic text-neutral-800">
-                (Kèm theo Báo cáo nghiệm thu khóa học số 15/BC-HĐĐT ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()})
-              </p>
+            <div className="text-center my-6 space-y-2">
+              <h1 className="text-[15pt] font-bold uppercase">BÁO CÁO KẾT QUẢ ĐÀO TẠO</h1>
+              <p className="text-[12pt] font-bold">{selectedProgram.name}</p>
+              <p className="text-[10.5pt] italic">Báo cáo nội bộ từ dữ liệu ghi danh và kết quả hiện có; không phải chứng chỉ đào tạo.</p>
             </div>
-
-            {/* Thông tin chương trình đào tạo */}
-            <div className="space-y-1.5 text-[12pt] sm:text-[12.5pt] leading-relaxed my-4 text-black">
-              <p>
-                <strong>1. Giảng viên phụ trách:</strong> {selectedProgram.trainerName}
-              </p>
-              <p>
-                <strong>2. Địa điểm tổ chức:</strong> {selectedProgram.location || 'Hội trường Tầng 5 & Trực tuyến qua phòng học số'}
-              </p>
-              <p>
-                <strong>3. Thời gian đào tạo:</strong> Từ ngày{' '}
-                {new Date(selectedProgram.startDate).toLocaleDateString('vi-VN')} đến ngày{' '}
-                {new Date(selectedProgram.endDate).toLocaleDateString('vi-VN')}
-              </p>
-              <p>
-                <strong>4. Tổng số học viên tham gia và đạt chuẩn:</strong>{' '}
-                {Math.min(selectedProgram.maxParticipants, 5)}/{selectedProgram.maxParticipants} cán bộ, nhân viên (Tỷ lệ hoàn thành: 100%).
-              </p>
+            <div className="space-y-1.5 text-[12pt] leading-relaxed my-4">
+              <p><strong>Giảng viên:</strong> {selectedProgram.trainerName || 'Chưa ghi nhận'}</p>
+              <p><strong>Địa điểm:</strong> {selectedProgram.location || 'Chưa ghi nhận'}</p>
+              <p><strong>Thời gian:</strong> {new Date(selectedProgram.startDate).toLocaleDateString('vi-VN')} – {new Date(selectedProgram.endDate).toLocaleDateString('vi-VN')}</p>
+              <p><strong>Trạng thái chương trình:</strong> {selectedProgram.status}</p>
+              <p><strong>Số lượt ghi danh:</strong> {selectedProgram.participantCount ?? selectedProgram.enrollments?.length ?? 0} · <strong>Đã có kết quả hoàn thành:</strong> {(selectedProgram.enrollments ?? []).filter((e) => e.status === 'COMPLETED').length}</p>
+              <p><strong>Mô tả đã lưu:</strong> {selectedProgram.description || 'Chưa ghi nhận'}</p>
             </div>
-
-            {/* Bảng danh sách học viên chuẩn Nghị định 30 */}
             <div className="my-5 overflow-x-auto">
-              <table className="w-full border-collapse border border-black text-[11pt] sm:text-[11.5pt] text-black">
-                <thead>
-                  <tr className="bg-neutral-100/70 border-b border-black">
-                    <th className="border border-black p-2 text-center font-bold w-12">STT</th>
-                    <th className="border border-black p-2 text-center font-bold w-24">Mã NV</th>
-                    <th className="border border-black p-2 text-center font-bold">Họ và tên học viên</th>
-                    <th className="border border-black p-2 text-center font-bold">Đơn vị công tác</th>
-                    <th className="border border-black p-2 text-center font-bold w-24">Chuyên cần</th>
-                    <th className="border border-black p-2 text-center font-bold w-28">Kết quả</th>
-                    <th className="border border-black p-2 text-center font-bold w-24">Ký nhận</th>
-                  </tr>
-                </thead>
+              <table className="w-full border-collapse border border-black text-[11pt] text-black">
+                <thead><tr className="bg-neutral-100 border-b border-black"><th className="border border-black p-2">STT</th><th className="border border-black p-2">Người học / mã người dùng</th><th className="border border-black p-2">Kết quả</th><th className="border border-black p-2">Mã chứng chỉ</th></tr></thead>
                 <tbody>
-                  {employees.slice(0, 5).map((e, idx) => (
-                    <tr key={e.id}>
-                      <td className="border border-black p-2 text-center">{idx + 1}</td>
-                      <td className="border border-black p-2 text-center">{e.employeeCode || `NV000${idx + 1}`}</td>
-                      <td className="border border-black p-2 font-bold">{e.fullName}</td>
-                      <td className="border border-black p-2">{e.orgUnit?.name || 'Phòng Kỹ thuật'}</td>
-                      <td className="border border-black p-2 text-center">100%</td>
-                      <td className="border border-black p-2 text-center">Đạt (Cấp CC)</td>
-                      <td className="border border-black p-2 text-center"></td>
+                  {(selectedProgram.enrollments ?? []).filter((e) => e.status === 'COMPLETED').map((enrollment, index) => (
+                    <tr key={enrollment.id}>
+                      <td className="border border-black p-2 text-center">{index + 1}</td>
+                      <td className="border border-black p-2">{enrollment.employeeName || enrollment.userId}</td>
+                      <td className="border border-black p-2 text-center">{enrollment.score == null ? 'Đã đánh dấu hoàn thành; chưa ghi điểm' : `${enrollment.score}/100`}</td>
+                      <td className="border border-black p-2 text-center">{enrollment.certificateId || 'Chưa ghi nhận'}</td>
                     </tr>
                   ))}
+                  {(selectedProgram.enrollments ?? []).filter((e) => e.status === 'COMPLETED').length === 0 && <tr><td colSpan={4} className="border border-black p-4 text-center">Chưa có học viên được ghi nhận hoàn thành.</td></tr>}
                 </tbody>
               </table>
             </div>
-
-            {/* Chữ ký & Nơi nhận theo Nghị định 30 */}
-            <div className="grid grid-cols-2 gap-8 items-start pt-6 text-[12pt] text-black">
-              {/* Nơi nhận theo NĐ 30 */}
-              <div className="space-y-1 text-left">
-                <p className="font-bold italic text-[11pt]">Nơi nhận:</p>
-                <ul className="text-[10pt] leading-tight space-y-0.5 list-none pl-2 text-black">
-                  <li>- Ban Tổng Giám đốc (để b/c);</li>
-                  <li>- Phòng Nhân sự & Kế toán;</li>
-                  <li>- Các đơn vị có học viên;</li>
-                  <li>- Lưu: VT, HĐĐT.</li>
-                </ul>
-              </div>
-
-              {/* Chữ ký người ban hành */}
-              <div className="text-center space-y-1">
-                <p className="font-bold uppercase text-[11.5pt] sm:text-[12pt]">TM. HỘI ĐỒNG ĐÀO TẠO</p>
-                <p className="font-bold uppercase text-[11.5pt] sm:text-[12pt]">TRƯỞNG BAN</p>
-                <p className="italic text-[10.5pt] text-neutral-600">(Ký, ghi rõ họ tên và đóng dấu)</p>
-                <div className="h-16" />
-                <p className="font-bold text-[12pt] uppercase">
-                  {selectedProgram?.trainerName || '(Ký, ghi rõ họ tên)'}
-                </p>
-              </div>
-            </div>
+            <p className="pt-4 border-t border-black text-[10.5pt] italic">Tài liệu nội bộ. Hệ thống hiện chưa lưu đầy đủ điểm danh theo buổi hoặc chữ ký xác nhận học viên; nội dung này không xác nhận các dữ liệu chưa được ghi nhận.</p>
           </div>
         )}
-
-        <ModalFooterActions
-          onCancel={() => setIsPrintCertOpen(false)}
-          cancelLabel="Đóng"
-          confirmLabel="In Báo Cáo & Danh Sách"
-          onConfirm={() => printDocumentElement('print-training-cert-doc')}
-        />
+        <ModalFooterActions onCancel={() => setIsPrintCertOpen(false)} cancelLabel="Đóng" confirmLabel="In báo cáo nội bộ" onConfirm={() => printDocumentElement('print-training-cert-doc')} />
       </Modal>
 
-      {/* ================= MODAL IN: BIÊN BẢN GIẢI QUYẾT KHIẾU NẠI (CHUẨN NĐ 30/2020/NĐ-CP) ================= */}
+      {/* Bản in nội bộ: trích xuất tình trạng hồ sơ khiếu nại đang lưu. */}
       <Modal
         open={isPrintGrievanceOpen}
-        onOpenChange={(open) => setIsPrintGrievanceOpen(open)}
-        title="Biên Bản Xử Lý Khiếu Nại Lao Động (Chuẩn Nghị định 30/2020/NĐ-CP)"
+        onOpenChange={setIsPrintGrievanceOpen}
+        title="Tóm tắt hồ sơ kiến nghị nội bộ"
         size="lg"
       >
         {selectedGrievance && (
-          <div
-            id="print-grievance-doc"
-            className="print-area font-times bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[13pt] print:p-0 print:border-0 print:shadow-none print:m-0 print:max-w-none"
-            style={{ fontFamily: "'Times New Roman', Times, serif" }}
-          >
-            {/* Header Thể thức Văn bản Hành chính theo NĐ 30/2020/NĐ-CP */}
+          <div id="print-grievance-doc" className="print-area font-times bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[13pt] print:p-0 print:border-0 print:shadow-none print:m-0 print:max-w-none">
             <div className="flex justify-between items-start pb-4 border-b border-black">
-              {/* Bên trái: Tên cơ quan, tổ chức ban hành & Số văn bản */}
-              <div className="w-[45%] text-center leading-tight">
-                <p className="font-normal text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  CÔNG TY CỔ PHẦN PHẦN MỀM SAIGON TECHNOLOGY
-                </p>
-                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  HỘI ĐỒNG ĐỐI THOẠI & GIẢI QUYẾT KN
-                </p>
-                <div className="w-28 border-b border-black mx-auto mt-1 mb-1.5" />
-                <p className="text-[11pt] text-black">
-                  Số: {selectedGrievance.id?.slice(0, 4).toUpperCase() || '01'}/BB-GQKNLĐ
-                </p>
+              <div className="w-[48%] text-center leading-tight">
+                <p className="font-bold text-[12pt] uppercase">{printConfig.orgName}</p>
+                <p className="text-[11pt] uppercase">{printConfig.deptName}</p>
               </div>
-
-              {/* Bên phải: Quốc hiệu, Tiêu ngữ & Địa danh, ngày tháng năm */}
-              <div className="w-[55%] text-center leading-tight">
-                <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
-                </p>
-                <p className="font-bold text-[12pt] sm:text-[13pt] text-black">
-                  Độc lập - Tự do - Hạnh phúc
-                </p>
-                <div className="w-40 border-b-[1.5px] border-black mx-auto mt-1 mb-1.5" />
-                <p className="text-[11.5pt] sm:text-[12pt] italic text-black">
-                  Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
-                </p>
+              <div className="w-[52%] text-center leading-tight">
+                <p className="font-bold text-[12pt] uppercase">TÀI LIỆU NỘI BỘ</p>
+                <p className="text-[11pt]">Mã hồ sơ: {selectedGrievance.id}</p>
+                <p className="text-[11pt] italic">{printConfig.location}, ngày in {new Date().toLocaleDateString('vi-VN')}</p>
               </div>
             </div>
-
-            {/* Tiêu đề biên bản */}
-            <div className="text-center my-6 space-y-1">
-              <h1 className="text-[14pt] sm:text-[15pt] font-bold uppercase tracking-wide text-black">
-                BIÊN BẢN HỌP ĐỐI THOẠI & GIẢI QUYẾT KHIẾU NẠI LAO ĐỘNG
-              </h1>
-              <p className="text-[11.5pt] sm:text-[12pt] italic text-neutral-800">
-                (Căn cứ quy định của Bộ luật Lao động số 45/2019/QH14 và Thỏa ước Lao động Tập thể)
-              </p>
+            <div className="text-center my-6">
+              <h1 className="text-[15pt] font-bold uppercase">TÓM TẮT HỒ SƠ KIẾN NGHỊ / KHIẾU NẠI</h1>
+              <p className="text-[10.5pt] italic mt-2">Trích xuất thông tin từ hệ thống; không phải biên bản đối thoại hay bằng chứng ký nhận.</p>
             </div>
-
-            {/* Nội dung biên bản hành chính */}
-            <div className="space-y-4 text-[12pt] sm:text-[12.5pt] leading-relaxed text-black">
-              <p className="indent-6">
-                Hôm nay, vào hồi {new Date().getHours()} giờ {new Date().getMinutes()} phút, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}, tại Phòng họp số 1 — Trụ sở Tổng công ty HRMIS, Hội đồng đối thoại và giải quyết khiếu nại tiến hành phiên họp giải quyết khiếu nại lao động.
-              </p>
-
-              <div className="space-y-1.5">
-                <p className="font-bold uppercase text-[12pt]">I. THÀNH PHẦN THAM DỰ:</p>
-                <div className="pl-6 space-y-1">
-                  <p><strong>1. Đại diện Người sử dụng lao động:</strong> {selectedGrievance.resolvedBy ? `Ông/Bà ${selectedGrievance.resolvedBy}` : 'Đại diện Ban Giám đốc Điều hành'}.</p>
-                  <p><strong>2. Đại diện Ban Chấp hành Công đoàn cơ sở:</strong> Chủ tịch Công đoàn cơ sở cùng các ủy viên.</p>
-                  <p><strong>3. Người có đơn kiến nghị/khiếu nại:</strong> Ông/Bà <strong>{selectedGrievance.employeeName}</strong>.</p>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <p className="font-bold uppercase text-[12pt]">II. NỘI DUNG VÀ YÊU CẦU CỦA NGƯỜI LAO ĐỘNG:</p>
-                <div className="pl-6 space-y-1">
-                  <p><strong>- Tiêu đề kiến nghị:</strong> {selectedGrievance.subject}</p>
-                  <p><strong>- Ngày tiếp nhận đơn:</strong> {new Date(selectedGrievance.createdAt).toLocaleDateString('vi-VN')}</p>
-                  <p><strong>- Nội dung chi tiết:</strong></p>
-                  <div className="p-3 bg-neutral-50 border border-black/40 rounded-sm text-black italic leading-relaxed">
-                    &quot;{selectedGrievance.description}&quot;
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <p className="font-bold uppercase text-[12pt]">III. KẾT QUẢ ĐỐI THOẠI VÀ BIỆN PHÁP GIẢI QUYẾT:</p>
-                <div className="pl-6">
-                  <p className="p-3 bg-neutral-50 border border-black/40 rounded-sm text-black leading-relaxed font-medium">
-                    {selectedGrievance.resolution ||
-                      'Hội đồng hòa giải cơ sở cùng Ban Chấp hành Công đoàn đã đối thoại trực tiếp, làm rõ các căn cứ pháp lý và thống nhất phương án xử lý bảo đảm quyền và lợi ích hợp pháp của người lao động theo đúng quy chế nội bộ.'}
-                  </p>
-                </div>
-              </div>
-
-              <p className="indent-6">
-                Biên bản được lập thành 03 bản có giá trị pháp lý như nhau, đã được các bên đọc lại, thống nhất nội dung và cùng ký tên xác nhận dưới đây. Phiên họp kết thúc vào hồi {new Date().getHours() + 1} giờ 30 phút cùng ngày.
-              </p>
-            </div>
-
-            {/* Chữ ký các bên theo Nghị định 30 */}
-            <div className="grid grid-cols-3 gap-4 items-start pt-6 text-[11.5pt] sm:text-[12pt] text-black">
-              <div className="text-center space-y-1">
-                <p className="font-bold uppercase">NGƯỜI KHIẾU NẠI</p>
-                <p className="italic text-[10.5pt] text-neutral-600">(Ký và ghi rõ họ tên)</p>
-                <div className="h-16" />
-                <p className="font-bold">{selectedGrievance.employeeName}</p>
-              </div>
-
-              <div className="text-center space-y-1">
-                <p className="font-bold uppercase">ĐẠI DIỆN CÔNG ĐOÀN CƠ SỞ</p>
-                <p className="italic text-[10.5pt] text-neutral-600">(Ký và ghi rõ họ tên)</p>
-                <div className="h-16" />
-                <p className="font-bold">Chủ tịch Công đoàn</p>
-              </div>
-
-              <div className="text-center space-y-1">
-                <p className="font-bold uppercase">NGƯỜI SỬ DỤNG LAO ĐỘNG</p>
-                <p className="italic text-[10.5pt] text-neutral-600">(Ký tên và đóng dấu)</p>
-                <div className="h-16" />
-                <p className="font-bold uppercase">Giám Đốc Nhân Sự</p>
-              </div>
+            <div className="space-y-3 text-[12pt] leading-relaxed">
+              <p><strong>Người gửi:</strong> {selectedGrievance.employeeName} · Mã người dùng: {selectedGrievance.userId}</p>
+              <p><strong>Phân loại:</strong> {CATEGORY_MAP[selectedGrievance.category]?.label || selectedGrievance.category}</p>
+              <p><strong>Tiêu đề:</strong> {selectedGrievance.subject}</p>
+              <p><strong>Ngày tiếp nhận:</strong> {new Date(selectedGrievance.createdAt).toLocaleString('vi-VN')}</p>
+              <p><strong>Trạng thái:</strong> {selectedGrievance.status}</p>
+              <div><strong>Nội dung đã gửi:</strong><p className="mt-1 whitespace-pre-wrap border border-black/40 p-3">{selectedGrievance.description}</p></div>
+              <div><strong>Kết quả ghi nhận:</strong><p className="mt-1 whitespace-pre-wrap border border-black/40 p-3">{selectedGrievance.resolution || 'Chưa ghi nhận kết quả xử lý.'}</p></div>
+              <p><strong>Người xử lý đã ghi nhận:</strong> {selectedGrievance.resolvedBy || 'Chưa ghi nhận'}</p>
+              <p><strong>Thời điểm hoàn tất:</strong> {selectedGrievance.resolvedAt ? new Date(selectedGrievance.resolvedAt).toLocaleString('vi-VN') : 'Chưa ghi nhận'}</p>
+              <p className="pt-4 border-t border-black text-[10.5pt] italic">Bản in không ghi nhận người tham dự, địa điểm họp hoặc chữ ký vì các dữ liệu này hiện không có trong hồ sơ hệ thống.</p>
             </div>
           </div>
         )}
-
-        <ModalFooterActions
-          onCancel={() => setIsPrintGrievanceOpen(false)}
-          cancelLabel="Đóng"
-          confirmLabel="In Biên Bản Giải Quyết"
-          onConfirm={() => printDocumentElement('print-grievance-doc')}
-        />
+        <ModalFooterActions onCancel={() => setIsPrintGrievanceOpen(false)} cancelLabel="Đóng" confirmLabel="In tóm tắt nội bộ" onConfirm={() => printDocumentElement('print-grievance-doc')} />
       </Modal>
     </div>
   );

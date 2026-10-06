@@ -120,7 +120,7 @@ function ActionsCell({ items, rowLabel }: { items: RowActionItem[]; rowLabel: st
 
   // Không có hành động nào khả dụng → hiển thị gạch ngang thay vì nút rỗng
   if (visible.length === 0 && !items.includes('separator')) {
-    return <span className="text-xs text-muted-foreground">—</span>;
+    return <span className="text-xs text-muted-foreground">Chưa cập nhật</span>;
   }
 
   return (
@@ -357,7 +357,7 @@ export function DataTable<T>({
                 <tr key={rowKey(row)} className="border-b transition-colors last:border-0 hover:bg-accent/40">
                   {columns.map((c) => (
                     <td key={c.key} className={cn('px-3 py-2.5 align-middle first:pl-4 last:pr-4 sm:first:pl-5 sm:last:pr-5', c.noPrint && 'no-print', c.className)}>
-                      {c.render ? c.render(row) : String((row as Record<string, unknown>)[c.key] ?? '—')}
+                      {c.render ? c.render(row) : String((row as Record<string, unknown>)[c.key] ?? 'Chưa cập nhật')}
                     </td>
                   ))}
                   {actions ? (

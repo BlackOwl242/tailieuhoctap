@@ -136,7 +136,7 @@ export default function MasterCatalogsPage() {
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
-  const groups = catalogsData?.groups ?? [];
+  const groups = useMemo(() => catalogsData?.groups ?? [], [catalogsData?.groups]);
 
   // Flatten all catalogs with group reference
   const allCatalogs = useMemo(() => {
@@ -364,7 +364,7 @@ export default function MasterCatalogsPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} title="Xuất CSV">
             <FileSpreadsheet className="h-4 w-4" /> Xuất CSV
           </Button>
-          <Button variant="outline" size="sm" onClick={() => window.print()} title="In biểu danh mục chuẩn NĐ 30">
+          <Button variant="outline" size="sm" onClick={() => window.print()} title="In danh mục nội bộ">
             <Printer className="h-4 w-4" /> In danh mục
           </Button>
           <Button size="sm" onClick={handleOpenAdd} className="bg-primary text-primary-foreground shadow-xs" disabled={isMutating}>
@@ -598,7 +598,7 @@ export default function MasterCatalogsPage() {
                             <td className="py-2 px-4 font-mono text-xs text-muted-foreground">
                               {item.salarySteps && item.salarySteps.length > 0
                                 ? item.salarySteps.slice(0, 6).join(' · ') + (item.salarySteps.length > 6 ? '...' : '')
-                                : '—'}
+                                : 'Chưa cập nhật'}
                             </td>
                           </>
                         )}
@@ -725,7 +725,7 @@ export default function MasterCatalogsPage() {
                       {it.payTable || ''} {it.yearsToStep ? `(Nâng bậc: ${it.yearsToStep} năm)` : ''}
                     </span>
                   ) : (
-                    it.sector || it.payTable || it.type || '—'
+                    it.sector || it.payTable || it.type || 'Chưa cập nhật'
                   )}
                 </td>
               </tr>

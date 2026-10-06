@@ -3,9 +3,10 @@ import { AttendanceController, DeviceWebhookController } from './attendance.cont
 import { AttendanceService } from './attendance.service';
 import { QrTokenService } from './qr-token.service';
 import { FaceCryptoService } from './face-crypto.service';
+import { AttendancePeriodsController } from './attendance-periods.controller';
 
 @Module({
-  controllers: [AttendanceController, DeviceWebhookController],
+  controllers: [AttendanceController, DeviceWebhookController, AttendancePeriodsController],
   providers: [AttendanceService, QrTokenService, FaceCryptoService],
 })
 export class AttendanceModule {}

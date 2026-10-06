@@ -110,9 +110,9 @@ export default function AttendancePage() {
                     {q.data!.days.map((d) => (
                       <tr key={d.workDate} className="border-b last:border-0">
                         <td className="py-2 pr-3">{new Date(d.workDate).toLocaleDateString('vi-VN')}</td>
-                        <td className="py-2 pr-3">{d.firstInAt ? new Date(d.firstInAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
-                        <td className="py-2 pr-3">{d.lastOutAt ? new Date(d.lastOutAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
-                        <td className="py-2 pr-3">{d.workedMinutes > 0 ? `${Math.floor(d.workedMinutes / 60)}h${d.workedMinutes % 60}'` : '—'}</td>
+                        <td className="py-2 pr-3">{d.firstInAt ? new Date(d.firstInAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa cập nhật'}</td>
+                        <td className="py-2 pr-3">{d.lastOutAt ? new Date(d.lastOutAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa cập nhật'}</td>
+                        <td className="py-2 pr-3">{d.workedMinutes > 0 ? `${Math.floor(d.workedMinutes / 60)}h${d.workedMinutes % 60}'` : 'Chưa cập nhật'}</td>
                         <td className="py-2">
                           <span className="inline-flex items-center gap-1.5 text-xs font-medium">
                             <span
@@ -154,8 +154,8 @@ export default function AttendancePage() {
                 {q.data.days.map((d) => (
                   <tr key={d.workDate}>
                     <td>{new Date(d.workDate).toLocaleDateString('vi-VN')}</td>
-                    <td>{d.firstInAt ? new Date(d.firstInAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
-                    <td>{d.lastOutAt ? new Date(d.lastOutAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+                    <td>{d.firstInAt ? new Date(d.firstInAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa cập nhật'}</td>
+                    <td>{d.lastOutAt ? new Date(d.lastOutAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa cập nhật'}</td>
                     <td>{d.workedMinutes > 0 ? `${Math.floor(d.workedMinutes / 60)} giờ ${d.workedMinutes % 60} phút` : '0 phút'}</td>
                     <td>{DAY_STATUS_LABEL[d.status] ?? d.status}{d.lateMinutes > 0 ? ` (Đi muộn ${d.lateMinutes}p)` : ''}</td>
                   </tr>

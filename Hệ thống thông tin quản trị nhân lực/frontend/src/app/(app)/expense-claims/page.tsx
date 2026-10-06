@@ -17,6 +17,7 @@ import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
 import { Button, Input, Label, Select } from '@/components/ui/primitives';
+import { useAuthStore } from '@/lib/auth-store';
 
 interface ExpenseItemDetail {
   item: string;
@@ -33,7 +34,7 @@ interface ExpenseClaim {
   category: string;
   totalAmount: number;
   approvedAmount?: number;
-  status: 'DRAFT' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'PAID' | 'CANCELLED';
+  status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PAID' | 'CANCELLED';
   items?: ExpenseItemDetail[];
   receiptUrls?: string[];
   submittedAt?: string;
@@ -51,9 +52,13 @@ interface TravelRequest {
   departureDate: string;
   returnDate: string;
   estimatedBudget: number;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED';
+  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED';
   notes?: string;
   createdAt?: string;
+  settlementClosedAt?: string | null;
+  advanceRefundDue?: number;
+  advanceRefundPaid?: number;
+  refundStatus?: 'NONE' | 'DUE' | 'PARTIAL' | 'REPAID';
 }
 
 interface EmployeeAdvance {
@@ -62,7 +67,8 @@ interface EmployeeAdvance {
   employeeName: string;
   amount: number;
   purpose: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'PAID' | 'CANCELLED';
+  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PAID' | 'CANCELLED';
+  paymentMethod?: 'CASH' | 'BANK' | null;
   disbursedAt?: string;
   createdAt?: string;
   travelRequestId?: string;
@@ -85,7 +91,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const STATUS_BADGES: Record<string, { label: string; dot: string; bg: string; text: string; border: string }> = {
-  PENDING: { label: 'Chờ duyệt', dot: 'bg-amber-500', bg: 'bg-amber-500/10', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-500/20' },
+  SUBMITTED: { label: 'Chờ duyệt', dot: 'bg-amber-500', bg: 'bg-amber-500/10', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-500/20' },
   APPROVED: { label: 'Đã duyệt', dot: 'bg-emerald-500', bg: 'bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-500/20' },
   PAID: { label: 'Đã giải ngân', dot: 'bg-blue-500', bg: 'bg-blue-500/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-500/20' },
   REJECTED: { label: 'Từ chối', dot: 'bg-rose-500', bg: 'bg-rose-500/10', text: 'text-rose-700 dark:text-rose-400', border: 'border-rose-500/20' },
@@ -107,9 +113,43 @@ function formatVND(amount?: number): string {
   return (amount || 0).toLocaleString('vi-VN') + ' VND';
 }
 
+function amountInVietnameseWords(value: number): string {
+  const digits = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+  const scales = ['', 'nghìn', 'triệu', 'tỷ', 'nghìn tỷ', 'triệu tỷ'];
+  const readGroup = (n: number, forceHundreds: boolean) => {
+    const hundreds = Math.floor(n / 100), tens = Math.floor((n % 100) / 10), units = n % 10;
+    const words: string[] = [];
+    if (hundreds || forceHundreds) words.push(`${digits[hundreds]} trăm`);
+    if (tens === 0 && units > 0) {
+      if (hundreds || forceHundreds) words.push('lẻ');
+      words.push(digits[units]);
+    } else if (tens === 1) {
+      words.push('mười');
+      if (units) words.push(units === 5 ? 'lăm' : digits[units]);
+    } else if (tens > 1) {
+      words.push(`${digits[tens]} mươi`);
+      if (units) words.push(units === 1 ? 'mốt' : units === 5 ? 'lăm' : digits[units]);
+    }
+    return words.join(' ');
+  };
+  let remaining = Math.max(0, Math.floor(value));
+  if (remaining === 0) return 'Không đồng';
+  const groups: number[] = [];
+  while (remaining > 0) { groups.push(remaining % 1000); remaining = Math.floor(remaining / 1000); }
+  const highest = groups.length - 1;
+  const parts: string[] = [];
+  for (let i = highest; i >= 0; i--) {
+    if (!groups[i]) continue;
+    parts.push(`${readGroup(groups[i], i !== highest && groups[i] < 100)} ${scales[i]}`.trim());
+  }
+  return `${parts.join(' ')} đồng`.replace(/^./, (letter) => letter.toLocaleUpperCase('vi-VN'));
+}
+
 export default function ExpenseClaimsPage() {
   const queryClient = useQueryClient();
   const toast = useToast();
+  const roles = useAuthStore((s) => s.user?.roles ?? []);
+  const canSettleTravel = roles.some((role) => ['ADMIN', 'ACCOUNTANT'].includes(role));
 
   const [activeTab, setActiveTab] = useState<'claims' | 'travel' | 'advances'>('claims');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
@@ -125,16 +165,19 @@ export default function ExpenseClaimsPage() {
   // Modals for Detail / View
   const [detailClaim, setDetailClaim] = useState<ExpenseClaim | null>(null);
   const [detailTravel, setDetailTravel] = useState<TravelRequest | null>(null);
+  const [refundAmount, setRefundAmount] = useState('');
   const [detailAdvance, setDetailAdvance] = useState<EmployeeAdvance | null>(null);
+  const [advancePayment, setAdvancePayment] = useState<EmployeeAdvance | null>(null);
+  const [advancePaymentMethod, setAdvancePaymentMethod] = useState<'CASH' | 'BANK'>('CASH');
 
   // Print state
   const [printDocument, setPrintDocument] = useState<{
-    type: 'CLAIM' | 'TRAVEL' | 'ADVANCE';
+    type: 'CLAIM' | 'TRAVEL' | 'ADVANCE' | 'PAYMENT_VOUCHER' | 'BANK_CONFIRMATION' | 'PAYMENT_UNVERIFIED';
     data: any;
   } | null>(null);
 
   // Form Claim State
-  const [claimEmployee, setClaimEmployee] = useState('Nguyễn Văn An');
+  const [claimEmployee, setClaimEmployee] = useState('');
   const [claimTitle, setClaimTitle] = useState('Thanh quyết toán chi phí công tác');
   const [claimCategory, setClaimCategory] = useState('TRAVEL');
   const [claimItems, setClaimItems] = useState<ExpenseItemDetail[]>([
@@ -143,7 +186,7 @@ export default function ExpenseClaimsPage() {
   ]);
 
   // Form Travel State
-  const [travelEmployee, setTravelEmployee] = useState('Nguyễn Văn An');
+  const [travelEmployee, setTravelEmployee] = useState('');
   const [travelPurpose, setTravelPurpose] = useState('Khảo sát và triển khai dự án chi nhánh');
   const [fromLoc, setFromLoc] = useState('TP. Hồ Chí Minh');
   const [toLoc, setToLoc] = useState('TP. Đà Nẵng');
@@ -153,7 +196,7 @@ export default function ExpenseClaimsPage() {
   const [travelNotes, setTravelNotes] = useState('Lịch trình gặp gỡ đối tác và kiểm tra hạ tầng kỹ thuật');
 
   // Form Advance State
-  const [advEmployee, setAdvEmployee] = useState('Nguyễn Văn An');
+  const [advEmployee, setAdvEmployee] = useState('');
   const [advPurpose, setAdvPurpose] = useState('Tạm ứng vé máy bay và công tác phí TP. Đà Nẵng');
   const [advAmount, setAdvAmount] = useState(8000000);
 
@@ -194,7 +237,7 @@ export default function ExpenseClaimsPage() {
   const createClaimMutation = useMutation({
     mutationFn: async (payload: { employeeName: string; title: string; category: string; totalAmount: number; items: ExpenseItemDetail[] }) => {
       return (await api.post('/hrms/expenses/claims', {
-        userId: 'system-user',
+        userId: payload.employeeName,
         ...payload,
       })).data;
     },
@@ -240,7 +283,7 @@ export default function ExpenseClaimsPage() {
       departureDate: string; returnDate: string; estimatedBudget: number; notes?: string;
     }) => {
       return (await api.post('/hrms/expenses/travel-requests', {
-        userId: 'system-user',
+        userId: payload.employeeName,
         ...payload,
         departureDate: new Date(payload.departureDate).toISOString(),
         returnDate: new Date(payload.returnDate).toISOString(),
@@ -269,6 +312,27 @@ export default function ExpenseClaimsPage() {
     onError: (err) => toast(errorMessage(err), 'error'),
   });
 
+  const closeTravelSettlementMutation = useMutation({
+    mutationFn: async (id: string) => (await api.post(`/hrms/expenses/travel-requests/${id}/close-settlement`, {})).data as TravelRequest,
+    onSuccess: (travel) => {
+      queryClient.invalidateQueries({ queryKey: ['hrms-travel-requests'] });
+      setDetailTravel(travel);
+      toast('Đã khóa đối soát; số tạm ứng dư đã được xác định', 'success');
+    },
+    onError: (err) => toast(errorMessage(err), 'error'),
+  });
+
+  const recordTravelRefundMutation = useMutation({
+    mutationFn: async () => (await api.post(`/hrms/expenses/travel-requests/${detailTravel!.id}/record-refund`, { amount: Number(refundAmount) })).data as TravelRequest,
+    onSuccess: (travel) => {
+      queryClient.invalidateQueries({ queryKey: ['hrms-travel-requests'] });
+      setDetailTravel(travel);
+      setRefundAmount('');
+      toast('Đã ghi nhận khoản hoàn ứng', 'success');
+    },
+    onError: (err) => toast(errorMessage(err), 'error'),
+  });
+
   const deleteTravelMutation = useMutation({
     mutationFn: async (id: string) => {
       return (await api.delete(`/hrms/expenses/travel-requests/${id}`)).data;
@@ -285,7 +349,7 @@ export default function ExpenseClaimsPage() {
   const createAdvanceMutation = useMutation({
     mutationFn: async (payload: { employeeName: string; purpose: string; amount: number }) => {
       return (await api.post('/hrms/expenses/advances', {
-        userId: 'system-user',
+        userId: payload.employeeName,
         ...payload,
       })).data;
     },
@@ -298,19 +362,31 @@ export default function ExpenseClaimsPage() {
   });
 
   const updateAdvanceStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      return (await api.patch(`/hrms/expenses/advances/${id}/status`, { status })).data;
+    mutationFn: async ({ id, status, paymentMethod }: { id: string; status: string; paymentMethod?: 'CASH' | 'BANK' }) => {
+      return (await api.patch(`/hrms/expenses/advances/${id}/status`, { status, paymentMethod })).data;
     },
-    onSuccess: (_, v) => {
+    onSuccess: (advance: EmployeeAdvance, v) => {
       queryClient.invalidateQueries({ queryKey: ['hrms-advances'] });
       if (detailAdvance && detailAdvance.id === v.id) {
-        setDetailAdvance((prev) => prev ? { ...prev, status: v.status as any } : null);
+        setDetailAdvance((prev) => prev ? { ...prev, status: v.status as any, paymentMethod: advance.paymentMethod ?? v.paymentMethod } : null);
       }
+      setAdvancePayment(null);
       const label = STATUS_BADGES[v.status]?.label || v.status;
       toast(`Đã cập nhật trạng thái tạm ứng: ${label}`, 'success');
     },
     onError: (err) => toast(errorMessage(err), 'error'),
   });
+
+  const openAdvancePayment = (advance: EmployeeAdvance) => {
+    setAdvancePayment(advance);
+    setAdvancePaymentMethod('CASH');
+  };
+
+  const advancePrintType = (advance: EmployeeAdvance) => {
+    if (advance.status !== 'PAID') return 'ADVANCE' as const;
+    if (advance.paymentMethod === 'BANK') return 'BANK_CONFIRMATION' as const;
+    return advance.paymentMethod === 'CASH' ? 'PAYMENT_VOUCHER' as const : 'PAYMENT_UNVERIFIED' as const;
+  };
 
   const deleteAdvanceMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -360,9 +436,9 @@ export default function ExpenseClaimsPage() {
   const totalClaimAmount = claims.reduce((sum, c) => sum + (c.totalAmount || 0), 0);
   const totalAdvanceAmount = advances.reduce((sum, a) => sum + (a.amount || 0), 0);
   const pendingApprovalsCount =
-    claims.filter((c) => c.status === 'PENDING').length +
-    travels.filter((t) => t.status === 'PENDING').length +
-    advances.filter((a) => a.status === 'PENDING').length;
+    claims.filter((c) => c.status === 'SUBMITTED').length +
+    travels.filter((t) => t.status === 'SUBMITTED').length +
+    advances.filter((a) => a.status === 'SUBMITTED').length;
 
   // Print Handler
   const handlePrint = () => {
@@ -743,7 +819,6 @@ export default function ExpenseClaimsPage() {
             <option value="APPROVED">Đã duyệt</option>
             <option value="PAID">Đã giải ngân</option>
             <option value="REJECTED">Từ chối</option>
-            {activeTab === 'travel' && <option value="COMPLETED">Hoàn tất</option>}
           </Select>
         </div>
       </div>
@@ -915,7 +990,7 @@ export default function ExpenseClaimsPage() {
                             <span>Chi tiền</span>
                           </Button>
                         )}
-                        {c.status === 'PENDING' && (
+                        {c.status === 'SUBMITTED' && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -977,10 +1052,10 @@ export default function ExpenseClaimsPage() {
                 onSelect: () => updateTravelStatusMutation.mutate({ id: r.id, status: 'APPROVED' }),
               },
               {
-                label: 'Đánh dấu Hoàn tất',
+                label: 'Khóa đối soát và tính tạm ứng dư',
                 icon: CheckCircle2,
-                hidden: r.status === 'COMPLETED',
-                onSelect: () => updateTravelStatusMutation.mutate({ id: r.id, status: 'COMPLETED' }),
+                hidden: !canSettleTravel || r.status !== 'APPROVED' || Boolean(r.settlementClosedAt),
+                onSelect: () => closeTravelSettlementMutation.mutate(r.id),
               },
               {
                 label: 'Từ chối đề xuất',
@@ -1102,14 +1177,14 @@ export default function ExpenseClaimsPage() {
                             <span>Duyệt</span>
                           </Button>
                         )}
-                        {t.status === 'APPROVED' && (
+                        {t.status === 'APPROVED' && canSettleTravel && !t.settlementClosedAt && (
                           <Button
                             size="sm"
-                            onClick={() => updateTravelStatusMutation.mutate({ id: t.id, status: 'COMPLETED' })}
+                            onClick={() => closeTravelSettlementMutation.mutate(t.id)}
                             className="h-7 text-xs px-2.5 gap-1 bg-teal-600 hover:bg-teal-700 text-white"
                           >
                             <CheckCircle2 className="h-3.5 w-3.5" />
-                            <span>Hoàn tất</span>
+                            <span>Khóa đối soát</span>
                           </Button>
                         )}
                         <Button
@@ -1151,9 +1226,9 @@ export default function ExpenseClaimsPage() {
                 onSelect: () => setDetailAdvance(r),
               },
               {
-                label: 'In Phiếu chi tạm ứng',
+                label: r.status === 'PAID' ? 'In Phiếu chi kế toán (Mẫu 02-TT)' : 'In đề nghị tạm ứng nội bộ',
                 icon: Printer,
-                onSelect: () => setPrintDocument({ type: 'ADVANCE', data: r }),
+                onSelect: () => setPrintDocument({ type: advancePrintType(r), data: r }),
               },
               'separator',
               {
@@ -1166,7 +1241,7 @@ export default function ExpenseClaimsPage() {
                 label: 'Giải ngân / Chi tiền mặt/CK',
                 icon: DollarSign,
                 hidden: r.status === 'PAID',
-                onSelect: () => updateAdvanceStatusMutation.mutate({ id: r.id, status: 'PAID' }),
+                onSelect: () => openAdvancePayment(r),
               },
               {
                 label: 'Từ chối tạm ứng',
@@ -1265,9 +1340,9 @@ export default function ExpenseClaimsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setPrintDocument({ type: 'ADVANCE', data: a })}
+                          onClick={() => setPrintDocument({ type: advancePrintType(a), data: a })}
                           className="h-7 text-xs px-2 gap-1 text-muted-foreground hover:text-foreground"
-                          title="In Phiếu chi tạm ứng"
+                          title={a.status === 'PAID' ? 'In Phiếu chi kế toán (Mẫu 02-TT)' : 'In đề nghị tạm ứng nội bộ'}
                         >
                           <Printer className="h-3.5 w-3.5" />
                           <span>In</span>
@@ -1288,7 +1363,7 @@ export default function ExpenseClaimsPage() {
                         {a.status === 'APPROVED' && (
                           <Button
                             size="sm"
-                            onClick={() => updateAdvanceStatusMutation.mutate({ id: a.id, status: 'PAID' })}
+                            onClick={() => openAdvancePayment(a)}
                             className="h-7 text-xs px-2.5 gap-1 bg-blue-600 hover:bg-blue-700 text-white"
                           >
                             <DollarSign className="h-3.5 w-3.5" />
@@ -1335,9 +1410,10 @@ export default function ExpenseClaimsPage() {
                 onChange={(e) => setClaimEmployee(e.target.value)}
                 className="mt-1 w-full text-xs"
               >
+                <option value="">Chọn nhân viên</option>
                 {employees.length > 0 ? (
                   employees.map((emp) => (
-                    <option key={emp.id} value={emp.fullName}>
+                    <option key={emp.id} value={emp.id}>
                       {emp.fullName} {emp.jobTitle ? `(${emp.jobTitle})` : ''}
                     </option>
                   ))
@@ -1496,9 +1572,10 @@ export default function ExpenseClaimsPage() {
               onChange={(e) => setTravelEmployee(e.target.value)}
               className="mt-1 w-full text-xs"
             >
-              {employees.length > 0 ? (
+              <option value="">Chọn nhân viên</option>
+                {employees.length > 0 ? (
                 employees.map((emp) => (
-                  <option key={emp.id} value={emp.fullName}>
+                  <option key={emp.id} value={emp.id}>
                     {emp.fullName} {emp.jobTitle ? `(${emp.jobTitle})` : ''}
                   </option>
                 ))
@@ -1622,9 +1699,10 @@ export default function ExpenseClaimsPage() {
               onChange={(e) => setAdvEmployee(e.target.value)}
               className="mt-1 w-full text-xs"
             >
-              {employees.length > 0 ? (
+              <option value="">Chọn nhân viên</option>
+                {employees.length > 0 ? (
                 employees.map((emp) => (
-                  <option key={emp.id} value={emp.fullName}>
+                  <option key={emp.id} value={emp.id}>
                     {emp.fullName} {emp.jobTitle ? `(${emp.jobTitle})` : ''}
                   </option>
                 ))
@@ -1791,7 +1869,7 @@ export default function ExpenseClaimsPage() {
                     <DollarSign className="h-3.5 w-3.5" /> Giải Ngân / Chi Tiền
                   </Button>
                 )}
-                {detailClaim.status === 'PENDING' && (
+                {detailClaim.status === 'SUBMITTED' && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -1863,6 +1941,10 @@ export default function ExpenseClaimsPage() {
                   <p>{detailTravel.notes}</p>
                 </div>
               )}
+              {detailTravel.settlementClosedAt ? <div className="pt-2 border-t space-y-1">
+                <div className="flex justify-between"><span className="text-muted-foreground">Tạm ứng còn phải hoàn:</span><span className="font-semibold">{formatVND(Math.max(0, (detailTravel.advanceRefundDue ?? 0) - (detailTravel.advanceRefundPaid ?? 0)))}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Đã hoàn / trạng thái:</span><span>{formatVND(detailTravel.advanceRefundPaid)} · {detailTravel.refundStatus ?? 'NONE'}</span></div>
+              </div> : null}
             </div>
 
             <div className="flex items-center justify-between pt-3 border-t">
@@ -1885,15 +1967,19 @@ export default function ExpenseClaimsPage() {
                     <Check className="h-3.5 w-3.5" /> Duyệt Lịch Trình
                   </Button>
                 )}
-                {detailTravel.status === 'APPROVED' && (
+                {detailTravel.status === 'APPROVED' && canSettleTravel && !detailTravel.settlementClosedAt && (
                   <Button
                     size="sm"
-                    onClick={() => updateTravelStatusMutation.mutate({ id: detailTravel.id, status: 'COMPLETED' })}
+                    onClick={() => closeTravelSettlementMutation.mutate(detailTravel.id)}
                     className="bg-teal-600 hover:bg-teal-700 text-white gap-1"
                   >
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Hoàn Tất
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Khóa đối soát
                   </Button>
                 )}
+                {detailTravel.settlementClosedAt && canSettleTravel && (detailTravel.advanceRefundDue ?? 0) > (detailTravel.advanceRefundPaid ?? 0) ? <div className="flex items-center gap-2">
+                  <Input type="number" min={1} max={(detailTravel.advanceRefundDue ?? 0) - (detailTravel.advanceRefundPaid ?? 0)} placeholder="Số tiền hoàn" value={refundAmount} onChange={(e) => setRefundAmount(e.target.value)} className="w-32" />
+                  <Button size="sm" onClick={() => recordTravelRefundMutation.mutate()} disabled={!Number(refundAmount) || recordTravelRefundMutation.isPending}>Ghi nhận hoàn ứng</Button>
+                </div> : null}
                 <Button
                   variant="outline"
                   size="sm"
@@ -1914,6 +2000,37 @@ export default function ExpenseClaimsPage() {
       )}
 
       {/* DETAIL MODAL: Tạm Ứng */}
+      {advancePayment && (
+        <Modal
+          open={!!advancePayment}
+          onOpenChange={(open) => { if (!open) setAdvancePayment(null); }}
+          title="Ghi nhận giải ngân tạm ứng"
+          description="Chọn hình thức chi để lưu đúng chứng từ kế toán kèm theo."
+          size="sm"
+        >
+          <div className="space-y-4 py-2">
+            <div className="rounded-md border bg-muted/20 p-3 text-sm">
+              <div className="font-semibold">{advancePayment.employeeName}</div>
+              <div className="text-muted-foreground">{advancePayment.purpose}</div>
+              <div className="mt-2 font-bold">{formatVND(advancePayment.amount)}</div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="advance-payment-method">Hình thức giải ngân</Label>
+              <Select id="advance-payment-method" value={advancePaymentMethod} onChange={(event) => setAdvancePaymentMethod(event.target.value as 'CASH' | 'BANK')}>
+                <option value="CASH">Tiền mặt — lập phiếu chi 02-TT</option>
+                <option value="BANK">Chuyển khoản — lưu chứng từ ngân hàng</option>
+              </Select>
+            </div>
+            <ModalFooterActions
+              onCancel={() => setAdvancePayment(null)}
+              onConfirm={() => updateAdvanceStatusMutation.mutate({ id: advancePayment.id, status: 'PAID', paymentMethod: advancePaymentMethod })}
+              confirmLabel="Xác nhận đã giải ngân"
+              pending={updateAdvanceStatusMutation.isPending}
+            />
+          </div>
+        </Modal>
+      )}
+
       {detailAdvance && (
         <Modal
           open={!!detailAdvance}
@@ -1960,10 +2077,10 @@ export default function ExpenseClaimsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setPrintDocument({ type: 'ADVANCE', data: detailAdvance })}
+                onClick={() => setPrintDocument({ type: advancePrintType(detailAdvance), data: detailAdvance })}
                 className="gap-1.5"
               >
-                <Printer className="h-3.5 w-3.5" /> In Phiếu Chi Tạm Ứng
+                <Printer className="h-3.5 w-3.5" /> {detailAdvance.status === 'PAID' ? (detailAdvance.paymentMethod === 'BANK' ? 'In xác nhận chuyển khoản' : 'In Phiếu chi kế toán (02-TT)') : 'In đề nghị tạm ứng'}
               </Button>
 
               <div className="flex items-center gap-2">
@@ -1979,7 +2096,7 @@ export default function ExpenseClaimsPage() {
                 {detailAdvance.status === 'APPROVED' && (
                   <Button
                     size="sm"
-                    onClick={() => updateAdvanceStatusMutation.mutate({ id: detailAdvance.id, status: 'PAID' })}
+                    onClick={() => openAdvancePayment(detailAdvance)}
                     className="bg-blue-600 hover:bg-blue-700 text-white gap-1"
                   >
                     <DollarSign className="h-3.5 w-3.5" /> Chi Tiền / Giải Ngân
@@ -2009,22 +2126,21 @@ export default function ExpenseClaimsPage() {
         <Modal
           open={!!printDocument}
           onOpenChange={(open) => { if (!open) setPrintDocument(null); }}
-          title="In Chứng Từ Nghiệp Vụ Kế Toán"
-          description="Biểu mẫu kế toán chuẩn hóa theo quy định tài chính doanh nghiệp và cơ quan nhà nước."
+          title={printDocument.type === 'PAYMENT_VOUCHER' ? 'Phiếu chi kế toán' : printDocument.type === 'BANK_CONFIRMATION' ? 'Xác nhận chuyển khoản' : printDocument.type === 'PAYMENT_UNVERIFIED' ? 'Giải ngân cũ chưa rõ hình thức' : 'Biểu mẫu nghiệp vụ nội bộ'}
+          description={printDocument.type === 'PAYMENT_VOUCHER' ? 'Biểu mẫu 02-TT theo Phụ lục I Thông tư 99/2025/TT-BTC cho khoản chi tiền mặt; hoàn thiện số phiếu, tài khoản và chữ ký theo chứng từ thực tế.' : printDocument.type === 'BANK_CONFIRMATION' ? 'Phiếu theo dõi nội bộ; đính kèm giấy báo nợ/ủy nhiệm chi của ngân hàng, không thay thế chứng từ ngân hàng.' : printDocument.type === 'PAYMENT_UNVERIFIED' ? 'Bản ghi cũ chưa lưu tiền mặt hay chuyển khoản. Cần đối chiếu chứng từ gốc trước khi lập chứng từ kế toán.' : 'Đề nghị thanh toán/công tác/tạm ứng phục vụ quy trình nội bộ; không thay thế chứng từ kế toán đã lập và ký.'}
           size="lg"
         >
           <div
             className="bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[12.5pt] print:p-0 print:border-0 print:shadow-none"
-            style={{ fontFamily: "'Times New Roman', Times, serif" }}
           >
-            {/* Header Thể thức Văn bản Hành chính theo NĐ 30/2020/NĐ-CP */}
-            <div className="flex justify-between items-start pb-4 border-b border-black">
+            {/* Internal request headings use a general business layout; the legal 02-TT voucher below uses its own form. */}
+            {!['PAYMENT_VOUCHER', 'BANK_CONFIRMATION', 'PAYMENT_UNVERIFIED'].includes(printDocument.type) ? <div className="flex justify-between items-start pb-4 border-b border-black">
               <div className="w-[45%] text-center leading-tight">
                 <p className="font-normal text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  CÔNG TY CỔ PHẦN PHẦN MỀM SAIGON TECHNOLOGY
+                  TÊN ĐƠN VỊ: __________________________________
                 </p>
                 <p className="font-bold text-[11pt] sm:text-[12pt] uppercase tracking-tight text-black">
-                  PHÒNG TÀI CHÍNH - KẾ TOÁN
+                  BỘ PHẬN: _____________________________________
                 </p>
                 <div className="w-28 border-b border-black mx-auto mt-1 mb-1.5" />
                 <p className="text-[11pt] text-black">
@@ -2041,12 +2157,74 @@ export default function ExpenseClaimsPage() {
                 </p>
                 <div className="w-40 border-b-[1.5px] border-black mx-auto mt-1 mb-1.5" />
                 <p className="text-[11.5pt] sm:text-[12pt] italic text-black">
-                  Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+                  __________, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
                 </p>
               </div>
-            </div>
+            </div> : null}
 
             {/* Document Content */}
+            {printDocument.type === 'PAYMENT_VOUCHER' && (
+              <div className="my-2 text-[11pt] leading-tight">
+                <div className="mb-5 flex justify-between items-start">
+                  <div className="w-[45%] text-left">Đơn vị: __________________________<br />Địa chỉ: __________________________</div>
+                  <div className="w-[45%] text-center">Mẫu số 02 - TT<br /><span className="italic">(Kèm theo Thông tư số 99/2025/TT-BTC<br />ngày 27 tháng 10 năm 2025 của Bộ trưởng Bộ Tài chính)</span></div>
+                </div>
+                <h2 className="mb-1 text-center text-[16pt] font-bold uppercase">PHIẾU CHI</h2>
+                <p className="mb-3 text-center italic">Ngày ____ tháng ____ năm ______</p>
+                <p className="mb-3 text-right">Quyển số: __________ &nbsp;&nbsp; Số: __________</p>
+                <div className="mb-3 flex justify-end gap-8"><span>Nợ: __________</span><span>Có: __________</span></div>
+                <div className="space-y-2">
+                  <p>Họ và tên người nhận tiền: <strong>{printDocument.data.employeeName}</strong></p>
+                  <p>Địa chỉ: __________________________________________________________________</p>
+                  <p>Lý do chi: <strong>Tạm ứng — {printDocument.data.purpose}</strong></p>
+                  <p>Số tiền: <strong>{formatVND(printDocument.data.amount)}</strong> (Viết bằng chữ): <strong>{amountInVietnameseWords(printDocument.data.amount)}</strong></p>
+                  <p>Kèm theo: __________ chứng từ gốc</p>
+                </div>
+                <p className="mt-7 mb-3 text-right italic">Ngày chi tiền: {formatSafeDate(printDocument.data.disbursedAt)}</p>
+                <div className="grid grid-cols-5 gap-2 text-center">
+                  {[
+                    { role: 'Giám đốc', sign: '(Ký, họ tên, đóng dấu)' },
+                    { role: 'Kế toán trưởng', sign: '(Ký, họ tên)' },
+                    { role: 'Thủ quỹ', sign: '(Ký, họ tên)' },
+                    { role: 'Người lập phiếu', sign: '(Ký, họ tên)' },
+                    { role: 'Người nhận tiền', sign: '(Ký, họ tên)' },
+                  ].map(({ role, sign }) => <div key={role}>
+                    <p className="font-bold">{role}</p><p className="italic">{sign}</p><div className="h-20" />
+                  </div>)}
+                </div>
+                <div className="space-y-1">
+                  <p>Đã nhận đủ số tiền (viết bằng chữ): ___________________________________________</p>
+                  <p>Tỷ giá ngoại tệ (nếu có): __________________ &nbsp;&nbsp; Số tiền quy đổi: ______________</p>
+                  <p className="italic">(Liên gửi ra ngoài phải đóng dấu)</p>
+                </div>
+                <div className="mt-3 border-t border-black pt-2 text-[10pt] italic">Chứng từ in từ hệ thống cần được kiểm tra, bổ sung số hiệu, tài khoản và chữ ký thực tế trước khi hạch toán; không tự coi là chứng từ đã ký.</div>
+              </div>
+            )}
+
+            {printDocument.type === 'BANK_CONFIRMATION' && (
+              <div className="my-8 space-y-4">
+                <h2 className="text-center text-[15pt] font-bold uppercase">PHIẾU THEO DÕI GIẢI NGÂN QUA NGÂN HÀNG</h2>
+                <p className="text-center italic">Biểu mẫu nội bộ — không thay thế ủy nhiệm chi hoặc giấy báo nợ ngân hàng</p>
+                <p>Người nhận: <strong>{printDocument.data.employeeName}</strong></p>
+                <p>Nội dung: <strong>{printDocument.data.purpose}</strong></p>
+                <p>Số tiền chuyển: <strong>{formatVND(printDocument.data.amount)}</strong> ({amountInVietnameseWords(printDocument.data.amount)})</p>
+                <p>Ngày chuyển: {formatSafeDate(printDocument.data.disbursedAt)} &nbsp;&nbsp; Ngân hàng: ____________________</p>
+                <p>Số tài khoản nhận: ______________________________ &nbsp; Mã giao dịch: __________________</p>
+                <p>Chứng từ ngân hàng đính kèm: ___________________________________________________</p>
+                <div className="mt-10 grid grid-cols-3 gap-4 text-center">
+                  {['Người lập', 'Kế toán kiểm tra', 'Người duyệt'].map((role) => <div key={role}><p className="font-bold">{role}</p><p className="italic">(Ký, họ tên)</p><div className="h-20" /></div>)}
+                </div>
+              </div>
+            )}
+
+            {printDocument.type === 'PAYMENT_UNVERIFIED' && (
+              <div className="my-10 space-y-4 rounded border-2 border-amber-700 p-6 text-center">
+                <h2 className="text-[15pt] font-bold uppercase">CHƯA XÁC MINH CHỨNG TỪ GIẢI NGÂN</h2>
+                <p>Bản ghi cũ của <strong>{printDocument.data.employeeName}</strong>, số tiền <strong>{formatVND(printDocument.data.amount)}</strong> chưa có hình thức thanh toán.</p>
+                <p>Đối chiếu chứng từ gốc, bổ sung bằng chứng và cập nhật hình thức giải ngân trước khi in phiếu chi hoặc lưu đối soát chuyển khoản.</p>
+              </div>
+            )}
+
             {printDocument.type === 'CLAIM' && (
               <div className="space-y-4 my-6">
                 <div className="text-center py-2 space-y-1">
@@ -2054,7 +2232,7 @@ export default function ExpenseClaimsPage() {
                     GIẤY ĐỀ NGHỊ THANH TOÁN TIỀN
                   </h2>
                   <p className="italic text-[11.5pt] text-neutral-800">
-                    (Căn cứ Thông tư 200/2014/TT-BTC & Quy chế Tài chính nội bộ)
+                    (Đề nghị nội bộ — không thay thế phiếu chi/chứng từ kế toán)
                   </p>
                 </div>
 
@@ -2131,10 +2309,10 @@ export default function ExpenseClaimsPage() {
               <div className="space-y-4 my-6">
                 <div className="text-center py-2 space-y-1">
                   <h2 className="text-[14pt] sm:text-[15pt] font-bold uppercase tracking-wide text-black">
-                    GIẤY ĐỀ NGHỊ TẠM ỨNG KINH PHÍ
+                    GIẤY ĐỀ NGHỊ TẠM ỨNG KINH PHÍ (NỘI BỘ)
                   </h2>
                   <p className="italic text-[11.5pt] text-neutral-800">
-                    (Ban hành theo Thông tư số 200/2014/TT-BTC)
+                    (Đề nghị nội bộ — phiếu chi chỉ lập sau khi giải ngân và hạch toán)
                   </p>
                 </div>
 
@@ -2147,8 +2325,8 @@ export default function ExpenseClaimsPage() {
               </div>
             )}
 
-            {/* Chữ ký 3 bên theo Nghị định 30 */}
-            <div className="grid grid-cols-3 gap-4 text-center pt-8 pb-4 text-[11.5pt] sm:text-[12pt] text-black">
+            {/* Chữ ký nội bộ; phiếu 02-TT và xác nhận chuyển khoản có bố cục chữ ký riêng. */}
+            {['PAYMENT_VOUCHER', 'BANK_CONFIRMATION', 'PAYMENT_UNVERIFIED'].includes(printDocument.type) ? null : <div className="grid grid-cols-3 gap-4 text-center pt-8 pb-4 text-[11.5pt] sm:text-[12pt] text-black">
               <div>
                 <p className="font-bold uppercase text-[11pt] sm:text-[11.5pt]">NGƯỜI ĐỀ NGHỊ</p>
                 <p className="italic text-[10pt] text-neutral-600">(Ký và ghi rõ họ tên)</p>
@@ -2170,7 +2348,7 @@ export default function ExpenseClaimsPage() {
                   (Đã duyệt chi)
                 </div>
               </div>
-            </div>
+            </div>}
           </div>
 
           <div className="flex justify-end gap-2 pt-3 border-t">
@@ -2186,3 +2364,4 @@ export default function ExpenseClaimsPage() {
     </div>
   );
 }
+

@@ -58,10 +58,6 @@ export function CommandPalette({ isOpen, onClose, userRoles = [] }: { isOpen: bo
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        onClose();
-      }
       if (!isOpen) return;
 
       if (e.key === 'ArrowDown') {

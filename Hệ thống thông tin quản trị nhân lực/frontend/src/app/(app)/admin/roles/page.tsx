@@ -82,6 +82,19 @@ const COMMON_PERMISSION_PRESETS = [
   'Không có quyền truy cập (Bị ẩn & Khóa HTTP 403)',
 ];
 
+const CRITICAL_PERMISSION_ROWS = [
+  { moduleKey: 'PAYROLL_READ', moduleName: 'Lương · Xem kỳ và phiếu lương của nhân viên', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD'], note: 'Các vai trò này xem dữ liệu bảng lương toàn đơn vị; chỉ ADMIN/Kế toán thấy số tài khoản nhận lương, nhân viên dùng luồng phiếu lương cá nhân.' },
+  { moduleKey: 'PAYROLL_CONFIG', moduleName: 'Lương · Sửa thành phần/cấu trúc và gán cấu trúc', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB'], note: 'Không bao gồm Kế toán; thay đổi mức lương cơ bản phải dựa trên quyết định nhân sự có hiệu lực.' },
+  { moduleKey: 'PAYROLL_PROCESS', moduleName: 'Lương · Tạo và tính kỳ lương', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB'], note: 'Phải chốt công tháng trước; không tạo trùng kỳ.' },
+  { moduleKey: 'PAYROLL_REVIEW', moduleName: 'Lương · Đối soát kỳ lương', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT'], note: 'Kế toán tham gia đối soát; người tính không được tự đối soát.' },
+  { moduleKey: 'PAYROLL_APPROVE', moduleName: 'Lương · Phê duyệt và khóa kỳ', roles: ['ADMIN', 'BOD'], note: 'Chỉ sau khi kỳ đã đối soát và phê duyệt.' },
+  { moduleKey: 'PAYROLL_PAY', moduleName: 'Lương · Xác nhận thanh toán', roles: ['ADMIN', 'ACCOUNTANT'], note: 'Chỉ thanh toán sau khi khóa kỳ và lưu mã giao dịch/chứng từ.' },
+  { moduleKey: 'PERFORMANCE_GOAL', moduleName: 'Đánh giá · Tạo/giao mục tiêu', roles: ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER'], note: 'Trưởng nhóm chỉ được giao trong cùng đơn vị; nhân viên và BOD không tự tạo mục tiêu.' },
+  { moduleKey: 'PERFORMANCE_SCORE', moduleName: 'Đánh giá · Tự chấm / chấm quản lý', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER'], note: 'Nhân viên chỉ tự chấm; quản lý chấm trong phạm vi được giao. HR Trainer và BOD không ghi điểm mục tiêu ở API.' },
+  { moduleKey: 'PERFORMANCE_CYCLE', moduleName: 'Đánh giá · Tạo, sửa và xóa chu kỳ', roles: ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'BOD'], note: 'Quyền quản trị chu kỳ; nhân viên chỉ xem chu kỳ được áp dụng.' },
+  { moduleKey: 'PERFORMANCE_PERSONAL', moduleName: 'Đánh giá · Tự đánh giá và nộp minh chứng', roles: ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER'], note: 'Đánh giá bản thân và minh chứng chỉ gắn với mục tiêu của chính tài khoản.' },
+];
+
 /**
  * KC02/RBAC — Quản lý phân quyền vai trò người dùng, thêm vai trò mới và cấu hình ma trận quyền hạn đồng bộ hệ thống.
  */
@@ -109,6 +122,9 @@ export default function RolesManagementPage() {
   // Chế độ chỉnh sửa ma trận quyền
   const [isEditingMatrix, setIsEditingMatrix] = useState(false);
   const [editableMatrix, setEditableMatrix] = useState<RbacMatrixItem[]>([]);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+  const [compareLeftId, setCompareLeftId] = useState('');
+  const [compareRightId, setCompareRightId] = useState('');
 
   // 1. Query danh sách tài khoản
   const usersQ = useQuery({
@@ -129,8 +145,28 @@ export default function RolesManagementPage() {
   });
 
   const users = usersQ.data ?? [];
-  const roles = rolesQ.data ?? [];
+  const roles = useMemo(() => rolesQ.data ?? [], [rolesQ.data]);
   const matrix = matrixQ.data ?? [];
+  const compareLeft = users.find((u) => u.id === compareLeftId) ?? users.find((u) => u.email === 'admin@demo.local') ?? users[0];
+  const compareRight = users.find((u) => u.id === compareRightId) ?? users.find((u) => u.email === 'dev.fresher@demo.local') ?? users[1];
+
+  const accountPermissionText = (account: UserRow | undefined, row: RbacMatrixItem) => {
+    if (!account) return 'Chọn tài khoản để so sánh';
+    const codes = account.roles.length ? account.roles : ['USER'];
+    const values = Array.from(new Set(codes.map((code) => row.permissions?.[code]).filter((value): value is string => Boolean(value?.trim()))));
+    if (!values.length) return 'Chưa cấu hình quyền cho vai trò này';
+    const allowed = values.filter((value) => !/^(?:-|—|không|none|deny)/i.test(value.trim()));
+    return (allowed.length ? allowed : values).join(' · ');
+  };
+
+  const accountHasAnyRole = (account: UserRow | undefined, roleCodes: string[]) =>
+    Boolean(account && (account.roles.length ? account.roles : ['USER']).some((role) => roleCodes.includes(role)));
+
+  const openCompareModal = () => {
+    if (!compareLeftId) setCompareLeftId(users.find((u) => u.email === 'admin@demo.local')?.id ?? users[0]?.id ?? '');
+    if (!compareRightId) setCompareRightId(users.find((u) => u.email === 'dev.fresher@demo.local')?.id ?? users[1]?.id ?? '');
+    setIsCompareModalOpen(true);
+  };
 
   // Bản đồ nhãn vai trò — Phân định rõ Quản trị viên Hệ thống CNTT, Ban Giám Đốc và Cổ đông
   const roleLabelMap = useMemo(() => {
@@ -285,13 +321,13 @@ export default function RolesManagementPage() {
       header: 'Đơn vị / Phòng ban',
       sortable: true,
       sortValue: (u) => u.orgUnit?.name ?? '',
-      render: (u) => <span className="text-xs text-muted-foreground">{u.orgUnit?.name ?? '—'}</span>,
+      render: (u) => <span className="text-xs text-muted-foreground">{u.orgUnit?.name ?? 'Chưa cập nhật'}</span>,
     },
     {
       key: 'jobTitle',
       header: 'Chức danh',
       sortable: true,
-      render: (u) => <span className="text-xs text-foreground">{u.jobTitle ?? '—'}</span>,
+      render: (u) => <span className="text-xs text-foreground">{u.jobTitle ?? 'Chưa cập nhật'}</span>,
     },
     {
       key: 'roles',
@@ -359,6 +395,14 @@ export default function RolesManagementPage() {
         ]}
         actions={
           <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={openCompareModal}
+              className="gap-1.5 shadow-2xs"
+            >
+              <ShieldCheck className="h-4 w-4" /> So sánh quyền tài khoản
+            </Button>
             <Button
               size="sm"
               onClick={() => setIsCreateRoleOpen(true)}
@@ -558,7 +602,7 @@ export default function RolesManagementPage() {
                           </Badge>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-muted-foreground">{r.description || '—'}</td>
+                      <td className="py-3 px-4 text-muted-foreground">{r.description || 'Chưa cập nhật'}</td>
                       <td className="py-3 px-4 text-center font-mono font-medium">
                         <Badge variant="secondary" className="text-xs font-mono">
                           {r.userCount}
@@ -889,6 +933,109 @@ export default function RolesManagementPage() {
             confirmVariant="destructive"
             pending={deleteRoleMutation.isPending}
           />
+        </div>
+      </Modal>
+
+      {/* ================= MODAL THAY ĐỔI VAI TRÒ PHÂN QUYỀN CHO NGƯỜI DÙNG ================= */}
+      <Modal
+        open={isCompareModalOpen}
+        onOpenChange={setIsCompareModalOpen}
+        title="So sánh quyền theo tài khoản"
+        description="Chọn hai tài khoản để đối chiếu các quyền nghiệp vụ trọng yếu và mô tả quyền theo phân hệ."
+        size="2xl"
+        footer={<Button variant="outline" onClick={() => setIsCompareModalOpen(false)}>Đóng</Button>}
+      >
+        <div className="space-y-5">
+          <div className="grid gap-4 md:grid-cols-2">
+            {[{ label: 'Tài khoản thứ nhất', account: compareLeft, value: compareLeft?.id ?? '', setValue: setCompareLeftId },
+              { label: 'Tài khoản thứ hai', account: compareRight, value: compareRight?.id ?? '', setValue: setCompareRightId }].map((item, index) => (
+              <div key={index} className="space-y-2 rounded-lg border border-border p-3">
+                <Label className="text-xs font-semibold">{item.label}</Label>
+                <Select
+                  value={item.value}
+                  onChange={(event) => item.setValue(event.target.value)}
+                  searchable
+                  placeholder="Chọn tài khoản"
+                  className="text-sm"
+                >
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.fullName} · {user.email} · {user.roles.join(', ') || 'USER'}
+                    </option>
+                  ))}
+                </Select>
+                {item.account ? (
+                  <div className="text-xs text-muted-foreground">
+                    {item.account.fullName} · {item.account.orgUnit?.name ?? 'Chưa phân bổ đơn vị'} · {item.account.status === 'ACTIVE' ? 'Đang hoạt động' : STATUS_LABEL[item.account.status] ?? item.account.status}
+                  </div>
+                ) : <div className="text-xs text-muted-foreground">Đang tải danh sách tài khoản…</div>}
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-xs leading-relaxed text-muted-foreground">
+            Bảng quyền nghiệp vụ bên dưới phản ánh vai trò được khai báo trên API và giới hạn phạm vi dữ liệu. Ma trận mô tả phân hệ là cấu hình hiển thị; chỉnh sửa nội dung ma trận không tự cấp quyền cho endpoint.
+          </div>
+
+          <section className="space-y-2">
+            <h3 className="text-sm font-semibold">Lương và đánh giá · quyền trên API</h3>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full min-w-[900px] text-xs text-left">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="p-3 font-semibold">Chức năng</th>
+                    <th className="p-3 font-semibold">{compareLeft?.fullName ?? 'Tài khoản 1'}<span className="block font-normal text-muted-foreground">{compareLeft?.roles.join(', ') || 'Chưa cập nhật'}</span></th>
+                    <th className="p-3 font-semibold">{compareRight?.fullName ?? 'Tài khoản 2'}<span className="block font-normal text-muted-foreground">{compareRight?.roles.join(', ') || 'Chưa cập nhật'}</span></th>
+                    <th className="p-3 font-semibold">Điều kiện / phạm vi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {CRITICAL_PERMISSION_ROWS.map((row) => (
+                    <tr key={row.moduleKey} className="align-top">
+                      <td className="p-3 font-medium">{row.moduleName}</td>
+                      {[compareLeft, compareRight].map((account, index) => {
+                        const permitted = accountHasAnyRole(account, row.roles);
+                        return (
+                          <td key={index} className="p-3">
+                            <span className={cn('inline-flex rounded-full px-2 py-1 font-medium', permitted ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' : 'bg-muted text-muted-foreground')}>
+                              {permitted ? 'Có quyền theo vai trò' : 'Không có quyền'}
+                            </span>
+                          </td>
+                        );
+                      })}
+                      <td className="p-3 text-muted-foreground leading-relaxed">{row.note}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-[11px] text-muted-foreground">“Có quyền theo vai trò” vẫn chịu kiểm tra trạng thái kỳ, phân tách người lập/người duyệt và phạm vi đơn vị; đây không đồng nghĩa mọi bản ghi đều truy cập được.</p>
+          </section>
+
+          <section className="space-y-2">
+            <h3 className="text-sm font-semibold">Quyền theo ma trận phân hệ</h3>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full min-w-[760px] text-xs text-left">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="p-3 font-semibold">Phân hệ</th>
+                    <th className="p-3 font-semibold">{compareLeft?.fullName ?? 'Tài khoản 1'}</th>
+                    <th className="p-3 font-semibold">{compareRight?.fullName ?? 'Tài khoản 2'}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {matrix.map((row) => (
+                    <tr key={row.moduleKey} className="align-top">
+                      <td className="p-3 font-medium">{row.moduleName}<span className="block font-mono text-[10px] text-muted-foreground">{row.moduleKey}</span></td>
+                      <td className="p-3 text-muted-foreground leading-relaxed">{accountPermissionText(compareLeft, row)}</td>
+                      <td className="p-3 text-muted-foreground leading-relaxed">{accountPermissionText(compareRight, row)}</td>
+                    </tr>
+                  ))}
+                  {!matrix.length && <tr><td colSpan={3} className="p-4 text-center text-muted-foreground">Đang tải ma trận phân hệ…</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </Modal>
 

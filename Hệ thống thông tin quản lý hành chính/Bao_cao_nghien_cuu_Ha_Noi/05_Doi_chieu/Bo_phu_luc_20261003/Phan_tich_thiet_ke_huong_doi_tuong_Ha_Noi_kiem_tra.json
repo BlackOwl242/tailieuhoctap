@@ -1,0 +1,126 @@
+{
+  "docx": "C:\\Users\\legen\\OneDrive\\Documents\\GitHub\\tailieuhoctap\\Hệ thống thông tin quản lý hành chính\\Bao_cao_nghien_cuu_Ha_Noi\\04_Bao_cao\\Phan_tich_thiet_ke_huong_doi_tuong_Ha_Noi.docx",
+  "sha256": "7eb58838ade5d45b5dac0a68409f52938388ea627dc8a37ba52aeb85f30769c0",
+  "checks": [
+    {
+      "check": "Hai phần theo mẫu",
+      "passed": true
+    },
+    {
+      "check": "Phần 1, page_width",
+      "passed": true
+    },
+    {
+      "check": "Phần 1, page_height",
+      "passed": true
+    },
+    {
+      "check": "Phần 1, top_margin",
+      "passed": true
+    },
+    {
+      "check": "Phần 1, bottom_margin",
+      "passed": true
+    },
+    {
+      "check": "Phần 1, left_margin",
+      "passed": true
+    },
+    {
+      "check": "Phần 1, right_margin",
+      "passed": true
+    },
+    {
+      "check": "Phần 1, header_distance",
+      "passed": true
+    },
+    {
+      "check": "Phần 1, footer_distance",
+      "passed": true
+    },
+    {
+      "check": "Phần 2, page_width",
+      "passed": true
+    },
+    {
+      "check": "Phần 2, page_height",
+      "passed": true
+    },
+    {
+      "check": "Phần 2, top_margin",
+      "passed": true
+    },
+    {
+      "check": "Phần 2, bottom_margin",
+      "passed": true
+    },
+    {
+      "check": "Phần 2, left_margin",
+      "passed": true
+    },
+    {
+      "check": "Phần 2, right_margin",
+      "passed": true
+    },
+    {
+      "check": "Phần 2, header_distance",
+      "passed": true
+    },
+    {
+      "check": "Phần 2, footer_distance",
+      "passed": true
+    },
+    {
+      "check": "Bảo toàn word/footer2.xml",
+      "passed": true
+    },
+    {
+      "check": "Bảo toàn word/footer1.xml",
+      "passed": true
+    },
+    {
+      "check": "Bảo toàn word/theme/theme1.xml",
+      "passed": true
+    },
+    {
+      "check": "Bảo toàn word/styles.xml",
+      "passed": true
+    },
+    {
+      "check": "Bảo toàn word/fontTable.xml",
+      "passed": true
+    },
+    {
+      "check": "Tên sinh viên đúng",
+      "passed": true
+    },
+    {
+      "check": "Giảng viên đúng",
+      "passed": true
+    },
+    {
+      "check": "Không có dấu gạch kép",
+      "passed": true
+    },
+    {
+      "check": "Không có thuật ngữ tiếng Anh thêm trong ngoặc",
+      "passed": true
+    },
+    {
+      "check": "Không còn chuỗi lỗi trường Word",
+      "passed": true
+    },
+    {
+      "check": "Mỗi hình có chú thích không tính danh mục",
+      "passed": true
+    },
+    {
+      "check": "Bảng không chia hàng",
+      "passed": true
+    }
+  ],
+  "all_passed": true,
+  "true_figures": 160,
+  "tables": 97,
+  "meaning": "Chỉ xác nhận các tiêu chí cấu trúc được liệt kê; không khẳng định mọi yêu cầu nghiệp vụ đã đạt 100%"
+}

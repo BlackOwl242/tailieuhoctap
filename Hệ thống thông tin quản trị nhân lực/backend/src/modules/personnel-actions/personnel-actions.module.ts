@@ -1,5 +1,9 @@
+import { ConflictException, ForbiddenException } from '@nestjs/common';
+import { PersonnelEffectsService } from '../../common/services/personnel-effects.service';
+import { HrAccessService, isHr } from '../../common/services/hr-access.service';
+import { dateKey, workDate } from '../../common/hr-time';
 import {
-  Body, Controller, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Post,
+  Body, Controller, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
@@ -38,6 +42,8 @@ export class PersonnelActionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly effects: PersonnelEffectsService,
+    private readonly access: HrAccessService,
   ) {}
 
   list(status?: string) {
@@ -67,8 +73,38 @@ export class PersonnelActionsService {
   async create(dto: CreateActionDto, actor: AuthUser, requestId?: string) {
     const subject = await this.prisma.user.findFirst({ where: { id: dto.subjectId, deletedAt: null } });
     if (!subject) throw new NotFoundException('Không tìm thấy nhân viên liên quan');
+    if (dto.type === 'SALARY_ADJUST') {
+      const reason = String(dto.payload.reason ?? '').trim();
+      const newSalary = Number(dto.payload.newSalary);
+      if (reason.length < 10) throw new ConflictException('Đề xuất tăng/điều chỉnh lương cần nêu lý do cụ thể (ít nhất 10 ký tự)');
+      if (!Number.isFinite(newSalary) || newSalary <= 0) throw new ConflictException('Mức lương mới phải lớn hơn 0');
+      const salaryReason = String(dto.payload.salaryReason ?? (dto.payload.rankProgression ? 'MERIT' : 'OTHER'));
+      if (!['MERIT', 'PROMOTION', 'MARKET_ALIGNMENT', 'LEGAL_MINIMUM', 'OTHER'].includes(salaryReason)) throw new ConflictException('Lý do điều chỉnh lương không hợp lệ');
+      const effectiveAt = dto.effectiveDate ? dateKey(dto.effectiveDate) : workDate();
+      const rankProfile = dto.payload.rankProgression === true
+        ? await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId: subject.id }, select: { rankCode: true } })
+        : null;
+      const isValidatedRankProgression = Boolean(rankProfile?.rankCode);
+      if (dto.payload.rankProgression === true && !isValidatedRankProgression) throw new ConflictException('Chỉ được dùng luồng ngạch/bậc cho nhân sự có ngạch công vụ đã khai báo');
+      if (!isValidatedRankProgression) {
+        const activeContract = await this.prisma.contract.findFirst({ where: { userId: subject.id, status: 'ACTIVE', startDate: { lte: effectiveAt }, OR: [{ endDate: null }, { endDate: { gte: effectiveAt } }] }, orderBy: { startDate: 'desc' } });
+        if (!activeContract) throw new ConflictException('Cần có hợp đồng còn hiệu lực vào ngày điều chỉnh lương');
+        const targetBandId = String(dto.payload.salaryBandId ?? subject.salaryBandId ?? '');
+        if (!targetBandId) throw new ConflictException('Cần gắn khung lương đã duyệt cho vị trí trước khi đề xuất mức mới');
+        const band = await this.prisma.hrmsSalaryBand.findUnique({ where: { id: targetBandId } });
+        if (!band || band.status !== 'ACTIVE' || band.effectiveFrom > effectiveAt || (band.effectiveTo && band.effectiveTo < effectiveAt)) throw new ConflictException('Khung lương cần áp dụng chưa được duyệt hoặc không còn hiệu lực vào ngày điều chỉnh');
+        if (band.compensationBasis !== activeContract.compensationBasis) throw new ConflictException('Đơn vị của khung lương phải khớp hợp đồng: theo tháng, ngày hoặc giờ');
+        if (newSalary < band.minSalary || newSalary > band.maxSalary) {
+          const unit = activeContract.compensationBasis === 'HOURLY' ? 'giờ' : activeContract.compensationBasis === 'DAILY' ? 'ngày công' : 'tháng';
+          throw new ConflictException(`Mức lương mới phải nằm trong khoảng của khung ${band.code}: ${band.minSalary.toLocaleString('vi-VN')}–${band.maxSalary.toLocaleString('vi-VN')} đồng/${unit}`);
+        }
+        dto.payload.salaryBandId = targetBandId;
+      }
+      dto.payload.salaryReason = salaryReason;
+    }
     // Nhân viên chỉ được tự đề xuất thôi việc; các loại khác do quản lý/HR đề xuất
-    const isManager = actor.roles.includes('ADMIN') || actor.roles.includes('KM_MANAGER');
+    const isManager = isHr(actor) || actor.roles.includes('LINE_MANAGER');
+    if (actor.roles.includes('LINE_MANAGER') && !isHr(actor) && dto.subjectId !== actor.id) await this.access.assertReviewer(actor, dto.subjectId);
     if (!isManager && (dto.type !== 'RESIGNATION' || dto.subjectId !== actor.id)) {
       throw new BusinessException(ErrorCodes.FORBIDDEN, 'Bạn chỉ được tạo đề xuất thôi việc cho chính mình', HttpStatus.FORBIDDEN);
     }
@@ -77,13 +113,20 @@ export class PersonnelActionsService {
     });
     if (dup) throw new BusinessException(ErrorCodes.CONFLICT, 'Đã có đề xuất cùng loại đang chờ duyệt cho nhân viên này', HttpStatus.CONFLICT);
 
+    const effectiveAt = dto.effectiveDate ? dateKey(dto.effectiveDate) : workDate();
+    if (['TRANSFER','SALARY_ADJUST','RESIGNATION'].includes(dto.type)) {
+      const closed = await this.prisma.hrmsPayrollRun.findFirst({where:{fromDate:{lte:effectiveAt},toDate:{gte:effectiveAt},status:{in:['REVIEWED','APPROVED','LOCKED','PAID']}}});
+      if (closed) throw new ConflictException('Ngày hiệu lực thuộc kỳ lương đã đối soát/khóa; cần lập điều chỉnh kỳ sau');
+    }
     const action = await this.prisma.personnelAction.create({
       data: {
         type: dto.type,
         subjectId: dto.subjectId,
         requestedById: actor.id,
+        effectiveAt: dto.effectiveDate ? dateKey(dto.effectiveDate) : workDate(),
         payload: {
           ...dto.payload,
+          oldSalary: subject.baseSalary,
           effectiveDate: dto.effectiveDate ?? null,
         },
       },
@@ -98,83 +141,47 @@ export class PersonnelActionsService {
   async decide(id: string, approve: boolean, actor: AuthUser, note?: string, requestId?: string, newOrgUnitIdFromDto?: string) {
     const action = await this.prisma.personnelAction.findUnique({ where: { id } });
     if (!action) throw new NotFoundException('Không tìm thấy đề xuất');
-    if (action.status !== 'PENDING') {
-      throw new BusinessException(ErrorCodes.INVALID_STATE_TRANSITION, 'Đề xuất đã được xử lý', HttpStatus.CONFLICT);
+    if (action.requestedById === actor.id) throw new ForbiddenException('Người đề xuất không được tự phê duyệt');
+    await this.access.assertReviewer(actor, action.subjectId);
+    const payload: Record<string, unknown> = { ...(action.payload as Record<string, unknown>), ...(newOrgUnitIdFromDto ? { newOrgUnitId: newOrgUnitIdFromDto } : {}) };
+    if (approve && action.type === 'TRANSFER') {
+      if (!payload.newOrgUnitId || !await this.prisma.orgUnit.findUnique({ where: { id: String(payload.newOrgUnitId) } })) throw new ConflictException('Đơn vị tiếp nhận không hợp lệ');
     }
-
-    if (approve) {
-      const payload = (action.payload ?? {}) as Record<string, unknown>;
-      const effectiveDate = payload.effectiveDate ? new Date(String(payload.effectiveDate)) : new Date();
-
-      switch (action.type) {
-        case 'TRANSFER': {
-          const newOrgUnitId = (newOrgUnitIdFromDto ? String(newOrgUnitIdFromDto) : null) || (payload.newOrgUnitId ? String(payload.newOrgUnitId) : null);
-          if (!newOrgUnitId) throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Thiếu đơn vị mới (newOrgUnitId)');
-          await this.prisma.user.update({ where: { id: action.subjectId }, data: { orgUnitId: newOrgUnitId } });
-          if (!payload.newOrgUnitId) {
-            await this.prisma.personnelAction.update({
-              where: { id },
-              data: { payload: { ...payload, newOrgUnitId } },
-            });
-          }
-          break;
-        }
-        case 'SALARY_ADJUST': {
-          const newSalary = Number(payload.newSalary);
-          if (!newSalary || newSalary <= 0) throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Thiếu mức lương mới (newSalary)');
-          await this.prisma.user.update({ where: { id: action.subjectId }, data: { baseSalary: newSalary } });
-          break;
-        }
-        case 'RESIGNATION': {
-          // Sinh checklist BÀN GIAO CÔNG VIỆC 4 xác nhận bắt buộc (UC17)
-          const leavingDate = effectiveDate;
-          const checklist = await this.prisma.handoverChecklist.create({
-            data: {
-              ownerUserId: action.subjectId,
-              leavingDate,
-              items: {
-                create: [
-                  { title: 'Bàn giao công việc cho người tiếp nhận (Trưởng dự án xác nhận)' },
-                  { title: 'Thu hồi tài sản: máy tính, thẻ từ, tài sản văn phòng (Hành chính xác nhận)' },
-                  { title: 'Thu hồi toàn bộ tài khoản & quyền truy cập hệ thống (IT xác nhận)' },
-                  { title: 'Quyết toán công – lương – bảo hiểm – thuế (Kế toán xác nhận)' },
-                  { title: 'Chuyển giao tri thức: tài liệu hóa quy trình đang phụ trách' },
-                ],
-              },
-            },
-          });
-          await this.prisma.user.update({
-            where: { id: action.subjectId },
-            data: { employmentStatus: 'RESIGNED' },
-          });
-          await this.audit.log({
-            actorId: actor.id, action: 'HANDOVER_CHECKLIST_CREATED', entityType: 'HandoverChecklist',
-            entityId: checklist.id, after: { from: 'RESIGNATION_APPROVED' }, requestId,
-          });
-          break;
-        }
-        case 'AWARD':
-        case 'DISCIPLINE':
-          // Mức thưởng/khấu trừ được kế toán nạp vào kỳ lương kế tiếp từ payload.amount
-          break;
+    if (approve && action.type === 'SALARY_ADJUST') {
+      const salary = Number(payload.newSalary);
+      if (!Number.isFinite(salary) || salary <= 0 || String(payload.reason ?? '').trim().length < 10) throw new ConflictException('Đề xuất tăng lương thiếu mức mới hoặc lý do cụ thể');
+      const rankProfile = payload.rankProgression === true
+        ? await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId: action.subjectId }, select: { rankCode: true } })
+        : null;
+      const isValidatedRankProgression = Boolean(rankProfile?.rankCode);
+      if (payload.rankProgression === true && !isValidatedRankProgression) throw new ConflictException('Chỉ được dùng luồng ngạch/bậc cho nhân sự có ngạch công vụ đã khai báo');
+      if (!isValidatedRankProgression) {
+        const bandId = String(payload.salaryBandId ?? '');
+        const effectiveAt = action.effectiveAt ?? workDate();
+        const activeContract = await this.prisma.contract.findFirst({ where: { userId: action.subjectId, status: 'ACTIVE', startDate: { lte: effectiveAt }, OR: [{ endDate: null }, { endDate: { gte: effectiveAt } }] }, orderBy: { startDate: 'desc' } });
+        if (!activeContract || !bandId) throw new ConflictException('Cần hợp đồng còn hiệu lực và khung lương trước khi duyệt');
+        const band = await this.prisma.hrmsSalaryBand.findUnique({ where: { id: bandId } });
+        if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== activeContract.compensationBasis || band.effectiveFrom > effectiveAt || (band.effectiveTo && band.effectiveTo < effectiveAt) || salary < band.minSalary || salary > band.maxSalary) throw new ConflictException('Mức lương phải nằm trong khung đã duyệt cùng đơn vị hợp đồng và có hiệu lực vào ngày áp dụng');
       }
     }
-
-    const updated = await this.prisma.personnelAction.update({
-      where: { id },
-      data: {
-        status: approve ? 'APPROVED' : 'REJECTED',
-        decidedById: actor.id,
-        decidedAt: new Date(),
-        decisionNote: note,
-      },
-    });
-    await this.audit.log({
-      actorId: actor.id, action: approve ? 'PERSONNEL_ACTION_APPROVED' : 'PERSONNEL_ACTION_REJECTED',
-      entityType: 'PersonnelAction', entityId: id, after: { type: action.type }, requestId,
-    });
+    const updated = await this.prisma.$transaction(async tx => {
+      if (approve && action.effectiveAt && await tx.hrmsPayrollRun.findFirst({where:{fromDate:{lte:action.effectiveAt},toDate:{gte:action.effectiveAt},status:{in:['REVIEWED','APPROVED','LOCKED','PAID']}}})) throw new ConflictException('Ngày hiệu lực thuộc kỳ lương đã đối soát; điều chỉnh ở kỳ sau');
+      const changed = await tx.personnelAction.updateMany({ where: { id, status: 'PENDING' }, data: { status: approve ? 'APPROVED' : 'REJECTED', payload: payload as import('@prisma/client').Prisma.InputJsonValue, effectiveAt: action.effectiveAt ?? (payload.effectiveDate ? dateKey(String(payload.effectiveDate)) : workDate()), decidedById: actor.id, decidedAt: new Date(), decisionNote: note } });
+      if (changed.count !== 1) throw new ConflictException('Đề xuất đã được xử lý');
+      if (approve && action.type === 'RESIGNATION') await tx.handoverChecklist.create({ data: { ownerUserId: action.subjectId, leavingDate: action.effectiveAt ?? workDate(), items: { create: [
+        { title: 'Bàn giao công việc cho người tiếp nhận', responsibleRole: 'LINE_MANAGER' },
+        { title: 'Thu hồi tài sản làm việc', responsibleRole: 'HR_CB' },
+        { title: 'Thu hồi toàn bộ tài khoản và quyền truy cập', responsibleRole: 'ADMIN' },
+        { title: 'Quyết toán công, lương, bảo hiểm, thuế và khoản vay', responsibleRole: 'ACCOUNTANT' },
+        { title: 'Chuyển giao tri thức và tài liệu công việc', responsibleRole: 'KM_MANAGER' },
+      ] } } });
+      await tx.auditLog.create({ data: { actorId: actor.id, action: approve ? 'PERSONNEL_ACTION_APPROVED' : 'PERSONNEL_ACTION_REJECTED', entityType: 'PersonnelAction', entityId: id, requestId, afterData: { type: action.type } } });
+      return tx.personnelAction.findUniqueOrThrow({ where: { id } });
+    }, { isolationLevel: 'Serializable' });
+    if (approve) await this.effects.applyDue();
     return updated;
   }
+
 }
 
 @ApiTags('personnel-actions')
@@ -188,9 +195,9 @@ export class PersonnelActionsController {
     return this.service.mine(user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD')
   @Get()
-  list(@Param('status') status?: string) {
+  list(@Query('status') status?: string) {
     return this.service.list(status);
   }
 
@@ -199,18 +206,18 @@ export class PersonnelActionsController {
     return this.service.create(dto, user);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'BOD')
   @Post(':id/approve')
   approve(@Param('id') id: string, @Body() dto: DecideActionDto, @CurrentUser() user: AuthUser) {
     return this.service.decide(id, true, user, dto.note, undefined, dto.newOrgUnitId);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'BOD')
   @Post(':id/reject')
   reject(@Param('id') id: string, @Body() dto: DecideActionDto, @CurrentUser() user: AuthUser) {
     return this.service.decide(id, false, user, dto.note);
   }
 }
 
-@Module({ controllers: [PersonnelActionsController], providers: [PersonnelActionsService] })
+@Module({ controllers: [PersonnelActionsController], providers: [PersonnelActionsService], exports: [PersonnelActionsService] })
 export class PersonnelActionsModule {}

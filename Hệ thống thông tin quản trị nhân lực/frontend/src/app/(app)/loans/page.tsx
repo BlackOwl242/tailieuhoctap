@@ -10,7 +10,7 @@ import {
   HelpCircle, RefreshCw, Calendar, Building2, User,
   ChevronRight, Laptop, HeartPulse, GraduationCap, Home,
   AlertTriangle, CheckCircle, Percent, LayoutGrid, Table as TableIcon,
-  Bot, ShieldAlert, Zap, ArrowDownCircle, BadgeCheck
+  Bot, ShieldAlert, ArrowDownCircle, BadgeCheck
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
@@ -23,6 +23,7 @@ import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { Portal } from '@/components/ui/portal';
 import { printDocumentElement } from '@/components/ui/print';
 import { formatDate } from '@/lib/utils';
+import { useOrgConfig } from '@/lib/org-config';
 
 export interface LoanItem {
   id: string;
@@ -39,6 +40,9 @@ export interface LoanItem {
   reason?: string;
   disbursedAt?: string;
   approverName?: string;
+  payrollDeductionAuthorizedAt?: string | null;
+  disbursementMethod?: 'CASH' | 'BANK' | null;
+  disbursementReference?: string | null;
   createdAt: string;
 }
 
@@ -51,63 +55,64 @@ interface EmployeeOption {
   jobTitle?: string;
 }
 
-// 4 Gói vay phúc lợi doanh nghiệp chuẩn hóa
+// 4 gói vay mẫu dùng để minh họa giao diện; chưa phải chính sách doanh nghiệp.
+// Gói, hạn mức và lãi suất bên dưới là dữ liệu minh họa, chưa phải chính sách doanh nghiệp.
 const PRESET_PACKAGES = [
   {
     id: 'pkg-tech',
-    title: 'Tạm Ứng Thiết Bị Làm Việc & Laptop',
-    category: 'Tạm ứng mua thiết bị làm việc & Laptop',
+    title: 'Vay phúc lợi mua thiết bị làm việc',
+    category: 'Vay phúc lợi mua thiết bị làm việc',
     icon: Laptop,
-    badge: 'Lãi suất 0%',
+    badge: 'Gói minh họa',
     badgeColor: 'bg-muted text-foreground border-border',
     amount: 28000000,
     term: 12,
     rate: 0,
-    highlight: 'Hỗ trợ 100% lãi suất doanh nghiệp',
+    highlight: 'Mức lãi và điều kiện cần chính sách doanh nghiệp phê duyệt.',
     description: 'Dành cho nhân sự chính thức cần nâng cấp máy trạm, laptop đồ họa hoặc trang thiết bị kỹ thuật phục vụ dự án.',
-    eligibility: 'Nhân viên chính thức đã qua thử việc (thâm niên ≥ 3 tháng)',
+    eligibility: 'Điều kiện mẫu; chưa cấu hình chính sách thật.',
   },
   {
     id: 'pkg-emergency',
     title: 'Hỗ Trợ Khẩn Cấp Y Tế & Gia Đình',
     category: 'Hỗ trợ khẩn cấp y tế gia đình',
     icon: HeartPulse,
-    badge: 'Giải ngân 24h',
+    badge: 'Gói minh họa',
     badgeColor: 'bg-muted text-foreground border-border',
     amount: 25000000,
     term: 10,
     rate: 0,
-    highlight: 'Duyệt hỏa tốc 0% lãi suất bảo trợ',
+    highlight: 'Mức lãi và điều kiện cần chính sách doanh nghiệp phê duyệt.',
     description: 'Hỗ trợ tài chính đột xuất khi người lao động hoặc thân nhân trực hệ gặp biến cố sức khỏe, viện phí khẩn cấp.',
-    eligibility: 'Tất cả người lao động có hợp đồng lao động',
+    eligibility: 'Điều kiện mẫu; chưa cấu hình chính sách thật.',
   },
   {
     id: 'pkg-education',
     title: 'Vay Học Tập & Nâng Cao Nghiệp Vụ',
     category: 'Vay học tập & nâng cao nghiệp vụ',
     icon: GraduationCap,
-    badge: 'Ưu đãi 2%/năm',
+    badge: 'Gói minh họa',
     badgeColor: 'bg-muted text-foreground border-border',
     amount: 40000000,
     term: 20,
     rate: 2,
-    highlight: 'Công ty đồng tài trợ học phí',
+    highlight: 'Mức lãi và điều kiện cần chính sách doanh nghiệp phê duyệt.',
     description: 'Tài trợ học thạc sĩ, chứng chỉ nghề nghiệp quốc tế (PMP, CFA, AWS, ACCA, SHRM, DevOps...) phục vụ tổ chức.',
-    eligibility: 'Thâm niên ≥ 12 tháng & cam kết đồng hành 2 năm',
+    eligibility: 'Điều kiện mẫu; chưa cấu hình chính sách thật.',
   },
   {
     id: 'pkg-housing',
     title: 'Phúc Lợi An Cư & Gắn Bó Thâm Niên',
     category: 'Phúc lợi an cư & Gắn bó thâm niên',
     icon: Home,
-    badge: 'Hạn mức đến 100Tr',
+    badge: 'Gói minh họa',
     badgeColor: 'bg-muted text-foreground border-border',
     amount: 80000000,
     term: 36,
     rate: 3.5,
-    highlight: 'Tri ân cống hiến thâm niên lâu năm',
+    highlight: 'Mức lãi và điều kiện cần chính sách doanh nghiệp phê duyệt.',
     description: 'Hỗ trợ người lao động sửa chữa nhà ở, trang trải phương tiện ổn định cuộc sống an tâm công tác lâu dài.',
-    eligibility: 'Thâm niên ≥ 24 tháng & Đánh giá hiệu suất Tốt/Xuất sắc',
+    eligibility: 'Điều kiện mẫu; chưa cấu hình chính sách thật.',
   },
 ];
 
@@ -115,6 +120,9 @@ export default function LoansPage() {
   const queryClient = useQueryClient();
   const toast = useToast();
   const { user } = useAuthStore();
+  const roles = user?.roles ?? [];
+  const canDisburse = roles.some((role) => ['ADMIN', 'ACCOUNTANT'].includes(role));
+  const [printConfig] = useOrgConfig();
 
   // Navigation View Mode & Filter
   const [activeTab, setActiveTab] = useState<'ledger' | 'pipeline' | 'simulator' | 'packages'>('ledger');
@@ -129,6 +137,9 @@ export default function LoansPage() {
   const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
   const [selectedDetailLoan, setSelectedDetailLoan] = useState<LoanItem | null>(null);
   const [isPrintLoanOpen, setIsPrintLoanOpen] = useState(false);
+  const [isDisbursementModalOpen, setIsDisbursementModalOpen] = useState(false);
+  const [disbursementMethod, setDisbursementMethod] = useState<'CASH' | 'BANK'>('BANK');
+  const [disbursementReference, setDisbursementReference] = useState('');
   const [repayLoanTarget, setRepayLoanTarget] = useState<LoanItem | null>(null);
   const [repayAmount, setRepayAmount] = useState<number>(0);
 
@@ -136,11 +147,12 @@ export default function LoansPage() {
   const [targetUserId, setTargetUserId] = useState<string>('');
   const [targetEmployeeName, setTargetEmployeeName] = useState<string>('');
   const [targetEstimatedSalary, setTargetEstimatedSalary] = useState<number>(25000000);
-  const [loanType, setLoanType] = useState('Tạm ứng mua thiết bị làm việc & Laptop');
+  const [loanType, setLoanType] = useState('Vay phúc lợi mua thiết bị làm việc');
   const [principalAmount, setPrincipalAmount] = useState(28000000);
   const [termMonths, setTermMonths] = useState(12);
   const [interestRate, setInterestRate] = useState(0);
   const [reason, setReason] = useState('Nâng cấp máy trạm đồ họa phục vụ dự án công nghệ');
+  const [payrollDeductionAuthorized, setPayrollDeductionAuthorized] = useState(false);
 
   // Simulator Studio State
   const [simAmount, setSimAmount] = useState(30000000);
@@ -169,6 +181,7 @@ export default function LoansPage() {
       termMonths: number;
       interestRate: number;
       reason: string;
+      payrollDeductionAuthorized: boolean;
     }) => {
       return (await api.post('/hrms/loans/apply', payload)).data;
     },
@@ -176,6 +189,7 @@ export default function LoansPage() {
       queryClient.invalidateQueries({ queryKey: ['hrms-loans'] });
       setIsApplyWizardOpen(false);
       setWizardStep(1);
+      setPayrollDeductionAuthorized(false);
       toast('Đã đăng ký khoản vay phúc lợi thành công', 'success');
     },
     onError: (err) => {
@@ -192,11 +206,24 @@ export default function LoansPage() {
       if (selectedDetailLoan && selectedDetailLoan.id === vars.id) {
         setSelectedDetailLoan((prev) => prev ? { ...prev, status: vars.status } : null);
       }
-      toast(vars.status === 'APPROVED' ? 'Đã phê duyệt giải ngân khoản vay' : 'Đã từ chối khoản vay', 'success');
+      toast(vars.status === 'APPROVED' ? 'Đã phê duyệt khoản vay; chờ kế toán ghi nhận giải ngân' : 'Đã từ chối khoản vay', 'success');
     },
     onError: (err) => {
       toast(errorMessage(err), 'error');
     },
+  });
+
+  const disburseMutation = useMutation({
+    mutationFn: async ({ id, method, reference }: { id: string; method: 'CASH' | 'BANK'; reference: string }) =>
+      (await api.patch(`/hrms/loans/${id}/disburse`, { method, reference })).data as LoanItem,
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ['hrms-loans'] });
+      setSelectedDetailLoan(updated);
+      setIsDisbursementModalOpen(false);
+      setDisbursementReference('');
+      toast('Đã ghi nhận giải ngân kèm mã chứng từ', 'success');
+    },
+    onError: (err) => toast(errorMessage(err), 'error'),
   });
 
   const repayMutation = useMutation({
@@ -221,7 +248,7 @@ export default function LoansPage() {
   const simTotalPayable = simAmount + simInterestTotal;
   const simMonthly = Math.round(simTotalPayable / simMonths);
   const simDeductionPercent = Number(((simMonthly / simSalary) * 100).toFixed(1));
-  const isSafeDeduction = simDeductionPercent <= 30; // Điều 102 BLLĐ 2019
+  const isWithinAvailableNet = simMonthly <= simSalary;
 
   // Filtered Loans
   const filteredLoans = useMemo(() => {
@@ -239,15 +266,17 @@ export default function LoansPage() {
   }, [loans, searchTerm, statusFilter, categoryFilter]);
 
   // Aggregate Metrics & Compliance Audits
-  const totalPrincipal = (loans ?? []).reduce((acc, cur) => acc + cur.principalAmount, 0);
-  const totalRemaining = (loans ?? []).reduce((acc, cur) => acc + cur.remainingAmount, 0);
-  const totalRepaidAll = (loans ?? []).reduce((acc, cur) => acc + (cur.principalAmount - cur.remainingAmount), 0);
+  const fundedLoans = (loans ?? []).filter((loan) => ['DISBURSED', 'COMPLETED'].includes(loan.status));
+  const totalPrincipal = fundedLoans.reduce((acc, cur) => acc + cur.principalAmount, 0);
+  const totalRemaining = fundedLoans.reduce((acc, cur) => acc + cur.remainingAmount, 0);
+  const totalRepaidAll = fundedLoans.reduce((acc, cur) => acc + (cur.principalAmount - cur.remainingAmount), 0);
   const pendingLoans = (loans ?? []).filter((l) => l.status === 'PENDING');
-  const activeLoans = (loans ?? []).filter((l) => l.status === 'APPROVED' || l.status === 'DISBURSED');
+  const approvedLoans = (loans ?? []).filter((l) => l.status === 'APPROVED');
+  const activeLoans = (loans ?? []).filter((l) => l.status === 'DISBURSED');
   const completedLoans = (loans ?? []).filter((l) => l.status === 'COMPLETED');
   const monthlyEmiRunRate = activeLoans.reduce((acc, cur) => acc + cur.monthlyEmi, 0);
 
-  // Fund Pool Limit (Hạn mức quỹ phúc lợi giả định của DN: 2 Tỷ VNĐ)
+  // Chỉ để minh họa giao diện; chưa lấy hạn mức quỹ từ chính sách doanh nghiệp.
   const fundLimit = 2000000000;
   const fundUtilization = Math.min(100, Math.round((totalPrincipal / fundLimit) * 100));
 
@@ -260,23 +289,6 @@ export default function LoansPage() {
     setReason(`Đăng ký theo ${pkg.title}`);
     setWizardStep(2);
     setIsApplyWizardOpen(true);
-  };
-
-  // 1-Click Approve All Safe Pending Loans
-  const handleBatchApprovePending = async () => {
-    if (pendingLoans.length === 0) return;
-    try {
-      for (const p of pendingLoans) {
-        await api.patch(`/hrms/loans/${p.id}/decide`, {
-          status: 'APPROVED',
-          decisionNote: 'Phê duyệt nhanh tự động: Thẩm định đạt chuẩn Điều 102 BLLĐ (khấu trừ ≤ 30% lương)'
-        });
-      }
-      queryClient.invalidateQueries({ queryKey: ['hrms-loans'] });
-      toast(`Đã phê duyệt thành công toàn bộ ${pendingLoans.length} hồ sơ an toàn!`, 'success');
-    } catch (err) {
-      toast(errorMessage(err), 'error');
-    }
   };
 
   // Open Repay Target Modal
@@ -353,8 +365,8 @@ export default function LoansPage() {
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/40 border border-border">
               <ShieldCheck className="h-4 w-4 text-foreground" />
               <div className="text-xs">
-                <p className="font-semibold text-foreground">Tuân thủ BLLĐ Điều 102</p>
-                <p className="text-muted-foreground">Khấu trừ lương tự động ≤ 30%</p>
+                <p className="font-semibold text-foreground">Khấu trừ theo thỏa thuận</p>
+                <p className="text-muted-foreground">Tối đa kỳ đến hạn, dư nợ và thực nhận khả dụng</p>
               </div>
             </div>
 
@@ -362,7 +374,7 @@ export default function LoansPage() {
               <Calendar className="h-4 w-4 text-foreground" />
               <div className="text-xs">
                 <p className="font-semibold text-foreground">Kỳ hoàn nợ kế tiếp</p>
-                <p className="text-muted-foreground">Kỳ lương ngày 05 tháng tới</p>
+                <p className="text-muted-foreground">Theo lịch trả được duyệt</p>
               </div>
             </div>
           </div>
@@ -371,8 +383,8 @@ export default function LoansPage() {
         {/* Progress Bar Hạn Mức Quỹ */}
         <div className="mt-4 space-y-1.5">
           <div className="flex justify-between text-xs text-muted-foreground font-medium">
-            <span>Đã giải ngân: {fundUtilization}%</span>
-            <span>Khả dụng cho vay mới: {100 - fundUtilization}% ({Math.max(0, 2000 - Math.round(totalPrincipal / 1000000))} Tr)</span>
+            <span>Sử dụng hạn mức minh họa 2 tỷ: {fundUtilization}%</span>
+            <span>Còn theo giả định mẫu: {100 - fundUtilization}% ({Math.max(0, 2000 - Math.round(totalPrincipal / 1000000))} Tr)</span>
           </div>
           <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
             <div
@@ -394,36 +406,25 @@ export default function LoansPage() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <h4 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                    <span>Bộ Thẩm Định Tự Động & Tuân Thủ Điều 102 BLLĐ</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border font-medium">Rule Engine</span>
+                    <span>Rà soát hồ sơ vay và lịch trả</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border font-medium">Cần thẩm định</span>
                   </h4>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {pendingLoans.length > 0 ? (
                     <>
-                      Hệ thống tự động phát hiện <strong className="text-foreground">{pendingLoans.length} hồ sơ chờ duyệt</strong>.
-                      Mức trích nợ bình quân chiếm <strong className="text-foreground font-semibold">9.8% - 11.2%</strong> mức lương thực lĩnh,
-                      hoàn toàn thỏa mãn ngưỡng an toàn của <strong>Điều 102 Bộ luật Lao động</strong> (≤ 30% lương).
+                      Có <strong className="text-foreground">{pendingLoans.length} hồ sơ chờ duyệt</strong>.
+                      Cần xem từng hồ sơ, thỏa thuận/lịch trả, dư nợ, khả năng thanh toán và bằng chứng giải ngân trước khi duyệt.
                     </>
                   ) : (
                     <>
-                      Hiện không có hồ sơ nào tồn đọng trong hàng chờ thẩm định.
-                      Dòng tiền thu hồi dự kiến kỳ tới đạt <strong className="text-foreground">{monthlyEmiRunRate.toLocaleString('vi-VN')} đ</strong>,
-                      đảm bảo thanh khoản quay vòng an toàn cho quỹ phúc lợi nội bộ.
+                      Không có hồ sơ chờ duyệt. Tổng kỳ trả dự kiến từ các khoản đang mở là <strong className="text-foreground">{monthlyEmiRunRate.toLocaleString('vi-VN')} đ</strong>; số này cần đối chiếu với lịch trả thực tế.
                     </>
                   )}
                 </p>
 
                 {pendingLoans.length > 0 && (
                   <div className="flex items-center gap-2 pt-2">
-                    <Button
-                      size="sm"
-                      onClick={handleBatchApprovePending}
-                      className="h-8 text-xs font-medium gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
-                    >
-                      <Zap className="h-3.5 w-3.5" />
-                      <span>Phê Duyệt Nhanh {pendingLoans.length} Hồ Sơ Đạt Chuẩn</span>
-                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -457,9 +458,8 @@ export default function LoansPage() {
           icon={Wallet}
         />
         <NumberCard
-          title="Dư Nợ Đang Thu Hồi"
+          title="Dư nợ các khoản đã giải ngân"
           value={`${Math.round(totalRemaining / 1000000)} Tr`}
-          trend={{ value: 100, isPositive: true, label: 'Đúng hạn 100%' }}
           subtitle={`Đã thu hồi ${Math.round(totalRepaidAll / 1000000)} Tr (${totalPrincipal > 0 ? Math.round((totalRepaidAll / totalPrincipal) * 100) : 0}%)`}
           icon={TrendingDown}
         />
@@ -903,7 +903,7 @@ export default function LoansPage() {
                                   setIsPrintLoanOpen(true);
                                 }}
                                 className="h-7 text-xs px-2"
-                                title="In biểu mẫu hợp đồng / phụ lục vay vốn chuẩn NĐ 30"
+                                title="In thông tin hồ sơ vay nội bộ"
                               >
                                 <Printer className="h-3 w-3" />
                               </Button>
@@ -1082,7 +1082,7 @@ export default function LoansPage() {
                 <span>Bộ Điều Khiển Mô Phỏng Trả Góp Thông Minh</span>
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Kéo thanh trượt để tính toán phương án tự động theo quy định bảo vệ thu nhập Điều 102 BLLĐ 2019.
+                Kéo thanh trượt để so sánh khoản trả dự kiến với số thực nhận tham chiếu. Đây là công cụ mô phỏng, không phải kết luận pháp lý hoặc quyết định duyệt vay.
               </p>
             </div>
 
@@ -1156,7 +1156,7 @@ export default function LoansPage() {
                 className="w-full accent-primary h-2 bg-muted rounded-lg cursor-pointer"
               />
               <p className="text-[11px] text-muted-foreground">
-                Căn cứ để kiểm tra mức khấu trừ tối đa 30% lương theo Điều 102 Bộ luật Lao động.
+                Số thực nhận ước tính chỉ dùng để thử khả năng trả nợ; Điều 102 BLLĐ không đặt trần 30% chung cho khoản vay.
               </p>
             </div>
 
@@ -1211,7 +1211,7 @@ export default function LoansPage() {
                 <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Chỉ Số Khấu Trừ & Sức Khỏe Tài Chính
                 </h4>
-                <span className="text-xs font-semibold text-primary">Tháng 10/2026</span>
+                    <span className="text-xs font-semibold text-primary">Kịch bản tham khảo</span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -1230,7 +1230,7 @@ export default function LoansPage() {
                   <p className="text-lg font-bold mt-0.5 text-foreground">
                     {simDeductionPercent}%
                   </p>
-                  <p className="text-[10px] text-muted-foreground">Trần tối đa luật định: 30.0%</p>
+                  <p className="text-[10px] text-muted-foreground">Tỷ lệ EMI so với thực nhận ước tính</p>
                 </div>
               </div>
 
@@ -1238,16 +1238,16 @@ export default function LoansPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-foreground">Thước đo an toàn thu nhập:</span>
-                  <span className={isSafeDeduction ? 'text-foreground' : 'text-destructive'}>
-                    {isSafeDeduction ? '✓ Trong ngưỡng an toàn' : '⚠️ Vượt trần 30% lương'}
+                  <span className={isWithinAvailableNet ? 'text-foreground' : 'text-destructive'}>
+                    {isWithinAvailableNet ? '✓ EMI thấp hơn số tham chiếu' : '⚠️ EMI cao hơn số tham chiếu'}
                   </span>
                 </div>
                 <div className="h-3 w-full rounded-full bg-muted overflow-hidden relative">
                   <div
                     className={`h-full rounded-full transition-all duration-300 ${
-                      isSafeDeduction ? 'bg-primary' : 'bg-destructive'
+                    isWithinAvailableNet ? 'bg-primary' : 'bg-destructive'
                     }`}
-                    style={{ width: `${Math.min(100, (simDeductionPercent / 30) * 100)}%` }}
+                    style={{ width: `${Math.min(100, simDeductionPercent)}%` }}
                   />
                 </div>
               </div>
@@ -1255,25 +1255,25 @@ export default function LoansPage() {
               {/* Lời khuyên chính sách BLLĐ */}
               <div
                 className={`p-3 rounded-md border text-xs leading-relaxed ${
-                  isSafeDeduction
+                  isWithinAvailableNet
                     ? 'border-border bg-muted/40 text-foreground'
                     : 'border-destructive/30 bg-destructive/5 text-destructive'
                 }`}
               >
-                {isSafeDeduction ? (
+                {isWithinAvailableNet ? (
                   <div className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                     <div>
-                      <strong className="block font-semibold">Phương án tài chính đạt chuẩn Điều 102 BLLĐ 2019</strong>
-                      Mức trích trừ {simMonthly.toLocaleString('vi-VN')} đ/tháng chiếm {simDeductionPercent}% lương thực lĩnh, đảm bảo người lao động giữ lại ít nhất 70% thu nhập để ổn định đời sống gia đình.
+                      <strong className="block font-semibold">EMI nằm trong số thực nhận tham chiếu</strong>
+                      Kỳ trả dự tính {simMonthly.toLocaleString('vi-VN')} đ/tháng, chiếm {simDeductionPercent}% số thực nhận ước tính. Cần đối chiếu hợp đồng vay và các nghĩa vụ khác trước khi duyệt.
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
                     <div>
-                      <strong className="block font-semibold">Cảnh báo vi phạm trần khấu trừ tiền lương</strong>
-                      Mức trích trừ {simDeductionPercent}% vượt quá hạn mức tối đa 30% lương thực lĩnh theo Điều 102. Khuyến nghị kéo dài kỳ hạn lên ít nhất {Math.ceil((simTotalPayable / (simSalary * 0.3)))} tháng để giảm EMI.
+                      <strong className="block font-semibold">EMI vượt số thực nhận tham chiếu</strong>
+                      Kỳ trả dự tính chiếm {simDeductionPercent}% số thực nhận ước tính. Cần xem lại số vay, kỳ hạn và thỏa thuận trả nợ.
                     </div>
                   </div>
                 )}
@@ -1316,9 +1316,13 @@ export default function LoansPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* TAB 4: GÓI PHÚC LỢI ƯU ĐÃI CHUẨN HÓA (PACKAGES)                           */}
+      {/* TAB 4: GÓI VAY THAM KHẢO MINH HỌA                                      */}
       {/* ========================================================================= */}
       {activeTab === 'packages' && (
+        <div className="space-y-4">
+        <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-muted-foreground">
+          Các gói, lãi suất, điều kiện và hạn mức dưới đây là giả định minh họa cho bài tập. Đây chưa phải chính sách phúc lợi đã được doanh nghiệp phê duyệt.
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {PRESET_PACKAGES.map((pkg) => {
             const IconComponent = pkg.icon;
@@ -1388,13 +1392,14 @@ export default function LoansPage() {
             );
           })}
         </div>
+        </div>
       )}
 
       {/* ========================================================================= */}
       {/* MODAL CHI TIẾT HỒ SƠ KHOẢN VAY & LỊCH TRÌNH KHẤU TRỪ                     */}
       {/* ========================================================================= */}
       <Modal
-        open={Boolean(selectedDetailLoan && !isPrintLoanOpen)}
+        open={Boolean(selectedDetailLoan && !isPrintLoanOpen && !isDisbursementModalOpen)}
         onOpenChange={(open) => {
           if (!open) setSelectedDetailLoan(null);
         }}
@@ -1410,11 +1415,20 @@ export default function LoansPage() {
               className="gap-1.5 text-xs font-medium"
             >
               <Printer className="h-3.5 w-3.5" />
-              <span>Xem & In Phụ Lục Hợp Đồng (NĐ 30)</span>
+              <span>In thông tin hồ sơ nội bộ</span>
             </Button>
 
             <div className="flex items-center gap-2">
-              {(selectedDetailLoan?.status === 'APPROVED' || selectedDetailLoan?.status === 'DISBURSED') && (
+              {selectedDetailLoan?.status === 'APPROVED' && canDisburse && (
+                <Button
+                  size="sm"
+                  onClick={() => setIsDisbursementModalOpen(true)}
+                  className="text-xs"
+                >
+                  Ghi nhận giải ngân
+                </Button>
+              )}
+              {selectedDetailLoan?.status === 'DISBURSED' && (
                 <>
                   <Button
                     size="sm"
@@ -1490,13 +1504,21 @@ export default function LoansPage() {
               )}
             </div>
 
+            <div className="p-3 rounded-md bg-muted/40 border border-border space-y-1">
+              <p className="font-semibold text-foreground">Trạng thái & bằng chứng ghi nhận</p>
+              <p className="text-muted-foreground">Trạng thái: {selectedDetailLoan.status}</p>
+              {selectedDetailLoan.status === 'APPROVED' && <p className="text-muted-foreground">Đã duyệt hồ sơ; chưa được xem là đã giải ngân và chưa trích nợ.</p>}
+              {selectedDetailLoan.status === 'DISBURSED' && <p className="text-muted-foreground">Giải ngân: {selectedDetailLoan.disbursementMethod === 'BANK' ? 'Chuyển khoản' : 'Tiền mặt'} · Mã tham chiếu: {selectedDetailLoan.disbursementReference || 'Chưa có'}</p>}
+              <p className="text-muted-foreground">Chấp thuận khấu trừ lương: {selectedDetailLoan.payrollDeductionAuthorizedAt ? formatDate(selectedDetailLoan.payrollDeductionAuthorizedAt) : 'Chưa ghi nhận'}</p>
+            </div>
+
             {/* Bảng Lịch Trình Khấu Trừ Từng Kỳ */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Lịch Trình Khấu Trừ Lương ({selectedDetailLoan.termMonths} Kỳ)
+                  Lịch dự kiến theo số tiền đã thu hồi ({selectedDetailLoan.termMonths} kỳ)
                 </h4>
-                <span className="text-[11px] text-muted-foreground">Tự động trừ ngày 05 hàng tháng</span>
+                <span className="text-[11px] text-muted-foreground">Ước tính; không phải lịch sử giao dịch lương</span>
               </div>
 
               <div className="rounded-md border border-border overflow-hidden max-h-60 overflow-y-auto">
@@ -1527,15 +1549,15 @@ export default function LoansPage() {
                             {isRepaid ? (
                               <span className="inline-flex items-center gap-1 text-[11px] text-foreground font-medium">
                                 <Check className="h-3 w-3 text-muted-foreground" />
-                                <span>Đã trừ lương</span>
+                                <span>Ước tính đã thu hồi</span>
                               </span>
                             ) : periodNumber === repaidMonths + 1 ? (
                               <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground font-medium">
                                 <Clock className="h-3 w-3" />
-                                <span>Kỳ tới (05/10)</span>
+                                <span>Kỳ ước tính tiếp theo</span>
                               </span>
                             ) : (
-                              <span className="text-[11px] text-muted-foreground">Chưa đến hạn</span>
+                              <span className="text-[11px] text-muted-foreground">Chưa ước tính đã thu</span>
                             )}
                           </td>
                         </tr>
@@ -1549,95 +1571,87 @@ export default function LoansPage() {
         )}
       </Modal>
 
-      {/* ================= MODAL IN: HỢP ĐỒNG / PHỤ LỤC VAY VỐN (CHUẨN NĐ 30/2020/NĐ-CP) ================= */}
+      {/* Modal ghi nhận thực chi sau khi khoản vay được duyệt */}
+      <Modal
+        open={isDisbursementModalOpen}
+        onOpenChange={setIsDisbursementModalOpen}
+        title="Ghi nhận giải ngân khoản vay"
+        description="Chỉ kế toán hoặc quản trị viên được ghi nhận. Nhập mã phiếu chi hoặc giao dịch ngân hàng để tra cứu đối chứng."
+        size="md"
+      >
+        <div className="space-y-4 text-sm">
+          <div className="rounded-md border border-border bg-muted/30 p-3">
+            <p><strong>Người vay:</strong> {selectedDetailLoan?.employeeName}</p>
+            <p><strong>Số tiền gốc:</strong> {selectedDetailLoan?.principalAmount.toLocaleString('vi-VN')} đ</p>
+          </div>
+          <label className="block space-y-1.5">
+            <span className="text-xs font-semibold">Phương thức giải ngân</span>
+            <Select value={disbursementMethod} onChange={(event) => setDisbursementMethod(event.target.value as 'CASH' | 'BANK')}>
+              <option value="BANK">Chuyển khoản</option>
+              <option value="CASH">Tiền mặt</option>
+            </Select>
+          </label>
+          <label className="block space-y-1.5">
+            <span className="text-xs font-semibold">Mã chứng từ tham chiếu</span>
+            <Input value={disbursementReference} onChange={(event) => setDisbursementReference(event.target.value)} maxLength={120} placeholder="Mã ủy nhiệm chi hoặc phiếu chi" />
+            <span className="text-xs text-muted-foreground">Bài tập lưu mã tham chiếu; chưa đính kèm hoặc xác minh chứng từ ngân hàng/phiếu chi.</span>
+          </label>
+        </div>
+        <ModalFooterActions
+          onCancel={() => setIsDisbursementModalOpen(false)}
+          confirmLabel="Ghi nhận giải ngân"
+          onConfirm={() => selectedDetailLoan && disburseMutation.mutate({ id: selectedDetailLoan.id, method: disbursementMethod, reference: disbursementReference.trim() })}
+          pending={disburseMutation.isPending}
+          disabled={!selectedDetailLoan || selectedDetailLoan.status !== 'APPROVED' || !disbursementReference.trim()}
+        />
+      </Modal>
+
+      {/* Bản in chỉ tổng hợp dữ liệu khoản vay đang lưu, không phải hợp đồng hoặc chứng từ pháp quy. */}
       <Modal
         open={isPrintLoanOpen}
         onOpenChange={(open) => setIsPrintLoanOpen(open)}
-        title="Biểu Mẫu Hợp Đồng / Phụ Lục Vay Vốn (Chuẩn Nghị định 30/2020/NĐ-CP)"
+        title="Thông tin hồ sơ vay phúc lợi nội bộ"
         size="lg"
       >
         {selectedDetailLoan && (
           <div
             id="print-loan-contract-doc"
             className="print-area font-times bg-white text-black p-6 sm:p-10 rounded-sm border border-neutral-300 shadow-md mx-auto max-w-4xl leading-relaxed text-[13pt] print:p-0 print:border-0 print:shadow-none print:m-0 print:max-w-none"
-            style={{ fontFamily: "'Times New Roman', Times, serif" }}
           >
-            {/* Header Thể thức Văn bản Hành chính theo NĐ 30/2020/NĐ-CP */}
             <div className="flex justify-between items-start pb-4 border-b border-black">
               <div className="w-[48%] text-center leading-tight">
-                <p className="font-normal text-[11.5pt] uppercase text-black">CÔNG TY CỔ PHẦN PHẦN MỀM SAIGON TECHNOLOGY</p>
-                <p className="font-bold text-[12pt] uppercase text-black">HỘI ĐỒNG PHÚC LỢI & CÔNG ĐOÀN</p>
-                <div className="w-32 border-b border-black mx-auto mt-1 mb-1.5" />
-                <p className="text-[11pt] text-black">Số: {selectedDetailLoan.id?.slice(0, 6).toUpperCase() || '01'}/HĐ-VVNB</p>
+                <p className="font-bold text-[12pt] uppercase">{printConfig.orgName}</p>
+                <p className="text-[11pt] uppercase">{printConfig.deptName}</p>
               </div>
               <div className="w-[52%] text-center leading-tight">
-                <p className="font-bold text-[12pt] uppercase text-black">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-                <p className="font-bold text-[12.5pt] text-black">Độc lập - Tự do - Hạnh phúc</p>
-                <div className="w-40 border-b-[1.5px] border-black mx-auto mt-1 mb-1.5" />
-                <p className="text-[11.5pt] italic text-black">
-                  Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
-                </p>
+                <p className="font-bold text-[12pt] uppercase">TÀI LIỆU NỘI BỘ</p>
+                <p className="text-[11pt]">Mã hồ sơ: {selectedDetailLoan.id}</p>
+                <p className="text-[11pt] italic">{printConfig.location}, ngày in {new Date().toLocaleDateString('vi-VN')}</p>
               </div>
             </div>
-
-            <div className="text-center my-6 space-y-1">
-              <h1 className="text-[15pt] font-bold uppercase tracking-wide text-black">
-                PHỤ LỤC HỢP ĐỒNG VAY VỐN PHÚC LỢI CÁN BỘ NHÂN VIÊN
-              </h1>
-              <p className="text-[12pt] italic text-black">
-                (Ban hành kèm theo Quy chế Quản trị Phúc lợi Doanh nghiệp số 24/QC-HRMIS)
-              </p>
+            <div className="text-center my-6 space-y-2">
+              <h1 className="text-[15pt] font-bold uppercase">TỔNG HỢP HỒ SƠ VAY PHÚC LỢI</h1>
+              <p className="text-[11pt] italic">Bản thông tin nội bộ; không thay thế hợp đồng, chứng từ giải ngân hoặc bằng chứng ký nhận/chấp thuận điện tử.</p>
             </div>
-
-            <div className="space-y-3 text-[12pt] leading-relaxed my-4 text-black">
-              <p><strong>Căn cứ:</strong> Bộ luật Lao động số 45/2019/QH14 và Thỏa ước Lao động Tập thể doanh nghiệp;</p>
-              <p><strong>Căn cứ:</strong> Đơn đề nghị vay vốn phúc lợi nội bộ của cán bộ, nhân viên ngày {new Date(selectedDetailLoan.disbursedAt || selectedDetailLoan.createdAt).toLocaleDateString('vi-VN')}.</p>
-              
-              <p className="font-bold uppercase pt-2">I. THÔNG TIN BÊN VAY VÀ KHOẢN VAY:</p>
-              <ul className="list-disc pl-6 space-y-1 text-black">
-                <li><strong>Họ và tên nhân sự:</strong> {selectedDetailLoan.employeeName} (Mã nhân sự: {selectedDetailLoan.userId})</li>
-                <li><strong>Chức danh / Đơn vị:</strong> Cán bộ nhân viên — Khối Vận hành Doanh nghiệp HRMIS</li>
-                <li><strong>Gói chương trình vay:</strong> {selectedDetailLoan.loanType}</li>
-                <li><strong>Số tiền vay gốc giải ngân:</strong> {selectedDetailLoan.principalAmount.toLocaleString('vi-VN')} VNĐ</li>
-                <li><strong>Lãi suất ưu đãi phúc lợi:</strong> {selectedDetailLoan.interestRate}%/năm</li>
-                <li><strong>Thời hạn hoàn trả:</strong> {selectedDetailLoan.termMonths} tháng (Kỳ khấu trừ hàng tháng: ~{selectedDetailLoan.monthlyEmi.toLocaleString('vi-VN')} VNĐ)</li>
-                <li><strong>Dư nợ thực tế hiện hành:</strong> {selectedDetailLoan.remainingAmount.toLocaleString('vi-VN')} VNĐ</li>
-              </ul>
-
-              <p className="font-bold uppercase pt-2">II. CAM KẾT VÀ PHƯƠNG THỨC KHẤU TRỪ:</p>
-              <p className="text-justify text-black">
-                Bên vay cam kết tuân thủ đúng tiến độ trả nợ hàng tháng qua hình thức tự động trích trừ vào bảng lương định kỳ. Trong trường hợp chấm dứt hợp đồng lao động trước thời hạn hoàn vốn, người lao động có trách nhiệm quyết toán toàn bộ số dư nợ còn lại trước khi nhận bàn giao thủ tục nghỉ việc.
-              </p>
-            </div>
-
-            {/* Chữ ký & Nơi nhận theo Nghị định 30 */}
-            <div className="grid grid-cols-2 gap-8 items-start pt-6 text-[12pt] text-black break-inside-avoid">
-              <div className="text-left space-y-1">
-                <p className="font-bold italic text-[11pt]">Nơi nhận:</p>
-                <ul className="text-[10pt] leading-tight space-y-0.5 list-none pl-2 text-black">
-                  <li>- Ban Tổng Giám đốc;</li>
-                  <li>- Phòng Tài chính - Kế toán;</li>
-                  <li>- Cán bộ vay vốn;</li>
-                  <li>- Lưu: VT, BQL-VV.</li>
-                </ul>
-              </div>
-              <div className="text-center space-y-1">
-                <p className="font-bold uppercase text-[12pt]">TM. HỘI ĐỒNG PHÚC LỢI NỘI BỘ</p>
-                <p className="font-bold uppercase text-[12pt]">CHỦ TỊCH HỘI ĐỒNG</p>
-                <p className="italic text-[10.5pt] text-neutral-600">(Ký, ghi rõ họ tên và đóng dấu)</p>
-                <div className="h-16" />
-                <p className="font-bold text-[12pt] uppercase">
-                  {selectedDetailLoan.approverName || '(Ký, ghi rõ họ tên)'}
-                </p>
-              </div>
+            <div className="space-y-3 text-[12pt] leading-relaxed">
+              <p><strong>Người vay:</strong> {selectedDetailLoan.employeeName} · Mã người dùng: {selectedDetailLoan.userId}</p>
+              <p><strong>Loại vay:</strong> {selectedDetailLoan.loanType}</p>
+              <p><strong>Lý do đã ghi nhận:</strong> {selectedDetailLoan.reason || 'Chưa ghi nhận'}</p>
+              <p><strong>Trạng thái hiện tại:</strong> {selectedDetailLoan.status}</p>
+              <p><strong>Ngày đăng ký:</strong> {new Date(selectedDetailLoan.createdAt).toLocaleString('vi-VN')}</p>
+              <p><strong>Gốc khoản vay:</strong> {selectedDetailLoan.principalAmount.toLocaleString('vi-VN')} đồng</p>
+              <p><strong>Lãi suất hồ sơ:</strong> {selectedDetailLoan.interestRate}%/năm · <strong>Thời hạn:</strong> {selectedDetailLoan.termMonths} tháng · <strong>Kỳ trả dự kiến:</strong> {selectedDetailLoan.monthlyEmi.toLocaleString('vi-VN')} đồng</p>
+              <p><strong>Dư nợ còn lại:</strong> {selectedDetailLoan.remainingAmount.toLocaleString('vi-VN')} đồng</p>
+              <p><strong>Chấp thuận khấu trừ qua lương:</strong> {selectedDetailLoan.payrollDeductionAuthorizedAt ? `Đã ghi nhận lúc ${new Date(selectedDetailLoan.payrollDeductionAuthorizedAt).toLocaleString('vi-VN')}` : 'Chưa ghi nhận'}</p>
+              <p><strong>Giải ngân:</strong> {selectedDetailLoan.disbursedAt ? `${new Date(selectedDetailLoan.disbursedAt).toLocaleString('vi-VN')} · ${selectedDetailLoan.disbursementMethod === 'BANK' ? 'Chuyển khoản' : 'Tiền mặt'} · Mã tham chiếu ${selectedDetailLoan.disbursementReference || 'chưa có'}` : 'Chưa ghi nhận giải ngân'}</p>
+              <p className="pt-4 border-t border-black text-[10.5pt] italic">Thông tin được in từ dữ liệu đang lưu trong hệ thống. Mã tham chiếu chưa chứng minh việc ngân hàng đã chuyển tiền; kiểm tra chứng từ gốc trước khi sử dụng cho kế toán hoặc quyết toán.</p>
             </div>
           </div>
         )}
-
         <ModalFooterActions
           onCancel={() => setIsPrintLoanOpen(false)}
           cancelLabel="Đóng"
-          confirmLabel="In Hợp Đồng & Phụ Lục"
+          confirmLabel="In thông tin nội bộ"
           onConfirm={() => printDocumentElement('print-loan-contract-doc')}
         />
       </Modal>
@@ -1844,26 +1858,20 @@ export default function LoansPage() {
                   </Select>
                 </div>
 
-                {/* Card Thẩm định Nhanh Hồ Sơ Nhân Sự */}
+                {/* Reference scenario; not a substitute for an approved loan assessment. */}
                 <div className="p-3.5 rounded-md bg-muted/40 border border-border space-y-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
                     <ShieldCheck className="h-4 w-4 text-foreground" />
-                    <span>Hạn ngạch tín dụng & Kiểm tra sơ bộ:</span>
+                    <span>Số liệu tham khảo để mô phỏng:</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-muted-foreground">Lương Net ước tính:</span>
-                      <p className="font-semibold text-foreground">{targetEstimatedSalary.toLocaleString('vi-VN')} đ</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Trần khấu trừ (30% Net):</span>
-                      <p className="font-semibold text-foreground">
-                        {(targetEstimatedSalary * 0.3).toLocaleString('vi-VN')} đ/tháng
-                      </p>
+                      <label className="text-muted-foreground" htmlFor="loan-estimated-net">Thực nhận tham chiếu (chỉ mô phỏng):</label>
+                      <Input id="loan-estimated-net" type="number" min={0} value={targetEstimatedSalary} onChange={(e) => setTargetEstimatedSalary(Number(e.target.value))} className="mt-1 h-8 text-xs" />
                     </div>
                   </div>
                   <p className="text-[11px] text-muted-foreground pt-1 border-t border-border/60">
-                    ✓ Nhân viên đã ký hợp đồng lao động chính thức, đủ điều kiện tham gia quỹ phúc lợi.
+                    Không xác minh được hợp đồng hay hạn mức quỹ từ dữ liệu mô phỏng này.
                   </p>
                 </div>
 
@@ -1930,7 +1938,7 @@ export default function LoansPage() {
                   const totalPayable = principalAmount + interestTotal;
                   const monthlyEmiCalc = Math.round(totalPayable / termMonths);
                   const deductionRatio = Number(((monthlyEmiCalc / targetEstimatedSalary) * 100).toFixed(1));
-                  const isSafe = deductionRatio <= 30;
+                  const isAffordable = monthlyEmiCalc <= Math.max(0, targetEstimatedSalary);
 
                   return (
                     <div className="p-3 rounded-md bg-muted/40 border border-border space-y-1.5 text-xs">
@@ -1940,8 +1948,8 @@ export default function LoansPage() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Tỷ lệ chiếm lương thực lĩnh:</span>
-                        <span className={`font-semibold ${isSafe ? 'text-foreground' : 'text-destructive'}`}>
-                          {deductionRatio}% {isSafe ? '(Đạt chuẩn Điều 102)' : '(Vượt trần 30% BLLĐ)'}
+                        <span className={`font-semibold ${isAffordable ? 'text-foreground' : 'text-destructive'}`}>
+                          {deductionRatio}% {isAffordable ? '(thấp hơn thực nhận tham chiếu)' : '(vượt thực nhận tham chiếu)'}
                         </span>
                       </div>
                     </div>
@@ -1994,10 +2002,15 @@ export default function LoansPage() {
                     rows={3}
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
-                    placeholder="Ghi rõ mục đích sử dụng vốn và cam kết trích trừ qua kỳ lương ngày 05 hàng tháng..."
+                    placeholder="Ghi rõ mục đích sử dụng vốn và thỏa thuận trả nợ..."
                     className="w-full text-xs"
                   />
                 </div>
+
+                <label className="flex items-start gap-2 rounded-md border border-border p-3 text-xs leading-relaxed">
+                  <input type="checkbox" checked={payrollDeductionAuthorized} onChange={(e) => setPayrollDeductionAuthorized(e.target.checked)} className="mt-0.5" />
+                  <span>Tôi đồng ý ghi nhận các khoản đến hạn qua bảng lương theo lịch trả đã thỏa thuận, tối đa trong phạm vi dư nợ và số thực nhận còn khả dụng. Mốc đồng ý này sẽ được lưu vào hồ sơ khoản vay.</span>
+                </label>
 
                 <div className="flex justify-between pt-2 border-t border-border">
                   <Button
@@ -2010,7 +2023,7 @@ export default function LoansPage() {
                   </Button>
                   <Button
                     size="sm"
-                    disabled={applyMutation.isPending || !targetUserId}
+                    disabled={applyMutation.isPending || !targetUserId || !payrollDeductionAuthorized || targetEstimatedSalary <= 0}
                     onClick={() => {
                       applyMutation.mutate({
                         userId: targetUserId || (user?.id ?? ''),
@@ -2020,6 +2033,7 @@ export default function LoansPage() {
                         termMonths,
                         interestRate,
                         reason,
+                        payrollDeductionAuthorized,
                       });
                     }}
                     className="text-xs h-9 font-semibold gap-1.5 bg-primary text-primary-foreground shadow-xs"

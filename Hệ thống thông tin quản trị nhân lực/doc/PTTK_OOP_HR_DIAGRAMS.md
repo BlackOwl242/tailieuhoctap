@@ -361,7 +361,7 @@ rectangle "Nhóm I - Chuẩn cán bộ & Báo cáo Nhà nước" {
   (UC40 Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV) as UC40
   (UC41 Quản trị danh mục ngạch bậc lương chuẩn NĐ 204) as UC41
   (UC42 Tự động rà soát & Phê duyệt nâng bậc lương định kỳ) as UC42
-  (UC43 Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03)) as UC43
+  (UC43 Kết xuất sơ yếu lý lịch và báo cáo nội bộ 01-03) as UC43
 }
 A0 -- UC40
 A1 -- UC41
@@ -862,6 +862,7 @@ skinparam linetype ortho
 skinparam shadowing false
 actor "Nhân viên" as NV
 actor "Chuyên viên nhân sự" as HR
+actor "Kế toán / Quản trị" as FIN
 boundary "Trang /leave" as B
 control "LeaveService" as C
 entity "LeaveRequest / LeaveBalance" as E
@@ -1003,7 +1004,7 @@ control "PayrollService" as C
 entity "Payslip / PayrollPeriod" as E
 CV -> B : bấm tính lương kỳ đã chốt công
 C -> E : nạp lương hợp đồng ACTIVE + OT đã duyệt
-C -> E : trừ BHXH 10,5% + thuế TNCN 7 bậc - EMI vay
+C -> E : tính BH/thuế theo năm và chính sách hiệu lực + khoản vay đã ủy quyền
 C -> E : sinh Payslip từng nhân viên
 CV -> B : đối chiếu
 alt khớp
@@ -1022,17 +1023,31 @@ _Hình D.38. Trình tự UC27 - Vận hành chức năng tính lương tự đ�
 skinparam linetype ortho
 skinparam shadowing false
 actor "Chuyên viên tiền lương" as CV
-actor "Quản trị viên" as AD
+actor "Người đối soát HR/Kế toán" as RV
+actor "Giám đốc" as BOD
+actor "Kế toán chi trả" as ACC
 boundary "Trang /payroll" as B
 control "PayrollService" as C
-entity "PayrollPeriod" as E
-CV -> B : trình kết quả REVIEWED
-AD -> B : duyệt và khóa kỳ
-C -> E : OPEN -> CALCULATED -> REVIEWED -> LOCKED
+entity "HrmsPayrollRun + phiếu lương" as E
+CV -> B : POST /runs · tính lương
+B -> C : tạo kỳ từ công đã chốt
+C -> E : tạo snapshot + PROCESSED
+RV -> B : POST /runs/:id/review
+B -> C : yêu cầu đối soát
+C -> E : REVIEWED (RV ≠ CV)
+BOD -> B : POST /runs/:id/approve
+B -> C : yêu cầu phê duyệt
+C -> E : APPROVED (BOD ≠ RV, CV)
+BOD -> B : POST /runs/:id/lock
+B -> C : yêu cầu khóa
+C -> E : LOCKED (không cho sửa/tính lại)
+ACC -> B : POST /runs/:id/pay
+B -> C : ghi nhận đã chi
+C -> E : PAID + áp dụng khấu trừ vay đủ điều kiện
 alt gọi tính lại sau khóa
   C --> B : chặn lỗi HTTP 409
 end
-C -> E : xuất bảng kê chi lương ngân hàng
+note over ACC,E : Chưa bắt buộc mã giao dịch/bằng chứng ngân hàng.
 @enduml
 ```
 _Hình D.39. Trình tự UC28 - Phê duyệt & Khóa bất biến kỳ lương (LOCKED state)._
@@ -1045,16 +1060,20 @@ skinparam linetype ortho
 skinparam shadowing false
 actor "Nhân viên" as NV
 actor "Chuyên viên nhân sự" as HR
+actor "Kế toán" as FIN
 boundary "Trang /loans" as B
 control "HrmsLoansService" as C
 entity "HrmsEmployeeLoan" as E
-NV -> B : tạo đơn vay / tạm ứng (kỳ hạn 1-24 tháng)
+NV -> B : tạo đơn vay (kỳ hạn trả và đồng ý khấu trừ lương)
 C -> E : tính EMI hàng tháng
-alt EMI <= 30% thực lĩnh
+alt đã ghi nhận chấp thuận khấu trừ
   C -> E : chuyển CHỜ THẨM ĐỊNH
-  HR -> C : duyệt giải ngân
-  C -> E : APPROVED, EMI nạp bảng lương đến hết nợ
-else vượt trần
+  HR -> C : phê duyệt khoản vay
+  C -> E : APPROVED (chưa giải ngân, chưa khấu trừ)
+  FIN -> C : ghi nhận tiền mặt/chuyển khoản + mã chứng từ
+  C -> E : DISBURSED, ghi thời điểm và tham chiếu
+  C -> E : bảng lương chỉ lấy khoản đã giải ngân và còn dư nợ
+else thiếu ủy quyền hoặc hồ sơ chưa đạt
   C --> NV : chặn kèm thông báo
 end
 @enduml
@@ -1346,7 +1365,7 @@ C -> E : cập nhật ngạch/bậc/hệ số + ghi diễn biến lương
 ```
 _Hình D.53. Trình tự UC42 - Tự động rà soát & Phê duyệt nâng bậc lương định kỳ._
 
-### B.UC43. Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03)
+### B.UC43. Kết xuất sơ yếu lý lịch và báo cáo nội bộ 01-03
 
 ```plantuml
 @startuml
@@ -1358,12 +1377,12 @@ control "PersonnelReportsService" as C
 entity "PersonnelComprehensiveProfile" as E
 HR -> B : chọn nhân viên, xuất 2C PDF
 C -> E : tổng hợp 111 thuộc tính + 8 bảng quá trình
-C --> HR : Sơ yếu lý lịch Mẫu 2C-BNV/2008 (4 trang)
+C --> HR : Sơ yếu lý lịch Mẫu 2C-BNV (ngoài phạm vi so khớp mẫu pháp quy theo yêu cầu)
 HR -> B : chọn Biểu thống kê
-C --> HR : Biểu 01 / 02 / 03 dạng Excel
+C --> HR : Báo cáo nội bộ 01 / 02 / 03 dạng Excel (không tuyên bố là biểu mẫu pháp quy)
 @enduml
 ```
-_Hình D.54. Trình tự UC43 - Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03)._
+_Hình D.54. Trình tự UC43 - Kết xuất sơ yếu lý lịch và báo cáo nội bộ 01-03._
 
 ### B.UC44. Quản lý không gian tri thức số & Tài liệu quy trình SOP
 
@@ -1546,9 +1565,30 @@ _Hình D.62. Hoạt động UC04 - Lập phiếu đề xuất tuyển dụng nh�
 skinparam linetype ortho
 skinparam shadowing false
 start
-Mở trang
-Truy vấn theo phạm vi quyền
-Hiển thị dữ liệu
+Tính xong kỳ lương
+:PROCESSED;
+:HR/C&B hoặc Kế toán đối soát;
+if (Người đối soát khác người tính?) then (có)
+  :REVIEWED;
+else (không)
+  :Từ chối thao tác;
+  stop
+endif
+:Giám đốc phê duyệt;
+if (Khác người tính và người đối soát?) then (có)
+  :APPROVED;
+else (không)
+  :Từ chối thao tác;
+  stop
+endif
+:Giám đốc khóa kỳ;
+:LOCKED - bất biến;
+:Kế toán ghi nhận PAID;
+:Áp dụng khấu trừ vay đủ điều kiện;
+note right
+  Chưa có mã giao dịch hoặc bằng chứng ngân hàng bắt buộc.
+  Chưa có bước trả kỳ về tính lại kèm lý do.
+end note
 stop
 @enduml
 ```
@@ -1983,7 +2023,7 @@ start
 :Chốt dữ liệu công + OT đã duyệt;
 :Nạp lương hợp đồng ACTIVE;
 :Tính gross theo cấu trúc lương;
-:Trừ BHXH 10,5% + thuế TNCN 7 bậc - EMI;
+:Tính BH/thuế theo chính sách của kỳ, OT đêm và khoản vay đã được ủy quyền;
 :Sinh phiếu lương từng nhân viên;
 :Đối chiếu;
 if (Khớp?) then (có)
@@ -2019,18 +2059,25 @@ _Hình D.86. Hoạt động UC28 - Phê duyệt & Khóa bất biến kỳ lươn
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Nhân viên tạo đơn vay/tạm ứng;
-:Hệ thống tính EMI hàng tháng;
-if (EMI <= 30% thực lĩnh?) then (đạt)
-:Chờ thẩm định;
-if (HR duyệt?) then (có)
-:Giải ngân;
-:EMI nạp bảng lương đến hết nợ;
-else (không)
-:Lưu lý do;
+:Nhân viên gửi đơn vay và chấp thuận lịch khấu trừ;
+:Hệ thống lưu consent, phiên bản và ngày giờ; trạng thái PENDING;
+if (Người có thẩm quyền duyệt?) then (duyệt)
+:APPROVED — chưa giải ngân, chưa khấu trừ;
+:Kế toán ghi phương thức chi và mã chứng từ;
+:DISBURSED;
+if (Đã giải ngân + có consent + còn dư nợ?) then (đủ điều kiện)
+:Kỳ lương sau mới xét khoản khấu trừ;
+:Cập nhật số đã thu và dư nợ;
+if (Dư nợ bằng 0?) then (đã tất toán)
+:COMPLETED;
+else (còn dư)
+:Tiếp tục kỳ sau hoặc ghi nhận hoàn trả;
 endif
-else (vượt trần)
-:Chặn kèm thông báo;
+else (không đủ điều kiện)
+:Không đưa vào bảng lương;
+endif
+else (từ chối)
+:REJECTED;
 endif
 stop
 @enduml
@@ -2277,7 +2324,7 @@ stop
 ```
 _Hình D.100. Hoạt động UC42 - Tự động rà soát & Phê duyệt nâng bậc lương định kỳ._
 
-### C.UC43. Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03)
+### C.UC43. Kết xuất sơ yếu lý lịch và báo cáo nội bộ 01-03
 
 ```plantuml
 @startuml
@@ -2287,14 +2334,14 @@ start
 :Chọn nhân viên / loại biểu mẫu;
 :Tổng hợp 111 thuộc tính + 8 bảng quá trình;
 alt SYLL 2C
-:Xuất PDF 4 trang Mẫu 2C-BNV/2008;
+:Xuất sơ yếu lý lịch Mẫu 2C-BNV PDF (ngoài phạm vi so khớp);
 else Biểu thống kê
-:Xuất Biểu 01/02/03 Excel;
+:Xuất báo cáo quản trị nội bộ 01/02/03 Excel;
 endif
 stop
 @enduml
 ```
-_Hình D.101. Hoạt động UC43 - Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03)._
+_Hình D.101. Hoạt động UC43 - Kết xuất sơ yếu lý lịch và báo cáo nội bộ 01-03._
 
 ### C.UC44. Quản lý không gian tri thức số & Tài liệu quy trình SOP
 
@@ -2450,11 +2497,13 @@ _Hình D.110. Trạng thái - Kỳ lương (PayrollPeriod)._
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-[*] --> PENDING : tạo đơn (EMI <= 30% net)
-PENDING --> APPROVED : giải ngân
+[*] --> PENDING : tạo đề nghị + đồng ý khấu trừ theo lịch
+PENDING --> APPROVED : người có thẩm quyền duyệt
 PENDING --> REJECTED : từ chối
-APPROVED --> SETTLED : trả hết EMI
-SETTLED --> [*]
+APPROVED --> DISBURSED : kế toán ghi nhận phương thức và mã tham chiếu
+DISBURSED --> DISBURSED : khấu trừ/hoàn trả, còn dư nợ
+DISBURSED --> COMPLETED : dư nợ bằng 0
+COMPLETED --> [*]
 @enduml
 ```
 _Hình D.111. Trạng thái - Khoản vay phúc lợi (HrmsEmployeeLoan)._
@@ -2596,7 +2645,7 @@ end fork
 :Sự kiện thô append-only;
 :Tổng hợp bảng công ngày;
 :Cộng OT đã duyệt - trừ phép đã duyệt;
-:Tính gross -> BHXH 10,5% -> thuế TNCN 7 bậc -> EMI;
+:Tính gross -> BH/thuế theo chính sách năm -> khoản vay có ủy quyền;
 :Sinh phiếu lương;
 :Đối chiếu -> ADMIN khóa LOCKED (409);
 :Phiếu lương điện tử + bảng kê ngân hàng;
@@ -3037,7 +3086,7 @@ package "Nhóm I - Chuẩn cán bộ & Báo cáo Nhà nước" {
     [Control: UC42Service]
     [Entity: UC42Entity]
   }
-  package "UC43 - Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03)" {
+  package "UC43 - Kết xuất sơ yếu lý lịch và báo cáo nội bộ 01-03" {
     [Boundary: UC43]
     [Control: UC43Service]
     [Entity: UC43Entity]
@@ -3461,7 +3510,7 @@ C_UC42 ..> E_UC42
 B_UC43 ..> C_UC43
 C_UC43 ..> E_UC43
 note bottom of C_UC40
-  Phục vụ use case: UC40=Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV; UC41=Quản trị danh mục ngạch bậc lương chuẩn NĐ 204; UC42=Tự động rà soát & Phê duyệt nâng bậc lương định kỳ; UC43=Kết xuất biểu mẫu báo cáo nhà nước (SYLL 2C, Biểu 01-03)
+  Phục vụ use case: UC40=Quản lý hồ sơ cán bộ toàn diện theo Mẫu 2C-BNV; UC41=Quản trị danh mục ngạch bậc lương chuẩn NĐ 204; UC42=Tự động rà soát & Phê duyệt nâng bậc lương định kỳ; UC43=Kết xuất sơ yếu lý lịch và báo cáo nội bộ 01-03
 end note
 @enduml
 ```

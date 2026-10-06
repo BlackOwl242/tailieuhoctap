@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Thông tin trạng thái và số lượng hiển thị dưới dạng chữ thuần, không dùng chip/badge. */
+span[class*="rounded-full"][class*="px-"],
+span[class*="rounded-md"][class*="px-"][class*="py-"] {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font-weight: normal !important;
+  padding: 0 !important;
+}
+
+span[data-variant] > span[class*="rounded-full"][class*="h-"][class*="w-"],
+span[class*="rounded-full"][class*="px-"] > span[class*="rounded-full"][class*="h-"][class*="w-"],
+span[class*="rounded-md"][class*="px-"][class*="py-"] > span[class*="rounded-full"][class*="h-"][class*="w-"] {
+  display: none !important;
+}
+
 /* Biến theme (shadcn/ui) — ánh xạ sang tailwind.config.ts */
 @layer base {
   :root {
@@ -157,6 +175,15 @@
   }
 }
 
+/* Mọi vùng giao diện dùng cùng font sans; font văn bản giấy chỉ áp dụng trong @media print bên dưới. */
+@media screen {
+  html,
+  body,
+  body * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  }
+}
+
 /* Hiệu ứng Shimmer Skeleton */
 @keyframes shimmer {
   100% {
@@ -203,39 +230,8 @@
 
 
 /* ==========================================================================
- * FONT TIMES NEW ROMAN CHO CÁC KHUNG VĂN BẢN HÀNH CHÍNH & XEM TRƯỚC IN ẤN (NGHỊ ĐỊNH 30)
+ * FONT TIMES NEW ROMAN CHỈ DÙNG KHI IN BIỂU MẪU / TÀI LIỆU
  * ========================================================================== */
-.font-times,
-.font-times *,
-.print-area,
-.print-area *,
-.document-preview,
-.document-preview *,
-[data-document-preview],
-[data-document-preview] *,
-[data-print-area],
-[data-print-area] *,
-.a4-sheet,
-.a4-sheet *,
-.huha-canvas,
-.huha-canvas *,
-.state-civil-servant-profile,
-.state-civil-servant-profile *,
-.enterprise-personnel-profile,
-.enterprise-personnel-profile * {
-  font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
-}
-
-/* Các thành phần điều khiển giao diện, nút bấm, dropdown (no-print) bên trong khung văn bản dùng font hệ thống */
-.font-times .no-print,
-.font-times .no-print *,
-.font-times [data-no-print],
-.font-times [data-no-print] *,
-.font-times .force-sans,
-.font-times .force-sans * {
-  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif) !important;
-}
-
 @media print {
   @page {
     size: A4 portrait;
@@ -254,10 +250,26 @@
   html, body {
     margin: 0 !important;
     padding: 0 !important;
+    width: 210mm !important;
+    min-width: 0 !important;
+    max-width: 210mm !important;
     background: #ffffff !important;
     color: #000000 !important;
     height: auto !important;
     min-height: 0 !important;
+  }
+
+  /* Bỏ khoảng chừa cho sidebar/topbar khi in; nếu giữ padding md của app-shell,
+     toàn bộ biểu mẫu bắt đầu lệch khỏi mép trái của tờ A4. */
+  main,
+  main > div,
+  main > div > div {
+    width: 210mm !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
   }
 
   /* Ẩn toàn bộ giao diện app web thông thường */
@@ -273,6 +285,22 @@
   .huha-canvas,
   .huha-canvas * {
     visibility: visible !important;
+    font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
+  }
+
+  /* Chỉ bản in dùng Times New Roman; trang xem trước vẫn theo font giao diện chung. */
+  .font-times,
+  .font-times *,
+  .document-preview,
+  .document-preview *,
+  [data-document-preview],
+  [data-document-preview] *,
+  [data-print-area],
+  [data-print-area] *,
+  .state-civil-servant-profile,
+  .state-civil-servant-profile *,
+  .enterprise-personnel-profile,
+  .enterprise-personnel-profile * {
     font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
   }
 
@@ -305,11 +333,14 @@
   }
 
   .print-area {
-    position: absolute !important;
+    position: relative !important;
     left: 0 !important;
     top: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    right: auto !important;
+    transform: none !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-width: 0 !important;
     margin: 0 !important;
     padding: 15mm 15mm 15mm 20mm !important;
     box-sizing: border-box !important;
@@ -317,6 +348,15 @@
     border: none !important;
     background: transparent !important;
     overflow: visible !important;
+  }
+
+  /* Hồ sơ cán bộ dùng từng tờ A4 rộng đủ 210 mm; không cộng thêm lề của vùng in. */
+  .state-civil-servant-print-area {
+    left: 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .print-area .a4-sheet,
@@ -329,7 +369,7 @@
     visibility: visible !important;
   }
 
-  /* Định dạng Bảng in thuần văn bản hành chính (Nghị định 30/2020/NĐ-CP) */
+  /* Bố cục bảng in dùng chung cho danh mục nội bộ */
   .print-area table,
   table {
     width: 100% !important;
@@ -430,7 +470,7 @@
     border-radius: 0 !important;
   }
 
-  /* Đường kẻ ngang chuẩn văn bản hành chính (Nghị định 30/2020/NĐ-CP) */
+  /* Đường kẻ ngang dùng chung cho tài liệu nội bộ */
   .print-divider-line {
     border: none !important;
     border-top: 1px solid #000000 !important;
@@ -464,6 +504,61 @@
 
 .print-only {
   display: none;
+}
+
+/* Các biểu mẫu đánh giá có nét chấm để viết tay, đặt trong từng ô thay vì kẻ phân cách toàn trang. */
+.print-write-area {
+  position: relative;
+}
+
+.print-write-area-identity::after,
+.print-write-area-response::before,
+.print-write-area-response::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-bottom: 1px dotted #555;
+}
+
+.print-write-area-identity::after,
+.print-write-area-response::after {
+  bottom: 1mm;
+}
+
+.print-write-area-response::before {
+  bottom: 8mm;
+}
+
+.print-score-slot {
+  display: inline-block;
+  height: 1em;
+  vertical-align: baseline;
+  border-bottom: 1px dotted #555;
+}
+
+.print-score-entry {
+  white-space: nowrap;
+}
+
+.print-score-slot-5 {
+  width: 9mm;
+}
+
+.print-score-slot-100 {
+  width: 6mm;
+}
+
+.print-score-slot-money {
+  width: 8mm;
+}
+
+.print-signature-rule {
+  width: 45mm;
+  max-width: 100%;
+  height: 1px;
+  margin: 0 auto;
+  border-bottom: 1px dotted #555;
 }
 
 /* Nội dung Markdown render từ bài viết */

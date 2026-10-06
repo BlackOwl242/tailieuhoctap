@@ -121,7 +121,7 @@ export interface PrintFrameProps {
 }
 
 /**
- * Khung tiêu đề báo cáo in chuẩn văn bản hành chính (Nghị định 30/2020/NĐ-CP)
+ * Khung tiêu đề dùng chung cho báo cáo nội bộ; không xác nhận tuân thủ biểu mẫu pháp quy.
  */
 export function PrintFrame({
   title,
@@ -148,7 +148,7 @@ export function PrintFrame({
 
   return (
     <div className="print-only font-times text-black mb-5">
-      {/* Header 2 cột chuẩn văn bản hành chính Việt Nam (Nghị định 30/2020/NĐ-CP) */}
+      {/* Header 2 cột tùy chọn cho báo cáo nội bộ */}
       <div className="flex justify-between items-start gap-6 pb-2">
         {/* Bên trái: Tên cơ quan, tổ chức ban hành văn bản (12-13pt) */}
         <div className="text-center flex flex-col items-center shrink-0 max-w-[48%] leading-normal">
@@ -205,7 +205,7 @@ export function PrintFrame({
 }
 
 /**
- * Khung chữ ký cuối trang văn bản in chuẩn Nghị định 30 (12-13pt)
+ * Khung chữ ký cuối trang cho tài liệu nội bộ (12-13pt).
  */
 export interface PrintSignatureBlockProps {
   leftTitle?: string;
@@ -279,10 +279,12 @@ export function printDocumentElement(elementId: string) {
 
   const iframe = document.createElement('iframe');
   iframe.style.position = 'fixed';
-  iframe.style.right = '0';
-  iframe.style.bottom = '0';
-  iframe.style.width = '0';
-  iframe.style.height = '0';
+  iframe.style.left = '-10000px';
+  iframe.style.top = '0';
+  // Keep the print document at the paper width so responsive layouts and
+  // utility classes are evaluated as they would be on an A4 sheet.
+  iframe.style.width = '210mm';
+  iframe.style.height = '297mm';
   iframe.style.border = '0';
   iframe.style.zIndex = '-9999';
   document.body.appendChild(iframe);
@@ -293,31 +295,182 @@ export function printDocumentElement(elementId: string) {
     return;
   }
 
+  const pageStyles = Array.from(document.head.querySelectorAll('link[rel="stylesheet"], style'))
+    .map((styleNode) => {
+      const copy = styleNode.cloneNode(true) as HTMLElement;
+      if (copy instanceof HTMLLinkElement && copy.href) {
+        // Relative Next.js asset URLs must be absolute in the about:blank print frame.
+        copy.href = copy.href;
+      }
+      return copy.outerHTML;
+    })
+    .join('\n');
+  const htmlClass = document.documentElement.className;
+  const bodyClass = document.body.className;
+  const printRootId = elementId.replace(/[^a-zA-Z0-9_-]/g, '');
+
   doc.open();
   doc.write(`
     <!DOCTYPE html>
-    <html lang="vi">
+    <html lang="vi" class="${htmlClass}">
       <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Văn Bản Hành Chính - In Ấn</title>
+        ${pageStyles}
         <style>
           @page {
             size: A4 portrait;
-            margin: 15mm 15mm 15mm 20mm;
+            margin: 0 !important;
           }
           * {
             box-sizing: border-box;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
-            font-family: 'Times New Roman', Times, serif;
           }
           body {
             margin: 0;
             padding: 0;
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
             background: #ffffff;
             color: #000000;
             font-size: 12.5pt;
             line-height: 1.45;
+            font-family: 'Times New Roman', Times, serif !important;
+          }
+          body > #${printRootId} {
+            min-height: 0 !important;
+          }
+          #${printRootId} {
+            position: static !important;
+            inset: auto !important;
+            width: 100% !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            height: auto !important;
+            max-height: none !important;
+            margin: 0 !important;
+            padding: 15mm 15mm 15mm 20mm !important;
+            overflow: visible !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-family: 'Times New Roman', Times, serif !important;
+          }
+          #${printRootId} * {
+            font-family: 'Times New Roman', Times, serif !important;
+            color: #000000;
+          }
+          #${printRootId} .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+          #${printRootId} .grid-cols-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+          }
+          #${printRootId} .print-a4-compact {
+            font-size: 10.5pt !important;
+            line-height: 1.25 !important;
+          }
+          #${printRootId} .print-a4-compact .print-section {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            border: 0 !important;
+            margin: 0 !important;
+          }
+          #${printRootId} .print-a4-compact .border-b,
+          #${printRootId} .print-a4-compact .border-t {
+            border: 0 !important;
+          }
+          #${printRootId} .print-a4-compact .print-field {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+          #${printRootId} .print-a4-compact .print-write-area {
+            display: block;
+            position: relative !important;
+            width: 100%;
+            border: 0 !important;
+            background: transparent !important;
+          }
+          #${printRootId} .print-write-area-identity::after,
+          #${printRootId} .print-write-area-response::before,
+          #${printRootId} .print-write-area-response::after,
+          #${printRootId} .print-score-slot,
+          #${printRootId} .print-signature-rule {
+            border-bottom: 0.75pt dotted #555555 !important;
+          }
+          #${printRootId} .print-write-area-identity::after,
+          #${printRootId} .print-write-area-response::before,
+          #${printRootId} .print-write-area-response::after {
+            content: "" !important;
+            position: absolute !important;
+            left: 0 !important;
+            right: 0 !important;
+          }
+          #${printRootId} .print-write-area-identity::after,
+          #${printRootId} .print-write-area-response::after {
+            bottom: 1mm !important;
+          }
+          #${printRootId} .print-write-area-response::before {
+            bottom: 8mm !important;
+          }
+          #${printRootId} .print-score-slot {
+            display: inline-block !important;
+            height: 1em !important;
+            vertical-align: baseline !important;
+          }
+          #${printRootId} .print-score-entry { white-space: nowrap !important; }
+          #${printRootId} .print-score-slot-5 { width: 9mm !important; }
+          #${printRootId} .print-score-slot-100 { width: 6mm !important; }
+          #${printRootId} .print-score-slot-money { width: 8mm !important; }
+          #${printRootId} .print-signature-rule {
+            width: 45mm !important;
+            max-width: 100% !important;
+            height: 1px !important;
+            margin: 0 auto !important;
+          }
+          #${printRootId} .print-a4-compact .print-signatures {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-top: 10pt !important;
+          }
+          #${printRootId} .print-a4-compact .space-y-1 > :not(:last-child),
+          #${printRootId} .print-a4-compact .space-y-2 > :not(:last-child),
+          #${printRootId} .print-a4-compact .space-y-3 > :not(:last-child),
+          #${printRootId} .print-a4-compact .space-y-4 > :not(:last-child) {
+            margin-block-end: 4pt !important;
+          }
+          #${printRootId} .print-a4-compact .text-xs {
+            font-size: 9pt !important;
+          }
+          #${printRootId}.print-a4-clean-template div[class*="border"],
+          #${printRootId}.print-a4-clean-template p[class*="border"] {
+            border: 0 !important;
+          }
+          #${printRootId}.print-a4-clean-template hr {
+            display: none !important;
+          }
+          #${printRootId}.print-a4-clean-template table {
+            border: 0 !important;
+          }
+          #${printRootId}.print-a4-clean-template th,
+          #${printRootId}.print-a4-clean-template td {
+            border-top: 0 !important;
+            border-bottom: 0 !important;
+          }
+          #${printRootId}.print-a4-clean-template th:first-child,
+          #${printRootId}.print-a4-clean-template td:first-child {
+            border-left: 0 !important;
+          }
+          #${printRootId}.print-a4-clean-template th:last-child,
+          #${printRootId}.print-a4-clean-template td:last-child {
+            border-right: 0 !important;
           }
           table {
             width: 100%;
@@ -325,6 +478,7 @@ export function printDocumentElement(elementId: string) {
             border: 1px solid #000000;
             margin: 12px 0;
             font-size: 11pt;
+            table-layout: fixed;
           }
           th, td {
             border: 1px solid #000000;
@@ -341,25 +495,42 @@ export function printDocumentElement(elementId: string) {
           }
         </style>
       </head>
-      <body>
-        ${element.innerHTML}
+      <body class="${bodyClass}">
+        ${element.outerHTML}
       </body>
     </html>
   `);
   doc.close();
 
-  iframe.contentWindow?.focus();
-  setTimeout(() => {
-    iframe.contentWindow?.print();
-    setTimeout(() => {
-      try {
-        if (document.body.contains(iframe)) {
-          document.body.removeChild(iframe);
-        }
-      } catch {
-        // ignore
-      }
-    }, 1500);
-  }, 250);
+  const printWindow = iframe.contentWindow;
+  if (!printWindow) return;
+  const removeFrame = () => {
+    window.setTimeout(() => {
+      if (document.body.contains(iframe)) document.body.removeChild(iframe);
+    }, 500);
+  };
+  printWindow.addEventListener('afterprint', removeFrame, { once: true });
+  const waitForStylesheet = (link: HTMLLinkElement) => new Promise<void>((resolve) => {
+    if (link.sheet) {
+      resolve();
+      return;
+    }
+    const done = () => {
+      window.clearTimeout(timeout);
+      link.removeEventListener('load', done);
+      link.removeEventListener('error', done);
+      resolve();
+    };
+    const timeout = window.setTimeout(done, 5000);
+    link.addEventListener('load', done, { once: true });
+    link.addEventListener('error', done, { once: true });
+  });
+  void Promise.all(Array.from(printWindow.document.querySelectorAll('link[rel="stylesheet"]')).map(link => waitForStylesheet(link as HTMLLinkElement)))
+    .then(() => printWindow.document.fonts.ready)
+    .then(() => {
+      printWindow.focus();
+      printWindow.print();
+    })
+    .catch(removeFrame);
 }
 

@@ -21,8 +21,8 @@ interface StateCivilServantProfileProps {
 }
 
 /**
- * MẪU IN SƠ YẾU LÝ LỊCH CÁN BỘ, CÔNG CHỨC, VIÊN CHỨC (HUHA-HRM / BỘ NỘI VỤ)
- * Tự động đồng bộ theo Cấu hình Cơ cấu Tổ chức của Đơn vị & Thông tin Nhân sự
+ * Bản hồ sơ khu vực công tham chiếu; cơ quan cần xác nhận biểu mẫu pháp quy đang áp dụng.
+ * Dữ liệu lấy theo cấu hình tổ chức và hồ sơ nhân sự đã nhập.
  */
 export function StateCivilServantProfile({
   data,
@@ -33,7 +33,7 @@ export function StateCivilServantProfile({
   cvMode = 'state',
   onSelectCvMode,
 }: StateCivilServantProfileProps) {
-  // Trạng thái điều hướng trang (0: xem toàn bộ 5 trang liên tục, 1-5: xem từng trang đơn)
+  // Bản in gồm một bìa và bốn trang nội dung.
   const [currentPage, setCurrentPage] = useState<number>(0); 
   const [zoomLevel, setZoomLevel] = useState<number>(100); // 75, 90, 100, 115, 125
 
@@ -46,7 +46,7 @@ export function StateCivilServantProfile({
   const rawOrgName = (orgConfig?.orgName || '').trim();
   const orgName = rawOrgName && rawOrgName !== 'CƠ QUAN / ĐƠN VỊ QUẢN LÝ NHÂN LỰC'
     ? rawOrgName
-    : 'CÔNG TY CỔ PHẦN SAIGON TECHNOLOGY';
+    : orgConfig?.orgSector === 'enterprise' ? 'DOANH NGHIỆP ĐƯỢC CẤU HÌNH' : 'CƠ QUAN / ĐƠN VỊ CÔNG ĐƯỢC CẤU HÌNH';
   const directUnit = meta?.orgUnitName || page1?.department || orgConfig?.deptName || '';
 
   // Thông tin định danh cá nhân
@@ -54,13 +54,13 @@ export function StateCivilServantProfile({
   const cleanFullName = rawFullName.replace(/\s*\([^)]*\)/g, '').trim();
   const fullName = cleanFullName.toUpperCase();
   const aliasName = page1.aliasName && page1.aliasName !== 'Không' ? page1.aliasName : '';
-  const jobTitle = page2.govPosition || meta.jobTitle || 'Chuyên viên';
-  const employeeCode = meta.employeeCode || page1.employeeCode || page1.idCardNo || 'NV0001';
-  const profileCode = meta.employeeCode ? `0102.${meta.employeeCode}` : '0102.0000001';
+  const jobTitle = page2.govPosition || meta.jobTitle || '';
+  const employeeCode = meta.employeeCode || page1.employeeCode || '';
+  const profileCode = meta.employeeCode ? `0102.${meta.employeeCode}` : '';
 
   // Trang 1: Thông tin chung & Công tác & Lương
   const birthDate = page1.birthDate ? formatDate(page1.birthDate) : '';
-  const gender = page1.gender || meta.gender || 'Nam';
+  const gender = page1.gender || meta.gender || '';
   const idCardNo = page1.idCardNo || '';
   const idCardIssueDate = page1.idCardIssueDate ? formatDate(page1.idCardIssueDate) : '';
   const idCardIssuePlace = page1.idCardIssuePlace || '';
@@ -68,10 +68,10 @@ export function StateCivilServantProfile({
   const hometown = page1.hometown || '';
   const permanentAddress = page1.permanentAddress || '';
   const currentAddress = page1.currentAddress || '';
-  const ethnicity = page1.ethnicity || 'Kinh';
-  const religion = page1.religion || 'Không';
-  const familyOrigin = page1.familyOrigin || 'Lao động';
-  const maritalStatus = page1.maritalStatus || 'Đã kết hôn';
+  const ethnicity = page1.ethnicity || '';
+  const religion = page1.religion || '';
+  const familyOrigin = page1.familyOrigin || '';
+  const maritalStatus = page1.maritalStatus || '';
   const email = meta.email || page1.email || '';
   const phone = page1.phone || meta.phone || '';
   const workPhone = page1.workPhone || '';
@@ -80,47 +80,47 @@ export function StateCivilServantProfile({
   // Mục II: Công tác
   const hireDate = meta.hireDate ? formatDate(meta.hireDate) : (page1.hireDate ? formatDate(page1.hireDate) : '');
   const recruitDate = page1.recruitDate ? formatDate(page1.recruitDate) : hireDate;
-  const recruitOrg = page1.recruitOrg || parentOrg || orgName;
-  const recruitType = page1.recruitType || 'Tuyển dụng trực tiếp';
+  const recruitOrg = page1.recruitOrg || parentOrg || '';
+  const recruitType = page1.recruitType || '';
   const contractSignDate = page1.contractSignDate ? formatDate(page1.contractSignDate) : hireDate;
-  const recruitJob = page1.recruitJob || 'Chuyên viên kỹ thuật';
-  const recruitSource = page1.recruitSource || 'Đại học';
-  const recruitPosition = meta.jobTitle || page1.jobTitle || 'Kỹ sư';
+  const recruitJob = page1.recruitJob || '';
+  const recruitSource = page1.recruitSource || '';
+  const recruitPosition = meta.jobTitle || page1.jobTitle || '';
   const currentGovDate = page1.currentGovDate ? formatDate(page1.currentGovDate) : hireDate;
-  const workField = page1.workField || 'Công nghệ thông tin';
-  const mainJob = page1.mainJob || meta.jobTitle || 'Chuyên môn nghiệp vụ';
+  const workField = page1.workField || '';
+  const mainJob = page1.mainJob || meta.jobTitle || '';
 
   // Mục III: Lương & Phụ cấp
-  const rankCode = page1.rankCode || meta.salaryRankCode || '01003';
-  const rankName = page1.rankName || meta.salaryRankName || 'Chuyên viên';
-  const rankAppointDate = page1.rankAppointDate ? formatDate(page1.rankAppointDate) : hireDate;
-  const salaryStep = page1.salaryStep || meta.salaryStep || '1';
-  const salaryRate = `${page1.salaryRate || 100} %`;
-  const salaryEffectiveDate = page1.salaryEffectiveDate ? formatDate(page1.salaryEffectiveDate) : hireDate;
+  const rankCode = page1.rankCode || meta.salaryRankCode || '';
+  const rankName = page1.rankName || meta.salaryRankName || '';
+  const rankAppointDate = page1.rankAppointDate ? formatDate(page1.rankAppointDate) : '';
+  const salaryStep = page1.salaryStep || meta.salaryStep || '';
+  const salaryRate = page1.salaryRate != null ? `${page1.salaryRate} %` : '';
+  const salaryEffectiveDate = page1.salaryEffectiveDate ? formatDate(page1.salaryEffectiveDate) : '';
 
   // Trang 2: Tiếp tục Lương, Đào tạo, Thông tin khác
   const nextSeniorityDate = page2.nextSeniorityDate ? formatDate(page2.nextSeniorityDate) : '';
-  const overGradePercent = page2.overGradePercent ? `${page2.overGradePercent} %` : '0 %';
-  const equivalentPosition = page2.equivalentPosition || jobTitle;
-  const positionAllowance = page2.positionAllowance != null ? String(page2.positionAllowance) : '0.00';
-  const positionAppointDate = page2.positionAppointDate ? formatDate(page2.positionAppointDate) : hireDate;
+  const overGradePercent = page2.overGradePercent != null ? `${page2.overGradePercent} %` : '';
+  const equivalentPosition = page2.equivalentPosition || '';
+  const positionAllowance = page2.positionAllowance != null ? String(page2.positionAllowance) : '';
+  const positionAppointDate = page2.positionAppointDate ? formatDate(page2.positionAppointDate) : '';
   const responsibilityAllowance = page2.responsibilityAllowance ? String(page2.responsibilityAllowance).replace('.', ',') : '';
   const socialInsuranceNo = page2.socialInsuranceNo || '';
-  const socialInsuranceDate = page2.socialInsuranceDate ? formatDate(page2.socialInsuranceDate) : hireDate;
+  const socialInsuranceDate = page2.socialInsuranceDate ? formatDate(page2.socialInsuranceDate) : '';
 
   // Mục IV: Đào tạo
-  const generalEducation = page2.generalEducation || '12/12';
+  const generalEducation = page2.generalEducation || '';
   const academicTitle = page2.academicTitle || '';
   const academicDate = page2.academicDate ? formatDate(page2.academicDate) : '';
-  const politicalTheory = page2.politicalTheory || 'Sơ cấp';
+  const politicalTheory = page2.politicalTheory || '';
   const stateManagement = page2.stateManagement || '';
   const economicManagement = page2.economicManagement || '';
-  const foreignLanguage = page2.foreignLanguage || 'Tiếng Anh B2';
-  const informaticsLevel = page2.informaticsLevel || 'Chuẩn CNTT cơ bản';
+  const foreignLanguage = page2.foreignLanguage || '';
+  const informaticsLevel = page2.informaticsLevel || '';
 
   // Mục V: Thông tin khác
   const unionJoinDate = page2.unionJoinDate ? formatDate(page2.unionJoinDate) : '';
-  const unionPosition = page2.unionPosition || 'Đoàn viên';
+  const unionPosition = page2.unionPosition || '';
   const partyJoinDate = page2.partyJoinDate ? formatDate(page2.partyJoinDate) : '';
   const partyOfficialDate = page2.partyOfficialDate ? formatDate(page2.partyOfficialDate) : '';
   const partyPosition = page2.partyPosition || '';
@@ -129,34 +129,34 @@ export function StateCivilServantProfile({
   const militaryPosition = page2.militaryPosition || '';
   const honorTitle = page2.honorTitle || '';
   const honorYear = page2.honorYear || '';
-  const policyBeneficiary = page2.policyBeneficiary || 'Không thuộc diện ưu đãi chính sách';
-  const healthStatus = page2.healthStatus || 'Loại 1 (Tốt)';
-  const heightStr = page2.heightCm ? `${page2.heightCm} cm` : '—';
-  const weightStr = page2.weightKg ? `${page2.weightKg} kg` : '—';
-  const bloodType = page2.bloodType || 'O';
+  const policyBeneficiary = page2.policyBeneficiary || '';
+  const healthStatus = page2.healthStatus || '';
+  const heightStr = page2.heightCm ? `${page2.heightCm} cm` : 'Chưa cập nhật';
+  const weightStr = page2.weightKg ? `${page2.weightKg} kg` : 'Chưa cập nhật';
+  const bloodType = page2.bloodType || '';
 
   // Trang 3 & 4: Khen thưởng, Kỷ luật, Lịch sử & Bảng quá trình
-  const strengths = page3.strengths || (page4.strengths || 'Nghiên cứu chuyên môn, quản trị công việc');
+  const strengths = page3.strengths || page4.strengths || '';
   const longestJob = page3.longestJob || mainJob || jobTitle;
-  const highestReward = page3.highestReward || (page4.rewardDisciplines?.[0]?.title || 'Chiến sĩ thi đua');
+  const highestReward = page3.highestReward || (page4.rewardDisciplines?.[0]?.title || '');
   const rewardDate = page3.rewardDate ? formatDate(page3.rewardDate) : (page4.rewardDisciplines?.[0]?.eventDate ? formatDate(page4.rewardDisciplines[0].eventDate) : '');
   const rewardDecisionNo = page3.rewardDecisionNo || (page4.rewardDisciplines?.[0]?.decisionNo || '');
   const rewardOrg = page3.rewardOrg || (page4.rewardDisciplines?.[0]?.grantAuthority || orgName);
-  const rewardSigner = page3.rewardSigner || orgConfig?.signerTitle3 || 'Giám đốc';
-  const highestDiscipline = page3.highestDiscipline || (page4.rewardDisciplines?.find((d: any) => d.type === 'DISCIPLINE')?.title || 'Không');
+  const rewardSigner = page3.rewardSigner || orgConfig?.signerTitle3 || '';
+  const highestDiscipline = page3.highestDiscipline || (page4.rewardDisciplines?.find((d: any) => d.type === 'DISCIPLINE')?.title || '');
 
   // Danh sách Quá trình đào tạo
   const rawEducations = data.educations || data.page3?.educations || [];
   const educationsList = rawEducations.length > 0 ? rawEducations.map((e: any) => ({
-    degree: e.degree || e.degreeType || 'Đại học',
-    major: e.major || e.majorName || '—',
-    type: e.type || e.studyMode || 'Chính quy',
-    grade: e.grade || e.classification || 'Giỏi',
-    country: e.country || 'Việt Nam',
-    school: e.school || e.institutionName || '—',
+    degree: e.degree || e.degreeType || '',
+    major: e.major || e.majorName || 'Chưa cập nhật',
+    type: e.type || e.studyMode || '',
+    grade: e.grade || e.classification || '',
+    country: e.country || '',
+    school: e.school || e.institutionName || 'Chưa cập nhật',
     year: e.year || (e.graduationYear ? String(e.graduationYear) : ''),
   })) : (page2.highestDegree ? [
-    { degree: page2.highestDegree, major: page2.majorName || '—', type: 'Chính quy', grade: 'Giỏi', country: 'Việt Nam', school: 'Đại học', year: '' }
+    { degree: page2.highestDegree, major: page2.majorName || '', type: '', grade: '', country: '', school: '', year: '' }
   ] : []);
 
   // Danh sách Quá trình công tác
@@ -164,26 +164,22 @@ export function StateCivilServantProfile({
   const workList = rawWork.length > 0 ? rawWork.map((w: any) => ({
     from: formatDate(w.fromDate),
     to: w.toDate ? formatDate(w.toDate) : '',
-    recruitJob: w.jobTitle || 'Chuyên viên',
+    recruitJob: w.jobTitle || '',
     org: w.companyName || orgName,
     dept: w.department || directUnit,
-    title: w.jobTitle || 'Chuyên viên',
-  })) : [
-    { from: hireDate || '', to: '', recruitJob: jobTitle, org: orgName, dept: directUnit, title: jobTitle }
-  ];
+    title: w.jobTitle || '',
+  })) : [];
 
   // Danh sách Diễn biến lương
   const rawSalary = data.salaryHistories || data.page3?.salaryHistories || [];
   const salaryList = rawSalary.length > 0 ? rawSalary.map((s: any) => ({
     from: formatDate(s.effectiveDate || s.fromDate),
     to: s.toDate ? formatDate(s.toDate) : '',
-    code: s.rankCode || (s.rank?.code) || rankCode,
-    rank: s.rankName || (s.rank?.name) || rankName,
-    step: String(s.step || salaryStep),
-    coeff: s.coefficient != null ? String(s.coefficient).replace('.', ',') : (page2.salaryCoefficient ? String(page2.salaryCoefficient).replace('.', ',') : '2,34'),
-  })) : [
-    { from: salaryEffectiveDate || hireDate || '', to: '', code: rankCode, rank: rankName, step: salaryStep, coeff: page2.salaryCoefficient ? String(page2.salaryCoefficient).replace('.', ',') : '2,34' }
-  ];
+    code: s.rankCode || (s.rank?.code) || '',
+    rank: s.rankName || (s.rank?.name) || '',
+    step: s.step != null ? String(s.step) : '',
+    coeff: s.coefficient != null ? String(s.coefficient).replace('.', ',') : (page2.salaryCoefficient != null ? String(page2.salaryCoefficient).replace('.', ',') : ''),
+  })) : [];
 
   const selfFamList = data.page4?.selfRelations || data.familyRelations?.filter((f: any) => f.category === 'SELF' || (f.relationType !== 'SPOUSE_FAMILY' && f.relationType !== 'SPOUSE')) || [];
   const spouseFamList = data.page4?.spouseRelations || data.familyRelations?.filter((f: any) => f.category === 'SPOUSE' || f.relationType === 'SPOUSE_FAMILY' || f.relationType === 'SPOUSE') || [];
@@ -193,7 +189,7 @@ export function StateCivilServantProfile({
   };
 
   const pageTabs = [
-    { id: 0, label: 'Toàn bộ 5 trang' },
+    { id: 0, label: 'Bìa + 4 trang' },
     { id: 1, label: 'Bìa' },
     { id: 2, label: 'Trang 1' },
     { id: 3, label: 'Trang 2' },
@@ -237,7 +233,7 @@ export function StateCivilServantProfile({
                   onChange={(e) => onSelectCvMode(e.target.value as 'state' | 'enterprise')}
                   className="w-[280px] text-xs"
                 >
-                  <option value="state">Mẫu 2C-BNV/2008 (Cơ quan Nhà nước - 5 Trang)</option>
+                  <option value="state">Mẫu 2C-BNV/2008 (bìa + 4 trang nội dung)</option>
                   <option value="enterprise">Mẫu Doanh nghiệp tư nhân (Hồ sơ trích ngang)</option>
                 </Select>
               </div>
@@ -319,7 +315,7 @@ export function StateCivilServantProfile({
       {/* VÙNG KHÔNG GIAN CANVAS XEM TRƯỚC BẢN IN HIỆN ĐẠI */}
       {/* ========================================================================= */}
       <div
-        className="huha-canvas font-times text-black bg-slate-900/90 dark:bg-slate-950 p-4 sm:p-10 overflow-x-auto min-h-[900px] flex flex-col items-center gap-10 rounded-lg border border-slate-800 shadow-inner"
+        className="huha-canvas font-times text-black bg-muted/30 p-4 sm:p-8 overflow-x-auto min-h-0 flex flex-col items-center gap-6 rounded-lg border border-border"
         style={{
           transform: zoomLevel !== 100 ? `scale(${zoomLevel / 100})` : undefined,
           transformOrigin: 'top center',
@@ -332,7 +328,7 @@ export function StateCivilServantProfile({
           .huha-title *,
           .a4-sheet,
           .a4-sheet * {
-            font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
+            font-family: inherit;
           }
 
           .huha-title {
@@ -380,7 +376,7 @@ export function StateCivilServantProfile({
             outline-offset: -6px;
             height: 100%;
             width: 100%;
-            padding: 32px 40px 24px 40px;
+            padding: 24px 28px 20px 28px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -391,7 +387,6 @@ export function StateCivilServantProfile({
             width: 100%;
             border-collapse: collapse;
             font-size: 11pt;
-            font-family: "Times New Roman", Times, serif;
             line-height: 1.25;
           }
 
@@ -424,9 +419,48 @@ export function StateCivilServantProfile({
           }
 
           @media print {
+            .a4-body-sheet {
+              font-size: 10.5pt !important;
+              line-height: 1.22 !important;
+              gap: 5px !important;
+            }
+            .huha-grid-table {
+              font-size: 9.5pt !important;
+              line-height: 1.12 !important;
+            }
+            .huha-grid-table th,
+            .huha-grid-table td {
+              padding: 2px 3px !important;
+              font-size: 9.5pt !important;
+            }
+            .a4-cover-sheet .huha-double-frame > div:first-child .flex {
+              gap: 8px !important;
+            }
+            .a4-cover-sheet .huha-double-frame > div:first-child .flex > div {
+              width: auto !important;
+              flex: 1 1 0% !important;
+              min-width: 0 !important;
+            }
+            .a4-cover-sheet .huha-double-frame > div:first-child p {
+              white-space: normal !important;
+              overflow-wrap: anywhere !important;
+              font-size: 9.5pt !important;
+            }
+          }
+
+          @media print {
             @page {
               size: A4 portrait;
               margin: 0mm !important;
+            }
+            .huha-canvas,
+            .huha-canvas *,
+            .huha-title,
+            .huha-title *,
+            .a4-sheet,
+            .a4-sheet *,
+            .huha-grid-table {
+              font-family: "Times New Roman", Times, "Liberation Serif", serif !important;
             }
             html, body {
               background: #ffffff !important;
@@ -489,9 +523,9 @@ export function StateCivilServantProfile({
             <div className="huha-double-frame">
               {/* Header Top Bìa */}
               <div className="pt-2">
-                <div className="flex justify-between items-start gap-4 text-center">
+              <div className="flex justify-between items-start gap-4 text-center">
                   {/* Góc trái: Cơ quan cấp trên / Cơ quan đơn vị */}
-                  <div className="w-[44%] text-center leading-tight">
+                  <div className="flex-1 min-w-0 text-center leading-tight">
                     {parentOrg ? (
                       <>
                         <p className="font-bold text-[11.5pt] uppercase tracking-tight huha-title">
@@ -510,11 +544,11 @@ export function StateCivilServantProfile({
                   </div>
 
                   {/* Góc phải: Quốc hiệu, tiêu ngữ */}
-                  <div className="w-[56%] text-center leading-tight">
-                    <p className="font-bold text-[11.5pt] sm:text-[12pt] uppercase tracking-tight huha-title whitespace-nowrap">
+                  <div className="flex-1 min-w-0 text-center leading-tight">
+                    <p className="font-bold text-[10pt] uppercase tracking-tight huha-title">
                       CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT&nbsp;NAM
                     </p>
-                    <p className="font-bold text-[12.5pt] sm:text-[13pt] huha-title mt-1 whitespace-nowrap">
+                    <p className="font-bold text-[10pt] huha-title mt-1">
                       Độc lập - Tự do - Hạnh phúc
                     </p>
                     <div className="w-36 border-b border-black mx-auto mt-2" />
@@ -556,7 +590,7 @@ export function StateCivilServantProfile({
                       Bí danh:
                     </div>
                     <div className="col-span-7 font-bold text-black">
-                      {aliasName || '—'}
+                      {aliasName || 'Chưa cập nhật'}
                     </div>
                   </div>
 
@@ -640,7 +674,7 @@ export function StateCivilServantProfile({
                   </p>
                   <p>
                     <span className="huha-title font-medium">Cơ quan, đơn vị quản lý trực tiếp: </span>
-                    <span className="text-black">{directUnit || '—'}</span>
+                    <span className="text-black">{directUnit || 'Chưa cập nhật'}</span>
                   </p>
                 </>
               )}
@@ -673,7 +707,7 @@ export function StateCivilServantProfile({
                       <span className="text-black font-medium">{page1.aliasName || ''}</span>
                       <span>
                         <span className="huha-title font-medium">Bí danh: </span>
-                        <span className="font-bold text-black">{aliasName || '—'}</span>
+                        <span className="font-bold text-black">{aliasName || 'Chưa cập nhật'}</span>
                       </span>
                     </div>
                   </div>
@@ -681,7 +715,7 @@ export function StateCivilServantProfile({
                   <div className="grid grid-cols-12 gap-1 items-baseline">
                     <div className="col-span-5 huha-title font-medium">Sinh ngày:</div>
                     <div className="col-span-7 flex justify-between">
-                      <span className="font-medium text-black">{birthDate || '—'}</span>
+                      <span className="font-medium text-black">{birthDate || 'Chưa cập nhật'}</span>
                       <span>
                         <span className="huha-title font-medium">Giới tính (nam, nữ): </span>
                         <span className="text-black font-medium">{gender}</span>
@@ -697,11 +731,11 @@ export function StateCivilServantProfile({
                   <div className="grid grid-cols-12 gap-1 items-baseline">
                     <div className="col-span-3 huha-title font-medium">Số CMTND:</div>
                     <div className="col-span-9 flex flex-wrap gap-x-2 text-[11.5pt]">
-                      <span className="font-bold text-black">{idCardNo || '—'}</span>
+                      <span className="font-bold text-black">{idCardNo || 'Chưa cập nhật'}</span>
                       <span className="huha-title font-medium">Ngày cấp:</span>
-                      <span className="text-black">{idCardIssueDate || '—'}</span>
+                      <span className="text-black">{idCardIssueDate || 'Chưa cập nhật'}</span>
                       <span className="huha-title font-medium">Nơi cấp:</span>
-                      <span className="text-black">{idCardIssuePlace || '—'}</span>
+                      <span className="text-black">{idCardIssuePlace || 'Chưa cập nhật'}</span>
                     </div>
                   </div>
                 </div>
@@ -711,27 +745,27 @@ export function StateCivilServantProfile({
               <div className="space-y-0.5 mt-1 text-[12.5pt]">
                 <div>
                   <span className="huha-title font-medium">Nơi sinh: </span>
-                  <span className="text-black">{birthPlace || '—'}</span>
+                  <span className="text-black">{birthPlace || 'Chưa cập nhật'}</span>
                 </div>
 
                 <div>
                   <span className="huha-title font-medium">Quê quán: </span>
                   <span className="ml-1">
-                    -Theo ĐVHC trước đây: <span className="text-black">{hometown || '—'}</span>
+                    -Theo ĐVHC trước đây: <span className="text-black">{hometown || 'Chưa cập nhật'}</span>
                   </span>
                 </div>
                 <div className="pl-16">
-                  -Theo ĐVHC hiện nay: <span className="text-black">{hometown || '—'}</span>
+                  -Theo ĐVHC hiện nay: <span className="text-black">{hometown || 'Chưa cập nhật'}</span>
                 </div>
 
                 <div>
                   <span className="huha-title font-medium">Nơi đăng ký hộ khẩu thường trú: </span>
-                  <span className="text-black">{permanentAddress || '—'}</span>
+                  <span className="text-black">{permanentAddress || 'Chưa cập nhật'}</span>
                 </div>
 
                 <div>
                   <span className="huha-title font-medium">Nơi ở hiện nay: </span>
-                  <span className="text-black">{currentAddress || '—'}</span>
+                  <span className="text-black">{currentAddress || 'Chưa cập nhật'}</span>
                 </div>
 
                 <div className="grid grid-cols-12 gap-1">
@@ -756,22 +790,22 @@ export function StateCivilServantProfile({
                   </div>
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Địa chỉ email: </span>
-                    <span className="text-black">{email || '—'}</span>
+                    <span className="text-black">{email || 'Chưa cập nhật'}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-12 gap-1">
                   <div className="col-span-4">
                     <span className="huha-title font-medium">ĐT di động: </span>
-                    <span className="text-black font-mono">{phone || '—'}</span>
+                    <span className="text-black font-mono">{phone || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-4">
                     <span className="huha-title font-medium">ĐT cơ quan: </span>
-                    <span className="text-black font-mono">{workPhone || '—'}</span>
+                    <span className="text-black font-mono">{workPhone || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-4">
                     <span className="huha-title font-medium">ĐTNR: </span>
-                    <span className="text-black font-mono">{homePhone || '—'}</span>
+                    <span className="text-black font-mono">{homePhone || 'Chưa cập nhật'}</span>
                   </div>
                 </div>
 
@@ -794,7 +828,7 @@ export function StateCivilServantProfile({
               <div className="space-y-0.5">
                 <div>
                   <span className="huha-title font-medium">Ngày đầu tiên tham gia công tác: </span>
-                  <span className="text-black font-medium">{hireDate || '—'}</span>
+                  <span className="text-black font-medium">{hireDate || 'Chưa cập nhật'}</span>
                 </div>
 
                 <div>
@@ -805,7 +839,7 @@ export function StateCivilServantProfile({
                 <div className="grid grid-cols-12 gap-1">
                   <div className="col-span-5">
                     <span className="huha-title font-medium">Ngày tuyển dụng: </span>
-                    <span className="text-black font-medium">{recruitDate || '—'}</span>
+                    <span className="text-black font-medium">{recruitDate || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Cơ quan tuyển dụng: </span>
@@ -823,7 +857,7 @@ export function StateCivilServantProfile({
 
                 <div>
                   <span className="huha-title font-medium">Ngày ký hợp đồng (hợp đồng lần đầu, thời vụ): </span>
-                  <span className="text-black font-medium">{contractSignDate || '—'}</span>
+                  <span className="text-black font-medium">{contractSignDate || 'Chưa cập nhật'}</span>
                 </div>
 
                 <div>
@@ -844,7 +878,7 @@ export function StateCivilServantProfile({
                 <div className="grid grid-cols-12 gap-1">
                   <div className="col-span-5">
                     <span className="huha-title font-medium">Ngày vào cơ quan hiện nay: </span>
-                    <span className="text-black font-medium">{currentGovDate || '—'}</span>
+                    <span className="text-black font-medium">{currentGovDate || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Lĩnh vực công tác: </span>
@@ -880,7 +914,7 @@ export function StateCivilServantProfile({
                 <div className="grid grid-cols-12 gap-1">
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Ngày bổ nhiệm vào ngạch, chức danh: </span>
-                    <span className="text-black font-medium">{rankAppointDate || '—'}</span>
+                    <span className="text-black font-medium">{rankAppointDate || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-5">
                     <span className="huha-title font-medium">Bậc lương hiện hưởng: </span>
@@ -895,7 +929,7 @@ export function StateCivilServantProfile({
                   </div>
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Ngày hưởng bậc lương hiện nay: </span>
-                    <span className="text-black font-medium">{salaryEffectiveDate || '—'}</span>
+                    <span className="text-black font-medium">{salaryEffectiveDate || 'Chưa cập nhật'}</span>
                   </div>
                 </div>
               </div>
@@ -913,7 +947,7 @@ export function StateCivilServantProfile({
               <div className="grid grid-cols-12 gap-1">
                 <div className="col-span-7">
                   <span className="huha-title font-medium">Mốc thời gian tính phụ cấp TNVK lần sau: </span>
-                  <span className="text-black font-medium">{nextSeniorityDate || '—'}</span>
+                  <span className="text-black font-medium">{nextSeniorityDate || 'Chưa cập nhật'}</span>
                 </div>
                 <div className="col-span-5">
                   <span className="huha-title font-medium">Phụ cấp TNVK: </span>
@@ -938,7 +972,7 @@ export function StateCivilServantProfile({
                 </div>
                 <div className="col-span-4">
                   <span className="huha-title font-medium">Ngày bổ nhiệm: </span>
-                  <span className="text-black font-medium">{positionAppointDate || '—'}</span>
+                  <span className="text-black font-medium">{positionAppointDate || 'Chưa cập nhật'}</span>
                 </div>
                 <div className="col-span-4">
                   <span className="huha-title font-medium">Phụ cấp khu vực: </span>
@@ -949,7 +983,7 @@ export function StateCivilServantProfile({
               <div className="grid grid-cols-12 gap-1">
                 <div className="col-span-4">
                   <span className="huha-title font-medium">Phụ cấp trách nhiệm: </span>
-                  <span className="text-black font-semibold">{responsibilityAllowance || '—'}</span>
+                  <span className="text-black font-semibold">{responsibilityAllowance || 'Chưa cập nhật'}</span>
                 </div>
                 <div className="col-span-4">
                   <span className="huha-title font-medium">Phụ cấp kiêm nhiệm: </span>
@@ -964,11 +998,11 @@ export function StateCivilServantProfile({
               <div className="grid grid-cols-12 gap-1">
                 <div className="col-span-6">
                   <span className="huha-title font-medium">Số sổ BHXH: </span>
-                  <span className="text-black font-mono font-medium">{socialInsuranceNo || '—'}</span>
+                  <span className="text-black font-mono font-medium">{socialInsuranceNo || 'Chưa cập nhật'}</span>
                 </div>
                 <div className="col-span-6">
                   <span className="huha-title font-medium">Ngày cấp sổ BHXH: </span>
-                  <span className="text-black font-medium">{socialInsuranceDate || '—'}</span>
+                  <span className="text-black font-medium">{socialInsuranceDate || 'Chưa cập nhật'}</span>
                 </div>
               </div>
             </div>
@@ -1027,11 +1061,11 @@ export function StateCivilServantProfile({
                 <div className="grid grid-cols-12 gap-1 pt-0.5">
                   <div className="col-span-5">
                     <span className="huha-title font-medium">Chức danh khoa học: </span>
-                    <span className="text-black font-semibold">{academicTitle || '—'}</span>
+                    <span className="text-black font-semibold">{academicTitle || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Ngày, tháng, năm phong: </span>
-                    <span className="text-black font-medium">{academicDate || '—'}</span>
+                    <span className="text-black font-medium">{academicDate || 'Chưa cập nhật'}</span>
                   </div>
                 </div>
 
@@ -1042,12 +1076,12 @@ export function StateCivilServantProfile({
 
                 <div>
                   <span className="huha-title font-medium">Trình độ quản lý HCNN: </span>
-                  <span className="text-black">{stateManagement || '—'}</span>
+                  <span className="text-black">{stateManagement || 'Chưa cập nhật'}</span>
                 </div>
 
                 <div>
                   <span className="huha-title font-medium">Trình độ quản lý kinh tế: </span>
-                  <span className="text-black">{economicManagement || '—'}</span>
+                  <span className="text-black">{economicManagement || 'Chưa cập nhật'}</span>
                 </div>
 
                 <div>
@@ -1083,7 +1117,7 @@ export function StateCivilServantProfile({
                 <div className="grid grid-cols-12 gap-1">
                   <div className="col-span-5">
                     <span className="huha-title font-medium">Ngày vào Đoàn: </span>
-                    <span className="text-black font-medium">{unionJoinDate || '—'}</span>
+                    <span className="text-black font-medium">{unionJoinDate || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Chức vụ Đoàn: </span>
@@ -1094,22 +1128,22 @@ export function StateCivilServantProfile({
                 <div className="grid grid-cols-12 gap-1">
                   <div className="col-span-5">
                     <span className="huha-title font-medium">Ngày vào Đảng: </span>
-                    <span className="text-black font-medium">{partyJoinDate || '—'}</span>
+                    <span className="text-black font-medium">{partyJoinDate || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Ngày chính thức: </span>
-                    <span className="text-black font-medium">{partyOfficialDate || '—'}</span>
+                    <span className="text-black font-medium">{partyOfficialDate || 'Chưa cập nhật'}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-12 gap-1">
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Chức vụ Đảng hiện nay: </span>
-                    <span className="text-black font-semibold">{partyPosition || '—'}</span>
+                    <span className="text-black font-semibold">{partyPosition || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-5">
                     <span className="huha-title font-medium">Nơi kết nạp: </span>
-                    <span className="text-black">{partyJoinPlace || '—'}</span>
+                    <span className="text-black">{partyJoinPlace || 'Chưa cập nhật'}</span>
                   </div>
                 </div>
 
@@ -1127,22 +1161,22 @@ export function StateCivilServantProfile({
                 <div className="grid grid-cols-12 gap-1">
                   <div className="col-span-5">
                     <span className="huha-title font-medium">Quân hàm cao nhất: </span>
-                    <span className="text-black font-semibold">{militaryRank || '—'}</span>
+                    <span className="text-black font-semibold">{militaryRank || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Chức vụ cao nhất: </span>
-                    <span className="text-black">{militaryPosition || '—'}</span>
+                    <span className="text-black">{militaryPosition || 'Chưa cập nhật'}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-12 gap-1">
                   <div className="col-span-7">
                     <span className="huha-title font-medium">Danh hiệu NN phong tặng: </span>
-                    <span className="text-black font-semibold">{honorTitle || '—'}</span>
+                    <span className="text-black font-semibold">{honorTitle || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="col-span-5">
                     <span className="huha-title font-medium">Năm phong tặng: </span>
-                    <span className="text-black font-bold">{honorYear || '—'}</span>
+                    <span className="text-black font-bold">{honorYear || 'Chưa cập nhật'}</span>
                   </div>
                 </div>
 
@@ -1209,13 +1243,13 @@ export function StateCivilServantProfile({
                 <span className="huha-title font-medium">Khen thưởng cao nhất: </span>
                 <span className="text-black font-bold">{highestReward}</span>
                 <span className="ml-6 huha-title font-medium">Ngày quyết định: </span>
-                <span className="text-black font-medium">{rewardDate || '—'}</span>
+                <span className="text-black font-medium">{rewardDate || 'Chưa cập nhật'}</span>
               </div>
 
               <div className="grid grid-cols-12 gap-1">
                 <div className="col-span-4">
                   <span className="huha-title font-medium">Số quyết định: </span>
-                  <span className="text-black font-bold">{rewardDecisionNo || '—'}</span>
+                  <span className="text-black font-bold">{rewardDecisionNo || 'Chưa cập nhật'}</span>
                 </div>
                 <div className="col-span-4">
                   <span className="huha-title font-medium">Cơ quan quyết định: </span>

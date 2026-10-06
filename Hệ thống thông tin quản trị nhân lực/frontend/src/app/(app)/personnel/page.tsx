@@ -24,7 +24,7 @@ interface ActionRow {
   id: string;
   type: keyof typeof ACTION_TYPE_LABEL;
   subjectId?: string;
-  payload: { reason?: string; effectiveDate?: string; newSalary?: number; newOrgUnitId?: string; amount?: number; subType?: string };
+  payload: { reason?: string; effectiveDate?: string; newSalary?: number; salaryReason?: string; salaryBandId?: string; newOrgUnitId?: string; newJobTitle?: string; amount?: number; subType?: string };
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   decisionNote: string | null;
   decidedAt: string | null;
@@ -33,6 +33,8 @@ interface ActionRow {
   requester?: { fullName: string };
   decider?: { fullName: string } | null;
 }
+type CompensationInfo = { salaryBandId: string | null; compensationBasis: 'MONTHLY' | 'DAILY' | 'HOURLY' | null; contractNo: string | null; hasActiveContract: boolean };
+const compensationUnit = (basis: CompensationInfo['compensationBasis']) => basis === 'HOURLY' ? 'giờ' : basis === 'DAILY' ? 'ngày công' : 'tháng';
 
 export default function PersonnelActionsPage() {
   const searchParams = useSearchParams();
@@ -60,8 +62,11 @@ export default function PersonnelActionsPage() {
     effectiveDate: '',
     reason: '',
     newSalary: '',
+    salaryReason: 'MERIT',
+    salaryBandId: '',
     amount: '',
     newOrgUnitId: '',
+    newJobTitle: '',
   });
 
   useEffect(() => {
@@ -93,6 +98,15 @@ export default function PersonnelActionsPage() {
     queryKey: ['org-units'],
     queryFn: async () => (await api.get<{ id: string; name: string; code: string }[]>('/org-units')).data,
   });
+  const salaryBandsQ = useQuery<{ id: string; code: string; name: string; minSalary: number; maxSalary: number; compensationBasis: 'MONTHLY' | 'DAILY' | 'HOURLY'; status: string }[]>({
+    queryKey: ['salary-bands'],
+    queryFn: async () => (await api.get('/salary-bands')).data,
+  });
+  const compensationQ = useQuery<CompensationInfo>({
+    queryKey: ['employee-compensation-basis', form.subjectId, form.effectiveDate],
+    queryFn: async () => (await api.get(`/employees/${form.subjectId}/compensation-basis`, { params: form.effectiveDate ? { effectiveDate: form.effectiveDate } : undefined })).data,
+    enabled: form.type === 'SALARY_ADJUST' && Boolean(form.subjectId),
+  });
 
   // Queries cho Bàn giao (nạp để hiển thị tích hợp trong popup chi tiết và cột bảng)
   const handoverQ = useQuery({
@@ -102,6 +116,7 @@ export default function PersonnelActionsPage() {
 
   const orgUnitMap = new Map((orgUnitsQ.data ?? []).map((u) => [u.id, u.name]));
   const selectedSubject = (employeesQ.data ?? []).find((e) => e.id === form.subjectId);
+  const applicableBands = (salaryBandsQ.data ?? []).filter(b => b.status === 'ACTIVE' && b.compensationBasis === compensationQ.data?.compensationBasis);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ['actions-mine'] });
@@ -117,10 +132,15 @@ export default function PersonnelActionsPage() {
         : form.reason;
       const payload: Record<string, unknown> = { reason: finalReason, subType: form.subType };
       if (form.newSalary) payload.newSalary = Number(form.newSalary);
+      if (form.type === 'SALARY_ADJUST') {
+        payload.salaryReason = form.salaryReason;
+        if (form.salaryBandId) payload.salaryBandId = form.salaryBandId;
+      }
       if (form.amount) payload.amount = Number(form.amount);
       if (form.type === 'TRANSFER') {
         if (!form.newOrgUnitId) throw new Error('Vui lòng chọn đơn vị chuyển đến');
         payload.newOrgUnitId = form.newOrgUnitId;
+        if (form.newJobTitle.trim()) payload.newJobTitle = form.newJobTitle.trim();
       }
       return api.post('/personnel-actions', {
         type: form.type,
@@ -132,7 +152,7 @@ export default function PersonnelActionsPage() {
     onSuccess: () => {
       toast(form.type === 'RESIGNATION' ? 'Đã nộp đơn thôi việc — chờ duyệt' : 'Đã tạo đề xuất — chờ duyệt', 'success');
       setOpen(false);
-      setForm({ type: 'TRANSFER', subType: 'BÃI NHIỆM', subjectId: '', effectiveDate: '', reason: '', newSalary: '', amount: '', newOrgUnitId: '' });
+      setForm({ type: 'TRANSFER', subType: 'BÃI NHIỆM', subjectId: '', effectiveDate: '', reason: '', newSalary: '', salaryReason: 'MERIT', salaryBandId: '', amount: '', newOrgUnitId: '', newJobTitle: '' });
       invalidate();
     },
     onError: (e) => toast(errorMessage(e), 'error'),
@@ -181,7 +201,7 @@ export default function PersonnelActionsPage() {
       sortable: true,
       render: (r) => (
         <span>
-          <span className="block font-medium text-foreground">{r.subject?.fullName ?? '—'}</span>
+          <span className="block font-medium text-foreground">{r.subject?.fullName ?? 'Chưa cập nhật'}</span>
           <span className="block text-xs text-muted-foreground">{r.subject?.employeeCode ?? ''} {r.subject?.orgUnit ? `· ${r.subject.orgUnit.name}` : ''}</span>
         </span>
       ),
@@ -196,7 +216,7 @@ export default function PersonnelActionsPage() {
             {r.type === 'TRANSFER' && targetUnitName ? (
               <span className="block font-medium text-foreground text-xs mb-0.5">→ Chuyển đến: {targetUnitName}</span>
             ) : null}
-            <span>{r.payload?.reason ?? '—'}</span>
+            <span>{r.payload?.reason ?? 'Chưa cập nhật'}</span>
             {r.payload?.newSalary ? ` · Lương mới: ${r.payload.newSalary.toLocaleString('vi-VN')}đ` : ''}
             {r.payload?.amount ? ` · Mức: ${r.payload.amount.toLocaleString('vi-VN')}đ` : ''}
           </span>
@@ -249,7 +269,7 @@ export default function PersonnelActionsPage() {
             </span>
           );
         }
-        return <span className="text-xs text-muted-foreground">—</span>;
+        return <span className="text-xs text-muted-foreground">Chưa cập nhật</span>;
       },
     },
     {
@@ -274,7 +294,7 @@ export default function PersonnelActionsPage() {
     {
       key: 'decider',
       header: 'Người duyệt',
-      render: (r) => <span className="text-xs text-muted-foreground">{r.decider?.fullName ?? '—'}</span>,
+      render: (r) => <span className="text-xs text-muted-foreground">{r.decider?.fullName ?? 'Chưa cập nhật'}</span>,
     },
   ];
 
@@ -374,15 +394,16 @@ export default function PersonnelActionsPage() {
           <div className="space-y-4">
             <dl className="grid grid-cols-1 gap-x-6 gap-y-2.5 text-sm sm:grid-cols-2 bg-muted/20 p-3.5 rounded-lg border border-border/60">
               {[
-                ['Nhân viên', `${detail.subject?.fullName ?? '—'} ${detail.subject?.employeeCode ? `(${detail.subject.employeeCode})` : ''}`],
-                ['Người đề xuất', detail.requester?.fullName ?? '—'],
-                ['Người duyệt', detail.decider?.fullName ?? '—'],
+                ['Nhân viên', `${detail.subject?.fullName ?? 'Chưa cập nhật'} ${detail.subject?.employeeCode ? `(${detail.subject.employeeCode})` : ''}`],
+                ['Người đề xuất', detail.requester?.fullName ?? 'Chưa cập nhật'],
+                ['Người duyệt', detail.decider?.fullName ?? 'Chưa cập nhật'],
                 ['Trạng thái', detail.status === 'PENDING' ? 'Chờ duyệt' : detail.status === 'APPROVED' ? 'Đã duyệt' : 'Đã từ chối'],
                 ['Ngày hiệu lực', formatDate(detail.payload?.effectiveDate ?? detail.createdAt)],
-                ['Lý do / nội dung', detail.payload?.reason ?? '—'],
+                ['Lý do / nội dung', detail.payload?.reason ?? 'Chưa cập nhật'],
                 ...(detail.type === 'TRANSFER' ? [
-                  ['Đơn vị hiện tại', detail.subject?.orgUnit?.name ?? '—'],
+                  ['Đơn vị hiện tại', detail.subject?.orgUnit?.name ?? 'Chưa cập nhật'],
                   ['Đơn vị chuyển đến', detail.payload?.newOrgUnitId ? (orgUnitMap.get(detail.payload.newOrgUnitId) ?? detail.payload.newOrgUnitId) : 'Chưa chọn'],
+                  ...(detail.payload?.newJobTitle ? [['Chức danh mới', detail.payload.newJobTitle]] : []),
                 ] : []),
                 ...(detail.payload?.newSalary ? [['Mức lương mới', `${Number(detail.payload.newSalary).toLocaleString('vi-VN')}đ`]] : []),
                 ...(detail.payload?.amount ? [['Mức thưởng / khấu trừ', `${Number(detail.payload.amount).toLocaleString('vi-VN')}đ`]] : []),
@@ -583,7 +604,7 @@ export default function PersonnelActionsPage() {
 
           <div className="space-y-1.5 sm:col-span-2">
             <Label>Nhân sự chịu tác động quyết định *</Label>
-            <Select required value={form.subjectId} onChange={(e) => setForm({ ...form, subjectId: e.target.value })}>
+            <Select required value={form.subjectId} onChange={(e) => setForm({ ...form, subjectId: e.target.value, salaryBandId: '' })}>
               <option value="">— Chọn nhân viên —</option>
               {((employeesQ.data ?? []) as Array<{ id: string; fullName: string; employeeCode: string | null }>).map((e2) => (
                 <option key={e2.id} value={e2.id}>{e2.fullName} {e2.employeeCode ? `(${e2.employeeCode})` : ''}</option>
@@ -599,15 +620,21 @@ export default function PersonnelActionsPage() {
           ) : null}
 
           {form.type === 'TRANSFER' ? (
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label>Đơn vị mới (chuyển đến / tiếp nhận) *</Label>
-              <Select required value={form.newOrgUnitId} onChange={(e) => setForm({ ...form, newOrgUnitId: e.target.value })}>
-                <option value="">— Chọn đơn vị / phòng ban tiếp nhận —</option>
-                {(orgUnitsQ.data ?? []).map((u) => (
-                  <option key={u.id} value={u.id}>{u.name} ({u.code})</option>
-                ))}
-              </Select>
-            </div>
+            <>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Đơn vị mới (chuyển đến / tiếp nhận) *</Label>
+                <Select required value={form.newOrgUnitId} onChange={(e) => setForm({ ...form, newOrgUnitId: e.target.value })}>
+                  <option value="">— Chọn đơn vị / phòng ban tiếp nhận —</option>
+                  {(orgUnitsQ.data ?? []).map((u) => (
+                    <option key={u.id} value={u.id}>{u.name} ({u.code})</option>
+                  ))}
+                </Select>
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Chức danh mới (nếu có thay đổi)</Label>
+                <Input maxLength={120} value={form.newJobTitle} onChange={(e) => setForm({ ...form, newJobTitle: e.target.value })} placeholder="Để trống nếu giữ nguyên chức danh" />
+              </div>
+            </>
           ) : null}
 
           {form.type === 'RESIGNATION' ? (
@@ -622,10 +649,30 @@ export default function PersonnelActionsPage() {
           </div>
 
           {form.type === 'SALARY_ADJUST' ? (
-            <div className="space-y-1.5">
-              <Label>Mức lương mới (VND) *</Label>
-              <Input required type="number" min={0} value={form.newSalary} onChange={(e) => setForm({ ...form, newSalary: e.target.value })} />
-            </div>
+            <>
+              <div className="space-y-1.5">
+                <Label>Lý do điều chỉnh *</Label>
+                <Select value={form.salaryReason} onChange={(e) => setForm({ ...form, salaryReason: e.target.value })}>
+                  <option value="MERIT">Tăng theo kết quả và năng lực trong vị trí</option>
+                  <option value="PROMOTION">Thăng chức/đổi sang vị trí khác</option>
+                  <option value="MARKET_ALIGNMENT">Cân chỉnh theo thị trường hoặc nội bộ</option>
+                  <option value="LEGAL_MINIMUM">Điều chỉnh theo mức tối thiểu pháp luật</option>
+                  <option value="OTHER">Lý do khác</option>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Mức lương mới (đ/{compensationUnit(compensationQ.data?.compensationBasis ?? null)}) *</Label>
+                <Input required type="number" min={1} value={form.newSalary} onChange={(e) => setForm({ ...form, newSalary: e.target.value })} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Khung lương áp dụng sau điều chỉnh *</Label>
+                <Select required value={form.salaryBandId} onChange={(e) => setForm({ ...form, salaryBandId: e.target.value })}>
+                  <option value="">— Chọn khung lương đã duyệt —</option>
+                  {applicableBands.map(b => <option key={b.id} value={b.id}>{b.code} · {b.name} · {b.minSalary.toLocaleString('vi-VN')}–{b.maxSalary.toLocaleString('vi-VN')} đ/{compensationUnit(b.compensationBasis)}</option>)}
+                </Select>
+                {!form.subjectId ? <p className="text-xs text-muted-foreground">Chọn nhân viên để đọc đơn vị lương từ hợp đồng đang hiệu lực.</p> : compensationQ.isLoading ? <p className="text-xs text-muted-foreground">Đang đọc đơn vị lương từ hợp đồng...</p> : !compensationQ.data?.hasActiveContract ? <p className="text-xs text-destructive">Nhân viên chưa có hợp đồng còn hiệu lực. Hãy hoàn tất hợp đồng trước khi đề xuất thay đổi lương.</p> : !applicableBands.length ? <p className="text-xs text-destructive">Chưa có khung lương đã duyệt theo đơn vị {compensationUnit(compensationQ.data.compensationBasis)}. HR cần tạo khung phù hợp trước.</p> : <p className="text-xs text-muted-foreground">Đơn vị lấy từ hợp đồng đang hiệu lực: theo {compensationUnit(compensationQ.data.compensationBasis)}. Chọn khung tương ứng; hệ thống sẽ chặn mức nằm ngoài khoảng đã duyệt.</p>}
+              </div>
+            </>
           ) : null}
 
           {form.type === 'AWARD' || form.type === 'DISCIPLINE' ? (

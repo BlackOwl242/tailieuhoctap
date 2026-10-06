@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 import type { Logger as PinoLogger } from 'pino';
@@ -58,6 +59,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       else if (status === 409) code = 'CONFLICT';
       else if (status === 429) code = 'RATE_LIMITED';
       else if (status >= 500) code = 'INTERNAL_ERROR';
+    } else if (exception instanceof Prisma.PrismaClientKnownRequestError && ['P2034','P2002'].includes(exception.code)) {
+      status=409;code='CONFLICT';message='Dữ liệu vừa thay đổi hoặc bị trùng; tải lại và thử thao tác lần nữa';
     } else {
       this.logger.error(
         { err: exception instanceof Error ? { message: exception.message, stack: exception.stack } : exception, requestId: req.requestId },

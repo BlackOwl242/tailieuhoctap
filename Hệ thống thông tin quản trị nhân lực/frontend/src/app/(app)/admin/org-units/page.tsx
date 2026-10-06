@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Building2,
@@ -58,11 +58,15 @@ function getLevelLabel(level?: number, depth = 0): string {
     case 1:
       return 'Cấp 1 · Đơn vị gốc';
     case 2:
-      return 'Cấp 2 · Khối / Ban';
+      return 'Cấp 2 · Quản trị / Ban điều hành';
     case 3:
-      return 'Cấp 3 · Phòng / TT';
+      return 'Cấp 3 · Khối tổng hợp';
+    case 4:
+      return 'Cấp 4 · Khối chức năng';
+    case 5:
+      return 'Cấp 5 · Phòng / Trung tâm';
     default:
-      return 'Cấp 4 · Tổ / Nhóm';
+      return `Cấp ${lvl} · Tổ / Nhóm`;
   }
 }
 
@@ -80,13 +84,14 @@ type ViewMode = 'tree' | 'table';
  * KC03 — Quản lý cây cơ cấu tổ chức:
  * - Đủ nghiệp vụ: THÊM / SỬA / XÓA / XEM CHI TIẾT từng đơn vị;
  * - Hai chế độ hiển thị: Cây danh mục phân cấp và Bảng quản lý phẳng;
- * - Hỗ trợ in ấn chuẩn văn bản hành chính Nghị định 30/2020/NĐ-CP và xuất Excel.
+ * - Hỗ trợ in danh mục nội bộ và xuất Excel.
  */
 export default function AdminOrgUnitsPage() {
   const qc = useQueryClient();
   const toast = useToast();
   const [view, setView] = useState<ViewMode>('tree');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const didAutoExpand = useRef(false);
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [addForm, setAddForm] = useState({ name: '', code: '' });
   const [editing, setEditing] = useState<TreeNode | null>(null);
@@ -108,7 +113,12 @@ export default function AdminOrgUnitsPage() {
       toast('Vui lòng nhập Tên Cơ quan / Đơn vị ban hành', 'error');
       return;
     }
-    setOrgConfig(formOrgConfig);
+    try {
+      await setOrgConfig(formOrgConfig);
+    } catch {
+      toast('Không thể lưu cấu hình tổ chức dùng chung. Vui lòng thử lại.', 'error');
+      return;
+    }
     // Tự động đồng bộ tên cơ quan vào đơn vị gốc của hệ thống
     const roots = (q.data ?? []).filter((n) => !n.parentId);
     if (roots.length > 0) {
@@ -201,6 +211,21 @@ export default function AdminOrgUnitsPage() {
     };
     walk(q.data ?? [], 0);
     return out;
+  }, [q.data]);
+  const directOrgUnitCount = flat.filter(({ node }) => node.code !== 'SG-TECH').length;
+
+  useEffect(() => {
+    if (!q.data?.length || didAutoExpand.current) return;
+    const initial = new Set<string>();
+    const addFirstThreeLevels = (nodes: TreeNode[], depth = 0) => {
+      for (const node of nodes) {
+        if (depth < 3 && node.children.length > 0) initial.add(node.id);
+        if (depth < 2) addFirstThreeLevels(node.children, depth + 1);
+      }
+    };
+    addFirstThreeLevels(q.data);
+    didAutoExpand.current = true;
+    setExpanded(initial);
   }, [q.data]);
 
   const detailMembers = useMemo(() => {
@@ -398,10 +423,10 @@ export default function AdminOrgUnitsPage() {
             {node.code}
           </span>
 
-          {/* Quy mô nhân sự - Căn phải, số monospace nhẹ nhàng, không badge cồng kềnh */}
+          {/* Số này là nhân sự gán trực tiếp tại đơn vị, không cộng đơn vị con. */}
           <span className="ml-auto mr-3 text-xs font-mono text-muted-foreground tabular-nums shrink-0">
-            {node.totalMembers ?? node.memberCount}{' '}
-            <span className="text-xs font-sans text-muted-foreground font-normal">NV</span>
+            {node.memberCount}{' '}
+            <span className="text-xs font-sans text-muted-foreground font-normal">nhân sự trực tiếp</span>
           </span>
 
           {/* Hành động: Chỉ hiện khi hover để màn hình luôn tĩnh lặng, sạch sẽ */}
@@ -461,15 +486,15 @@ export default function AdminOrgUnitsPage() {
     },
     {
       key: 'memberCount',
-      header: 'Quy mô',
+      header: 'Nhân sự trực tiếp',
       sortable: true,
-      sortValue: (r) => r.node.totalMembers ?? r.node.memberCount,
+      sortValue: (r) => r.node.memberCount,
       render: (r) => (
         <span className="text-xs font-mono text-foreground tabular-nums">
-          {r.node.totalMembers ?? r.node.memberCount} <span className="font-sans text-muted-foreground">NV</span>
+          {r.node.memberCount} <span className="font-sans text-muted-foreground">người</span>
         </span>
       ),
-      exportValue: (r) => `${r.node.totalMembers ?? r.node.memberCount} NV`,
+      exportValue: (r) => `${r.node.memberCount} nhân sự trực tiếp`,
     },
     {
       key: 'parent',
@@ -490,7 +515,7 @@ export default function AdminOrgUnitsPage() {
     <>
       <PageHeader
         title="Đơn vị phòng ban"
-        description="Quản lý cây phân cấp phòng ban và cấu hình thông tin cơ quan đơn vị."
+        description="Đại hội đồng quản trị cấp cao; Ban Kiểm soát giám sát độc lập Ban Tổng Giám đốc. Ban Tổng Giám đốc điều hành hai nhánh kinh doanh cốt lõi và hỗ trợ nội bộ. Số cạnh mỗi đơn vị là nhân sự trực tiếp."
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -498,7 +523,7 @@ export default function AdminOrgUnitsPage() {
               variant={isConfigOpen ? 'default' : 'outline'}
               onClick={() => setIsConfigOpen((v) => !v)}
               className="gap-1.5 text-xs font-semibold"
-              title="Cấu hình thông tin cơ quan và tiêu đề in ấn chuẩn Nghị định 30"
+              title="Cấu hình tên tổ chức hiển thị trên tài liệu nội bộ"
             >
               <Building2 className="h-4 w-4" />
               <span>Cơ quan & In ấn</span>
@@ -554,7 +579,7 @@ export default function AdminOrgUnitsPage() {
                 <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
                   <span>Thông tin Cơ quan, Đơn vị & Tiêu đề Văn bản In ấn</span>
                   <Badge variant="outline" className="text-xs font-normal">
-                    Nghị định 30/2020/NĐ-CP
+                    Cấu hình bản in nội bộ
                   </Badge>
                 </CardTitle>
                 <CardDescription className="text-xs mt-0.5">
@@ -584,28 +609,44 @@ export default function AdminOrgUnitsPage() {
               <div className="space-y-1.5 pb-2">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                   <Label className="text-xs font-semibold text-foreground">
-                    Mô hình Tổ chức & Chuẩn Sơ yếu lý lịch mặc định
+                    Chế độ tổ chức và quy tắc đánh giá mặc định
                   </Label>
                   <span className="text-xs text-muted-foreground italic">
-                    Quyết định định dạng mẫu in (Mẫu Nhà nước 2C-BNV vs Mẫu Doanh nghiệp tư nhân)
+                    Cấu hình dùng chung cho hồ sơ, quy trình đánh giá và biểu mẫu mới
                   </span>
                 </div>
                 <Select
-                  value={formOrgConfig.orgSector || 'state'}
+                  value={formOrgConfig.orgSector || 'enterprise'}
                   onChange={(e) => {
-                    const sector = e.target.value as any;
+                    const sector = e.target.value as 'state' | 'enterprise';
                     setFormOrgConfig({
                       ...formOrgConfig,
                       orgSector: sector,
                       orgLevel: sector === 'enterprise' ? 'DV_DNTN' : (formOrgConfig.orgLevel === 'DV_DNTN' ? 'DV_TINH' : formOrgConfig.orgLevel),
+                      publicPersonnelType: sector === 'state' ? (formOrgConfig.publicPersonnelType || 'CIVIL_SERVANT') : null,
                     });
                   }}
                   className="h-9 w-full text-xs font-medium"
                 >
-                  <option value="state">Cơ quan Nhà nước / Đơn vị sự nghiệp công lập (Mẫu 2C-BNV/2008 của Bộ Nội vụ)</option>
+                  <option value="state">Khu vực nhà nước</option>
                   <option value="enterprise">Doanh nghiệp tư nhân / Tập đoàn kinh tế (Mẫu Trích ngang người lao động)</option>
                 </Select>
               </div>
+
+              {formOrgConfig.orgSector === 'state' && (
+                <div className="space-y-1.5 pb-2">
+                  <Label className="text-xs font-semibold text-foreground">Chế độ nhân sự khu vực nhà nước</Label>
+                  <Select
+                    value={formOrgConfig.publicPersonnelType || 'CIVIL_SERVANT'}
+                    onChange={(e) => setFormOrgConfig({ ...formOrgConfig, publicPersonnelType: e.target.value as 'CIVIL_SERVANT' | 'PUBLIC_EMPLOYEE' })}
+                    className="h-9 w-full text-xs font-medium"
+                  >
+                    <option value="CIVIL_SERVANT">Cơ quan hành chính — công chức</option>
+                    <option value="PUBLIC_EMPLOYEE">Đơn vị sự nghiệp công lập — viên chức</option>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Chế độ này quyết định căn cứ và biểu đánh giá; không ảnh hưởng kỳ doanh nghiệp đã tạo.</p>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
@@ -639,27 +680,29 @@ export default function AdminOrgUnitsPage() {
                   </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-foreground">
-                    3. Cấp đơn vị hành chính
-                  </Label>
-                  <Select
-                    value={formOrgConfig.orgLevel}
-                    onChange={(e) => setFormOrgConfig({ ...formOrgConfig, orgLevel: e.target.value })}
-                    className="text-xs"
-                  >
-                    {Object.entries(ORG_LEVEL_LABELS).map(([code, label]) => (
-                      <option key={code} value={code}>
-                        {label}
-                      </option>
-                    ))}
-                  </Select>
-                  <p className="text-xs text-muted-foreground">Phân cấp theo danh mục quản lý</p>
-                </div>
+                {formOrgConfig.orgSector === 'state' ? (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-foreground">
+                      3. Cấp quản lý cơ quan / đơn vị công
+                    </Label>
+                    <Select
+                      value={formOrgConfig.orgLevel}
+                      onChange={(e) => setFormOrgConfig({ ...formOrgConfig, orgLevel: e.target.value })}
+                      className="text-xs"
+                    >
+                      {Object.entries(ORG_LEVEL_LABELS).filter(([code]) => code !== 'DV_DNTN').map(([code, label]) => (
+                        <option key={code} value={code}>
+                          {label}
+                        </option>
+                      ))}
+                    </Select>
+                    <p className="text-xs text-muted-foreground">Dùng để mô tả cấp cơ quan trên biểu mẫu; loại hình và quy trình được điều khiển bởi chế độ khu vực công.</p>
+                  </div>
+                ) : null}
 
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold text-foreground">
-                    4. Phòng ban chuyên trách tham mưu
+                    {formOrgConfig.orgSector === 'state' ? '4.' : '3.'} Phòng ban chuyên trách tham mưu
                   </Label>
                   <Input
                     value={formOrgConfig.deptName}
@@ -672,7 +715,7 @@ export default function AdminOrgUnitsPage() {
 
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold text-foreground">
-                    5. Địa danh ban hành văn bản
+                    {formOrgConfig.orgSector === 'state' ? '5.' : '4.'} Địa danh ban hành văn bản
                   </Label>
                   <Input
                     value={formOrgConfig.location}
@@ -710,11 +753,11 @@ export default function AdminOrgUnitsPage() {
               </div>
             </div>
 
-            {/* Live Preview góc in văn bản chuẩn Nghị định 30 - Đặt bên dưới với chiều rộng rộng rãi, không đè chữ */}
+            {/* Xem trước phần đầu bản in nội bộ */}
             <div className="pt-6 border-t border-border/70 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                 <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
-                  Xem trước góc văn bản in toàn hệ thống (Nghị định 30/2020/NĐ-CP)
+                  Xem trước phần đầu báo cáo nội bộ
                 </Label>
                 <span className="text-xs text-muted-foreground italic">
                   Tự động hiển thị tại phần đầu của mọi trang in, báo cáo, danh mục
@@ -763,7 +806,7 @@ export default function AdminOrgUnitsPage() {
                     BÁO CÁO / DANH MỤC THAM CHIẾU
                   </p>
                   <p className="text-[10pt] italic text-muted-foreground mt-0.5">
-                    Tiêu đề biểu mẫu theo chuẩn hành chính
+                    Bố cục tham khảo; không xác nhận tuân thủ mẫu pháp quy
                   </p>
                 </div>
               </div>
@@ -775,7 +818,7 @@ export default function AdminOrgUnitsPage() {
       <div className="print-area font-times">
         <PrintFrame
           title="DANH MỤC CƠ CẤU TỔ CHỨC ĐƠN VỊ"
-          subtitle={`${formOrgConfig.parentOrgName ? `${formOrgConfig.parentOrgName} · ` : ''}${formOrgConfig.orgName || 'CƠ QUAN / ĐƠN VỊ'} · Tổng số ${flat.length} đơn vị/phòng ban`}
+          subtitle={`${formOrgConfig.parentOrgName ? `${formOrgConfig.parentOrgName} · ` : ''}${formOrgConfig.orgName || 'CƠ QUAN / ĐƠN VỊ'} · ${directOrgUnitCount} đơn vị trực thuộc`}
           parentOrgName={formOrgConfig.parentOrgName}
           orgName={formOrgConfig.orgName}
           deptName={formOrgConfig.deptName}
@@ -783,7 +826,7 @@ export default function AdminOrgUnitsPage() {
           docNumber=".../BC-TCCB"
         />
 
-        {/* Khung Bảng In Ấn Chuẩn Nghị định 30/2020/NĐ-CP */}
+        {/* Bảng in danh mục nội bộ */}
         <div className="print-only">
           <table className="w-full text-sm">
             <thead>
@@ -792,7 +835,7 @@ export default function AdminOrgUnitsPage() {
                 <th style={{ width: '14%' }}>MÃ ĐƠN VỊ</th>
                 <th style={{ width: '48%' }}>TÊN ĐƠN VỊ / PHÒNG BAN</th>
                 <th style={{ width: '22%' }}>ĐƠN VỊ TRỰC THUỘC</th>
-                <th style={{ width: '10%' }}>NHÂN SỰ</th>
+                <th style={{ width: '10%' }}>NHÂN SỰ TRỰC TIẾP</th>
               </tr>
             </thead>
             <tbody>
@@ -827,7 +870,7 @@ export default function AdminOrgUnitsPage() {
               {/* Dòng Tổng kết cuối bảng */}
               <tr className="font-bold">
                 <td colSpan={4} className="text-center uppercase font-bold py-2">
-                  TỔNG CỘNG ({flat.length} ĐƠN VỊ / PHÒNG BAN)
+                  TỔNG CỘNG ({directOrgUnitCount} ĐƠN VỊ / PHÒNG BAN)
                 </td>
                 <td className="text-center font-bold">
                   {flat.reduce((sum, f) => sum + (f.node.memberCount || 0), 0)} người
@@ -854,7 +897,7 @@ export default function AdminOrgUnitsPage() {
                     Sơ đồ phân cấp đơn vị
                   </span>
                   <span className="text-xs text-muted-foreground font-mono">
-                    ({flat.length} đơn vị · {q.data?.reduce((sum, n) => sum + (n.totalMembers ?? n.memberCount ?? 0), 0) ?? 0} nhân sự)
+                    ({flat.length} nút · {directOrgUnitCount} đơn vị · {flat.reduce((sum, f) => sum + f.node.memberCount, 0)} nhân sự đã gán đơn vị)
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">

@@ -13,11 +13,13 @@ import {
   Calculator, CreditCard, Receipt, Target, GraduationCap, FileSpreadsheet
 } from 'lucide-react';
 import { CommandPalette } from '@/components/layout/command-palette';
+import { GlobalSearch } from '@/components/layout/global-search';
 import { cn } from '@/lib/utils';
 import { useAuthStore, type AuthState } from '@/lib/auth-store';
 import { api } from '@/lib/api';
 import { PageContainer } from './page-container';
 import type { MeProfile } from '@/lib/types';
+import { isEnterpriseSector, useOrgConfig } from '@/lib/org-config';
 
 /**
  * Biểu tượng hình học tối giản 3 khối isometric (Tri-cube Geometric Logo)
@@ -69,7 +71,7 @@ interface NavDomain {
   icon: React.ComponentType<{ className?: string }>;
   roles?: string[];
   folders: NavFolder[];
-  tags: { id: string; label: string; count: number; href: string }[];
+  tags: { id: string; label: string; count?: number; href: string }[];
 }
 
 /**
@@ -88,6 +90,8 @@ const DOMAINS: NavDomain[] = [
         items: [
           { href: '/dashboard', label: 'Tổng quan' },
           { href: '/ess', label: 'Cổng nhân viên' },
+          { href: '/hr-workflows', label: 'Quy trình & xác nhận' },
+          { href: '/knowledge', label: 'Tri thức & bài viết' },
           { href: '/org-chart', label: 'Sơ đồ tổ chức' },
           { href: '/notifications', label: 'Thông báo' },
           { href: '/profile', label: 'Hồ sơ cá nhân' },
@@ -95,9 +99,9 @@ const DOMAINS: NavDomain[] = [
       },
     ],
     tags: [
-      { id: 'tag-daily', label: '#Hàng ngày', count: 5, href: '/ess' },
-      { id: 'tag-requests', label: '#Đơn từ', count: 2, href: '/ess' },
-      { id: 'tag-alerts', label: '#Thông báo', count: 3, href: '/notifications' },
+      { id: 'tag-daily', label: '#Hàng ngày', href: '/ess' },
+      { id: 'tag-requests', label: '#Đơn từ', href: '/ess' },
+      { id: 'tag-alerts', label: '#Thông báo', href: '/notifications' },
     ],
   },
   {
@@ -121,15 +125,16 @@ const DOMAINS: NavDomain[] = [
         label: 'Chế độ & Ngạch bậc',
         items: [
           { href: '/personnel', label: 'Biến động nhân sự' },
-          { href: '/salary-ranks', label: 'Ngạch bậc lương' },
+          { href: '/salary-ranks', label: 'Ngạch, bậc lương khu vực công' },
+          { href: '/salary-bands', label: 'Khung lương vị trí' },
         ],
       },
     ],
     tags: [
-      { id: 'tag-active', label: '#Đang làm việc', count: 110, href: '/employees' },
-      { id: 'tag-probation', label: '#Thử việc', count: 18, href: '/employees' },
-      { id: 'tag-contract', label: '#Hợp đồng', count: 45, href: '/personnel' },
-      { id: 'tag-assets', label: '#Tài sản', count: 12, href: '/assets' },
+      { id: 'tag-active', label: '#Đang làm việc', href: '/employees' },
+      { id: 'tag-probation', label: '#Thử việc', href: '/employees' },
+      { id: 'tag-contract', label: '#Hợp đồng', href: '/personnel' },
+      { id: 'tag-assets', label: '#Tài sản', href: '/assets' },
     ],
   },
   {
@@ -157,9 +162,9 @@ const DOMAINS: NavDomain[] = [
       },
     ],
     tags: [
-      { id: 'tag-today', label: '#Điểm danh hôm nay', count: 98, href: '/attendance' },
-      { id: 'tag-pending-leave', label: '#Phép chờ duyệt', count: 3, href: '/leave' },
-      { id: 'tag-ot', label: '#Làm thêm giờ', count: 2, href: '/overtime' },
+      { id: 'tag-today', label: '#Điểm danh hôm nay', href: '/attendance' },
+      { id: 'tag-pending-leave', label: '#Phép chờ duyệt', href: '/leave' },
+      { id: 'tag-ot', label: '#Làm thêm giờ', href: '/overtime' },
     ],
   },
   {
@@ -173,6 +178,7 @@ const DOMAINS: NavDomain[] = [
         id: 'comp-payroll',
         label: 'Tiền lương & Quy chế',
         items: [
+          { href: '/payroll-guide', label: 'Cách tính lương' },
           { href: '/payroll-engine', label: 'Bảng tính lương' },
           { href: '/regulations', label: 'Quy chế Tiền lương & Phúc lợi' },
         ],
@@ -187,10 +193,10 @@ const DOMAINS: NavDomain[] = [
       },
     ],
     tags: [
-      { id: 'tag-payroll-run', label: '#Bảng tính lương', count: 1, href: '/payroll-engine' },
-      { id: 'tag-regulations', label: '#Quy chế Tiền lương', count: 5, href: '/regulations' },
-      { id: 'tag-nd30', label: '#Khoản vay', count: 5, href: '/loans' },
-      { id: 'tag-expense-pending', label: '#Công tác phí', count: 4, href: '/expense-claims' },
+      { id: 'tag-payroll-run', label: '#Bảng tính lương', href: '/payroll-engine' },
+      { id: 'tag-regulations', label: '#Quy chế Tiền lương', href: '/regulations' },
+      { id: 'tag-nd30', label: '#Khoản vay', href: '/loans' },
+      { id: 'tag-expense-pending', label: '#Công tác phí', href: '/expense-claims' },
     ],
   },
   {
@@ -198,7 +204,7 @@ const DOMAINS: NavDomain[] = [
     label: 'Phát triển',
     shortLabel: 'Phát triển',
     icon: Briefcase,
-    roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER', 'HR_TRAINER'],
+    roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER', 'HR_TRAINER', 'USER'],
     folders: [
       {
         id: 'talent-recruitment',
@@ -211,7 +217,9 @@ const DOMAINS: NavDomain[] = [
         id: 'talent-growth',
         label: 'Đánh giá & Đào tạo',
         items: [
+          { href: '/performance-guide', label: 'Cách đánh giá nhân sự' },
           { href: '/performance-360', label: 'Đánh giá KPI & 360' },
+          { href: '/competency-development', label: 'Năng lực & phát triển' },
           { href: '/performance-360?tab=templates', label: 'Biểu mẫu đánh giá chuẩn' },
           { href: '/performance-360?tab=rubrics', label: 'Quy ước xếp loại thi đua' },
           { href: '/training-grievance', label: 'Đào tạo & Khiếu nại' },
@@ -219,9 +227,9 @@ const DOMAINS: NavDomain[] = [
       },
     ],
     tags: [
-      { id: 'tag-ats-interview', label: '#Lịch phỏng vấn', count: 6, href: '/recruitment-ats' },
-      { id: 'tag-kpi-q3', label: '#Đánh giá KPI', count: 1, href: '/performance-360' },
-      { id: 'tag-cert', label: '#Đào tạo', count: 2, href: '/training-grievance' },
+      { id: 'tag-ats-interview', label: '#Lịch phỏng vấn', href: '/recruitment-ats' },
+      { id: 'tag-kpi-q3', label: '#Đánh giá KPI', href: '/performance-360' },
+      { id: 'tag-cert', label: '#Đào tạo', href: '/training-grievance' },
     ],
   },
   {
@@ -246,8 +254,8 @@ const DOMAINS: NavDomain[] = [
       },
     ],
     tags: [
-      { id: 'tag-templates', label: '#Mẫu văn bản', count: 12, href: '/documents' },
-      { id: 'tag-labor-report', label: '#Báo cáo định kỳ', count: 4, href: '/personnel-reports' },
+      { id: 'tag-templates', label: '#Mẫu văn bản', href: '/documents' },
+      { id: 'tag-labor-report', label: '#Báo cáo định kỳ', href: '/personnel-reports' },
     ],
   },
   {
@@ -278,9 +286,9 @@ const DOMAINS: NavDomain[] = [
       },
     ],
     tags: [
-      { id: 'tag-user-accounts', label: '#Tài khoản quản trị', count: 3, href: '/admin/users' },
-      { id: 'tag-devices', label: '#Máy chấm công', count: 2, href: '/admin/attendance' },
-      { id: 'tag-catalogs', label: '#Tham số hệ thống', count: 8, href: '/admin/catalogs' },
+      { id: 'tag-user-accounts', label: '#Tài khoản quản trị', href: '/admin/users' },
+      { id: 'tag-devices', label: '#Máy chấm công', href: '/admin/attendance' },
+      { id: 'tag-catalogs', label: '#Tham số hệ thống', href: '/admin/catalogs' },
     ],
   },
 ];
@@ -291,6 +299,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
   const router = useRouter();
   const clear = useAuthStore((s: AuthState) => s.clear);
   const queryClient = useQueryClient();
+  const [orgConfig] = useOrgConfig();
 
   // Mobile nav state
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -391,11 +400,23 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
 
   // Lọc các domain theo quyền vai trò (roles)
   const availableDomains = useMemo(() => {
-    return DOMAINS.filter((d) => {
+    return DOMAINS.map((domain) => ({
+      ...domain,
+      folders: domain.folders
+        .map((folder) => ({
+          ...folder,
+          items: folder.items.filter((item) => {
+            if (item.href === '/salary-ranks') return !isEnterpriseSector(orgConfig);
+            if (item.href === '/salary-bands') return isEnterpriseSector(orgConfig);
+            return true;
+          }),
+        }))
+        .filter((folder) => folder.items.length > 0),
+    })).filter((d) => {
       if (!d.roles) return true;
       return d.roles.some((r) => profile.roles.includes(r));
     });
-  }, [profile.roles]);
+  }, [profile.roles, orgConfig]);
 
   const activeDomain = useMemo(() => {
     return availableDomains.find((d) => d.id === selectedDomainId) || availableDomains[0] || DOMAINS[0];
@@ -668,12 +689,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                                   </div>
                                   {item.badge !== undefined && (
                                     <span
-                                      className={cn(
-                                        'rounded-full px-1.5 py-0.2 text-[10px] font-medium shrink-0',
-                                        active
-                                          ? 'bg-muted-foreground/15 text-foreground font-medium'
-                                          : 'bg-muted/80 text-muted-foreground'
-                                      )}
+                                      className="shrink-0 pl-2 text-[10px] text-muted-foreground"
                                     >
                                       {item.badge}
                                     </span>
@@ -786,22 +802,20 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
           )}
         </div>
 
-        {/* Thanh tìm kiếm đặt chính giữa Topbar */}
+        {/* Tìm kiếm nhân viên, tài liệu và bài viết */}
         <div className="hidden md:flex flex-1 items-center justify-center px-4 max-w-xl mx-auto">
-          <button
-            onClick={() => setCommandPaletteOpen(true)}
-            className="flex w-full max-w-md items-center justify-between rounded-xl border border-border/60 bg-muted/30 px-3.5 py-1.5 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all shadow-2xs outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none select-none"
-          >
-            <span className="flex items-center gap-2">
-              <Search className="h-3.5 w-3.5 text-muted-foreground" />
-              <span>Tìm kiếm nhân viên, chức năng, tạo đơn từ...</span>
-            </span>
-            <kbd className="inline-flex items-center rounded-md border border-border bg-card px-1.5 py-0.5 text-[10px] font-mono font-bold text-muted-foreground">
-              Ctrl K
-            </kbd>
-          </button>
+          <div className="flex w-full items-center gap-2">
+            <GlobalSearch />
+            <button
+              onClick={() => setCommandPaletteOpen(true)}
+              className="shrink-0 rounded-md border border-border px-3 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+              aria-label="Mở danh mục chức năng"
+              title="Mở danh mục chức năng"
+            >
+              Chức năng
+            </button>
+          </div>
         </div>
-
         {/* Cụm hành động phải: thông báo + hồ sơ */}
         <div className="ml-auto flex items-center gap-1.5">
           <Link
@@ -868,19 +882,18 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
               </button>
             </div>
 
-            <div className="mb-3">
+            <div className="mb-3 space-y-2">
+              <GlobalSearch />
               <button
                 onClick={() => {
                   setMobileNavOpen(false);
                   setCommandPaletteOpen(true);
                 }}
-                className="flex w-full items-center justify-between rounded-xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
+                className="w-full rounded-md border border-border px-3 py-2 text-left text-sm text-muted-foreground hover:bg-accent"
               >
-                <span>Tìm kiếm nhanh...</span>
-                <kbd className="text-xs font-mono">⌘K</kbd>
+                Mở danh mục chức năng
               </button>
             </div>
-
             <div className="space-y-4">
               {availableDomains.map((domain) => (
                 <div key={domain.id} className="space-y-1">
@@ -905,7 +918,7 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
                       >
                         <span className="truncate">{item.label}</span>
                         {item.badge !== undefined && (
-                          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                          <span className="pl-2 text-[10px] text-muted-foreground">
                             {item.badge}
                           </span>
                         )}

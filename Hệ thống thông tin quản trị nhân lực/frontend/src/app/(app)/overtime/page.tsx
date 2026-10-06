@@ -15,7 +15,7 @@ import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { ErrorState } from '@/components/common/states';
 
 interface OvertimeRow {
-  id: string; workDate: string; hours: number; reason: string;
+  id: string; workDate: string; hours: number; nightHours?: number; dayCategory?: string; reason: string;
   status: keyof typeof REQUEST_STATUS_LABEL; decisionNote: string | null;
   user?: { fullName: string; employeeCode: string | null; orgUnit?: { name: string } | null };
   approver?: { fullName: string } | null;
@@ -30,7 +30,7 @@ export default function OvertimePage() {
   const [tab, setTab] = useState<'mine' | 'all'>('mine');
   const [open, setOpen] = useState(false);
   const [detail, setDetail] = useState<OvertimeRow | null>(null);
-  const [form, setForm] = useState({ workDate: '', hours: '', reason: '' });
+  const [form, setForm] = useState({ workDate: '', hours: '', nightHours: '0', dayCategory: 'WEEKDAY', reason: '' });
 
   const mineQ = useQuery({
     queryKey: ['overtime-mine'],
@@ -48,8 +48,8 @@ export default function OvertimePage() {
   };
 
   const create = useMutation({
-    mutationFn: async () => api.post('/overtime', { workDate: form.workDate, hours: Number(form.hours), reason: form.reason }),
-    onSuccess: () => { toast('Đã gửi đăng ký làm thêm giờ', 'success'); setOpen(false); invalidate(); },
+    mutationFn: async () => api.post('/overtime', { workDate: form.workDate, hours: Number(form.hours), nightHours: Number(form.nightHours), dayCategory: form.dayCategory, reason: form.reason }),
+    onSuccess: () => { toast('Đã gửi đăng ký làm thêm giờ', 'success'); setOpen(false); setForm({ workDate: '', hours: '', nightHours: '0', dayCategory: 'WEEKDAY', reason: '' }); invalidate(); },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
   const decide = useMutation({
@@ -62,11 +62,13 @@ export default function OvertimePage() {
   const columns: DataColumn<OvertimeRow>[] = [
     ...(tab === 'all' ? [{
       key: 'user', header: 'Nhân viên', sortable: true,
-      render: (r: OvertimeRow) => r.user?.fullName ?? '—',
+      render: (r: OvertimeRow) => r.user?.fullName ?? 'Chưa cập nhật',
       exportValue: (r: OvertimeRow) => r.user?.fullName ?? '',
     } as DataColumn<OvertimeRow>] : []),
     { key: 'workDate', header: 'Ngày làm thêm', sortable: true, render: (r) => formatDate(r.workDate), exportValue: (r) => formatDate(r.workDate) },
     { key: 'hours', header: 'Số giờ', sortable: true },
+    { key: 'dayCategory', header: 'Loại ngày', render: (r) => r.dayCategory === 'PUBLIC_HOLIDAY' ? 'Lễ, Tết' : r.dayCategory === 'WEEKLY_REST' ? 'Nghỉ tuần' : 'Ngày thường' },
+    { key: 'nightHours', header: 'Giờ ban đêm', render: (r) => r.nightHours ?? 0 },
     { key: 'reason', header: 'Lý do', render: (r) => <span className="line-clamp-2 max-w-[18rem]">{r.reason}</span> },
     {
       key: 'status', header: 'Trạng thái', sortable: true,
@@ -141,6 +143,8 @@ export default function OvertimePage() {
               ...(detail.user ? [['Nhân viên', `${detail.user.fullName} ${detail.user.employeeCode ? `(${detail.user.employeeCode})` : ''}`]] : []),
               ['Ngày làm thêm', formatDate(detail.workDate)],
               ['Số giờ', String(detail.hours)],
+              ['Loại ngày', detail.dayCategory === 'PUBLIC_HOLIDAY' ? 'Lễ, Tết' : detail.dayCategory === 'WEEKLY_REST' ? 'Nghỉ tuần' : 'Ngày thường'],
+              ['Giờ ban đêm', String(detail.nightHours ?? 0)],
               ['Trạng thái', REQUEST_STATUS_LABEL[detail.status] ?? detail.status],
               ...(detail.approver ? [['Người duyệt', detail.approver.fullName]] : []),
               ...(detail.decisionNote ? [['Ghi chú duyệt', detail.decisionNote]] : []),
@@ -163,8 +167,16 @@ export default function OvertimePage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5"><Label>Ngày *</Label>
               <Input required type="date" value={form.workDate} onChange={(e) => setForm({ ...form, workDate: e.target.value })} /></div>
-            <div className="space-y-1.5"><Label>Số giờ (0.5–12) *</Label>
-              <Input required type="number" step="0.5" min={0.5} max={12} value={form.hours} onChange={(e) => setForm({ ...form, hours: e.target.value })} /></div>
+            <div className="space-y-1.5"><Label>Số giờ (0.5–4) *</Label>
+              <Input required type="number" step="0.5" min={0.5} max={4} value={form.hours} onChange={(e) => setForm({ ...form, hours: e.target.value })} /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5"><Label>Loại ngày làm thêm</Label>
+              <select className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm" value={form.dayCategory} onChange={(e) => setForm({ ...form, dayCategory: e.target.value })}>
+                <option value="WEEKDAY">Ngày làm việc bình thường</option><option value="WEEKLY_REST">Ngày nghỉ hằng tuần</option><option value="PUBLIC_HOLIDAY">Ngày lễ, Tết</option>
+              </select></div>
+            <div className="space-y-1.5"><Label>Số giờ làm ban đêm</Label>
+              <Input type="number" step="0.5" min={0} max={Number(form.hours || 0)} value={form.nightHours} onChange={(e) => setForm({ ...form, nightHours: e.target.value })} /></div>
           </div>
           <div className="space-y-1.5"><Label>Lý do *</Label>
             <Textarea required value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} /></div>
