@@ -1522,6 +1522,7 @@ model HrmsSalaryBand {
   updatedAt         DateTime          @updatedAt
   employees         User[]            @relation("EmployeeSalaryBand")
   openings          HrmsJobOpening[]
+  salaryStructures  HrmsSalaryStructure[] @relation("SalaryBandStructure")
 
   @@unique([code, effectiveFrom])
   @@index([status, effectiveFrom, effectiveTo])
@@ -1540,6 +1541,8 @@ model HrmsSalaryComponent {
   formula               String? // VD: "baseSalary * 0.08"
   defaultAmount         Float                     @default(0)
   description           String?
+  basisType             String                    @default("UNVERIFIED") // LAW, COMPANY_POLICY, CONTRACT, SYSTEM
+  basisReference        String?
   createdAt             DateTime                  @default(now())
   updatedAt             DateTime                  @updatedAt
   structureItems        HrmsSalaryStructureItem[]
@@ -1555,11 +1558,15 @@ model HrmsSalaryStructure {
   description      String?
   jobTitle         String?
   orgUnitId        String?
+  salaryBandId     String?
   createdAt        DateTime                        @default(now())
   updatedAt        DateTime                        @updatedAt
   items            HrmsSalaryStructureItem[]
   assignments      HrmsSalaryStructureAssignment[]
   orgUnit          OrgUnit?                        @relation(fields: [orgUnitId], references: [id], onDelete: SetNull)
+  salaryBand       HrmsSalaryBand?                 @relation("SalaryBandStructure", fields: [salaryBandId], references: [id], onDelete: SetNull)
+
+  @@index([salaryBandId, isActive])
 
   @@map("hrms_salary_structures")
 }

@@ -17,6 +17,11 @@ async function main() {
     },
   });
 
+  const closedRun = oldRuns.find((run) => ['APPROVED', 'REVIEWED', 'LOCKED', 'PAID'].includes(run.status));
+  if (closedRun) {
+    throw new Error(`Không ghi đè kỳ lương ${closedRun.periodName} ở trạng thái ${closedRun.status}. Phiếu hiện tại là ảnh chụp đã chốt; cần quy trình điều chỉnh riêng có đối soát.`);
+  }
+
   for (const r of oldRuns) {
     await prisma.hrmsPayrollSlip.deleteMany({ where: { payrollRunId: r.id } });
     await prisma.hrmsPayrollRun.delete({ where: { id: r.id } });
@@ -81,8 +86,7 @@ async function main() {
 
     const lunchAllowancePerDay = 35000;
     const lunchAllowance = Math.round(lunchAllowancePerDay * actualDays);
-    const responsibilityAllowance = 1500000;
-    const grossPay = base + lunchAllowance + responsibilityAllowance;
+    const grossPay = base + lunchAllowance;
 
     const unpaidDeduction = Math.round((base / standardWorkingDays) * unpaidDays);
     const socialInsurance = Math.round(base * 0.08);
@@ -136,7 +140,6 @@ async function main() {
         earnings: [
           { name: 'Lương Cơ Bản Theo Hợp Đồng', amount: base },
           { name: `Phụ Cấp Ăn Trưa (${actualDays} ngày thực tế)`, amount: lunchAllowance },
-          { name: 'Phụ Cấp Trách Nhiệm / Nghiệp Vụ', amount: responsibilityAllowance },
         ],
         deductions: deductionsList,
       },

@@ -180,7 +180,7 @@ const DOMAINS: NavDomain[] = [
         items: [
           { href: '/payroll-guide', label: 'Cách tính lương' },
           { href: '/payroll-engine', label: 'Bảng tính lương' },
-          { href: '/regulations', label: 'Quy chế Tiền lương & Phúc lợi' },
+          { href: '/payroll-engine?tab=policy', label: 'Chính sách & quy tắc lương' },
         ],
       },
       {
@@ -194,7 +194,7 @@ const DOMAINS: NavDomain[] = [
     ],
     tags: [
       { id: 'tag-payroll-run', label: '#Bảng tính lương', href: '/payroll-engine' },
-      { id: 'tag-regulations', label: '#Quy chế Tiền lương', href: '/regulations' },
+      { id: 'tag-payroll-policy', label: '#Chính sách lương', href: '/payroll-engine?tab=policy' },
       { id: 'tag-nd30', label: '#Khoản vay', href: '/loans' },
       { id: 'tag-expense-pending', label: '#Công tác phí', href: '/expense-claims' },
     ],

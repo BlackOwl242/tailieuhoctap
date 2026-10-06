@@ -616,16 +616,6 @@ export default function Performance360Page() {
         breadcrumbs={[{ label: 'Phát triển' }, { label: 'Đánh giá KPI' }]}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <Link href="/regulations">
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs h-8"
-              >
-                <BookOpen className="h-3.5 w-3.5 mr-1.5" />
-                Sổ tay Quy ước C&amp;B
-              </Button>
-            </Link>
             <Link href="/performance-guide">
               <Button variant="outline" size="sm" className="text-xs h-8">
                 <HelpCircle className="h-3.5 w-3.5 mr-1.5" />

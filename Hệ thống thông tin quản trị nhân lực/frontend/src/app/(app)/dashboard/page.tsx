@@ -390,7 +390,7 @@ export default function FrappeHrmsDeskDashboard() {
       icon: Wallet,
       description: 'Xem phiếu lương điện tử từng tháng, tra cứu tài sản và khoản vay phúc lợi.',
       links: [
-        { label: 'Phiếu lương điện tử cá nhân', href: '/ess' },
+        { label: 'Phiếu lương điện tử cá nhân', href: '/my-payslips' },
         { label: 'Tra cứu tài sản & thiết bị bàn giao', href: '/ess' },
         { label: 'Khoản vay & Tạm ứng cá nhân', href: '/ess' },
       ],

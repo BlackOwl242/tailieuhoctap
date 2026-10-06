@@ -7,6 +7,9 @@ const proxyTarget = rawProxy.trim();
 const nextConfig = {
   output: 'standalone', // đóng gói tối giản cho image Node nhỏ
   reactStrictMode: true,
+  async redirects() {
+    return [{ source: '/regulations', destination: '/payroll-guide', permanent: true }];
+  },
   async rewrites() {
     return [
       { source: '/uploads/:path*', destination: `${proxyTarget}/uploads/:path*` },

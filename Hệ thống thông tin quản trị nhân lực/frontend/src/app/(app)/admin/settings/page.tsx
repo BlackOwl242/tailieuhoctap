@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { Save, ShieldCheck, KeyRound, ArrowRight } from 'lucide-react';
+import { Save, ShieldCheck, KeyRound, ArrowRight, Banknote } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
 import { Button, Card, CardContent, Input, Label, Skeleton } from '@/components/ui/primitives';
@@ -112,6 +112,17 @@ export default function AdminSettingsPage() {
               <p className="text-xs text-muted-foreground">Khóa: {key}</p>
             </div>
           ))}
+        </CardContent>
+      </Card>
+      <Card className="mt-5 border-primary/20">
+        <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-primary"><Banknote className="h-5 w-5" /></div>
+            <div><h2 className="text-sm font-semibold">Toàn bộ cấu hình lương</h2><p className="mt-1 text-xs text-muted-foreground">Quản lý chính sách, thành phần thu nhập và cấu trúc áp dụng tập trung trong trang Tiền lương.</p></div>
+          </div>
+          <Link href="/payroll-engine?tab=policy" className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
+            Mở quản lý lương <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </CardContent>
       </Card>
     </>

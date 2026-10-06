@@ -198,7 +198,7 @@ export default function EssPage() {
 
           <div className="flex items-center justify-between pt-1 text-xs border-t border-border/40">
             <span className="text-muted-foreground">Phiếu lương gần nhất: <b>Tháng {String(new Date().getMonth() === 0 ? 12 : new Date().getMonth()).padStart(2, '0')}/{new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear()}</b></span>
-            <Link href="/payroll-engine" className="font-semibold text-primary hover:underline flex items-center gap-1">
+            <Link href="/my-payslips" className="font-semibold text-primary hover:underline flex items-center gap-1">
               Xem Chi Tiết Phiếu Lương <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>

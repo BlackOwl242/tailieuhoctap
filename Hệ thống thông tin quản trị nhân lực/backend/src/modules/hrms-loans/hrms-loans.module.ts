@@ -129,6 +129,9 @@ export class HrmsLoansService {
     if (loan.status !== 'PENDING') throw new ConflictException('Khoản vay đã được xử lý');
     if (loan.userId === actorId) throw new ForbiddenException('Không được tự duyệt khoản vay');
     if (!['APPROVED', 'REJECTED'].includes(dto.status)) throw new BadRequestException('Trạng thái không hợp lệ');
+    if (dto.status === 'APPROVED' && (!loan.payrollDeductionAuthorizedAt || !loan.deductionConsentVersion)) {
+      throw new ConflictException('Chưa có bằng chứng người lao động đồng ý khấu trừ theo lịch trả; chưa thể duyệt khoản vay này.');
+    }
     const updated = await this.prisma.hrmsEmployeeLoan.update({
       where: { id: loanId, status: 'PENDING' },
       data: {
@@ -153,6 +156,9 @@ export class HrmsLoansService {
     if (!loan) throw new NotFoundException('Không tìm thấy khoản vay');
     if (loan.status !== 'APPROVED') throw new ConflictException('Chỉ khoản vay đã duyệt mới được giải ngân');
     if (loan.userId === actorId) throw new ForbiddenException('Người vay không được tự ghi nhận giải ngân');
+    if (!loan.payrollDeductionAuthorizedAt || !loan.deductionConsentVersion) {
+      throw new ConflictException('Chưa có bằng chứng người lao động đồng ý khấu trừ theo lịch trả; chưa thể giải ngân khoản vay này.');
+    }
     const updated = await this.prisma.hrmsEmployeeLoan.updateMany({
       where: { id: loanId, status: 'APPROVED' },
       data: { status: 'DISBURSED', disbursedAt: new Date(), disbursementMethod: dto.method, disbursementReference: dto.reference.trim() },

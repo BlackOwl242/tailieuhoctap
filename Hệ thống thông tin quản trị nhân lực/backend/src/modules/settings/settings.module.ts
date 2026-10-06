@@ -57,7 +57,7 @@ export class SettingsService {
         if (!Array.isArray(value) || !value.length) throw new BadRequestException('Cần ít nhất một chính sách lương có ngày hiệu lực');
         for (const candidate of value as PayrollPolicy[]) {
           const rateValues = [candidate.employeeRates?.socialInsurance,candidate.employeeRates?.healthInsurance,candidate.employeeRates?.unemployment,candidate.employerRates?.socialInsurance,candidate.employerRates?.healthInsurance,candidate.employerRates?.unemployment,candidate.employerRates?.occupationalAccident,candidate.employerRates?.tradeUnionFund,candidate.nonResidentTaxRate,candidate.loanDeductionCapRate];
-          if (!candidate.version?.trim() || !candidate.effectiveFrom || dateKey(candidate.effectiveFrom).toISOString().slice(0,10) !== candidate.effectiveFrom
+          if (!candidate.version?.trim() || !candidate.basisReference?.trim() || !candidate.effectiveFrom || dateKey(candidate.effectiveFrom).toISOString().slice(0,10) !== candidate.effectiveFrom
             || !Number.isFinite(candidate.personalRelief) || candidate.personalRelief < 0 || !Number.isFinite(candidate.dependentRelief) || candidate.dependentRelief < 0
             || !candidate.taxBrackets?.length || candidate.taxBrackets.some(([limit,rate]) => (limit !== null && (!Number.isFinite(limit) || limit <= 0)) || !Number.isFinite(rate) || rate < 0 || rate > 1)
             || rateValues.some(rate => !Number.isFinite(rate) || rate < 0 || rate > 1)
