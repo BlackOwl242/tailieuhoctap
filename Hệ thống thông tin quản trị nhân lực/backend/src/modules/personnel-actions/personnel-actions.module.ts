@@ -127,6 +127,7 @@ export class PersonnelActionsService {
         payload: {
           ...dto.payload,
           oldSalary: subject.baseSalary,
+          ...(dto.type === 'TRANSFER' ? { oldOrgUnitId: subject.orgUnitId, oldJobTitle: subject.jobTitle } : {}),
           effectiveDate: dto.effectiveDate ?? null,
         },
       },

@@ -21,51 +21,22 @@ async function seedFrappeHrms() {
 
   // 2. Salary Components
   const salaryComponents = [
-    { code: 'BASIC', name: 'Lương Cơ bản', type: 'EARNING', isTaxApplicable: true, isFormulaBased: false, defaultAmount: 12000000, description: 'Lương thỏa thuận trên hợp đồng lao động' },
-    { code: 'POSITION_ALLOW', name: 'Phụ cấp Chức vụ', type: 'EARNING', isTaxApplicable: true, isFormulaBased: false, defaultAmount: 3000000, description: 'Phụ cấp trách nhiệm theo cấp bậc quản lý' },
-    { code: 'LUNCH_ALLOW', name: 'Phụ cấp Ăn trưa', type: 'EARNING', isTaxApplicable: false, isFormulaBased: false, defaultAmount: 730000, description: 'Phụ cấp tiền ăn giữa ca miễn thuế' },
-    { code: 'KPI_BONUS', name: 'Thưởng Hiệu suất KPI', type: 'EARNING', isTaxApplicable: true, isFormulaBased: false, defaultAmount: 2500000, description: 'Thưởng căn cứ theo kết quả hoàn thành mục tiêu' },
-    { code: 'BHXH', name: 'Trừ Bảo hiểm Xã hội (8%)', type: 'DEDUCTION', isTaxApplicable: false, isFormulaBased: true, formula: 'baseSalary * 0.08', defaultAmount: 960000, description: 'Đóng BHXH người lao động' },
-    { code: 'BHYT', name: 'Trừ Bảo hiểm Y tế (1.5%)', type: 'DEDUCTION', isTaxApplicable: false, isFormulaBased: true, formula: 'baseSalary * 0.015', defaultAmount: 180000, description: 'Đóng BHYT người lao động' },
-    { code: 'BHTN', name: 'Trừ Bảo hiểm Thất nghiệp (1%)', type: 'DEDUCTION', isTaxApplicable: false, isFormulaBased: true, formula: 'baseSalary * 0.01', defaultAmount: 120000, description: 'Đóng BHTN người lao động' },
-    { code: 'PIT', name: 'Thuế Thu nhập Cá nhân (TNCN)', type: 'DEDUCTION', isTaxApplicable: false, isFormulaBased: true, formula: 'taxableIncome * 0.1', defaultAmount: 450000, description: 'Trừ thuế TNCN biểu lũy tiến từng phần' },
+    { code: 'BASIC', name: 'Lương Cơ bản', type: 'EARNING', isTaxApplicable: true, isFormulaBased: false, defaultAmount: 0, description: 'Lương nền lấy từ hợp đồng hoặc quyết định có hiệu lực; không cấu hình trong khung phụ cấp.' },
+    { code: 'POSITION_ALLOW', name: 'Phụ cấp Chức vụ', type: 'EARNING', isTaxApplicable: true, isFormulaBased: false, defaultAmount: 0, description: 'Chưa có mức mặc định được duyệt; chỉ áp dụng khi cấu hình chính sách theo vị trí/đơn vị.' },
+    { code: 'LUNCH_ALLOW', name: 'Phụ cấp Ăn trưa', type: 'EARNING', isTaxApplicable: false, isFormulaBased: false, defaultAmount: 0, description: 'Chưa có mức mặc định được duyệt; mức chi và xử lý thuế theo chính sách có hiệu lực.' },
+    { code: 'BHXH', name: 'Trừ Bảo hiểm Xã hội', type: 'DEDUCTION', isTaxApplicable: false, isFormulaBased: true, formula: 'baseSalary * 0.08', defaultAmount: 0, description: 'Hệ thống tính tự động theo căn cứ đóng và chính sách bảo hiểm trong kỳ.' },
+    { code: 'BHYT', name: 'Trừ Bảo hiểm Y tế', type: 'DEDUCTION', isTaxApplicable: false, isFormulaBased: true, formula: 'baseSalary * 0.015', defaultAmount: 0, description: 'Hệ thống tính tự động theo căn cứ đóng và chính sách bảo hiểm trong kỳ.' },
+    { code: 'BHTN', name: 'Trừ Bảo hiểm Thất nghiệp', type: 'DEDUCTION', isTaxApplicable: false, isFormulaBased: true, formula: 'baseSalary * 0.01', defaultAmount: 0, description: 'Hệ thống tính tự động theo căn cứ đóng và chính sách bảo hiểm trong kỳ.' },
+    { code: 'PIT', name: 'Thuế Thu nhập Cá nhân (TNCN)', type: 'DEDUCTION', isTaxApplicable: false, isFormulaBased: true, formula: 'taxableIncome * 0.1', defaultAmount: 0, description: 'Hệ thống tính tự động theo thu nhập tính thuế và chính sách trong kỳ.' },
   ];
 
   for (const sc of salaryComponents) {
     const existing = await prisma.hrmsSalaryComponent.findUnique({ where: { code: sc.code } });
-    if (!existing) {
-      await prisma.hrmsSalaryComponent.create({ data: sc });
-    }
+    if (!existing) await prisma.hrmsSalaryComponent.create({ data: sc });
   }
 
-  // 3. Salary Structures
-  const compMap = {};
-  const allComps = await prisma.hrmsSalaryComponent.findMany();
-  for (const c of allComps) compMap[c.code] = c.id;
-
-  const structStandard = await prisma.hrmsSalaryStructure.upsert({
-    where: { id: 'struct-standard-tech' },
-    update: {},
-    create: {
-      id: 'struct-standard-tech',
-      name: 'Cấu trúc Lương Khối Công nghệ & Kỹ thuật',
-      payrollFrequency: 'MONTHLY',
-      description: 'Áp dụng cho Software Engineers, Solution Architects, DevOps',
-    },
-  });
-
-  if (compMap['BASIC'] && compMap['LUNCH_ALLOW'] && compMap['BHXH'] && compMap['BHYT'] && compMap['BHTN']) {
-    await prisma.hrmsSalaryStructureItem.deleteMany({ where: { structureId: structStandard.id } });
-    await prisma.hrmsSalaryStructureItem.createMany({
-      data: [
-        { structureId: structStandard.id, componentId: compMap['BASIC'], amount: 18000000 },
-        { structureId: structStandard.id, componentId: compMap['LUNCH_ALLOW'], amount: 730000 },
-        { structureId: structStandard.id, componentId: compMap['BHXH'], amount: 1440000, formula: 'BASIC * 0.08' },
-        { structureId: structStandard.id, componentId: compMap['BHYT'], amount: 270000, formula: 'BASIC * 0.015' },
-        { structureId: structStandard.id, componentId: compMap['BHTN'], amount: 180000, formula: 'BASIC * 0.01' },
-      ],
-    });
-  }
+  // Structures are configured from verified, current position/unit pay policies by HR.
+  // Do not seed a salary structure with invented rates or an unscoped role mapping.
 
   // 4. Job Openings & Applicants
   const openingDev = await prisma.hrmsJobOpening.upsert({

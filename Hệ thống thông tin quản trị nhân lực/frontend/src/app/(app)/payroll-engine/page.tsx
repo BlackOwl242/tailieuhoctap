@@ -38,9 +38,31 @@ interface SalaryStructure {
   id: string;
   name: string;
   payrollFrequency: string;
+  jobTitle?: string | null;
+  orgUnitId?: string | null;
+  orgUnit?: { id: string; name: string } | null;
   description?: string;
+  positionEmployeeCount?: number;
   items: { id: string; amount: number; formula?: string; component: SalaryComponent }[];
   _count?: { assignments: number };
+}
+
+interface ApprovedPayrollBand {
+  id: string;
+  code: string;
+  name: string;
+  levelTitle: string;
+  minSalary: number;
+  midSalary: number;
+  maxSalary: number;
+  compensationBasis: 'MONTHLY' | 'DAILY' | 'HOURLY';
+  effectiveFrom: string;
+  effectiveTo: string | null;
+  jobTitles: string[];
+  employeeCount: number;
+  withinRange: number;
+  belowRange: number;
+  aboveRange: number;
 }
 
 interface PayrollAssignmentTarget {
@@ -73,7 +95,16 @@ interface PayrollSlip {
     calculation?: {
       personalRelief: number; dependentRelief: number; taxableIncome: number; year: number; paidDays: number; standardDays: number;
       minimumWageReview?: { region: string; contractualMonthlyWage: number; standardHours: number; monthlyMinimum: number | null; hourlyEquivalent: number; hourlyMinimum: number | null; monthlyBelowMinimum: boolean; hourlyBelowMinimum: boolean; status: 'PASS' | 'REVIEW' | 'UNCONFIGURED' };
+      salaryBandReview?: { bands: { code: string; name: string; minSalary: number; midSalary: number; maxSalary: number; compensationBasis: string; status: string; days: number }[]; daysWithoutApprovedBand: number };
       overtimeBasis?: { contractualMonthlyWage: number; standardHours: number; hourlyRate: number };
+      salarySource?: 'EMPLOYEE_ASSIGNMENT' | 'POSITION_RULE' | 'CONTRACT_ONLY' | 'MIXED';
+      salaryStructureName?: string | null;
+      contractNo?: string | null;
+      payRatesUsed?: { basis: string; rate: number }[];
+      attendance?: { standardDays: number; paidDays: number; actualWorkDays: number; workedHours: number; scheduledHours: number; shortHours: number; lateDays: number; lateMinutes: number; earlyLeaveDays: number; earlyLeaveMinutes: number; absenceDays: number; paidLeaveDays: number; unpaidLeaveDays: number; socialInsuranceLeaveDays: number; missingPairDays: number };
+      overtimeRequests?: { workDate: string; status: string; hours: number; nightHours: number; dayCategory: string; paid: boolean }[];
+      approvedOvertime?: { workDate: string; hours: number; nightHours: number; category: string; hourlyRate: number; pay: number }[];
+      attendanceDays?: { workDate: string; status: string; scheduledMinutes: number; workedMinutes: number; lateMinutes: number; earlyMinutes: number; leaveType?: string | null; paidLeave: boolean }[];
     };
     earnings?: { name: string; amount: number }[];
     deductions?: { name: string; amount: number }[];
@@ -97,6 +128,8 @@ interface PayrollRun {
   createdAt: string;
   slips?: PayrollSlip[];
 }
+
+const SYSTEM_MANAGED_PAYROLL_CODES = new Set(['BASIC', 'BHXH', 'BHYT', 'BHTN', 'PIT']);
 
 export default function PayrollEnginePage() {
   const router = useRouter();
@@ -137,6 +170,8 @@ export default function PayrollEnginePage() {
   const [isStructureModalOpen, setIsStructureModalOpen] = useState(false);
   const [newStructureName, setNewStructureName] = useState('');
   const [newStructureDescription, setNewStructureDescription] = useState('');
+  const [newStructureJobTitle, setNewStructureJobTitle] = useState('');
+  const [newStructureOrgUnitId, setNewStructureOrgUnitId] = useState('');
   const [newStructureItems, setNewStructureItems] = useState<Record<string, number>>({});
 
   // Form xử lý bảng lương
@@ -174,11 +209,18 @@ export default function PayrollEnginePage() {
     queryFn: async () => (await api.get('/hrms/payroll/structures')).data,
   });
 
+  const { data: approvedBands = [], isLoading: isLoadingBands } = useQuery<ApprovedPayrollBand[]>({
+    queryKey: ['hrms-approved-salary-bands'],
+    queryFn: async () => (await api.get('/hrms/payroll/approved-bands')).data,
+  });
+
   const { data: assignmentTargets = [] } = useQuery<PayrollAssignmentTarget[]>({
     queryKey: ['payroll-structure-assignment-targets'],
     queryFn: async () => (await api.get('/hrms/payroll/assignment-targets')).data,
     enabled: canConfigurePayroll,
   });
+  const payrollJobTitles = useMemo(() => Array.from(new Set(assignmentTargets.map((employee) => employee.jobTitle?.trim()).filter((title): title is string => Boolean(title)))).sort((a, b) => a.localeCompare(b, 'vi')), [assignmentTargets]);
+  const payrollOrgUnits = useMemo(() => Array.from(new Map(assignmentTargets.filter((employee) => employee.orgUnit?.id).map((employee) => [employee.orgUnit!.id, employee.orgUnit!.name])).entries()).sort((a, b) => a[1].localeCompare(b[1], 'vi')), [assignmentTargets]);
 
   const currentRun = useMemo(() => {
     if (!runs || runs.length === 0) return null;
@@ -268,6 +310,8 @@ export default function PayrollEnginePage() {
     mutationFn: async () => (await api.post('/hrms/payroll/structures', {
       name: newStructureName.trim(),
       description: newStructureDescription.trim() || undefined,
+      jobTitle: newStructureJobTitle || undefined,
+      orgUnitId: newStructureOrgUnitId || undefined,
       payrollFrequency: 'MONTHLY',
       items: Object.entries(newStructureItems).map(([componentId, amount]) => ({ componentId, amount })),
     })).data,
@@ -276,6 +320,8 @@ export default function PayrollEnginePage() {
       setIsStructureModalOpen(false);
       setNewStructureName('');
       setNewStructureDescription('');
+      setNewStructureJobTitle('');
+      setNewStructureOrgUnitId('');
       setNewStructureItems({});
       toast('Đã tạo cấu trúc lương', 'success');
     },
@@ -325,7 +371,7 @@ export default function PayrollEnginePage() {
     onError: (error) => toast(errorMessage(error), 'error'),
   });
 
-  if (isLoadingRuns || isLoadingComps || isLoadingStructs) {
+  if (isLoadingRuns || isLoadingComps || isLoadingStructs || isLoadingBands) {
     return <LoadingState text="Đang tải dữ liệu..." />;
   }
 
@@ -346,6 +392,7 @@ export default function PayrollEnginePage() {
           <span className="font-medium text-xs text-foreground">{s.employeeName}</span>
           <p className="text-xs text-muted-foreground">{s.jobTitle || 'Chuyên viên'}</p>
           {s.breakdown?.calculation?.minimumWageReview?.status === 'REVIEW' && <p className="text-[10px] text-amber-600">Cần rà soát mức lương tối thiểu</p>}
+          {s.breakdown?.calculation?.salaryBandReview?.bands.some((band) => band.status === 'BELOW_RANGE' || band.status === 'ABOVE_RANGE' || band.status === 'BASIS_MISMATCH') && <p className="text-[10px] text-amber-700">Lương hợp đồng cần đối chiếu khung vị trí đã duyệt</p>}
         </div>
       ),
     },
@@ -668,6 +715,8 @@ export default function PayrollEnginePage() {
 
       {/* ================= TAB 2: THÀNH PHẦN LƯƠNG ================= */}
       {activeTab === 'components' && (
+        <div className="space-y-4">
+        <p className="rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Lương nền lấy từ hợp đồng/quyết định; BHXH, BHYT, BHTN và thuế TNCN do bảng lương tự tính. Khung vị trí đã duyệt chỉ quy định khoảng lương cơ bản; phụ cấp ăn trưa/chức vụ cần chính sách riêng, nên hiện chưa gán mức mặc định.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Khoản Thu Nhập */}
           <div className="space-y-3">
@@ -688,14 +737,14 @@ export default function PayrollEnginePage() {
                         <span className="font-mono text-xs text-muted-foreground">{c.code}</span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {c.isTaxApplicable ? 'Tính thuế TNCN' : 'Miễn thuế'} · {c.isInsuranceApplicable ? 'Tính đóng bảo hiểm' : 'Không tính đóng bảo hiểm'} · {c.isOvertimeApplicable ? 'Tính đơn giá OT' : 'Không tính đơn giá OT'} · {c.description || 'Cố định'}
+                        {SYSTEM_MANAGED_PAYROLL_CODES.has(c.code) ? `Tính tự động · ${c.description || 'Theo hợp đồng/chính sách kỳ'}` : `${c.isTaxApplicable ? 'Tính thuế TNCN' : 'Miễn thuế'} · ${c.isInsuranceApplicable ? 'Tính đóng bảo hiểm' : 'Không tính đóng bảo hiểm'} · ${c.isOvertimeApplicable ? 'Tính đơn giá OT' : 'Không tính đơn giá OT'} · ${c.description || 'Khoản biến động theo cấu hình'}`}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-3 pt-0.5">
                       <span className="whitespace-nowrap font-mono text-xs text-foreground">
-                        +{c.defaultAmount.toLocaleString('vi-VN')} đ
+                        {SYSTEM_MANAGED_PAYROLL_CODES.has(c.code) ? 'Tự tính' : c.defaultAmount > 0 ? `Mặc định ${c.defaultAmount.toLocaleString('vi-VN')} đ` : 'Chưa đặt mức'}
                       </span>
-                      {canConfigurePayroll && <div className="flex items-center gap-1">
+                      {canConfigurePayroll && !SYSTEM_MANAGED_PAYROLL_CODES.has(c.code) && <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -749,9 +798,9 @@ export default function PayrollEnginePage() {
                     </div>
                     <div className="flex shrink-0 items-center gap-3 pt-0.5">
                       <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
-                        -{c.defaultAmount.toLocaleString('vi-VN')} đ
+                        {SYSTEM_MANAGED_PAYROLL_CODES.has(c.code) ? 'Tự tính' : c.defaultAmount > 0 ? `Mặc định ${c.defaultAmount.toLocaleString('vi-VN')} đ` : 'Chưa đặt mức'}
                       </span>
-                      {canConfigurePayroll && <div className="flex items-center gap-1">
+                      {canConfigurePayroll && !SYSTEM_MANAGED_PAYROLL_CODES.has(c.code) && <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -781,21 +830,50 @@ export default function PayrollEnginePage() {
             </div>
           </div>
         </div>
+        </div>
       )}
 
       {/* ================= TAB 3: CẤU TRÚC LƯƠNG ================= */}
       {activeTab === 'structures' && (
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="max-w-3xl text-xs text-muted-foreground">Cấu trúc xác định các khoản áp dụng theo vị trí/nhóm nhân sự. Mức lương cơ bản lấy từ hồ sơ hợp đồng hoặc quyết định lương đã có hiệu lực khi gán.</p>
+            <div>
+              <h2 className="text-sm font-semibold">Khung lương vị trí đã được duyệt</h2>
+              <p className="mt-1 max-w-3xl text-xs text-muted-foreground">Dùng các khung đang hiệu lực tại thời điểm hiện tại. Lương thực trả vẫn lấy từ hợp đồng/quyết định cá nhân; hệ thống đối chiếu với khoảng đã duyệt và báo trường hợp cần rà soát, không tự ý đổi lương hợp đồng.</p>
+            </div>
+            <Link href="/salary-bands" className="text-xs font-medium underline underline-offset-2">Quản lý khung lương</Link>
+          </div>
+          {approvedBands.length === 0 ? <EmptyState title="Chưa có khung lương vị trí được duyệt đang hiệu lực" description="Khung nháp hoặc khung hết hiệu lực không được dùng để đối chiếu lương." /> : <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+            {approvedBands.map((band) => {
+              const basis = band.compensationBasis === 'MONTHLY' ? 'tháng' : band.compensationBasis === 'DAILY' ? 'ngày' : 'giờ';
+              return <div key={band.id} className="rounded-lg border border-border bg-card p-4 text-xs">
+                <div className="flex items-start justify-between gap-3">
+                  <div><p className="font-mono text-muted-foreground">{band.code}</p><h3 className="mt-1 font-semibold">{band.name}</h3><p className="mt-1 text-muted-foreground">{band.levelTitle}</p></div>
+                  <span className="shrink-0 text-right text-muted-foreground">Hiệu lực từ {new Date(band.effectiveFrom).toLocaleDateString('vi-VN')}</span>
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 border-y border-border py-3">
+                  <div><p className="text-muted-foreground">Sàn</p><p className="mt-1 font-mono font-medium">{band.minSalary.toLocaleString('vi-VN')} đ/{basis}</p></div>
+                  <div><p className="text-muted-foreground">Mức tham chiếu</p><p className="mt-1 font-mono font-medium">{band.midSalary.toLocaleString('vi-VN')} đ/{basis}</p></div>
+                  <div><p className="text-muted-foreground">Trần</p><p className="mt-1 font-mono font-medium">{band.maxSalary.toLocaleString('vi-VN')} đ/{basis}</p></div>
+                </div>
+                <p className="mt-3 text-muted-foreground">{band.jobTitles.length} chức danh · {band.employeeCount} nhân sự khớp · {band.withinRange} trong khoảng · {band.belowRange} dưới sàn{band.aboveRange ? ` · ${band.aboveRange} trên trần` : ''}</p>
+                {band.belowRange > 0 || band.aboveRange > 0 ? <p className="mt-2 text-amber-700">Cần đối chiếu hợp đồng/quyết định cá nhân; khung tham chiếu không tự làm thay đổi mức lương đã ký.</p> : null}
+              </div>;
+            })}
+          </div>}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+            <div><h2 className="text-sm font-semibold">Cấu phần thu nhập bổ sung</h2><p className="mt-1 max-w-3xl text-xs text-muted-foreground">Cấu hình phụ cấp hoặc thưởng đã có căn cứ theo chức danh/đơn vị. Lương hợp đồng và BHXH, BHYT, BHTN, thuế TNCN được xử lý riêng theo hợp đồng và chính sách kỳ.</p></div>
             {canConfigurePayroll ? <Button size="sm" onClick={() => {
               setNewStructureName('');
               setNewStructureDescription('');
+              setNewStructureJobTitle('');
+              setNewStructureOrgUnitId('');
               setNewStructureItems({});
               setIsStructureModalOpen(true);
             }}><Plus className="mr-1.5 h-4 w-4" />Tạo cấu trúc lương</Button> : null}
           </div>
-          {structures.length === 0 ? <EmptyState title="Chưa có cấu trúc lương" description="Tạo cấu trúc từ các thành phần lương hiện có, sau đó gán cho nhân sự phù hợp." /> : null}
+          {structures.length === 0 ? <EmptyState title="Chưa có cấu phần bổ sung theo vị trí" description="Các khoản đã duyệt ở khung lương vị trí đang được hiển thị phía trên. Chỉ thêm phụ cấp/thưởng khi có chính sách được duyệt; hệ thống không tạo mức giả định." /> : null}
+          {structures.length > 0 ? <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-950">Số nhân sự là số bản gán trực tiếp; quy tắc chức danh áp dụng tự động khi tính kỳ và không cộng vào số này. Phiếu kỳ đã tính là dữ liệu chốt tại thời điểm tính; thay đổi khung không tự tính lại kỳ cũ.</p> : null}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {structures.map((s) => (
             <div key={s.id} className="rounded-lg border border-border bg-card p-4 space-y-3 text-xs">
@@ -803,8 +881,9 @@ export default function PayrollEnginePage() {
                 <div>
                   <h3 className="font-medium text-foreground">{s.name}</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">{s.description || 'Cấu trúc tiêu chuẩn'}</p>
+                  <p className="mt-1 text-xs font-medium">{s.jobTitle ? `Chức danh: ${s.jobTitle}` : 'Chưa có quy tắc tự áp dụng theo chức danh'}{s.orgUnit ? ` · ${s.orgUnit.name}` : s.jobTitle ? ' · Mọi đơn vị' : ''}</p>
                 </div>
-                <span className="text-muted-foreground text-xs">{s._count?.assignments ?? 0} nhân sự</span>
+                <span className="text-muted-foreground text-right text-xs">{s._count?.assignments ?? 0} gán riêng<br />{s.positionEmployeeCount ?? 0} tự khớp</span>
               </div>
 
               <div className="border-t border-border pt-2 space-y-1 text-xs text-muted-foreground">
@@ -816,7 +895,7 @@ export default function PayrollEnginePage() {
                     </div>
                   ))
                 ) : (
-                  <p className="italic">Lương cơ bản + Phụ cấp ăn trưa</p>
+                  <p className="italic">Không có cấu phần bổ sung; lương nền lấy từ hợp đồng/quyết định.</p>
                 )}
               </div>
 
@@ -1041,7 +1120,7 @@ export default function PayrollEnginePage() {
         open={isStructureModalOpen}
         onOpenChange={setIsStructureModalOpen}
         title="Tạo cấu trúc lương"
-        description="Chọn các thành phần áp dụng và thiết lập số tiền mặc định. Mức thực trả vẫn được tính theo hồ sơ nhân sự và dữ liệu kỳ lương."
+        description="Mức lương nền lấy từ hợp đồng/quyết định. Chọn chức danh để tự áp dụng các thành phần; có thể giới hạn vào một đơn vị cụ thể. Gán trực tiếp cho cá nhân sẽ được ưu tiên hơn quy tắc chức danh."
         size="lg"
       >
         <div className="space-y-4 text-sm">
@@ -1053,10 +1132,28 @@ export default function PayrollEnginePage() {
             <label className="text-xs font-medium">Mô tả / nhóm áp dụng</label>
             <input className="w-full rounded-md border border-border bg-background px-3 py-2" value={newStructureDescription} onChange={(e) => setNewStructureDescription(e.target.value)} placeholder="Ví dụ: Khối kinh doanh, lương tháng" />
           </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium">Tự áp dụng cho chức danh</label>
+              <Select value={newStructureJobTitle} onChange={(e) => setNewStructureJobTitle(e.target.value)} className="w-full text-sm">
+                <option value="">Chỉ dùng khi gán thủ công</option>
+                {payrollJobTitles.map((title) => <option key={title} value={title}>{title}</option>)}
+              </Select>
+              <p className="text-xs text-muted-foreground">Khớp chính xác với chức danh trong hồ sơ nhân sự.</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium">Đơn vị áp dụng (tùy chọn)</label>
+              <Select value={newStructureOrgUnitId} onChange={(e) => setNewStructureOrgUnitId(e.target.value)} className="w-full text-sm" disabled={!newStructureJobTitle}>
+                <option value="">Tất cả đơn vị</option>
+                {payrollOrgUnits.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+              </Select>
+              <p className="text-xs text-muted-foreground">Cấu hình theo đơn vị được ưu tiên hơn cấu hình toàn công ty.</p>
+            </div>
+          </div>
           <div className="space-y-2">
             <p className="text-xs font-semibold">Thành phần áp dụng</p>
             <div className="max-h-72 overflow-y-auto divide-y divide-border rounded-md border border-border">
-              {components.map((component) => {
+              {components.filter((component) => !SYSTEM_MANAGED_PAYROLL_CODES.has(component.code)).map((component) => {
                 const included = Object.prototype.hasOwnProperty.call(newStructureItems, component.id);
                 return <label key={component.id} className="flex items-center gap-3 p-3 text-xs hover:bg-muted/30">
                   <input type="checkbox" checked={included} onChange={(e) => setNewStructureItems((current) => {
@@ -1076,7 +1173,7 @@ export default function PayrollEnginePage() {
           onCancel={() => setIsStructureModalOpen(false)}
           confirmLabel="Tạo cấu trúc"
           pending={createStructureMutation.isPending}
-          disabled={!newStructureName.trim() || Object.keys(newStructureItems).length === 0}
+          disabled={!newStructureName.trim() || Object.keys(newStructureItems).length === 0 || Object.values(newStructureItems).some((amount) => !Number.isFinite(amount) || amount <= 0)}
           onConfirm={() => createStructureMutation.mutate()}
         />
       </Modal>
@@ -1162,7 +1259,7 @@ export default function PayrollEnginePage() {
         open={isPayslipModalOpen}
         onOpenChange={(open) => setIsPayslipModalOpen(open)}
         title="Chi Tiết Phiếu Lương Cán Bộ Nhân Viên"
-        size="lg"
+        size="2xl"
       >
         {selectedSlip && (
           <div className="space-y-4 text-xs font-sans">
@@ -1211,6 +1308,23 @@ export default function PayrollEnginePage() {
                 </div>
 
                 <div className="space-y-3 text-xs">
+                  {selectedSlip.breakdown?.calculation?.attendance ? (() => {
+                    const attendance = selectedSlip.breakdown!.calculation!.attendance!;
+                    const overtime = selectedSlip.breakdown!.calculation!.approvedOvertime ?? [];
+                    const requests = selectedSlip.breakdown!.calculation!.overtimeRequests ?? [];
+                    return <section className="rounded-md border border-border bg-background p-3 space-y-2">
+                      <div className="flex flex-wrap justify-between gap-2"><b>Nguồn tính và đối soát ngày công</b><span>{selectedSlip.breakdown!.calculation!.salarySource === 'EMPLOYEE_ASSIGNMENT' ? 'Khung gán riêng cho nhân sự' : selectedSlip.breakdown!.calculation!.salarySource === 'POSITION_RULE' ? 'Khung theo chức danh / đơn vị' : selectedSlip.breakdown!.calculation!.salarySource === 'MIXED' ? 'Có thay đổi nguồn/khung trong kỳ; xem chi tiết từng khoản' : 'Lương theo hợp đồng, không có khung phụ cấp áp dụng'}</span></div>
+                      <p>Khung: <b>{selectedSlip.breakdown!.calculation!.salaryStructureName || 'Không áp dụng'}</b> · Hợp đồng: <b>{selectedSlip.breakdown!.calculation!.contractNo || 'Lương căn cứ trên hồ sơ nhân sự'}</b></p>
+                      {selectedSlip.breakdown!.calculation!.payRatesUsed?.length ? <p>Mức căn cứ: {selectedSlip.breakdown!.calculation!.payRatesUsed!.map((item) => `${item.rate.toLocaleString('vi-VN')} đ/${item.basis === 'DAILY' ? 'ngày' : item.basis === 'HOURLY' ? 'giờ' : 'tháng'}`).join(' · ')}. Số ở cột lương cơ bản là giá trị quy đổi theo kỳ để đối soát.</p> : null}
+                      {(selectedSlip.breakdown!.calculation!.salaryBandReview?.bands ?? []).map((band) => <p key={band.code}>Khung {band.code} – {band.name}: {band.minSalary.toLocaleString('vi-VN')}–{band.maxSalary.toLocaleString('vi-VN')} đ/{band.compensationBasis === 'DAILY' ? 'ngày' : band.compensationBasis === 'HOURLY' ? 'giờ' : 'tháng'}; {band.status === 'IN_RANGE' ? 'lương căn cứ trong khoảng' : band.status === 'BELOW_RANGE' ? 'lương căn cứ dưới sàn, cần rà soát hợp đồng/quyết định' : band.status === 'ABOVE_RANGE' ? 'lương căn cứ trên trần, cần rà soát' : band.status === 'BASIS_MISMATCH' ? 'khác cơ sở trả lương, cần đối chiếu' : 'có thay đổi khung trong kỳ'} ({band.days} ngày).</p>)}
+                      <p>Lịch chuẩn {attendance.standardDays} ngày / {attendance.scheduledHours} giờ; công hưởng lương {attendance.paidDays}; thời gian ghi nhận {attendance.workedHours} giờ; thiếu giờ {attendance.shortHours} giờ.</p>
+                      <p>Đi muộn {attendance.lateDays} ngày / {attendance.lateMinutes} phút; về sớm {attendance.earlyLeaveDays} ngày / {attendance.earlyLeaveMinutes} phút; vắng {attendance.absenceDays} ngày; phép năm hưởng lương {attendance.paidLeaveDays} ngày; nghỉ không lương {attendance.unpaidLeaveDays} ngày; nghỉ ốm/thai sản ghi nhận theo chế độ BHXH {attendance.socialInsuranceLeaveDays} ngày.</p>
+                      {attendance.missingPairDays > 0 ? <p className="font-semibold text-rose-700">Có {attendance.missingPairDays} ngày thiếu cặp vào/ra cần đối soát.</p> : null}
+                      {(selectedSlip.breakdown!.calculation!.attendanceDays ?? []).length > 0 ? <div className="max-h-64 overflow-auto"><table className="w-full text-left"><thead><tr><th>Ngày</th><th>Trạng thái</th><th>Giờ chuẩn</th><th>Giờ ghi nhận</th><th>Muộn / sớm</th></tr></thead><tbody>{selectedSlip.breakdown!.calculation!.attendanceDays!.map((day) => <tr key={day.workDate}><td>{day.workDate}</td><td>{day.status === 'ON_LEAVE' ? (day.leaveType === 'ANNUAL' ? 'Phép năm hưởng lương' : day.leaveType === 'UNPAID' ? 'Nghỉ không lương' : `${day.leaveType === 'SICK' ? 'Nghỉ ốm' : 'Thai sản'} · BHXH`) : day.status === 'HOLIDAY' ? 'Ngày lễ' : day.status === 'ABSENT' ? 'Vắng' : day.status === 'LATE' ? 'Đi muộn' : day.status === 'EARLY_LEAVE' ? 'Về sớm' : day.status === 'MISSING_PAIR' ? 'Thiếu cặp công' : 'Đủ công'}</td><td>{(day.scheduledMinutes / 60).toFixed(2)}</td><td>{(day.workedMinutes / 60).toFixed(2)}</td><td>{day.lateMinutes} / {day.earlyMinutes} phút</td></tr>)}</tbody></table></div> : null}
+                      <p>OT đã duyệt: {overtime.reduce((sum, item) => sum + item.hours, 0)} giờ · Tiền OT {overtime.reduce((sum, item) => sum + item.pay, 0).toLocaleString('vi-VN')} đ. Yêu cầu OT đang chờ duyệt: {requests.filter((item) => item.status === 'PENDING').reduce((sum, item) => sum + item.hours, 0)} giờ; chưa được tính vào lương.</p>
+                      {overtime.length > 0 ? <div className="overflow-x-auto"><table className="w-full text-left"><thead><tr><th>Ngày</th><th>Loại ngày</th><th>Giờ</th><th>Giờ đêm</th><th>Đơn giá giờ</th><th className="text-right">Tiền OT</th></tr></thead><tbody>{overtime.map((item) => <tr key={`${item.workDate}-${item.category}`}><td>{item.workDate}</td><td>{item.category === 'PUBLIC_HOLIDAY' ? 'Lễ' : item.category === 'WEEKLY_REST' ? 'Nghỉ tuần' : 'Ngày thường'}</td><td>{item.hours}</td><td>{item.nightHours}</td><td>{item.hourlyRate.toLocaleString('vi-VN')} đ</td><td className="text-right">{item.pay.toLocaleString('vi-VN')} đ</td></tr>)}</tbody></table></div> : null}
+                    </section>;
+                  })() : null}
                   <p>Công được hưởng: {selectedSlip.actualWorkDays ?? 0}/{selectedSlip.workingDays ?? 0} ngày</p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div><b>Các khoản thu nhập</b>{(selectedSlip.breakdown?.earnings ?? []).map((line, i) => <div className="flex justify-between py-1" key={i}><span>{line.name}</span><span>{line.amount.toLocaleString('vi-VN')} đ</span></div>)}</div>
@@ -1223,6 +1337,7 @@ export default function PayrollEnginePage() {
                     {selectedSlip.breakdown.calculation.minimumWageReview.hourlyBelowMinimum && <p>Quy đổi theo lịch chuẩn ({selectedSlip.breakdown.calculation.minimumWageReview.hourlyEquivalent.toLocaleString('vi-VN')} đ/giờ) thấp hơn mốc giờ {selectedSlip.breakdown.calculation.minimumWageReview.hourlyMinimum?.toLocaleString('vi-VN')} đ.</p>}
                     <p>Đối chiếu hình thức trả lương, thời giờ bình thường và hợp đồng trước khi duyệt; đây là cảnh báo, không tự chặn kỳ lương.</p>
                   </div>}
+                  {selectedSlip.breakdown?.calculation?.salaryBandReview?.bands.some((band) => band.status !== 'IN_RANGE') ? <div className="border-y border-border py-3 text-xs"><b>Đối chiếu khung lương vị trí đã duyệt</b>{selectedSlip.breakdown?.calculation?.salaryBandReview?.bands.map((band) => <p key={band.code} className="mt-1">{band.code}: {band.minSalary.toLocaleString('vi-VN')}–{band.maxSalary.toLocaleString('vi-VN')} đ · {band.status === 'BELOW_RANGE' ? 'Mức hợp đồng dưới sàn' : band.status === 'ABOVE_RANGE' ? 'Mức hợp đồng trên trần' : band.status === 'BASIS_MISMATCH' ? 'Khác cơ sở trả lương' : 'Khung thay đổi trong kỳ'}. Hãy đối chiếu hồ sơ lương đã duyệt; bảng lương không tự thay đổi hợp đồng.</p>)}</div> : null}
                   {selectedSlip.breakdown?.calculation && <p>Thuế năm {selectedSlip.breakdown.calculation.year}: giảm trừ bản thân {selectedSlip.breakdown.calculation.personalRelief.toLocaleString('vi-VN')} đ; người phụ thuộc {selectedSlip.breakdown.calculation.dependentRelief.toLocaleString('vi-VN')} đ; thu nhập tính thuế {selectedSlip.breakdown.calculation.taxableIncome.toLocaleString('vi-VN')} đ.</p>}
                   <p className="font-bold">Thực lĩnh = {selectedSlip.grossPay.toLocaleString('vi-VN')} − {selectedSlip.totalDeduction.toLocaleString('vi-VN')} = {selectedSlip.netPay.toLocaleString('vi-VN')} đ</p>
                 </div>
@@ -1232,8 +1347,22 @@ export default function PayrollEnginePage() {
               /* TAB: PHIẾU LƯƠNG CHUẨN IN ẤN (PRINTABLE DOC) */
               <div id="print-payslip-doc" className="print-area print-payslip space-y-3 text-xs font-sans">
                 <style jsx global>{`
+                  #print-payslip-doc {
+                    box-sizing: border-box;
+                    width: 210mm;
+                    max-width: 100%;
+                    margin: 0 auto;
+                    padding: 15mm 15mm 15mm 20mm;
+                    background: #fff;
+                    color: #000;
+                    font-family: "Times New Roman", Times, serif;
+                    font-size: 10pt;
+                    line-height: 1.3;
+                  }
+                  #print-payslip-doc header { display: block; }
                   @media print {
-                    #print-payslip-doc { padding: 14mm 16mm !important; font-size: 10pt !important; line-height: 1.3 !important; }
+                    #print-payslip-doc { width: 210mm !important; max-width: 210mm !important; margin: 0 !important; padding: 15mm 15mm 15mm 20mm !important; font-size: 10pt !important; line-height: 1.3 !important; }
+                    #print-payslip-doc > header { display: block !important; visibility: visible !important; }
                     #print-payslip-doc table { width: 100% !important; border-collapse: collapse !important; table-layout: auto !important; margin: 2mm 0 4mm !important; }
                     #print-payslip-doc th, #print-payslip-doc td { padding: 2mm 2.5mm !important; border-bottom: 1px solid #777 !important; vertical-align: top !important; word-break: normal !important; overflow-wrap: anywhere !important; }
                     #print-payslip-doc th { text-align: left !important; border-top: 1px solid #111 !important; border-bottom: 1px solid #111 !important; }
@@ -1257,10 +1386,23 @@ export default function PayrollEnginePage() {
                       <tr><th>Mã nhân viên</th><td>{selectedSlip.employeeCode || 'Chưa cập nhật'}</td></tr>
                       <tr><th>Phòng ban / đơn vị</th><td>{selectedSlip.department || 'Chưa cập nhật'}</td></tr>
                       <tr><th>Chức danh công việc</th><td>{selectedSlip.jobTitle || 'Chưa cập nhật'}</td></tr>
+                    <tr><th>Mức căn cứ hợp đồng</th><td>{(selectedSlip.breakdown?.calculation?.payRatesUsed ?? []).map((item) => `${item.rate.toLocaleString('vi-VN')} VND/${item.basis === 'DAILY' ? 'ngày' : item.basis === 'HOURLY' ? 'giờ' : 'tháng'}`).join('; ') || `${selectedSlip.baseSalary.toLocaleString('vi-VN')} VND`}</td></tr>
                       <tr><th>Ngày công hưởng lương</th><td>{selectedSlip.actualWorkDays ?? 0}/{selectedSlip.workingDays ?? 0} công</td></tr>
                     </tbody>
                   </table>
                 </section>
+
+                {selectedSlip.breakdown?.calculation?.attendance ? <section className="payslip-section">
+                  <h3 className="font-bold uppercase">Đối soát thời gian và làm thêm</h3>
+                  <table><tbody>
+                    <tr><th>Lịch chuẩn / giờ chuẩn</th><td>{selectedSlip.breakdown.calculation.attendance.standardDays} ngày / {selectedSlip.breakdown.calculation.attendance.scheduledHours} giờ</td></tr>
+                    <tr><th>Giờ đã ghi nhận / thiếu giờ</th><td>{selectedSlip.breakdown.calculation.attendance.workedHours} giờ / {selectedSlip.breakdown.calculation.attendance.shortHours} giờ</td></tr>
+                    <tr><th>Đi muộn / về sớm</th><td>{selectedSlip.breakdown.calculation.attendance.lateDays} ngày ({selectedSlip.breakdown.calculation.attendance.lateMinutes} phút) / {selectedSlip.breakdown.calculation.attendance.earlyLeaveDays} ngày ({selectedSlip.breakdown.calculation.attendance.earlyLeaveMinutes} phút)</td></tr>
+                    <tr><th>Vắng / phép năm hưởng lương / nghỉ không lương</th><td>{selectedSlip.breakdown.calculation.attendance.absenceDays} / {selectedSlip.breakdown.calculation.attendance.paidLeaveDays} / {selectedSlip.breakdown.calculation.attendance.unpaidLeaveDays} ngày</td></tr>
+                    <tr><th>Nghỉ ốm / thai sản</th><td>{selectedSlip.breakdown.calculation.attendance.socialInsuranceLeaveDays} ngày; đối soát theo hồ sơ chế độ BHXH</td></tr>
+                    <tr><th>Làm thêm đã duyệt</th><td>{(selectedSlip.breakdown.calculation.approvedOvertime ?? []).map((ot) => `${ot.workDate}: ${ot.hours} giờ (${ot.category === 'PUBLIC_HOLIDAY' ? 'ngày lễ' : ot.category === 'WEEKLY_REST' ? 'nghỉ tuần' : 'ngày thường'})`).join('; ') || 'Không có'}</td></tr>
+                  </tbody></table>
+                </section> : null}
 
                 <section className="payslip-section">
                   <h3 className="font-bold uppercase">I. Các khoản thu nhập (VND)</h3>

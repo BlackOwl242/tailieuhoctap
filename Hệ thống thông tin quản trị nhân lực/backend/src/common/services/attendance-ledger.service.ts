@@ -96,7 +96,7 @@ export class AttendanceLedgerService {
     const holidays = await this.settings.get<string[]>('HOLIDAYS', []);
     const leave = await db.leaveRequest.findFirst({ where: { userId, status: 'APPROVED', startDate: { lte: schedule.key }, endDate: { gte: schedule.key } } });
     let status: DayStatus = !firstIn && !lastOut ? 'ABSENT' : !firstIn || !lastOut || open ? 'MISSING_PAIR' : lateMinutes > schedule.lateTolerance ? 'LATE' : earlyMinutes > schedule.earlyTolerance ? 'EARLY_LEAVE' : 'PRESENT';
-    if (leave && leave.type !== 'UNPAID') status = 'ON_LEAVE';
+    if (leave) status = 'ON_LEAVE';
     if (holidays.includes(schedule.key.toISOString().slice(0, 10))) status = 'HOLIDAY';
     status = overrideStatus ?? status;
     let nightWorkedMinutes = 0;
@@ -114,7 +114,7 @@ export class AttendanceLedgerService {
         if (overlapOut > overlapIn) nightWorkedMinutes += minutes(overlapIn, overlapOut);
       }
     }
-    const data = { paidLeave: Boolean(leave && leave.type === 'ANNUAL'), scheduledMinutes, firstInAt: firstIn, lastOutAt: lastOut, workedMinutes: Math.round(pairedMinutes), nightWorkedMinutes: Math.round(nightWorkedMinutes), lateMinutes, earlyMinutes, status, eventCount: selected.length };
+    const data = { paidLeave: Boolean(leave && leave.type === 'ANNUAL'), leaveType: leave?.type ?? null, scheduledMinutes, firstInAt: firstIn, lastOutAt: lastOut, workedMinutes: Math.round(pairedMinutes), nightWorkedMinutes: Math.round(nightWorkedMinutes), lateMinutes, earlyMinutes, status, eventCount: selected.length };
     return db.attendanceDay.upsert({ where: { userId_workDate: { userId, workDate: schedule.key } }, create: { userId, workDate: schedule.key, ...data }, update: data });
   }
 

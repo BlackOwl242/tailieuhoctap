@@ -167,6 +167,7 @@ model OrgUnit {
   parent          OrgUnit?         @relation("OrgUnitTree", fields: [parentId], references: [id])
   children        OrgUnit[]        @relation("OrgUnitTree")
   users           User[]           @relation("UserOrgUnit")
+  salaryStructures HrmsSalaryStructure[]
   spaces          Space[]
   onboardingPaths OnboardingPath[]
 
@@ -675,6 +676,7 @@ enum DayStatus {
 model AttendanceDay {
   scheduledMinutes   Int       @default(480)
   paidLeave          Boolean   @default(false)
+  leaveType          String?
   userId             String
   workDate           DateTime  @db.Date
   firstInAt          DateTime?
@@ -1551,10 +1553,13 @@ model HrmsSalaryStructure {
   payrollFrequency String                          @default("MONTHLY")
   isActive         Boolean                         @default(true)
   description      String?
+  jobTitle         String?
+  orgUnitId        String?
   createdAt        DateTime                        @default(now())
   updatedAt        DateTime                        @updatedAt
   items            HrmsSalaryStructureItem[]
   assignments      HrmsSalaryStructureAssignment[]
+  orgUnit          OrgUnit?                        @relation(fields: [orgUnitId], references: [id], onDelete: SetNull)
 
   @@map("hrms_salary_structures")
 }

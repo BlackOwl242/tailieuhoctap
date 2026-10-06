@@ -28,6 +28,26 @@ export class UpsertSalaryBandDto {
 export class SalaryBandsService {
   constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
 
+  private async linkUnassignedProfilesToUniqueEffectiveBands() {
+    const today = dateKey(new Date());
+    const [bands, users] = await Promise.all([
+      this.prisma.hrmsSalaryBand.findMany({ where: { status: 'ACTIVE', approvedAt: { not: null }, effectiveFrom: { lte: today }, OR: [{ effectiveTo: null }, { effectiveTo: { gte: today } }] }, select: { id: true, jobTitles: true } }),
+      this.prisma.user.findMany({ where: { deletedAt: null, status: 'ACTIVE', employmentStatus: { in: ['ACTIVE', 'PROBATION'] }, jobTitle: { not: null } }, select: { id: true, jobTitle: true, salaryBandId: true } }),
+    ]);
+    const effectiveBandIds = new Set(bands.map((band) => band.id));
+    const byBand = new Map<string, { salaryBandId: string; previousBandId: string | null; userIds: string[] }>();
+    for (const user of users) {
+      if (user.salaryBandId && effectiveBandIds.has(user.salaryBandId)) continue;
+      const matches = bands.filter((band) => band.jobTitles.includes(user.jobTitle!));
+      if (matches.length !== 1) continue;
+      const key = `${matches[0].id}:${user.salaryBandId ?? 'none'}`;
+      const group = byBand.get(key) ?? { salaryBandId: matches[0].id, previousBandId: user.salaryBandId, userIds: [] };
+      group.userIds.push(user.id);
+      byBand.set(key, group);
+    }
+    await this.prisma.$transaction([...byBand.values()].map((group) => this.prisma.user.updateMany({ where: { id: { in: group.userIds }, salaryBandId: group.previousBandId }, data: { salaryBandId: group.salaryBandId } })));
+  }
+
   list() {
     return this.prisma.hrmsSalaryBand.findMany({
       include: { _count: { select: { employees: true, openings: true } } },
@@ -84,6 +104,7 @@ export class SalaryBandsService {
     });
     if (overlap) throw new ConflictException('Thời gian hiệu lực bị trùng với phiên bản khung lương đã duyệt');
     const result = await this.prisma.hrmsSalaryBand.update({ where: { id }, data: { status: 'ACTIVE', approvedById: actor.id, approvedAt: new Date() } });
+    await this.linkUnassignedProfilesToUniqueEffectiveBands();
     await this.audit.log({ actorId: actor.id, action: 'SALARY_BAND_APPROVED', entityType: 'HrmsSalaryBand', entityId: id });
     return result;
   }

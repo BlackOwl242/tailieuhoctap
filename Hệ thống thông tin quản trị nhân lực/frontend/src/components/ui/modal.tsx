@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/primitives';
+import { Button, SelectDialogContext } from '@/components/ui/primitives';
 
 /**
  * Modal dùng chung (radix dialog) cho mọi form thêm/sửa/xem chi tiết.
@@ -36,9 +36,11 @@ export function Modal({
   }[size];
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <SelectDialogContext.Provider value={true}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xs animate-in fade-in duration-150 no-print" />
         <DialogPrimitive.Content
+          data-select-dialog="true"
           className={cn(
             'fixed left-1/2 top-1/2 z-[101] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2',
             'max-h-[85dvh] overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-2xl focus:outline-none animate-in zoom-in-95 duration-150 text-foreground',
@@ -63,6 +65,7 @@ export function Modal({
           {footer ? <div className="mt-5 flex justify-end gap-2 no-print">{footer}</div> : null}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
+      </SelectDialogContext.Provider>
     </DialogPrimitive.Root>
   );
 }

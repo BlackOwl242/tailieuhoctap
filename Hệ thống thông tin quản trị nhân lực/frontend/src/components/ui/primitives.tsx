@@ -208,6 +208,8 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
   containerClassName?: string;
 }
 
+export const SelectDialogContext = React.createContext(false);
+
 /**
  * Select hiện đại toàn hệ thống:
  * - Thay thế giao diện dropdown native bằng Popover Combobox bo góc sang trọng.
@@ -248,6 +250,7 @@ export function Select({
     openUpwards: boolean;
   } | null>(null);
   const [mounted, setMounted] = React.useState(false);
+  const selectDialogContext = React.useContext(SelectDialogContext);
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const popoverRef = React.useRef<HTMLDivElement>(null);
@@ -259,6 +262,9 @@ export function Select({
 
   // SSR guard
   React.useEffect(() => { setMounted(true); }, []);
+  const insideDialog = selectDialogContext || Boolean(
+    containerRef.current?.closest('[data-select-dialog="true"], [role="dialog"], [aria-modal="true"]')
+  );
 
   // Trích xuất danh sách options từ children hoặc props.options
   const allOptions = React.useMemo<CustomSelectOption[]>(() => {
@@ -307,38 +313,48 @@ export function Select({
   // Chiều cao thanh topbar sticky chuẩn của hệ thống (h-14 = 56px)
   const TOPBAR_HEIGHT = 56;
 
-  // Tính toạ độ fixed cho portal popover khi mở — tuyệt đối không cho phép đè lên topbar
+  // Tính giới hạn vùng hiển thị. Trong modal, menu được đặt inline để Radix scroll-lock nhận đúng sự kiện.
   const computeCoords = React.useCallback(() => {
     if (!containerRef.current) return;
     const r = containerRef.current.getBoundingClientRect();
+    const dialog = insideDialog
+      ? containerRef.current.closest('[data-select-dialog="true"], [role="dialog"], [aria-modal="true"]') as HTMLElement | null
+      : null;
+    const dialogRect = dialog?.getBoundingClientRect();
+    const boundaryTop = dialogRect ? Math.max(8, dialogRect.top + 8) : TOPBAR_HEIGHT;
+    const boundaryBottom = dialogRect
+      ? Math.min(window.innerHeight, dialogRect.bottom) - 8
+      : window.innerHeight - 8;
 
-    // Nếu nút kích hoạt đã bị cuộn lọt vào sau topbar hoặc vượt khỏi viewport -> đóng lại
-    if (r.bottom <= TOPBAR_HEIGHT || r.top >= window.innerHeight) {
+    if (r.bottom <= boundaryTop || r.top >= boundaryBottom) {
       setIsOpen(false);
       return;
     }
 
     // Độ rộng menu dropdown tối thiểu 380px để hiển thị trọn vẹn câu tiếng Việt, tối đa 560px
     const popoverWidth = Math.min(Math.max(r.width, 380), Math.min(560, window.innerWidth - 20));
-    const spaceAbove = Math.max(0, r.top - TOPBAR_HEIGHT);
-    const spaceBelow = Math.max(0, window.innerHeight - r.bottom);
+    const spaceAbove = Math.max(0, r.top - boundaryTop);
+    const spaceBelow = Math.max(0, boundaryBottom - r.bottom);
 
     // Chỉ mở lên trên khi phía dưới chật VÀ phía trên có tối thiểu 160px để không bao giờ đè lên topbar
     const shouldOpenUp = spaceBelow < 240 && spaceAbove > spaceBelow && spaceAbove >= 160;
-    const maxHeight = shouldOpenUp ? Math.min(320, spaceAbove - 8) : Math.min(320, spaceBelow - 12);
+    const availableSpace = shouldOpenUp ? spaceAbove : spaceBelow;
+    const maxHeight = Math.max(96, Math.min(320, availableSpace - 12));
 
     // Căn trái hoặc đẩy lùi sang trái nếu popover vượt quá mép phải màn hình
     const maxLeft = Math.max(8, window.innerWidth - popoverWidth - 12);
     const leftPos = Math.max(8, Math.min(r.left, maxLeft));
+    const topPos = Math.max(TOPBAR_HEIGHT + 6, r.bottom + 6);
+    const bottomPos = window.innerHeight - (r.top - 6);
     setCoords({
-      top: shouldOpenUp ? undefined : Math.max(TOPBAR_HEIGHT + 6, r.bottom + 6),
-      bottom: shouldOpenUp ? window.innerHeight - (r.top - 6) : undefined,
+      top: shouldOpenUp ? undefined : topPos,
+      bottom: shouldOpenUp ? bottomPos : undefined,
       left: leftPos,
       width: popoverWidth,
       maxHeight,
       openUpwards: shouldOpenUp,
     });
-  }, []);
+  }, [insideDialog]);
 
   // Khi mở: tính toạ độ, focus ô tìm kiếm
   React.useEffect(() => {
@@ -454,24 +470,19 @@ export function Select({
   const widthMatches = className?.match(/\b(w-\[\S+\]|w-\d+|min-w-\[\S+\]|max-w-\[\S+\]|flex-1)\b/g);
 
   // Kiểm tra xem Select có nằm trong Modal / Dialog không để chọn tầng z-index tương ứng
-  const isInsideModal = Boolean(
-    containerRef.current?.closest('[role="dialog"], [aria-modal="true"], .fixed')
-  );
-
   // Nội dung popover (render qua portal)
   const popoverContent = isOpen && coords ? (
     <div
       ref={popoverRef}
       className="bg-popover border border-border rounded-md shadow-xl overflow-hidden animate-in fade-in-50 zoom-in-95 duration-100 flex flex-col font-sans"
       style={{
-        position: 'fixed',
-        left: coords.left,
+        position: insideDialog ? 'absolute' : 'fixed',
+        left: insideDialog ? 0 : coords.left,
         width: coords.width,
-        top: coords.top,
-        bottom: coords.bottom,
+        top: insideDialog ? (coords.openUpwards ? undefined : 'calc(100% + 6px)') : coords.top,
+        bottom: insideDialog ? (coords.openUpwards ? 'calc(100% + 6px)' : undefined) : coords.bottom,
         maxHeight: coords.maxHeight,
-        // Modal overlay/content use z-index 100/101; a portaled picker must sit above both.
-        zIndex: isInsideModal ? 120 : 35,
+        zIndex: 120,
       }}
     >
       {/* Ô tìm kiếm nếu danh sách >= 6 mục hoặc có cờ searchable */}
@@ -577,6 +588,7 @@ export function Select({
       ref={containerRef}
       className={cn(
         'relative font-sans',
+        insideDialog && isOpen && 'z-[102]',
         isInline ? 'inline-block' : 'w-full',
         widthMatches?.join(' '),
         containerClassName
@@ -612,8 +624,8 @@ export function Select({
         />
       </button>
 
-      {/* Popover menu qua portal - thoát khỏi modal overflow */}
-      {mounted && popoverContent ? createPortal(popoverContent, document.body) : null}
+      {/* Menu trong modal nằm cùng lớp nội dung để giữ tìm kiếm, cuộn và nhận click đúng. */}
+      {popoverContent && (insideDialog ? popoverContent : mounted ? createPortal(popoverContent, document.body) : null)}
 
       {/* Hidden native select để hỗ trợ HTML5 form submission và required check */}
       <select
