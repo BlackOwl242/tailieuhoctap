@@ -85,6 +85,8 @@ model User {
   attendanceEvents      AttendanceEvent[]
   attendanceDays        AttendanceDay[]
   attendanceCorrections AttendanceCorrection[] @relation("CorrectionBy")
+  attendanceEvidenceFor HrmsAttendanceEvidence[] @relation("AttendanceEvidenceEmployee")
+  attendanceEvidenceBy  HrmsAttendanceEvidence[] @relation("AttendanceEvidenceUploader")
   faceEmbeddings        FaceEmbedding[]
   managedDevices        AttendanceDevice[]     @relation("DeviceCreator")
   correctionsMade       AttendanceCorrection[] @relation("CorrectionCorrector")
@@ -711,6 +713,25 @@ model AttendanceCorrection {
 
   @@index([userId, workDate])
   @@map("attendance_corrections")
+}
+
+model HrmsAttendanceEvidence {
+  id           String   @id @default(uuid())
+  userId       String
+  workDate     DateTime @db.Date
+  kind         String
+  title        String
+  fileUrl      String
+  fileName     String
+  fileSize     Int
+  uploadedById String
+  createdAt    DateTime @default(now())
+
+  user     User @relation("AttendanceEvidenceEmployee", fields: [userId], references: [id], onDelete: Cascade)
+  uploader User @relation("AttendanceEvidenceUploader", fields: [uploadedById], references: [id])
+
+  @@index([userId, workDate])
+  @@map("hrms_attendance_evidence")
 }
 
 model FaceEmbedding {

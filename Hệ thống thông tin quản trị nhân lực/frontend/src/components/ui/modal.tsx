@@ -27,6 +27,7 @@ export function Modal({
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }) {
+  const [selectDialogLayer, setSelectDialogLayer] = React.useState<HTMLElement | null>(null);
   const width = {
     sm: 'max-w-sm',
     md: 'max-w-lg',
@@ -36,14 +37,14 @@ export function Modal({
   }[size];
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
-      <SelectDialogContext.Provider value={true}>
+      <SelectDialogContext.Provider value={selectDialogLayer}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xs animate-in fade-in duration-150 no-print" />
         <DialogPrimitive.Content
           data-select-dialog="true"
           className={cn(
             'fixed left-1/2 top-1/2 z-[101] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2',
-            'max-h-[85dvh] overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-2xl focus:outline-none animate-in zoom-in-95 duration-150 text-foreground',
+            'flex max-h-[85dvh] flex-col overflow-visible rounded-xl border border-border bg-card p-6 shadow-2xl focus:outline-none animate-in zoom-in-95 duration-150 text-foreground',
             'print:static print:transform-none print:max-h-none print:w-full print:max-w-none print:overflow-visible print:border-0 print:shadow-none print:p-0 print:bg-transparent',
             width,
           )}
@@ -61,8 +62,11 @@ export function Modal({
               </button>
             </DialogPrimitive.Close>
           </div>
-          {children}
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+            {children}
+          </div>
           {footer ? <div className="mt-5 flex justify-end gap-2 no-print">{footer}</div> : null}
+          <div ref={setSelectDialogLayer} className="pointer-events-none absolute inset-0 z-[120] overflow-visible" />
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
       </SelectDialogContext.Provider>

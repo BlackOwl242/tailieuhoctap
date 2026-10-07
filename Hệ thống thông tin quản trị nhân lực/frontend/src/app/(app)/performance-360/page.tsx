@@ -615,9 +615,9 @@ export default function Performance360Page() {
           : `Đánh giá nhiệm vụ theo tiêu chí chung 30% và kết quả công việc 70% (${printConfig.publicPersonnelType === 'PUBLIC_EMPLOYEE' ? 'NĐ 233/2026' : 'NĐ 335/2025'}).`}
         breadcrumbs={[{ label: 'Phát triển' }, { label: 'Đánh giá KPI' }]}
         actions={
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
             <Link href="/performance-guide">
-              <Button variant="outline" size="sm" className="text-xs h-8">
+              <Button variant="outline" size="sm" className="h-9 w-full text-xs sm:h-8 sm:w-auto">
                 <HelpCircle className="h-3.5 w-3.5 mr-1.5" />
                 Cách đánh giá
               </Button>
@@ -626,7 +626,7 @@ export default function Performance360Page() {
               variant="outline"
               size="sm"
               onClick={() => setIsCycleModalOpen(true)}
-              className="text-xs h-8"
+              className="h-9 w-full text-xs sm:h-8 sm:w-auto"
             >
               <Calendar className="h-3.5 w-3.5 mr-1.5" />
               Khởi tạo chu kỳ
@@ -642,7 +642,7 @@ export default function Performance360Page() {
                 }
                 setIsReviewModalOpen(true);
               }}
-              className="text-xs h-8"
+              className="h-9 w-full text-xs sm:h-8 sm:w-auto"
             >
               <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
               Gửi phản hồi 360
@@ -650,7 +650,7 @@ export default function Performance360Page() {
             {canManageGoals && <Button
               size="sm"
               onClick={openGoalSetup}
-              className="text-xs h-8"
+              className="h-9 w-full text-xs sm:h-8 sm:w-auto"
             >
               <Plus className="h-3.5 w-3.5 mr-1.5" />
               Thiết lập mục tiêu KRA

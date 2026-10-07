@@ -10,6 +10,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select,
 import { PageHeader, ErrorState } from '@/components/common/states';
 
 interface DeviceRow { id: string; name: string; type: string; location: string | null; status: string; lastSeenAt: string | null }
+interface AttendancePeriod { id: string; month: number; year: number; status: string; version: number; closedAt: string | null }
 interface DayRow {
   userId: string; workDate: string; firstInAt: string | null; lastOutAt: string | null;
   lateMinutes: number; status: string;
@@ -21,10 +22,16 @@ export default function AdminAttendancePage() {
   const qc = useQueryClient();
   const toast = useToast();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [monthToFinalize, setMonthToFinalize] = useState(() => {
+    const previousMonth = new Date();
+    previousMonth.setMonth(previousMonth.getMonth() - 1);
+    return previousMonth.toISOString().slice(0, 7);
+  });
   const [deviceForm, setDeviceForm] = useState({ name: '', type: 'MACHINE_WEBHOOK' });
   const [lastSecret, setLastSecret] = useState<string | null>(null);
   const [correction, setCorrection] = useState<{ userId: string; date: string } | null>(null);
   const [corrValue, setCorrValue] = useState({ field: 'firstInAt', newValue: '08:00', reason: '' });
+  const correctionReasonValid = corrValue.reason.trim().length >= 3;
 
   const devicesQ = useQuery({
     queryKey: ['devices'],
@@ -35,6 +42,16 @@ export default function AdminAttendancePage() {
     queryFn: async () =>
       (await api.get<{ items: DayRow[] }>('/attendance/days', { params: { date } })).data,
   });
+  const periodQ = useQuery({
+    queryKey: ['attendance-period', monthToFinalize],
+    enabled: /^\d{4}-\d{2}$/.test(monthToFinalize),
+    queryFn: async () => {
+      const [year, month] = monthToFinalize.split('-');
+      const response = await api.get<AttendancePeriod | null>(`/attendance-periods/${year}/${Number(month)}`);
+      return response.data;
+    },
+  });
+  const periodFinalized = periodQ.data?.status === 'FINALIZED';
 
   const createDevice = useMutation({
     mutationFn: async () => (await api.post('/attendance/devices', deviceForm)).data as { secret: string },
@@ -67,6 +84,18 @@ export default function AdminAttendancePage() {
     onError: (e) => toast(errorMessage(e), 'error'),
   });
 
+  const finalizeMonth = useMutation({
+    mutationFn: async () => {
+      const [year, month] = monthToFinalize.split('-').map(Number);
+      return api.post('/attendance-periods/finalize', { month, year });
+    },
+    onSuccess: () => {
+      toast('Đã chốt bảng công tháng', 'success');
+      qc.invalidateQueries({ queryKey: ['attendance-period'] });
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
   return (
     <>
       <PageHeader
@@ -78,6 +107,23 @@ export default function AdminAttendancePage() {
           </Button>
         }
       />
+
+      <Card className="mb-4">
+        <CardHeader><CardTitle>Chốt bảng công tháng</CardTitle></CardHeader>
+        <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-1">
+            <Label htmlFor="attendance-finalize-month">Tháng cần chốt</Label>
+            <Input id="attendance-finalize-month" type="month" value={monthToFinalize} onChange={(e) => setMonthToFinalize(e.target.value)} className="w-48" />
+            <p className="max-w-2xl text-xs leading-5 text-muted-foreground">Trước khi tính lương, hệ thống kiểm tra đơn giải trình và ngày thiếu cặp vào/ra. Chọn ngày ở bảng công bên dưới để hiệu chỉnh có lý do; sau đó chốt lại tháng.</p>
+            {periodQ.isLoading ? <p className="text-xs text-muted-foreground">Đang kiểm tra trạng thái kỳ công…</p> : null}
+            {periodQ.isError ? <p className="text-xs text-destructive">Không đọc được trạng thái kỳ công; hãy tải lại trang trước khi chốt.</p> : null}
+            {periodFinalized ? <p className="text-sm font-medium text-foreground">Đã chốt công tháng {String(periodQ.data!.month).padStart(2, '0')}/{periodQ.data!.year} · phiên bản {periodQ.data!.version}{periodQ.data!.closedAt ? ` · ${formatDate(periodQ.data!.closedAt)}` : ''}</p> : null}
+          </div>
+          <Button disabled={!monthToFinalize || periodQ.isLoading || periodQ.isError || periodFinalized || finalizeMonth.isPending} onClick={() => finalizeMonth.mutate()}>
+            {finalizeMonth.isPending ? 'Đang chốt…' : periodFinalized ? 'Đã chốt công' : 'Chốt công tháng'}
+          </Button>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Thiết bị */}
@@ -164,11 +210,12 @@ export default function AdminAttendancePage() {
                 <Input placeholder={corrValue.field === 'status' ? 'PRESENT / LATE / MISSING_PAIR' : 'HH:MM'}
                   value={corrValue.newValue}
                   onChange={(e) => setCorrValue({ ...corrValue, newValue: e.target.value })} />
-                <Input placeholder="Lý do hiệu chỉnh (bắt buộc)"
+                <Input placeholder="Lý do hiệu chỉnh (tối thiểu 3 ký tự)"
                   value={corrValue.reason}
                   onChange={(e) => setCorrValue({ ...corrValue, reason: e.target.value })} />
+                <p className="text-xs text-muted-foreground">Nhập lý do ít nhất 3 ký tự; ví dụ: “Đối chiếu log máy chấm công”.</p>
                 <div className="flex gap-2">
-                  <Button size="sm" disabled={!corrValue.reason.trim() || correct.isPending} onClick={() => correct.mutate()}>
+                  <Button size="sm" disabled={!correctionReasonValid || correct.isPending} onClick={() => correct.mutate()}>
                     Áp dụng
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => setCorrection(null)}>Hủy</Button>

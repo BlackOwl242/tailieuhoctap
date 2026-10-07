@@ -234,7 +234,10 @@ export function calculatePayroll(input: PayrollInput) {
     if (amount > 0) { deductions.push({ code: `LOAN_${loan.id}`, name: 'Khấu trừ vay phúc lợi', amount }); loanDeductions.push({ loanId: loan.id, amount }); available -= amount; }
   }
   const totalDeduction = deductions.reduce((sum, line) => sum + line.amount, 0);
-  if (totalDeduction > grossPay) throw new Error('Các khoản khấu trừ vượt thu nhập; cần đối soát trước khi tính lương');
+  if (totalDeduction > grossPay) {
+    const detail = deductions.map(line => `${line.code}=${Math.round(line.amount)}`).join(', ');
+    throw new Error(`Các khoản khấu trừ vượt thu nhập (thu nhập ${Math.round(grossPay)}; khấu trừ ${Math.round(totalDeduction)}; chi tiết ${detail}); cần đối soát trước khi tính lương`);
+  }
   const employerInsuranceBase = (paidDays === 0 || input.insuranceRequired === false) ? 0 : Math.min(input.insuranceSalary, policy.bhxhCap);
   const employerUnemploymentBase = (paidDays === 0 || input.insuranceRequired === false) ? 0 : Math.min(input.insuranceSalary, input.unemploymentCap);
   const employerContributions = {

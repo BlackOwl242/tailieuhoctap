@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { DayStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
-import { atClock, businessDates, clockMinutes, dateKey, DAY_MS, DEFAULT_WORK_DAYS, isScheduledWorkday, VN_OFFSET, workDate } from '../hr-time';
+import { atClock, clockMinutes, dateKey, DAY_MS, VN_OFFSET, workDate } from '../hr-time';
 import { RuntimeSettingsService } from './runtime-settings.service';
 
 type Database = Prisma.TransactionClient | PrismaService;
@@ -122,29 +122,24 @@ export class AttendanceLedgerService {
     if (!Number.isInteger(month) || month < 1 || month > 12 || !Number.isInteger(year) || year < 2000) throw new BadRequestException('Kỳ công không hợp lệ');
     const from = new Date(Date.UTC(year, month - 1, 1)), to = new Date(Date.UTC(year, month, 0));
     if (to >= workDate()) throw new ConflictException('Chỉ chốt kỳ công đã kết thúc');
+    const current = await this.prisma.attendancePeriod.findUnique({ where: { month_year: { month, year } } });
+    if (current?.status === 'FINALIZED') throw new ConflictException('Kỳ công đã chốt');
+    const pending = await this.prisma.hrmsAttendanceRegularization.count({ where: { workDate: { gte: from, lte: to }, status: 'PENDING' } });
+    if (pending) throw new ConflictException(`Còn ${pending} đơn giải trình chưa xử lý`);
+
+    // Recompute unresolved rows outside the snapshot transaction so valid source events
+    // remain refreshed even if other days still need HR review.
+    const unresolvedRows = await this.prisma.attendanceDay.findMany({
+      where: { workDate: { gte: from, lte: to }, status: 'MISSING_PAIR' },
+      select: { userId: true, workDate: true },
+    });
+    for (const row of unresolvedRows) await this.recompute(row.userId, row.workDate);
+
     return this.prisma.$transaction(async tx => {
       const existing = await tx.attendancePeriod.findUnique({ where: { month_year: { month, year } } });
       if (existing?.status === 'FINALIZED') throw new ConflictException('Kỳ công đã chốt');
-      const pending = await tx.hrmsAttendanceRegularization.count({ where: { workDate: { gte: from, lte: to }, status: 'PENDING' } });
-      if (pending) throw new ConflictException(`Còn ${pending} đơn giải trình chưa xử lý`);
-      const leavers = await tx.personnelAction.findMany({ where: { type: 'RESIGNATION', status: 'APPROVED', effectiveAt: { gte: from, lte: to } } });
-      const users = await tx.user.findMany({ where: { deletedAt: null, OR: [{ employmentStatus: { in: ['ACTIVE', 'PROBATION'] } }, { id: { in: leavers.map(a => a.subjectId) } }] }, select: { id: true, hireDate: true } });
-      // Chốt theo lịch làm việc của từng người; người chưa được phân ca dùng lịch văn phòng T2-T6.
-      const assignments = await tx.hrmsShiftAssignment.findMany({
-        where: { userId: { in: users.map(user => user.id) }, status: 'ACTIVE', startDate: { lte: to }, OR: [{ endDate: null }, { endDate: { gte: from } }] },
-        select: { userId: true, startDate: true, endDate: true, workDays: true },
-        orderBy: { startDate: 'desc' },
-      });
-      for (const user of users) {
-        const userAssignments = assignments.filter(assignment => assignment.userId === user.id);
-        const leaving = leavers.find(action => action.subjectId === user.id)?.effectiveAt;
-        for (let time = from.getTime(); time <= to.getTime(); time += DAY_MS) {
-          const day = new Date(time);
-          const assignment = userAssignments.find(candidate => dateKey(candidate.startDate) <= day && (!candidate.endDate || dateKey(candidate.endDate) >= day));
-          const workDays = assignment?.workDays ?? DEFAULT_WORK_DAYS;
-          if (isScheduledWorkday(day, workDays) && (!user.hireDate || dateKey(user.hireDate) <= day) && (!leaving || day <= dateKey(leaving))) await this.recompute(user.id, day, tx);
-        }
-      }
+      const pendingInside = await tx.hrmsAttendanceRegularization.count({ where: { workDate: { gte: from, lte: to }, status: 'PENDING' } });
+      if (pendingInside) throw new ConflictException(`Còn ${pendingInside} đơn giải trình chưa xử lý`);
       const unresolved = await tx.attendanceDay.count({ where: { workDate: { gte: from, lte: to }, status: 'MISSING_PAIR' } });
       if (unresolved) throw new ConflictException(`Còn ${unresolved} ngày thiếu cặp vào/ra; cần giải trình trước khi chốt`);
       const rows = await tx.attendanceDay.findMany({ where: { workDate: { gte: from, lte: to } }, orderBy: [{ userId: 'asc' }, { workDate: 'asc' }] });

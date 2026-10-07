@@ -97,7 +97,32 @@ export default function AttendancePage() {
             ) : (q.data!.days.length === 0) ? (
               <p className="text-sm text-muted-foreground">Chưa có dữ liệu công. Hãy chạy bộ mô phỏng ở trang Quản trị → Thiết bị chấm công.</p>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+                <ul className="divide-y divide-border sm:hidden">
+                  {q.data!.days.map((d) => (
+                    <li key={d.workDate} className="py-3 first:pt-0 last:pb-0">
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="text-sm font-semibold text-foreground">{new Date(d.workDate).toLocaleDateString('vi-VN')}</h3>
+                        <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                          <span className={cn(
+                            'h-1.5 w-1.5 rounded-full',
+                            d.status === 'PRESENT' && 'bg-emerald-600',
+                            d.status === 'LATE' && 'bg-amber-600',
+                            d.status === 'MISSING_PAIR' && 'bg-rose-600',
+                            !['PRESENT', 'LATE', 'MISSING_PAIR'].includes(d.status) && 'bg-slate-400',
+                          )} />
+                          {DAY_STATUS_LABEL[d.status] ?? d.status}{d.lateMinutes > 0 ? ` · Muộn ${d.lateMinutes} phút` : ''}
+                        </span>
+                      </div>
+                      <dl className="mt-2 grid grid-cols-3 gap-2">
+                        <div><dt className="text-[11px] text-muted-foreground">Vào</dt><dd className="mt-0.5 text-sm tabular-nums">{d.firstInAt ? new Date(d.firstInAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—'}</dd></div>
+                        <div><dt className="text-[11px] text-muted-foreground">Ra</dt><dd className="mt-0.5 text-sm tabular-nums">{d.lastOutAt ? new Date(d.lastOutAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—'}</dd></div>
+                        <div><dt className="text-[11px] text-muted-foreground">Làm việc</dt><dd className="mt-0.5 text-sm tabular-nums">{d.workedMinutes > 0 ? `${Math.floor(d.workedMinutes / 60)}h${d.workedMinutes % 60}′` : '—'}</dd></div>
+                      </dl>
+                    </li>
+                  ))}
+                </ul>
+                <div className="hidden overflow-x-auto sm:block">
                 <table className="w-full min-w-[520px] text-sm">
                   <thead>
                     <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -132,7 +157,8 @@ export default function AttendancePage() {
                     ))}
                   </tbody>
                 </table>
-              </div>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

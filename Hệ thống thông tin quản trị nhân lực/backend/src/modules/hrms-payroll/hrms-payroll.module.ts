@@ -8,10 +8,13 @@ import {
   Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsDateString, IsEnum, IsIn, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsEnum, IsIn, IsNumber, IsObject, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { SalaryComponentType, PayrollRunStatus } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { extname, join } from 'node:path';
 
 export class CreateComponentDto {
   @ApiProperty({ example: 'ALLOWANCE_SKILL' })
@@ -133,6 +136,19 @@ export class RecordPayrollPaymentDto {
   @MinLength(1)
   @MaxLength(120)
   paymentReference!: string;
+}
+
+class AttendanceEvidenceFileDto {
+  @IsString() @MaxLength(255) name!: string;
+  @IsString() @MaxLength(120) mimeType!: string;
+  @IsString() @MaxLength(11_200_000) dataBase64!: string;
+}
+
+class AddAttendanceEvidenceDto {
+  @IsDateString() workDate!: string;
+  @IsIn(['ATTENDANCE_CORRECTION', 'LEAVE', 'OVERTIME', 'OTHER']) kind!: string;
+  @IsString() @MinLength(2) @MaxLength(160) title!: string;
+  @IsObject() file!: AttendanceEvidenceFileDto;
 }
 
 @Injectable()
@@ -401,6 +417,35 @@ export class HrmsPayrollService {
     return { success: true, message: 'Đã xóa bảng lương thành công' };
   }
 
+  async cancelPayrollRunForRecalculation(actorId: string, id: string) {
+    return this.prisma.$transaction(async tx => {
+      const run = await tx.hrmsPayrollRun.findUnique({ where: { id } });
+      if (!run) throw new NotFoundException('Không tìm thấy bảng lương');
+      if (run.status === 'CANCELLED') throw new ConflictException('Kỳ lương này đã được hủy');
+
+      const appliedLoanDeductions = await tx.payrollLoanDeduction.count({ where: { payrollRunId: id, appliedAt: { not: null } } });
+      if (appliedLoanDeductions > 0) throw new ConflictException('Kỳ đã hạch toán hoàn trả khoản vay; không thể hủy để tính lại tự động. Cần đối soát khoản vay trước.');
+
+      const updated = await tx.hrmsPayrollRun.updateMany({ where: { id, status: run.status }, data: {
+        status: 'CANCELLED',
+        notes: [run.notes, `Hủy để tính lại theo yêu cầu quản trị ngày ${new Date().toISOString()}. Bản ghi thanh toán cũ được giữ nguyên; thao tác này không đảo ngược giao dịch ngân hàng.`].filter(Boolean).join('\n'),
+      } });
+      if (updated.count !== 1) throw new ConflictException('Trạng thái kỳ lương vừa thay đổi; hãy tải lại trang');
+      await tx.hrmsPayrollSlip.updateMany({ where: { payrollRunId: id }, data: { status: 'CANCELLED' } });
+      await tx.auditLog.create({
+        data: {
+          actorId,
+          action: 'PAYROLL_CANCELLED_FOR_RECALCULATION',
+          entityType: 'HrmsPayrollRun',
+          entityId: id,
+          beforeData: { status: run.status, paymentReference: run.paymentReference },
+          afterData: { status: 'CANCELLED', paymentRecordPreserved: Boolean(run.paymentReference) },
+        },
+      });
+      return { success: true, message: 'Đã hủy kỳ để lập lại; bản ghi/chứng từ cũ vẫn được lưu.', previousStatus: run.status };
+    }, { isolationLevel: 'Serializable' });
+  }
+
   async createPayrollRun(actorId: string, dto: CreatePayrollRunDto, legacyPeriodId?: string) {
     const from = dateKey(dto.fromDate), to = dateKey(dto.toDate);
     if (from.getUTCDate() !== 1 || from.getUTCFullYear() !== to.getUTCFullYear() || from.getUTCMonth() !== to.getUTCMonth()
@@ -417,6 +462,9 @@ export class HrmsPayrollService {
     const result = await this.prisma.$transaction(async tx => {
       const attendancePeriod = await tx.attendancePeriod.findUnique({ where: { month_year: { month, year } } });
       if (!attendancePeriod || attendancePeriod.status !== 'FINALIZED') throw new ConflictException('Phải chốt công tháng trước khi tính lương');
+      const orgProfileSetting = await tx.setting.findUnique({ where: { key: 'ORG_PROFILE' } });
+      const orgProfile = (orgProfileSetting?.value ?? {}) as { orgSector?: string };
+      const isStateOrganization = orgProfile.orgSector === 'state';
       const overlap = await tx.hrmsPayrollRun.findFirst({ where: { fromDate: { lte: to }, toDate: { gte: from }, status: { not: 'CANCELLED' } } });
       if (overlap) throw new ConflictException('Đã có kỳ lương cho khoảng thời gian này; không tạo trùng');
       const rows = attendancePeriod.snapshot as unknown as { userId: string; workDate: string; status: string; workedMinutes: number; nightWorkedMinutes?: number; scheduledMinutes?: number; paidLeave?: boolean; leaveType?: string | null; lateMinutes?: number; earlyMinutes?: number }[];
@@ -507,6 +555,8 @@ export class HrmsPayrollService {
             : null;
           const positionStructure = salaryBandStructure ?? selectedPositionMatches[0] ?? null;
           const appliedStructure = assignment?.structure ?? positionStructure;
+          const appliedComponentItems = (appliedStructure?.items ?? []).filter((item) =>
+            !(isStateOrganization && item.component.code === 'RESPONSIBILITY_ALLOW' && item.component.basisType === 'COMPANY_POLICY'));
           if (appliedStructure) {
             salaryStructuresUsed.add(appliedStructure.name);
             salaryStructureSourcesUsed.add(assignment ? 'EMPLOYEE_ASSIGNMENT' : 'POSITION_RULE');
@@ -526,7 +576,7 @@ export class HrmsPayrollService {
           baseTotal += monthlyEquivalentBase;
           const formulaValues: Record<string, number> = { baseSalary: monthlyEquivalentBase, BASIC: monthlyEquivalentBase, standardDays: dates.length };
           let insurableAllowances = 0, overtimeApplicableAllowances = 0;
-          for (const item of appliedStructure?.items ?? []) {
+          for (const item of appliedComponentItems) {
             formulaValues.unitAmount = item.amount;
             const formula = item.formula ?? (item.component.isFormulaBased ? item.component.formula : null);
             const amount = formula ? evaluateFormula(formula, formulaValues) : item.amount;
@@ -572,7 +622,7 @@ export class HrmsPayrollService {
             } else earnedBase += dailyBase * paidFraction / dates.length;
           }
           const componentFormulaValues: Record<string, number> = { baseSalary: monthlyEquivalentBase, BASIC: monthlyEquivalentBase, standardDays: dates.length, workingDays: 1, actualWorkDays: 1 };
-          for (const item of appliedStructure?.items ?? []) {
+          for (const item of appliedComponentItems) {
             componentFormulaValues.unitAmount = item.amount;
             const formula = item.formula ?? (item.component.isFormulaBased ? item.component.formula : null);
             const amount = formula ? evaluateFormula(formula, componentFormulaValues) : item.amount;
@@ -580,7 +630,9 @@ export class HrmsPayrollService {
             const fraction = item.component.code === 'LUNCH_ALLOW' ? actual : paidFraction;
             const earnedAmount = amount * fraction / dates.length;
             if (item.component.type === 'EARNING') {
-              expectedComponents += amount / dates.length;
+              const activeForDay = eligibleKeys.has(day.toISOString().slice(0, 10));
+              const lunchIsPayable = item.component.code !== 'LUNCH_ALLOW' || row?.status !== 'HOLIDAY';
+              if (activeForDay && lunchIsPayable) expectedComponents += amount / dates.length;
               earnedComponents += earnedAmount;
             }
             const existing = componentTotals.get(item.component.code);
@@ -610,13 +662,25 @@ export class HrmsPayrollService {
         const nightWorkBase = employeeRows.reduce((sum, row) => sum + Number(row.nightWorkedMinutes ?? 0) / 60 * (overtimeHourlyRateByDate.get(row.workDate.slice(0, 10)) ?? hourly), 0);
         const nightWorkPremium = nightWorkBase * policy.overtimeRates.nightAdditional;
         const firstMonthSick = user.hireDate && dateKey(user.hireDate) >= from && await tx.leaveRequest.count({where:{userId:user.id,type:'SICK',status:'APPROVED',startDate:{lte:to},endDate:{gte:from}}}) > 0;
+        // A finalized resignation can leave fewer than 14 paid workdays in the month.
+        // Count scheduled workdays after the effective termination date as days with no
+        // salary so insurance is not withheld for a full month against a one-day payslip.
+        const postEmploymentUnpaidDays = resignation?.effectiveAt
+          ? dates.filter(day => day > dateKey(resignation.effectiveAt!)).length
+          : 0;
         const region = ['I','II','III','IV'].includes(user.minimumWageRegion) ? user.minimumWageRegion : 'I';
         const unemploymentCap = Number(await this.settings.get(`INSURANCE_CAP_BHTN_${region}_${year}`, policy.unemploymentCapByRegion[region]));
         const resident = user.taxResidency !== 'NON_RESIDENT';
         const taxContract = contracts.find(c => c.type !== 'AMENDMENT' && dateKey(c.startDate) <= to && (!c.endDate || dateKey(c.endDate) >= from));
         const hasSalaryAmendment = contracts.some(c => c.type === 'AMENDMENT' && dateKey(c.startDate) <= to && (!c.endDate || dateKey(c.endDate) >= from));
         const flatTenPercent = resident && !hasSalaryAmendment && (!taxContract || Boolean(taxContract.type !== 'INDEFINITE' && taxContract.endDate && isUnderThreeMonths(taxContract.startDate, taxContract.endDate)));
-        const calculated = calculatePayroll({ year, earnedBase, overtimeTaxable, nightWorkBase, nightWorkPremium, insuranceRequired: unpaidFullDays < 14 || Boolean(firstMonthSick), baseSalary: base, standardDays: dates.length, paidDays, attendanceDays, insuranceSalary, insuranceCap, unemploymentCap, dependents: user.taxDependentCount, taxResidency: resident ? 'RESIDENT' : 'NON_RESIDENT', taxWithholdingMode: flatTenPercent ? 'FLAT_10' : 'PROGRESSIVE', policy, overtime: otPay, bonus, items, loans: loans.map(l => ({ id: l.id, emi: l.monthlyEmi, remaining: l.remainingAmount })), minimumWageAudit: { region, contractualMonthlyWage: overtimeBase, standardHours }, overtimeBasis: { contractualMonthlyWage: overtimeBase, standardHours, hourlyRate: hourly } });
+        let calculated: ReturnType<typeof calculatePayroll>;
+        try {
+          calculated = calculatePayroll({ year, earnedBase, overtimeTaxable, nightWorkBase, nightWorkPremium, insuranceRequired: unpaidFullDays + postEmploymentUnpaidDays < 14 || Boolean(firstMonthSick), baseSalary: base, standardDays: dates.length, paidDays, attendanceDays, insuranceSalary, insuranceCap, unemploymentCap, dependents: user.taxDependentCount, taxResidency: resident ? 'RESIDENT' : 'NON_RESIDENT', taxWithholdingMode: flatTenPercent ? 'FLAT_10' : 'PROGRESSIVE', policy, overtime: otPay, bonus, items, loans: loans.map(l => ({ id: l.id, emi: l.monthlyEmi, remaining: l.remainingAmount })), minimumWageAudit: { region, contractualMonthlyWage: overtimeBase, standardHours }, overtimeBasis: { contractualMonthlyWage: overtimeBase, standardHours, hourlyRate: hourly } });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Dữ liệu lương không hợp lệ';
+          throw new ConflictException(`Không thể tính lương cho ${user.fullName} (${user.employeeCode ?? 'chưa có mã'}): ${message}`);
+        }
         const compensationBases = [...new Set(contracts.filter(c => dateKey(c.startDate) <= to && (!c.endDate || dateKey(c.endDate) >= from)).map(c => c.compensationBasis))];
         const breakdown = {
           ...calculated.breakdown,
@@ -717,6 +781,72 @@ export class HrmsPayrollService {
     return slip;
   }
 
+  async getSlipAttendance(id: string) {
+    const slip = await this.prisma.hrmsPayrollSlip.findUnique({ where: { id }, include: { payrollRun: true } });
+    if (!slip) throw new NotFoundException('Không tìm thấy phiếu lương');
+    const from = new Date(slip.payrollRun.fromDate);
+    const to = new Date(slip.payrollRun.toDate);
+    const period = slip.payrollRun.attendancePeriodId
+      ? await this.prisma.attendancePeriod.findUnique({ where: { id: slip.payrollRun.attendancePeriodId }, select: { snapshot: true } })
+      : null;
+    const fromKey = from.toISOString().slice(0, 10);
+    const toKey = to.toISOString().slice(0, 10);
+    const snapshotRows = Array.isArray(period?.snapshot)
+      ? (period.snapshot as Array<Record<string, unknown>>).filter((row) => row.userId === slip.userId && typeof row.workDate === 'string' && String(row.workDate).slice(0, 10) >= fromKey && String(row.workDate).slice(0, 10) <= toKey)
+      : await this.prisma.attendanceDay.findMany({ where: { userId: slip.userId, workDate: { gte: from, lte: to } }, orderBy: { workDate: 'asc' } });
+    const [events, corrections, leaves, overtime, evidence] = await Promise.all([
+      this.prisma.attendanceEvent.findMany({ where: { userId: slip.userId, occurredAt: { gte: from, lt: new Date(to.getTime() + 86_400_000) } }, orderBy: { occurredAt: 'asc' }, select: { occurredAt: true, source: true, anomalyReason: true } }),
+      this.prisma.attendanceCorrection.findMany({ where: { userId: slip.userId, workDate: { gte: from, lte: to } }, orderBy: { createdAt: 'asc' }, include: { correctedByUser: { select: { fullName: true } } } }),
+      this.prisma.leaveRequest.findMany({ where: { userId: slip.userId, startDate: { lte: to }, endDate: { gte: from } }, orderBy: { startDate: 'asc' }, select: { id: true, type: true, startDate: true, endDate: true, days: true, reason: true, status: true, decisionNote: true } }),
+      this.prisma.overtimeRequest.findMany({ where: { userId: slip.userId, workDate: { gte: from, lte: to } }, orderBy: { workDate: 'asc' }, select: { id: true, workDate: true, hours: true, nightHours: true, reason: true, status: true, dayCategory: true, decisionNote: true } }),
+      this.prisma.hrmsAttendanceEvidence.findMany({ where: { userId: slip.userId, workDate: { gte: from, lte: to } }, orderBy: { createdAt: 'desc' }, select: { id: true, workDate: true, kind: true, title: true, fileUrl: true, fileName: true, fileSize: true, createdAt: true } }),
+    ]);
+    const dayKey = (value: Date | string) => (value instanceof Date ? value.toISOString() : value).slice(0, 10);
+    const days = snapshotRows.map((row) => {
+      const key = dayKey(row.workDate as Date | string);
+      const dayCorrections = corrections.filter((item) => dayKey(item.workDate) === key).map((item) => ({ id: item.id, field: item.field, oldValue: item.oldValue, newValue: item.newValue, reason: item.reason, correctedBy: item.correctedByUser.fullName, createdAt: item.createdAt }));
+      const dayEvidence = evidence.filter((item) => dayKey(item.workDate) === key);
+      return {
+        workDate: key, firstInAt: row.firstInAt ?? null, lastOutAt: row.lastOutAt ?? null,
+        workedMinutes: Number(row.workedMinutes ?? 0), scheduledMinutes: Number(row.scheduledMinutes ?? 480),
+        lateMinutes: Number(row.lateMinutes ?? 0), earlyMinutes: Number(row.earlyMinutes ?? 0),
+        status: String(row.status ?? 'UNKNOWN'), eventCount: Number(row.eventCount ?? 0),
+        paidLeave: Boolean(row.paidLeave), leaveType: row.leaveType ?? null,
+        events: events.filter((event) => dayKey(event.occurredAt) === key).map((event) => ({ occurredAt: event.occurredAt, source: event.source, anomalyReason: event.anomalyReason })),
+        corrections: dayCorrections,
+        leaveRequests: leaves.filter((item) => dayKey(item.startDate) <= key && dayKey(item.endDate) >= key).map((item) => ({ id: item.id, type: item.type, status: item.status, reason: item.reason, decisionNote: item.decisionNote })),
+        overtimeRequests: overtime.filter((item) => dayKey(item.workDate) === key).map((item) => ({ id: item.id, hours: item.hours, nightHours: item.nightHours, status: item.status, dayCategory: item.dayCategory, reason: item.reason, decisionNote: item.decisionNote })),
+        evidence: dayEvidence,
+        missingEvidence: ((dayCorrections.length > 0 || row.status === 'MISSING_PAIR') && !dayEvidence.some((item) => item.kind === 'ATTENDANCE_CORRECTION'))
+          || (leaves.some((item) => dayKey(item.startDate) <= key && dayKey(item.endDate) >= key && item.status === 'APPROVED') && !dayEvidence.some((item) => item.kind === 'LEAVE'))
+          || (overtime.some((item) => dayKey(item.workDate) === key && item.status === 'APPROVED') && !dayEvidence.some((item) => item.kind === 'OVERTIME')),
+      };
+    });
+    return { employeeName: slip.employeeName, employeeCode: slip.employeeCode, fromDate: fromKey, toDate: toKey, source: period ? 'ATTENDANCE_SNAPSHOT' : 'CURRENT_ATTENDANCE', days };
+  }
+
+  async addSlipAttendanceEvidence(slipId: string, dto: AddAttendanceEvidenceDto, actor: AuthUser) {
+    const slip = await this.prisma.hrmsPayrollSlip.findUnique({ where: { id: slipId }, include: { payrollRun: true } });
+    if (!slip) throw new NotFoundException('Không tìm thấy phiếu lương');
+    const workDate = new Date(`${dto.workDate.slice(0, 10)}T00:00:00.000Z`);
+    if (workDate < slip.payrollRun.fromDate || workDate > slip.payrollRun.toDate) throw new BadRequestException('Ngày chứng từ phải nằm trong kỳ lương của phiếu.');
+    const ext = extname(dto.file.name).toLowerCase();
+    const allowed = new Set(['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.png', '.jpg', '.jpeg', '.txt', '.csv']);
+    if (!allowed.has(ext)) throw new BadRequestException('Chỉ nhận PDF, Office, ảnh, TXT hoặc CSV.');
+    const buffer = Buffer.from(dto.file.dataBase64, 'base64');
+    if (!buffer.length || buffer.length > 8 * 1024 * 1024) throw new BadRequestException('Tệp phải có dung lượng từ 1 byte đến 8 MB.');
+    const storageKey = `${randomUUID()}${ext}`;
+    const uploadDir = process.env.UPLOAD_DIR || '/app/uploads';
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(join(uploadDir, storageKey), buffer, { flag: 'wx' });
+    const item = await this.prisma.hrmsAttendanceEvidence.create({ data: {
+      userId: slip.userId, workDate, kind: dto.kind, title: dto.title.trim(),
+      fileUrl: `/uploads/${storageKey}`, fileName: dto.file.name, fileSize: buffer.byteLength, uploadedById: actor.id,
+    } });
+    await this.audit.log({ actorId: actor.id, action: 'ATTENDANCE_EVIDENCE_ADDED', targetType: 'HrmsAttendanceEvidence', targetId: item.id, description: `Bổ sung chứng từ chấm công ${slip.employeeCode ?? slip.employeeName} ngày ${dto.workDate.slice(0, 10)} (${dto.kind})` });
+    return { id: item.id, workDate: item.workDate, kind: item.kind, title: item.title, fileUrl: item.fileUrl, fileName: item.fileName, fileSize: item.fileSize, createdAt: item.createdAt };
+  }
+
   async listSlipsByUser(userId: string) {
     return this.prisma.hrmsPayrollSlip.findMany({
       where: { userId, payrollRun: { status: { in: ['APPROVED', 'LOCKED', 'PAID'] } } },
@@ -814,6 +944,12 @@ export class HrmsPayrollController {
   }
 
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
+  @Post('runs/:id/cancel-for-recalculation')
+  cancelRunForRecalculation(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.cancelPayrollRunForRecalculation(actor.id, id);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Post('runs')
   createRun(@Body() dto: CreatePayrollRunDto, @CurrentUser() actor: AuthUser) {
     return this.service.createPayrollRun(actor.id, dto);
@@ -839,6 +975,17 @@ export class HrmsPayrollController {
   async getSlip(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
     const slip = await this.service.getSlip(id);
     return actor.roles.some(role => ['ADMIN', 'ACCOUNTANT'].includes(role)) ? slip : this.redactBankDetails(slip);
+  }
+
+  @Get('slips/:id/attendance')
+  getSlipAttendance(@Param('id') id: string) {
+    return this.service.getSlipAttendance(id);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
+  @Post('slips/:id/attendance-evidence')
+  addSlipAttendanceEvidence(@Param('id') id: string, @Body() dto: AddAttendanceEvidenceDto, @CurrentUser() actor: AuthUser) {
+    return this.service.addSlipAttendanceEvidence(id, dto, actor);
   }
 
   @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')

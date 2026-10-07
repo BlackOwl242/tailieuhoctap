@@ -7,10 +7,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Calculator, Plus, Trash2, Edit3, Eye, Printer, FileText, Download,
   BookOpen, ShieldCheck, Percent, Clock, Award, Info, CheckCircle2, ChevronRight,
-  Layers, Sliders, FileSpreadsheet, Sparkles, ArrowRight, ExternalLink, Save
+  Layers, Sliders, FileSpreadsheet, Sparkles, ArrowRight, ExternalLink, Save, Upload, Paperclip
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth-store';
-import { api, errorMessage } from '@/lib/api';
+import { api, errorMessage, openProtectedFile } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { EmptyState, LoadingState } from '@/components/common/states';
 import { Button, Select } from '@/components/ui/primitives';
@@ -18,7 +18,7 @@ import { DataTable, DataColumn } from '@/components/ui/data-table';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toaster';
 import { printDocumentElement } from '@/components/ui/print';
-import { useOrgConfig } from '@/lib/org-config';
+import { isEnterpriseSector, useOrgConfig } from '@/lib/org-config';
 
 interface SalaryComponent {
   id: string;
@@ -119,6 +119,34 @@ interface PayrollSlip {
   status: string;
 }
 
+interface SlipAttendanceEvidence {
+  id: string; workDate: string; kind: 'ATTENDANCE_CORRECTION' | 'LEAVE' | 'OVERTIME' | 'OTHER';
+  title: string; fileUrl: string; fileName: string; fileSize: number; createdAt: string;
+}
+interface SlipAttendanceDay {
+  workDate: string; firstInAt: string | null; lastOutAt: string | null; workedMinutes: number;
+  scheduledMinutes: number; lateMinutes: number; earlyMinutes: number; status: string; eventCount: number;
+  paidLeave: boolean; leaveType: string | null;
+  events: { occurredAt: string; source: string; anomalyReason: string | null }[];
+  corrections: { id: string; field: string; oldValue: string | null; newValue: string | null; reason: string; correctedBy: string; createdAt: string }[];
+  leaveRequests: { id: string; type: string; status: string; reason: string; decisionNote: string | null }[];
+  overtimeRequests: { id: string; hours: number; nightHours: number; status: string; dayCategory: string; reason: string; decisionNote: string | null }[];
+  evidence: SlipAttendanceEvidence[]; missingEvidence: boolean;
+}
+interface SlipAttendanceDetail {
+  employeeName: string; employeeCode: string | null; fromDate: string; toDate: string;
+  source: 'ATTENDANCE_SNAPSHOT' | 'CURRENT_ATTENDANCE'; days: SlipAttendanceDay[];
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1] ?? '');
+    reader.onerror = () => reject(new Error('Không đọc được tệp đã chọn.'));
+    reader.readAsDataURL(file);
+  });
+}
+
 interface PayrollRun {
   id: string;
   periodName: string;
@@ -160,6 +188,7 @@ export default function PayrollEnginePage() {
   const toast = useToast();
   const searchParams = useSearchParams();
   const [orgConfig] = useOrgConfig();
+  const isEnterprise = isEnterpriseSector(orgConfig);
 
   const [activeTab, setActiveTab] = useState<'runs' | 'components' | 'structures' | 'policy'>('runs');
   const [policyDraft, setPolicyDraft] = useState<PayrollPolicyForm | null>(null);
@@ -169,7 +198,9 @@ export default function PayrollEnginePage() {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [selectedSlip, setSelectedSlip] = useState<PayrollSlip | null>(null);
   const [isPayslipModalOpen, setIsPayslipModalOpen] = useState(false);
-  const [payslipViewMode, setPayslipViewMode] = useState<'summary' | 'formula'>('summary');
+  const [payslipViewMode, setPayslipViewMode] = useState<'summary' | 'formula' | 'attendance'>('summary');
+  const [selectedAttendanceDate, setSelectedAttendanceDate] = useState<string | null>(null);
+  const [activeAttendanceLegend, setActiveAttendanceLegend] = useState<'full' | 'late' | 'absent' | 'other' | null>(null);
 
   // Giữ tương thích liên kết cũ; quy chế và cấu hình hiện nằm trong tab chính sách.
   useEffect(() => {
@@ -224,6 +255,12 @@ export default function PayrollEnginePage() {
   const { data: runs = [], isLoading: isLoadingRuns, isError: isRunsError, error: runsError, refetch: refetchRuns } = useQuery<PayrollRun[]>({
     queryKey: ['hrms-payroll-runs'],
     queryFn: async () => (await api.get('/hrms/payroll/runs')).data,
+  });
+
+  const slipAttendanceQuery = useQuery<SlipAttendanceDetail>({
+    queryKey: ['hrms-slip-attendance', selectedSlip?.id],
+    enabled: isPayslipModalOpen && payslipViewMode === 'attendance' && !!selectedSlip,
+    queryFn: async () => (await api.get(`/hrms/payroll/slips/${selectedSlip!.id}/attendance`)).data,
   });
 
   const { data: components = [], isLoading: isLoadingComps, isError: isComponentsError, error: componentsError, refetch: refetchComponents } = useQuery<SalaryComponent[]>({
@@ -319,7 +356,7 @@ export default function PayrollEnginePage() {
         periodName: payload.periodName,
         fromDate: new Date(payload.fromDate).toISOString(),
         toDate: new Date(payload.toDate).toISOString(),
-      })).data;
+      }, { timeout: 120_000 })).data;
     },
     onSuccess: (data: PayrollRun) => {
       queryClient.invalidateQueries({ queryKey: ['hrms-payroll-runs'] });
@@ -327,7 +364,7 @@ export default function PayrollEnginePage() {
       setSelectedRunId(data.id);
       toast(`Đã xử lý bảng lương ${data.periodName}`, 'success');
     },
-    onError: () => toast('Lỗi khi xử lý bảng lương', 'error'),
+    onError: (error) => toast(errorMessage(error), 'error'),
   });
 
   const deleteRunMutation = useMutation({
@@ -340,6 +377,16 @@ export default function PayrollEnginePage() {
       toast('Đã xóa bảng lương', 'success');
     },
     onError: () => toast('Không thể xóa bảng lương', 'error'),
+  });
+
+  const cancelRunMutation = useMutation({
+    mutationFn: async (id: string) => (await api.post(`/hrms/payroll/runs/${id}/cancel-for-recalculation`)).data,
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ['hrms-payroll-runs'] });
+      setSelectedRunId(id);
+      toast('Đã giữ kỳ cũ và hủy để lập lại', 'success');
+    },
+    onError: (error) => toast(errorMessage(error), 'error'),
   });
 
   const createCompMutation = useMutation({
@@ -462,6 +509,23 @@ export default function PayrollEnginePage() {
   const transitionMutation = useMutation({
     mutationFn: async ({ id, action, payment }: { id: string; action: string; payment?: { paymentMethod: string; paymentReference: string } }) => (await api.post(`/hrms/payroll/runs/${id}/${action}`, payment)).data,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['hrms-payroll-runs'] }); toast('Đã cập nhật trạng thái kỳ lương', 'success'); },
+    onError: (error) => toast(errorMessage(error), 'error'),
+  });
+
+  const attendanceEvidenceMutation = useMutation({
+    mutationFn: async ({ workDate, kind, file }: { workDate: string; kind: SlipAttendanceEvidence['kind']; file: File }) => {
+      if (!selectedSlip) throw new Error('Chưa chọn phiếu lương.');
+      if (file.size > 8 * 1024 * 1024) throw new Error('Tệp phải nhỏ hơn hoặc bằng 8 MB.');
+      const dataBase64 = await fileToBase64(file);
+      return api.post(`/hrms/payroll/slips/${selectedSlip.id}/attendance-evidence`, {
+        workDate, kind, title: file.name,
+        file: { name: file.name, mimeType: file.type || 'application/octet-stream', dataBase64 },
+      });
+    },
+    onSuccess: () => {
+      toast('Đã bổ sung chứng từ chấm công.', 'success');
+      if (selectedSlip) queryClient.invalidateQueries({ queryKey: ['hrms-slip-attendance', selectedSlip.id] });
+    },
     onError: (error) => toast(errorMessage(error), 'error'),
   });
 
@@ -601,6 +665,9 @@ export default function PayrollEnginePage() {
           size="sm"
           onClick={() => {
             setSelectedSlip(s);
+            setPayslipViewMode('summary');
+            setSelectedAttendanceDate(null);
+            setActiveAttendanceLegend(null);
             setIsPayslipModalOpen(true);
           }}
           className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-foreground"
@@ -774,8 +841,8 @@ export default function PayrollEnginePage() {
                   <div className="flex min-w-0 flex-col gap-2 xl:items-end">
                     <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 xl:justify-end">
                       <span className="font-medium">{currentRun.status}</span>
-                      {currentRun.status === 'PAID' && currentRun.paymentReference && (
-                        <span className="max-w-full truncate text-xs text-muted-foreground" title={`Chứng từ: ${currentRun.paymentReference}`}>Chứng từ: {currentRun.paymentReference}</span>
+                      {currentRun.paymentReference && (
+                        <span className="max-w-full truncate text-xs text-muted-foreground" title={`Chứng từ kỳ cũ: ${currentRun.paymentReference}`}>{currentRun.status === 'CANCELLED' ? 'Chứng từ kỳ cũ: ' : 'Chứng từ: '}{currentRun.paymentReference}</span>
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-2 xl:justify-end">
@@ -805,10 +872,10 @@ export default function PayrollEnginePage() {
                       <Download className="h-3 w-3 mr-1" />
                       Xuất CSV ngân hàng
                     </Button>
-                    {canDeletePayrollRun && <Button
+                    {canDeletePayrollRun && ['DRAFT', 'PROCESSED'].includes(currentRun.status) && <Button
                       variant="ghost"
                       size="sm"
-                      disabled={!['DRAFT', 'PROCESSED'].includes(currentRun.status)}
+                      disabled={deleteRunMutation.isPending}
                       onClick={() => {
                         if (confirm(`Bạn có chắc muốn xóa đợt lương "${currentRun.periodName}"?`)) {
                           deleteRunMutation.mutate(currentRun.id);
@@ -817,6 +884,18 @@ export default function PayrollEnginePage() {
                       className="h-7 text-xs px-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/20"
                     >
                       Xóa đợt này
+                    </Button>}
+                    {canDeletePayrollRun && !['DRAFT', 'PROCESSED', 'CANCELLED'].includes(currentRun.status) && <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={cancelRunMutation.isPending}
+                      onClick={() => {
+                        const confirmed = confirm(`Kỳ lương đang ở trạng thái ${currentRun.status}. Hủy để lập lại sẽ đánh dấu kỳ cũ là CANCELLED và giữ nguyên phiếu lương/chứng từ trong lịch sử. Thao tác này không đảo ngược khoản tiền đã chuyển. Bạn có muốn tiếp tục?`);
+                        if (confirmed) cancelRunMutation.mutate(currentRun.id);
+                      }}
+                      className="h-7 text-xs px-2.5"
+                    >
+                      Hủy kỳ để lập lại
                     </Button>}
                     </div>
                   </div>
@@ -853,7 +932,12 @@ export default function PayrollEnginePage() {
       {/* ================= TAB 2: THÀNH PHẦN LƯƠNG ================= */}
       {activeTab === 'components' && (
         <div className="space-y-4">
-        <p className="rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Lương nền lấy từ hợp đồng/quyết định; BHXH, BHYT, BHTN và thuế TNCN do bảng lương tự tính. Khung vị trí đã duyệt chỉ quy định khoảng lương cơ bản; phụ cấp ăn trưa/chức vụ cần chính sách riêng, nên hiện chưa gán mức mặc định.</p>
+        <p className="rounded-md border border-border bg-muted/30 px-3 py-2 text-xs leading-5 text-muted-foreground">
+          {isEnterprise
+            ? 'Chế độ doanh nghiệp tư nhân: phụ cấp trách nhiệm/nghiệp vụ hiện được tính bằng 10% lương cơ bản theo hợp đồng/quyết định của từng nhân viên và phân bổ theo ngày được hưởng.'
+            : 'Chế độ khu vực nhà nước: không dùng mức phụ cấp doanh nghiệp. Phụ cấp trách nhiệm theo đúng nhóm vị trí/hệ số tại Thông tư 05/2005/TT-BNV; hỗ trợ chuyển đổi số 5.000.000 đ/tháng theo Nghị định 179/2025/NĐ-CP chỉ cho đối tượng chuyên trách đủ điều kiện. Bảng lương chưa tự suy ra các khoản này từ ngạch/bậc; phải khai báo căn cứ và gán theo quyết định đã duyệt.'}
+          {' '}<Link href="/payroll-guide" className="font-medium text-primary underline">Xem hướng dẫn và ví dụ theo chế độ đang chọn</Link>
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Khoản Thu Nhập */}
           <div className="space-y-3">
@@ -880,7 +964,7 @@ export default function PayrollEnginePage() {
                     </div>
                     <div className="flex shrink-0 items-center gap-3 pt-0.5">
                       <span className="whitespace-nowrap font-mono text-xs text-foreground">
-                        {SYSTEM_MANAGED_PAYROLL_CODES.has(c.code) ? 'Tự tính' : c.defaultAmount > 0 ? `Mặc định ${c.defaultAmount.toLocaleString('vi-VN')} đ` : 'Chưa đặt mức'}
+                        {SYSTEM_MANAGED_PAYROLL_CODES.has(c.code) ? 'Tự tính' : c.isFormulaBased && c.formula === 'baseSalary * 0.1' ? '10% lương cơ bản' : c.defaultAmount > 0 ? `Mặc định ${c.defaultAmount.toLocaleString('vi-VN')} đ` : 'Chưa đặt mức'}
                       </span>
                       {canConfigurePayroll && <div className="flex items-center gap-1">
                         <Button
@@ -1003,7 +1087,7 @@ export default function PayrollEnginePage() {
                     <p className="mt-1 font-medium">{s.salaryBand ? `Theo khung ${s.salaryBand.code} · ${s.salaryBand.name}` : s.jobTitle ? `Chức danh: ${s.jobTitle}` : s.orgUnit ? `Mọi chức danh tại ${s.orgUnit.name}` : 'Chỉ áp dụng khi gán riêng'}{!s.salaryBand && s.jobTitle && s.orgUnit ? ` · ${s.orgUnit.name}` : !s.salaryBand && s.jobTitle ? ' · Mọi đơn vị' : ''}</p>
                   </div><span className="shrink-0 text-right text-muted-foreground">{s._count?.assignments ?? 0} gán riêng<br />{s.positionEmployeeCount ?? 0} tự áp dụng</span>
                 </div>
-                <div className="border-t border-border pt-2 space-y-1">{s.salaryBand ? <><div className="flex justify-between gap-3"><span>Lương cơ bản</span><span className="font-medium">Theo hợp đồng/quyết định cá nhân</span></div><div className="rounded bg-muted/50 p-2 text-muted-foreground">Khung tham chiếu {s.salaryBand.minSalary.toLocaleString('vi-VN')}–{s.salaryBand.maxSalary.toLocaleString('vi-VN')} đ/{s.salaryBand.compensationBasis === 'MONTHLY' ? 'tháng' : s.salaryBand.compensationBasis === 'DAILY' ? 'ngày' : 'giờ'}; mức giữa {s.salaryBand.midSalary.toLocaleString('vi-VN')} đ. Khung không tự cộng hoặc thay mức đã thỏa thuận.</div></> : null}{s.items.length ? s.items.map((item) => <div key={item.id} className="flex justify-between gap-3"><span>{item.component.name}</span><span className="font-mono">{item.formula && item.component.code === 'LUNCH_ALLOW' ? `${item.amount.toLocaleString('vi-VN')} đ × ngày công thực tế` : `${item.amount.toLocaleString('vi-VN')} đ/tháng`}</span></div>) : !s.salaryBand ? <p className="text-muted-foreground">Chưa cấu hình khoản thu nhập bổ sung.</p> : null}</div>
+                <div className="border-t border-border pt-2 space-y-1">{s.salaryBand ? <><div className="flex justify-between gap-3"><span>Lương cơ bản</span><span className="font-medium">Theo hợp đồng/quyết định cá nhân</span></div><div className="rounded bg-muted/50 p-2 text-muted-foreground">Khung tham chiếu {s.salaryBand.minSalary.toLocaleString('vi-VN')}–{s.salaryBand.maxSalary.toLocaleString('vi-VN')} đ/{s.salaryBand.compensationBasis === 'MONTHLY' ? 'tháng' : s.salaryBand.compensationBasis === 'DAILY' ? 'ngày' : 'giờ'}; mức giữa {s.salaryBand.midSalary.toLocaleString('vi-VN')} đ. Khung không tự cộng hoặc thay mức đã thỏa thuận.</div></> : null}{s.items.length ? s.items.map((item) => <div key={item.id} className="flex justify-between gap-3"><span>{item.component.name}</span><span className="font-mono">{item.formula && item.component.code === 'LUNCH_ALLOW' ? `${item.amount.toLocaleString('vi-VN')} đ × ngày công thực tế` : (item.formula || (item.component.isFormulaBased ? item.component.formula : null)) === 'baseSalary * 0.1' ? '10% lương cơ bản' : `${item.amount.toLocaleString('vi-VN')} đ/tháng`}</span></div>) : !s.salaryBand ? <p className="text-muted-foreground">Chưa cấu hình khoản thu nhập bổ sung.</p> : null}</div>
                 <details className="border-t border-border pt-2"><summary className="cursor-pointer">Xem {matched.length} nhân sự trong phạm vi</summary><ul className="mt-2 max-h-40 space-y-1 overflow-y-auto text-muted-foreground">{matched.map((employee) => <li key={employee.id}>{employee.fullName} · {employee.jobTitle || 'Chưa có chức danh'} · {employee.orgUnit?.name || 'Chưa xếp đơn vị'}{employee.currentStructureName === s.name ? ' · Gán riêng' : ''}</li>)}</ul></details>
                 {canConfigurePayroll ? <div className="border-t border-border pt-2 flex justify-end"><Button variant="outline" size="sm" onClick={() => { setSelectedStructureId(s.id); setIsAssignModalOpen(true); }} className="h-7 text-xs">Gán riêng cho nhân viên</Button></div> : null}
               </div>;
@@ -1511,9 +1595,9 @@ export default function PayrollEnginePage() {
       >
         {selectedSlip && (
           <div className="space-y-4 text-xs font-sans">
-            {/* Chế độ xem: Tóm tắt hoặc Giải trình công thức */}
+            {/* Chế độ xem: Phiếu lương, giải trình hoặc lịch sử chấm công */}
             <div className="flex items-center justify-between border-b border-border pb-2 no-print">
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => setPayslipViewMode('summary')}
@@ -1535,6 +1619,17 @@ export default function PayrollEnginePage() {
                   }`}
                 >
                   Giải Trình Công Thức Chi Tiết
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPayslipViewMode('attendance')}
+                  className={`px-3 py-1.5 rounded-md font-medium text-xs transition-colors ${
+                    payslipViewMode === 'attendance'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted/50 text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Chấm công & hồ sơ
                 </button>
               </div>
               <span className="text-2xs text-muted-foreground font-mono">
@@ -1592,14 +1687,105 @@ export default function PayrollEnginePage() {
                 </div>
 
               </div>
+            ) : payslipViewMode === 'attendance' ? (
+              <section className="space-y-3">
+                {slipAttendanceQuery.isLoading ? <LoadingState text="Đang tải lịch sử chấm công..." /> : null}
+                {slipAttendanceQuery.isError ? <div className="rounded-md border border-rose-300 p-3 text-rose-800">Không tải được lịch sử chấm công: {errorMessage(slipAttendanceQuery.error)}</div> : null}
+                {slipAttendanceQuery.data ? (() => {
+                  const detail = slipAttendanceQuery.data;
+                  const missingCount = detail.days.filter((day) => day.missingEvidence).length;
+                  const dateText = (value: string) => new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(value));
+                  const timeText = (value: string | null) => value ? new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' }).format(new Date(value)) : '—';
+                  const statusText = (day: SlipAttendanceDay) => day.status === 'ON_LEAVE' ? (day.leaveType === 'ANNUAL' ? 'Nghỉ phép hưởng lương' : day.leaveType === 'UNPAID' ? 'Nghỉ không lương' : `Nghỉ ${day.leaveType === 'SICK' ? 'ốm' : 'chế độ BHXH'}`) : day.status === 'HOLIDAY' ? 'Ngày lễ' : day.status === 'ABSENT' ? 'Vắng' : day.status === 'LATE' ? 'Đi muộn' : day.status === 'EARLY_LEAVE' ? 'Về sớm' : day.status === 'MISSING_PAIR' ? 'Thiếu lượt vào/ra' : day.status === 'PRESENT' ? day.workedMinutes < day.scheduledMinutes ? 'Thiếu giờ' : 'Đủ công' : day.status;
+                  const evidenceKind = (day: SlipAttendanceDay): SlipAttendanceEvidence['kind'] => (day.corrections.length > 0 || day.status === 'MISSING_PAIR') && !day.evidence.some((item) => item.kind === 'ATTENDANCE_CORRECTION') ? 'ATTENDANCE_CORRECTION' : day.leaveRequests.some((item) => item.status === 'APPROVED') && !day.evidence.some((item) => item.kind === 'LEAVE') ? 'LEAVE' : day.overtimeRequests.some((item) => item.status === 'APPROVED') && !day.evidence.some((item) => item.kind === 'OVERTIME') ? 'OVERTIME' : 'OTHER';
+                  const categoryFor = (day?: SlipAttendanceDay) => {
+                    if (!day) return 'none';
+                    if (day.status === 'ABSENT') return 'absent';
+                    if (day.status === 'MISSING_PAIR' || day.missingEvidence || day.status === 'LATE' || day.status === 'EARLY_LEAVE' || day.lateMinutes > 0 || day.earlyMinutes > 0 || day.workedMinutes < day.scheduledMinutes) return 'late';
+                    if (day.status === 'HOLIDAY' || day.status === 'ON_LEAVE') return 'other';
+                    return 'full';
+                  };
+                  const from = new Date(`${detail.fromDate.slice(0, 10)}T00:00:00.000Z`);
+                  const to = new Date(`${detail.toDate.slice(0, 10)}T00:00:00.000Z`);
+                  const mondayOffset = (from.getUTCDay() + 6) % 7;
+                  const gridStart = new Date(from);
+                  gridStart.setUTCDate(gridStart.getUTCDate() - mondayOffset);
+                  const gridLength = Math.ceil((mondayOffset + Math.floor((to.getTime() - from.getTime()) / 86_400_000) + 1) / 7) * 7;
+                  const dayByDate = new Map(detail.days.map((day) => [day.workDate.slice(0, 10), day]));
+                  const calendarCells = Array.from({ length: gridLength }, (_, index) => {
+                    const date = new Date(gridStart);
+                    date.setUTCDate(gridStart.getUTCDate() + index);
+                    const key = date.toISOString().slice(0, 10);
+                    return { key, inRange: date >= from && date <= to, day: dayByDate.get(key) };
+                  });
+                  const selectedDay = detail.days.find((day) => day.workDate.slice(0, 10) === selectedAttendanceDate) ?? detail.days[0] ?? null;
+                  const counts = {
+                    full: detail.days.filter((day) => categoryFor(day) === 'full').length,
+                    late: detail.days.filter((day) => categoryFor(day) === 'late').length,
+                    absent: detail.days.filter((day) => categoryFor(day) === 'absent').length,
+                    other: detail.days.filter((day) => categoryFor(day) === 'other').length,
+                  };
+                  const legend = {
+                    full: { label: 'Đủ công', swatch: 'bg-emerald-400/70 border-emerald-600/30', cell: 'bg-emerald-400/70 border-emerald-600/30', help: 'Xanh dịu: có dữ liệu chấm công, không muộn/về sớm và số giờ đạt lịch chuẩn.' },
+                    late: { label: 'Cần xem lại', swatch: 'bg-amber-300/80 border-amber-600/30', cell: 'bg-amber-300/80 border-amber-600/30', help: 'Vàng dịu: đi muộn, về sớm, thiếu lượt vào/ra hoặc còn thiếu tệp hồ sơ hỗ trợ.' },
+                    absent: { label: 'Vắng', swatch: 'bg-rose-300/80 border-rose-700/30', cell: 'bg-rose-300/80 border-rose-700/30', help: 'Đỏ dịu: hệ thống ghi nhận vắng trong ngày. Mở ngày để xem dữ liệu và hồ sơ liên quan.' },
+                    other: { label: 'Nghỉ / ngày lễ', swatch: 'bg-slate-300/80 border-slate-500/30', cell: 'bg-slate-300/80 border-slate-500/30', help: 'Xám dịu: ngày nghỉ hoặc ngày lễ, xem đơn nghỉ và trạng thái phê duyệt ở chi tiết ngày.' },
+                  } as const;
+                  return <>
+                    <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-muted/20 p-4">
+                      <div><h3 className="text-sm font-semibold">Lịch sử chấm công · {detail.employeeName}</h3><p className="mt-1 text-muted-foreground">{detail.employeeCode || 'Chưa có mã nhân viên'} · Kỳ {dateText(detail.fromDate)} – {dateText(detail.toDate)}</p><p className="mt-1 text-muted-foreground">{detail.source === 'ATTENDANCE_SNAPSHOT' ? 'Dữ liệu chốt công đã lưu cùng kỳ lương' : 'Kỳ cũ không có ảnh chụp chốt công; đang hiển thị dữ liệu chấm công hiện tại'}</p></div>
+                      <div className="text-right"><p className="font-semibold">{detail.days.length} ngày có dữ liệu</p><p className={missingCount ? 'mt-1 font-medium text-amber-800' : 'mt-1 text-muted-foreground'}>{missingCount ? `${missingCount} ngày chưa có tệp hồ sơ đính kèm` : 'Không có hồ sơ thiếu tệp đính kèm'}</p></div>
+                    </div>
+                    <p className="rounded-md border border-border p-3 text-muted-foreground">Giờ vào/ra và công lấy từ dữ liệu chốt của kỳ. Các đơn nghỉ/OT hiển thị trạng thái phê duyệt; tệp đính kèm là hồ sơ hỗ trợ để đối soát. Tải lên tệp thật của ngày tương ứng (PDF, Office, ảnh, TXT/CSV; tối đa 8 MB).</p>
+                    {detail.days.length === 0 ? <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">Kỳ lương này chưa có dữ liệu ngày công để hiển thị.</div> : <div className="space-y-3">
+                      <div className="rounded-lg border border-border bg-background p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-3"><div><h4 className="font-semibold">Lịch chấm công tháng</h4><p className="mt-1 text-muted-foreground">Chọn một ngày để xem giờ vào/ra, đơn nghỉ, OT và hồ sơ. Mỗi cột là một ngày trong tuần.</p></div><span className="font-medium text-foreground">{new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', month: 'long', year: 'numeric' }).format(from)}</span></div>
+                        <div className="mt-4 overflow-x-auto pb-2">
+                          <div className="min-w-[700px]">
+                            <div className="mb-2 grid grid-cols-7 gap-2 text-center text-xs font-medium text-muted-foreground"><span>Thứ 2</span><span>Thứ 3</span><span>Thứ 4</span><span>Thứ 5</span><span>Thứ 6</span><span>Thứ 7</span><span>Chủ nhật</span></div>
+                            <div className="grid grid-cols-7 gap-2" aria-label="Lịch chấm công theo ngày">
+                            {calendarCells.map(({ key, inRange, day }) => {
+                              const category = categoryFor(day);
+                              const cellColor = category === 'none' ? 'border-border bg-muted/20 text-muted-foreground' : category === 'full' ? 'border-emerald-600/45 bg-emerald-300/85 text-emerald-950' : category === 'late' ? 'border-amber-600/45 bg-amber-300/90 text-amber-950' : category === 'absent' ? 'border-rose-600/40 bg-rose-300/90 text-rose-950' : 'border-slate-500/35 bg-slate-200 text-slate-900';
+                              const isSelected = selectedDay?.workDate.slice(0, 10) === key;
+                              const content = inRange ? `${dateText(key)} · ${day ? statusText(day) : 'Không có dữ liệu chấm công'}${day?.missingEvidence ? ' · Chưa có tệp hồ sơ' : ''}` : '';
+                              return inRange ? <button key={key} type="button" disabled={!day} onClick={() => day && setSelectedAttendanceDate(key)} title={content} aria-label={content} aria-pressed={Boolean(day && isSelected)} className={`flex min-h-[76px] flex-col items-start justify-between rounded-md border p-2 text-left transition-shadow sm:min-h-[90px] sm:p-2.5 ${cellColor} ${day ? 'cursor-pointer hover:ring-2 hover:ring-foreground/25' : 'cursor-default'} ${day && isSelected ? 'outline outline-2 outline-foreground/70 outline-offset-1' : ''}`}><span className="text-sm font-semibold">{Number(key.slice(-2))}</span>{day ? <span className="w-full"><span className="block truncate text-[11px] font-medium">{statusText(day)}</span><span className="mt-1 block truncate text-[10px] opacity-80">{timeText(day.firstInAt)}–{timeText(day.lastOutAt)}</span><span className="block truncate text-[10px] opacity-80">{(day.workedMinutes / 60).toFixed(1)} / {(day.scheduledMinutes / 60).toFixed(1)} giờ</span></span> : <span className="text-[10px] opacity-70">{inRange ? 'Không có dữ liệu' : ''}</span>}</button> : <span key={key} aria-hidden="true" className="min-h-[76px] sm:min-h-[90px]" />;
+                            })}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                          {(Object.entries(legend) as [keyof typeof legend, typeof legend.full][]).map(([key, item]) => <button key={key} type="button" aria-pressed={activeAttendanceLegend === key} onClick={() => setActiveAttendanceLegend(activeAttendanceLegend === key ? null : key)} className={`flex items-center gap-2 rounded-md border px-2.5 py-2 text-left transition-colors ${activeAttendanceLegend === key ? 'border-foreground/50 bg-muted' : 'border-border hover:bg-muted/50'}`}><span className={`h-3.5 w-3.5 shrink-0 rounded-[3px] border ${item.swatch}`} /><span className="min-w-0"><span className="block font-medium">{item.label}</span><span className="text-muted-foreground">{counts[key]} ngày</span></span></button>)}
+                        </div>
+                        {activeAttendanceLegend ? <p className="mt-3 rounded-md bg-muted/50 px-3 py-2 text-muted-foreground" role="status">{legend[activeAttendanceLegend].help}</p> : null}
+                      </div>
+                      {selectedDay ? <article className={`rounded-lg border p-4 ${selectedDay.missingEvidence ? 'border-amber-500/50 bg-amber-50/40 dark:bg-amber-950/10' : 'border-border bg-background'}`}>
+                        <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-semibold">{dateText(selectedDay.workDate)} · {statusText(selectedDay)}</p><p className="mt-1 text-muted-foreground">Vào {timeText(selectedDay.firstInAt)} · Ra {timeText(selectedDay.lastOutAt)} · {(selectedDay.workedMinutes / 60).toFixed(2)} / {(selectedDay.scheduledMinutes / 60).toFixed(2)} giờ</p><p className="mt-1 text-muted-foreground">Muộn {selectedDay.lateMinutes} phút · Về sớm {selectedDay.earlyMinutes} phút · {selectedDay.eventCount} lượt chấm</p></div>
+                          {selectedDay.missingEvidence ? <label className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5 font-medium hover:bg-muted"><Upload className="h-3.5 w-3.5" />{attendanceEvidenceMutation.isPending ? 'Đang tải...' : 'Bổ sung tệp'}<input type="file" className="sr-only" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt,.csv" disabled={attendanceEvidenceMutation.isPending} onChange={(event) => { const file = event.currentTarget.files?.[0]; if (file) attendanceEvidenceMutation.mutate({ workDate: selectedDay.workDate, kind: evidenceKind(selectedDay), file }); event.currentTarget.value = ''; }} /></label> : null}
+                        </div>
+                        {(selectedDay.events.length > 0 || selectedDay.corrections.length > 0 || selectedDay.leaveRequests.length > 0 || selectedDay.overtimeRequests.length > 0 || selectedDay.evidence.length > 0) ? <div className="mt-3 space-y-1.5 border-t border-border/70 pt-3 text-muted-foreground">
+                          {selectedDay.events.length ? <p><b className="text-foreground">Lượt chấm:</b> {selectedDay.events.map((event) => `${timeText(event.occurredAt)}${event.anomalyReason ? ` (${event.anomalyReason})` : ''}`).join(' · ')}</p> : null}
+                          {selectedDay.corrections.map((correction) => <p key={correction.id}><b className="text-foreground">Hiệu chỉnh {correction.field}:</b> {correction.oldValue || '—'} → {correction.newValue || '—'} · {correction.reason} · {correction.correctedBy} ({timeText(correction.createdAt)}){!selectedDay.evidence.some((item) => item.kind === 'ATTENDANCE_CORRECTION') ? ' · Chưa có tệp hỗ trợ' : ''}</p>)}
+                          {selectedDay.leaveRequests.map((item) => <p key={item.id}><b className="text-foreground">Đơn nghỉ {item.type} · {item.status}:</b> {item.reason}{item.decisionNote ? ` · Ghi chú duyệt: ${item.decisionNote}` : ''}{item.status === 'APPROVED' && !selectedDay.evidence.some((file) => file.kind === 'LEAVE') ? ' · Chưa đính kèm tệp' : ''}</p>)}
+                          {selectedDay.overtimeRequests.map((item) => <p key={item.id}><b className="text-foreground">OT {item.status} · {item.hours} giờ (đêm {item.nightHours} giờ):</b> {item.reason}{item.decisionNote ? ` · Ghi chú duyệt: ${item.decisionNote}` : ''}{item.status === 'APPROVED' && !selectedDay.evidence.some((file) => file.kind === 'OVERTIME') ? ' · Chưa đính kèm tệp' : ''}</p>)}
+                          {selectedDay.evidence.map((file) => <p key={file.id} className="flex flex-wrap items-center gap-1.5"><Paperclip className="h-3.5 w-3.5" /><span>{file.title}</span><button type="button" onClick={() => void openProtectedFile(file.fileUrl)} className="text-primary underline underline-offset-2">Mở tệp</button><span>· {file.kind}</span></p>)}
+                        </div> : <p className="mt-3 border-t border-border/70 pt-3 text-muted-foreground">Không có lượt chấm hoặc hồ sơ bổ sung cho ngày này.</p>}
+                      </article> : null}
+                    </div>}
+                  </>;
+                })() : null}
+              </section>
             ) : (
               /* TAB: PHIẾU LƯƠNG CHUẨN IN ẤN (PRINTABLE DOC) */
+              <div className="payslip-preview-stage overflow-x-auto rounded-lg bg-slate-100 p-4">
               <div id="print-payslip-doc" className="print-area print-payslip space-y-3 text-xs font-sans">
                 <style jsx global>{`
                   #print-payslip-doc {
                     box-sizing: border-box;
                     width: 210mm;
-                    max-width: 100%;
+                    min-width: 210mm;
+                    max-width: none;
+                    min-height: 297mm;
                     margin: 0 auto;
                     padding: 15mm 15mm 15mm 20mm;
                     background: #fff;
@@ -1608,16 +1794,45 @@ export default function PayrollEnginePage() {
                     font-size: 10pt;
                     line-height: 1.3;
                   }
+                  #print-payslip-doc,
+                  #print-payslip-doc * {
+                    font-family: "Times New Roman", Times, serif !important;
+                  }
+                  #print-payslip-doc table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    table-layout: auto;
+                    margin: 2mm 0 4mm;
+                    border: 1px solid #111;
+                    font-size: 10pt;
+                  }
+                  #print-payslip-doc th,
+                  #print-payslip-doc td {
+                    padding: 2mm 2.5mm;
+                    border: 1px solid #777;
+                    vertical-align: top;
+                    word-break: normal;
+                    overflow-wrap: anywhere;
+                  }
+                  #print-payslip-doc th {
+                    background: #f2f2f2;
+                    color: #000;
+                    font-weight: 700;
+                    text-align: left;
+                  }
+                  #print-payslip-doc .amount { text-align: right; white-space: nowrap; }
+                  #print-payslip-doc .payslip-total { border-top: 1px solid #111; font-weight: 700; }
+                  #print-payslip-doc .payslip-section { break-inside: avoid; page-break-inside: avoid; }
                   #print-payslip-doc header { display: block; }
                   @media print {
-                    #print-payslip-doc { width: 210mm !important; max-width: 210mm !important; margin: 0 !important; padding: 15mm 15mm 15mm 20mm !important; font-size: 10pt !important; line-height: 1.3 !important; }
+                    #print-payslip-doc { width: 210mm !important; min-width: 210mm !important; max-width: 210mm !important; min-height: 297mm !important; margin: 0 !important; padding: 15mm 15mm 15mm 20mm !important; font-size: 10pt !important; line-height: 1.3 !important; }
                     #print-payslip-doc > header { display: block !important; visibility: visible !important; }
-                    #print-payslip-doc table { width: 100% !important; border-collapse: collapse !important; table-layout: auto !important; margin: 2mm 0 4mm !important; }
-                    #print-payslip-doc th, #print-payslip-doc td { padding: 2mm 2.5mm !important; border-bottom: 1px solid #777 !important; vertical-align: top !important; word-break: normal !important; overflow-wrap: anywhere !important; }
-                    #print-payslip-doc th { text-align: left !important; border-top: 1px solid #111 !important; border-bottom: 1px solid #111 !important; }
+                    #print-payslip-doc table { width: 100% !important; border-collapse: collapse !important; table-layout: auto !important; margin: 2mm 0 4mm !important; font-size: 10pt !important; }
+                    #print-payslip-doc th, #print-payslip-doc td { padding: 2mm 2.5mm !important; border: 1px solid #777 !important; vertical-align: top !important; word-break: normal !important; overflow-wrap: anywhere !important; }
+                    #print-payslip-doc th { background: #f2f2f2 !important; text-align: left !important; border-top: 1px solid #111 !important; border-bottom: 1px solid #111 !important; }
                     #print-payslip-doc .amount { text-align: right !important; white-space: nowrap !important; }
                     #print-payslip-doc .payslip-total { border-top: 1px solid #111 !important; font-weight: bold !important; }
-                    #print-payslip-doc .payslip-section { break-inside: avoid; page-break-inside: avoid; }
+                    #print-payslip-doc .payslip-section { break-inside: avoid !important; page-break-inside: avoid !important; }
                   }
                 `}</style>
                 <header className="text-center pb-3">
@@ -1688,15 +1903,16 @@ export default function PayrollEnginePage() {
                   <div><p className="font-bold uppercase">Người duyệt</p><p className="italic">(Ký, ghi rõ họ tên)</p><div className="h-16" /></div>
                 </footer>
               </div>
+              </div>
             )}
           </div>
         )}
 
         <ModalFooterActions
-          onCancel={() => setIsPayslipModalOpen(false)}
-          cancelLabel="Đóng"
-          confirmLabel="In phiếu lương"
-          onConfirm={() => printDocumentElement('print-payslip-doc')}
+          onCancel={() => payslipViewMode === 'attendance' ? setPayslipViewMode('summary') : setIsPayslipModalOpen(false)}
+          cancelLabel={payslipViewMode === 'attendance' ? 'Quay lại phiếu lương' : 'Đóng'}
+          confirmLabel={payslipViewMode === 'attendance' ? 'Đóng' : 'In phiếu lương'}
+          onConfirm={() => payslipViewMode === 'attendance' ? setIsPayslipModalOpen(false) : printDocumentElement('print-payslip-doc')}
         />
       </Modal>
     </div>

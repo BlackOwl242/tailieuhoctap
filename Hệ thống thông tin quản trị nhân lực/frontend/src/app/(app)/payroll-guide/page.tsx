@@ -121,6 +121,7 @@ export default function PayrollGuidePage() {
         <div>
           <h2 className="flex items-center gap-2 text-lg font-semibold"><BookOpen className="h-5 w-5 text-primary" />Hướng dẫn thao tác lương trong hệ thống</h2>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">Làm theo thứ tự dưới đây. Thiết lập chính sách, thành phần và cấu trúc ở trang Tiền lương; chỉ tạo kỳ sau khi dữ liệu công, nghỉ và làm thêm đã được đối soát.</p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">Chế độ áp dụng được chọn tại <b>Quản trị → Đơn vị tổ chức → Chế độ tổ chức</b>; các hướng dẫn và cảnh báo ở trang lương thay đổi theo chế độ đã chọn. <Link href="/admin/org-units" className="font-medium text-primary underline">Mở cấu hình tổ chức</Link></p>
         </div>
         {isEnterprise ? <>
           <div className="grid gap-3 lg:grid-cols-2">
@@ -133,6 +134,7 @@ export default function PayrollGuidePage() {
               <h3 className="font-semibold">2. Khai báo từng thành phần thu nhập/khấu trừ</h3>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">Trong tab <b>Thành phần lương</b>, tạo khoản như phụ cấp trách nhiệm, ăn trưa, thưởng hoặc khấu trừ. Mỗi khoản cần mã, tên, loại, nguồn căn cứ và số văn bản/quy chế. Chọn rõ chịu thuế, tính căn cứ bảo hiểm hay tính căn cứ OT. Nếu chưa có mức được duyệt, không tự đặt số; mức mặc định 0 không tự phát sinh thu nhập.</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">Mức mặc định là giá trị để đưa vào cấu trúc, không phải bằng chứng mọi nhân viên được hưởng. Khoản phụ thuộc ngày công/điều kiện cần mô tả điều kiện và kiểm tra kết quả từng phiếu.</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground"><b>Phụ cấp trách nhiệm/nghiệp vụ:</b> chính sách doanh nghiệp đang cấu hình là <b>10% lương cơ bản của từng nhân viên</b>. Hệ thống lấy lương theo hợp đồng/quyết định của người đó, tính khoản phụ cấp theo công thức <code>baseSalary × 0,10</code> rồi phân bổ theo ngày được hưởng trong kỳ.</p>
               <Link href="/payroll-engine?tab=components" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">Mở thành phần lương <ArrowRight className="h-4 w-4" /></Link>
             </div>
             <div className="rounded-lg border p-4">
@@ -170,10 +172,22 @@ export default function PayrollGuidePage() {
               <Link href="/my-payslips" className="rounded-md border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted">Phiếu lương của tôi</Link>
             </div>
           </div>
-        </> : <div className="rounded-lg border p-4 text-sm leading-6 text-muted-foreground">
-          <p>Với chế độ khu vực công, bắt đầu bằng việc xác nhận loại nhân sự, ngạch/bậc hoặc chế độ trả lương và quyết định đang có hiệu lực trong hồ sơ. Chính sách lương và khoản phụ cấp phải do cơ quan có thẩm quyền xác nhận. Hiện hệ thống hỗ trợ lưu/đối chiếu dữ liệu nhưng chưa tự quy đổi đầy đủ hệ số công vụ thành lương; phải kiểm tra bảng tính bên ngoài trước khi chi trả.</p>
-          <p className="mt-2">Sau đó đối soát công, phép và làm thêm; lập kỳ; rà soát từng phiếu và so với quyết định/bảng tính của cơ quan trước khi duyệt. Không dùng cấu trúc/phụ cấp doanh nghiệp để thay chế độ ngạch bậc.</p>
-          <Link href="/salary-ranks" className="mt-3 inline-flex items-center gap-1 font-medium text-primary hover:underline">Mở hồ sơ ngạch bậc <ArrowRight className="h-4 w-4" /></Link>
+        </> : <div className="space-y-4 rounded-lg border p-4 text-sm leading-6 text-muted-foreground">
+          <div>
+            <p>Với chế độ khu vực công, xác nhận loại nhân sự, ngạch/bậc, hệ số và quyết định đang có hiệu lực trong hồ sơ. Chính sách lương và từng khoản phụ cấp phải do cơ quan có thẩm quyền xác nhận. Sau đó đối soát công, phép và làm thêm; lập kỳ; rà soát từng phiếu với quyết định/bảng tính của cơ quan trước khi duyệt.</p>
+            <p className="mt-2">Không dùng cấu trúc, mức phụ cấp doanh nghiệp hoặc dải thị trường để thay chế độ ngạch bậc.</p>
+          </div>
+          <div className="rounded-lg border bg-background p-4">
+            <h3 className="font-semibold text-foreground">Phụ cấp trách nhiệm và hỗ trợ chuyển đổi số — hai khoản riêng</h3>
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              <li><b className="text-foreground">Phụ cấp trách nhiệm công việc:</b> Thông tư 05/2005/TT-BNV quy định bốn hệ số 0,5; 0,3; 0,2; 0,1 cho các nhóm công việc cụ thể. Đây không phải bốn mức mặc định áp cho mọi công chức, viên chức.</li>
+              <li><b className="text-foreground">Ví dụ tính theo mức lương cơ sở:</b> từ 01/07/2026, mức lương cơ sở là 2.530.000 đồng/tháng; tương ứng 1.265.000; 759.000; 506.000; 253.000 đồng/tháng. Chỉ dùng hệ số đúng với vị trí đủ điều kiện và quyết định được duyệt.</li>
+              <li><b className="text-foreground">Hỗ trợ chuyên trách chuyển đổi số/an toàn thông tin/an ninh mạng:</b> Nghị định 179/2025/NĐ-CP quy định mức 5.000.000 đồng/tháng cho nhóm đối tượng và vị trí việc làm đủ điều kiện. Không tự gán cho mọi nhân sự IT hoặc cộng chung với phụ cấp trách nhiệm.</li>
+            </ul>
+            <p className="mt-2">Trong hồ sơ, lưu hệ số, vị trí, ngày hiệu lực và quyết định. Trong <b className="text-foreground">Tiền lương → Bảng tính lương → Thành phần lương</b>, khai báo hai khoản tách biệt và mặc định 0; trong <b className="text-foreground">Cấu trúc lương</b>, gán đúng người/vị trí, đúng số tiền đã được duyệt. Bảng lương hiện chưa tự suy ra khoản trách nhiệm từ ngạch/bậc hoặc tự xác định ai đủ điều kiện nhận hỗ trợ 5 triệu; phải đối chiếu quyết định và chi tiết phiếu trước khi duyệt.</p>
+            <p className="mt-2 text-xs">Căn cứ: <a className="underline" href="https://vbpl.vn/TW/Pages/vbpq-toanvan.aspx?ItemID=15834" target="_blank" rel="noreferrer">Thông tư 05/2005/TT-BNV</a>, <a className="underline" href="https://chinhphu.vn/?docid=218107&pageid=27160" target="_blank" rel="noreferrer">Nghị định 161/2026/NĐ-CP</a>, <a className="underline" href="https://chinhphu.vn/?classid=1&docid=214333&pageid=27160&typegroupid=4" target="_blank" rel="noreferrer">Nghị định 179/2025/NĐ-CP</a>.</p>
+          </div>
+          <Link href="/salary-ranks" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">Mở hồ sơ ngạch bậc <ArrowRight className="h-4 w-4" /></Link>
         </div>}
       </Card>
 

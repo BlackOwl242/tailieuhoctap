@@ -51,6 +51,10 @@ function defaultColumnMinWidth(column: { minWidth?: number; key: string; header:
   return Math.max(104, Math.min(168, column.header.length * 8 + 40));
 }
 
+function normalizeColumnText(value: string) {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase();
+}
+
 export interface DataFilterDef<T> {
   key: string;
   label: string;
@@ -257,6 +261,10 @@ export function DataTable<T>({
 
   const hasToolbar = searchFields || filters.length > 0 || toolbarExtra || exportFilename || showPrint || printLabel;
   const tableMinWidth = columns.reduce((width, column) => width + defaultColumnMinWidth(column), actions ? 72 : 0);
+  const primaryColumn = columns.find((column) => {
+    const text = normalizeColumnText(`${column.key} ${column.header}`);
+    return /(^|\W)(name|fullname|employee|personnel|staff|title|subject)(\W|$)|ho va ten|ho ten|nhan su|nhan vien|can bo|nguoi lao dong|ten nhan vien|chuc danh/.test(text);
+  }) ?? columns[0];
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
@@ -326,7 +334,38 @@ export function DataTable<T>({
       ) : null}
 
       {/* --------------------------------- Bảng --------------------------------- */}
-      <div tabIndex={0} aria-label="Bảng dữ liệu; cuộn ngang để xem thêm cột" className="max-w-full overflow-x-auto rounded-lg border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [overscroll-behavior-x:contain]">
+      <div className="overflow-hidden rounded-lg border bg-card sm:hidden print:hidden">
+        {loading ? (
+          <div className="space-y-3 p-4">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}</div>
+        ) : pageRows.length === 0 ? (
+          <EmptyState title={emptyTitle} hint={emptyHint} />
+        ) : (
+          <ul className="divide-y divide-border">
+            {pageRows.map((row) => (
+              <li key={rowKey(row)} className="min-w-0 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1 text-sm font-semibold text-foreground">
+                    {primaryColumn?.render ? primaryColumn.render(row) : String((row as Record<string, unknown>)[primaryColumn?.key ?? ''] ?? primaryColumn?.header ?? '')}
+                  </div>
+                  {actions ? <div className="shrink-0"><ActionsCell items={actions(row)} rowLabel={`dòng ${(row as Record<string, unknown>).id ?? ''}`} /></div> : null}
+                </div>
+                <dl className="mt-3 grid min-w-0 grid-cols-2 gap-x-4 gap-y-2">
+                  {columns.filter((column) => column !== primaryColumn).map((column) => (
+                    <div key={column.key} className="min-w-0">
+                      <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{column.header}</dt>
+                      <dd className="mt-0.5 min-w-0 break-words text-sm text-foreground">
+                        {column.render ? column.render(row) : String((row as Record<string, unknown>)[column.key] ?? 'Chưa cập nhật')}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div tabIndex={0} aria-label="Bảng dữ liệu; cuộn ngang để xem thêm cột" className="hidden sm:block print:block max-w-full overflow-x-auto rounded-lg border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [overscroll-behavior-x:contain]">
         <table className="w-full text-sm" style={{ minWidth: `max(100%, ${tableMinWidth}px)` }}>
           <thead>
             <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">

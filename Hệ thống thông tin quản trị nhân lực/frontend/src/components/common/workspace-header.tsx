@@ -51,9 +51,13 @@ export function WorkspaceHeader({
         </nav>
       )}
 
-      <div className="grid min-w-0 grid-cols-1 gap-3 2xl:grid-cols-[minmax(0,1fr)_auto] 2xl:items-center">
-        <h1 className="min-w-0 text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
-        {actions && <div className="min-w-0 max-w-full">{actions}</div>}
+      <div className="grid min-w-0 grid-cols-1 gap-3 2xl:grid-cols-[minmax(0,1fr)_minmax(0,auto)] 2xl:items-center">
+        <h1 className="min-w-0 break-words text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
+        {actions && (
+          <div className="min-w-0 w-full max-w-full 2xl:w-auto 2xl:justify-self-end [&>*]:max-w-full [&>div.flex]:flex-col [&>div.flex>*]:w-full sm:[&>div.flex]:flex-row sm:[&>div.flex>*]:w-auto">
+            {actions}
+          </div>
+        )}
       </div>
 
       {description && (

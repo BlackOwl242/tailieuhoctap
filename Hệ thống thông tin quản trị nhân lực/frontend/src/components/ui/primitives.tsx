@@ -208,7 +208,7 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
   containerClassName?: string;
 }
 
-export const SelectDialogContext = React.createContext(false);
+export const SelectDialogContext = React.createContext<HTMLElement | null>(null);
 
 /**
  * Select hiện đại toàn hệ thống:
@@ -250,7 +250,7 @@ export function Select({
     openUpwards: boolean;
   } | null>(null);
   const [mounted, setMounted] = React.useState(false);
-  const selectDialogContext = React.useContext(SelectDialogContext);
+  const selectDialogLayer = React.useContext(SelectDialogContext);
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const popoverRef = React.useRef<HTMLDivElement>(null);
@@ -262,7 +262,7 @@ export function Select({
 
   // SSR guard
   React.useEffect(() => { setMounted(true); }, []);
-  const insideDialog = selectDialogContext || Boolean(
+  const insideDialog = Boolean(selectDialogLayer) || Boolean(
     containerRef.current?.closest('[data-select-dialog="true"], [role="dialog"], [aria-modal="true"]')
   );
 
@@ -347,9 +347,9 @@ export function Select({
     const topPos = Math.max(TOPBAR_HEIGHT + 6, r.bottom + 6);
     const bottomPos = window.innerHeight - (r.top - 6);
     setCoords({
-      top: shouldOpenUp ? undefined : topPos,
-      bottom: shouldOpenUp ? bottomPos : undefined,
-      left: leftPos,
+      top: shouldOpenUp ? undefined : insideDialog && dialogRect ? topPos - dialogRect.top : topPos,
+      bottom: shouldOpenUp ? insideDialog && dialogRect ? dialogRect.bottom - r.top + 6 : bottomPos : undefined,
+      left: insideDialog && dialogRect ? leftPos - dialogRect.left : leftPos,
       width: popoverWidth,
       maxHeight,
       openUpwards: shouldOpenUp,
@@ -485,12 +485,13 @@ export function Select({
       className="bg-popover border border-border rounded-md shadow-xl overflow-hidden animate-in fade-in-50 zoom-in-95 duration-100 flex flex-col font-sans"
       style={{
         position: insideDialog ? 'absolute' : 'fixed',
-        left: insideDialog ? 0 : coords.left,
+        left: coords.left,
         width: coords.width,
-        top: insideDialog ? (coords.openUpwards ? undefined : 'calc(100% + 6px)') : coords.top,
-        bottom: insideDialog ? (coords.openUpwards ? 'calc(100% + 6px)' : undefined) : coords.bottom,
+        top: coords.top,
+        bottom: coords.bottom,
         maxHeight: coords.maxHeight,
         zIndex: 120,
+        pointerEvents: 'auto',
       }}
     >
       {/* Ô tìm kiếm nếu danh sách >= 6 mục hoặc có cờ searchable */}
@@ -633,7 +634,7 @@ export function Select({
       </button>
 
       {/* Menu trong modal nằm cùng lớp nội dung để giữ tìm kiếm, cuộn và nhận click đúng. */}
-      {popoverContent && (insideDialog ? popoverContent : mounted ? createPortal(popoverContent, document.body) : null)}
+      {popoverContent && (insideDialog && selectDialogLayer ? createPortal(popoverContent, selectDialogLayer) : mounted ? createPortal(popoverContent, document.body) : null)}
 
       {/* Hidden native select để hỗ trợ HTML5 form submission và required check */}
       <select

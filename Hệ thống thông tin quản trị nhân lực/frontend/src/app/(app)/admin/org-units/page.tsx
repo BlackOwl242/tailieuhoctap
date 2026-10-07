@@ -394,14 +394,14 @@ export default function AdminOrgUnitsPage() {
         {depth > 0 && (
           <div
             className="absolute top-0 bottom-0 border-l border-border pointer-events-none"
-            style={{ left: (depth - 1) * 20 + 17 }}
+            style={{ left: (depth - 1) * 12 + 17 }}
           />
         )}
         <div
-          className={`group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/60 transition-colors duration-100 ${
+          className={`group flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-md px-2 py-1.5 hover:bg-muted/60 transition-colors duration-100 ${
             nodeLevel === 1 ? 'bg-muted/40 font-semibold mb-0.5' : ''
           }`}
-          style={{ paddingLeft: depth * 20 + 6 }}
+          style={{ paddingLeft: depth * 12 + 6 }}
         >
           <button
             onClick={() => toggle(node.id)}
@@ -416,7 +416,7 @@ export default function AdminOrgUnitsPage() {
           </button>
 
           {/* Tên đơn vị */}
-          <span className={nameClass}>{node.name}</span>
+          <span className={`${nameClass} min-w-0 flex-1 basis-[calc(100%-2rem)] break-words sm:basis-auto`}>{node.name}</span>
 
           {/* Mã đơn vị - Tối giản */}
           <span className="text-xs font-mono text-muted-foreground font-normal shrink-0">
@@ -424,13 +424,13 @@ export default function AdminOrgUnitsPage() {
           </span>
 
           {/* Số này là nhân sự gán trực tiếp tại đơn vị, không cộng đơn vị con. */}
-          <span className="ml-auto mr-3 text-xs font-mono text-muted-foreground tabular-nums shrink-0">
+          <span className="ml-auto mr-1 text-xs font-mono text-muted-foreground tabular-nums shrink-0">
             {node.memberCount}{' '}
             <span className="text-xs font-sans text-muted-foreground font-normal">nhân sự trực tiếp</span>
           </span>
 
           {/* Hành động: Chỉ hiện khi hover để màn hình luôn tĩnh lặng, sạch sẽ */}
-          <span className="shrink-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
+          <span className="shrink-0 opacity-100 sm:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
             {nodeActions(node)}
           </span>
         </div>
@@ -890,8 +890,8 @@ export default function AdminOrgUnitsPage() {
         <div className="no-print space-y-4">
           {view === 'tree' ? (
             <Card className="rounded-lg border-border shadow-xs overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-muted/20">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-2 px-4 py-3 border-b border-border/60 bg-muted/20 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <FolderTree className="h-4 w-4 text-primary" />
                   <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
                     Sơ đồ phân cấp đơn vị
@@ -900,7 +900,7 @@ export default function AdminOrgUnitsPage() {
                     ({flat.length} nút · {directOrgUnitCount} đơn vị · {flat.reduce((sum, f) => sum + f.node.memberCount, 0)} nhân sự đã gán đơn vị)
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5">
                   <Button
                     size="sm"
                     variant="ghost"

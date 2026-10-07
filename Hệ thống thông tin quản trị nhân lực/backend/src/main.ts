@@ -21,7 +21,11 @@ async function bootstrap(): Promise<void> {
     timestamp: pino.stdTimeFunctions.isoTime,
   });
 
-  const app = await NestFactory.create(AppModule, { logger: false, rawBody: false });
+  const app = await NestFactory.create(AppModule, { logger: false, rawBody: false, bodyParser: false });
+  // HR attachments are sent as base64 JSON (maximum 8 MB); keep the parser limit
+  // just above that encoded size so uploads do not fail at Express's 100 KB default.
+  app.use(express.json({ limit: '12mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
   // Request id correlation (echoed back in every response and every log line)
   app.use((req: express.Request & { requestId?: string }, res: express.Response, next: express.NextFunction) => {

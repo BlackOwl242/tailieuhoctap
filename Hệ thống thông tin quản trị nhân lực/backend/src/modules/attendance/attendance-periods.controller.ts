@@ -17,6 +17,14 @@ export class AttendancePeriodsController {
   constructor(private readonly prisma: PrismaService, private readonly ledger: AttendanceLedgerService) {}
   @Get()
   list() { return this.prisma.attendancePeriod.findMany({ orderBy: [{ year: 'desc' }, { month: 'desc' }] }); }
+  @Get(':year/:month')
+  async getPeriod(@Param('year') year: string, @Param('month') month: string) {
+    const period = await this.prisma.attendancePeriod.findUnique({
+      where: { month_year: { year: Number(year), month: Number(month) } },
+      select: { id: true, month: true, year: true, status: true, version: true, closedAt: true },
+    });
+    return period;
+  }
   @Post('finalize')
   finalize(@Body() dto: ClosePeriodDto, @CurrentUser() actor: AuthUser) { return this.ledger.finalize(dto.month, dto.year, actor.id); }
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')

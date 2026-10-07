@@ -65,6 +65,10 @@ export class FilesService {
       if (probation) { allowed = isHr || roles.has('BOD') || probation.userId === actor.id || probation.managerId === actor.id; }
     }
     if (!allowed) {
+      const attendanceEvidence = await this.prisma.hrmsAttendanceEvidence.findFirst({ where: { fileUrl: url }, select: { userId: true } });
+      if (attendanceEvidence) { originalName = 'Chứng từ chấm công'; allowed = isHr || roles.has('ACCOUNTANT') || attendanceEvidence.userId === actor.id; }
+    }
+    if (!allowed) {
       const offer = await this.prisma.hrmsJobOffer.findFirst({ where: { acceptedEvidenceUrl: url }, select: { applicantId: true } });
       if (offer) { allowed = roles.has('ADMIN') || roles.has('HR_RECRUITER') || roles.has('KM_MANAGER'); }
     }

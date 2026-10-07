@@ -25,7 +25,8 @@ export const useToastStore = create<ToastStore>((set) => ({
   push: (title, variant = 'info') => {
     const id = Date.now() + Math.random();
     set((s) => ({ items: [...s.items, { id, title, variant }] }));
-    setTimeout(() => set((s) => ({ items: s.items.filter((t) => t.id !== id) })), 4000);
+    // Keep errors visible long enough to read detailed server validation messages.
+    setTimeout(() => set((s) => ({ items: s.items.filter((t) => t.id !== id) })), variant === 'error' ? 30_000 : 4_000);
   },
   dismiss: (id) => set((s) => ({ items: s.items.filter((t) => t.id !== id) })),
 }));

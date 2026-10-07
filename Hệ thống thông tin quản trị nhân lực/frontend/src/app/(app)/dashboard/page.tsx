@@ -205,7 +205,7 @@ export default function FrappeHrmsDeskDashboard() {
                   href="/admin/roles"
                   className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted transition-colors shadow-2xs"
                 >
-                  <KeyRound className="h-3.5 w-3.5 text-rose-500" />
+                  <KeyRound className="h-3.5 w-3.5 text-muted-foreground" />
                   Phân quyền RBAC
                 </Link>
               )}
@@ -237,7 +237,7 @@ export default function FrappeHrmsDeskDashboard() {
           />
           <NumberCard
             title="Quỹ lương chu kỳ"
-            value={latestRun ? `${(latestRun.totalNetPay / 1_000_000).toFixed(1)} Tr` : 'Chưa cập nhật'}
+            value={latestRun ? `${new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(latestRun.totalNetPay / 1_000_000_000)} tỷ đồng` : 'Chưa cập nhật'}
             subtitle="Bảng lương chu kỳ gần nhất"
             icon={Wallet}
           />
@@ -258,7 +258,7 @@ export default function FrappeHrmsDeskDashboard() {
             </span>
             <span className="text-xs text-muted-foreground">Truy cập tức thì</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-6 gap-2">
             {[
               { label: 'Phân Ca Tuần', href: '/shifts', icon: Clock4 },
               { label: 'Tính Lương', href: '/payroll-engine', icon: Calculator },
@@ -482,7 +482,7 @@ export default function FrappeHrmsDeskDashboard() {
           </span>
           <span className="text-xs text-muted-foreground">Truy cập nhanh</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-6 gap-2">
           {[
             { label: 'Điểm Danh Ca', href: '/check-in', icon: ShieldCheck },
             { label: 'Đăng Ký Nghỉ Phép', href: '/leave', icon: CalendarDays },
