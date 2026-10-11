@@ -48,7 +48,7 @@
     "Bảng 4.5: Nhánh ngoại lệ không được suy thành trạng thái hồ sơ",
     "Bảng 4.6: Phân bố thực thi và giao tiếp",
     "Bảng 4.7: Ma trận phụ thuộc các gói đề xuất",
-    "Bảng 4.8: Các màn hình phần mềm nghiên cứu",
+    "Bảng 4.8: Các màn hình hệ thống",
     "Bảng 4.9: Trạng thái và kiểm soát của CMS tin tức",
     "Bảng 5.1: Mức cung cấp và phạm vi hướng dẫn",
     "Bảng 5.2: Điều kiện để một hướng dẫn chuyên biệt được coi là đầy đủ",
@@ -240,7 +240,9 @@
     "Hình 4.36: Trạng thái kết nối và hàng chờ cục bộ",
     "Hình 4.37: Trang chủ công dân hiển thị tin lấy từ dữ liệu đã xuất bản",
     "Hình 4.38: Danh sách và trạng thái tin trong tài khoản quản trị viên",
-    "Hình 4.39: Biểu mẫu biên tập tin với chuyên mục, ảnh và nguồn chính thức"
+    "Hình 4.39: Biểu mẫu biên tập tin với chuyên mục, ảnh và nguồn chính thức",
+    "Hình 4.40: Tài khoản cá nhân, quyền công tác và tình trạng xác minh email",
+    "Hình 4.41: Cập nhật liên hệ, đổi mật khẩu và quản lý phiên đăng nhập"
   ],
-  "paragraphs": 674
+  "paragraphs": 686
 }

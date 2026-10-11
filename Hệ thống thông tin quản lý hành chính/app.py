@@ -69,6 +69,7 @@ SESSION_TTL = 60 * 60 * 12
 PASSWORD_ITERATIONS = 600_000
 COOKIE_SECURE = os.environ.get("HANOI_COOKIE_SECURE", "0") == "1"
 STAFF_ROLES = {"intake", "specialist", "leader", "registrar", "finance", "admin"}
+ROLE_LABELS = {"intake": "Cán bộ tiếp nhận", "specialist": "Chuyên viên thụ lý", "leader": "Lãnh đạo phê duyệt", "registrar": "Văn thư phát hành", "finance": "Tài chính", "admin": "Quản trị hệ thống"}
 NEWS_CATEGORIES = ("Hoạt động của Trung tâm", "Hành chính xung kích", "Cải cách hành chính", "Chuyển đổi số", "Tiện ích công dân")
 DEFAULT_NEWS = [
     ("khai-sinh", "Hỗ trợ đăng ký khai sinh tại Bệnh viện Phụ sản", "10/10/2026", "Hoạt động của Trung tâm", "news-birth.jpg", "Gia đình được hướng dẫn làm thủ tục trực tuyến ngay tại bệnh viện.", "/hoat-dong-cua-trung-tam/ha-noi-trien-khai-quay-ho-tro-dang-ky-khai-sinh-ngay-tai-benh-vien-phu-san-2850261010092318881.htm", 1),
@@ -213,6 +214,70 @@ def load_catalog() -> list[dict]:
 
 PROCEDURES = load_catalog()
 PROCEDURE_BY_CODE = {p["code"]: p for p in PROCEDURES}
+for procedure in PROCEDURES:
+    procedure["fieldSource"] = procedure.get("field", "").strip() or "Chưa phân loại"
+PROCEDURE_OVERRIDES: dict[str, dict] = {}
+PROCEDURE_CATEGORY_OVERRIDES: dict[str, dict] = {}
+SAMPLE_DATASET_VERSION = 2
+
+
+def procedure_catalog_records() -> list[dict]:
+    records = []
+    for source in PROCEDURES:
+        item = dict(source)
+        item["sourceCode"] = source["code"]
+        edit = PROCEDURE_OVERRIDES.get(item["code"])
+        if edit:
+            item.update({key: edit[key] for key in ("name", "field", "level", "agency")})
+            item["code"] = edit.get("localCode") or source["code"]
+            item["fieldSource"] = edit.get("categoryKey") or edit["field"] or "Chưa phân loại"
+            item["serviceMode"] = {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}.get(item["level"], "UNKNOWN")
+            item["localEdit"] = {key: edit[key] for key in ("sourceUrl", "checkedAt", "reason", "version", "updatedBy", "updatedAt")}
+        item["field"] = item.get("field", "").strip() or "Chưa phân loại"
+        category_edit = PROCEDURE_CATEGORY_OVERRIDES.get(item.get("fieldSource") or "Chưa phân loại")
+        if category_edit:
+            item["field"] = category_edit["displayName"]
+            item["categoryEdit"] = {key: category_edit[key] for key in ("sourceUrl", "checkedAt", "reason", "version", "updatedBy", "updatedAt")}
+        item["categoryKey"] = item.get("fieldSource") or "Chưa phân loại"
+        item.pop("fieldSource", None)
+        records.append(item)
+    return records
+
+
+def procedure_category_records() -> list[dict]:
+    """Return all reference groups, including locally created groups with no procedures yet."""
+    groups: dict[str, dict] = {}
+    for source in PROCEDURES:
+        key = source.get("fieldSource") or "Chưa phân loại"
+        edit = PROCEDURE_CATEGORY_OVERRIDES.get(key)
+        groups.setdefault(key, {
+            "key": key,
+            "name": edit["displayName"] if edit else (source.get("field") or "Chưa phân loại"),
+            "source": "internal" if key.startswith("local:") else "reference",
+            "categoryEdit": edit,
+        })
+    for key, edit in PROCEDURE_CATEGORY_OVERRIDES.items():
+        groups.setdefault(key, {
+            "key": key, "name": edit["displayName"],
+            "source": "internal" if key.startswith("local:") else "reference",
+            "categoryEdit": edit,
+        })
+    for item in procedure_catalog_records():
+        key = item.get("categoryKey") or item.get("field") or "Chưa phân loại"
+        group = groups.setdefault(key, {
+            "key": key, "name": item.get("field") or "Chưa phân loại",
+            "source": "internal" if key.startswith("local:") else "reference",
+            "categoryEdit": item.get("categoryEdit"),
+        })
+        group["name"] = item.get("field") or group["name"]
+        group.setdefault("procedures", []).append(item)
+    for group in groups.values():
+        group.setdefault("procedures", [])
+        group["count"] = len(group["procedures"])
+        edit = group.get("categoryEdit")
+        group["categoryEdit"] = ({key: edit[key] for key in ("sourceUrl", "checkedAt", "reason", "version", "updatedBy", "updatedAt")}
+                                  if edit else None)
+    return sorted(groups.values(), key=lambda item: (item["name"].casefold(), item["key"].casefold()))
 
 
 class ClosingSQLiteConnection(sqlite3.Connection):
@@ -337,6 +402,59 @@ def init_db() -> None:
                 created_at TEXT NOT NULL
             );
             CREATE INDEX IF NOT EXISTS idx_news_audit_article ON news_audit_log(news_id, id DESC);
+            CREATE TABLE IF NOT EXISTS procedure_catalog_edits (
+                procedure_code TEXT PRIMARY KEY,
+                local_code TEXT NOT NULL DEFAULT '',
+                name TEXT NOT NULL,
+                field TEXT NOT NULL,
+                category_key TEXT NOT NULL DEFAULT '',
+                level TEXT NOT NULL,
+                agency TEXT NOT NULL,
+                source_url TEXT NOT NULL,
+                checked_at TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                version INTEGER NOT NULL DEFAULT 1,
+                updated_by TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS procedure_catalog_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                procedure_code TEXT NOT NULL,
+                actor_id TEXT NOT NULL,
+                actor_name TEXT NOT NULL,
+                action TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                before_json TEXT,
+                after_json TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_procedure_catalog_audit_code ON procedure_catalog_audit(procedure_code, id DESC);
+            CREATE TABLE IF NOT EXISTS procedure_category_edits (
+                source_field TEXT PRIMARY KEY,
+                display_name TEXT NOT NULL,
+                source_url TEXT NOT NULL,
+                checked_at TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                version INTEGER NOT NULL DEFAULT 1,
+                updated_by TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS procedure_category_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source_field TEXT NOT NULL,
+                actor_id TEXT NOT NULL,
+                actor_name TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                before_json TEXT,
+                after_json TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_procedure_category_audit_field ON procedure_category_audit(source_field, id DESC);
+            CREATE TABLE IF NOT EXISTS app_data_versions (
+                data_key TEXT PRIMARY KEY,
+                version INTEGER NOT NULL,
+                applied_at TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS staff_access_requests (
                 id TEXT PRIMARY KEY,
                 user_id TEXT NOT NULL REFERENCES users(id),
@@ -392,6 +510,10 @@ def init_db() -> None:
         """)
         if "submission_hash" not in {row["name"] for row in con.execute("PRAGMA table_info(case_lookup_secrets)")} :
             con.execute("ALTER TABLE case_lookup_secrets ADD COLUMN submission_hash TEXT NOT NULL DEFAULT ''")
+        if "category_key" not in {row["name"] for row in con.execute("PRAGMA table_info(procedure_catalog_edits)")}:
+            con.execute("ALTER TABLE procedure_catalog_edits ADD COLUMN category_key TEXT NOT NULL DEFAULT ''")
+        if "local_code" not in {row["name"] for row in con.execute("PRAGMA table_info(procedure_catalog_edits)")}:
+            con.execute("ALTER TABLE procedure_catalog_edits ADD COLUMN local_code TEXT NOT NULL DEFAULT ''")
         if con.execute("SELECT COUNT(*) FROM news_articles").fetchone()[0] == 0:
             for news_id, title, date_label, category, image_path, summary, source_path, featured in DEFAULT_NEWS:
                 published_at = datetime.strptime(date_label, "%d/%m/%Y").replace(tzinfo=TZ).isoformat(timespec="seconds")
@@ -404,6 +526,7 @@ def init_db() -> None:
             "may_sign_stop": "INTEGER NOT NULL DEFAULT 0",
             "signing_authority_ref": "TEXT NOT NULL DEFAULT ''",
             "must_change_password": "INTEGER NOT NULL DEFAULT 0",
+            "can_manage_agency_accounts": "INTEGER NOT NULL DEFAULT 0",
         }.items():
             if name not in user_columns:
                 con.execute(f"ALTER TABLE users ADD COLUMN {name} {declaration}")
@@ -415,13 +538,43 @@ def init_db() -> None:
         }.items():
             if name not in request_columns:
                 con.execute(f"ALTER TABLE staff_access_requests ADD COLUMN {name} {declaration}")
-        # Remove records created by the earlier demo build. New installations
-        # begin empty; user submissions are never generated by the server.
+        # Remove records created by the retired, unlabelled demo build. The current
+        # simulation dataset has a version marker and is kept intact across restarts.
         for row in con.execute("SELECT id,owner_id,payload_json FROM cases").fetchall():
             payload = json.loads(row["payload_json"])
-            if row["owner_id"].startswith("demo-") or payload.get("sample"):
+            if row["owner_id"].startswith("demo-") or (payload.get("sample") and payload.get("sampleDatasetVersion") != SAMPLE_DATASET_VERSION):
                 con.execute("DELETE FROM cases WHERE id=?", (row["id"],))
         con.execute("DELETE FROM sessions WHERE expires_at < ?", (int(datetime.now(TZ).timestamp()),))
+        global PROCEDURE_OVERRIDES
+        PROCEDURE_OVERRIDES = {
+            row["procedure_code"]: {
+                "localCode": row["local_code"] or row["procedure_code"],
+                "name": row["name"], "field": row["field"], "categoryKey": row["category_key"] or row["field"] or "Chưa phân loại", "level": row["level"], "agency": row["agency"],
+                "sourceUrl": row["source_url"], "checkedAt": row["checked_at"], "reason": row["reason"],
+                "version": row["version"], "updatedBy": row["updated_by"], "updatedAt": row["updated_at"],
+            }
+            for row in con.execute("SELECT * FROM procedure_catalog_edits").fetchall()
+        }
+        for code, edit in PROCEDURE_OVERRIDES.items():
+            if code in PROCEDURE_BY_CODE:
+                PROCEDURE_BY_CODE[code].update({key: edit[key] for key in ("name", "field", "level", "agency")})
+                PROCEDURE_BY_CODE[code]["fieldSource"] = edit.get("categoryKey") or edit["field"] or "Chưa phân loại"
+                PROCEDURE_BY_CODE[code]["serviceMode"] = {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}.get(edit["level"], "UNKNOWN")
+                if edit.get("localCode") and edit["localCode"] != code:
+                    PROCEDURE_BY_CODE[edit["localCode"]] = PROCEDURE_BY_CODE[code]
+        global PROCEDURE_CATEGORY_OVERRIDES
+        PROCEDURE_CATEGORY_OVERRIDES = {
+            row["source_field"]: {
+                "displayName": row["display_name"], "sourceUrl": row["source_url"], "checkedAt": row["checked_at"],
+                "reason": row["reason"], "version": row["version"], "updatedBy": row["updated_by"], "updatedAt": row["updated_at"],
+            }
+            for row in con.execute("SELECT * FROM procedure_category_edits").fetchall()
+        }
+        for procedure in PROCEDURES:
+            category_edit = PROCEDURE_CATEGORY_OVERRIDES.get(procedure.get("fieldSource") or "Chưa phân loại")
+            if category_edit:
+                procedure["field"] = category_edit["displayName"]
+    seed_training_cases()
 
 
 def procedure_for(code: str) -> dict:
@@ -667,6 +820,8 @@ def public_case_view(con: sqlite3.Connection, row: sqlite3.Row) -> dict:
         "publicNote": payload.get("publicNote", ""),
         "result": result,
         "feedbackSubmitted": feedback_exists,
+        "sampleData": bool(payload.get("sampleDatasetVersion")),
+        "sampleDataNote": payload.get("sampleNote", "") if payload.get("sampleDatasetVersion") else "",
     }
 
 
@@ -820,7 +975,11 @@ def validate_password(password: str) -> None:
 
 
 def public_user(user: sqlite3.Row) -> dict:
-    return {"id": user["id"], "email": user["email"], "phone": user["phone"], "name": user["full_name"], "role": user["role"], "emailVerified": False, "agencyScope": user["agency_scope"], "validFrom": user["valid_from"], "validUntil": user["valid_until"], "maySignStop": bool(user["may_sign_stop"]), "signingAuthorityRef": user["signing_authority_ref"], "mustChangePassword": bool(user["must_change_password"])}
+    return {"id": user["id"], "email": user["email"], "phone": user["phone"], "name": user["full_name"], "role": user["role"], "emailVerified": False, "agencyScope": user["agency_scope"], "validFrom": user["valid_from"], "validUntil": user["valid_until"], "maySignStop": bool(user["may_sign_stop"]), "signingAuthorityRef": user["signing_authority_ref"], "mustChangePassword": bool(user["must_change_password"]), "canManageAgencyAccounts": bool(user["can_manage_agency_accounts"])}
+
+
+def can_manage_staff_accounts(user: sqlite3.Row) -> bool:
+    return user["role"] == "admin" or bool(user["can_manage_agency_accounts"])
 
 
 def new_session(con: sqlite3.Connection, user_id: str) -> tuple[str, str, int]:
@@ -1261,6 +1420,119 @@ def build_stats(cases: list[dict]) -> dict:
         if due_day and due_day < today:
             overdue.append(case)
     return {"total": len(cases), "open": len(open_cases), "waiting": counts.get("CHO_TIEP_NHAN", 0), "supplement": counts.get("CHO_BO_SUNG", 0), "review": counts.get("TRINH_DUYET", 0), "overdue": len(overdue), "byStatus": counts}
+
+
+def seed_training_cases() -> None:
+    """Install a clearly labelled, local-only scenario set once for UI/workflow practice."""
+    agencies = {
+        "so": "Sở Nông nghiệp và Môi trường Hà Nội",
+        "tay-ho": "UBND phường Tây Hồ",
+    }
+    scenarios = [
+        ("so", "CHO_TIEP_NHAN", 1), ("so", "DA_TIEP_NHAN", 3), ("so", "DANG_THU_LY", 2),
+        ("so", "DANG_THU_LY", 8), ("so", "CHO_BO_SUNG", 5), ("so", "TRINH_DUYET", 4),
+        ("so", "DA_PHE_DUYET", 12), ("so", "HOAN_THANH", 17),
+        ("tay-ho", "CHO_TIEP_NHAN", 2), ("tay-ho", "DA_TIEP_NHAN", 6),
+        ("tay-ho", "DANG_THU_LY", 3), ("tay-ho", "CHO_BO_SUNG", 7),
+        ("tay-ho", "TRINH_DUYET", 9), ("tay-ho", "DA_PHAT_HANH", 14),
+        ("tay-ho", "HOAN_THANH", 21), ("tay-ho", "TU_CHOI", 10), ("tay-ho", "DUNG", 25),
+    ]
+    actions_for_status = {
+        "CHO_TIEP_NHAN": [],
+        "DA_TIEP_NHAN": [("accept", "Đã tiếp nhận", "Cán bộ đã kiểm tra thông tin ban đầu trong tình huống mô phỏng.")],
+        "DANG_THU_LY": [("accept", "Đã tiếp nhận", "Hồ sơ mô phỏng đã qua bước kiểm tra ban đầu."), ("assign", "Chuyển chuyên viên thụ lý", "Đã phân công chuyên viên theo phạm vi cơ quan mô phỏng.")],
+        "CHO_BO_SUNG": [("accept", "Đã tiếp nhận", "Hồ sơ mô phỏng đã được tiếp nhận."), ("assign", "Chuyển chuyên viên thụ lý", "Đã phân công xử lý."), ("request_supplement", "Yêu cầu bổ sung", "Tình huống thực hành: cần bổ sung thông tin còn thiếu.")],
+        "TRINH_DUYET": [("accept", "Đã tiếp nhận", "Hồ sơ mô phỏng đã được tiếp nhận."), ("assign", "Chuyển chuyên viên thụ lý", "Đã phân công xử lý."), ("submit_review", "Trình phê duyệt", "Chuyển lãnh đạo xem xét trong tình huống thực hành.")],
+        "DA_PHE_DUYET": [("accept", "Đã tiếp nhận", "Hồ sơ mô phỏng đã được tiếp nhận."), ("assign", "Chuyển chuyên viên thụ lý", "Đã phân công xử lý."), ("submit_review", "Trình phê duyệt", "Đã chuyển lãnh đạo xem xét."), ("approve", "Đã phê duyệt", "Tình huống mô phỏng đã được phê duyệt, chờ phát hành.")],
+        "DA_PHAT_HANH": [("accept", "Đã tiếp nhận", "Hồ sơ mô phỏng đã được tiếp nhận."), ("assign", "Chuyển chuyên viên thụ lý", "Đã phân công xử lý."), ("submit_review", "Trình phê duyệt", "Đã chuyển lãnh đạo xem xét."), ("approve", "Đã phê duyệt", "Đã phê duyệt trong tình huống mô phỏng."), ("issue", "Phát hành kết quả", "Đã ghi nhận kết quả mô phỏng; không có giá trị pháp lý.")],
+        "HOAN_THANH": [("accept", "Đã tiếp nhận", "Hồ sơ mô phỏng đã được tiếp nhận."), ("assign", "Chuyển chuyên viên thụ lý", "Đã phân công xử lý."), ("submit_review", "Trình phê duyệt", "Đã chuyển lãnh đạo xem xét."), ("approve", "Đã phê duyệt", "Đã phê duyệt trong tình huống mô phỏng."), ("issue", "Phát hành kết quả", "Đã ghi nhận kết quả mô phỏng; không có giá trị pháp lý."), ("deliver", "Trả kết quả", "Đã hoàn tất tình huống thực hành; không phải kết quả hành chính thật.")],
+        "TU_CHOI": [("reject", "Từ chối tiếp nhận", "Tình huống thực hành minh họa hồ sơ chưa đáp ứng điều kiện tiếp nhận.")],
+        "DUNG": [("accept", "Đã tiếp nhận", "Hồ sơ mô phỏng đã được tiếp nhận."), ("assign", "Chuyển chuyên viên thụ lý", "Đã phân công xử lý."), ("submit_review", "Trình phê duyệt", "Đã chuyển lãnh đạo xem xét."), ("approve", "Đã phê duyệt", "Đã phê duyệt tình huống mô phỏng."), ("stop", "Dừng quy trình", "Tình huống thực hành minh họa nhánh dừng xử lý; không phải văn bản thật.")],
+    }
+    with DB_LOCK, connect() as con:
+        installed = con.execute("SELECT version FROM app_data_versions WHERE data_key='training-cases'").fetchone()
+        if installed and installed["version"] >= SAMPLE_DATASET_VERSION:
+            return
+        existing = con.execute("SELECT COUNT(*) FROM cases WHERE json_extract(payload_json,'$.sampleDatasetVersion')=?", (SAMPLE_DATASET_VERSION,)).fetchone()[0]
+        if existing:
+            con.execute("INSERT INTO app_data_versions(data_key,version,applied_at) VALUES('training-cases',?,?) ON CONFLICT(data_key) DO UPDATE SET version=excluded.version,applied_at=excluded.applied_at", (SAMPLE_DATASET_VERSION, now_iso()))
+            return
+        staff_by_scope = {}
+        for key, agency in agencies.items():
+            staff_by_scope[key] = {
+                row["role"]: row for row in con.execute(
+                    "SELECT id,full_name,role FROM users WHERE active=1 AND agency_scope=? COLLATE NOCASE AND role IN ('intake','specialist','leader','registrar','finance') ORDER BY created_at,id",
+                    (agency,),
+                ).fetchall()
+            }
+        for index, (agency_key, status, age_days) in enumerate(scenarios, start=1):
+            agency = agencies[agency_key]
+            office = staff_by_scope[agency_key]
+            procedure_code = "1.004237" if agency_key == "so" else "2.000908"
+            procedure = dict(procedure_for(procedure_code))
+            procedure["code"] = procedure_code
+            created_dt = datetime.now(TZ) - timedelta(days=age_days)
+            created_dt = created_dt.replace(hour=9 + (index % 6), minute=(index * 7) % 60, second=0, microsecond=0)
+            created = created_dt.isoformat(timespec="seconds")
+            code = f"HN-{created_dt.year}-{hashlib.sha256(f'TRAINING-CODE-{index}'.encode('ascii')).hexdigest()[:8].upper()}"
+            lookup_key = hashlib.sha256(f"TRAINING-KEY-{index}".encode("ascii")).hexdigest().upper()
+            owner_hash = hashlib.sha256(lookup_key.encode("ascii")).hexdigest()
+            actions = actions_for_status[status]
+            assigned = office.get("specialist")
+            if status in {"DANG_THU_LY", "CHO_BO_SUNG", "TRINH_DUYET", "DA_PHE_DUYET", "DA_PHAT_HANH", "HOAN_THANH", "DUNG"}:
+                assignee = {"assigneeId": assigned["id"], "assigneeName": assigned["full_name"], "assignedAt": created} if assigned else None
+            else:
+                assignee = None
+            closed = status in {"DA_PHAT_HANH", "HOAN_THANH", "TU_CHOI", "KHONG_GIAI_QUYET", "DUNG"}
+            if closed:
+                deadline = (created_dt.date() + timedelta(days=4)).isoformat()
+            elif index % 5 == 0:
+                deadline = (datetime.now(TZ).date() - timedelta(days=2)).isoformat()
+            elif index % 3 == 0:
+                deadline = (datetime.now(TZ).date() + timedelta(days=2)).isoformat()
+            else:
+                deadline = (datetime.now(TZ).date() + timedelta(days=7)).isoformat()
+            fee_status = "DUE" if procedure_code == "1.004237" and index in {3, 7} else "NOT_CONNECTED"
+            payload = {
+                "procedureCode": procedure_code, "procedure": procedure, "applicantType": "citizen",
+                "agencyScope": agency, "receivingAgency": agency,
+                "applicant": {"name": f"Công dân mô phỏng {index:02d}", "phone": "", "email": ""},
+                "subject": {"name": f"Chủ hồ sơ mô phỏng {index:02d}", "relation": "Người yêu cầu"},
+                "requestSummary": f"Tình huống thực hành số {index:02d}: kiểm tra luồng xử lý thủ tục {procedure_code}.",
+                "schemaVersion": (procedure.get("submission") or {}).get("version", "scenario-v1"),
+                "declaration": {"scenario": f"Tình huống mô phỏng {index:02d}", "purpose": "Thực hành giao diện và luồng nghiệp vụ; không phải thông tin công dân thật."},
+                "deliveryMethod": "Trực tiếp", "deliveryAddress": "", "attachments": [], "events": [],
+                "fee": {"status": fee_status, "amount": None, "note": "Tình huống mô phỏng; chưa phát sinh nghĩa vụ tài chính thật."},
+                "sync": {"status": "NOT_CONFIGURED", "attempts": 0}, "assignment": {"assigneeId": assignee["assigneeId"], "assigneeName": assignee["assigneeName"], "assignedAt": assignee["assignedAt"]} if assignee else {},
+                "deadline": deadline, "deadlineNote": "Hạn minh họa trong dữ liệu tình huống; không dùng làm hạn pháp lý.",
+                "sample": True, "sampleDatasetVersion": SAMPLE_DATASET_VERSION,
+                "sampleNote": "Dữ liệu tình huống sinh tại máy cục bộ để thực hành và kiểm tra; không phải hồ sơ công dân, không có giá trị pháp lý hoặc báo cáo chính thức.",
+            }
+            if status == "CHO_BO_SUNG":
+                payload["supplement"] = {"reason": "Tình huống mô phỏng: cần bổ sung thông tin minh họa để kiểm tra nhánh phản hồi.", "items": [], "requestedAt": created, "stage": "CITIZEN", "resumeStatus": "DANG_THU_LY"}
+            if status in {"DA_PHAT_HANH", "HOAN_THANH"}:
+                payload["result"] = {"number": f"MO-PHONG-{index:03d}", "content": "Kết quả minh họa trong dữ liệu mô phỏng, không phải quyết định hoặc văn bản do cơ quan nhà nước phát hành.", "issuedAt": created, "publishedAt": created}
+            con.execute("INSERT INTO cases(code,owner_id,procedure_code,status,version,idempotency_key,payload_json,created_at,updated_at) VALUES(?,?,?,?,1,NULL,?,?,?)",
+                        (code, owner_hash, procedure_code, status, json.dumps(payload, ensure_ascii=False), created, now_iso()))
+            case_id = con.execute("SELECT id FROM cases WHERE code=?", (code,)).fetchone()["id"]
+            con.execute("INSERT INTO case_lookup_secrets(case_id,encrypted_key,submission_hash,updated_at) VALUES(?,?,?,?)",
+                        (case_id, lookup_cipher().encrypt(lookup_key.encode("ascii")), hashlib.sha256(lookup_key.encode("ascii")).hexdigest(), now_iso()))
+            add_event(con, case_id, "citizen", "Người nộp (mô phỏng)", "submit", "Đã gửi hồ sơ mô phỏng", payload["sampleNote"], "public", created)
+            for action_index, (action, title, detail) in enumerate(actions, start=1):
+                event_at = (created_dt + timedelta(hours=action_index * 5)).isoformat(timespec="seconds")
+                if action == "submit_review":
+                    actor = office.get("specialist")
+                elif action == "approve":
+                    actor = office.get("leader")
+                elif action in {"issue", "deliver"}:
+                    actor = office.get("registrar") or office.get("intake")
+                else:
+                    actor = office.get("intake")
+                add_event(con, case_id, (actor["role"] if actor else "intake"), (actor["full_name"] if actor else "Cán bộ mô phỏng"), action, title, detail, "public", event_at)
+            if status == "HOAN_THANH":
+                con.execute("INSERT INTO feedback(case_id,owner_id,score,content,created_at) VALUES(?,?,5,?,?)",
+                            (case_id, owner_hash, "Giao diện và các bước được minh họa rõ ràng trong tình huống thực hành.", now_iso()))
+        con.execute("INSERT INTO app_data_versions(data_key,version,applied_at) VALUES('training-cases',?,?) ON CONFLICT(data_key) DO UPDATE SET version=excluded.version,applied_at=excluded.applied_at", (SAMPLE_DATASET_VERSION, now_iso()))
 
 
 class AppHandler(BaseHTTPRequestHandler):
@@ -1845,6 +2117,7 @@ class AppHandler(BaseHTTPRequestHandler):
             "agencyScope": row["agency_scope"],
             "validFrom": row["valid_from"],
             "validUntil": row["valid_until"],
+            "canManageAgencyAccounts": bool(row["can_manage_agency_accounts"]),
         }
 
     def request_staff_account_change(self, user_id: str, body: dict, requester: sqlite3.Row):
@@ -1873,16 +2146,29 @@ class AppHandler(BaseHTTPRequestHandler):
             raise ValueError("Không thể kích hoạt tài khoản với thời hạn đã kết thúc.")
         change_id = str(uuid.uuid4())
         created = now_iso()
-        proposed = {"role": role, "active": body["active"], "agencyScope": agency_scope, "validFrom": valid_from, "validUntil": valid_until}
         with DB_LOCK, connect() as con:
             target = con.execute("SELECT * FROM users WHERE id=? AND role!='citizen'", (user_id,)).fetchone()
             if not target:
                 return self.send_error_json("Không tìm thấy tài khoản cán bộ.", 404)
+            if requester["role"] != "admin":
+                if role == "admin" or target["role"] == "admin" or target["agency_scope"].strip().casefold() != requester["agency_scope"].strip().casefold():
+                    raise PermissionError("Chỉ được đề nghị thay đổi tài khoản thuộc cơ quan đang được giao quản lý.")
+                if agency_scope.casefold() != requester["agency_scope"].strip().casefold():
+                    raise PermissionError("Quản trị viên cơ quan không được chuyển tài khoản sang cơ quan khác.")
+                can_manage_agency_accounts = bool(target["can_manage_agency_accounts"])
+            else:
+                requested_manager = body.get("canManageAgencyAccounts", bool(target["can_manage_agency_accounts"]))
+                if not isinstance(requested_manager, bool):
+                    raise ValueError("Quyền quản lý tài khoản cơ quan phải được gửi rõ ràng.")
+                can_manage_agency_accounts = requested_manager
+            if role == "admin" and can_manage_agency_accounts:
+                raise ValueError("Tài khoản quản trị hệ thống không đồng thời mang quyền quản trị cơ quan.")
             if requester["id"] == user_id:
                 raise PermissionError("Không thể lập đề nghị thay đổi chính tài khoản đang sử dụng.")
             if not target["active"] and con.execute("SELECT 1 FROM staff_access_requests WHERE user_id=? AND status='PENDING'", (user_id,)).fetchone():
                 raise RuntimeError("Tài khoản đang chờ duyệt đề nghị cấp ban đầu; hãy xử lý đề nghị đó trước.")
             before = self.account_access_values(target)
+            proposed = {"role": role, "active": body["active"], "agencyScope": agency_scope, "validFrom": valid_from, "validUntil": valid_until, "canManageAgencyAccounts": can_manage_agency_accounts}
             if before == proposed:
                 raise ValueError("Thông tin đề nghị giống quyền hiện tại; không có nội dung cần thay đổi.")
             pending = con.execute("SELECT 1 FROM staff_account_changes WHERE user_id=? AND status='PENDING'", (user_id,)).fetchone()
@@ -1915,7 +2201,10 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.send_error_json("Tài khoản đích không còn tồn tại.", 404)
             before = json.loads(request["before_json"])
             proposed = json.loads(request["proposed_json"])
-            if self.account_access_values(target) != before:
+            before.setdefault("canManageAgencyAccounts", False)
+            proposed.setdefault("canManageAgencyAccounts", False)
+            current_access = self.account_access_values(target)
+            if current_access != before:
                 raise RuntimeError("Quyền tài khoản đã đổi sau khi lập đề nghị. Hãy lập đề nghị mới dựa trên thông tin hiện tại.")
             status = "APPROVED" if decision == "approve" else "REJECTED"
             if decision == "approve":
@@ -1927,7 +2216,7 @@ class AppHandler(BaseHTTPRequestHandler):
                     proposed_is_effective_admin = proposed["role"] == "admin" and proposed["active"] and (not proposed["validFrom"] or proposed["validFrom"] <= today) and (not proposed["validUntil"] or proposed["validUntil"] >= today)
                     if not other_admins and not proposed_is_effective_admin:
                         raise ValueError("Không thể thu hồi hoặc hạ quyền quản trị viên cuối cùng đang có hiệu lực.")
-                con.execute("UPDATE users SET role=?,active=?,agency_scope=?,valid_from=?,valid_until=?,updated_at=? WHERE id=?", (proposed["role"], int(proposed["active"]), proposed["agencyScope"], proposed["validFrom"], proposed["validUntil"], now_iso(), target["id"]))
+                con.execute("UPDATE users SET role=?,active=?,agency_scope=?,valid_from=?,valid_until=?,can_manage_agency_accounts=?,updated_at=? WHERE id=?", (proposed["role"], int(proposed["active"]), proposed["agencyScope"], proposed["validFrom"], proposed["validUntil"], int(proposed["canManageAgencyAccounts"]), now_iso(), target["id"]))
                 if target["role"] == "leader" and proposed["role"] != "leader" and target["may_sign_stop"]:
                     con.execute("UPDATE users SET may_sign_stop=0,signing_authority_ref='' WHERE id=?", (target["id"],))
                     con.execute("INSERT INTO staff_authority_events(user_id,changed_by,action,authority_ref,reason,created_at) VALUES(?,?,'REVOKE_STOP_SIGNING',?,?,?)", (target["id"], reviewer["id"], target["signing_authority_ref"], f"Thu hồi do đổi vai trò; đề nghị {request_id}: {clean_text(request['reason'], 500)}", now_iso()))
@@ -1952,6 +2241,240 @@ class AppHandler(BaseHTTPRequestHandler):
             con.execute("INSERT INTO staff_authority_events(user_id,changed_by,action,authority_ref,reason,created_at) VALUES(?,?,'REVOKE_STOP_SIGNING',?,?,?)", (user_id, reviewer["id"], target["signing_authority_ref"], reason, now_iso()))
         return self.send_json({"ok": True, "userId": user_id, "maySignStop": False})
 
+    def save_procedure_catalog_edit(self, code: str, body: dict, actor: sqlite3.Row):
+        if actor["role"] != "admin":
+            return self.send_error_json("Chỉ quản trị viên hệ thống được cập nhật danh mục thủ tục.", 403)
+        current = PROCEDURE_BY_CODE.get(code)
+        if not current:
+            return self.send_error_json("Không tìm thấy mã thủ tục trong danh mục tham chiếu.", 404)
+        source_code = current.get("sourceCode") or current["code"]
+        local_code = clean_text(body.get("code"), 40).upper()
+        name = clean_text(body.get("name"), 500)
+        level = clean_text(body.get("level"), 80)
+        agency = clean_text(body.get("agency"), 300)
+        source_url = clean_text(body.get("sourceUrl"), 600)
+        checked_at = clean_text(body.get("checkedAt"), 10)
+        reason = clean_text(body.get("reason"), 1200)
+        category_key = clean_text(body.get("categoryKey"), 180) or current.get("fieldSource") or current.get("field")
+        target_category = next((item for item in procedure_category_records() if item["key"] == category_key), None)
+        if not target_category:
+            raise ValueError("Chọn một lĩnh vực hiện có trong danh mục.")
+        field = target_category["name"]
+        if not re.fullmatch(r"[A-Z0-9][A-Z0-9._/-]{1,39}", local_code):
+            raise ValueError("Mã thủ tục cần 2–40 ký tự gồm chữ, số, dấu chấm, gạch ngang hoặc gạch chéo; không có khoảng trắng.")
+        if not name or not agency:
+            raise ValueError("Tên thủ tục và cơ quan thực hiện không được để trống.")
+        for item in procedure_catalog_records():
+            if item.get("sourceCode") != source_code and item.get("code", "").casefold() == local_code.casefold():
+                raise ValueError("Mã thủ tục đã được một thủ tục khác sử dụng.")
+        if level not in {"Toàn trình", "Một phần", "Cung cấp thông tin"}:
+            raise ValueError("Mức dịch vụ phải chọn theo một trong ba nhóm của danh mục.")
+        if source_url:
+            self.validate_catalog_source(source_url)
+            if not checked_at:
+                raise ValueError("Khi ghi nguồn đối chiếu, hãy nhập cả ngày đã kiểm tra nguồn.")
+        if checked_at:
+            if not source_url:
+                raise ValueError("Chỉ ghi ngày đối chiếu khi có liên kết nguồn chính thức.")
+            self.validate_catalog_date(checked_at)
+        if len(reason) < 20:
+            raise ValueError("Hãy ghi căn cứ thay đổi ít nhất 20 ký tự.")
+        expected_version = body.get("expectedVersion", 0)
+        if isinstance(expected_version, bool) or not isinstance(expected_version, int) or expected_version < 0:
+            raise ValueError("Phiên bản danh mục không hợp lệ.")
+
+        before = PROCEDURE_OVERRIDES.get(source_code)
+        current_version = before["version"] if before else 0
+        if expected_version != current_version:
+            return self.send_error_json("Danh mục đã được người khác cập nhật. Tải lại trước khi lưu tiếp.", 409)
+        version = current_version + 1
+        updated_at = now_iso()
+        edit = {
+            "localCode": local_code, "name": name, "field": field, "categoryKey": category_key, "level": level, "agency": agency,
+            "sourceUrl": source_url, "checkedAt": checked_at, "reason": reason,
+            "version": version, "updatedBy": actor["full_name"], "updatedAt": updated_at,
+        }
+        after_json = json.dumps(edit, ensure_ascii=False, separators=(",", ":"))
+        before_json = json.dumps(before, ensure_ascii=False, separators=(",", ":")) if before else None
+        with DB_LOCK, connect() as con:
+            con.execute("""INSERT INTO procedure_catalog_edits(procedure_code,local_code,name,field,category_key,level,agency,source_url,checked_at,reason,version,updated_by,updated_at)
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(procedure_code) DO UPDATE SET local_code=excluded.local_code,name=excluded.name,field=excluded.field,category_key=excluded.category_key,level=excluded.level,agency=excluded.agency,source_url=excluded.source_url,checked_at=excluded.checked_at,reason=excluded.reason,version=excluded.version,updated_by=excluded.updated_by,updated_at=excluded.updated_at""",
+                (source_code, local_code, name, field, category_key, level, agency, source_url, checked_at, reason, version, actor["full_name"], updated_at))
+            con.execute("INSERT INTO procedure_catalog_audit(procedure_code,actor_id,actor_name,action,reason,before_json,after_json,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                (source_code, actor["id"], actor["full_name"], "UPDATED", reason, before_json, after_json, updated_at))
+        PROCEDURE_OVERRIDES[source_code] = edit
+        current.update({"name": name, "field": field, "level": level, "agency": agency,
+            "serviceMode": {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}[level]})
+        current["fieldSource"] = category_key
+        for alias, procedure in list(PROCEDURE_BY_CODE.items()):
+            if procedure is current and alias not in {source_code, local_code}:
+                del PROCEDURE_BY_CODE[alias]
+        PROCEDURE_BY_CODE[source_code] = current
+        PROCEDURE_BY_CODE[local_code] = current
+        updated_record = next(item for item in procedure_catalog_records() if item.get("sourceCode") == source_code)
+        return self.send_json({"procedure": updated_record})
+
+    def save_procedure_category_edit(self, body: dict, actor: sqlite3.Row):
+        if actor["role"] != "admin":
+            return self.send_error_json("Chỉ quản trị viên hệ thống được cập nhật lĩnh vực thủ tục.", 403)
+        source_field = clean_text(body.get("sourceName"), 180)
+        display_name = clean_text(body.get("name"), 180)
+        source_url = clean_text(body.get("sourceUrl"), 600)
+        checked_at = clean_text(body.get("checkedAt"), 10)
+        reason = clean_text(body.get("reason"), 1200)
+        if not source_field or not display_name:
+            raise ValueError("Tên lĩnh vực hiện tại và tên lĩnh vực mới không được để trống.")
+        if not any(item["key"] == source_field for item in procedure_category_records()):
+            raise ValueError("Lĩnh vực không còn trong danh mục; hãy tải lại dữ liệu.")
+        conflicts = {item["key"] for item in procedure_category_records()
+                     if item["name"].strip().casefold() == display_name.casefold() and item["key"] != source_field}
+        if conflicts:
+            raise ValueError("Tên lĩnh vực này đang được một nhóm khác sử dụng. Hãy chọn tên phân biệt hoặc xử lý từng nhóm riêng.")
+        is_internal = source_field.startswith("local:")
+        if source_url or not is_internal:
+            self.validate_catalog_source(source_url)
+        if checked_at:
+            self.validate_catalog_date(checked_at)
+        elif not is_internal:
+            raise ValueError("Nhập ngày đối chiếu theo nguồn chính thức.")
+        if len(reason) < 20:
+            raise ValueError("Hãy ghi căn cứ thay đổi ít nhất 20 ký tự.")
+        expected_version = body.get("expectedVersion", 0)
+        if isinstance(expected_version, bool) or not isinstance(expected_version, int) or expected_version < 0:
+            raise ValueError("Phiên bản lĩnh vực không hợp lệ.")
+        before = PROCEDURE_CATEGORY_OVERRIDES.get(source_field)
+        current_version = before["version"] if before else 0
+        if expected_version != current_version:
+            return self.send_error_json("Lĩnh vực đã được cập nhật. Tải lại danh mục trước khi lưu tiếp.", 409)
+        version = current_version + 1
+        updated_at = now_iso()
+        edit = {"displayName": display_name, "sourceUrl": source_url, "checkedAt": checked_at, "reason": reason,
+                "version": version, "updatedBy": actor["full_name"], "updatedAt": updated_at}
+        before_json = json.dumps(before, ensure_ascii=False, separators=(",", ":")) if before else None
+        after_json = json.dumps(edit, ensure_ascii=False, separators=(",", ":"))
+        with DB_LOCK, connect() as con:
+            con.execute("""INSERT INTO procedure_category_edits(source_field,display_name,source_url,checked_at,reason,version,updated_by,updated_at)
+                VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(source_field) DO UPDATE SET display_name=excluded.display_name,source_url=excluded.source_url,checked_at=excluded.checked_at,reason=excluded.reason,version=excluded.version,updated_by=excluded.updated_by,updated_at=excluded.updated_at""",
+                (source_field, display_name, source_url, checked_at, reason, version, actor["full_name"], updated_at))
+            con.execute("INSERT INTO procedure_category_audit(source_field,actor_id,actor_name,reason,before_json,after_json,created_at) VALUES(?,?,?,?,?,?,?)",
+                (source_field, actor["id"], actor["full_name"], reason, before_json, after_json, updated_at))
+        PROCEDURE_CATEGORY_OVERRIDES[source_field] = edit
+        for procedure in PROCEDURES:
+            if (procedure.get("fieldSource") or "Chưa phân loại") == source_field:
+                procedure["field"] = display_name
+        return self.send_json({"category": {"sourceName": source_field, "name": display_name, **edit}})
+
+    @staticmethod
+    def validate_catalog_source(source_url: str) -> None:
+        parsed = urlparse(source_url)
+        hostname = (parsed.hostname or "").lower().rstrip(".")
+        official_host = hostname == "gov.vn" or hostname.endswith(".gov.vn") or hostname == "chinhphu.vn" or hostname.endswith(".chinhphu.vn")
+        if parsed.scheme != "https" or not official_host:
+            raise ValueError("Nguồn đối chiếu phải là liên kết HTTPS thuộc miền .gov.vn hoặc chinhphu.vn.")
+
+    @staticmethod
+    def validate_catalog_date(checked_at: str) -> None:
+        try:
+            checked_day = date.fromisoformat(checked_at)
+        except ValueError as exc:
+            raise ValueError("Ngày đối chiếu cần nhập theo dạng YYYY-MM-DD.") from exc
+        if checked_day > datetime.now(TZ).date():
+            raise ValueError("Ngày đối chiếu không thể ở trong tương lai.")
+
+    def create_procedure_category(self, body: dict, actor: sqlite3.Row):
+        if actor["role"] != "admin":
+            return self.send_error_json("Chỉ quản trị viên hệ thống được tạo nhóm lĩnh vực nội bộ.", 403)
+        name = clean_text(body.get("name"), 180)
+        source_url = clean_text(body.get("sourceUrl"), 600)
+        checked_at = clean_text(body.get("checkedAt"), 10)
+        reason = clean_text(body.get("reason"), 1200)
+        if len(name) < 3:
+            raise ValueError("Tên lĩnh vực cần ít nhất 3 ký tự.")
+        if source_url:
+            self.validate_catalog_source(source_url)
+        if checked_at:
+            self.validate_catalog_date(checked_at)
+        if len(reason) < 20:
+            raise ValueError("Nêu rõ mục đích tạo nhóm, tối thiểu 20 ký tự.")
+        if any(item["name"].casefold() == name.casefold() for item in procedure_category_records()):
+            raise ValueError("Tên lĩnh vực này đã có trong danh mục.")
+        key = f"local:{uuid.uuid4().hex[:16]}"
+        created_at = now_iso()
+        edit = {"displayName": name, "sourceUrl": source_url, "checkedAt": checked_at,
+                "reason": reason, "version": 1, "updatedBy": actor["full_name"], "updatedAt": created_at}
+        with DB_LOCK, connect() as con:
+            con.execute("INSERT INTO procedure_category_edits(source_field,display_name,source_url,checked_at,reason,version,updated_by,updated_at) VALUES(?,?,?,?,?,1,?,?)",
+                        (key, name, source_url, checked_at, reason, actor["full_name"], created_at))
+            con.execute("INSERT INTO procedure_category_audit(source_field,actor_id,actor_name,reason,before_json,after_json,created_at) VALUES(?,?,?,?,?,?,?)",
+                        (key, actor["id"], actor["full_name"], reason, None, json.dumps(edit, ensure_ascii=False, separators=(",", ":")), created_at))
+        PROCEDURE_CATEGORY_OVERRIDES[key] = edit
+        return self.send_json({"category": {"key": key, "name": name, "count": 0, "source": "internal", "categoryEdit": edit}}, 201)
+
+    def move_procedures_to_category(self, body: dict, actor: sqlite3.Row):
+        if actor["role"] != "admin":
+            return self.send_error_json("Chỉ quản trị viên hệ thống được phân loại lại danh mục.", 403)
+        codes = body.get("procedureCodes")
+        if not isinstance(codes, list) or not codes or len(codes) > 100:
+            raise ValueError("Chọn từ 1 đến 100 thủ tục trong một lần chuyển nhóm.")
+        target_key = clean_text(body.get("targetCategoryKey"), 180)
+        target = next((item for item in procedure_category_records() if item["key"] == target_key), None)
+        if not target:
+            raise ValueError("Lĩnh vực đích không còn trong danh mục.")
+        source_url = clean_text(body.get("sourceUrl"), 600)
+        checked_at = clean_text(body.get("checkedAt"), 10)
+        reason = clean_text(body.get("reason"), 1200)
+        if source_url:
+            self.validate_catalog_source(source_url)
+        if target["source"] == "reference":
+            if not source_url or not checked_at:
+                raise ValueError("Khi chuyển vào lĩnh vực tham chiếu, cần ghi nguồn .gov.vn/chinhphu.vn và ngày đối chiếu.")
+            self.validate_catalog_date(checked_at)
+        elif checked_at:
+            self.validate_catalog_date(checked_at)
+        if len(reason) < 20:
+            raise ValueError("Nêu căn cứ và mục đích chuyển nhóm, tối thiểu 20 ký tự.")
+        unique_codes = list(dict.fromkeys(clean_text(value, 40).upper() for value in codes))
+        if len(unique_codes) != len(codes):
+            raise ValueError("Danh sách có mã thủ tục trống hoặc lặp.")
+        records_by_source = {item["sourceCode"]: item for item in procedure_catalog_records()}
+        expected_versions = body.get("expectedVersions") if isinstance(body.get("expectedVersions"), dict) else {}
+        changes = []
+        for submitted_code in unique_codes:
+            current = PROCEDURE_BY_CODE.get(submitted_code)
+            source_code = current.get("code") if current else None
+            record = records_by_source.get(source_code or "")
+            if not current or not record:
+                raise ValueError(f"Không tìm thấy thủ tục {submitted_code} trong danh mục hiện tại.")
+            if record["categoryKey"] == target_key:
+                continue
+            before = PROCEDURE_OVERRIDES.get(source_code)
+            version = before["version"] if before else 0
+            supplied_version = expected_versions.get(source_code, version)
+            if isinstance(supplied_version, bool) or not isinstance(supplied_version, int) or supplied_version != version:
+                return self.send_error_json(f"Thủ tục {record['code']} vừa thay đổi. Tải lại danh mục trước khi chuyển.", 409)
+            changes.append((current, record, source_code, before, version + 1))
+        if not changes:
+            return self.send_json({"moved": 0, "message": "Các thủ tục đã thuộc lĩnh vực được chọn."})
+        updated_at = now_iso()
+        with DB_LOCK, connect() as con:
+            for current, record, source_code, before, version in changes:
+                edit = {
+                    "localCode": record["code"], "name": record["name"], "field": target["name"], "categoryKey": target_key,
+                    "level": record["level"], "agency": record["agency"], "sourceUrl": source_url, "checkedAt": checked_at,
+                    "reason": reason, "version": version, "updatedBy": actor["full_name"], "updatedAt": updated_at,
+                }
+                con.execute("""INSERT INTO procedure_catalog_edits(procedure_code,local_code,name,field,category_key,level,agency,source_url,checked_at,reason,version,updated_by,updated_at)
+                    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(procedure_code) DO UPDATE SET local_code=excluded.local_code,name=excluded.name,field=excluded.field,category_key=excluded.category_key,level=excluded.level,agency=excluded.agency,source_url=excluded.source_url,checked_at=excluded.checked_at,reason=excluded.reason,version=excluded.version,updated_by=excluded.updated_by,updated_at=excluded.updated_at""",
+                    (source_code, edit["localCode"], edit["name"], edit["field"], target_key, edit["level"], edit["agency"], source_url, checked_at, reason, version, actor["full_name"], updated_at))
+                con.execute("INSERT INTO procedure_catalog_audit(procedure_code,actor_id,actor_name,action,reason,before_json,after_json,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                    (source_code, actor["id"], actor["full_name"], "MOVED_CATEGORY", reason,
+                     json.dumps(before, ensure_ascii=False, separators=(",", ":")) if before else json.dumps({"code": record["code"], "name": record["name"], "field": record["field"], "categoryKey": record["categoryKey"]}, ensure_ascii=False, separators=(",", ":")),
+                     json.dumps(edit, ensure_ascii=False, separators=(",", ":")), updated_at))
+                PROCEDURE_OVERRIDES[source_code] = edit
+                current["field"] = target["name"]
+                current["fieldSource"] = target_key
+        return self.send_json({"moved": len(changes), "targetCategory": target["name"]})
+
     def do_GET(self):
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
@@ -1967,10 +2490,35 @@ class AppHandler(BaseHTTPRequestHandler):
             if user["must_change_password"]:
                 return self.send_error_json("Đổi mật khẩu khởi tạo trước khi tiếp tục.", 403)
             return self.personal_account(user)
+        if path == "/api/procedure-categories":
+            return self.send_json({"categories": procedure_category_records()})
         if path == "/api/public/news":
             return self.list_public_news()
+        if path.startswith("/api/procedures/") and path.endswith("/history"):
+            user = self.current_user()
+            if not user:
+                return self.send_error_json("Bạn cần đăng nhập để xem lịch sử chỉnh sửa danh mục.", 401)
+            if user["role"] != "admin":
+                return self.send_error_json("Lịch sử chỉnh sửa danh mục chỉ dành cho quản trị viên hệ thống.", 403)
+            code = path[len("/api/procedures/"):-len("/history")].strip("/")
+            if not code or "/" in code or code not in PROCEDURE_BY_CODE:
+                return self.send_error_json("Không tìm thấy thủ tục.", 404)
+            with DB_LOCK, connect() as con:
+                rows = con.execute("SELECT actor_name,action,reason,before_json,after_json,created_at FROM procedure_catalog_audit WHERE procedure_code=? ORDER BY id DESC LIMIT 30", (code,)).fetchall()
+            return self.send_json({"history": [{"actor": row["actor_name"], "action": row["action"], "reason": row["reason"], "before": json.loads(row["before_json"]) if row["before_json"] else None, "after": json.loads(row["after_json"]), "createdAt": row["created_at"]} for row in rows]})
+        if path == "/api/procedure-categories/history":
+            user = self.current_user()
+            if not user:
+                return self.send_error_json("Bạn cần đăng nhập để xem lịch sử lĩnh vực.", 401)
+            if user["role"] != "admin":
+                return self.send_error_json("Lịch sử chỉnh sửa lĩnh vực chỉ dành cho quản trị viên hệ thống.", 403)
+            source_field = clean_text((parse_qs(parsed.query).get("key") or [""])[0], 180)
+            with DB_LOCK, connect() as con:
+                rows = con.execute("SELECT actor_name,reason,before_json,after_json,created_at FROM procedure_category_audit WHERE source_field=? ORDER BY id DESC LIMIT 30", (source_field,)).fetchall()
+            return self.send_json({"history": [{"actor": row["actor_name"], "reason": row["reason"], "before": json.loads(row["before_json"]) if row["before_json"] else None, "after": json.loads(row["after_json"]), "createdAt": row["created_at"]} for row in rows]})
         if path.startswith("/api/procedures"):
-            return self.send_json({"procedures": PROCEDURES, "count": len(PROCEDURES)})
+            records = procedure_catalog_records()
+            return self.send_json({"procedures": records, "count": len(records)})
         if path == "/api/public/agencies":
             today = datetime.now(TZ).date().isoformat()
             with DB_LOCK, connect() as con:
@@ -1994,6 +2542,12 @@ class AppHandler(BaseHTTPRequestHandler):
                 rows = con.execute("SELECT * FROM cases ORDER BY created_at DESC").fetchall()
                 visible_rows = [r for r in rows if visible_to_user(user, r)]
                 cases = [case_dict(con, r, include_internal=is_staff, role=role) for r in visible_rows]
+                total_case_records = con.execute("SELECT COUNT(*) FROM cases").fetchone()[0]
+                if role == "admin":
+                    sample_case_count = con.execute("SELECT COUNT(*) FROM cases WHERE json_extract(payload_json,'$.sampleDatasetVersion')=?", (SAMPLE_DATASET_VERSION,)).fetchone()[0]
+                else:
+                    sample_case_count = sum(json.loads(r["payload_json"]).get("sampleDatasetVersion") == SAMPLE_DATASET_VERSION for r in visible_rows)
+                published_news_count = con.execute("SELECT COUNT(*) FROM news_articles WHERE status='PUBLISHED'").fetchone()[0]
                 visible_codes = {r["code"] for r in visible_rows}
                 feedback_rows = feedback_for_scope(con, role, visible_codes)
                 today = datetime.now(TZ).date().isoformat()
@@ -2006,8 +2560,9 @@ class AppHandler(BaseHTTPRequestHandler):
                             AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?) ORDER BY full_name""", (user["agency_scope"], today, today)).fetchall()
                 else:
                     staff = []
-            outbox = [{"code": c["code"], "status": c["sync"]["status"], "attempts": c["sync"]["attempts"], "lastError": c["sync"].get("lastError"), "messageId": c["sync"].get("messageId")} for c in cases if c.get("sync", {}).get("status") in {"ERROR", "PENDING"} or c.get("status") in {"DA_PHAT_HANH", "HOAN_THANH"}]
-            return self.send_json({"user": public_user(user), "procedures": PROCEDURES, "cases": cases, "stats": build_stats(cases), "feedback": rows_to_dicts(feedback_rows), "outbox": outbox, "staff": [{"id": r["id"], "name": r["full_name"], "role": r["role"]} for r in staff], "statusLabels": STATUS_LABELS})
+            outbox = [{"code": c["code"], "status": c["sync"]["status"], "attempts": c["sync"]["attempts"], "lastError": c["sync"].get("lastError"), "messageId": c["sync"].get("messageId")} for c in cases if c.get("sync", {}).get("status") in {"ERROR", "PENDING"}]
+            storage = {"database": "connected", "procedureCount": len(PROCEDURES), "caseRecords": total_case_records if role == "admin" else len(cases), "sampleCaseCount": sample_case_count, "sampleDataVersion": SAMPLE_DATASET_VERSION if sample_case_count else 0, "publishedNews": published_news_count, "caseCountScope": "toàn ứng dụng" if role == "admin" else "phạm vi được cấp"}
+            return self.send_json({"user": public_user(user), "procedures": procedure_catalog_records(), "procedureCategories": procedure_category_records(), "cases": cases, "stats": build_stats(cases), "storage": storage, "feedback": rows_to_dicts(feedback_rows), "outbox": outbox, "staff": [{"id": r["id"], "name": r["full_name"], "role": r["role"]} for r in staff], "statusLabels": STATUS_LABELS})
         if path.startswith("/api/cases/") and "/files/" in path:
             user = self.require_user()
             parts = path.split("/")
@@ -2024,16 +2579,44 @@ class AppHandler(BaseHTTPRequestHandler):
         if path == "/api/export/cases.csv":
             if user["role"] not in STAFF_ROLES - {"admin"}:
                 return self.send_error_json("Tài khoản không có quyền thực hiện thao tác này.", 403)
+            query = parse_qs(parsed.query)
+            agency_filter = clean_text((query.get("agency") or [""])[0], 180)
+            status_filter = clean_text((query.get("status") or [""])[0], 40)
+            from_date = clean_text((query.get("from") or [""])[0], 10)
+            to_date = clean_text((query.get("to") or [""])[0], 10)
+            for value in (from_date, to_date):
+                if value:
+                    try:
+                        date.fromisoformat(value)
+                    except ValueError as exc:
+                        raise ValueError("Ngày lọc phải theo định dạng YYYY-MM-DD.") from exc
+            if from_date and to_date and to_date < from_date:
+                raise ValueError("Ngày kết thúc phải bằng hoặc sau ngày bắt đầu.")
+            if agency_filter and user["agency_scope"].strip().casefold() != "toàn thành phố" and agency_filter.casefold() != user["agency_scope"].strip().casefold():
+                return self.send_error_json("Không thể xuất dữ liệu ngoài phạm vi cơ quan được cấp.", 403)
             with DB_LOCK, connect() as con:
                 rows = con.execute("SELECT * FROM cases ORDER BY created_at DESC").fetchall()
                 rows = [r for r in rows if visible_to_user(user, r)]
+            filtered_rows = []
+            for row in rows:
+                data = json.loads(row["payload_json"])
+                agency = clean_text(data.get("agencyScope") or data.get("receivingAgency"), 180)
+                created_day = row["created_at"][:10]
+                if agency_filter and agency.casefold() != agency_filter.casefold():
+                    continue
+                if status_filter and row["status"] != status_filter:
+                    continue
+                if from_date and created_day < from_date:
+                    continue
+                if to_date and created_day > to_date:
+                    continue
+                filtered_rows.append((row, data, agency))
             output = io.StringIO()
             writer = csv.writer(output)
-            writer.writerow(["Mã hồ sơ", "Mã thủ tục", "Trạng thái", "Người nộp", "Cơ quan", "Ngày gửi", "Hạn giải quyết", "Đồng bộ"])
-            for r in rows:
-                data = json.loads(r["payload_json"])
+            writer.writerow(["Mã hồ sơ", "Mã thủ tục", "Trạng thái", "Người nộp", "Cơ quan tiếp nhận", "Ngày gửi", "Hạn giải quyết", "Đồng bộ"])
+            for r, data, agency in filtered_rows:
                 applicant_name = "" if user["role"] == "finance" else csv_safe(data.get("applicant", {}).get("name"))
-                writer.writerow([r["code"], r["procedure_code"], STATUS_LABELS.get(r["status"], r["status"]), applicant_name, csv_safe(data.get("procedure", {}).get("agency")), r["created_at"], data.get("deadline") or "", data.get("sync", {}).get("status")])
+                writer.writerow([r["code"], r["procedure_code"], STATUS_LABELS.get(r["status"], r["status"]), applicant_name, csv_safe(agency), r["created_at"], data.get("deadline") or "", data.get("sync", {}).get("status")])
             raw = ("\ufeff" + output.getvalue()).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/csv; charset=utf-8")
@@ -2041,23 +2624,126 @@ class AppHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(raw)))
             self.end_headers()
             return self.wfile.write(raw)
-        if path == "/api/users":
+        if path == "/api/export/users.csv":
+            if not can_manage_staff_accounts(user):
+                return self.send_error_json("Tài khoản không có quyền xuất danh sách cán bộ.", 403)
+            query = parse_qs(parsed.query)
+            agency_filter = clean_text((query.get("agency") or [""])[0], 180)
+            manager_scope = user["agency_scope"].strip()
             if user["role"] != "admin":
-                return self.send_error_json("Chỉ quản trị viên mới được quản lý tài khoản.", 403)
+                if not manager_scope or manager_scope.casefold() == "toàn thành phố":
+                    return self.send_error_json("Tài khoản quản lý cơ quan chưa có phạm vi cơ quan cụ thể.", 403)
+                if agency_filter and agency_filter.casefold() != manager_scope.casefold():
+                    return self.send_error_json("Không thể xuất tài khoản ngoài cơ quan đang được giao quản lý.", 403)
+                agency_filter = manager_scope
             with DB_LOCK, connect() as con:
-                rows = con.execute("SELECT id,email,phone,full_name,role,active,email_verified,agency_scope,valid_from,valid_until,may_sign_stop,signing_authority_ref,must_change_password,created_at FROM users WHERE role!='citizen' ORDER BY created_at DESC").fetchall()
+                if agency_filter:
+                    rows = con.execute("SELECT full_name,email,phone,role,active,agency_scope,valid_from,valid_until,can_manage_agency_accounts,created_at FROM users WHERE role!='citizen' AND agency_scope=? COLLATE NOCASE ORDER BY full_name COLLATE NOCASE", (agency_filter,)).fetchall()
+                else:
+                    rows = con.execute("SELECT full_name,email,phone,role,active,agency_scope,valid_from,valid_until,can_manage_agency_accounts,created_at FROM users WHERE role!='citizen' ORDER BY agency_scope COLLATE NOCASE,full_name COLLATE NOCASE").fetchall()
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["Họ tên", "Email", "Điện thoại", "Vai trò", "Trạng thái", "Cơ quan", "Hiệu lực từ", "Hiệu lực đến", "Quản lý tài khoản cơ quan", "Ngày tạo"])
+            for row in rows:
+                writer.writerow([csv_safe(row["full_name"]), csv_safe(row["email"]), csv_safe(row["phone"]), ROLE_LABELS.get(row["role"], row["role"]), "Đang hoạt động" if row["active"] else "Chưa hiệu lực / tạm ngưng", csv_safe(row["agency_scope"]), row["valid_from"], row["valid_until"], "Có" if row["can_manage_agency_accounts"] else "Không", row["created_at"]])
+            raw = ("\ufeff" + output.getvalue()).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/csv; charset=utf-8")
+            self.send_header("Content-Disposition", "attachment; filename=danh-sach-tai-khoan-can-bo.csv")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            return self.wfile.write(raw)
+        if path in {"/api/reporting/summary", "/api/reporting/summary.csv"}:
+            if user["role"] != "admin":
+                return self.send_error_json("Báo cáo tổng hợp toàn hệ thống chỉ dành cho quản trị viên hệ thống.", 403)
+            query = parse_qs(parsed.query)
+            agency_filter = clean_text((query.get("agency") or [""])[0], 180)
+            from_date = clean_text((query.get("from") or [""])[0], 10)
+            to_date = clean_text((query.get("to") or [""])[0], 10)
+            for value in (from_date, to_date):
+                if value:
+                    try:
+                        date.fromisoformat(value)
+                    except ValueError as exc:
+                        raise ValueError("Ngày lọc phải theo định dạng YYYY-MM-DD.") from exc
+            if from_date and to_date and to_date < from_date:
+                raise ValueError("Ngày kết thúc phải bằng hoặc sau ngày bắt đầu.")
+            with DB_LOCK, connect() as con:
+                agencies = [r["agency_scope"] for r in con.execute("SELECT DISTINCT agency_scope FROM users WHERE role!='citizen' AND trim(agency_scope)!='' AND agency_scope!='Toàn thành phố' COLLATE NOCASE ORDER BY agency_scope COLLATE NOCASE").fetchall()]
+                rows = con.execute("SELECT code,procedure_code,status,created_at,payload_json FROM cases ORDER BY created_at").fetchall()
+            if agency_filter and agency_filter.casefold() not in {value.casefold() for value in agencies}:
+                return self.send_error_json("Cơ quan cần lọc không có trong danh sách phân quyền.", 400)
+            by_agency: dict[str, int] = {}
+            by_status: dict[str, int] = {}
+            by_procedure: dict[str, int] = {}
+            by_agency_status: dict[tuple[str, str], int] = {}
+            total = 0
+            sample_total = 0
+            for row in rows:
+                day = row["created_at"][:10]
+                if from_date and day < from_date or to_date and day > to_date:
+                    continue
+                payload = json.loads(row["payload_json"])
+                agency = clean_text(payload.get("agencyScope") or payload.get("receivingAgency"), 180) or "Chưa xác định cơ quan"
+                if agency_filter and agency.casefold() != agency_filter.casefold():
+                    continue
+                total += 1
+                if payload.get("sampleDatasetVersion") == SAMPLE_DATASET_VERSION:
+                    sample_total += 1
+                by_agency[agency] = by_agency.get(agency, 0) + 1
+                status = STATUS_LABELS.get(row["status"], row["status"])
+                by_status[status] = by_status.get(status, 0) + 1
+                procedure = f"{row['procedure_code']} · {clean_text((payload.get('procedure') or {}).get('name'), 180)}"
+                by_procedure[procedure] = by_procedure.get(procedure, 0) + 1
+                key = (agency, status)
+                by_agency_status[key] = by_agency_status.get(key, 0) + 1
+            report = {"reportKind": "INTERNAL_OPERATIONS", "officialForm": False, "agency": agency_filter or "Tất cả cơ quan", "from": from_date, "to": to_date, "total": total, "sampleTotal": sample_total, "realTotal": total - sample_total, "storedTotal": len(rows), "agencies": agencies,
+                "byAgency": [{"name": name, "count": count} for name, count in sorted(by_agency.items())],
+                "byStatus": [{"name": name, "count": count} for name, count in sorted(by_status.items(), key=lambda item: (-item[1], item[0]))],
+                "byProcedure": [{"name": name, "count": count} for name, count in sorted(by_procedure.items(), key=lambda item: (-item[1], item[0]))],
+                "byAgencyStatus": [{"agency": agency, "status": status, "count": count} for (agency, status), count in sorted(by_agency_status.items())]}
+            if path.endswith(".csv"):
+                output = io.StringIO()
+                writer = csv.writer(output)
+                writer.writerow(["Báo cáo vận hành nội bộ - không phải biểu mẫu báo cáo pháp định", ""])
+                writer.writerow(["Cơ quan lọc", report["agency"]])
+                writer.writerow(["Từ ngày", from_date, "Đến ngày", to_date])
+                writer.writerow(["Tình huống mô phỏng", report["sampleTotal"], "Hồ sơ phát sinh thật trong ứng dụng", report["realTotal"]])
+                writer.writerow([])
+                writer.writerow(["Cơ quan tiếp nhận", "Trạng thái", "Số hồ sơ"])
+                for item in report["byAgencyStatus"]:
+                    writer.writerow([csv_safe(item["agency"]), item["status"], item["count"]])
+                raw = ("\ufeff" + output.getvalue()).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/csv; charset=utf-8")
+                self.send_header("Content-Disposition", "attachment; filename=bao-cao-van-hanh-noi-bo.csv")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                return self.wfile.write(raw)
+            return self.send_json(report)
+        if path == "/api/users":
+            if not can_manage_staff_accounts(user):
+                return self.send_error_json("Tài khoản không có quyền quản lý tài khoản cán bộ.", 403)
+            manager_scope = user["agency_scope"].strip()
+            if user["role"] != "admin" and (not manager_scope or manager_scope.casefold() == "toàn thành phố"):
+                return self.send_error_json("Tài khoản quản lý cơ quan chưa có phạm vi cơ quan cụ thể.", 403)
+            with DB_LOCK, connect() as con:
+                agency_clause = " AND agency_scope=? COLLATE NOCASE" if user["role"] != "admin" else ""
+                rows = con.execute("SELECT id,email,phone,full_name,role,active,email_verified,agency_scope,valid_from,valid_until,may_sign_stop,signing_authority_ref,must_change_password,can_manage_agency_accounts,created_at FROM users WHERE role!='citizen'" + agency_clause + " ORDER BY created_at DESC", (manager_scope,) if agency_clause else ()).fetchall()
                 requests = con.execute("""SELECT r.*,u.email,u.full_name,requester.full_name AS requester_name,reviewer.full_name AS reviewer_name
                     FROM staff_access_requests r JOIN users u ON u.id=r.user_id
                     JOIN users requester ON requester.id=r.requested_by
                     LEFT JOIN users reviewer ON reviewer.id=r.reviewed_by
-                    ORDER BY CASE r.status WHEN 'PENDING' THEN 0 ELSE 1 END,r.created_at DESC""").fetchall()
+                    WHERE (?='admin' OR r.agency_scope=? COLLATE NOCASE)
+                    ORDER BY CASE r.status WHEN 'PENDING' THEN 0 ELSE 1 END,r.created_at DESC""", (user["role"], manager_scope)).fetchall()
                 account_changes = con.execute("""SELECT c.*,u.email,u.full_name,requester.full_name AS requester_name,reviewer.full_name AS reviewer_name
                     FROM staff_account_changes c JOIN users u ON u.id=c.user_id
                     JOIN users requester ON requester.id=c.requested_by
                     LEFT JOIN users reviewer ON reviewer.id=c.reviewed_by
-                    ORDER BY CASE c.status WHEN 'PENDING' THEN 0 ELSE 1 END,c.created_at DESC""").fetchall()
+                    WHERE (?='admin' OR u.agency_scope=? COLLATE NOCASE)
+                    ORDER BY CASE c.status WHEN 'PENDING' THEN 0 ELSE 1 END,c.created_at DESC""", (user["role"], manager_scope)).fetchall()
             return self.send_json({
-                "users": [{"id": r["id"], "email": r["email"], "phone": r["phone"], "name": r["full_name"], "role": r["role"], "active": bool(r["active"]), "emailVerified": False, "agencyScope": r["agency_scope"], "validFrom": r["valid_from"], "validUntil": r["valid_until"], "maySignStop": bool(r["may_sign_stop"]), "signingAuthorityRef": r["signing_authority_ref"], "mustChangePassword": bool(r["must_change_password"]), "createdAt": r["created_at"]} for r in rows],
+                "users": [{"id": r["id"], "email": r["email"], "phone": r["phone"], "name": r["full_name"], "role": r["role"], "active": bool(r["active"]), "emailVerified": False, "agencyScope": r["agency_scope"], "validFrom": r["valid_from"], "validUntil": r["valid_until"], "maySignStop": bool(r["may_sign_stop"]), "signingAuthorityRef": r["signing_authority_ref"], "mustChangePassword": bool(r["must_change_password"]), "canManageAgencyAccounts": bool(r["can_manage_agency_accounts"]), "createdAt": r["created_at"]} for r in rows],
                 "accessRequests": [{"id": r["id"], "userId": r["user_id"], "email": r["email"], "name": r["full_name"], "requestedBy": r["requester_name"], "requestedById": r["requested_by"], "role": r["role"], "agencyScope": r["agency_scope"], "validFrom": r["valid_from"], "validUntil": r["valid_until"], "maySignStop": bool(r["requested_sign_stop"]), "signingAuthorityRef": r["signing_authority_ref"], "reason": r["reason"], "status": r["status"], "reviewedBy": r["reviewer_name"], "reviewNote": r["review_note"], "createdAt": r["created_at"], "reviewedAt": r["reviewed_at"]} for r in requests],
                 "accountChanges": [{"id": r["id"], "userId": r["user_id"], "email": r["email"], "name": r["full_name"], "requestedBy": r["requester_name"], "requestedById": r["requested_by"], "before": json.loads(r["before_json"]), "proposed": json.loads(r["proposed_json"]), "reason": r["reason"], "status": r["status"], "reviewedBy": r["reviewer_name"], "reviewNote": r["review_note"], "createdAt": r["created_at"], "reviewedAt": r["reviewed_at"]} for r in account_changes],
             })
@@ -2126,6 +2812,17 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.change_password(body, user)
             if user["must_change_password"]:
                 raise PermissionError("Đổi mật khẩu khởi tạo trước khi tiếp tục.")
+            if path.startswith("/api/procedures/") and path.endswith("/edit"):
+                code = path[len("/api/procedures/"):-len("/edit")].strip("/")
+                if not code or "/" in code:
+                    return self.send_error_json("Mã thủ tục không hợp lệ.", 400)
+                return self.save_procedure_catalog_edit(code, body, user)
+            if path == "/api/procedure-categories/edit":
+                return self.save_procedure_category_edit(body, user)
+            if path == "/api/procedure-categories/create":
+                return self.create_procedure_category(body, user)
+            if path == "/api/procedure-categories/move":
+                return self.move_procedures_to_category(body, user)
             if path == "/api/auth/contact":
                 return self.update_personal_contact(body, user)
             if path == "/api/auth/revoke-other-sessions":
@@ -2133,8 +2830,8 @@ class AppHandler(BaseHTTPRequestHandler):
             if path == "/api/news":
                 return self.save_managed_news(body, user)
             if path == "/api/users":
-                if user["role"] != "admin":
-                    return self.send_error_json("Chỉ quản trị viên mới được cấp tài khoản cán bộ.", 403)
+                if not can_manage_staff_accounts(user):
+                    return self.send_error_json("Tài khoản không có quyền lập đề nghị cấp tài khoản cán bộ.", 403)
                 return self.create_staff_account(body, user)
             if path.startswith("/api/users/access-requests/") and path.endswith("/review"):
                 request_id = path.split("/")[-2]
@@ -2147,8 +2844,8 @@ class AppHandler(BaseHTTPRequestHandler):
                     return self.send_error_json("Chỉ quản trị viên mới được duyệt thay đổi tài khoản.", 403)
                 return self.review_staff_account_change(request_id, body, user)
             if path.startswith("/api/users/") and path.endswith("/change-requests"):
-                if user["role"] != "admin":
-                    return self.send_error_json("Chỉ quản trị viên mới được đề nghị thay đổi tài khoản cán bộ.", 403)
+                if not can_manage_staff_accounts(user):
+                    return self.send_error_json("Tài khoản không có quyền đề nghị thay đổi tài khoản cán bộ.", 403)
                 target_id = path[len("/api/users/"):-len("/change-requests")].strip("/")
                 return self.request_staff_account_change(target_id, body, user)
             if path.startswith("/api/users/") and path.endswith("/stop-signature-authority"):

@@ -25,6 +25,7 @@ export const SETTING_DEFAULTS: Record<string, unknown> = {
   LOGIN_MAX_ATTEMPTS: 5,
   LOCK_MINUTES: 15,
   HOLIDAYS: [],
+  KPI_TEMPLATE_LIBRARY: null,
   PAYROLL_POLICIES: VN_PAYROLL_POLICIES,
 };
 
@@ -83,6 +84,28 @@ export class SettingsService {
         if (typeof profile.orgName !== 'string' || !profile.orgName.trim()) throw new BadRequestException('Tên tổ chức không được để trống');
         for (const field of ['parentOrgName', 'deptName', 'orgLevel', 'location', 'signerTitle1', 'signerTitle2', 'signerTitle3']) {
           if (profile[field] !== undefined && typeof profile[field] !== 'string') throw new BadRequestException(`Trường ${field} trong hồ sơ tổ chức không hợp lệ`);
+        }
+      } else if (key === 'KPI_TEMPLATE_LIBRARY') {
+        if (!Array.isArray(value) || value.length > 50) throw new BadRequestException('Thư viện KPI cần là danh sách tối đa 50 nhóm phòng ban');
+        const departments = new Set<string>();
+        for (const candidate of value as unknown[]) {
+          if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) throw new BadRequestException('Nhóm trong thư viện KPI không hợp lệ');
+          const department = candidate as Record<string, unknown>;
+          if (typeof department.department !== 'string' || !department.department.trim()
+            || typeof department.deptName !== 'string' || !department.deptName.trim()
+            || !Array.isArray(department.items) || department.items.length > 500
+            || departments.has(department.department)) throw new BadRequestException('Thông tin nhóm phòng ban trong thư viện KPI không hợp lệ hoặc bị trùng');
+          departments.add(department.department);
+          for (const row of department.items as unknown[]) {
+            if (!row || typeof row !== 'object' || Array.isArray(row)) throw new BadRequestException('Mục tiêu mẫu KPI không hợp lệ');
+            const item = row as Record<string, unknown>;
+            if (typeof item.kraTitle !== 'string' || !item.kraTitle.trim()
+              || typeof item.targetMetric !== 'string' || !item.targetMetric.trim()
+              || typeof item.description !== 'string' || !item.description.trim()
+              || typeof item.weightage !== 'number' || !Number.isFinite(item.weightage) || item.weightage < 1 || item.weightage > 100) {
+              throw new BadRequestException('Mục tiêu mẫu cần có tên, chỉ số, mô tả và trọng số từ 1 đến 100%');
+            }
+          }
         }
       } else if (['WORK_START', 'WORK_END', 'WORK_BREAK_START', 'WORK_BREAK_END'].includes(key)) clockMinutes(String(value));
       else if (key === 'HOLIDAYS') {

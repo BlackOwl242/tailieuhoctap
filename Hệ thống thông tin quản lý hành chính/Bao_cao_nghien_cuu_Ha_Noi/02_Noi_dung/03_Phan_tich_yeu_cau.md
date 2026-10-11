@@ -302,7 +302,7 @@ Bảng 3.15: Đặc tả chức năng nhánh tài khoản
 
 | Chức năng | Đầu vào và chủ thể | Đầu ra và kiểm soát |
 | --- | --- | --- |
-| CN01 Quản lý tài khoản | Căn cứ cấp, đổi hoặc thu hồi; người quản trị được giao | Tài khoản và quyền theo cơ quan, vai trò, thời hạn; phê duyệt và nhật ký. Chuyển công tác phải thu hồi quyền cũ, xử lý hồ sơ còn phụ trách và kiểm tra phiên truy cập |
+| CN01 Quản lý tài khoản | Căn cứ cấp, đổi hoặc thu hồi; quản trị viên hệ thống và người quản lý được giao theo cơ quan | Phân quyền theo cơ quan, vai trò, thời hạn; người quản lý cơ quan chỉ xem/lập đề nghị trong phạm vi được giao, không tự duyệt hoặc chuyển cơ quan; quản trị viên hệ thống duyệt độc lập. Ghi trước/sau và nhật ký; khi chuyển công tác phải thu hồi quyền cũ, xử lý hồ sơ còn phụ trách và kết thúc phiên |
 
 Tài khoản cán bộ khác danh tính người dân trên cổng quốc gia. Cán bộ có thể hỗ trợ nhập nhưng hồ sơ phải ghi người giao dịch thực tế. Đổi tên cơ quan không làm mất lịch sử trách nhiệm của cán bộ trong hồ sơ đã xử lý.
 
@@ -369,11 +369,13 @@ Bảng 3.20: Đặc tả chức năng nhánh báo cáo
 
 | Chức năng | Đầu vào và chủ thể | Đầu ra và kiểm soát |
 | --- | --- | --- |
-| CN23 Tổng hợp báo cáo | Hồ sơ, sự kiện, nguồn và kỳ; đầu mối báo cáo | Báo cáo có mốc chốt, phạm vi và nguồn; loại nháp và trùng, tách tác nghiệp Thành phố với số liệu nhận từ bộ |
-| CN24 Mẫu báo cáo | Định nghĩa chỉ số, mẫu và lịch; người duyệt | Phiên bản và công thức truy nguyên; đổi công thức không làm báo cáo cũ mang ý nghĩa mới. Lưu định nghĩa dùng khi phát hành |
+| CN23 Tổng hợp báo cáo | Hồ sơ, sự kiện, nguồn và kỳ; đầu mối báo cáo | Báo cáo có mốc chốt, phạm vi, nguồn và cách đếm; loại nháp và trùng, tách tác nghiệp Thành phố với số liệu nhận từ bộ. Bản hiện thực là tổng hợp vận hành nội bộ, không được trình bày như biểu mẫu pháp định |
+| CN24 Mẫu báo cáo | Định nghĩa chỉ số, mẫu và lịch; người duyệt | Chỉ cấu hình/in đúng mẫu sau khi có tệp gốc hoặc bản điện tử chính thức, cơ quan ban hành, phiên bản và hiệu lực đã xác minh; lưu công thức và dấu vết phát hành. Không tự dựng Quốc hiệu, tiêu ngữ, tên cơ quan, khung giấy, cỡ chữ hoặc chữ ký |
 | CN25 Thống kê hồ sơ | Hồ sơ đủ điều kiện, bộ lọc và cách đếm | Số lượng, tỷ lệ, danh sách đối chiếu; tách quá hạn đang mở với hoàn thành trễ, thao tác với hồ sơ, đích nhận với kết quả |
 
 Để kiểm tra một tỷ lệ cần cả tử số, mẫu số, kỳ và các loại trừ. Hai nền tảng có thể hiển thị cùng tỷ lệ nhưng khác phạm vi dữ liệu; đối soát phải đi đến mã hồ sơ và sự kiện nguồn, không chỉ so con số tổng. Số liệu công khai năm 2026 được dùng đúng kỳ để nhận diện tiêu chí phục vụ. [20]
+
+Thông tư 09/2026/TT-BTP quy định chế độ báo cáo về công tác kiểm soát thủ tục hành chính. Nguồn Bộ Tư pháp cho biết nền tảng số chuyên ngành được chuẩn bị chức năng phân quyền, cấp tài khoản, biểu mẫu và đề cương báo cáo để kiểm thử/tập huấn; đây là thông tin về nền tảng của Bộ, không chứng minh ứng dụng nghiên cứu đã kết nối hoặc có cùng biểu mẫu [47], [48]. Ứng dụng hiện chỉ in/xuất bảng kê và tổng hợp vận hành nội bộ từ dữ liệu cục bộ. Không xuất mẫu pháp định cho đến khi đối chiếu được bản chính thức hiện hành và các thông số trình bày của nó.
 
 ### 3.9.7. Nhánh điều hành tác nghiệp
 

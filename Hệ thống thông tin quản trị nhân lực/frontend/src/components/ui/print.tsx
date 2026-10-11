@@ -456,21 +456,28 @@ export function printDocumentElement(elementId: string) {
           #${printRootId}.print-a4-clean-template hr {
             display: none !important;
           }
-          #${printRootId}.print-a4-clean-template table {
-            border: 0 !important;
+          #${printRootId}.print-a4-clean-template .print-kpi-table {
+            width: 100% !important;
+            border: 1px solid #333333 !important;
+            border-collapse: collapse !important;
+            table-layout: fixed !important;
           }
-          #${printRootId}.print-a4-clean-template th,
-          #${printRootId}.print-a4-clean-template td {
-            border-top: 0 !important;
-            border-bottom: 0 !important;
+          #${printRootId}.print-a4-clean-template .print-kpi-table th,
+          #${printRootId}.print-a4-clean-template .print-kpi-table td {
+            border: 1px solid #333333 !important;
+            background: #ffffff !important;
+            padding: 5pt 4pt !important;
+            vertical-align: top !important;
           }
-          #${printRootId}.print-a4-clean-template th:first-child,
-          #${printRootId}.print-a4-clean-template td:first-child {
-            border-left: 0 !important;
+          #${printRootId}.print-a4-clean-template .print-kpi-table th {
+            text-align: center !important;
+            font-weight: 700 !important;
           }
-          #${printRootId}.print-a4-clean-template th:last-child,
-          #${printRootId}.print-a4-clean-template td:last-child {
-            border-right: 0 !important;
+          #${printRootId}.print-a4-clean-template .print-template-header,
+          #${printRootId}.print-a4-clean-template .print-template-identification,
+          #${printRootId}.print-a4-clean-template .print-template-signatures {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
           }
           table {
             width: 100%;

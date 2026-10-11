@@ -91,3 +91,9 @@
 [45] Trung tâm Phục vụ hành chính công thành phố Hà Nội (2025), “Hà Nội ban hành quy định mới về chức năng, nhiệm vụ các phòng thuộc Trung tâm Phục vụ hành chính công”, thông tin về tổ chức một cửa, kiểm tra, giám sát và chất lượng. https://ttpvhcc.hanoi.gov.vn/hoat-dong-cua-trung-tam/ha-noi-ban-hanh-quy-dinh-moi-ve-chuc-nang-nhiem-vu-cac-phong-thuoc-trung-tam-phuc-vu-hanh-chinh-cong-2850250930164750403.htm
 
 Các trang động có thể thay đổi; phải kiểm tra phiên bản trước khi tiếp nhận hồ sơ. Riêng trang chi tiết [36] chưa truy cập được.
+
+[46] Trung tâm Phục vụ hành chính công thành phố Hà Nội (2026), “Hướng dẫn công dân nộp hồ sơ trực tuyến trên Cổng Dịch vụ công Quốc gia”, hướng dẫn đăng nhập VNeID, hoàn tất nộp hồ sơ, nhận mã hồ sơ qua SMS và tra cứu hồ sơ. https://ttpvhcc.hanoi.gov.vn/video/huong-dan-cong-dan-nop-ho-so-truc-tuyen-tren-cong-dich-vu-cong-quoc-gia-2850260116085159336.htm
+
+[47] Bộ Tư pháp (2026), “Bộ Tư pháp hướng tới nền tảng kiểm soát thủ tục hành chính thông minh”, thông tin về các chức năng nền tảng số KSTTHC, gồm phân quyền, cấp tài khoản và cung cấp biểu mẫu/đề cương báo cáo theo Thông tư 09/2026/TT-BTP để kiểm thử, tập huấn. Đây là thông tin về nền tảng chuyên ngành của Bộ, không chứng minh ứng dụng nghiên cứu đã kết nối hoặc là giao diện vận hành của Hà Nội. https://kstthc.moj.gov.vn/portal/tin-tuc/chi-tiet/bo-tu-phap-huong-toi-nen-tang-kiem-soat-thu-tuc-hanh-chinh-thong-minh-tjcjp0de4e.html
+
+[48] Bộ Tư pháp, Cơ sở dữ liệu quốc gia về văn bản pháp luật, bản ghi Thông tư 09/2026/TT-BTP “Quy định chế độ báo cáo về công tác kiểm soát thủ tục hành chính”; cơ sở dữ liệu hiển thị ngày hiệu lực 01/08/2026. Cần kiểm tra toàn văn và phụ lục gốc đang có hiệu lực trước khi triển khai biểu mẫu. https://vbpl.moj.gov.vn/TW/Pages/home.aspx

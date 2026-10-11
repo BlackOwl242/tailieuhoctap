@@ -11,7 +11,7 @@ import {
   ArrowRight, CheckCheck, FileSpreadsheet, BookOpen, FileText,
   Printer, Calculator, BarChart3, HelpCircle, Eye, Sliders,
   ChevronRight, Bookmark, ArrowUpRight, CheckSquare, ShieldCheck,
-  Percent, Info, ExternalLink, Scale
+  Percent, Info, ExternalLink, Scale, Pencil
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth-store';
 import { api, errorMessage } from '@/lib/api';
@@ -62,6 +62,21 @@ interface AppraisalGoal {
   evidences?: { id: string; description: string; metricValue?: string | null; evidenceUrl?: string | null; createdAt: string }[];
 }
 
+type GoalEvaluationStatus = 'WAITING_EVIDENCE' | 'WAITING_SCORE' | 'SCORED';
+type GoalEvaluationFilter = GoalEvaluationStatus | 'ALL';
+
+const goalEvaluationStatus = (goal: AppraisalGoal): GoalEvaluationStatus => {
+  if (goal.finalScore != null || goal.managerScore != null) return 'SCORED';
+  if (goal.cycle?.organizationSector === 'state' && goal.criteriaGroup === 'GENERAL') return 'WAITING_SCORE';
+  return (goal.evidences?.length ?? 0) > 0 ? 'WAITING_SCORE' : 'WAITING_EVIDENCE';
+};
+
+const GOAL_EVALUATION_STATUS_LABEL: Record<GoalEvaluationStatus, string> = {
+  WAITING_EVIDENCE: 'Chờ cập nhật kết quả',
+  WAITING_SCORE: 'Chờ quản lý chấm',
+  SCORED: 'Đã chấm',
+};
+
 interface EmployeeItem {
   id: string;
   fullName: string;
@@ -99,6 +114,19 @@ interface PublicDecisionRow {
   decided: boolean;
 }
 
+interface KpiLibraryItem {
+  kraTitle: string;
+  targetMetric: string;
+  weightage: number;
+  description: string;
+}
+
+interface KpiLibraryDepartment {
+  department: string;
+  deptName: string;
+  items: KpiLibraryItem[];
+}
+
 type PublicDecisionDraft = {
   userId: string;
   comparableGroup: string;
@@ -129,7 +157,7 @@ function isInOrgUnitSubtree(units: OrgUnitItem[], candidateId?: string | null, p
 }
 
 // Thư viện Mục tiêu KPI Mẫu theo Khối Phòng Ban
-const KPI_LIBRARY = [
+const KPI_LIBRARY: KpiLibraryDepartment[] = [
   {
     department: 'tech',
     deptName: 'Khối Công Nghệ & Kỹ Thuật (Tech / DevOps / QA)',
@@ -266,6 +294,7 @@ export default function PerformanceKpiPage() {
   const canManageCycles = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(role)));
   const canDeleteCycles = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER'].includes(role)));
   const canAdministerGoals = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(role)));
+  const canManageKpiLibrary = Boolean(currentUser?.roles.includes('ADMIN'));
 
   const searchParams = useSearchParams();
   const validTabs = useMemo(() => canCalibrate && !isEnterprise ? ['goals', 'templates', 'rubrics', 'calibration', 'cycles'] : ['goals', 'templates', 'rubrics', 'cycles'], [isEnterprise, canCalibrate]);
@@ -296,6 +325,7 @@ export default function PerformanceKpiPage() {
 
   const [selectedCycleFilter, setSelectedCycleFilter] = useState<string>('ALL');
   const [selectedUnitFilter, setSelectedUnitFilter] = useState<string>('ALL');
+  const [selectedEvaluationFilter, setSelectedEvaluationFilter] = useState<GoalEvaluationFilter>('ALL');
 
   // Modals
   const [isCycleModalOpen, setIsCycleModalOpen] = useState(false);
@@ -308,6 +338,9 @@ export default function PerformanceKpiPage() {
   const [publicDecisionDrafts, setPublicDecisionDrafts] = useState<Record<string, PublicDecisionDraft>>({});
   const [isKpiLibraryOpen, setIsKpiLibraryOpen] = useState(false);
   const [selectedKpiDept, setSelectedKpiDept] = useState<'tech' | 'sales' | 'finance' | 'hr'>('tech');
+  const [isKpiTemplateFormOpen, setIsKpiTemplateFormOpen] = useState(false);
+  const [editingKpiTemplateIndex, setEditingKpiTemplateIndex] = useState<number | null>(null);
+  const [kpiTemplateForm, setKpiTemplateForm] = useState<KpiLibraryItem>({ kraTitle: '', targetMetric: '', weightage: 20, description: '' });
   const [selectedTemplateForPrint, setSelectedTemplateForPrint] = useState<'kra' | null>(null);
 
   // Active items for modals
@@ -369,6 +402,17 @@ export default function PerformanceKpiPage() {
     queryFn: async () => (await api.get('/org-units')).data,
   });
 
+  const { data: effectiveSettings } = useQuery<Record<string, unknown>>({
+    queryKey: ['settings-effective'],
+    queryFn: async () => (await api.get('/settings/effective')).data,
+  });
+  const kpiLibrary = useMemo<KpiLibraryDepartment[]>(
+    () => Array.isArray(effectiveSettings?.KPI_TEMPLATE_LIBRARY)
+      ? effectiveSettings.KPI_TEMPLATE_LIBRARY as KpiLibraryDepartment[]
+      : KPI_LIBRARY,
+    [effectiveSettings?.KPI_TEMPLATE_LIBRARY],
+  );
+
   useEffect(() => {
     const cycleId = searchParams.get('cycleId');
     if (cycleId && cycles.some(cycle => cycle.id === cycleId)) setSelectedCycleFilter(cycleId);
@@ -419,6 +463,16 @@ export default function PerformanceKpiPage() {
       setIsCycleModalOpen(false);
     },
     onError: (err) => toast('Lỗi: ' + errorMessage(err), 'error'),
+  });
+
+  const saveKpiLibraryMutation = useMutation({
+    mutationFn: async (library: KpiLibraryDepartment[]) => (await api.patch('/admin/settings', { values: { KPI_TEMPLATE_LIBRARY: library } })).data,
+    onSuccess: (settings: Record<string, unknown>) => {
+      queryClient.setQueryData(['settings-effective'], settings);
+      toast('Đã lưu thư viện mục tiêu KPI mẫu.', 'success');
+      setIsKpiTemplateFormOpen(false);
+    },
+    onError: (err) => toast('Không lưu được thư viện KPI: ' + errorMessage(err), 'error'),
   });
 
   const toggleCycleStatusMutation = useMutation({
@@ -570,6 +624,46 @@ export default function PerformanceKpiPage() {
     setIsGoalModalOpen(true);
   };
 
+  const openKpiTemplateForm = (item?: KpiLibraryItem, index?: number) => {
+    setEditingKpiTemplateIndex(typeof index === 'number' ? index : null);
+    setKpiTemplateForm(item ? { ...item } : { kraTitle: '', targetMetric: '', weightage: 20, description: '' });
+    setIsKpiTemplateFormOpen(true);
+  };
+
+  const saveKpiTemplate = () => {
+    const deptIndex = kpiLibrary.findIndex(department => department.department === selectedKpiDept);
+    if (deptIndex < 0) {
+      toast('Chưa có nhóm phòng ban để lưu mục tiêu mẫu.', 'error');
+      return;
+    }
+    if (!kpiTemplateForm.kraTitle.trim() || !kpiTemplateForm.targetMetric.trim() || !kpiTemplateForm.description.trim()) {
+      toast('Nhập tên mục tiêu, chỉ số đo và mô tả trước khi lưu.', 'error');
+      return;
+    }
+    if (!Number.isFinite(Number(kpiTemplateForm.weightage)) || Number(kpiTemplateForm.weightage) < 1 || Number(kpiTemplateForm.weightage) > 100) {
+      toast('Trọng số tham khảo phải nằm trong khoảng 1–100%.', 'error');
+      return;
+    }
+    const nextLibrary = kpiLibrary.map((department, index) => {
+      if (index !== deptIndex) return department;
+      const items = [...department.items];
+      if (editingKpiTemplateIndex === null) items.push({ ...kpiTemplateForm, kraTitle: kpiTemplateForm.kraTitle.trim(), targetMetric: kpiTemplateForm.targetMetric.trim(), description: kpiTemplateForm.description.trim(), weightage: Number(kpiTemplateForm.weightage) });
+      else items[editingKpiTemplateIndex] = { ...kpiTemplateForm, kraTitle: kpiTemplateForm.kraTitle.trim(), targetMetric: kpiTemplateForm.targetMetric.trim(), description: kpiTemplateForm.description.trim(), weightage: Number(kpiTemplateForm.weightage) };
+      return { ...department, items };
+    });
+    saveKpiLibraryMutation.mutate(nextLibrary);
+  };
+
+  const deleteKpiTemplate = (index: number) => {
+    const department = kpiLibrary.find(item => item.department === selectedKpiDept);
+    const item = department?.items[index];
+    if (!department || !item || !window.confirm(`Xóa mục tiêu mẫu “${item.kraTitle}” khỏi thư viện? Việc này không xóa các mục tiêu đã giao cho nhân viên.`)) return;
+    const nextLibrary = kpiLibrary.map(current => current.department !== selectedKpiDept
+      ? current
+      : { ...current, items: current.items.filter((_, itemIndex) => itemIndex !== index) });
+    saveKpiLibraryMutation.mutate(nextLibrary);
+  };
+
   const activeEmployees = employees.filter(employee => employee.id !== currentUser?.id
     && employee.status === 'ACTIVE' && ['ACTIVE', 'PROBATION'].includes(employee.employmentStatus ?? ''));
   const isRestrictedLineManager = Boolean(currentUser?.roles.includes('LINE_MANAGER')
@@ -587,12 +681,19 @@ export default function PerformanceKpiPage() {
   const cycleFilteredGoals = selectedCycleFilter === 'ALL'
     ? goals
     : goals.filter(goal => goal.cycleId === selectedCycleFilter);
-  const visibleGoals = selectedUnitFilter === 'ALL'
+  const unitFilteredGoals = selectedUnitFilter === 'ALL'
     ? cycleFilteredGoals
     : cycleFilteredGoals.filter(goal => {
       const goalUnitId = goal.assignmentOrgUnitId ?? employees.find(employee => employee.id === goal.userId)?.orgUnitId;
       return isInOrgUnitSubtree(orgUnits, goalUnitId, selectedUnitFilter);
     });
+  const visibleGoals = selectedEvaluationFilter === 'ALL'
+    ? unitFilteredGoals
+    : unitFilteredGoals.filter(goal => goalEvaluationStatus(goal) === selectedEvaluationFilter);
+  const evaluationStatusCounts = unitFilteredGoals.reduce<Record<GoalEvaluationStatus, number>>((counts, goal) => {
+    counts[goalEvaluationStatus(goal)] += 1;
+    return counts;
+  }, { WAITING_EVIDENCE: 0, WAITING_SCORE: 0, SCORED: 0 });
 
   return (
     <div className="space-y-6 pb-12">
@@ -714,7 +815,7 @@ export default function PerformanceKpiPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
           <Select
             value={selectedCycleFilter}
@@ -736,6 +837,17 @@ export default function PerformanceKpiPage() {
             <option value="ALL">Tất cả phòng ban</option>
             {orgUnits.map(unit => <option key={unit.id} value={unit.id}>{unit.code} · {unit.name}</option>)}
           </Select>}
+          {activeTab === 'goals' && <Select
+            value={selectedEvaluationFilter}
+            onChange={(e) => setSelectedEvaluationFilter(e.target.value as GoalEvaluationFilter)}
+            className="w-[200px] text-xs font-medium"
+            aria-label="Lọc mục tiêu theo trạng thái đánh giá"
+          >
+            <option value="ALL">Mọi trạng thái ({unitFilteredGoals.length})</option>
+            <option value="WAITING_EVIDENCE">Chờ cập nhật kết quả ({evaluationStatusCounts.WAITING_EVIDENCE})</option>
+            <option value="WAITING_SCORE">Chờ quản lý chấm ({evaluationStatusCounts.WAITING_SCORE})</option>
+            <option value="SCORED">Đã chấm ({evaluationStatusCounts.SCORED})</option>
+          </Select>}
         </div>
       </div>
 
@@ -745,13 +857,17 @@ export default function PerformanceKpiPage() {
           {visibleGoals.length === 0 ? (
             <div className="text-center py-12 border border-dashed rounded-lg bg-card space-y-3">
               <Target className="w-10 h-10 text-muted-foreground/40 mx-auto" />
-              <div className="text-sm font-bold text-foreground">{goals.length === 0 ? 'Chưa có mục tiêu KRA/KPI nào trong chu kỳ này' : 'Đơn vị này chưa có mục tiêu trong chu kỳ đang chọn'}</div>
+              <div className="text-sm font-bold text-foreground">{unitFilteredGoals.length === 0
+                ? (goals.length === 0 ? 'Chưa có mục tiêu KRA/KPI nào trong chu kỳ này' : 'Đơn vị này chưa có mục tiêu trong chu kỳ đang chọn')
+                : `Không có mục tiêu ở trạng thái “${GOAL_EVALUATION_STATUS_LABEL[selectedEvaluationFilter as GoalEvaluationStatus]}”`}</div>
               <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                {canManageGoals
+                {unitFilteredGoals.length > 0
+                  ? 'Thử chọn trạng thái khác hoặc mở lại bộ lọc chu kỳ và phòng ban.'
+                  : canManageGoals
                   ? 'Quản lý thiết lập mục tiêu theo định hướng của đơn vị và thống nhất chỉ tiêu với nhân viên trước khi giao.'
                   : 'Mục tiêu được quản lý thiết lập và thống nhất với nhân viên. Nhân viên theo dõi KPI, cập nhật kết quả thực tế và nộp minh chứng.'}
               </p>
-              {canManageGoals && goals.length === 0 && <Button size="sm" onClick={openGoalSetup}>
+              {unitFilteredGoals.length === 0 && canManageGoals && goals.length === 0 && <Button size="sm" onClick={openGoalSetup}>
                 <Plus className="w-4 h-4 mr-1.5" /> Thiết Lập Mục Tiêu KRA Đầu Tiên
               </Button>}
             </div>
@@ -771,6 +887,17 @@ export default function PerformanceKpiPage() {
                       {g.assignmentScope === 'ORG_UNIT' && <p className="mt-1 text-xs text-muted-foreground">Giao theo {g.assignmentOrgUnitName ?? g.assignmentOrgUnit?.name} ({g.assignmentOrgUnitCode ?? g.assignmentOrgUnit?.code}) · đánh giá riêng theo từng nhân sự</p>}
                     </div>
                     <div className="flex items-center gap-1.5">
+                      {(() => {
+                        const evaluationStatus = goalEvaluationStatus(g);
+                        const statusClass = evaluationStatus === 'SCORED'
+                          ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                          : evaluationStatus === 'WAITING_SCORE'
+                            ? 'border-amber-200 bg-amber-50 text-amber-900'
+                            : 'border-border bg-muted/40 text-muted-foreground';
+                        return <span className={`inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium ${statusClass}`}>
+                          {GOAL_EVALUATION_STATUS_LABEL[evaluationStatus]}
+                        </span>;
+                      })()}
                       <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border border-border bg-muted/40 text-foreground">
                         Trọng số: {g.weightage}%
                       </span>
@@ -1613,7 +1740,7 @@ export default function PerformanceKpiPage() {
             <div className="relative z-10 w-full max-w-4xl max-h-[90vh] flex flex-col rounded-xl bg-card p-6 shadow-2xl border border-border space-y-4 animate-in fade-in zoom-in-95 text-foreground">
               <div className="flex justify-between items-center border-b pb-3 shrink-0">
                 <div className="flex items-center gap-2">
-                  <span className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                  <span className="p-2 rounded-lg bg-muted text-foreground border border-border">
                     <Sparkles className="w-4 h-4" />
                   </span>
                   <div>
@@ -1621,22 +1748,29 @@ export default function PerformanceKpiPage() {
                       Thư Viện Mục Tiêu KPI / KRA Mẫu Chuẩn SMART
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Chọn mục tiêu mẫu định chuẩn cho từng khối phòng ban để tự động áp dụng vào chu kỳ đánh giá.
+                      {canManageKpiLibrary
+                        ? 'Quản trị viên có thể thêm, sửa, xóa mục tiêu mẫu; thay đổi không làm đổi KPI đã giao.'
+                        : 'Chọn một mục tiêu để đưa sang biểu mẫu giao KPI; chỉnh sửa thư viện không làm thay đổi mục tiêu đã giao.'}
                     </p>
                   </div>
                 </div>
-                <button onClick={() => setIsKpiLibraryOpen(false)} className="text-muted-foreground hover:text-foreground">
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {canManageKpiLibrary && <Button size="sm" onClick={() => openKpiTemplateForm()}>
+                    <Plus className="w-4 h-4 mr-1.5" /> Thêm mục tiêu mẫu
+                  </Button>}
+                  <button type="button" aria-label="Đóng thư viện KPI" onClick={() => setIsKpiLibraryOpen(false)} className="text-muted-foreground hover:text-foreground">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Department Tabs */}
               <div className="flex gap-1.5 border-b border-border pb-2 shrink-0 overflow-x-auto text-xs">
-                {KPI_LIBRARY.map((dept) => (
+                {kpiLibrary.map((dept) => (
                   <button
                     key={dept.department}
                     type="button"
-                    onClick={() => setSelectedKpiDept(dept.department as any)}
+                    onClick={() => setSelectedKpiDept(dept.department as typeof selectedKpiDept)}
                     className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-colors whitespace-nowrap ${
                       selectedKpiDept === dept.department
                         ? 'bg-primary text-primary-foreground shadow-2xs'
@@ -1651,7 +1785,9 @@ export default function PerformanceKpiPage() {
               {/* KPI Items List */}
               <div className="overflow-y-auto space-y-3.5 pr-1 py-1 flex-1 text-sm">
                 {(() => {
-                  const currentDept = KPI_LIBRARY.find((d) => d.department === selectedKpiDept) || KPI_LIBRARY[0];
+                  const currentDept = kpiLibrary.find((d) => d.department === selectedKpiDept) || kpiLibrary[0];
+                  if (!currentDept) return <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Chưa có mục tiêu mẫu trong thư viện.</div>;
+                  if (!currentDept.items.length) return <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Nhóm này chưa có mục tiêu mẫu.{canManageKpiLibrary ? ' Dùng nút “Thêm mục tiêu mẫu” để bổ sung.' : ''}</div>;
                   return currentDept.items.map((item, idx) => (
                     <div
                       key={idx}
@@ -1680,7 +1816,15 @@ export default function PerformanceKpiPage() {
                         {item.description}
                       </p>
 
-                      <div className="pt-2 border-t border-border/50 flex justify-end">
+                      <div className="pt-2 border-t border-border/50 flex items-center justify-between gap-2">
+                        {canManageKpiLibrary && <div className="flex items-center gap-1">
+                          <button type="button" onClick={() => openKpiTemplateForm(item, idx)} aria-label={`Sửa ${item.kraTitle}`} className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
+                            <Pencil className="w-3.5 h-3.5" /> Sửa
+                          </button>
+                          <button type="button" onClick={() => deleteKpiTemplate(idx)} aria-label={`Xóa ${item.kraTitle}`} className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
+                            <Trash2 className="w-3.5 h-3.5" /> Xóa
+                          </button>
+                        </div>}
                         {canManageGoals && <button
                           type="button"
                           onClick={() => {
@@ -1709,6 +1853,42 @@ export default function PerformanceKpiPage() {
               <div className="flex justify-end pt-3 border-t shrink-0">
                 <Button variant="outline" size="sm" onClick={() => setIsKpiLibraryOpen(false)}>
                   Đóng
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
+
+      {isKpiTemplateFormOpen && (
+        <Portal>
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <button type="button" aria-label="Đóng biểu mẫu mục tiêu KPI" className="fixed inset-0 bg-black/50" onClick={() => setIsKpiTemplateFormOpen(false)} />
+            <div className="relative z-10 w-full max-w-xl rounded-xl border border-border bg-card p-5 shadow-2xl text-foreground space-y-4">
+              <div className="space-y-1">
+                <h3 className="font-semibold text-base">{editingKpiTemplateIndex === null ? 'Thêm mục tiêu KPI mẫu' : 'Sửa mục tiêu KPI mẫu'}</h3>
+                <p className="text-sm text-muted-foreground">Nhóm: {kpiLibrary.find(department => department.department === selectedKpiDept)?.deptName.split('(')[0].trim()}</p>
+              </div>
+              <label className="block space-y-1.5 text-sm">
+                <span className="font-medium">Tên mục tiêu</span>
+                <Input value={kpiTemplateForm.kraTitle} onChange={event => setKpiTemplateForm(form => ({ ...form, kraTitle: event.target.value }))} placeholder="Ví dụ: Hoàn thành kế hoạch tuyển dụng" />
+              </label>
+              <label className="block space-y-1.5 text-sm">
+                <span className="font-medium">Chỉ số đo lường mục tiêu</span>
+                <Input value={kpiTemplateForm.targetMetric} onChange={event => setKpiTemplateForm(form => ({ ...form, targetMetric: event.target.value }))} placeholder="Nêu rõ ngưỡng, đơn vị và thời hạn" />
+              </label>
+              <label className="block max-w-40 space-y-1.5 text-sm">
+                <span className="font-medium">Trọng số tham khảo (%)</span>
+                <Input type="number" min={1} max={100} value={kpiTemplateForm.weightage} onChange={event => setKpiTemplateForm(form => ({ ...form, weightage: Number(event.target.value) }))} />
+              </label>
+              <label className="block space-y-1.5 text-sm">
+                <span className="font-medium">Mô tả / cách thực hiện</span>
+                <textarea value={kpiTemplateForm.description} onChange={event => setKpiTemplateForm(form => ({ ...form, description: event.target.value }))} rows={3} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-ring" placeholder="Ghi nguồn số liệu hoặc cách xác nhận kết quả." />
+              </label>
+              <div className="flex justify-end gap-2 border-t border-border pt-3">
+                <Button variant="outline" size="sm" onClick={() => setIsKpiTemplateFormOpen(false)}>Hủy</Button>
+                <Button size="sm" onClick={saveKpiTemplate} disabled={saveKpiLibraryMutation.isPending || !canManageKpiLibrary}>
+                  {saveKpiLibraryMutation.isPending ? 'Đang lưu...' : 'Lưu mục tiêu'}
                 </Button>
               </div>
             </div>
@@ -1761,14 +1941,15 @@ export default function PerformanceKpiPage() {
                 {/* 1. MẪU KRA TRỌNG SỐ */}
                 {selectedTemplateForPrint === 'kra' && (
                   <div className="space-y-4">
-                    <div className="pb-3 flex justify-between items-start">
+                    <div className="print-template-header pb-3 flex justify-between items-start">
                       <div>
-                        <p className="font-bold text-sm uppercase tracking-wider">CÔNG TY CỔ PHẦN CÔNG NGHỆ HRMIS PRO</p>
-                        <p className="text-xs text-muted-foreground">BAN NHÂN SỰ &amp; QUẢN TRỊ HIỆU SUẤT</p>
+                        {printConfig.parentOrgName && <p className="text-xs uppercase">{printConfig.parentOrgName}</p>}
+                        <p className="font-bold text-sm uppercase tracking-wider">{printConfig.orgName}</p>
+                        {printConfig.deptName && <p className="text-xs uppercase">{printConfig.deptName}</p>}
                       </div>
                       <div className="text-right text-xs text-muted-foreground">
                         <p className="font-bold text-foreground">MẪU SỐ: 01/ĐG-KRA</p>
-                        <p>Năm đánh giá: 2026</p>
+                        <p>Năm đánh giá: {activeCycle?.year ?? new Date().getFullYear()}</p>
                       </div>
                     </div>
 
@@ -1782,79 +1963,79 @@ export default function PerformanceKpiPage() {
                     </div>
 
                     {/* Khung thông tin cá nhân */}
-                    <div className="grid grid-cols-2 gap-x-5 gap-y-2 text-sm">
+                    <div className="print-template-identification space-y-1.5 text-sm">
                       {['Họ và tên nhân sự', 'Mã số nhân viên', 'Chức vụ / Vị trí', 'Phòng ban / Đơn vị', 'Người quản lý trực tiếp', 'Kỳ đánh giá'].map((label) => (
-                        <div className="print-field" key={label}>
-                          <p className="font-medium">{label}</p>
-                          <div className="print-write-area print-write-area-identity min-h-[9mm]" />
+                        <div className="print-field flex items-end gap-2" key={label}>
+                          <span className="font-medium whitespace-nowrap">{label}:</span>
+                          <div className="print-write-area print-write-area-identity min-h-[6mm] flex-1" />
                         </div>
                       ))}
                     </div>
 
                     {/* Bảng mục tiêu KRA */}
-                    <table className="w-full text-sm text-left border border-border/80">
-                      <thead className="bg-muted/50 text-foreground font-semibold border-b border-border/80">
+                    <table className="print-kpi-table w-full text-sm text-left border-collapse border border-neutral-600 [&_th]:border [&_th]:border-neutral-600 [&_td]:border [&_td]:border-neutral-600 [&_th]:px-2 [&_td]:px-2 [&_th]:py-1.5 [&_td]:py-1.5">
+                      <thead className="text-foreground font-semibold">
                         <tr>
-                          <th className="p-2.5 border-r border-border/60 text-center w-8">TT</th>
-                          <th className="p-2.5 border-r border-border/60">Tiêu chí KRA / Chỉ tiêu nhiệm vụ</th>
-                          <th className="p-2.5 border-r border-border/60 text-center w-20">Trọng số</th>
-                          <th className="p-2.5 border-r border-border/60">Chỉ số đích (Target Metric)</th>
-                          <th className="p-2.5 border-r border-border/60 text-center w-24">Điểm KPI (0–100)</th>
-                          <th className="p-2.5 text-center w-24">Điểm theo trọng số</th>
+                          <th className="text-center w-8">TT</th>
+                          <th>Tiêu chí KRA / Chỉ tiêu nhiệm vụ</th>
+                          <th className="text-center w-20">Trọng số</th>
+                          <th>Chỉ số đích (Target Metric)</th>
+                          <th className="text-center w-24">Điểm KPI (0–100)</th>
+                          <th className="text-center w-24">Điểm theo trọng số</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-border/60">
+                      <tbody>
                         <tr>
-                          <td className="p-2.5 text-center font-bold border-r border-border/60">1</td>
-                          <td className="p-2.5 border-r border-border/60">
+                          <td className="text-center font-bold">1</td>
+                          <td>
                             <b>KRA 1: Doanh số / Nghiệp vụ cốt lõi</b>
                             <span className="block text-xs text-muted-foreground mt-0.5">Đảm bảo chỉ tiêu doanh thu thực thu hoặc sản lượng theo cam kết</span>
                           </td>
-                          <td className="p-2.5 text-center font-bold border-r border-border/60">35%</td>
-                          <td className="p-2.5 border-r border-border/60 text-sm">Đạt &gt;= 100% hạn mức doanh số cam kết theo quý</td>
-                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
-                          <td className="p-2.5 text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="text-center font-bold">35%</td>
+                          <td>Đạt &gt;= 100% hạn mức doanh số cam kết theo quý</td>
+                          <td className="text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
                         </tr>
                         <tr>
-                          <td className="p-2.5 text-center font-bold border-r border-border/60">2</td>
-                          <td className="p-2.5 border-r border-border/60">
+                          <td className="text-center font-bold">2</td>
+                          <td>
                             <b>KRA 2: Tiến độ bàn giao &amp; SLA Dịch vụ</b>
                             <span className="block text-xs text-muted-foreground mt-0.5">Hoàn thành Sprint/Dự án đúng hạn, đảm bảo chất lượng kỹ thuật</span>
                           </td>
-                          <td className="p-2.5 text-center font-bold border-r border-border/60">25%</td>
-                          <td className="p-2.5 border-r border-border/60 text-sm">SLA Uptime &gt;= 99.9%, bàn giao đúng hạn &gt;= 95%</td>
-                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
-                          <td className="p-2.5 text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="text-center font-bold">25%</td>
+                          <td>SLA Uptime &gt;= 99.9%, bàn giao đúng hạn &gt;= 95%</td>
+                          <td className="text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
                         </tr>
                         <tr>
-                          <td className="p-2.5 text-center font-bold border-r border-border/60">3</td>
-                          <td className="p-2.5 border-r border-border/60">
+                          <td className="text-center font-bold">3</td>
+                          <td>
                             <b>KRA 3: Cải tiến kỹ thuật &amp; Tối ưu chi phí</b>
                             <span className="block text-xs text-muted-foreground mt-0.5">Sáng kiến tối ưu hóa, tự động hóa quy trình, tiết kiệm tài nguyên</span>
                           </td>
-                          <td className="p-2.5 text-center font-bold border-r border-border/60">20%</td>
-                          <td className="p-2.5 border-r border-border/60 text-sm">Tiết kiệm &gt;= 15% thời gian xử lý hoặc ngân sách</td>
-                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
-                          <td className="p-2.5 text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="text-center font-bold">20%</td>
+                          <td>Tiết kiệm &gt;= 15% thời gian xử lý hoặc ngân sách</td>
+                          <td className="text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
                         </tr>
                         <tr>
-                          <td className="p-2.5 text-center font-bold border-r border-border/60">4</td>
-                          <td className="p-2.5 border-r border-border/60">
+                          <td className="text-center font-bold">4</td>
+                          <td>
                             <b>KRA 4: Báo cáo &amp; Tuân thủ kỷ luật quy trình</b>
                             <span className="block text-xs text-muted-foreground mt-0.5">Báo cáo định kỳ đầy đủ, tuân thủ quy chế nội quy cơ quan</span>
                           </td>
-                          <td className="p-2.5 text-center font-bold border-r border-border/60">20%</td>
-                          <td className="p-2.5 border-r border-border/60 text-sm">100% báo cáo đúng hạn, 0 sai phạm quy chế</td>
-                          <td className="p-2.5 text-center border-r border-border/60"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
-                          <td className="p-2.5 text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="text-center font-bold">20%</td>
+                          <td>100% báo cáo đúng hạn, 0 sai phạm quy chế</td>
+                          <td className="text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td className="text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
                         </tr>
                       </tbody>
-                      <tfoot className="bg-muted/30 font-bold border-t border-border/80">
+                      <tfoot className="font-bold">
                         <tr>
-                          <td colSpan={2} className="p-2.5 text-right">TỔNG CỘNG TRỌNG SỐ:</td>
-                          <td className="p-2.5 text-center">100%</td>
-                          <td colSpan={2} className="p-2.5 text-right">ĐIỂM KRA TỔNG HỢP:</td>
-                          <td className="p-2.5 text-center text-primary"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
+                          <td colSpan={2} className="text-right">TỔNG CỘNG TRỌNG SỐ:</td>
+                          <td className="text-center">100%</td>
+                          <td colSpan={2} className="text-right">ĐIỂM KRA TỔNG HỢP:</td>
+                          <td className="text-center"><span className="print-score-entry"><span className="print-score-slot print-score-slot-100" /> / 100</span></td>
                         </tr>
                       </tfoot>
                     </table>
@@ -1869,23 +2050,23 @@ export default function PerformanceKpiPage() {
                     <p className="pt-3 text-xs italic text-muted-foreground">Biểu mẫu KPI nội bộ; điểm từng KPI do quản lý chấm trên cơ sở kết quả và minh chứng. Điểm chu kỳ là tổng điểm KPI nhân trọng số mục tiêu, tổng trọng số bằng 100%. {isEnterprise ? 'Không tự động quy đổi điểm thành tiền thưởng hoặc lương.' : 'Kết luận công vụ cần được người có thẩm quyền xem xét theo quy định áp dụng.'}</p>
 
                     {/* 3 Khung chữ ký */}
-                    <div className="grid grid-cols-3 gap-4 pt-6 text-center text-sm">
+                    <div className="print-template-signatures grid grid-cols-3 gap-4 pt-4 text-center text-sm">
                       <div>
                         <p className="font-bold uppercase">NGƯỜI LAO ĐỘNG</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên)</p>
-                        <div className="h-14" />
+                        <div className="h-10" />
                         <div className="print-signature-rule" />
                       </div>
                       <div>
                         <p className="font-bold uppercase">QUẢN LÝ TRỰC TIẾP</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, ghi rõ họ tên)</p>
-                        <div className="h-14" />
+                        <div className="h-10" />
                         <div className="print-signature-rule" />
                       </div>
                       <div>
                         <p className="font-bold uppercase">LÃNH ĐẠO ĐƠN VỊ DUYỆT</p>
                         <p className="text-xs italic text-muted-foreground">(Ký, đóng dấu)</p>
-                        <div className="h-14" />
+                        <div className="h-10" />
                         <div className="print-signature-rule" />
                       </div>
                     </div>

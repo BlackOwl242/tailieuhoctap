@@ -14,7 +14,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
-    "seed": "node dist/prisma/seed.js"
+    "seed": "node dist/prisma/seed.js",
+    "seed:kpi-samples": "node prisma/seed-kpi-evaluation-samples.cjs"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.4",

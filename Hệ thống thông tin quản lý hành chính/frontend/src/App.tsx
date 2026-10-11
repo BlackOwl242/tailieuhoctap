@@ -6,13 +6,14 @@ import { InformationHome } from './InformationHome'
 import { CitizenProcedureCatalog } from './CitizenProcedureCatalog'
 import { showcaseProcedureCodes } from './serviceTopics'
 
-type User = { id: string; email: string; phone: string; name: string; role: string; emailVerified: boolean; agencyScope?: string; validFrom?: string; validUntil?: string; maySignStop?: boolean; signingAuthorityRef?: string; mustChangePassword?: boolean }
-type Procedure = { ref?: string; code: string; name: string; field: string; level: string; agency: string; verified: boolean; serviceMode?: string; submission?: SubmissionSchema; routing?: { mode: string; status: string; summary: string; officialUrl: string; checkedAt?: string; observedAuthorities?: { locality: string; authority: string }[] } }
+type User = { id: string; email: string; phone: string; name: string; role: string; emailVerified: boolean; agencyScope?: string; validFrom?: string; validUntil?: string; maySignStop?: boolean; signingAuthorityRef?: string; mustChangePassword?: boolean; canManageAgencyAccounts?: boolean }
+type Procedure = { ref?: string; sourceCode?: string; code: string; name: string; field: string; categoryKey?: string; categoryEdit?: { sourceUrl: string; checkedAt: string; reason: string; version: number; updatedBy: string; updatedAt: string }; level: string; agency: string; verified: boolean; serviceMode?: string; submission?: SubmissionSchema; localEdit?: { sourceUrl: string; checkedAt: string; reason: string; version: number; updatedBy: string; updatedAt: string }; routing?: { mode: string; status: string; summary: string; officialUrl: string; checkedAt?: string; observedAuthorities?: { locality: string; authority: string }[] } }
+type ProcedureCategory = { key: string; name: string; count: number; source: 'reference' | 'internal'; procedures: Procedure[]; categoryEdit?: Procedure['categoryEdit'] | null }
 type CaseFile = { code: string; procedureCode: string; procedure: Procedure; status: string; statusLabel: string; version: number; createdAt: string; deadline?: string; deadlineNote?: string; applicant: { name: string; phone: string; email: string; citizenId?: string; address?: string }; subject: { name: string; relation: string }; events: { title: string; detail: string; at: string; audience: string; actor?: string; role?: string; action?: string; id?: string }[]; supplement?: { reason: string; resumeStatus?: string }; draftResult?: string; result?: { number: string; content: string }; attachments?: { name: string; url?: string; downloadUrl?: string }[]; [key: string]: any }
-type Bootstrap = { procedures: Procedure[]; cases: CaseFile[]; stats: { total?: number; open?: number; waiting?: number; supplement?: number; review?: number; overdue?: number; byStatus?: Record<string, number> }; statusLabels: Record<string, string>; staff?: { id: string; name: string; role: string }[]; feedback?: { code: string; score: number; content: string; created_at: string }[]; outbox?: { code: string; status: string; attempts: number; lastError?: string; messageId?: string }[] }
-type ManagedUser = { id: string; email: string; phone: string; name: string; role: string; active: boolean; agencyScope: string; validFrom: string; validUntil: string; maySignStop: boolean; signingAuthorityRef: string; mustChangePassword?: boolean; createdAt: string }
+type Bootstrap = { procedures: Procedure[]; procedureCategories?: ProcedureCategory[]; cases: CaseFile[]; stats: { total?: number; open?: number; waiting?: number; supplement?: number; review?: number; overdue?: number; byStatus?: Record<string, number> }; storage?: { database: string; procedureCount: number; caseRecords: number; sampleCaseCount?: number; sampleDataVersion?: number; publishedNews: number; caseCountScope: string }; statusLabels: Record<string, string>; staff?: { id: string; name: string; role: string }[]; feedback?: { code: string; score: number; content: string; created_at: string }[]; outbox?: { code: string; status: string; attempts: number; lastError?: string; messageId?: string }[] }
+type ManagedUser = { id: string; email: string; phone: string; name: string; role: string; active: boolean; agencyScope: string; validFrom: string; validUntil: string; maySignStop: boolean; signingAuthorityRef: string; mustChangePassword?: boolean; canManageAgencyAccounts?: boolean; createdAt: string }
 type StaffAccessRequest = { id: string; userId: string; email: string; name: string; requestedBy: string; requestedById: string; role: string; agencyScope: string; validFrom: string; validUntil: string; maySignStop: boolean; signingAuthorityRef: string; reason: string; status: 'PENDING' | 'APPROVED' | 'REJECTED'; reviewedBy?: string; reviewNote: string; createdAt: string; reviewedAt?: string }
-type AccountAccess = { role: string; active: boolean; agencyScope: string; validFrom: string; validUntil: string }
+type AccountAccess = { role: string; active: boolean; agencyScope: string; validFrom: string; validUntil: string; canManageAgencyAccounts?: boolean }
 type StaffAccountChange = { id: string; userId: string; email: string; name: string; requestedBy: string; requestedById: string; before: AccountAccess; proposed: AccountAccess; reason: string; status: 'PENDING' | 'APPROVED' | 'REJECTED'; reviewedBy?: string; reviewNote: string; createdAt: string; reviewedAt?: string }
 type ManagedNews = { id: string; title: string; summary: string; body: string; category: string; image: string; sourceUrl: string; featured: boolean; status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'; publishedAt: string; date?: string; version: number; updatedAt: string }
 
@@ -30,6 +31,25 @@ async function api<T>(path: string, body?: unknown): Promise<T> {
 }
 const roleNames: Record<string, string> = { intake: 'Cán bộ tiếp nhận', specialist: 'Chuyên viên thụ lý', leader: 'Lãnh đạo phê duyệt', registrar: 'Văn thư phát hành', finance: 'Tài chính', admin: 'Quản trị hệ thống' }
 const toDate = (value?: string) => value ? new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium', timeStyle: value.includes('T') ? 'short' : undefined }).format(new Date(value)) : 'Chưa xác định'
+function printInternalTable(title: string, subtitle: string, headers: string[], rows: string[][]) {
+  const escape = (value: string) => value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char] || char))
+  const popup = window.open('', '_blank')
+  if (!popup) return
+  popup.document.write(`<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>${escape(title)}</title><style>@page{size:A4 landscape;margin:16mm}body{font:10.5pt Arial,sans-serif;color:#162c43}h1{font-size:17pt;margin:0 0 8px}p{margin:0 0 16px;color:#52657a}.internal{font-size:9.5pt;margin:0 0 10px;color:#52657a}table{width:100%;border-collapse:collapse}th,td{border:1px solid #8090a0;padding:7px;text-align:left;vertical-align:top}th{background:#eaf0f6}footer{margin-top:18px;color:#52657a;font-size:9pt}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="internal">BẢNG KÊ NỘI BỘ · TRÍCH XUẤT TỪ HỆ THỐNG</div><h1>${escape(title)}</h1><p>${escape(subtitle)}</p><table><thead><tr>${headers.map(item => `<th>${escape(item)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(item => `<td>${escape(item)}</td>`).join('')}</tr>`).join('')}</tbody></table><footer>Không phải biểu mẫu hoặc văn bản hành chính ban hành bởi cơ quan nhà nước. In lúc ${escape(new Date().toLocaleString('vi-VN'))}.</footer><script>window.onload=()=>window.print()</script></body></html>`)
+  popup.document.close()
+}
+function downloadCsv(filename: string, headers: string[], rows: string[][]) {
+  const cell = (value: string) => {
+    let safe = String(value ?? '')
+    if (/^[\s]*[=+\-@]/.test(safe)) safe = `'${safe}`
+    return `"${safe.replace(/"/g, '""')}"`
+  }
+  const content = '\ufeff' + [headers, ...rows].map(row => row.map(cell).join(',')).join('\r\n')
+  const url = URL.createObjectURL(new Blob([content], { type: 'text/csv;charset=utf-8' }))
+  const link = document.createElement('a')
+  link.href = url; link.download = filename; link.click()
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
 const CLOSED_STATUSES = new Set(['HOAN_THANH', 'TU_CHOI', 'KHONG_GIAI_QUYET', 'DUNG'])
 const OPERATION_STAGES = [
   { label: 'Tiếp nhận', statuses: ['CHO_TIEP_NHAN', 'DA_TIEP_NHAN'] },
@@ -38,6 +58,7 @@ const OPERATION_STAGES = [
   { label: 'Phát hành', statuses: ['DA_PHE_DUYET'] },
   { label: 'Trả kết quả', statuses: ['DA_PHAT_HANH', 'HOAN_THANH'] },
 ]
+type QueueFocus = { statuses?: string[]; deadlineFilter?: string; assigneeFilter?: string; agencyFilter?: string; procedureCode?: string; updatedSince?: string; createdFrom?: string; createdTo?: string; label?: string }
 function hanoiDate(value?: string) {
   if (!value) return ''
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value
@@ -291,9 +312,12 @@ function CitizenTrackingPage({ initialReceipt }: { initialReceipt: SubmissionRec
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  async function lookup(event?: FormEvent<HTMLFormElement>) {
+  async function lookup(event?: FormEvent<HTMLFormElement>, credentials?: { code: string; accessKey: string }) {
     event?.preventDefault(); setBusy(true); setError(''); setMessage('')
-    try { const result = await api<{ case: any }>('/api/public/cases/lookup', { code, accessKey }); setItem(result.case) }
+    const lookupCode = credentials?.code || code
+    const lookupKey = credentials?.accessKey || accessKey
+    if (credentials) { setCode(lookupCode); setAccessKey(lookupKey) }
+    try { const result = await api<{ case: any }>('/api/public/cases/lookup', { code: lookupCode, accessKey: lookupKey }); setItem(result.case) }
     catch (reason) { setItem(null); setError(reason instanceof Error ? reason.message : 'Không tìm thấy hồ sơ với thông tin đã nhập.') }
     finally { setBusy(false) }
   }
@@ -309,6 +333,7 @@ function CitizenTrackingPage({ initialReceipt }: { initialReceipt: SubmissionRec
   return <section className="citizen-track-page">
     <div className="citizen-page-heading"><span className="eyebrow">TRA CỨU TIẾN ĐỘ</span><h1>Tra cứu hồ sơ đã gửi</h1><p>Nhập mã hồ sơ và khóa tra cứu do cán bộ tiếp nhận hoặc trả kết quả cung cấp. Không cần tài khoản công dân.</p></div>
     <form className="citizen-track-form" onSubmit={lookup}><label className="citizen-field">Mã hồ sơ<input value={code} onChange={event => setCode(event.target.value.toUpperCase())} placeholder="HN-2026-XXXXXXXX" autoComplete="off" required /></label><label className="citizen-field">Khóa tra cứu<input value={accessKey} onChange={event => setAccessKey(event.target.value)} autoComplete="off" spellCheck={false} required /></label><button className="button primary" disabled={busy}>{busy ? 'Đang tra cứu…' : 'Tra cứu hồ sơ'}</button></form>
+    <aside className="sample-lookup-guidance" role="note"><div><b>Hồ sơ tình huống để xem thử</b><p>Dữ liệu dưới đây do ứng dụng tạo để minh họa thao tác tra cứu; không phải hồ sơ thật và không có giá trị pháp lý.</p></div><div className="sample-lookup-actions"><button type="button" className="button secondary" disabled={busy} onClick={() => lookup(undefined, { code: 'HN-2026-34374F1C', accessKey: 'A11BA24C2898477D98F06C4CAD2ED22336492DA922666720412C947DC14EAF52' })}>Xem tình huống chờ bổ sung</button><button type="button" className="button secondary" disabled={busy} onClick={() => lookup(undefined, { code: 'HN-2026-37F2572D', accessKey: '73D3F359300354E0CEEFE0F29ABAAEE879669A1CB946AC01E6844C5E7EDCBB21' })}>Xem tình huống đã phát hành</button></div></aside>
     {error && <div className="form-error" role="alert">{error}</div>}{message && <div className="citizen-success" role="status">{message}</div>}
     {item && <CitizenCaseStatus item={item} busy={busy} onAction={citizenAction} />}
   </section>
@@ -342,6 +367,7 @@ function CitizenCaseStatus({ item, busy, onAction }: { item: any; busy: boolean;
     setFeedback('')
   }
   return <article className="citizen-case-view">
+    {item.sampleData && <aside className="sample-data-notice citizen-sample-note" role="note"><b>Hồ sơ tình huống mô phỏng</b><span>{item.sampleDataNote || 'Thông tin này được tạo để minh họa cách tra cứu, không phải hồ sơ thật và không có giá trị pháp lý.'}</span></aside>}
     <header className="citizen-case-heading"><div><span className="eyebrow">{item.procedureCode}</span><h2>{item.procedure?.name || 'Hồ sơ thủ tục hành chính'}</h2><p>Mã hồ sơ <b>{item.code}</b> · Cơ quan tiếp nhận: {item.receivingAgency}</p></div><div className="citizen-case-current-status"><small>TRẠNG THÁI HIỆN TẠI</small><b>{item.statusLabel}</b></div></header>
     <div className="citizen-progress evidence-progress" aria-label="Tiến độ xử lý hồ sơ">{(item.progress || []).map((phase: { id: string; label: string; state: string; at?: string }, index: number) => <div key={phase.id} className={phase.state}><i>{phase.state === 'completed' ? '✓' : phase.state === 'terminated' ? '×' : index + 1}</i><b>{phase.label}</b><span>{({ completed: 'Đã hoàn tất', current: 'Đang xử lý', pending: 'Chưa thực hiện', paused: 'Chờ bổ sung', terminated: 'Đã kết thúc tại khâu này' } as Record<string, string>)[phase.state]}</span>{phase.at && <time>{toDate(phase.at)}</time>}</div>)}</div>
     {item.status === 'CHO_BO_SUNG' && <div className="citizen-request-warning"><b>Cơ quan đang yêu cầu bạn bổ sung thông tin</b><p>{item.supplement?.reason}</p>{item.supplement?.items?.length > 0 && <ul>{item.supplement.items.map((entry: string, index: number) => <li key={`${entry}-${index}`}>{entry}</li>)}</ul>}</div>}
@@ -360,11 +386,14 @@ function CitizenCaseStatus({ item, busy, onAction }: { item: any; busy: boolean;
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
-  const [data, setData] = useState<Bootstrap>({ procedures: [], cases: [], stats: {}, statusLabels: {}, staff: [] })
+  const [data, setData] = useState<Bootstrap>({ procedures: [], procedureCategories: [], cases: [], stats: {}, statusLabels: {}, staff: [] })
   const [route, setRoute] = useState<PortalRoute>(routeFromPath)
   const [citizenProcedureCode, setCitizenProcedureCode] = useState(() => new URLSearchParams(window.location.search).get('procedure') || '')
   const [citizenReceipt, setCitizenReceipt] = useState<SubmissionReceipt | null>(null)
   const [page, setPage] = useState('home')
+  const [pageHistory, setPageHistory] = useState<string[]>(['home'])
+  const [queueFocus, setQueueFocus] = useState<QueueFocus | null>(null)
+  const [queueFocusVersion, setQueueFocusVersion] = useState(0)
   const [selected, setSelected] = useState<CaseFile | null>(null)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -394,13 +423,25 @@ function App() {
     const activeApplicantType = applicantType || sessionStorage.getItem('hanoiApplicantType') || ''
     if (next === 'submit' && activeApplicantType) queryParams.set('applicant', activeApplicantType)
     const query = queryParams.size ? `?${queryParams.toString()}` : ''
-    if (window.location.pathname + window.location.search !== targetPath + query) window.history.pushState({ route: next }, '', targetPath + query)
+    if (window.location.pathname + window.location.search !== targetPath + query) window.history.pushState({ route: next, page: next === 'staff' ? (user?.role === 'admin' ? 'overview' : 'inbox') : undefined, pageHistory }, '', targetPath + query)
     setCitizenProcedureCode(next === 'submit' ? procedureCode : '')
     setRoute(next)
   }
 
   useEffect(() => {
-    const syncRoute = () => { setRoute(routeFromPath()); setCitizenProcedureCode(new URLSearchParams(window.location.search).get('procedure') || '') }
+    const syncRoute = () => {
+      const nextRoute = routeFromPath()
+      setRoute(nextRoute)
+      setCitizenProcedureCode(new URLSearchParams(window.location.search).get('procedure') || '')
+      const restoredPage = window.history.state?.page
+      const restoredHistory = window.history.state?.pageHistory
+      if (nextRoute === 'staff' && typeof restoredPage === 'string') {
+        setPage(restoredPage)
+        setSelected(null)
+        setMobileNavOpen(false)
+        setPageHistory(Array.isArray(restoredHistory) ? restoredHistory : [restoredPage])
+      }
+    }
     window.addEventListener('popstate', syncRoute)
     return () => window.removeEventListener('popstate', syncRoute)
   }, [])
@@ -412,7 +453,18 @@ function App() {
   }, [])
   useEffect(() => {
     api<{ user: User | null; csrfToken: string | null }>('/api/auth/me').then(async result => {
-      if (result.user) { csrfToken = result.csrfToken || ''; setUser(result.user); if (result.user.role === 'admin') setPage('overview'); if (!result.user.mustChangePassword) await refresh() }
+      if (result.user) {
+        csrfToken = result.csrfToken || ''
+        setUser(result.user)
+        const firstPage = result.user.role === 'admin' ? 'overview' : 'inbox'
+        const savedPage = window.history.state?.page
+        const startPage = routeFromPath() === 'staff' && typeof savedPage === 'string' ? savedPage : firstPage
+        const savedHistory = window.history.state?.pageHistory
+        const startHistory = Array.isArray(savedHistory) ? savedHistory : [startPage]
+        setPage(startPage); setPageHistory(startHistory)
+        if (routeFromPath() === 'staff') window.history.replaceState({ ...(window.history.state || {}), route: 'staff', page: startPage, pageHistory: startHistory }, '', window.location.href)
+        if (!result.user.mustChangePassword) await refresh()
+      }
     }).catch(e => setError(e.message))
   }, [refresh])
 
@@ -448,9 +500,9 @@ function App() {
 
   const isStaff = !!user
 
-  async function authenticate(account: User, csrf: string) { csrfToken = csrf; setUser(account); setError(''); navigateRoute('staff'); if (!account.mustChangePassword) { await refresh(); setPage(account.role === 'admin' ? 'overview' : 'inbox') } }
-  function passwordChanged(account: User) { setUser(account); setError(''); setPage(account.role === 'admin' ? 'overview' : 'inbox'); refresh().catch(e => setError(e instanceof Error ? e.message : 'Không tải được dữ liệu sau khi đổi mật khẩu.')) }
-  async function signOut() { try { await api('/api/auth/logout', {}) } catch {} csrfToken = ''; setUser(null); setSelected(null); setPage('home'); setMobileNavOpen(false); setData({ procedures: [], cases: [], stats: {}, statusLabels: {}, staff: [], feedback: [], outbox: [] }); navigateRoute('public') }
+  async function authenticate(account: User, csrf: string) { csrfToken = csrf; setUser(account); setError(''); navigateRoute('staff'); const firstPage = account.role === 'admin' ? 'overview' : 'inbox'; if (!account.mustChangePassword) { await refresh(); setPage(firstPage); setPageHistory([firstPage]); window.history.replaceState({ ...(window.history.state || {}), route: 'staff', page: firstPage, pageHistory: [firstPage] }, '', window.location.href) } }
+  function passwordChanged(account: User) { const firstPage = account.role === 'admin' ? 'overview' : 'inbox'; setUser(account); setError(''); setPage(firstPage); setPageHistory([firstPage]); window.history.replaceState({ ...(window.history.state || {}), route: 'staff', page: firstPage, pageHistory: [firstPage] }, '', window.location.href); refresh().catch(e => setError(e instanceof Error ? e.message : 'Không tải được dữ liệu sau khi đổi mật khẩu.')) }
+  async function signOut() { try { await api('/api/auth/logout', {}) } catch {} csrfToken = ''; setUser(null); setSelected(null); setPage('home'); setPageHistory(['home']); setMobileNavOpen(false); setData({ procedures: [], procedureCategories: [], cases: [], stats: {}, statusLabels: {}, staff: [], feedback: [], outbox: [] }); navigateRoute('public') }
 
   async function submitAction(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (!selected || !action) return
@@ -512,6 +564,7 @@ function App() {
     activity: { title: 'Nhật ký hồ sơ', eyebrow: 'TRUY VẾT TÁC NGHIỆP', description: 'Lần theo mốc thời gian, người thực hiện và nội dung sự kiện trong hồ sơ được phép xem.' },
     connections: { title: 'Kết nối dịch vụ', eyebrow: 'TÍCH HỢP VÀ ĐỐI SOÁT', description: 'Theo dõi trạng thái các phụ thuộc; thao tác tích hợp chỉ mở khi có hợp đồng và thông tin xác thực được duyệt.' },
     users: { title: 'Quản lý tài khoản cán bộ', eyebrow: 'QUẢN TRỊ VÀ PHÂN QUYỀN', description: 'Cấp tài khoản theo cơ quan, vai trò, thời hạn và phê duyệt tách biệt.' },
+    reports: { title: 'Báo cáo theo cơ quan', eyebrow: 'TỔNG HỢP VẬN HÀNH', description: 'Tổng hợp hồ sơ lưu trong ứng dụng theo cơ quan, trạng thái và kỳ dữ liệu.' },
     guide: { title: 'Hướng dẫn sử dụng', eyebrow: 'TRA CỨU CÁCH THAO TÁC', description: 'Hướng dẫn các thao tác đang có trong cổng tra cứu và bàn làm việc cán bộ.' },
     profile: { title: 'Tài khoản cá nhân', eyebrow: 'THÔNG TIN VÀ BẢO MẬT', description: 'Kiểm tra quyền được cấp, thông tin liên hệ và quản lý phiên đăng nhập của bạn.' },
     detail: { title: 'Chi tiết hồ sơ', eyebrow: 'HỒ SƠ VÀ LỊCH SỬ', description: 'Kiểm tra thông tin, chứng cứ, lịch sử và hành động được phép ở trạng thái hiện tại.' },
@@ -523,6 +576,7 @@ function App() {
       { key: 'overview', label: 'Tổng quan quản trị', icon: '▦', count: undefined as number | undefined },
       { key: 'news', label: 'Tin tức cổng thông tin', icon: '▤', count: undefined as number | undefined },
       { key: 'users', label: 'Tài khoản cán bộ', icon: '♙', count: undefined as number | undefined },
+      { key: 'reports', label: 'Báo cáo theo cơ quan', icon: '▥', count: undefined as number | undefined },
       { key: 'procedures', label: 'Danh mục thủ tục', icon: '▧', count: data.procedures.length },
       { key: 'connections', label: 'Kết nối dịch vụ', icon: '⇄', count: undefined as number | undefined },
       { key: 'guide', label: 'Hướng dẫn sử dụng', icon: '☷', count: undefined as number | undefined },
@@ -539,13 +593,37 @@ function App() {
     ] },
     { label: 'QUẢN TRỊ DỊCH VỤ', items: [
       { key: 'connections', label: 'Kết nối dịch vụ', icon: '⇄' },
+      ...(user.canManageAgencyAccounts ? [{ key: 'users', label: 'Tài khoản tại cơ quan', icon: '♙' }] : []),
     ] },
     { label: 'TRỢ GIÚP', items: [
       { key: 'guide', label: 'Hướng dẫn sử dụng', icon: '☷' },
     ] },
   ]
   function openPage(nextPage: string) {
+    if (nextPage !== page) {
+      const nextHistory = [...pageHistory, nextPage]
+      window.history.pushState({ ...(window.history.state || {}), route: 'staff', page: nextPage, pageHistory: nextHistory }, '', window.location.href)
+      setPageHistory(nextHistory)
+    }
     setPage(nextPage); setSelected(null); setMobileNavOpen(false); setError('')
+  }
+  function openQueue(focus: QueueFocus = {}) {
+    setQueueFocus(focus)
+    setQueueFocusVersion(value => value + 1)
+    openPage('inbox')
+  }
+  function openCase(item: CaseFile) {
+    if (page !== 'detail') {
+      const nextHistory = [...pageHistory, 'detail']
+      window.history.pushState({ ...(window.history.state || {}), route: 'staff', page: 'detail', pageHistory: nextHistory }, '', window.location.href)
+      setPageHistory(nextHistory)
+    }
+    setSelected(item); setPage('detail'); setMobileNavOpen(false); setError('')
+  }
+  function goBack() {
+    if (pageHistory.length > 1) window.history.back()
+    else if (page === 'detail') openPage('inbox')
+    else openPage(user?.role === 'admin' ? 'overview' : 'home')
   }
 
   return <div className={`app-shell${captureMode ? ' capture-mode' : ''}`}>
@@ -557,18 +635,20 @@ function App() {
       <div className="sidebar-footer"><button className="nav-link sidebar-signout" onClick={signOut}><i aria-hidden="true">↪</i><span>Đăng xuất</span></button></div>
     </aside>
     <main className="workspace">
-      <div className="page-heading"><div><span className="eyebrow">{pageInfo.eyebrow}</span><h1>{pageInfo.title}</h1><p>{pageInfo.description}</p></div>{page !== 'profile' && <div className="page-heading-tools"><span className="scope-stamp">{user.agencyScope || 'Phạm vi được cấp'}</span><button className="refresh-data-button" onClick={() => refresh().then(() => setMessage('Đã tải lại dữ liệu trong phạm vi tài khoản.')).catch(e => setError(e instanceof Error ? e.message : 'Không thể tải lại dữ liệu.'))}>↻ Tải lại dữ liệu</button></div>}</div>
+       <div className="page-heading"><div><span className="eyebrow">{pageInfo.eyebrow}</span><h1>{pageInfo.title}</h1><p>{pageInfo.description}</p></div><div className="page-heading-tools">{pageHistory.length > 1 && <button className="staff-back-action" onClick={goBack}>← Quay lại</button>}{page !== 'profile' && <><span className="scope-stamp">{user.agencyScope || 'Phạm vi được cấp'}</span><button className="refresh-data-button" onClick={() => refresh().then(() => setMessage('Đã tải lại dữ liệu trong phạm vi tài khoản.')).catch(e => setError(e instanceof Error ? e.message : 'Không thể tải lại dữ liệu.'))}>↻ Tải lại dữ liệu</button></>}</div></div>
+       {!!data.storage?.sampleCaseCount && <aside className="sample-data-notice" role="note"><b>Bộ dữ liệu tình huống mô phỏng</b><span>{data.storage.sampleCaseCount.toLocaleString('vi-VN')} hồ sơ dùng để thực hành và kiểm tra giao diện; không phải hồ sơ công dân hoặc số liệu báo cáo chính thức. Chi tiết vẫn bị giới hạn theo phạm vi tài khoản.</span></aside>}
       {message && <div className="toast-success" role="status">✓ {message}<button onClick={() => setMessage('')}>Đóng</button></div>}{error && <div className="form-error page-error" role="alert">{error}<button onClick={() => setError('')}>×</button></div>}
-      {page === 'inbox' && <CaseQueue user={user} data={data} onOpen={c => { setSelected(c); setPage('detail'); setError('') }} />}
+       {page === 'inbox' && <CaseQueue key={queueFocusVersion} user={user} data={data} initialFocus={queueFocus} onOpen={openCase} />}
       {page === 'overview' && user.role === 'admin' && <AdminOverview onNavigate={openPage} />}
       {page === 'news' && user.role === 'admin' && <NewsManagement onNotice={setMessage} />}
-      {page === 'users' && user.role === 'admin' && <StaffAccountManagement actor={user} onNotice={setMessage} />}
-      {page === 'detail' && selected && <CaseDetail key={`${selected.code}:${selected.withdrawal?.status || ''}:${selected.withdrawal?.requestReceivedAt || ''}:${JSON.stringify(selected.withdrawal?.noticeDraft || {})}`} item={selected} isStaff={isStaff} signingAuthorityRef={user.signingAuthorityRef || ''} labels={data.statusLabels} actionOptions={actionOptions} action={action} setAction={setAction} actionText={actionText} setActionText={setActionText} assignee={assignee} setAssignee={setAssignee} staff={data.staff || []} busy={busy} onSubmitAction={submitAction} onLookupKeyChanged={async () => { setSelected(await api<CaseFile>(`/api/cases/${encodeURIComponent(selected.code)}`)); await refresh() }} onBack={() => setPage('inbox')} />}
+      {page === 'users' && (user.role === 'admin' || user.canManageAgencyAccounts) && <StaffAccountManagement actor={user} onNotice={setMessage} />}
+       {page === 'reports' && user.role === 'admin' && <AdministrativeReports data={data} onOpenQueue={openQueue} />}
+      {page === 'detail' && selected && <CaseDetail key={`${selected.code}:${selected.withdrawal?.status || ''}:${selected.withdrawal?.requestReceivedAt || ''}:${JSON.stringify(selected.withdrawal?.noticeDraft || {})}`} item={selected} isStaff={isStaff} signingAuthorityRef={user.signingAuthorityRef || ''} labels={data.statusLabels} actionOptions={actionOptions} action={action} setAction={setAction} actionText={actionText} setActionText={setActionText} assignee={assignee} setAssignee={setAssignee} staff={data.staff || []} busy={busy} onSubmitAction={submitAction} onLookupKeyChanged={async () => { setSelected(await api<CaseFile>(`/api/cases/${encodeURIComponent(selected.code)}`)); await refresh() }} onBack={goBack} />}
       {page === 'detail' && !selected && <div className="panel empty-state">Hãy chọn một hồ sơ trong danh sách để xem chi tiết.</div>}
-      {page === 'home' && isStaff && <StaffHome user={user} data={data} onOpen={c => { setSelected(c); setPage('detail') }} onNavigate={openPage} />}
-      {page === 'monitoring' && <OperationsMonitor user={user} data={data} onOpen={c => { setSelected(c); setPage('detail') }} onNavigate={openPage} />}
-      {page === 'procedures' && <ProcedureCatalog procedures={data.procedures} />}
-      {page === 'activity' && <CaseActivityLog cases={data.cases} onOpen={c => { setSelected(c); setPage('detail'); setError('') }} />}
+       {page === 'home' && isStaff && <StaffHome user={user} data={data} onOpen={openCase} onOpenQueue={openQueue} onNavigate={openPage} />}
+       {page === 'monitoring' && <OperationsMonitor user={user} data={data} onOpen={openCase} onOpenQueue={openQueue} onNavigate={openPage} />}
+      {page === 'procedures' && <ProcedureCatalog procedures={data.procedures} procedureCategories={data.procedureCategories || []} canManage={user.role === 'admin'} onUpdated={refresh} />}
+      {page === 'activity' && <CaseActivityLog cases={data.cases} onOpen={openCase} />}
       {page === 'connections' && <ServiceConnections data={data} onNavigate={openPage} />}
       {page === 'guide' && <GuideContent isStaff />}
       {page === 'profile' && <PersonalAccount user={user} onChanged={setUser} onNotice={setMessage} />}
@@ -671,6 +751,7 @@ function getActions(user: User, item: CaseFile) {
 }
 
 function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (message: string) => void }) {
+  const isSystemAdmin = actor.role === 'admin'
   const [users, setUsers] = useState<ManagedUser[]>([])
   const [requests, setRequests] = useState<StaffAccessRequest[]>([])
   const [changes, setChanges] = useState<StaffAccountChange[]>([])
@@ -679,10 +760,14 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
   const [error, setError] = useState('')
   const [editing, setEditing] = useState<ManagedUser | null>(null)
   const [proposedActive, setProposedActive] = useState(true)
+  const [agencyFilter, setAgencyFilter] = useState('all')
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({})
   const [signingAuthorityChecks, setSigningAuthorityChecks] = useState<Record<string, boolean>>({})
   const [today] = useState(() => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date()))
   const accessState = (account: ManagedUser) => !account.active ? 'Chưa được duyệt' : account.validFrom && today < account.validFrom ? 'Chờ ngày hiệu lực' : account.validUntil && today > account.validUntil ? 'Hết thời hạn' : 'Đang hiệu lực'
+  const agencyOptions = [...new Set(users.map(account => account.agencyScope).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'vi'))
+  const managedAgencies = [...new Set(users.filter(account => account.canManageAgencyAccounts).map(account => account.agencyScope).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'vi'))
+  const visibleUsers = users.filter(account => agencyFilter === 'all' || account.agencyScope === agencyFilter)
 
   async function refresh() {
     const result = await api<{ users: ManagedUser[]; accessRequests: StaffAccessRequest[]; accountChanges: StaffAccountChange[] }>('/api/users')
@@ -715,7 +800,7 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
     setBusy(true); setError('')
     const { confirmPassword: _confirmPassword, ...request } = values
     try {
-      await api('/api/users', { ...request, maySignStop, signingAuthorityRef: String(values.signingAuthorityRef || '').trim() })
+      await api('/api/users', { ...request, agencyScope: isSystemAdmin ? request.agencyScope : actor.agencyScope, maySignStop, signingAuthorityRef: String(values.signingAuthorityRef || '').trim() })
       form.reset()
       onNotice('Đã lập đề nghị cấp tài khoản. Tài khoản chỉ hoạt động sau khi một quản trị viên khác duyệt.')
       await refresh()
@@ -759,7 +844,7 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
     const values = Object.fromEntries(new FormData(event.currentTarget).entries())
     setBusy(true); setError('')
     try {
-      await api(`/api/users/${encodeURIComponent(editing.id)}/change-requests`, { ...values, active: proposedActive })
+      await api(`/api/users/${encodeURIComponent(editing.id)}/change-requests`, { ...values, active: proposedActive, canManageAgencyAccounts: isSystemAdmin && values.canManageAgencyAccounts === 'on' })
       setEditing(null)
       onNotice(`Đã gửi đề nghị điều chỉnh tài khoản ${editing.name}; cần quản trị viên khác duyệt.`)
       await refresh()
@@ -777,18 +862,18 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
     } catch (e) { setError(e instanceof Error ? e.message : 'Không thể xử lý đề nghị thay đổi.') } finally { setReviewing('') }
   }
 
-  const accessSummary = (value: AccountAccess) => `${roleNames[value.role] || value.role} · ${value.active ? 'Đang kích hoạt' : 'Tạm ngưng'} · ${value.agencyScope} · ${value.validFrom || 'Không giới hạn'} – ${value.validUntil || 'Không giới hạn'}`
+  const accessSummary = (value: AccountAccess) => `${roleNames[value.role] || value.role} · ${value.active ? 'Đang kích hoạt' : 'Tạm ngưng'} · ${value.agencyScope} · ${value.validFrom || 'Không giới hạn'} – ${value.validUntil || 'Không giới hạn'}${value.canManageAgencyAccounts ? ' · Có quyền quản lý tài khoản cơ quan' : ''}`
 
   return <div className="account-workspace">
-    <section className="panel account-intro"><div><span className="eyebrow">QUẢN TRỊ QUYỀN CÁN BỘ</span><h2>Cấp và điều chỉnh quyền truy cập</h2><p>Mọi thay đổi vai trò, cơ quan, thời hạn và trạng thái tài khoản đều cần căn cứ và người duyệt độc lập. Khi được duyệt, phiên đăng nhập cũ bị thu hồi.</p></div><span className="count-chip">{requests.filter(r => r.status === 'PENDING').length + changes.filter(r => r.status === 'PENDING').length} chờ duyệt</span></section>
+    <section className="panel account-intro"><div><span className="eyebrow">QUẢN TRỊ QUYỀN CÁN BỘ</span><h2>Cấp và điều chỉnh quyền truy cập</h2><p>{isSystemAdmin ? 'Quản trị hệ thống xem danh sách tài khoản toàn hệ thống; quyền này không cho phép xem hồ sơ công dân.' : `Quản lý cơ quan chỉ lập đề nghị và xem tài khoản thuộc ${actor.agencyScope}; quản trị hệ thống khác phải duyệt.`} Khi thay đổi được duyệt, phiên đăng nhập cũ bị thu hồi.</p>{isSystemAdmin && <p><b>Cơ quan đã giao quyền quản lý tài khoản:</b> {managedAgencies.length ? managedAgencies.join('; ') : 'Chưa có cơ quan nào. Giao quyền qua đề nghị điều chỉnh và cần quản trị viên khác duyệt.'}</p>}</div><span className="count-chip">{requests.filter(r => r.status === 'PENDING').length + changes.filter(r => r.status === 'PENDING').length} chờ duyệt</span></section>
     {error && <div className="form-error" role="alert">{error}</div>}
-    <section className="panel"><div className="panel-title"><div><h2>Lập đề nghị cấp tài khoản</h2><p>Tài khoản cán bộ không tự đăng ký; quản trị viên lập đề nghị và bàn giao mật khẩu khởi tạo qua kênh nội bộ. Người dùng phải đổi mật khẩu trước lần truy cập nghiệp vụ đầu tiên.</p></div></div>
+    <section className="panel"><div className="panel-title"><div><h2>Lập đề nghị cấp tài khoản</h2><p>Cán bộ không tự đăng ký. Quản trị viên hệ thống hoặc người quản lý cơ quan được phân quyền lập đề nghị; tài khoản chỉ hoạt động sau khi quản trị viên hệ thống độc lập duyệt.</p></div></div>
       <form className="form-grid account-form" onSubmit={createRequest}>
         <label>Họ và tên<input name="name" autoComplete="name" maxLength={150} required /></label>
         <label>Email công vụ<input name="email" type="email" autoComplete="off" maxLength={254} required /></label>
         <label>Số điện thoại<input name="phone" type="tel" autoComplete="off" maxLength={40} /></label>
         <label>Vai trò<select name="role" defaultValue="intake" required><option value="intake">Cán bộ tiếp nhận</option><option value="specialist">Chuyên viên thụ lý</option><option value="leader">Lãnh đạo phê duyệt</option><option value="registrar">Văn thư phát hành</option><option value="finance">Tài chính</option></select></label>
-        <label className="span-two">Cơ quan / đơn vị được giao<input name="agencyScope" maxLength={180} placeholder="Nhập đúng tên cơ quan/đơn vị theo danh mục nội bộ" required /></label>
+        <label className="span-two">Cơ quan / đơn vị được giao<input name="agencyScope" maxLength={180} defaultValue={isSystemAdmin ? '' : actor.agencyScope} readOnly={!isSystemAdmin} placeholder="Nhập đúng tên cơ quan/đơn vị theo danh mục nội bộ" required /></label>
         <label className="span-two check-row"><input name="maySignStop" type="checkbox" /> Đề nghị cấp quyền ký Thông báo dừng Mẫu 06 (chỉ dành cho người có văn bản phân công thẩm quyền)</label>
         <label className="span-two">Số văn bản phân công thẩm quyền ký Mẫu 06<input name="signingAuthorityRef" maxLength={180} placeholder="Chỉ nhập khi đề nghị quyền ký Mẫu 06" /><small className="field-help">Quản trị viên thứ hai phải đối chiếu văn bản này trước khi cấp quyền.</small></label>
         <label>Hiệu lực từ<input name="validFrom" type="date" min={today} defaultValue={today} required /></label>
@@ -806,7 +891,8 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
         {request.maySignStop && <p className="request-reason"><b>Đề nghị quyền ký Mẫu 06:</b> {request.signingAuthorityRef}. Quyền chỉ có hiệu lực nếu người duyệt xác nhận đã đối chiếu văn bản phân công.</p>}
         <p className="request-reason"><b>Căn cứ:</b> {request.reason}</p>
         {request.status === 'PENDING' && request.requestedById === actor.id && <p className="form-notice">Bạn đã lập đề nghị này; cần một quản trị viên khác xử lý.</p>}
-        {request.status === 'PENDING' && request.requestedById !== actor.id && <div className="request-review">{request.maySignStop && <label className="check-row"><input type="checkbox" checked={signingAuthorityChecks[request.id] === true} onChange={e => setSigningAuthorityChecks(current => ({ ...current, [request.id]: e.target.checked }))} /> Đã đối chiếu văn bản phân công thẩm quyền ký Mẫu 06</label>}<label>Ý kiến duyệt / căn cứ từ chối<textarea value={reviewNotes[request.id] || ''} onChange={e => setReviewNotes(current => ({ ...current, [request.id]: e.target.value }))} rows={2} maxLength={1200} /></label><div className="form-actions"><button className="button secondary" disabled={reviewing === request.id} onClick={() => reviewRequest(request, 'reject')}>Từ chối</button><button className="button primary" disabled={reviewing === request.id} onClick={() => reviewRequest(request, 'approve')}>{reviewing === request.id ? 'Đang xử lý…' : 'Duyệt quyền'}</button></div></div>}
+        {!isSystemAdmin && request.status === 'PENDING' && request.requestedById !== actor.id && <p className="form-notice">Đề nghị đang chờ quản trị viên hệ thống duyệt.</p>}
+        {isSystemAdmin && request.status === 'PENDING' && request.requestedById !== actor.id && <div className="request-review">{request.maySignStop && <label className="check-row"><input type="checkbox" checked={signingAuthorityChecks[request.id] === true} onChange={e => setSigningAuthorityChecks(current => ({ ...current, [request.id]: e.target.checked }))} /> Đã đối chiếu văn bản phân công thẩm quyền ký Mẫu 06</label>}<label>Ý kiến duyệt / căn cứ từ chối<textarea value={reviewNotes[request.id] || ''} onChange={e => setReviewNotes(current => ({ ...current, [request.id]: e.target.value }))} rows={2} maxLength={1200} /></label><div className="form-actions"><button className="button secondary" disabled={reviewing === request.id} onClick={() => reviewRequest(request, 'reject')}>Từ chối</button><button className="button primary" disabled={reviewing === request.id} onClick={() => reviewRequest(request, 'approve')}>{reviewing === request.id ? 'Đang xử lý…' : 'Duyệt quyền'}</button></div></div>}
         {request.status === 'REJECTED' && request.reviewNote && <p className="request-reason"><b>Căn cứ từ chối:</b> {request.reviewNote}</p>}
       </article>)}</div> : <div className="empty-state">Chưa có đề nghị cấp quyền.</div>}
     </section>
@@ -816,13 +902,76 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
         <div className="account-change-diff"><span><small>Quyền hiện tại</small><b>{accessSummary(change.before)}</b></span><span><small>Đề nghị mới</small><b>{accessSummary(change.proposed)}</b></span></div>
         <p className="request-reason"><b>Căn cứ:</b> {change.reason} · <b>Người lập:</b> {change.requestedBy}</p>
         {change.status === 'PENDING' && (change.requestedById === actor.id || change.userId === actor.id) && <p className="form-notice">Người lập và chủ tài khoản không được duyệt đề nghị này.</p>}
-        {change.status === 'PENDING' && change.requestedById !== actor.id && change.userId !== actor.id && <div className="request-review"><label>Ý kiến duyệt / căn cứ từ chối<textarea value={reviewNotes[change.id] || ''} onChange={e => setReviewNotes(current => ({ ...current, [change.id]: e.target.value }))} rows={2} maxLength={1200} /></label><div className="form-actions"><button className="button secondary" disabled={reviewing === change.id} onClick={() => reviewAccountChange(change, 'reject')}>Từ chối</button><button className="button primary" disabled={reviewing === change.id} onClick={() => reviewAccountChange(change, 'approve')}>{reviewing === change.id ? 'Đang xử lý…' : 'Duyệt và áp dụng'}</button></div></div>}
+        {!isSystemAdmin && change.status === 'PENDING' && change.requestedById !== actor.id && change.userId !== actor.id && <p className="form-notice">Đề nghị đang chờ quản trị viên hệ thống duyệt.</p>}
+        {isSystemAdmin && change.status === 'PENDING' && change.requestedById !== actor.id && change.userId !== actor.id && <div className="request-review"><label>Ý kiến duyệt / căn cứ từ chối<textarea value={reviewNotes[change.id] || ''} onChange={e => setReviewNotes(current => ({ ...current, [change.id]: e.target.value }))} rows={2} maxLength={1200} /></label><div className="form-actions"><button className="button secondary" disabled={reviewing === change.id} onClick={() => reviewAccountChange(change, 'reject')}>Từ chối</button><button className="button primary" disabled={reviewing === change.id} onClick={() => reviewAccountChange(change, 'approve')}>{reviewing === change.id ? 'Đang xử lý…' : 'Duyệt và áp dụng'}</button></div></div>}
         {change.reviewedBy && <p className="request-reason"><b>Người xử lý:</b> {change.reviewedBy}{change.reviewNote && <> · <b>Ý kiến:</b> {change.reviewNote}</>}</p>}
       </article>)}</div> : <div className="empty-state">Chưa có lịch sử điều chỉnh tài khoản.</div>}
     </section>
-    <section className="panel"><div className="panel-title"><div><h2>Tài khoản trong hệ thống</h2><p>Quyền chỉ có hiệu lực trong thời gian được duyệt.</p></div><span className="count-chip">{users.length} tài khoản</span></div>
-      {users.length ? <div className="managed-user-list">{users.map(account => { const state = accessState(account); const pendingChange = changes.some(change => change.userId === account.id && change.status === 'PENDING'); return <article className="managed-user-row" key={account.id}><div><b>{account.name}</b><small>{account.email} · {roleNames[account.role] || account.role}</small>{account.mustChangePassword && <small className="account-password-note">Chưa đổi mật khẩu khởi tạo</small>}{account.maySignStop && <small>Được ký Mẫu 06 · {account.signingAuthorityRef}</small>}</div><span className={`request-status ${state === 'Đang hiệu lực' ? 'request-approved' : state === 'Hết thời hạn' || !account.active ? 'request-rejected' : 'request-pending'}`}>{!account.active ? 'Tạm ngưng' : state}</span><span className="managed-user-scope">{account.agencyScope || 'Chưa khai báo phạm vi'}<small>{account.validFrom || 'Không giới hạn'} – {account.validUntil || 'Không giới hạn'}</small></span><div className="managed-user-actions">{account.maySignStop && <button className="button secondary" disabled={busy} onClick={() => revokeStopSigning(account)}>Thu hồi quyền ký</button>}<button className="button secondary" disabled={busy || pendingChange || account.id === actor.id} onClick={() => beginAccountChange(account)}>{pendingChange ? 'Đang chờ duyệt' : 'Điều chỉnh quyền'}</button>{account.active && <button className="button secondary" disabled={busy || pendingChange || account.id === actor.id} onClick={() => beginAccountChange(account, false)}>Đề nghị tạm ngưng</button>}</div>{editing?.id === account.id && <form className="account-change-form" onSubmit={submitAccountChange}><div className="account-change-form-title"><b>Đề nghị thay đổi · {account.name}</b><button type="button" className="text-button" onClick={() => setEditing(null)}>Đóng</button></div><div className="form-grid account-form"><label>Vai trò<select name="role" defaultValue={account.role} required>{Object.entries(roleNames).map(([role, label]) => <option key={role} value={role}>{label}</option>)}</select></label><label>Cơ quan / phạm vi<input name="agencyScope" defaultValue={account.agencyScope} maxLength={180} required /></label><label>Hiệu lực từ<input name="validFrom" type="date" defaultValue={account.validFrom} /></label><label>Hiệu lực đến<input name="validUntil" type="date" defaultValue={account.validUntil} /></label><label className="span-two check-row"><input type="checkbox" checked={proposedActive} onChange={e => setProposedActive(e.target.checked)} /> Tài khoản được kích hoạt sau khi duyệt</label><label className="span-two">Căn cứ điều chỉnh<textarea name="reason" rows={3} minLength={12} maxLength={1200} placeholder="Quyết định điều động, phân công, chấm dứt nhiệm vụ hoặc căn cứ nghiệp vụ" required /></label><div className="form-actions span-two"><button className="button primary" disabled={busy}>{busy ? 'Đang gửi…' : 'Gửi người duyệt'}</button></div></div></form>}</article> })}</div> : <div className="empty-state">Chưa có tài khoản.</div>}
+    <section className="panel"><div className="panel-title"><div><h2>Tài khoản theo cơ quan</h2><p>Danh sách không chứa mật khẩu; quyền chỉ có hiệu lực sau phê duyệt.</p></div><span className="count-chip">{visibleUsers.length} tài khoản</span></div>
+      <div className="account-list-tools">{isSystemAdmin && <label>Cơ quan<select value={agencyFilter} onChange={e => setAgencyFilter(e.target.value)}><option value="all">Tất cả cơ quan</option>{agencyOptions.map(agency => <option key={agency} value={agency}>{agency}</option>)}</select></label>}<a className="button secondary" href={`/api/export/users.csv${agencyFilter !== 'all' ? `?agency=${encodeURIComponent(agencyFilter)}` : ''}`}>Xuất CSV</a><button className="button secondary" onClick={() => printInternalTable('Danh sách tài khoản cán bộ', agencyFilter === 'all' ? 'Tất cả cơ quan trong phạm vi quản trị hệ thống' : agencyFilter, ['Họ tên','Email','Vai trò','Cơ quan','Trạng thái','Hiệu lực','Quản lý tài khoản cơ quan'], visibleUsers.map(account => [account.name,account.email,roleNames[account.role] || account.role,account.agencyScope,!account.active?'Chưa kích hoạt / tạm ngưng':accessState(account),`${account.validFrom || 'Không giới hạn'} – ${account.validUntil || 'Không giới hạn'}`,account.canManageAgencyAccounts?'Có':'Không']))}>In danh sách</button></div>
+      {visibleUsers.length ? <div className="managed-user-list">{visibleUsers.map(account => { const state = accessState(account); const pendingChange = changes.some(change => change.userId === account.id && change.status === 'PENDING'); return <article className="managed-user-row" key={account.id}><div><b>{account.name}</b><small>{account.email} · {roleNames[account.role] || account.role}</small>{account.canManageAgencyAccounts && <small>Được quản lý tài khoản tại cơ quan này</small>}{account.mustChangePassword && <small className="account-password-note">Chưa đổi mật khẩu khởi tạo</small>}{account.maySignStop && <small>Được ký Mẫu 06 · {account.signingAuthorityRef}</small>}</div><span className={`request-status ${state === 'Đang hiệu lực' ? 'request-approved' : state === 'Hết thời hạn' || !account.active ? 'request-rejected' : 'request-pending'}`}>{!account.active ? 'Tạm ngưng' : state}</span><span className="managed-user-scope">{account.agencyScope || 'Chưa khai báo phạm vi'}<small>{account.validFrom || 'Không giới hạn'} – {account.validUntil || 'Không giới hạn'}</small></span><div className="managed-user-actions">{isSystemAdmin && account.maySignStop && <button className="button secondary" disabled={busy} onClick={() => revokeStopSigning(account)}>Thu hồi quyền ký</button>}<button className="button secondary" disabled={busy || pendingChange || account.id === actor.id || (!isSystemAdmin && account.role === 'admin')} onClick={() => beginAccountChange(account)}>{pendingChange ? 'Đang chờ duyệt' : 'Điều chỉnh quyền'}</button>{account.active && <button className="button secondary" disabled={busy || pendingChange || account.id === actor.id || (!isSystemAdmin && account.role === 'admin')} onClick={() => beginAccountChange(account, false)}>Đề nghị tạm ngưng</button>}</div>{editing?.id === account.id && <form className="account-change-form" onSubmit={submitAccountChange}><div className="account-change-form-title"><b>Đề nghị thay đổi · {account.name}</b><button type="button" className="text-button" onClick={() => setEditing(null)}>Đóng</button></div><div className="form-grid account-form"><label>Vai trò<select name="role" defaultValue={account.role} required>{Object.entries(roleNames).filter(([role]) => isSystemAdmin || role !== 'admin').map(([role, label]) => <option key={role} value={role}>{label}</option>)}</select></label><label>Cơ quan / phạm vi<input name="agencyScope" defaultValue={account.agencyScope} maxLength={180} required readOnly={!isSystemAdmin} /></label><label>Hiệu lực từ<input name="validFrom" type="date" defaultValue={account.validFrom} /></label><label>Hiệu lực đến<input name="validUntil" type="date" defaultValue={account.validUntil} /></label>{isSystemAdmin && account.role !== 'admin' && <label className="span-two check-row"><input name="canManageAgencyAccounts" type="checkbox" defaultChecked={account.canManageAgencyAccounts} /> Quản lý tài khoản cán bộ trong cơ quan được giao</label>}<label className="span-two check-row"><input type="checkbox" checked={proposedActive} onChange={e => setProposedActive(e.target.checked)} /> Tài khoản được kích hoạt sau khi duyệt</label><label className="span-two">Căn cứ điều chỉnh<textarea name="reason" rows={3} minLength={12} maxLength={1200} placeholder="Quyết định điều động, phân công, chấm dứt nhiệm vụ hoặc căn cứ nghiệp vụ" required /></label><div className="form-actions span-two"><button className="button primary" disabled={busy}>{busy ? 'Đang gửi…' : 'Gửi người duyệt'}</button></div></div></form>}</article> })}</div> : <div className="empty-state">Không có tài khoản trong cơ quan hoặc điều kiện lọc này.</div>}
     </section>
+  </div>
+}
+
+function reportDateDisplay(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  return match ? `${match[3]}/${match[2]}/${match[1]}` : ''
+}
+function parseReportDate(value: string): string | null {
+  const text = value.trim()
+  if (!text) return ''
+  const match = /^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{4})$/.exec(text)
+  if (!match) return null
+  const day = Number(match[1]); const month = Number(match[2]); const year = Number(match[3])
+  const dateValue = new Date(Date.UTC(year, month - 1, day))
+  if (dateValue.getUTCFullYear() !== year || dateValue.getUTCMonth() !== month - 1 || dateValue.getUTCDate() !== day) return null
+  return `${year.toString().padStart(4,'0')}-${month.toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}`
+}
+function ReportDateField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  const [draft, setDraft] = useState(() => reportDateDisplay(value))
+  const [invalid, setInvalid] = useState(false)
+  useEffect(() => { setDraft(reportDateDisplay(value)); setInvalid(false) }, [value])
+  function update(next: string) {
+    setDraft(next); setInvalid(false)
+    const parsed = parseReportDate(next)
+    if (parsed !== null) onChange(parsed)
+  }
+  return <label className="report-date-field"><span>{label}</span><input type="text" inputMode="numeric" autoComplete="off" maxLength={10} placeholder="dd/mm/yyyy" value={draft} aria-invalid={invalid} onChange={event => update(event.target.value)} onBlur={() => { const parsed = parseReportDate(draft); setInvalid(parsed === null); if (parsed !== null) onChange(parsed) }} /><small>{invalid ? 'Nhập ngày theo dạng ngày/tháng/năm hợp lệ.' : 'Định dạng ngày/tháng/năm'}</small></label>
+}
+
+function AdministrativeReports({ data, onOpenQueue }: { data: Bootstrap; onOpenQueue: (focus: QueueFocus) => void }) {
+  type Report = { reportKind: string; officialForm: boolean; agency: string; from: string; to: string; total: number; sampleTotal: number; realTotal: number; storedTotal: number; agencies: string[]; byAgency: {name:string;count:number}[]; byStatus: {name:string;count:number}[]; byProcedure: {name:string;count:number}[]; byAgencyStatus: {agency:string;status:string;count:number}[] }
+  const [report, setReport] = useState<Report | null>(null)
+  const [agency, setAgency] = useState('')
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const query = new URLSearchParams()
+  if (agency) query.set('agency', agency)
+  if (from) query.set('from', from)
+  if (to) query.set('to', to)
+  const suffix = query.toString() ? `?${query.toString()}` : ''
+  useEffect(() => {
+    let active = true
+    setLoading(true); setError('')
+    api<Report>(`/api/reporting/summary${suffix}`).then(value => { if (active) setReport(value) }).catch(e => { if (active) setError(e instanceof Error ? e.message : 'Không tải được báo cáo.') }).finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [suffix])
+  const subtitle = `${agency || 'Tất cả cơ quan'} · ${from ? reportDateDisplay(from) : 'Từ đầu dữ liệu'} đến ${to ? reportDateDisplay(to) : 'hiện tại'}`
+  return <div className="report-workspace">
+    <section className="panel report-boundary"><b>Báo cáo vận hành nội bộ</b><p>Số liệu lấy trực tiếp từ cơ sở dữ liệu cục bộ của ứng dụng. Biểu mẫu này không thay thế báo cáo pháp định và không giả lập Quốc hiệu, tiêu ngữ, tên cơ quan hay chữ ký trên văn bản phát hành chính thức.</p><p>Ứng dụng chưa kết nối Nền tảng báo cáo của Bộ Tư pháp. Biểu mẫu chính thức chưa được xác minh bản gốc và quy cách trình bày nên không được xuất từ đây.</p><div className="report-source-links"><a href="https://kstthc.moj.gov.vn/portal/tin-tuc/chi-tiet/bo-tu-phap-huong-toi-nen-tang-kiem-soat-thu-tuc-hanh-chinh-thong-minh-tjcjp0de4e.html" target="_blank" rel="noreferrer">Thông tin của Bộ Tư pháp ↗</a><a href="https://vbpl.moj.gov.vn/TW/Pages/home.aspx" target="_blank" rel="noreferrer">Cơ sở dữ liệu văn bản pháp luật ↗</a></div></section>
+    <section className="panel report-filters"><label className="report-agency-field"><span>Cơ quan</span><select value={agency} onChange={e => setAgency(e.target.value)}><option value="">Tất cả cơ quan</option>{(report?.agencies || []).map(item => <option key={item} value={item}>{item}</option>)}</select></label><ReportDateField label="Từ ngày" value={from} onChange={setFrom} /><ReportDateField label="Đến ngày" value={to} onChange={setTo} /><div className="report-filter-actions"><a className="button secondary" href={`/api/reporting/summary.csv${suffix}`}>Xuất CSV</a>{report && <button className="button secondary" onClick={() => printInternalTable('Báo cáo vận hành hồ sơ theo cơ quan', subtitle, ['Nhóm tổng hợp','Đơn vị / giá trị','Số lượng'], [...report.byAgency.map(row => ['Theo cơ quan',row.name,String(row.count)]),...report.byStatus.map(row => ['Theo trạng thái',row.name,String(row.count)]),...report.byProcedure.map(row => ['Theo thủ tục',row.name,String(row.count)]),...report.byAgencyStatus.map(row => ['Cơ quan và trạng thái',`${row.agency} · ${row.status}`,String(row.count)])])}>In báo cáo nội bộ</button>}</div></section>
+    {error && <p className="form-error" role="alert">{error}</p>}
+    {loading && <section className="panel"><p>Đang tổng hợp dữ liệu…</p></section>}
+    {report && !loading && <>
+      <aside className="report-data-provenance" role="note"><b>Số liệu trong ứng dụng</b><span>{report.sampleTotal.toLocaleString('vi-VN')} tình huống mô phỏng · {report.realTotal.toLocaleString('vi-VN')} hồ sơ phát sinh thật trong ứng dụng. Tình huống mô phỏng không phải số liệu báo cáo chính thức.</span></aside>
+      <section className="metric-grid report-metrics"><MetricCard label="Hồ sơ trong phạm vi" value={report.total} note="Gồm tình huống mô phỏng và dữ liệu ứng dụng" tone="navy" /><MetricCard label="Cơ quan có hồ sơ" value={report.byAgency.length} note="Theo cơ quan tiếp nhận lưu trên hồ sơ" tone="blue" /><MetricCard label="Nhóm trạng thái" value={report.byStatus.length} note="Theo trạng thái hiện tại" tone="green" /></section>
+      {report.total===0&&<section className="report-empty-state"><h2>{report.storedTotal===0?'Chưa có hồ sơ nào được lưu trong ứng dụng':'Không có hồ sơ khớp điều kiện lọc'}</h2><p>{report.storedTotal===0?'Kết nối API và cơ sở dữ liệu đang hoạt động; hiện chưa có công dân gửi hồ sơ vào ứng dụng. Danh mục tham chiếu được nạp riêng và không được tính thành hồ sơ.':'Hồ sơ có trong cơ sở dữ liệu nhưng không thuộc cơ quan hoặc khoảng ngày đang chọn.'}</p>{report.storedTotal===0&&<a className="button secondary" href="/nop-ho-so">Mở luồng nộp hồ sơ của ứng dụng</a>}</section>}
+      <section className="panel report-table-panel"><PanelHeading kicker="TỔNG HỢP THEO ĐƠN VỊ" title="Hồ sơ theo cơ quan và trạng thái" description={`${subtitle} · chọn một dòng để mở đúng nhóm hồ sơ.`} />{report.byAgencyStatus.length ? <div className="report-table-wrap"><table className="report-table"><thead><tr><th>Cơ quan tiếp nhận</th><th>Trạng thái hiện tại</th><th>Số hồ sơ</th><th>Thao tác</th></tr></thead><tbody>{report.byAgencyStatus.map(row => { const statuses = Object.entries(data.statusLabels).filter(([, label]) => label === row.status).map(([code]) => code); return <tr key={`${row.agency}-${row.status}`}><td>{row.agency}</td><td>{row.status}</td><td>{row.count}</td><td><button className="report-drilldown-link" onClick={() => onOpenQueue({ agencyFilter: row.agency, statuses, createdFrom: from, createdTo: to, label: `${row.agency} · ${row.status}` })}>Mở hồ sơ →</button></td></tr> })}</tbody></table></div> : <div className="report-compact-empty">Chưa có dòng tổng hợp theo cơ quan và trạng thái trong điều kiện đã chọn.</div>}</section>
+      <section className="panel report-table-panel"><PanelHeading kicker="THEO THỦ TỤC" title="Phân bố hồ sơ theo thủ tục" description="Chọn một dòng để mở danh sách hồ sơ tương ứng." />{report.byProcedure.length ? <div className="report-table-wrap"><table className="report-table"><thead><tr><th>Mã và tên thủ tục</th><th>Số hồ sơ</th><th>Thao tác</th></tr></thead><tbody>{report.byProcedure.map(row => { const code = row.name.split(' · ')[0]; return <tr key={row.name}><td>{row.name}</td><td>{row.count}</td><td><button className="report-drilldown-link" onClick={() => onOpenQueue({ procedureCode: code, createdFrom: from, createdTo: to, label: row.name })}>Mở hồ sơ →</button></td></tr> })}</tbody></table></div> : <div className="report-compact-empty">Chưa có hồ sơ để phân bổ theo thủ tục.</div>}</section>
+    </>}
   </div>
 }
 
@@ -955,14 +1104,16 @@ function GuideContent({ isStaff = false }: { isStaff?: boolean }) {
       <section className="guide-lead"><span className="eyebrow">HƯỚNG DẪN CÁN BỘ</span><h2>Làm việc theo quyền được cấp</h2><p>Bàn cán bộ có các màn hình tổng quan, hộp xử lý, giám sát, danh mục thủ tục, nhật ký và kết nối. Hồ sơ và thao tác chỉ hiện theo vai trò, cơ quan, trạng thái và dữ liệu đã có trong cơ sở dữ liệu.</p>{!isStaff && <a className="button primary" href="/staff">Đăng nhập bàn cán bộ</a>}</section>
       <section className="guide-note"><b>Khởi tạo tài khoản lần đầu</b><p>Người vận hành chạy <code>python app.py create-admin</code> trong thư mục ứng dụng để tạo quản trị viên đầu tiên; chạy lệnh thêm lần nữa để có quản trị viên thứ hai duyệt độc lập. Sau đó, quản trị viên đăng nhập bàn cán bộ, lập đề nghị cấp tài khoản tiếp nhận theo đúng cơ quan và chờ quản trị viên còn lại phê duyệt. Không có đăng ký cán bộ công khai và không dùng tài khoản mẫu.</p></section>
       <ol className="guide-steps">
-        <li><b>Đăng nhập và kiểm tra phạm vi</b><p>Dùng tài khoản nội bộ do quản trị viên cấp. Nếu đây là lần đăng nhập đầu, đổi mật khẩu theo yêu cầu. Tên vai trò và cơ quan ở đầu bàn làm việc cho biết phạm vi đang áp dụng; tài khoản hết hạn hoặc bị thu hồi sẽ không truy cập được.</p></li>
+        <li><b>Đăng nhập và kiểm tra phạm vi</b><p>Dùng tài khoản nội bộ đã được cấp. Tên vai trò và cơ quan ở đầu bàn làm việc cho biết phạm vi đang áp dụng; tài khoản hết hạn hoặc bị thu hồi sẽ không truy cập được. Mật khẩu hiện có được giữ nguyên; chỉ đổi trong phần “Tài khoản cá nhân” khi chủ tài khoản chủ động cần đổi.</p></li>
         <li><b>Quản lý tài khoản cá nhân và đăng xuất</b><p>Nhấp tên của bạn ở góc trên bên phải để xem vai trò, cơ quan, thời hạn và căn cứ cấp quyền. Trong “Tài khoản cá nhân”, bạn có thể đổi điện thoại bằng mật khẩu hiện tại, đổi mật khẩu hoặc kết thúc các phiên đăng nhập khác. Hệ thống ghi rõ email chưa được xác minh qua mã hoặc liên kết. Nút “Đăng xuất” nằm ở cuối thanh bên; trên điện thoại, mở “Danh mục” để dùng nút này.</p></li>
-        <li><b>Dùng Tổng quan để chọn việc cần làm</b><p>Các ô chỉ số mở danh sách hoặc màn hình giám sát tương ứng. “Luồng hồ sơ” cho biết số lượng theo trạng thái; “Hồ sơ cần chú ý” xếp theo hạn; “Tồn theo người phụ trách” và “Hoạt động gần đây” giúp kiểm tra tải việc và sự kiện trong phạm vi tài khoản.</p></li>
+         <li><b>Dùng Tổng quan để chọn việc cần làm</b><p>Các ô chỉ số mở danh sách đã lọc theo việc cần xử lý, hạn gần đến hoặc quá hạn. Nhấp từng giai đoạn trong “Luồng hồ sơ” để mở đúng nhóm trạng thái; nhấp tên người phụ trách để lọc hồ sơ của người đó. Từ “Hồ sơ cần chú ý”, mở thẳng hồ sơ để xem căn cứ, lịch sử và bước được phép làm tiếp.</p></li>
         <li><b>Lọc Hộp xử lý và mở hồ sơ</b><p>Trong “Hộp xử lý”, tìm theo thông tin hồ sơ, lọc trạng thái, hạn hoặc người phụ trách rồi mở một dòng để xem chi tiết. Nếu danh sách trống, hiện chưa có hồ sơ thuộc phạm vi tài khoản được nạp; ứng dụng không tự tạo hồ sơ mẫu.</p></li>
         <li><b>Thực hiện thao tác khả dụng</b><p>Ở chi tiết hồ sơ, chọn một thao tác trong danh sách được phép ở trạng thái hiện tại. Tùy thao tác, nhập căn cứ, dự thảo, người được phân công hoặc đính kèm tài liệu; kiểm tra lại nội dung rồi xác nhận. Máy chủ kiểm tra quyền và điều kiện trạng thái, sau đó cập nhật hồ sơ và nhật ký.</p></li>
         <li><b>Giám sát, tra cứu và truy vết</b><p>“Giám sát quy trình” tổng hợp hạn, tồn đọng, tải việc và các thông tin vận hành có sẵn. “Danh mục thủ tục” tìm theo mã, tên, lĩnh vực, cơ quan và cấp thực hiện; xem nguồn cùng trạng thái xác minh trước khi dùng. “Nhật ký hồ sơ” lần theo mốc thời gian, người thao tác và nội dung sự kiện.</p></li>
         <li><b>Cung cấp mã và khóa tra cứu</b><p>Cán bộ tiếp nhận hoặc trả kết quả mở hồ sơ trong phạm vi cơ quan, chọn “Xem khóa tra cứu”, rồi sao chép mã và khóa để cung cấp cho chủ hồ sơ sau khi xác minh. “Ẩn khóa” đóng nội dung đang xem. Nếu cần cấp lại, chọn “Cấp lại khóa” và xác nhận; khóa cũ mất hiệu lực. Các lần xem và cấp lại được ghi nhật ký nội bộ.</p></li>
-        <li><b>Quản trị tài khoản nếu được phân quyền</b><p>Quản trị viên mở “Tài khoản cán bộ” để lập đề nghị cấp, đổi vai trò/phạm vi hoặc tạm ngừng tài khoản, kèm căn cứ và thời hạn. Đề nghị cần người có quyền duyệt độc lập; người lập không tự duyệt đề nghị của mình.</p></li>
+        <li><b>Quản lý tài khoản theo cơ quan nếu được giao</b><p>Quản trị viên hệ thống có thể đề nghị giao quyền này cho một cán bộ không giữ vai trò quản trị hệ thống. Sau khi quản trị viên khác duyệt, người được giao mở “Tài khoản tại cơ quan”; danh sách và thao tác chỉ giới hạn ở đúng cơ quan của mình. Người quản lý cơ quan có thể lập đề nghị cấp mới, thay đổi hoặc tạm ngưng tài khoản, nhưng không tự duyệt, không chuyển tài khoản sang cơ quan khác và không quản lý tài khoản quản trị hệ thống. Quản trị viên hệ thống duyệt độc lập; quyết định và căn cứ được ghi nhật ký.</p></li>
+        <li><b>In và xuất danh sách theo phạm vi</b><p>Trong “Tài khoản cán bộ” hoặc “Tài khoản tại cơ quan”, chọn cơ quan rồi dùng “In danh sách” để in bảng nội bộ hoặc “Xuất CSV” để lưu dữ liệu. Tệp tài khoản không chứa mật khẩu. Trong “Hộp xử lý”, cán bộ chỉ in/xuất các hồ sơ đã được máy chủ trả về trong phạm vi tài khoản; không gửi tệp ra ngoài nếu chưa có căn cứ công vụ.</p></li>
+         <li><b>Xem báo cáo vận hành</b><p>Quản trị viên hệ thống mở “Báo cáo vận hành”, lọc theo cơ quan và thời gian, xem tổng hợp theo trạng thái/thủ tục, rồi in hoặc xuất CSV. Chọn “Mở hồ sơ” ở một dòng tổng hợp để xem đúng danh sách chi tiết với cùng điều kiện cơ quan và kỳ báo cáo. Báo cáo này chỉ thống kê dữ liệu đang có trong ứng dụng. Nó không phải biểu mẫu báo cáo pháp định, không có Quốc hiệu, tiêu ngữ, chữ ký hay tên cơ quan phát hành. Chỉ dùng mẫu nhà nước khi đã có bản gốc chính thức, đúng phiên bản và căn cứ áp dụng.</p></li>
         <li><b>Biên tập tin trên cổng nếu là quản trị viên</b><p>Mở “Tin tức cổng thông tin” để tìm/lọc bài, soạn bản nháp, sửa tiêu đề, tóm tắt và nội dung, chọn chuyên mục/ảnh, điền nguồn chính thức, rồi lưu nháp hoặc xuất bản. Chỉ bài đã xuất bản hiện ở trang chủ. Tin đang công khai có thể lưu trữ; tin lưu trữ khôi phục về bản nháp và cần xuất bản lại. Kiểm tra thông tin nguồn trước khi công khai; hệ thống chưa tự đồng bộ bài từ trang Trung tâm.</p></li>
         <li><b>Kiểm tra kết nối trước các nghiệp vụ bên ngoài</b><p>Màn hình “Kết nối dịch vụ” cho biết các phụ thuộc và trạng thái hàng chờ của ứng dụng. Khi chưa có cấu hình, hợp đồng và thông tin truy cập được phê duyệt, ký số, thanh toán, phát hành hoặc đồng bộ với hệ thống cơ quan chưa được thực hiện tại đây.</p></li>
         <li><b>Ghi nhận yêu cầu dừng theo Mẫu 05/06</b><p>Chỉ dùng khi nhận được yêu cầu thuộc trường hợp áp dụng. Đối chiếu danh tính và căn cứ đại diện, ghi kênh tiếp nhận, lưu văn bản Mẫu 05; người có thẩm quyền ký phải tải lên bản Mẫu 06 đã ký và xác nhận thông tin phát hành. Ứng dụng lưu chứng cứ, không tự tạo chữ ký số.</p></li>
@@ -981,7 +1132,7 @@ function StandaloneGuide({ signedIn, onHome, onStaff }: { signedIn: boolean; onH
   </div>
 }
 
-function StaffHome({ user, data, onOpen, onNavigate }: { user: User; data: Bootstrap; onOpen: (item: CaseFile) => void; onNavigate: (page: string) => void }) {
+function StaffHome({ user, data, onOpen, onOpenQueue, onNavigate }: { user: User; data: Bootstrap; onOpen: (item: CaseFile) => void; onOpenQueue: (focus?: QueueFocus) => void; onNavigate: (page: string) => void }) {
   const [workingDate] = useState(() => new Intl.DateTimeFormat('vi-VN', { dateStyle: 'full', timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date()))
   const actionable = actionableCases(user, data.cases)
   const openCases = data.cases.filter(item => !CLOSED_STATUSES.has(item.status))
@@ -993,10 +1144,10 @@ function StaffHome({ user, data, onOpen, onNavigate }: { user: User; data: Boots
     .sort((a, b) => (daysUntil(a.deadline) ?? 999) - (daysUntil(b.deadline) ?? 999)).slice(0, 6)
   return <div className="staff-dashboard">
     <section className="welcome-banner staff-banner ops-welcome"><div><span className="eyebrow">KHÔNG GIAN CÔNG VIỆC · {user.agencyScope || 'PHẠM VI ĐƯỢC CẤP'}</span><h2>{roleNames[user.role] || 'Cán bộ'}</h2><p>Ưu tiên công việc theo hạn và trạng thái. Dữ liệu trên màn hình được giới hạn theo vai trò, cơ quan và hồ sơ tài khoản được phép xem.</p><button className="button light" onClick={() => onNavigate('inbox')}>Mở hàng đợi của tôi <span>→</span></button></div><div className="ops-date"><small>NGÀY LÀM VIỆC</small><b>{workingDate}</b><span>{actionable.length} hồ sơ đang có thao tác khả dụng</span></div></section>
-    <section className="metric-grid" aria-label="Chỉ số công việc"><MetricCard label="Trong phạm vi" value={data.cases.length} note="Hồ sơ tài khoản xem được" tone="navy" onClick={() => onNavigate('inbox')} /><MetricCard label="Có thể xử lý" value={actionable.length} note="Theo vai trò và trạng thái" tone="blue" onClick={() => onNavigate('inbox')} /><MetricCard label="Sắp đến hạn" value={dueSoon.length} note="Trong 3 ngày theo lịch" tone="amber" onClick={() => onNavigate('monitoring')} /><MetricCard label="Đã quá hạn" value={overdue.length} note="Hồ sơ còn đang mở" tone="red" onClick={() => onNavigate('monitoring')} /></section>
+     <section className="metric-grid" aria-label="Chỉ số công việc"><MetricCard label="Trong phạm vi" value={data.cases.length} note="Mở danh sách hồ sơ được xem" tone="navy" onClick={() => onOpenQueue({ label: 'Toàn bộ hồ sơ trong phạm vi' })} /><MetricCard label="Có thể xử lý" value={actionable.length} note="Theo vai trò và trạng thái" tone="blue" onClick={actionable.length ? () => onOpenQueue({ statuses: [...new Set(actionable.map(item => item.status))], label: 'Hồ sơ đang chờ thao tác theo vai trò' }) : undefined} /><MetricCard label="Sắp đến hạn" value={dueSoon.length} note="Trong 3 ngày theo lịch" tone="amber" onClick={dueSoon.length ? () => onOpenQueue({ deadlineFilter: 'soon', label: 'Hồ sơ đến hạn trong 3 ngày' }) : undefined} /><MetricCard label="Đã quá hạn" value={overdue.length} note="Hồ sơ còn đang mở" tone="red" onClick={overdue.length ? () => onOpenQueue({ deadlineFilter: 'overdue', label: 'Hồ sơ quá hạn' }) : undefined} /></section>
     <div className="dashboard-columns">
       <section className="panel dashboard-panel"><PanelHeading kicker="TRẠNG THÁI HIỆN TẠI" title="Luồng hồ sơ" description="Số hồ sơ đang hiển thị theo từng nhóm trạng thái." action={<button className="text-button" onClick={() => onNavigate('inbox')}>Mở danh sách →</button>} />
-        <div className="stage-list">{OPERATION_STAGES.map((stage, index) => { const count = data.cases.filter(item => stage.statuses.includes(item.status)).length; const width = data.cases.length ? Math.max(count ? 5 : 0, count / Math.max(...OPERATION_STAGES.map(s => data.cases.filter(item => s.statuses.includes(item.status)).length), 1) * 100) : 0; return <div className="stage-row" key={stage.label}><span className="stage-number">0{index + 1}</span><span className="stage-label">{stage.label}</span><span className="stage-track"><i style={{ width: `${width}%` }} /></span><b>{count}</b></div> })}</div>
+         <div className="stage-list">{OPERATION_STAGES.map((stage, index) => { const count = data.cases.filter(item => stage.statuses.includes(item.status)).length; const width = data.cases.length ? Math.max(count ? 5 : 0, count / Math.max(...OPERATION_STAGES.map(s => data.cases.filter(item => s.statuses.includes(item.status)).length), 1) * 100) : 0; return <button type="button" className="stage-row stage-row-button" key={stage.label} aria-label={`Mở ${count} hồ sơ ở giai đoạn ${stage.label}`} onClick={() => onOpenQueue({ statuses: stage.statuses, label: `Giai đoạn ${stage.label}` })}><span className="stage-number">0{index + 1}</span><span className="stage-label">{stage.label}</span><span className="stage-track"><i style={{ width: `${width}%` }} /></span><b>{count}</b></button> })}</div>
         <div className="stage-footnote">Bảng điều hành này không tự kết luận đúng hạn/nghiệp vụ; hãy mở hồ sơ để xem căn cứ, lịch sử và bước kế tiếp.</div>
       </section>
       <section className="panel dashboard-panel"><PanelHeading kicker="ƯU TIÊN XỬ LÝ" title="Hồ sơ cần chú ý" description="Sắp xếp theo hạn gần nhất; không thay quyết định của cán bộ." action={<button className="text-button" onClick={() => onNavigate('monitoring')}>Xem giám sát →</button>} />
@@ -1005,7 +1156,7 @@ function StaffHome({ user, data, onOpen, onNavigate }: { user: User; data: Boots
     </div>
     <div className="dashboard-columns lower-columns">
       <section className="panel dashboard-panel"><PanelHeading kicker="TRÁCH NHIỆM" title="Tồn theo người phụ trách" description="Chỉ đếm các hồ sơ đang mở và đã có thông tin phân công." />
-        <WorkloadList cases={openCases} />
+         <WorkloadList cases={openCases} onOpenQueue={onOpenQueue} />
       </section>
       <section className="panel dashboard-panel"><PanelHeading kicker="TRUY VẾT" title="Hoạt động gần đây" description="Các sự kiện gần nhất trong hồ sơ mà tài khoản được phép xem." action={<button className="text-button" onClick={() => onNavigate('activity')}>Mở nhật ký →</button>} />
         {recent.length ? <div className="recent-activity">{recent.map((event, index) => <div className="recent-event" key={`${event.code}-${event.at}-${index}`}><span className="timeline-dot"/><div><b>{event.title}</b><small>{event.code} · {event.actor} · {toDate(event.at)}</small></div></div>)}</div> : <div className="empty-state compact-empty">Chưa có sự kiện trong phạm vi tài khoản.</div>}
@@ -1021,12 +1172,12 @@ function MetricCard({ label, value, note, tone, onClick }: { label: string; valu
   const content = <><span className={`metric-accent ${tone}`} /><span className="metric-copy"><small>{label}</small><b>{value.toLocaleString('vi-VN')}</b><em>{note}</em></span><span className="metric-arrow">↗</span></>
   return onClick ? <button className="metric-card metric-button" onClick={onClick}>{content}</button> : <article className="metric-card">{content}</article>
 }
-function WorkloadList({ cases }: { cases: CaseFile[] }) {
-  const workload = new Map<string, number>()
-  cases.forEach(item => { const name = item.assignment?.assignee || item.assignment?.assigneeName || (item.assignment?.assigneeId ? 'Đã phân công' : 'Chưa phân công'); workload.set(name, (workload.get(name) || 0) + 1) })
-  const rows = [...workload.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6)
-  const max = Math.max(1, ...rows.map(([, count]) => count))
-  return rows.length ? <div className="workload-list">{rows.map(([name, count]) => <div className="workload-row" key={name}><span>{name}</span><i><b style={{ width: `${count / max * 100}%` }} /></i><strong>{count}</strong></div>)}</div> : <div className="empty-state compact-empty">Chưa có hồ sơ đang mở.</div>
+function WorkloadList({ cases, onOpenQueue }: { cases: CaseFile[]; onOpenQueue: (focus?: QueueFocus) => void }) {
+  const workload = new Map<string, { name: string; count: number }>()
+  cases.forEach(item => { const id = item.assignment?.assigneeId || (item.assignment?.assignee || item.assignment?.assigneeName ? item.assignment?.assignee || item.assignment?.assigneeName || 'assigned' : 'unassigned'); const name = item.assignment?.assignee || item.assignment?.assigneeName || (item.assignment?.assigneeId ? 'Đã phân công' : 'Chưa phân công'); workload.set(id, { name, count: (workload.get(id)?.count || 0) + 1 }) })
+  const rows = [...workload.entries()].sort((a, b) => b[1].count - a[1].count).slice(0, 6)
+  const max = Math.max(1, ...rows.map(([, item]) => item.count))
+  return rows.length ? <div className="workload-list">{rows.map(([id, item]) => <button type="button" className="workload-row workload-row-button" key={id} aria-label={`Mở ${item.count} hồ sơ của ${item.name}`} onClick={() => onOpenQueue({ assigneeFilter: id === 'unassigned' ? 'unassigned' : id, label: `Người phụ trách: ${item.name}` })}><span>{item.name}</span><i><b style={{ width: `${item.count / max * 100}%` }} /></i><strong>{item.count}</strong></button>)}</div> : <div className="empty-state compact-empty">Chưa có hồ sơ đang mở.</div>
 }
 const QUEUE_FILTERS = [
   { key: 'ALL', label: 'Tất cả hồ sơ', statuses: [] as string[] },
@@ -1036,17 +1187,32 @@ const QUEUE_FILTERS = [
   { key: 'SUPPLEMENT', label: 'Chờ bổ sung', statuses: ['CHO_BO_SUNG'] },
   { key: 'CLOSED', label: 'Đã kết thúc', statuses: [...CLOSED_STATUSES] },
 ]
-function CaseQueue({ user, data, onOpen }: { user: User; data: Bootstrap; onOpen: (item: CaseFile) => void }) {
+function CaseQueue({ user, data, initialFocus, onOpen }: { user: User; data: Bootstrap; initialFocus: QueueFocus | null; onOpen: (item: CaseFile) => void }) {
   const [query, setQuery] = useState('')
   const [bucket, setBucket] = useState('ALL')
-  const [deadlineFilter, setDeadlineFilter] = useState('all')
-  const [assigneeFilter, setAssigneeFilter] = useState('all')
+  const [focusedStatuses, setFocusedStatuses] = useState(initialFocus?.statuses || [])
+  const [focusLabel, setFocusLabel] = useState(initialFocus?.label || '')
+  const [agencyFilter, setAgencyFilter] = useState(initialFocus?.agencyFilter || 'all')
+  const [deadlineFilter, setDeadlineFilter] = useState(initialFocus?.deadlineFilter || 'all')
+  const [assigneeFilter, setAssigneeFilter] = useState(initialFocus?.assigneeFilter || 'all')
+  const [procedureFilter, setProcedureFilter] = useState(initialFocus?.procedureCode || '')
+  const [updatedSince, setUpdatedSince] = useState(initialFocus?.updatedSince || '')
+  const [createdFrom, setCreatedFrom] = useState(initialFocus?.createdFrom || '')
+  const [createdTo, setCreatedTo] = useState(initialFocus?.createdTo || '')
   const [sort, setSort] = useState('deadline')
+  const agencyOptions = [...new Set(data.cases.map(item => item.agencyScope || item.receivingAgency || 'Chưa xác định cơ quan'))].sort((a,b) => a.localeCompare(b, 'vi'))
+  const assigneeOptions = [...new Map(data.cases.filter(item => item.assignment?.assigneeId || item.assignment?.assigneeName || item.assignment?.assignee).map(item => [item.assignment?.assigneeId || item.assignment?.assigneeName || item.assignment?.assignee || '', { id: item.assignment?.assigneeId || item.assignment?.assigneeName || item.assignment?.assignee || '', name: item.assignment?.assigneeName || item.assignment?.assignee || 'Đã phân công' }])).values()].filter(item => item.id)
   const selectedBucket = QUEUE_FILTERS.find(item => item.key === bucket) || QUEUE_FILTERS[0]
   const filtered = useMemo(() => {
     const term = query.trim().toLocaleLowerCase('vi')
     return [...data.cases].filter(item => {
       if (selectedBucket.statuses.length && !selectedBucket.statuses.includes(item.status)) return false
+      if (focusedStatuses.length && !focusedStatuses.includes(item.status)) return false
+      if (agencyFilter !== 'all' && (item.agencyScope || item.receivingAgency || 'Chưa xác định cơ quan') !== agencyFilter) return false
+      if (procedureFilter && item.procedureCode !== procedureFilter) return false
+      if (updatedSince && hanoiDate(item.updatedAt || item.createdAt) < updatedSince) return false
+      if (createdFrom && hanoiDate(item.createdAt) < createdFrom) return false
+      if (createdTo && hanoiDate(item.createdAt) > createdTo) return false
       const haystack = [item.code, item.procedureCode, item.procedure?.name, item.procedure?.agency, item.applicant?.name, item.assignment?.assignee, item.assignment?.assigneeName].join(' ').toLocaleLowerCase('vi')
       if (term && !haystack.includes(term)) return false
       const days = daysUntil(item.deadline)
@@ -1056,17 +1222,20 @@ function CaseQueue({ user, data, onOpen }: { user: User; data: Bootstrap; onOpen
       const assigned = !!(item.assignment?.assigneeId || item.assignment?.assignee || item.assignment?.assigneeName)
       if (assigneeFilter === 'assigned' && !assigned) return false
       if (assigneeFilter === 'unassigned' && assigned) return false
+      if (!['all', 'assigned', 'unassigned'].includes(assigneeFilter) && item.assignment?.assigneeId !== assigneeFilter && item.assignment?.assignee !== assigneeFilter && item.assignment?.assigneeName !== assigneeFilter) return false
       return true
     }).sort((a, b) => sort === 'updated' ? Date.parse(b.updatedAt || b.createdAt) - Date.parse(a.updatedAt || a.createdAt) : sort === 'created' ? Date.parse(b.createdAt) - Date.parse(a.createdAt) : (daysUntil(a.deadline) ?? 9999) - (daysUntil(b.deadline) ?? 9999))
-  }, [data.cases, query, selectedBucket.statuses, deadlineFilter, assigneeFilter, sort])
+  }, [data.cases, query, agencyFilter, selectedBucket.statuses, focusedStatuses, deadlineFilter, assigneeFilter, procedureFilter, updatedSince, createdFrom, createdTo, sort])
+  const exportVisibleCases = () => downloadCsv('danh-sach-ho-so-trong-pham-vi.csv', ['Mã hồ sơ','Mã thủ tục','Tên thủ tục','Cơ quan tiếp nhận',...(user.role === 'finance' ? [] : ['Người nộp']),'Trạng thái','Ngày gửi','Hạn giải quyết'], filtered.map(item => [item.code,item.procedureCode,item.procedure?.name || '',item.agencyScope || item.receivingAgency || '',...(user.role === 'finance' ? [] : [item.applicant?.name || '']),data.statusLabels[item.status] || item.status,toDate(item.createdAt),toDate(item.deadline)]))
   const counts = (filter: typeof QUEUE_FILTERS[number]) => data.cases.filter(item => !filter.statuses.length || filter.statuses.includes(item.status)).length
   return <div className="queue-workspace">
-    <section className="panel queue-overview"><div><span className="ops-kicker">PHẠM VI ĐƯỢC PHÉP</span><h2>{user.agencyScope || 'Theo vai trò tài khoản'}</h2><p>Danh sách không chứa hồ sơ ngoài phạm vi cấp quyền. Mở từng hồ sơ để xem điều kiện chuyển trạng thái và thao tác hiện hành.</p></div><a className="button secondary export-link" href="/api/export/cases.csv">Xuất CSV trong phạm vi ↗</a></section>
-    <div className="queue-tabs" role="tablist" aria-label="Lọc nhóm trạng thái hồ sơ">{QUEUE_FILTERS.map(filter => <button key={filter.key} role="tab" aria-selected={bucket === filter.key} className={bucket === filter.key ? 'queue-tab active' : 'queue-tab'} onClick={() => setBucket(filter.key)}><span>{filter.label}</span><b>{counts(filter)}</b></button>)}</div>
+    <section className="panel queue-overview"><div><span className="ops-kicker">PHẠM VI ĐƯỢC PHÉP</span><h2>{agencyFilter === 'all' ? user.agencyScope || 'Theo vai trò tài khoản' : agencyFilter}</h2><p>Danh sách không chứa hồ sơ ngoài phạm vi cấp quyền. Mở từng hồ sơ để xem điều kiện chuyển trạng thái và thao tác hiện hành.</p></div><div className="queue-export-actions"><button className="button secondary" onClick={exportVisibleCases}>Xuất CSV · {filtered.length}</button><button className="button secondary" onClick={() => printInternalTable('Bảng kê hồ sơ đang xem', `${agencyFilter === 'all' ? user.agencyScope || 'Phạm vi được cấp' : agencyFilter} · ${filtered.length} hồ sơ`, ['Mã hồ sơ','Thủ tục',...(user.role === 'finance' ? [] : ['Người nộp']),'Trạng thái','Ngày gửi','Hạn giải quyết'], filtered.map(item => [item.code,`${item.procedureCode} · ${item.procedure?.name || ''}`,...(user.role === 'finance' ? [] : [item.applicant?.name || '']),data.statusLabels[item.status] || item.status,toDate(item.createdAt),toDate(item.deadline)]))}>In danh sách · {filtered.length}</button></div></section>
+     {focusLabel && <div className="queue-focus-bar"><span>Danh sách lọc từ: <b>{focusLabel}</b>{(createdFrom || createdTo) && <small> · Ngày gửi {createdFrom || 'bất kỳ'} — {createdTo || 'hiện tại'}</small>}{updatedSince && <small> · Cập nhật từ {reportDateDisplay(updatedSince)}</small>}</span><button type="button" className="text-button" onClick={() => { setBucket('ALL'); setFocusedStatuses([]); setFocusLabel(''); setAgencyFilter('all'); setDeadlineFilter('all'); setAssigneeFilter('all'); setProcedureFilter(''); setUpdatedSince(''); setCreatedFrom(''); setCreatedTo(''); setQuery('') }}>Xóa điều kiện lọc</button></div>}
+     <div className="queue-tabs" role="tablist" aria-label="Lọc nhóm trạng thái hồ sơ">{QUEUE_FILTERS.map(filter => <button key={filter.key} role="tab" aria-selected={bucket === filter.key} className={bucket === filter.key ? 'queue-tab active' : 'queue-tab'} onClick={() => { setBucket(filter.key); setFocusedStatuses([]); setFocusLabel('') }}><span>{filter.label}</span><b>{counts(filter)}</b></button>)}</div>
     <section className="panel queue-panel"><PanelHeading kicker="DANH SÁCH TÁC NGHIỆP" title={`${filtered.length.toLocaleString('vi-VN')} hồ sơ`} description="Tìm theo mã, tên thủ tục, người nộp, cơ quan hoặc người được phân công." />
-      <div className="queue-filter-grid"><label className="queue-search"><span>Tìm hồ sơ</span><input className="search-input" type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Mã hồ sơ, thủ tục, người nộp…" /></label><label><span>Thời hạn</span><select value={deadlineFilter} onChange={e => setDeadlineFilter(e.target.value)}><option value="all">Mọi thời hạn</option><option value="overdue">Quá hạn</option><option value="soon">Đến hạn trong 3 ngày</option><option value="unknown">Chưa xác định</option></select></label><label><span>Phân công</span><select value={assigneeFilter} onChange={e => setAssigneeFilter(e.target.value)}><option value="all">Tất cả</option><option value="assigned">Đã phân công</option><option value="unassigned">Chưa phân công</option></select></label><label><span>Sắp xếp</span><select value={sort} onChange={e => setSort(e.target.value)}><option value="deadline">Hạn gần nhất</option><option value="updated">Cập nhật gần nhất</option><option value="created">Mới tiếp nhận</option></select></label></div>
+        <div className="queue-filter-grid"><label className="queue-search"><span>Tìm hồ sơ</span><input className="search-input" type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Mã hồ sơ, thủ tục, người nộp…" /></label>{agencyOptions.length > 1 && <label><span>Cơ quan tiếp nhận</span><select value={agencyFilter} onChange={e => setAgencyFilter(e.target.value)}><option value="all">Tất cả trong phạm vi</option>{agencyOptions.map(agency => <option key={agency} value={agency}>{agency}</option>)}</select></label>}{procedureFilter && <label><span>Mã thủ tục</span><input value={procedureFilter} readOnly /></label>}<label><span>Thời hạn</span><select value={deadlineFilter} onChange={e => setDeadlineFilter(e.target.value)}><option value="all">Mọi thời hạn</option><option value="overdue">Quá hạn</option><option value="soon">Đến hạn trong 3 ngày</option><option value="unknown">Chưa xác định</option></select></label><label><span>Phân công</span><select value={assigneeFilter} onChange={e => setAssigneeFilter(e.target.value)}><option value="all">Tất cả</option><option value="assigned">Đã phân công</option><option value="unassigned">Chưa phân công</option>{assigneeOptions.map(person=><option key={person.id} value={person.id}>{person.name}</option>)}</select></label><label><span>Sắp xếp</span><select value={sort} onChange={e => setSort(e.target.value)}><option value="deadline">Hạn gần nhất</option><option value="updated">Cập nhật gần nhất</option><option value="created">Mới tiếp nhận</option></select></label></div>
       <div className="queue-list">{filtered.map(item => <QueueItem key={item.code} item={item} label={data.statusLabels[item.status] || item.status} onOpen={onOpen} />)}{filtered.length === 0 && <div className="empty-state">Không tìm thấy hồ sơ phù hợp. Hãy thay từ khóa hoặc bỏ bớt điều kiện lọc.</div>}</div>
-      <div className="queue-footer"><span>Đang xem {filtered.length.toLocaleString('vi-VN')} / {data.cases.length.toLocaleString('vi-VN')} hồ sơ trong phạm vi.</span><span>Xuất CSV lấy toàn bộ danh sách được phép xem, không chỉ các dòng đang lọc.</span></div>
+       <div className="queue-footer"><span>Đang xem {filtered.length.toLocaleString('vi-VN')} / {data.cases.length.toLocaleString('vi-VN')} hồ sơ trong phạm vi.</span><span>Bản in và CSV lấy đúng danh sách sau các bộ lọc đang chọn.</span></div>
     </section>
   </div>
 }
@@ -1077,21 +1246,23 @@ function QueueItem({ item, label, onOpen }: { item: CaseFile; label: string; onO
   return <article className="queue-item"><div className="queue-item-main"><span className="case-code">{item.code}</span><h3>{item.procedure?.name || item.procedureCode}</h3><p>{item.applicant?.name || 'Chưa có thông tin người nộp'} · Gửi {toDate(item.createdAt)}</p></div><div className="queue-item-facts"><span><small>Cơ quan</small><b>{item.agencyScope || item.receivingAgency || item.procedure?.agency || 'Chưa xác định'}</b></span><span><small>Người phụ trách</small><b>{assignee}</b></span></div><div className="queue-item-status"><span className={`status-pill status-${item.status}`}>{label}</span><span className={`deadline-mark ${tone}`}>{dueText(item)}</span></div><button className="queue-open" onClick={() => onOpen(item)} aria-label={`Mở hồ sơ ${item.code}`}>Mở hồ sơ <b>→</b></button></article>
 }
 
-function OperationsMonitor({ user, data, onOpen, onNavigate }: { user: User; data: Bootstrap; onOpen: (item: CaseFile) => void; onNavigate: (page: string) => void }) {
+function OperationsMonitor({ user, data, onOpen, onOpenQueue, onNavigate }: { user: User; data: Bootstrap; onOpen: (item: CaseFile) => void; onOpenQueue: (focus?: QueueFocus) => void; onNavigate: (page: string) => void }) {
   const [period, setPeriod] = useState('30')
   const [loadedAt] = useState(() => Date.now())
   const since = period === 'all' ? 0 : loadedAt - Number(period) * 86400000
+  const updatedSince = period === 'all' ? '' : hanoiDate(new Date(since).toISOString())
   const cases = data.cases.filter(item => Date.parse(item.updatedAt || item.createdAt) >= since)
   const open = cases.filter(item => !CLOSED_STATUSES.has(item.status))
   const completed = cases.filter(item => ['HOAN_THANH', 'DA_PHAT_HANH'].includes(item.status)).length
   const overdue = open.filter(item => (daysUntil(item.deadline) ?? 999) < 0)
   const statusRows = Object.entries(data.statusLabels).map(([status, label]) => ({ status, label, count: cases.filter(item => item.status === status).length })).filter(row => row.count).sort((a, b) => b.count - a.count)
   const byAgency = new Map<string, number>()
-  const byAssignee = new Map<string, number>()
+  const byAssignee = new Map<string, { name: string; count: number }>()
   open.forEach(item => {
-    const agency = item.agencyScope || item.receivingAgency || item.procedure?.agency || 'Chưa xác định cơ quan'
+    const agency = item.agencyScope || item.receivingAgency || 'Chưa xác định cơ quan'
+    const assigneeId = item.assignment?.assigneeId || item.assignment?.assignee || item.assignment?.assigneeName || 'unassigned'
     const assignee = item.assignment?.assignee || item.assignment?.assigneeName || (item.assignment?.assigneeId ? 'Đã phân công' : 'Chưa phân công')
-    byAgency.set(agency, (byAgency.get(agency) || 0) + 1); byAssignee.set(assignee, (byAssignee.get(assignee) || 0) + 1)
+    byAgency.set(agency, (byAgency.get(agency) || 0) + 1); byAssignee.set(assigneeId, { name: assignee, count: (byAssignee.get(assigneeId)?.count || 0) + 1 })
   })
   const highestStatus = Math.max(1, ...statusRows.map(row => row.count))
   const feedback = data.feedback || []
@@ -1100,32 +1271,244 @@ function OperationsMonitor({ user, data, onOpen, onNavigate }: { user: User; dat
   const oldest = [...open].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)).slice(0, 5)
   return <div className="monitor-workspace">
     <section className="panel monitor-controls"><div><span className="ops-kicker">BỘ LỌC PHẠM VI</span><b>{user.agencyScope || 'Theo phạm vi tài khoản'}</b><small>Phân quyền dữ liệu do máy chủ áp dụng trước khi trả danh sách.</small></div><label>Kỳ theo ngày cập nhật<select value={period} onChange={e => setPeriod(e.target.value)}><option value="7">7 ngày gần nhất</option><option value="30">30 ngày gần nhất</option><option value="90">90 ngày gần nhất</option><option value="all">Toàn bộ hồ sơ thấy được</option></select></label><a className="button secondary" href="/api/export/cases.csv">Tải báo cáo CSV</a></section>
-    <section className="metric-grid monitor-metrics"><MetricCard label="Hồ sơ trong kỳ" value={cases.length} note="Theo thời điểm cập nhật" tone="navy" /><MetricCard label="Đang mở" value={open.length} note="Chưa ở trạng thái kết thúc" tone="blue" /><MetricCard label="Quá hạn" value={overdue.length} note="Theo hạn đang lưu trên hồ sơ" tone="red" /><MetricCard label="Đã phát hành / hoàn tất" value={completed} note="Không bao gồm hồ sơ từ chối" tone="green" /></section>
-    <div className="dashboard-columns monitor-columns"><section className="panel dashboard-panel"><PanelHeading kicker="PHÂN BỐ TỒN" title="Hồ sơ theo trạng thái" description="Tỷ lệ thanh biểu đồ tính trên số hồ sơ trong kỳ đã chọn." />{statusRows.length ? <div className="monitor-status-list">{statusRows.map(row => <div className="monitor-status-row" key={row.status}><span>{row.label}</span><i><b style={{ width: `${row.count / highestStatus * 100}%` }} /></i><strong>{row.count}</strong></div>)}</div> : <div className="empty-state compact-empty">Không có hồ sơ trong kỳ.</div>}</section>
-      <section className="panel dashboard-panel"><PanelHeading kicker="TẢI CÔNG VIỆC" title="Theo cơ quan và người phụ trách" description="Chỉ hồ sơ đang mở; số liệu không vượt phạm vi quyền." />{[...byAgency.entries()].length ? <div className="monitor-groups"><h3>Cơ quan / đơn vị</h3>{[...byAgency.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,count])=><div className="monitor-group-row" key={name}><span>{name}</span><b>{count}</b></div>)}<h3>Người phụ trách</h3>{[...byAssignee.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,count])=><div className="monitor-group-row" key={name}><span>{name}</span><b>{count}</b></div>)}</div> : <div className="empty-state compact-empty">Chưa có hồ sơ mở trong kỳ.</div>}</section></div>
+     <section className="metric-grid monitor-metrics"><MetricCard label="Hồ sơ trong kỳ" value={cases.length} note="Mở danh sách đã lọc theo kỳ" tone="navy" onClick={() => onOpenQueue({ updatedSince, label: `Hồ sơ cập nhật từ ${period === 'all' ? 'toàn bộ thời gian' : reportDateDisplay(updatedSince)}` })} /><MetricCard label="Đang mở" value={open.length} note="Chưa ở trạng thái kết thúc" tone="blue" onClick={open.length ? () => onOpenQueue({ statuses: [...new Set(open.map(item => item.status))], updatedSince, label: 'Hồ sơ đang mở trong kỳ' }) : undefined} /><MetricCard label="Quá hạn" value={overdue.length} note="Theo hạn đang lưu trên hồ sơ" tone="red" onClick={overdue.length ? () => onOpenQueue({ deadlineFilter: 'overdue', updatedSince, label: 'Hồ sơ quá hạn' }) : undefined} /><MetricCard label="Đã phát hành / hoàn tất" value={completed} note="Không bao gồm hồ sơ từ chối" tone="green" onClick={completed ? () => onOpenQueue({ statuses: [...new Set(cases.filter(item => ['HOAN_THANH', 'DA_PHAT_HANH'].includes(item.status)).map(item => item.status))], updatedSince, label: 'Hồ sơ đã phát hành hoặc hoàn tất' }) : undefined} /></section>
+     <div className="dashboard-columns monitor-columns"><section className="panel dashboard-panel"><PanelHeading kicker="PHÂN BỐ TỒN" title="Hồ sơ theo trạng thái" description="Chọn một trạng thái để mở danh sách đúng nhóm hồ sơ trong phạm vi." />{statusRows.length ? <div className="monitor-status-list">{statusRows.map(row => <button type="button" className="monitor-status-row monitor-status-button" key={row.status} onClick={() => onOpenQueue({ statuses: [row.status], updatedSince, label: `Trạng thái: ${row.label}` })}><span>{row.label}</span><i><b style={{ width: `${row.count / highestStatus * 100}%` }} /></i><strong>{row.count}</strong></button>)}</div> : <div className="empty-state compact-empty">Không có hồ sơ trong kỳ.</div>}</section>
+       <section className="panel dashboard-panel"><PanelHeading kicker="TẢI CÔNG VIỆC" title="Theo cơ quan và người phụ trách" description="Chọn một nhóm để mở các hồ sơ đang mở tương ứng." />{[...byAgency.entries()].length ? <div className="monitor-groups"><h3>Cơ quan / đơn vị</h3>{[...byAgency.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,count])=><button type="button" className="monitor-group-row monitor-group-button" key={name} onClick={() => onOpenQueue({ agencyFilter: name, updatedSince, statuses: [...new Set(open.filter(item => (item.agencyScope || item.receivingAgency || 'Chưa xác định cơ quan') === name).map(item => item.status))], label: `Cơ quan: ${name}` })}><span>{name}</span><b>{count}</b></button>)}<h3>Người phụ trách</h3>{[...byAssignee.entries()].sort((a,b)=>b[1].count-a[1].count).slice(0,5).map(([id,item])=><button type="button" className="monitor-group-row monitor-group-button" key={id} onClick={() => onOpenQueue({ assigneeFilter: id === 'unassigned' ? 'unassigned' : id, updatedSince, label: `Người phụ trách: ${item.name}` })}><span>{item.name}</span><b>{item.count}</b></button>)}</div> : <div className="empty-state compact-empty">Chưa có hồ sơ mở trong kỳ.</div>}</section></div>
     <div className="dashboard-columns monitor-columns"><section className="panel dashboard-panel"><PanelHeading kicker="TUỔI HỒ SƠ" title="Hồ sơ đang mở lâu nhất" description="Sắp theo ngày tạo; cần xem nhật ký để biết thời gian thực tế ở từng bước." action={<button className="text-button" onClick={() => onNavigate('inbox')}>Mở hàng đợi →</button>} />{oldest.length ? <div className="attention-list">{oldest.map(item => <button className="attention-row" key={item.code} onClick={() => onOpen(item)}><span className="attention-mark" data-tone={daysUntil(item.deadline) !== null && (daysUntil(item.deadline) as number) < 0 ? 'red' : 'blue'} /><span className="attention-main"><b>{item.procedure?.name || item.procedureCode}</b><small>{item.code} · Tạo {toDate(item.createdAt)}</small></span><span className="attention-side"><span className={`status-pill status-${item.status}`}>{data.statusLabels[item.status] || item.status}</span><small>{dueText(item)}</small></span></button>)}</div> : <div className="empty-state compact-empty">Không có hồ sơ đang mở.</div>}</section>
       <section className="panel dashboard-panel"><PanelHeading kicker="CHẤT LƯỢNG PHỤC VỤ" title="Phản hồi sau kết quả" description="Chỉ tổng hợp đánh giá đã lưu; nội dung không làm thay đổi quyết định hồ sơ." />{feedback.length ? <><div className="feedback-score"><b>{averageScore?.toFixed(1)}</b><span>/ 5</span><small>{feedback.length} phản hồi trong phạm vi dữ liệu được phép</small></div><div className="feedback-list">{feedback.slice(0,4).map((row,index)=><article key={`${row.code}-${index}`}><b>{'★'.repeat(row.score)}{'☆'.repeat(5-row.score)}</b><span>{row.code}</span><p>{row.content || 'Không có nội dung nhận xét.'}</p></article>)}</div></> : <div className="empty-state compact-empty">Chưa có đánh giá trong dữ liệu hồ sơ được phép xem.</div>}</section></div>
     <section className="panel integration-summary"><PanelHeading kicker="PHỤ THUỘC HỆ THỐNG" title="Hàng chờ đồng bộ" description="Dữ liệu hàng chờ trong ứng dụng; đây không phải xác nhận đã kết nối tới hệ thống bên ngoài." action={<button className="text-button" onClick={() => onNavigate('connections')}>Chi tiết kết nối →</button>} />{activeOutbox.length ? <div className="outbox-list">{activeOutbox.map(row=><div className="outbox-row" key={row.code}><b>{row.code}</b><span className={`request-status ${row.status === 'ERROR' ? 'request-rejected' : 'request-pending'}`}>{row.status === 'ERROR' ? 'Có lỗi' : 'Đang chờ'}</span><span>{row.attempts} lần thử</span><small>{row.lastError || 'Chưa có phản hồi xác nhận.'}</small></div>)}</div> : <div className="empty-state compact-empty">Không có bản ghi PENDING/ERROR trong hàng chờ hiện tại.</div>}</section>
   </div>
 }
 
-function ProcedureCatalog({ procedures }: { procedures: Procedure[] }) {
+function ProcedureCatalog({ procedures, procedureCategories, canManage, onUpdated }: { procedures: Procedure[]; procedureCategories: ProcedureCategory[]; canManage: boolean; onUpdated: () => Promise<void> }) {
+  type CatalogAudit = { actor: string; action: string; reason: string; before: Record<string, unknown> | null; after: Record<string, unknown>; createdAt: string }
+  type CategoryAudit = { actor: string; reason: string; before: Record<string, unknown> | null; after: Record<string, unknown>; createdAt: string }
   const [query, setQuery] = useState('')
   const [field, setField] = useState('all')
+  const [mode, setMode] = useState('all')
   const [page, setPage] = useState(1)
-  const [selected, setSelected] = useState<Procedure | null>(() => procedures[0] || null)
+  const [selectedCode, setSelectedCode] = useState(() => procedures[0]?.sourceCode || procedures[0]?.code || '')
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+  const [history, setHistory] = useState<CatalogAudit[]>([])
+  const [showHistory, setShowHistory] = useState(false)
+  const [categoryQuery, setCategoryQuery] = useState('')
+  const [selectedCategoryKey, setSelectedCategoryKey] = useState('')
+  const [editingCategory, setEditingCategory] = useState(false)
+  const [savingCategory, setSavingCategory] = useState(false)
+  const [categoryHistory, setCategoryHistory] = useState<CategoryAudit[]>([])
+  const [showCategoryHistory, setShowCategoryHistory] = useState(false)
+  const [newCategoryOpen, setNewCategoryOpen] = useState(false)
+  const [savingNewCategory, setSavingNewCategory] = useState(false)
+  const [managingMembers, setManagingMembers] = useState(false)
+  const [memberQuery, setMemberQuery] = useState('')
+  const [memberPage, setMemberPage] = useState(1)
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([])
+  const [targetCategoryKey, setTargetCategoryKey] = useState('')
+  const [savingMove, setSavingMove] = useState(false)
+  const memberPageSize = 20
   const pageSize = 12
   const fields = useMemo(() => [...new Set(procedures.map(item => item.field).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'vi')), [procedures])
+  const categories = useMemo(() => {
+    const grouped = new Map<string, ProcedureCategory>()
+    for (const category of procedureCategories) grouped.set(category.key, { ...category, procedures: [] })
+    for (const item of procedures) {
+      const key = item.categoryKey || item.field
+      const existing = grouped.get(key)
+      if (existing) existing.procedures.push(item)
+      else grouped.set(key, { key, name: item.field, count: 0, source: key.startsWith('local:') ? 'internal' : 'reference', procedures: [], categoryEdit: item.categoryEdit })
+    }
+    for (const category of grouped.values()) category.count = category.procedures.length
+    return [...grouped.values()].sort((a,b)=>a.name.localeCompare(b.name,'vi'))
+  }, [procedures, procedureCategories])
+  const visibleCategories = categories.filter(item => item.name.toLocaleLowerCase('vi').includes(categoryQuery.trim().toLocaleLowerCase('vi')))
+  const selectedCategory = categories.find(item => item.key === selectedCategoryKey) || categories[0] || null
+  const classifiedFieldCount = categories.filter(item => item.key !== 'Chưa phân loại').length
+  const selected = procedures.find(item => (item.sourceCode || item.code) === selectedCode) || procedures[0] || null
+  const categoryMemberMatches = selectedCategory?.procedures.filter(item => `${item.code} ${item.name}`.toLocaleLowerCase('vi').includes(memberQuery.trim().toLocaleLowerCase('vi'))) || []
+  const categoryMemberPages = Math.max(1, Math.ceil(categoryMemberMatches.length / memberPageSize))
+  const categoryMemberShown = categoryMemberMatches.slice((memberPage - 1) * memberPageSize, memberPage * memberPageSize)
+  const configuredForms = procedures.filter(item => item.submission).length
   const filtered = useMemo(() => procedures.filter(item => {
     const term = query.trim().toLocaleLowerCase('vi')
-    return (field === 'all' || item.field === field) && (!term || `${item.code} ${item.name} ${item.field} ${item.agency} ${item.level}`.toLocaleLowerCase('vi').includes(term))
-  }), [procedures, query, field])
+    return (field === 'all' || item.field === field) && (mode === 'all' || item.serviceMode === mode) && (!term || `${item.code} ${item.name} ${item.field} ${item.agency} ${item.level}`.toLocaleLowerCase('vi').includes(term))
+  }), [procedures, query, field, mode])
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const shown = filtered.slice((page-1)*pageSize, page*pageSize)
-  const sourceStatus = (item: Procedure) => item.routing?.status === 'partially-verified' ? 'Đối chiếu một phần' : item.routing?.status === 'unverified' ? 'Cần xác minh' : item.routing?.status === 'catalog-reference-only' ? 'Chỉ dữ liệu danh mục' : item.verified ? 'Đã xác minh' : 'Cần xác minh'
-  return <div className="catalog-workspace"><section className="panel catalog-controls"><label className="catalog-search"><span>Tìm theo mã, tên, lĩnh vực hoặc cơ quan</span><input className="search-input" type="search" value={query} onChange={e=>{setQuery(e.target.value);setPage(1)}} placeholder="Ví dụ: 2.000908, hộ tịch…" /></label><label><span>Lĩnh vực</span><select value={field} onChange={e=>{setField(e.target.value);setPage(1)}}><option value="all">Tất cả lĩnh vực</option>{fields.map(value=><option key={value} value={value}>{value}</option>)}</select></label><div className="catalog-count"><b>{filtered.length.toLocaleString('vi-VN')}</b><small>thủ tục phù hợp</small></div></section>
-    <div className="catalog-layout"><section className="panel catalog-list-panel"><div className="catalog-list-head"><div><span className="ops-kicker">DANH MỤC THAM CHIẾU</span><h2>Kết quả tra cứu</h2></div><span>{filtered.length ? `${(page-1)*pageSize+1}–${Math.min(page*pageSize,filtered.length)} / ${filtered.length}` : '0 kết quả'}</span></div><div className="catalog-list">{shown.map(item=><button className={`catalog-row${selected?.code===item.code?' selected':''}`} key={`${item.code}-${item.ref}`} onClick={()=>setSelected(item)}><span className="catalog-row-code">{item.code}</span><span className="catalog-row-main"><b>{item.name}</b><small>{item.field} · {item.level}</small></span><span className={`catalog-verify ${item.routing?.status==='catalog-reference-only' || item.routing?.status==='unverified'?'unverified':'verified'}`}>{sourceStatus(item)}</span><span className="row-arrow">›</span></button>)}</div>{filtered.length===0&&<div className="empty-state">Không tìm thấy thủ tục phù hợp.</div>}<div className="catalog-pagination"><button className="button secondary" disabled={page<=1} onClick={()=>setPage(current=>Math.max(1,current-1))}>← Trước</button><span>Trang {page} / {pageCount}</span><button className="button secondary" disabled={page>=pageCount} onClick={()=>setPage(current=>Math.min(pageCount,current+1))}>Tiếp →</button></div></section>
-      <aside className="panel procedure-detail-panel">{selected ? <><span className="ops-kicker">THÔNG TIN THỦ TỤC</span><small className="procedure-detail-code">{selected.code}{selected.ref ? ` · ${selected.ref}` : ''}</small><h2>{selected.name}</h2><dl className="procedure-facts"><div><dt>Lĩnh vực</dt><dd>{selected.field || 'Chưa xác định'}</dd></div><div><dt>Mức dịch vụ theo danh mục</dt><dd>{serviceModeLabel(selected.level)}</dd></div><div><dt>Cơ quan trong danh mục</dt><dd>{selected.agency || 'Chưa xác định'}</dd></div></dl><div className={`routing-evidence ${selected.routing?.status==='catalog-reference-only' || selected.routing?.status==='unverified'?'warning':'confirmed'}`}><b>{sourceStatus(selected)}</b><p>{selected.routing?.summary || 'Bản ghi lấy từ danh mục tham chiếu; cần chọn địa bàn/cơ quan và xác minh trên Cổng quốc gia trước khi hướng dẫn giao dịch.'}</p>{selected.routing?.checkedAt&&<small>Mốc đối chiếu: {toDate(selected.routing.checkedAt)}</small>}</div>{selected.routing?.officialUrl&&<a className="button secondary source-link" href={selected.routing.officialUrl} target="_blank" rel="noreferrer">Mở nguồn công khai ↗</a>}</> : <div className="catalog-placeholder"><span>▧</span><h2>Chọn một thủ tục</h2><p>Xem mã, lĩnh vực, cơ quan, tình trạng xác minh và liên kết nguồn công khai.</p></div>}</aside></div>
+  const sourceStatus = (item: Procedure) => item.localEdit ? 'Chỉnh sửa nội bộ · cần đối chiếu' : item.categoryEdit ? 'Lĩnh vực sửa nội bộ · cần đối chiếu' : item.routing?.status === 'partially-verified' ? 'Đối chiếu một phần' : item.routing?.status === 'unverified' ? 'Cần xác minh' : item.routing?.status === 'catalog-reference-only' ? 'Dữ liệu tham chiếu' : item.verified ? 'Đã xác minh' : 'Cần xác minh'
+  useEffect(() => {
+    if (!procedures.some(item => (item.sourceCode || item.code) === selectedCode)) setSelectedCode(procedures[0]?.sourceCode || procedures[0]?.code || '')
+  }, [procedures, selectedCode])
+  useEffect(() => {
+    if (!categories.some(item => item.key === selectedCategoryKey)) setSelectedCategoryKey(categories[0]?.key || '')
+  }, [categories, selectedCategoryKey])
+  useEffect(() => { setMemberPage(1); setMemberQuery(''); setSelectedMembers([]); setTargetCategoryKey('') }, [selectedCategoryKey])
+  function startEdit() {
+    if (!selected) return
+    setError(''); setNotice(''); setEditing(true)
+  }
+  async function saveEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!selected) return
+    const form = new FormData(event.currentTarget)
+    const categoryKey = String(form.get('categoryKey') || '')
+    const target = categories.find(item => item.key === categoryKey)
+    const payload = {
+      code: String(form.get('code') || ''), name: String(form.get('name') || ''), field: target?.name || '', categoryKey, level: String(form.get('level') || ''),
+      agency: String(form.get('agency') || ''), sourceUrl: String(form.get('sourceUrl') || ''), checkedAt: String(form.get('checkedAt') || ''),
+      reason: String(form.get('reason') || ''), expectedVersion: selected.localEdit?.version || 0,
+    }
+    setSaving(true); setError(''); setNotice('')
+    try {
+      await api<{procedure:Procedure}>(`/api/procedures/${encodeURIComponent(selected.sourceCode || selected.code)}/edit`, payload)
+      await onUpdated(); setEditing(false); setShowHistory(false); setNotice('Đã lưu phiên bản danh mục nội bộ. Bản sửa vẫn cần được đối chiếu với nguồn chính thức trước khi dùng làm căn cứ nghiệp vụ.')
+    } catch (e) { setError(e instanceof Error ? e.message : 'Không lưu được danh mục.') }
+    finally { setSaving(false) }
+  }
+  async function toggleHistory() {
+    if (!selected || !canManage) return
+    if (showHistory) { setShowHistory(false); return }
+    setError('')
+    try {
+      const result = await api<{history:CatalogAudit[]}>(`/api/procedures/${encodeURIComponent(selected.sourceCode || selected.code)}/history`)
+      setHistory(result.history); setShowHistory(true)
+    } catch (e) { setError(e instanceof Error ? e.message : 'Không tải được lịch sử danh mục.') }
+  }
+  async function saveCategory(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!selectedCategory) return
+    const values = new FormData(event.currentTarget)
+    const payload = { sourceName: selectedCategory.key, name: String(values.get('name') || ''), sourceUrl: String(values.get('sourceUrl') || ''), checkedAt: String(values.get('checkedAt') || ''), reason: String(values.get('reason') || ''), expectedVersion: selectedCategory.categoryEdit?.version || 0 }
+    setSavingCategory(true); setError('')
+    try {
+      await api('/api/procedure-categories/edit', payload)
+      await onUpdated(); setEditingCategory(false); setShowCategoryHistory(false)
+      setNotice('Đã cập nhật tên lĩnh vực cho toàn bộ thủ tục thuộc nhóm này. Phiên bản nội bộ đã được ghi lịch sử.')
+    } catch (e) { setError(e instanceof Error ? e.message : 'Không lưu được lĩnh vực.') }
+    finally { setSavingCategory(false) }
+  }
+  async function saveNewCategory(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const values = new FormData(event.currentTarget)
+    setSavingNewCategory(true); setError('')
+    try {
+      const result = await api<{category:ProcedureCategory}>('/api/procedure-categories/create', {
+        name: String(values.get('name') || ''), sourceUrl: String(values.get('sourceUrl') || ''), checkedAt: String(values.get('checkedAt') || ''), reason: String(values.get('reason') || ''),
+      })
+      await onUpdated(); setSelectedCategoryKey(result.category.key); setNewCategoryOpen(false); setNotice('Đã tạo lĩnh vực nội bộ. Hãy chuyển thủ tục vào nhóm và ghi căn cứ đối chiếu trước khi dùng nghiệp vụ.')
+    } catch (e) { setError(e instanceof Error ? e.message : 'Không tạo được lĩnh vực.') }
+    finally { setSavingNewCategory(false) }
+  }
+  async function moveSelectedMembers(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!selectedCategory || !selectedMembers.length || !targetCategoryKey) return
+    const values = new FormData(event.currentTarget)
+    const selectedProcedures = selectedCategory.procedures.filter(item => selectedMembers.includes(item.sourceCode || item.code))
+    setSavingMove(true); setError('')
+    try {
+      const result = await api<{moved:number; targetCategory:string}>('/api/procedure-categories/move', {
+        procedureCodes: selectedProcedures.map(item => item.sourceCode || item.code), targetCategoryKey,
+        expectedVersions: Object.fromEntries(selectedProcedures.map(item => [item.sourceCode || item.code, item.localEdit?.version || 0])),
+        sourceUrl: String(values.get('sourceUrl') || ''), checkedAt: String(values.get('checkedAt') || ''), reason: String(values.get('reason') || ''),
+      })
+      await onUpdated(); setSelectedMembers([]); setManagingMembers(false); setShowCategoryHistory(false)
+      setNotice(`Đã chuyển ${result.moved.toLocaleString('vi-VN')} thủ tục sang lĩnh vực “${result.targetCategory}”. Lịch sử được lưu cho từng mã thủ tục.`)
+    } catch (e) { setError(e instanceof Error ? e.message : 'Không chuyển được thủ tục.') }
+    finally { setSavingMove(false) }
+  }
+  async function toggleCategoryHistory() {
+    if (!selectedCategory || !canManage) return
+    if (showCategoryHistory) { setShowCategoryHistory(false); return }
+    setError('')
+    try {
+      const params = new URLSearchParams({ key: selectedCategory.key })
+      const result = await api<{history:CategoryAudit[]}>(`/api/procedure-categories/history?${params.toString()}`)
+      setCategoryHistory(result.history); setShowCategoryHistory(true)
+    } catch (e) { setError(e instanceof Error ? e.message : 'Không tải được lịch sử lĩnh vực.') }
+  }
+  return <div className="catalog-workspace">
+    <section className="catalog-summary-grid" aria-label="Tình trạng danh mục">
+      <article className="catalog-summary"><span>Thủ tục đã nạp</span><b>{procedures.length.toLocaleString('vi-VN')}</b><small>Dữ liệu tham chiếu lưu trong ứng dụng</small></article>
+      <article className="catalog-summary"><span>Lĩnh vực đã phân loại</span><b>{classifiedFieldCount.toLocaleString('vi-VN')}</b><small>{categories.some(item=>item.key==='Chưa phân loại')?'Còn bản ghi chưa phân loại':'Nhóm theo danh mục hiện có'}</small></article>
+      <article className="catalog-summary"><span>Biểu mẫu tiếp nhận đã cấu hình</span><b>{configuredForms.toLocaleString('vi-VN')}</b><small>Thủ tục khác chưa có biểu mẫu số trong ứng dụng</small></article>
+    </section>
+    <section className="panel catalog-source-note"><b>Nguồn dữ liệu</b><p>Danh mục được nạp từ tệp tham chiếu trong dự án; ứng dụng chưa đồng bộ trực tiếp với Cổng Dịch vụ công quốc gia. Mọi chỉnh sửa tại đây là dữ liệu nội bộ, có ghi phiên bản và nguồn đối chiếu, không tự trở thành thông tin đã được cơ quan có thẩm quyền xác nhận.</p></section>
+    <section className="panel field-catalog-panel" aria-label="Danh mục lĩnh vực thủ tục">
+      <div className="field-catalog-header"><div><span className="ops-kicker">DANH MỤC PHÂN LOẠI</span><h2>Lĩnh vực thủ tục</h2><p>{classifiedFieldCount.toLocaleString('vi-VN')} lĩnh vực đã phân loại{categories.some(item=>item.key==='Chưa phân loại')?' · có nhóm thủ tục chưa phân loại':''} · mở nhóm để quản lý đầy đủ các thủ tục trực thuộc.</p></div><div className="field-catalog-header-actions">{canManage&&<button className="button secondary" onClick={()=>{setNewCategoryOpen(open=>!open);setError('')}}>{newCategoryOpen?'Đóng tạo lĩnh vực':'Tạo lĩnh vực'}</button>}<label className="field-catalog-search">Tìm lĩnh vực<input type="search" value={categoryQuery} onChange={event=>setCategoryQuery(event.target.value)} placeholder="Nhập tên lĩnh vực" /></label></div></div>
+      {newCategoryOpen&&<form className="catalog-edit-form new-category-form" onSubmit={saveNewCategory}><h3>Tạo lĩnh vực nội bộ</h3><p>Nhóm mới bắt đầu ở trạng thái nội bộ. Có thể chuyển thủ tục vào nhóm; chỉ gắn nguồn chính thức khi đã đối chiếu thật.</p><label>Tên lĩnh vực<input name="name" required minLength={3} maxLength={180} /></label><label>Nguồn chính thức nếu đã đối chiếu<input name="sourceUrl" type="url" maxLength={600} placeholder="https://...gov.vn/..." /></label><label>Ngày đối chiếu nếu có<input name="checkedAt" type="date" /></label><label>Mục đích và căn cứ tạo nhóm<textarea name="reason" rows={2} required minLength={20} maxLength={1200} /></label><div className="catalog-editor-actions"><button className="button primary" disabled={savingNewCategory}>{savingNewCategory?'Đang tạo…':'Lưu lĩnh vực nội bộ'}</button></div></form>}
+      <div className="field-catalog-layout">
+        <div className="field-catalog-list" role="listbox" aria-label="Các lĩnh vực">
+          {visibleCategories.map(category=><button type="button" role="option" aria-selected={selectedCategory?.key===category.key} className={`field-catalog-row${selectedCategory?.key===category.key?' active':''}`} key={category.key} onClick={()=>{setSelectedCategoryKey(category.key);setEditingCategory(false);setShowCategoryHistory(false);setManagingMembers(false);setError('')}}><span>{category.name}</span><b>{category.procedures.length.toLocaleString('vi-VN')}</b></button>)}
+          {!visibleCategories.length&&<p className="field-catalog-no-results">Không có lĩnh vực khớp từ khóa.</p>}
+        </div>
+        {selectedCategory&&<div className="field-catalog-detail">
+          {editingCategory ? <>
+            <div className="catalog-editor-heading"><div><span className="ops-kicker">CHỈNH SỬA LĨNH VỰC · {selectedCategory.procedures.length.toLocaleString('vi-VN')} THỦ TỤC</span><h3>{selectedCategory.name}</h3></div><button type="button" className="text-button" onClick={()=>setEditingCategory(false)}>Hủy</button></div>
+            <p className="catalog-editor-warning">Tên mới áp dụng cho toàn bộ thủ tục trong nhóm. Lịch sử giữ tên cũ; lĩnh vực tham chiếu cần nguồn chính thức, nhóm nội bộ được ghi rõ là nội bộ.</p>
+            <form className="catalog-edit-form" onSubmit={saveCategory}>
+              <label>Tên lĩnh vực<input name="name" defaultValue={selectedCategory.name} required maxLength={180} /></label>
+              <label>{selectedCategory.source==='reference'?'Nguồn chính thức':'Nguồn chính thức nếu đã đối chiếu'}<input name="sourceUrl" type="url" defaultValue={selectedCategory.categoryEdit?.sourceUrl || selectedCategory.procedures.find(item=>item.routing?.officialUrl)?.routing?.officialUrl || ''} required={selectedCategory.source==='reference'} maxLength={600} placeholder="https://...gov.vn/..." /></label>
+              <label>Ngày đối chiếu{selectedCategory.source==='internal'?' nếu có':''}<input name="checkedAt" type="date" defaultValue={selectedCategory.categoryEdit?.checkedAt || (selectedCategory.source==='reference'?new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Ho_Chi_Minh'}).format(new Date()):'')} required={selectedCategory.source==='reference'} /></label>
+              <label>Căn cứ và nội dung đã đối chiếu<textarea name="reason" rows={3} defaultValue={selectedCategory.categoryEdit?.reason || ''} required minLength={20} maxLength={1200} /></label>
+              {error&&<p className="form-error" role="alert">{error}</p>}
+              <div className="catalog-editor-actions"><button className="button primary" disabled={savingCategory}>{savingCategory?'Đang lưu…':'Lưu lĩnh vực nội bộ'}</button></div>
+            </form>
+          </> : <>
+            <div className="field-detail-heading"><div><span className="ops-kicker">THÔNG TIN LĨNH VỰC · {selectedCategory.source==='internal'?'NHÓM NỘI BỘ':'DANH MỤC THAM CHIẾU'}</span><h3>{selectedCategory.name}</h3><p>{selectedCategory.procedures.length.toLocaleString('vi-VN')} thủ tục hiện thuộc lĩnh vực này</p></div>{canManage&&<div className="field-detail-actions"><button className="button secondary" onClick={()=>{setError('');setEditingCategory(true)}}>Sửa tên lĩnh vực</button><button className="button secondary" onClick={()=>{setManagingMembers(open=>!open);setError('')}}>{managingMembers?'Đóng quản lý thủ tục':'Quản lý thủ tục'}</button></div>}</div>
+            {selectedCategory.categoryEdit&&<div className="field-catalog-provenance"><b>{selectedCategory.source==='internal'?'Nhóm lĩnh vực nội bộ':'Phiên bản nội bộ'} {selectedCategory.categoryEdit.version}</b><span>Cập nhật bởi {selectedCategory.categoryEdit.updatedBy} · {toDate(selectedCategory.categoryEdit.updatedAt)}{selectedCategory.source==='reference'?' · cần cơ quan nghiệp vụ xác nhận':' · không phải nhóm phân loại chính thức'}</span><p>{selectedCategory.categoryEdit.reason}</p>{selectedCategory.categoryEdit.sourceUrl&&<a href={selectedCategory.categoryEdit.sourceUrl} target="_blank" rel="noreferrer">Mở nguồn đối chiếu ↗</a>}</div>}
+            <div className="field-member-toolbar"><label>Tìm trong lĩnh vực<input type="search" value={memberQuery} onChange={event=>{setMemberQuery(event.target.value);setMemberPage(1);setSelectedMembers([])}} placeholder="Mã thủ tục hoặc tên thủ tục" /></label><span>{categoryMemberMatches.length.toLocaleString('vi-VN')} / {selectedCategory.procedures.length.toLocaleString('vi-VN')} thủ tục</span></div>
+            {managingMembers&&canManage&&<form className="field-member-manager" onSubmit={moveSelectedMembers}><div className="field-member-selection"><span>Đã chọn {selectedMembers.length.toLocaleString('vi-VN')} thủ tục · chọn trong trang hiện tại</span><div><button type="button" className="text-button" onClick={()=>setSelectedMembers(current=>[...new Set([...current,...categoryMemberShown.map(item=>item.sourceCode||item.code)])])}>Chọn trang này</button><button type="button" className="text-button" onClick={()=>setSelectedMembers(current=>current.filter(code=>!categoryMemberShown.some(item=>(item.sourceCode||item.code)===code)))}>Bỏ chọn trang này</button></div></div><label>Chuyển các thủ tục đã chọn sang lĩnh vực<select value={targetCategoryKey} onChange={event=>setTargetCategoryKey(event.target.value)} required><option value="">Chọn lĩnh vực đích</option>{categories.filter(item=>item.key!==selectedCategory.key).map(item=><option key={item.key} value={item.key}>{item.name} · {item.procedures.length.toLocaleString('vi-VN')}</option>)}</select></label><label>Nguồn chính thức nếu chuyển vào lĩnh vực tham chiếu<input name="sourceUrl" type="url" maxLength={600} placeholder="https://...gov.vn/..." /></label><label>Ngày đối chiếu nếu có<input name="checkedAt" type="date" /></label><label>Căn cứ phân loại và lý do chuyển nhóm<textarea name="reason" required minLength={20} maxLength={1200} rows={2} /></label><button className="button primary" disabled={savingMove||!selectedMembers.length||!targetCategoryKey}>{savingMove?'Đang chuyển…':`Chuyển ${selectedMembers.length.toLocaleString('vi-VN')} thủ tục`}</button></form>}
+            <div className="field-procedure-list"><b>Thủ tục trong lĩnh vực</b>{categoryMemberShown.map(item=><div className="field-procedure-row" key={item.sourceCode||item.code}>{managingMembers&&canManage&&<input type="checkbox" aria-label={`Chọn thủ tục ${item.code}`} checked={selectedMembers.includes(item.sourceCode||item.code)} onChange={event=>setSelectedMembers(current=>event.target.checked?[...current,item.sourceCode||item.code]:current.filter(code=>code!==(item.sourceCode||item.code)))} />}<button type="button" onClick={()=>{const stableCode=item.sourceCode||item.code;setSelectedCode(stableCode);setField(item.field);setMode('all');setQuery('');const group=procedures.filter(value=>value.field===item.field);setPage(Math.floor(group.findIndex(value=>(value.sourceCode||value.code)===stableCode)/pageSize)+1)}}><span><b>{item.code}</b> · {item.name}</span><span aria-hidden="true">›</span></button></div>)}{!categoryMemberShown.length&&<p className="field-catalog-no-results">Lĩnh vực này chưa có thủ tục{memberQuery?' khớp nội dung tìm kiếm':''}. Chọn “Quản lý thủ tục” để phân loại bản ghi vào nhóm.</p>}</div>
+            {categoryMemberPages>1&&<div className="catalog-pagination field-member-pagination"><button className="button secondary" disabled={memberPage<=1} onClick={()=>setMemberPage(value=>Math.max(1,value-1))}>← Trang trước</button><span>Trang {memberPage} / {categoryMemberPages}</span><button className="button secondary" disabled={memberPage>=categoryMemberPages} onClick={()=>setMemberPage(value=>Math.min(categoryMemberPages,value+1))}>Trang sau →</button></div>}
+            {canManage&&<button className="text-button field-history-button" onClick={toggleCategoryHistory}>{showCategoryHistory?'Ẩn lịch sử lĩnh vực':'Xem lịch sử lĩnh vực'}</button>}
+            {showCategoryHistory&&<div className="catalog-history-list">{categoryHistory.length?categoryHistory.map(entry=><article key={`${entry.createdAt}-${entry.actor}`}><b>{String(entry.after.version ?? '—')} · {entry.actor}</b><time>{toDate(entry.createdAt)}</time><p>{entry.reason}</p></article>):<p>Lĩnh vực này chưa có lần chỉnh sửa nội bộ.</p>}</div>}
+            {error&&<p className="form-error" role="alert">{error}</p>}
+          </>}
+        </div>}
+      </div>
+    </section>
+    <section className="panel catalog-controls">
+      <label className="catalog-search"><span>Tìm theo mã, tên, lĩnh vực hoặc cơ quan</span><input className="search-input" type="search" value={query} onChange={e=>{setQuery(e.target.value);setPage(1)}} placeholder="Ví dụ: 2.000908, hộ tịch…" /></label>
+      <label><span>Lĩnh vực</span><select value={field} onChange={e=>{setField(e.target.value);setPage(1)}}><option value="all">Tất cả lĩnh vực</option>{fields.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
+      <label><span>Mức dịch vụ</span><select value={mode} onChange={e=>{setMode(e.target.value);setPage(1)}}><option value="all">Tất cả mức</option><option value="FULL">Toàn trình</option><option value="PARTIAL">Một phần</option><option value="INFORMATION">Cung cấp thông tin</option></select></label>
+      <div className="catalog-count"><b>{filtered.length.toLocaleString('vi-VN')}</b><small>thủ tục phù hợp</small></div>
+    </section>
+    <div className="catalog-layout">
+      <section className="panel catalog-list-panel"><div className="catalog-list-head"><div><span className="ops-kicker">DANH MỤC THAM CHIẾU</span><h2>Kết quả tra cứu</h2><p>Chọn một dòng để xem đầy đủ thông tin khả dụng.</p></div><span>{filtered.length ? `${(page-1)*pageSize+1}–${Math.min(page*pageSize,filtered.length)} / ${filtered.length}` : '0 kết quả'}</span></div>
+        <div className="catalog-list">{shown.map(item=>{const stableCode=item.sourceCode||item.code;const isSelected=(selected?.sourceCode||selected?.code)===stableCode;return <button aria-label={`Xem thông tin thủ tục ${item.code}: ${item.name}`} aria-pressed={isSelected} className={`catalog-row${isSelected?' selected':''}`} key={`${stableCode}-${item.ref}`} onClick={()=>{setSelectedCode(stableCode);setEditing(false);setShowHistory(false);setError('')}}><span className="catalog-row-code">{item.code}</span><span className="catalog-row-main"><b>{item.name}</b><small>{item.field} · {serviceModeLabel(item.level)}</small></span><span className={`catalog-verify ${item.localEdit || item.categoryEdit || item.routing?.status==='catalog-reference-only' || item.routing?.status==='unverified'?'unverified':'verified'}`}>{sourceStatus(item)}</span><span className="row-arrow" aria-hidden="true">›</span></button>})}</div>
+        {filtered.length===0&&<div className="empty-state">Không tìm thấy thủ tục phù hợp. Hãy kiểm tra từ khóa hoặc bỏ bớt bộ lọc.</div>}
+        {filtered.length>pageSize&&<div className="catalog-pagination"><button className="button secondary" disabled={page<=1} onClick={()=>setPage(current=>Math.max(1,current-1))}>← Trước</button><span>Trang {page} / {pageCount}</span><button className="button secondary" disabled={page>=pageCount} onClick={()=>setPage(current=>Math.min(pageCount,current+1))}>Tiếp →</button></div>}
+      </section>
+      <aside className="panel procedure-detail-panel" aria-live="polite">
+        {selected ? editing ? <>
+          <div className="catalog-editor-heading"><div><span className="ops-kicker">CHỈNH SỬA NỘI BỘ</span><h2>{selected.code}</h2></div><button type="button" className="text-button" onClick={()=>setEditing(false)}>Hủy</button></div>
+          <p className="catalog-editor-warning">Mã, tên, lĩnh vực và mức dịch vụ được lưu thành phiên bản nội bộ. Chỉ ghi nguồn và ngày khi đã đối chiếu thật với trang HTTPS thuộc miền .gov.vn hoặc chinhphu.vn; nếu bỏ trống, bản sửa vẫn được đánh dấu cần xác minh.</p>
+          <form className="catalog-edit-form" onSubmit={saveEdit}>
+            <label>Mã thủ tục<input name="code" defaultValue={selected.code} required minLength={2} maxLength={40} autoCapitalize="characters" /></label>
+            <label>Tên thủ tục<input name="name" defaultValue={selected.name} required maxLength={500} /></label>
+            <label>Lĩnh vực / danh mục<select name="categoryKey" defaultValue={selected.categoryKey || selected.field} required>{categories.map(category=><option key={category.key} value={category.key}>{category.name}{category.source==='internal'?' · nội bộ':''}</option>)}</select></label>
+            <label>Mức dịch vụ<select name="level" defaultValue={selected.level} required><option value="Toàn trình">Toàn trình</option><option value="Một phần">Một phần</option><option value="Cung cấp thông tin">Cung cấp thông tin</option></select></label>
+            <label>Cơ quan thực hiện theo nguồn<input name="agency" defaultValue={selected.agency} required maxLength={300} /></label>
+            <label>Nguồn chính thức nếu đã đối chiếu<input name="sourceUrl" type="url" defaultValue={selected.localEdit?.sourceUrl || selected.routing?.officialUrl || ''} maxLength={600} placeholder="https://...gov.vn/..." /></label>
+            <label>Ngày đối chiếu nếu có<input name="checkedAt" type="date" defaultValue={selected.localEdit?.checkedAt || selected.routing?.checkedAt || ''} /></label>
+            <label>Căn cứ và nội dung đã đối chiếu<textarea name="reason" rows={3} defaultValue={selected.localEdit?.reason || ''} required minLength={20} maxLength={1200} /></label>
+            {error&&<p className="form-error" role="alert">{error}</p>}
+            <div className="catalog-editor-actions"><button className="button primary" disabled={saving}>{saving?'Đang lưu…':'Lưu phiên bản nội bộ'}</button></div>
+          </form>
+        </> : <>
+          <div className="procedure-detail-heading"><div><span className="ops-kicker">THÔNG TIN THỦ TỤC</span><small className="procedure-detail-code">Mã đang dùng: {selected.code}{selected.ref ? ` · Mã bản ghi tham chiếu: ${selected.ref}` : ''}{selected.sourceCode&&selected.sourceCode!==selected.code?` · Mã nguồn: ${selected.sourceCode}`:''}</small></div>{canManage&&<button className="button secondary" onClick={startEdit}>Chỉnh sửa</button>}</div>
+          <h2>{selected.name}</h2>
+          <dl className="procedure-facts"><div><dt>Lĩnh vực</dt><dd>{selected.field || 'Chưa xác định'}</dd></div><div><dt>Mức dịch vụ</dt><dd>{serviceModeLabel(selected.level)}</dd></div><div><dt>Cơ quan trong bản tham chiếu</dt><dd>{selected.agency || 'Chưa xác định'}</dd></div><div><dt>Mã bản ghi</dt><dd>{selected.ref || 'Không có mã tham chiếu trong tệp nguồn'}</dd></div></dl>
+          {selected.submission ? <section className="procedure-form-detail"><h3>{selected.submission.title}</h3><p><b>Căn cứ pháp lý:</b> {selected.submission.legalBasis}</p><p><b>Thời hạn:</b> {selected.submission.deadlineText}</p><p><b>Phí:</b> {selected.submission.feeText}</p><div className="procedure-requirement-list"><b>Trường khai báo và giấy tờ đã cấu hình</b>{[...selected.submission.fields,...selected.submission.documents].slice(0,12).map((entry,index)=><div key={`${entry.id}-${index}`}><span>{entry.label}</span><small>{entry.required?'Bắt buộc':'Tùy trường hợp / không bắt buộc'}</small></div>)}{selected.submission.fields.length+selected.submission.documents.length>12&&<small>Hiển thị 12 mục đầu; biểu mẫu trong bước nộp hồ sơ có toàn bộ trường và điều kiện.</small>}</div><a className="source-link text-link" href={selected.submission.sourceUrl} target="_blank" rel="noreferrer">Mở nguồn thủ tục ↗</a>{selected.submission.formSourceUrl&&<a className="source-link text-link" href={selected.submission.formSourceUrl} target="_blank" rel="noreferrer">Mở nguồn biểu mẫu ↗</a>}</section> : <div className="routing-evidence warning"><b>Chưa cấu hình biểu mẫu tiếp nhận trong ứng dụng</b><p>Danh mục có thông tin tham chiếu nhưng chưa đủ căn cứ để nhận hồ sơ điện tử cho thủ tục này. Ứng dụng sẽ không tự dựng tờ khai hoặc thành phần hồ sơ còn thiếu.</p></div>}
+          <div className={`routing-evidence ${selected.localEdit || selected.categoryEdit || selected.routing?.status==='catalog-reference-only' || selected.routing?.status==='unverified'?'warning':'confirmed'}`}><b>{sourceStatus(selected)}</b><p>{selected.localEdit ? `Đã cập nhật tại ứng dụng bởi ${selected.localEdit.updatedBy}, phiên bản ${selected.localEdit.version}. Cần cơ quan nghiệp vụ đối chiếu trước khi dùng.` : selected.categoryEdit ? `Lĩnh vực được cập nhật nội bộ bởi ${selected.categoryEdit.updatedBy}, phiên bản ${selected.categoryEdit.version}. Cần cơ quan nghiệp vụ đối chiếu trước khi dùng.` : selected.routing?.summary || 'Bản ghi lấy từ danh mục tham chiếu; cần chọn địa bàn/cơ quan và xác minh trên Cổng quốc gia trước khi hướng dẫn giao dịch.'}</p>{selected.localEdit&&<small>Ngày đối chiếu khai báo: {toDate(selected.localEdit.checkedAt)} · Lưu lúc {toDate(selected.localEdit.updatedAt)}</small>}{selected.categoryEdit&&<small>Ngày đối chiếu khai báo: {toDate(selected.categoryEdit.checkedAt)} · Lưu lúc {toDate(selected.categoryEdit.updatedAt)}</small>}{selected.routing?.checkedAt&&!selected.localEdit&&!selected.categoryEdit&&<small>Mốc đối chiếu: {toDate(selected.routing.checkedAt)}</small>}</div>
+          {(selected.localEdit?.sourceUrl || selected.categoryEdit?.sourceUrl || selected.routing?.officialUrl)&&<a className="button secondary source-link" href={selected.localEdit?.sourceUrl || selected.categoryEdit?.sourceUrl || selected.routing?.officialUrl} target="_blank" rel="noreferrer">Mở nguồn công khai ↗</a>}
+          {canManage&&<div className="catalog-history-control"><button className="text-button" onClick={toggleHistory}>{showHistory?'Ẩn lịch sử':'Xem lịch sử chỉnh sửa'}</button>{showHistory&&<div className="catalog-history-list">{history.length?history.map(entry=><article key={`${entry.createdAt}-${entry.actor}`}><b>Phiên bản {String(entry.after.version ?? '—')} · {entry.actor}</b><time>{toDate(entry.createdAt)}</time><p>{entry.reason}</p></article>):<p>Thủ tục này chưa có lần chỉnh sửa nội bộ.</p>}</div>}</div>}
+        </> : <div className="catalog-placeholder"><h2>Chưa có thủ tục phù hợp</h2><p>Thay điều kiện tìm kiếm để xem chi tiết bản ghi.</p></div>}
+        {notice&&!editing&&<p className="form-notice" role="status">{notice}</p>}
+      </aside>
+    </div>
   </div>
 }
 
@@ -1146,15 +1529,19 @@ function ServiceConnections({ data, onNavigate }: { data: Bootstrap; onNavigate:
   const errorCount = outbox.filter(item=>item.status==='ERROR').length
   const pendingCount = outbox.filter(item=>item.status==='PENDING').length
   const services = [
-    { name:'Cổng Dịch vụ công quốc gia', category:'Tiếp nhận và trao đổi hồ sơ', state:'Chưa cấu hình', detail:'Ứng dụng hướng người dân sang cổng chính thức; chưa có thông tin xác thực hoặc hợp đồng API để nhận hồ sơ trực tiếp.' },
-    { name:'Dịch vụ ký số', category:'Ký và xác minh kết quả', state:'Chưa cấu hình', detail:'Chưa cấu hình nhà cung cấp, chứng thư, môi trường ký hoặc quy trình xác minh chữ ký.' },
-    { name:'Thanh toán và hoàn phí', category:'Thu, đối soát và hoàn', state:'Chưa cấu hình', detail:'Không tạo giao dịch hoặc trạng thái đã thu khi chưa có phản hồi xác thực từ đối tác thanh toán.' },
-    { name:'Thông báo và giao kết quả', category:'Thông báo, bưu chính, kho nhận', state:'Chưa cấu hình', detail:'Chưa có kênh gửi và biên nhận từ nhà cung cấp; thông báo gửi không được coi là bằng chứng đã giao.' },
+    { name:'Cổng Dịch vụ công quốc gia', category:'Tiếp nhận và trao đổi hồ sơ', detail:'Ứng dụng hiện hướng người dân tới cổng chính thức, chưa nhận hồ sơ trực tiếp từ Cổng quốc gia.', prerequisites:['Hợp đồng/API được cơ quan đầu mối cấp','Thông tin xác thực và môi trường kiểm thử','Quy tắc đối soát mã hồ sơ và trạng thái'] },
+    { name:'Dịch vụ ký số', category:'Ký và xác minh kết quả', detail:'Chưa gửi yêu cầu ký hoặc phát hành văn bản ra bên ngoài.', prerequisites:['Nhà cung cấp và chứng thư số được phê duyệt','Môi trường ký thử, quy trình ký và xác minh','Thẩm quyền ký và nhật ký bàn giao'] },
+    { name:'Thanh toán và hoàn phí', category:'Thu, đối soát và hoàn', detail:'Không tạo giao dịch và không ghi nhận đã thu khi chưa có phản hồi xác thực.', prerequisites:['Đơn vị trung gian thanh toán được chấp thuận','API, khóa bí mật và cấu hình đối soát','Quy trình xử lý giao dịch lỗi/hoàn tiền'] },
+    { name:'Thông báo và giao kết quả', category:'Thông báo, bưu chính, kho nhận', detail:'Ứng dụng chưa gửi SMS, email, bưu chính hoặc xác nhận giao kết quả.', prerequisites:['Nhà cung cấp và tài khoản gửi được phê duyệt','Mẫu thông điệp, kênh nhận và chính sách bảo vệ dữ liệu','Biên nhận giao nhận có thể đối soát'] },
   ]
-  return <div className="connections-workspace"><section className="panel connection-state-banner"><div><span className="ops-kicker">TRẠNG THÁI MÔI TRƯỜNG</span><h2>Hệ thống độc lập</h2><p>Hồ sơ, tài khoản và sự kiện được lưu trong cơ sở dữ liệu của ứng dụng. Chưa kết nối Cổng quốc gia, SSO, thanh toán hoặc ký số.</p></div><span className="environment-badge">Đang hoạt động cục bộ</span></section>
-    <div className="integration-cards">{services.map(service=><article className="panel integration-card" key={service.name}><div className="integration-card-top"><span className="integration-icon">⇄</span><span className="connection-badge">{service.state}</span></div><span className="ops-kicker">{service.category}</span><h3>{service.name}</h3><p>{service.detail}</p><div className="integration-card-foot"><span>Không phát sinh giao dịch ngoài</span><b>Chưa mở thao tác</b></div></article>)}</div>
-    <section className="panel integration-summary"><PanelHeading kicker="THEO DÕI TÁC VỤ" title="Hàng chờ dữ liệu" description="Chỉ hiển thị mã hồ sơ, trạng thái lưu trong ứng dụng và số lần thử đã ghi nhận." action={<button className="text-button" onClick={()=>onNavigate('monitoring')}>Xem chỉ số vận hành →</button>} /><div className="outbox-summary"><MetricCard label="Hồ sơ trong hàng chờ" value={outbox.length} note="Mã bản ghi được trả về từ ứng dụng" tone="navy"/><MetricCard label="Đang chờ" value={pendingCount} note="Chưa có xác nhận đích nhận" tone="amber"/><MetricCard label="Có lỗi" value={errorCount} note="Cần xem lại trạng thái ghi nhận" tone="red"/></div>{outbox.length ? <div className="outbox-list">{outbox.map(row=><div className="outbox-row" key={row.code}><b>{row.code}</b><span>{row.status}</span><span>{row.attempts} lần thử</span><small>{row.lastError||'Bản ghi hàng chờ cục bộ; chưa phải xác nhận giao nhận bên ngoài.'}</small></div>)}</div> : <div className="empty-state compact-empty">Chưa có thông điệp trong hàng chờ của tài khoản.</div>}</section>
-    <section className="panel integration-boundary"><b>Nguyên tắc an toàn</b><p>Nếu cần kết nối hệ thống thật, phải có đầu mối được ủy quyền, hợp đồng giao tiếp, thông tin xác thực môi trường thử, quy tắc chống gửi lặp và biên bản đối soát. Giao diện không cho phép người dùng tự bật một kết nối chưa được phê duyệt.</p></section>
+  const storage = data.storage
+  return <div className="connections-workspace">
+    <section className="panel connection-state-banner"><div><span className="ops-kicker">KẾT NỐI NỘI BỘ</span><h2>{storage?.database==='connected'?'API và cơ sở dữ liệu đang hoạt động':'Chưa xác nhận được kết nối cơ sở dữ liệu'}</h2><p>{storage?.database==='connected'?'Dữ liệu dưới đây vừa được đọc từ máy chủ ứng dụng và SQLite cục bộ. Đây là kết nối nội bộ, không đồng nghĩa với liên thông hệ thống Chính phủ.':'Không đọc được trạng thái từ máy chủ. Tải lại dữ liệu hoặc kiểm tra tiến trình backend.'}</p></div><span className={`environment-badge ${storage?.database==='connected'?'environment-connected':'environment-disconnected'}`}>{storage?.database==='connected'?'Đã kết nối nội bộ':'Mất kết nối'}</span></section>
+    <section className="local-data-grid" aria-label="Dữ liệu đang lưu cục bộ"><article><span>Thủ tục tham chiếu</span><b>{(storage?.procedureCount ?? data.procedures.length).toLocaleString('vi-VN')}</b><small>Tệp danh mục trong dự án; chưa đồng bộ trực tuyến</small><button className="text-button" onClick={()=>onNavigate('procedures')}>Mở danh mục và chi tiết →</button></article><article><span>Hồ sơ đã lưu</span><b>{(storage?.caseRecords ?? data.cases.length).toLocaleString('vi-VN')}</b><small>{storage?.caseCountScope || 'Phạm vi được cấp'} · cơ sở dữ liệu hiện tại</small><a className="text-link" href="/nop-ho-so">Mở luồng nộp hồ sơ →</a></article><article><span>Tin đang công khai</span><b>{(storage?.publishedNews ?? 0).toLocaleString('vi-VN')}</b><small>Nội dung đã lưu tại ứng dụng</small></article></section>
+    <section className="panel external-boundary"><h2>Các dịch vụ bên ngoài</h2><p>Các kết nối này chưa được thiết lập. Cần hợp đồng, thông tin truy cập và quy trình kiểm thử do cơ quan/nhà cung cấp cấp; ứng dụng không tự dò hoặc giả lập kết nối thật.</p></section>
+    <div className="integration-cards">{services.map(service=><article className="panel integration-card" key={service.name}><div className="integration-card-top"><span className="ops-kicker">{service.category}</span><span className="connection-state-text">Chưa kết nối</span></div><h3>{service.name}</h3><p>{service.detail}</p><div className="integration-prerequisites"><b>Điều kiện cần cấu hình</b><ul>{service.prerequisites.map(item=><li key={item}>{item}</li>)}</ul></div></article>)}</div>
+    <section className="panel integration-summary"><PanelHeading kicker="THEO DÕI TÁC VỤ" title="Hàng chờ đồng bộ bên ngoài" description="Các mục chỉ xuất hiện khi ứng dụng đã ghi nhận tác vụ. Chúng không thay thế biên nhận từ hệ thống đích." action={<button className="text-button" onClick={()=>onNavigate('monitoring')}>Mở giám sát quy trình →</button>} /><div className="outbox-summary"><MetricCard label="Tổng tác vụ" value={outbox.length} note="Bản ghi hàng chờ đọc từ ứng dụng" tone="navy"/><MetricCard label="Đang chờ" value={pendingCount} note="Chưa được bên nhận xác nhận" tone="amber"/><MetricCard label="Có lỗi" value={errorCount} note="Cần xem lại chi tiết tác vụ" tone="red"/></div>{outbox.length ? <div className="outbox-list">{outbox.map(row=><div className="outbox-row" key={row.code}><b>{row.code}</b><span>{row.status}</span><span>{row.attempts} lần thử</span><small>{row.lastError||'Bản ghi hàng chờ cục bộ; chưa phải xác nhận giao nhận bên ngoài.'}</small></div>)}</div> : <div className="connection-empty-state"><b>Chưa có tác vụ đồng bộ</b><p>Hiện chưa có dịch vụ ngoài nào được kết nối để nhận hồ sơ hoặc phản hồi trạng thái.</p></div>}</section>
+    <section className="panel integration-boundary"><b>Điều kiện mở kết nối</b><p>Đơn vị quản lý cần cấp đầu mối, hợp đồng giao tiếp, thông tin xác thực môi trường thử, quy tắc chống gửi lặp và quy trình đối soát. Sau khi có các căn cứ này mới có thể cấu hình và kiểm thử từng dịch vụ.</p></section>
   </div>
 }
 function StaffLookupKey({ item, onChanged }: { item: CaseFile; onChanged: () => Promise<void> }) {
@@ -1189,6 +1576,7 @@ function CaseDetail({ item, isStaff, signingAuthorityRef, labels, actionOptions,
     <section className="panel detail-main">
       <button className="back-link" onClick={onBack}>← Quay lại danh sách</button>
       <div className="detail-heading"><div><span className="eyebrow">{item.procedureCode} · {item.code}</span><h2>{item.procedure?.name}</h2></div><span className={`status-pill status-${item.status}`}>{labels[item.status] || item.status}</span></div>
+      {item.sampleData && <aside className="sample-data-notice case-sample-note" role="note"><b>Hồ sơ tình huống mô phỏng</b><span>{item.sampleDataNote || 'Thông tin được tạo để thực hành; không phải hồ sơ thật và không có giá trị pháp lý hoặc báo cáo chính thức.'}</span></aside>}
       {isStaff && item.canManageLookupKey && <StaffLookupKey key={item.code} item={item} onChanged={onLookupKeyChanged} />}
       <div className="detail-facts"><div><small>Người nộp</small><b>{item.applicant?.name}</b></div><div><small>Ngày gửi</small><b>{toDate(item.createdAt)}</b></div><div><small>Thời hạn</small><b>{item.deadline ? toDate(item.deadline) : item.deadlineNote || 'Chưa xác định'}</b></div><div><small>Người có thông tin</small><b>{item.subject?.name}</b></div></div>
       <CaseDeclaration item={item} />

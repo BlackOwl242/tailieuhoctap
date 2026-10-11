@@ -40,7 +40,7 @@ Chưa có căn cứ xác nhận tương đồng 100% với hệ thống tác ngh
 
 ## Kiểm tra
 
-21 bài kiểm tra tự động đã chạy đạt trên dữ liệu tạm, gồm API, phân quyền, thao tác hồ sơ, tờ khai, giấy tờ, phân loại dịch vụ, hạn giải quyết, tiến độ theo sự kiện, tài khoản và khóa tra cứu mã hóa. TypeScript, lint và bản dựng frontend chạy thành công. Trình duyệt đã kiểm tra luồng chọn cơ quan, khai người nộp, chuyển trường trong nước/nước ngoài và chặn thiếu Mẫu 03. Kết quả này kiểm tra ứng dụng hiện có, không phải nghiệm thu toàn bộ thủ tục hoặc hạ tầng của cơ quan nhà nước.
+23 bài kiểm tra tự động đã chạy đạt trên dữ liệu tạm, gồm API, phân quyền, thao tác hồ sơ, tờ khai, giấy tờ, phân loại dịch vụ, hạn giải quyết, tiến độ theo sự kiện, tài khoản và khóa tra cứu mã hóa. TypeScript, lint và bản dựng frontend chạy thành công. Trình duyệt đã kiểm tra luồng chọn cơ quan, khai người nộp, chuyển trường trong nước/nước ngoài và chặn thiếu Mẫu 03. Kết quả này kiểm tra ứng dụng hiện có, không phải nghiệm thu toàn bộ thủ tục hoặc hạ tầng của cơ quan nhà nước.
 
 ## Bổ sung thông tin người nộp và ký hiệu trường cần điền
 

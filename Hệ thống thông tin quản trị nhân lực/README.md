@@ -18,12 +18,15 @@ git clone <repo-url> && cd <repo>
 docker compose up -d          # build + khởi động db/api/web (lần đầu ~3-6 phút do pull ảnh)
 ```
 
+Trên Windows, có thể nhấp đúp `Khoi_dong_HRMIS.bat`. File sẽ kiểm tra Docker Compose,
+build và khởi động cùng stack `kms` trong thư mục này, đợi giao diện sẵn sàng rồi mở
+trình duyệt. Nếu Docker Desktop chưa chạy, hãy mở ứng dụng đó và chạy lại file. Để dừng
+hệ thống, chạy `docker compose down` trong thư mục dự án; dữ liệu vẫn được giữ.
+
 Mở **http://localhost:8080** và đăng nhập:
 
 | Vai trò                       | Họ tên & Chức danh / Đơn vị | Email                    | Mật khẩu      |
 | ----------------------------- | --------------------------- | ------------------------ | ------------- |
-| Cấp / vai trò | Đại diện | Email | Mật khẩu |
-| --- | --- | --- | --- |
 | Quản trị CNTT — `ADMIN` | Nguyễn Hoàng Nam, Phòng CNTT | `admin@demo.local` | `Admin@123` |
 | Ban điều hành — `BOD` | Trần Minh Hoàng, Tổng Giám đốc | `ceo@saigontechnology.vn` | `Admin@123` |
 | Cổ đông / HĐQT — `SHAREHOLDER` + `BOD` | Phạm Tiến Thành, Chủ tịch HĐQT | `chairman@saigontechnology.vn` | `Admin@123` |
