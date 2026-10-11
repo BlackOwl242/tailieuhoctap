@@ -36,7 +36,7 @@ Bảng 1.1: Câu hỏi nghiên cứu và sản phẩm đối chiếu
 
 Các nền tảng quốc gia, hệ thống giải quyết thủ tục của bộ, cơ sở dữ liệu chuyên ngành, thanh toán, chuyển phát và lưu trữ là những đầu mối liên quan. Báo cáo xác định trách nhiệm, dữ liệu trao đổi và xử lý thất bại tại điểm kết nối; không suy đoán cấu trúc lưu trữ bên trong của các đầu mối này.
 
-Phạm vi thời gian của việc rà soát nguồn là đến ngày 02/10/2026. Các nguồn có thời điểm ban hành khác nhau được ghi riêng để tránh gộp hiện trạng trước và sau đợt chuyển đổi năm 2025. Hồ sơ nội bộ, quyền truy cập cán bộ, cấu hình vận hành, nhật ký máy chủ và số liệu kiểm thử thực tế chưa được cung cấp. Do đó, báo cáo không kết luận về nhà cung cấp tường lửa, số lượng vi dịch vụ, dung lượng máy chủ hoặc mức độ sẵn sàng thực tế.
+Các nguồn có thời điểm ban hành khác nhau được ghi riêng để tránh gộp hiện trạng trước và sau đợt chuyển đổi năm 2025. Hồ sơ nội bộ, quyền truy cập cán bộ, cấu hình vận hành, nhật ký máy chủ và số liệu kiểm thử thực tế chưa được cung cấp. Do đó, báo cáo không kết luận về nhà cung cấp tường lửa, số lượng vi dịch vụ, dung lượng máy chủ hoặc mức độ sẵn sàng thực tế.
 
 Bảng 1.2: Phân định phạm vi nghiên cứu
 

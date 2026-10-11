@@ -34,7 +34,9 @@
     "tai_lieu_huong_dan": "TaiLieuHuongDan",
     "tai_lieu_kho": "TaiLieuKho",
     "quyen_khai_thac_kho": "QuyenKhaiThacKho",
-    "chi_dao_dieu_hanh": "ChiDaoDieuHanh"
+    "chi_dao_dieu_hanh": "ChiDaoDieuHanh",
+    "yeu_cau_dung": "YeuCauDung",
+    "su_kien_quyen_ky_mau06": "SuKienQuyenKyMau06"
   },
   "parts": {
     "1": [
@@ -61,7 +63,9 @@
       "phan_cong",
       "su_kien_xu_ly",
       "yeu_cau_bo_sung",
-      "nhiem_vu_phoi_hop"
+      "nhiem_vu_phoi_hop",
+      "yeu_cau_dung",
+      "su_kien_quyen_ky_mau06"
     ],
     "5": [
       "thong_bao",
@@ -137,7 +141,15 @@
       [
         "su_kien_xu_ly",
         "yeu_cau_bo_sung",
-        "nhiem_vu_phoi_hop"
+        "nhiem_vu_phoi_hop",
+        "yeu_cau_dung"
+      ]
+    ],
+    [
+      4,
+      "lop_nhom_4_3",
+      [
+        "su_kien_quyen_ky_mau06"
       ]
     ],
     [

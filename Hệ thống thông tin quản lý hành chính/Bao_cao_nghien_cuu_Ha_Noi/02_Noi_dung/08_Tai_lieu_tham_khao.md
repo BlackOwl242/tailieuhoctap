@@ -1,6 +1,6 @@
 # TÀI LIỆU THAM KHẢO
 
-[1] Trung tâm Phục vụ hành chính công thành phố Hà Nội (2025), Thông báo thực hiện thủ tục hành chính trên Cổng Dịch vụ công quốc gia từ ngày 01/07/2025; đối chiếu thông báo tại dichvucong.hanoi.gov.vn. Truy cập ngày 01/10/2026. https://ttpvhcc.hanoi.gov.vn/tien-ich-cong-dan/tu-ngay-01-07-2025-nguoi-dan-thuc-hien-thu-tuc-hanh-chinh-tren-dia-ban-thanh-pho-ha-noi-se-thuc-hien-tren-cong-dich-vu-cong-quoc-gia-2850250629165651829.htm
+[1] Trung tâm Phục vụ hành chính công thành phố Hà Nội (2025), Thông báo thực hiện thủ tục hành chính trên Cổng Dịch vụ công quốc gia từ ngày 01/07/2025; đối chiếu thông báo tại dichvucong.hanoi.gov.vn. https://ttpvhcc.hanoi.gov.vn/tien-ich-cong-dan/tu-ngay-01-07-2025-nguoi-dan-thuc-hien-thu-tuc-hanh-chinh-tren-dia-ban-thanh-pho-ha-noi-se-thuc-hien-tren-cong-dich-vu-cong-quoc-gia-2850250629165651829.htm
 
 [2] Trung tâm Phục vụ hành chính công thành phố Hà Nội (2025), Quyết định 1811/QĐ-TTPVHCC ngày 24/12/2025 và Phương án tái cấu trúc thủ tục cấp bản sao trích lục hộ tịch, bản sao giấy khai sinh. Bản phương án, phần A, B, C, D và phụ lục. https://vanban.hanoi.gov.vn/chi-tiet-van-ban/ve-viec-phe-duyet-phuong-an-tai-cau-truc-thu-tuc-hanh-chinh-cap-ban-sao-trich-luc-ho-tich-ban-sao-g-230492
 
@@ -20,13 +20,13 @@
 
 [10] Thủ tướng Chính phủ (2022), Quyết định 766/QĐ-TTg ngày 23/06/2022 phê duyệt Bộ chỉ số chỉ đạo, điều hành và đánh giá chất lượng phục vụ người dân, doanh nghiệp trong thực hiện thủ tục hành chính, dịch vụ công theo thời gian thực trên môi trường điện tử. https://congbao.chinhphu.vn/van-ban-dang-cong-bao/thu-tuong-chinh-phu-c2/trang-101.htm
 
-[11] W3C (2024), Web Content Accessibility Guidelines 2.2. Tài liệu kỹ thuật tham chiếu cho các tiêu chí tiếp cận của thiết kế; truy cập ngày 01/10/2026. https://www.w3.org/TR/WCAG22/
+[11] W3C (2024), Web Content Accessibility Guidelines 2.2. Tài liệu kỹ thuật tham chiếu cho các tiêu chí tiếp cận của thiết kế. https://www.w3.org/TR/WCAG22/
 
-[12] OWASP Foundation, Application Security Verification Standard. Danh mục tham chiếu phục vụ lập kế hoạch kiểm tra an toàn; truy cập ngày 01/10/2026. https://owasp.org/projects/asvs
+[12] OWASP Foundation, Application Security Verification Standard. Danh mục tham chiếu phục vụ lập kế hoạch kiểm tra an toàn. https://owasp.org/projects/asvs
 
-[13] Cổng Dịch vụ công quốc gia, dữ liệu công bố thủ tục mã 2.000635. Nguồn đối chiếu tên thủ tục và sự khác nhau giữa phiên bản theo cơ quan, không thay thế phương án tại Sở Tư pháp. Truy cập ngày 01/10/2026. https://thutuc.dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=100119
+[13] Cổng Dịch vụ công quốc gia, dữ liệu công bố thủ tục mã 2.000635. Nguồn đối chiếu tên thủ tục và sự khác nhau giữa phiên bản theo cơ quan, không thay thế phương án tại Sở Tư pháp. https://thutuc.dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=100119
 
-[14] Cơ sở dữ liệu quốc gia về văn bản pháp luật, Lịch sử hiệu lực Nghị định 45/2020/NĐ-CP. Truy cập ngày 01/10/2026. https://vbpl.vn/vanphongchinhphu/Pages/vbpq-lichsu.aspx?ItemID=141950
+[14] Cơ sở dữ liệu quốc gia về văn bản pháp luật, Lịch sử hiệu lực Nghị định 45/2020/NĐ-CP. https://vbpl.vn/vanphongchinhphu/Pages/vbpq-lichsu.aspx?ItemID=141950
 
 [15] Cổng Thông tin điện tử Chính phủ (2023), Hoàn thành 25/25 dịch vụ công thiết yếu theo đúng lộ trình Đề án 06, ngày 03/07/2023. Nguồn ghi hệ thống Hà Nội vận hành từ ngày 11/04/2023. https://thanglong.chinhphu.vn/hoan-thanh-25-25-dich-vu-cong-thiet-yeu-theo-dung-lo-trinh-de-an-06-10323070313374254.htm
 
@@ -60,6 +60,34 @@
 
 [30] Cổng Thông tin điện tử thành phố Hà Nội (2024), Hà Nội hướng tới xây dựng chính quyền số, chính quyền phục vụ, ngày 17/04/2024. Thông tin lịch sử về triển khai và kết nối hệ thống, không thay thế hiện trạng năm 2026. https://hanoi.gov.vn/tin-tuc-su-kien-noi-bat/ha-noi-huong-toi-xay-dung-chinh-quyen-so-chinh-quyen-phuc-vu-42862896.htm
 
-[31] Hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội, địa chỉ công khai và tiêu đề trang; kiểm tra ngày 02/10/2026. Bản tải nhận diện tên và địa chỉ, không xác nhận các chức năng sau đăng nhập. https://dichvucong.hanoi.gov.vn/
+[31] Hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội, địa chỉ công khai và tiêu đề trang. Bản tải nhận diện tên và địa chỉ, không xác nhận các chức năng sau đăng nhập. https://dichvucong.hanoi.gov.vn/
 
-Các nguồn bổ sung [15] đến [30] được truy cập trong ngày 01/10/2026 và đối chiếu khi hoàn thiện báo cáo ngày 02/10/2026; nguồn [31] được tải ngày 02/10/2026. Bản tải, văn bản trích và dấu kiểm tra tệp được lưu trong hồ sơ nguồn. Ngày truy cập không được dùng thay ngày ban hành hoặc ngày có hiệu lực.
+[32] Trung tâm Phục vụ hành chính công thành phố Hà Nội, Trang thông tin điện tử Trung tâm; đối chiếu mục điều hướng, tiện ích trực tuyến và các khu vực thông tin công khai. https://ttpvhcc.hanoi.gov.vn/trang-chu
+
+[33] Cổng Dịch vụ công quốc gia, Trang chủ; đối chiếu điều hướng, nhóm dịch vụ, thanh toán, phản ánh và đánh giá. https://dichvucong.gov.vn/
+
+[34] Cổng Dịch vụ công quốc gia, Trang đăng nhập/đăng ký; phân biệt phương thức xác thực VNeID cho công dân với tài khoản Cổng quốc gia của tổ chức, doanh nghiệp. https://dangky.dichvucong.gov.vn/
+
+[35] Cổng Dịch vụ công quốc gia, Bản ghi “Thủ tục cấp bản sao từ sổ gốc DVCTT toàn trình”; hiển thị sau khi chọn Thành phố Hà Nội và Phường Tây Hồ. Đây là bản ghi theo một thủ tục và địa bàn được chọn, không đại diện cho toàn bộ Hà Nội. https://dichvucong.gov.vn/tim-kiem-thu-tuc-hanh-chinh?formalityId=019d2bfd-8e5d-72f9-8cf2-c71780251483&searchType=PROVINCE&province=019bad30-cd82-76ed-b1cc-14070f806e01&provinceCode=01&wardCode=00103&agency=019bad30-cd82-76ed-b1cc-3538098faf4b&commune=WARD&showAdvanced=false&isProvince=0&isMinistry=0
+
+[36] Cổng Dịch vụ công quốc gia, kết quả chỉ mục tìm kiếm cho mã 2.000635.H17, `ma_thu_tuc=182694`; trích lục công khai nêu cấp xã, Quyết định 386/QĐ-UBND, mức 8.000 đồng/bản sao và xử lý trong ngày. Trang chi tiết trực tiếp trả 503, nên chỉ dùng làm dấu vết tra cứu, chưa xác nhận tuyến hiện hành tại Hà Nội. https://thutuc.dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=182694
+
+[37] Chính phủ (2026), Nghị định 309/2026/NĐ-CP ngày 05/08/2026 sửa đổi Nghị định 118/2025/NĐ-CP. Hiệu lực từ 05/08/2026; nguồn chính thức về Cổng Dịch vụ công quốc gia, tái sử dụng dữ liệu và hướng dẫn hồ sơ đầu vào. https://vanban.chinhphu.vn/?docid=219100&pageid=27160
+
+[38] Chính phủ (2026), Nghị định 310/2026/NĐ-CP ngày 05/08/2026 sửa đổi quy định về giao dịch thủ tục hành chính trên môi trường điện tử; hiệu lực từ 05/08/2026. https://vanban.chinhphu.vn/?classid=1&docid=219101&pageid=27160
+
+[39] Bộ Tư pháp (2026), Thông tư 13/2026/TT-BTP ngày 30/09/2026, có hiệu lực từ 10/10/2026; gồm quy trình một cửa, khai thác dữ liệu, chuẩn hóa quy trình điện tử và bộ biểu mẫu mới tại Phụ lục I; bãi bỏ một phần Thông tư 03/2025/TT-VPCP. https://vanban.chinhphu.vn/?docid=219795&pageid=27160
+
+[40] Bộ Tư pháp (2026), Thông tư 14/2026/TT-BTP ngày 30/09/2026, có hiệu lực từ 10/10/2026; hướng dẫn số hóa hồ sơ, kết quả và tái cấu trúc thủ tục hành chính trên môi trường điện tử. https://vanban.chinhphu.vn/?docid=219796&pageid=27160&typegroupid=6
+
+[41] Trung tâm Phục vụ hành chính công thành phố Hà Nội (2025), Quyết định 2265/QĐ-TTPVHCC ngày 29/12/2025, phụ lục quy trình QT-01 đến QT-11 cho chi nhánh/điểm hỗ trợ. Bản PDF do Hà Nội công bố; trường ngày hiệu lực trên một số quy trình để trống nên cần đối chiếu bản vận hành hiện tại. https://datafiles.hanoi.gov.vn/gov-hni/6847/VanBan/2026/1/8/Q%C4%90-TTPVHCC-2265-2025-PL.pdf
+
+[42] UBND thành phố Hà Nội (2025), Quyết định 6470/QĐ-UBND ngày 26/12/2025 quy định chức năng, nhiệm vụ, quyền hạn và cơ cấu tổ chức Trung tâm Phục vụ hành chính công thành phố Hà Nội; trang chức năng, nhiệm vụ của Trung tâm. https://ttpvhcc.hanoi.gov.vn/chuc-nang-nhiem-vu
+
+[43] Thủ tướng Chính phủ (2026), Quyết định 29/2026/QĐ-TTg về Quy chế quản lý, vận hành, khai thác Cổng Dịch vụ công quốc gia; có hiệu lực từ 20/07/2026. https://vanban.chinhphu.vn/?docid=218352&orggroupid=3&pageid=27160
+
+[44] Trung tâm Phục vụ hành chính công thành phố Hà Nội (2026), “Nâng cao nghiệp vụ, chuẩn hóa quy trình phục vụ hành chính công”, mô tả hành trình phục vụ và chuẩn hóa quy trình nghiệp vụ. https://ttpvhcc.hanoi.gov.vn/hoat-dong-cua-trung-tam/nang-cao-nghiep-vu-chuan-hoa-quy-trinh-phuc-vu-hanh-chinh-cong-285026032121304981.htm
+
+[45] Trung tâm Phục vụ hành chính công thành phố Hà Nội (2025), “Hà Nội ban hành quy định mới về chức năng, nhiệm vụ các phòng thuộc Trung tâm Phục vụ hành chính công”, thông tin về tổ chức một cửa, kiểm tra, giám sát và chất lượng. https://ttpvhcc.hanoi.gov.vn/hoat-dong-cua-trung-tam/ha-noi-ban-hanh-quy-dinh-moi-ve-chuc-nang-nhiem-vu-cac-phong-thuoc-trung-tam-phuc-vu-hanh-chinh-cong-2850250930164750403.htm
+
+Các trang động có thể thay đổi; phải kiểm tra phiên bản trước khi tiếp nhận hồ sơ. Riêng trang chi tiết [36] chưa truy cập được.

@@ -39,3 +39,9 @@ scratch/
 .skills/
 *.scratch.*
 
+# Temporary page previews generated from document PDFs
+/doc/ui_screenshots/
+/doc/qa-kpi-rework-*/
+/doc/qa-kpi-diagrams-recheck-*/
+/doc/rendered-*/
+

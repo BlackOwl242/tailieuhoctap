@@ -24,7 +24,7 @@ const ENTERPRISE_ROLES = [
   {
     code: 'LINE_MANAGER',
     name: 'Quản lý / Trưởng bộ phận',
-    description: 'Quản lý trực tiếp: Duyệt đơn xin nghỉ phép, duyệt làm thêm giờ (OT), phân ca kíp và đánh giá hiệu suất KPI 360.',
+    description: 'Quản lý trực tiếp: Duyệt đơn xin nghỉ phép, duyệt làm thêm giờ (OT), phân ca kíp, giao mục tiêu KPI và chấm kết quả theo minh chứng.',
   },
   {
     code: 'HR_CB',
@@ -141,12 +141,12 @@ const FULL_RBAC_MATRIX = [
   },
   {
     moduleKey: 'PERFORMANCE',
-    moduleName: 'Đánh Giá 360, Đào Tạo & Khiếu Nại',
+    moduleName: 'Đánh Giá KPI, Đào Tạo & Khiếu Nại',
     permissions: {
-      USER: 'Tự đánh giá, đánh giá chéo, gửi khiếu nại',
-      LINE_MANAGER: 'Giao KPI, đánh giá hiệu suất nhân viên bộ phận',
+      USER: 'Cập nhật kết quả và minh chứng KPI của mình; gửi khiếu nại',
+      LINE_MANAGER: 'Giao mục tiêu KPI và chấm kết quả nhân viên trong phạm vi quản lý',
       HR_RECRUITER: 'Đánh giá năng lực ứng viên trong giai đoạn thử việc',
-      HR_CB: 'Căn cứ kết quả KPI để tính thưởng hiệu suất',
+      HR_CB: 'Tra cứu kết quả KPI theo quyền; thưởng cần quyết định riêng',
       ACCOUNTANT: 'Không có quyền truy cập',
       HR_TRAINER: 'Quản trị ngân hàng khóa học, kế hoạch đào tạo và khảo sát',
       AUDITOR: 'Giám sát giải quyết khiếu nại và tuân thủ quy trình đánh giá',

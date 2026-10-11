@@ -40,7 +40,7 @@ export default function AttendancePage() {
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
         title="Bảng chấm công"
-        description="Điểm danh qua máy chấm công & nhận diện khuôn mặt sinh trắc học."
+        description="Chấm công vào/ra ca trên web hoặc bằng khuôn mặt qua camera thường."
         breadcrumbs={[{ label: 'Chấm công' }, { label: 'Bảng chấm công' }]}
         actions={
           <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export default function AttendancePage() {
 
       {/* Bảng công 14 ngày */}
       <div className="print-area">
-        <PrintFrame title="BẢNG CHẤM CÔNG CÁ NHÂN" subtitle="Ghi nhận từ hệ thống máy chấm công & sinh trắc học khuôn mặt" />
+        <PrintFrame title="BẢNG CHẤM CÔNG CÁ NHÂN" subtitle="Ghi nhận từ web, camera khuôn mặt và các nguồn chấm công đã cấu hình" />
         <Card className="no-print">
           <CardHeader><CardTitle>Bảng công gần đây</CardTitle></CardHeader>
           <CardContent>

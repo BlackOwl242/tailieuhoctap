@@ -3,13 +3,14 @@ import csv,re
 SCHEMA=json.loads((ROOT/'03_Thiet_ke/Tu_dien_du_lieu.json').read_text('utf-8'))
 # Từng trường thuộc hợp đồng đề xuất, tách khỏi giao tiếp của hệ thống thật.
 FIELDS=[
-'taiKhoanId,coQuanId,vaiTro,tuNgay,denNgay,canCu','ma,ten,loai,tuNgay,denNgay,nguon','thuTucId,quyetDinh,tuNgay,thanhPhan,quyTacHan,tuyenId','phienBanThuTucId,trangThaiNguon,trangThaiDich,suKien,dieuKien,vaiTro','phienBanThuTucId,chuTheId,uyQuyenId,toKhai,taiLieuIds,kenh','hoSoId,coQuanDichId,canCu,goiBanGiaoId','hoSoId,hanhDong,bangChungIds','hoSoId','phienBanThuTucId,buocXuLy,canhNoi,quyTacTongHop','ketQuaId,giaTriBam,chungThuId','heThongId,cauHinhBiMatId,maTuongQuan','hoSoId,ketQuaKiemTra,giayHenId','hoSoId,yeuCauBoSungId,giaiDoan,taiLieuIds','hoSoId,nguoiXuLyId,canCu','hoSoId,nhiemVuIds,yKienIds,duThaoId','hoSoId,ketQuaId,chuKyId,soVanBan','hoSoId,quyetDinhId,canCu,phuongAnTaiChinh','ketQuaId,nguoiNhanId,kenh,bangChungIds','hoSoId,mauId,mucDich','hoSoId,nguoiNhanIds,kenh,noiDung','tuKhoa,coQuanId,thuTucId,tuNgay,denNgay,trang','thuTucId,ngayApDung,cauHoi','mauId,coQuanId,tuNgay,denNgay,mocChot','mauId,cotDuLieu,congThuc,quyTacLoaiTru,tuNgay','chiTieu,coQuanId,tuNgay,denNgay,mocChot','coQuanId,trachNhiem,hanXuLy,trang','noiDung,nguoiNhanIds,hanXuLy,hoSoIds','taiLieuId,chuTheId,quyen,denNgay,canCu','hoSoId,taiLieuId,mucDich','heThongId,maSuKien,thuTu,chuKyNoiDung,noiDung','thongDiepId,maTuongQuan,lanThu','khoanThuId,soTien,phuongThuc','giaoDichId,maDoiTac,soTien,trangThaiDoiTac,kyDoiSoat','hoSoId,thanhPhanId,taiLieuId,soTrang,nguon,giaTriBam','hoSoId,loai,noiDung,lienHe,taiLieuIds','hoSoId,dotNopLuuId,danhMucTep,giaTriBam,thoiHanBaoQuan']
+'taiKhoanId,coQuanId,vaiTro,tuNgay,denNgay,canCu','ma,ten,loai,tuNgay,denNgay,nguon','thuTucId,quyetDinh,tuNgay,thanhPhan,quyTacHan,tuyenId','phienBanThuTucId,trangThaiNguon,trangThaiDich,suKien,dieuKien,vaiTro','phienBanThuTucId,chuTheId,uyQuyenId,toKhai,taiLieuIds,kenh','hoSoId,coQuanDichId,canCu,goiBanGiaoId','hoSoId,hanhDong,bangChungIds','hoSoId','phienBanThuTucId,buocXuLy,canhNoi,quyTacTongHop','ketQuaId,giaTriBam,chungThuId','heThongId,cauHinhBiMatId,maTuongQuan','hoSoId,ketQuaKiemTra,giayHenId','hoSoId,yeuCauBoSungId,giaiDoan,taiLieuIds','hoSoId,nguoiXuLyId,canCu','hoSoId,nhiemVuIds,yKienIds,duThaoId','hoSoId,ketQuaId,chuKyId,soVanBan','hoSoId,kenhYeuCau,maPhieuYeuCau,nguoiYeuCauId,uyQuyenId,canCu,tepYeuCauIds,thoiDiemNhan','ketQuaId,nguoiNhanId,kenh,bangChungIds','hoSoId,mauId,mucDich','hoSoId,nguoiNhanIds,kenh,noiDung','tuKhoa,coQuanId,thuTucId,tuNgay,denNgay,trang','thuTucId,ngayApDung,cauHoi','mauId,coQuanId,tuNgay,denNgay,mocChot','mauId,cotDuLieu,congThuc,quyTacLoaiTru,tuNgay','chiTieu,coQuanId,tuNgay,denNgay,mocChot','coQuanId,trachNhiem,hanXuLy,trang','noiDung,nguoiNhanIds,hanXuLy,hoSoIds','taiLieuId,chuTheId,quyen,denNgay,canCu','hoSoId,taiLieuId,mucDich','heThongId,maSuKien,thuTu,chuKyNoiDung,noiDung','thongDiepId,maTuongQuan,lanThu','khoanThuId,soTien,phuongThuc','giaoDichId,maDoiTac,soTien,trangThaiDoiTac,kyDoiSoat','hoSoId,thanhPhanId,taiLieuId,soTrang,nguon,giaTriBam','hoSoId,loai,noiDung,lienHe,taiLieuIds','hoSoId,dotNopLuuId,danhMucTep,giaTriBam,thoiHanBaoQuan']
 contracts=[]; cases=[]
-date={'tuNgay','denNgay','ngayApDung','hanXuLy','mocChot'}
-arrays={'thanhPhan','taiLieuIds','bangChungIds','buocXuLy','canhNoi','nhiemVuIds','yKienIds','nguoiNhanIds','hoSoIds','cotDuLieu','danhMucTep'}
+date={'tuNgay','denNgay','ngayApDung','hanXuLy','mocChot','thoiDiemNhan'}
+arrays={'thanhPhan','taiLieuIds','bangChungIds','buocXuLy','canhNoi','nhiemVuIds','yKienIds','nguoiNhanIds','hoSoIds','cotDuLieu','danhMucTep','tepYeuCauIds'}
 objects={'toKhai','quyTacHan','dieuKien','quyTacTongHop','noiDung'}
 def prop(f):
  if f.endswith('Id'):return {'type':'string','format':'uuid'}
+ if f=='kenhYeuCau':return {'type':'string','enum':['TRUC_TIEP','BUU_CHINH']}
  if f in arrays:return {'type':'array','items':{'type':'string' if f.endswith('Ids') else 'object'},'minItems':1}
  if f in date:return {'type':'string','format':'date-time'}
  if f in {'soTrang','thuTu','lanThu','trang','thoiHanBaoQuan'}:return {'type':'integer','minimum':0 if f=='lanThu' else 1}
@@ -17,16 +18,35 @@ def prop(f):
  if f in objects:return {'type':'object','description':'Có lược đồ chuyên biệt theo phiên bản thủ tục; chưa chấp nhận dữ liệu không kiểm tra'}
  return {'type':'string','minLength':1,'maxLength':20000 if f in {'canCu','congThuc','quyTacLoaiTru','cauHoi'} else 512}
 for u,raw in zip(MODEL,FIELDS):
- fields=raw.split(','); optional={'uyQuyenId','hoSoId'} if u['id'] in {'UC05','UC35'} else set()
+ fields=raw.split(',')
+ if u['id']=='UC17':fields.remove('thoiDiemNhan')  # server timestamp; never trust a client clock for legal order
+ optional={'uyQuyenId','hoSoId'} if u['id'] in {'UC05','UC35'} else ({'uyQuyenId'} if u['id']=='UC17' else set())
  method='GET' if u['read_only'] else 'POST';path='/api/v1/nghiep-vu/'+u['operation']
  props={f:prop(f) for f in fields}
  if not u['read_only']:props['phienBanMongDoi']={'type':'integer','minimum':0}
  c=dict(uc=u['id'],method=method,path=path,operationId=u['operation'],role=u['actor'],scope='Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ',requestSchema={'type':'object','additionalProperties':False,'properties':props,'required':[f for f in fields if f not in optional]+([] if u['read_only'] else ['phienBanMongDoi'])},guard=u['guard'],success={'code':200,'fields':['maTuongQuan','duLieu','phienBanMoi'],'condition':'Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận'},errors={'400':'Dữ liệu không hợp lệ','401':'Chưa xác thực','403':'Thiếu quyền hoặc sai phạm vi','404':'Không tìm thấy trong phạm vi được phép','409':'Phiên bản khác hoặc khóa chống lặp khác nội dung','422':'Điều kiện nghiệp vụ chưa đạt','503':'Dịch vụ chưa sẵn sàng, không xác nhận thành công'},idempotency='Không áp dụng với đọc' if u['read_only'] else 'Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả',tables=u['tables'])
+ if u['id']=='UC17':
+  c['relatedOperations']=[dict(method='POST',path='/api/v1/nghiep-vu/yeu-cau-dung/{yeuCauDungId}/phat-hanh',operationId='phatHanhThongBaoDung',role='Tài khoản được cấp riêng quyền ký Mẫu 06 còn hiệu lực',requestSchema={'type':'object','additionalProperties':False,'properties':{'yeuCauDungId':{'type':'string','format':'uuid'},'soThongBao':{'type':'string','minLength':3},'tepMau06DaKyId':{'type':'string','format':'uuid'},'kenhThongBao':{'type':'string','enum':['TRUC_TIEP','BUU_CHINH']},'bangChungGiaoIds':{'type':'array','items':{'type':'string','format':'uuid'},'minItems':1},'donViLienHeNhanLai':{'type':'string','minLength':3},'xacNhanBanKy':{'type':'boolean'},'phienBanMongDoi':{'type':'integer','minimum':0}},'required':['yeuCauDungId','soThongBao','tepMau06DaKyId','kenhThongBao','bangChungGiaoIds','donViLienHeNhanLai','xacNhanBanKy','phienBanMongDoi']},guard='Yêu cầu đủ điều kiện; quyền ký được duyệt theo văn bản phân công và còn hiệu lực; tại thời điểm phát hành chưa có quyết định/văn bản thông báo kết quả; bản Mẫu 06 đã ký',success={'code':200,'condition':'Ghi nhận Mẫu 06 đã ký/phát hành, bằng chứng gửi và chuyển hồ sơ sang DUNG trong cùng giao dịch; thời gian do máy chủ đóng dấu'})]
  contracts.append(c)
  for suffix,scenario,expect in [('A','Dữ liệu hợp lệ, đúng quyền, đủ điều kiện','Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép'),('B','Không đáp ứng điều kiện: '+u['guard'],'Trả lỗi nghiệp vụ; không áp dụng thay đổi'),('C','Không có quyền trên cơ quan hoặc hồ sơ','Từ chối; không rò dữ liệu hoặc tổng số')]:
   cases.append(dict(id=u['test']+suffix,uc=u['id'],scenario=scenario,expected=expect,status='Chưa thực hiện'))
  if not u['read_only']:
   for suffix,scenario,expect in [('D','Gửi lại cùng khóa, nội dung và người gửi','Trả cùng kết quả; không ghi trùng'),('E','Gửi phiên bản cũ hoặc cùng khóa khác nội dung','Báo xung đột; giữ dữ liệu đã xác nhận')]:cases.append(dict(id=u['test']+suffix,uc=u['id'],scenario=scenario,expected=expect,status='Chưa thực hiện'))
+ if u['id']=='UC17':
+  for suffix,scenario,expect in [
+   ('F','Yêu cầu dừng trực tuyến được gửi trực tiếp vào API địa phương','Từ chối; hướng dẫn xử lý qua chức năng Cổng Dịch vụ công quốc gia'),
+   ('G','Hồ sơ chưa được tiếp nhận hợp lệ','Không tạo yêu cầu dừng; không đổi trạng thái hồ sơ'),
+   ('H','Quyết định hoặc văn bản thông báo kết quả đã được ban hành','Không tạo Thông báo dừng; giữ nguyên trạng thái và lịch sử'),
+   ('I','Yêu cầu hợp lệ đã được kiểm tra và Mẫu 06 đang chờ ký','Giữ hồ sơ ở trạng thái hiện tại; chặn phát hành kết quả và thao tác xung đột'),
+   ('J','Chuyển hồ sơ sang DUNG khi chưa có Mẫu 06 đã ký/phát hành','Từ chối; yêu cầu dừng vẫn chờ người ký'),
+   ('K','Kết quả được ban hành giữa lúc kiểm tra và lúc phát hành Mẫu 06','Kiểm tra lại điều kiện; không phát hành Mẫu 06 hoặc chuyển DUNG'),
+   ('L','Có khoản thu đã thanh toán khi phát hành Mẫu 06','Theo dõi trả/hoàn riêng; không tự ghi hoàn tiền hoặc xóa giao dịch'),
+   ('M','Người yêu cầu là đại diện nhưng không có căn cứ đại diện','Không lập yêu cầu đủ điều kiện; lưu lý do và yêu cầu chứng cứ hợp lệ'),
+   ('N','Lãnh đạo không được cấp riêng quyền ký Mẫu 06','Từ chối phát hành; giữ hồ sơ nguyên trạng'),
+   ('O','Hồ sơ ở trạng thái KHONG_GIAI_QUYET','Không mở lại nhánh dừng; giữ kết luận đã ghi nhận'),
+   ('P','Đại diện chỉ đính kèm Mẫu 05, thiếu căn cứ đại diện','Từ chối ghi nhận yêu cầu đủ điều kiện; không chuyển trạng thái'),
+   ('Q','Người dân tải Mẫu 06 sau khi phát hành','Chủ hồ sơ tải được bản đã ký; người ngoài phạm vi nhận 404')]:
+   cases.append(dict(id='OO17'+suffix,uc='UC17',scenario=scenario,expected=expect,status='Chưa thực hiện'))
 (OUT/'Hop_dong_36_thao_tac.json').write_text(json.dumps(contracts,ensure_ascii=False,indent=2),encoding='utf-8')
 with (OUT/'Kich_ban_kiem_thu_huong_doi_tuong.csv').open('w',encoding='utf-8-sig',newline='') as f:
  w=csv.DictWriter(f,fieldnames=list(cases[0]));w.writeheader();w.writerows(cases)

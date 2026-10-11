@@ -1,0 +1,390 @@
+{
+  "1.004237": {
+    "version": "1.004237-704-2025-v2",
+    "title": "Phiếu yêu cầu cung cấp thông tin, dữ liệu tài nguyên và môi trường",
+    "sourceUrl": "https://dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=6022",
+    "formSourceUrl": "https://congbaocdn.chinhphu.vn/CongBaoCP/VanBan/2017/6/24031/18088-1-2017469-47073-2017-nd-cp.pdf",
+    "legalBasis": "Mẫu 02 hoặc Mẫu 03 của Nghị định 73/2017/NĐ-CP, sửa đổi bởi Nghị định 22/2023/NĐ-CP; Quyết định 704/QĐ-BNNMT và Quyết định 2273/QĐ-TTPVHCC của Hà Nội.",
+    "deadlineText": "Trong 05 ngày làm việc: kiểm tra yêu cầu và thông báo nghĩa vụ tài chính nếu có. Dữ liệu được cung cấp sau khi hoàn thành nghĩa vụ tài chính; đây không phải hạn hoàn tất chung cho mọi yêu cầu.",
+    "feeText": "Khoản thu phụ thuộc dữ liệu và nghĩa vụ tài chính được cơ quan thông báo. Chưa có khoản thu xác định khi lập hồ sơ.",
+    "fields": [
+      {
+        "id": "submissionRole",
+        "label": "Hình thức nộp yêu cầu",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Tự nộp",
+          "Nộp thay theo ủy quyền"
+        ],
+        "help": "Thông tin người yêu cầu ở bước trước là chủ yêu cầu. Nếu nộp thay, khai riêng người thực hiện việc nộp; không thay tên chủ yêu cầu bằng tên người nộp thay."
+      },
+      {
+        "id": "submitterName",
+        "label": "Họ và tên người nộp thay",
+        "type": "text",
+        "required": true,
+        "when": {
+          "field": "submissionRole",
+          "equals": "Nộp thay theo ủy quyền"
+        }
+      },
+      {
+        "id": "submitterIdentity",
+        "label": "Số căn cước hoặc hộ chiếu của người nộp thay",
+        "type": "text",
+        "required": true,
+        "when": {
+          "field": "submissionRole",
+          "equals": "Nộp thay theo ủy quyền"
+        }
+      },
+      {
+        "id": "submitterIdentityDate",
+        "label": "Ngày cấp giấy tờ của người nộp thay (nếu có)",
+        "type": "date",
+        "required": false,
+        "when": {
+          "field": "submissionRole",
+          "equals": "Nộp thay theo ủy quyền"
+        }
+      },
+      {
+        "id": "submitterIdentityPlace",
+        "label": "Nơi cấp giấy tờ của người nộp thay (nếu có)",
+        "type": "text",
+        "required": false,
+        "when": {
+          "field": "submissionRole",
+          "equals": "Nộp thay theo ủy quyền"
+        }
+      },
+      {
+        "id": "submitterAddress",
+        "label": "Địa chỉ liên hệ của người nộp thay",
+        "type": "text",
+        "required": true,
+        "when": {
+          "field": "submissionRole",
+          "equals": "Nộp thay theo ủy quyền"
+        }
+      },
+      {
+        "id": "submitterPhone",
+        "label": "Số điện thoại người nộp thay (nếu có)",
+        "type": "tel",
+        "required": false,
+        "when": {
+          "field": "submissionRole",
+          "equals": "Nộp thay theo ủy quyền"
+        }
+      },
+      {
+        "id": "submitterEmail",
+        "label": "Email người nộp thay (nếu có)",
+        "type": "email",
+        "required": false,
+        "when": {
+          "field": "submissionRole",
+          "equals": "Nộp thay theo ủy quyền"
+        }
+      },
+      {
+        "id": "nationalityType",
+        "label": "Đối tượng yêu cầu",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Trong nước",
+          "Cá nhân nước ngoài tại Việt Nam"
+        ],
+        "applicantTypes": [
+          "citizen"
+        ]
+      },
+      {
+        "id": "address",
+        "label": "Địa chỉ tổ chức hoặc cá nhân",
+        "required": true
+      },
+      {
+        "id": "identityNumber",
+        "label": "Số căn cước, số định danh cá nhân hoặc giấy tờ nhận dạng",
+        "required": true,
+        "applicantTypes": [
+          "citizen"
+        ],
+        "when": {
+          "field": "nationalityType",
+          "not": "Cá nhân nước ngoài tại Việt Nam"
+        }
+      },
+      {
+        "id": "identityDate",
+        "label": "Ngày cấp giấy tờ (nếu có)",
+        "type": "date",
+        "applicantTypes": [
+          "citizen"
+        ],
+        "when": {
+          "field": "nationalityType",
+          "not": "Cá nhân nước ngoài tại Việt Nam"
+        }
+      },
+      {
+        "id": "identityPlace",
+        "label": "Nơi cấp giấy tờ (nếu có)",
+        "applicantTypes": [
+          "citizen"
+        ],
+        "when": {
+          "field": "nationalityType",
+          "not": "Cá nhân nước ngoài tại Việt Nam"
+        }
+      },
+      {
+        "id": "workplace",
+        "label": "Nơi làm việc hoặc học tập",
+        "required": true,
+        "applicantTypes": [
+          "citizen"
+        ],
+        "when": {
+          "field": "nationalityType",
+          "equals": "Cá nhân nước ngoài tại Việt Nam"
+        }
+      },
+      {
+        "id": "nationality",
+        "label": "Quốc tịch",
+        "required": true,
+        "applicantTypes": [
+          "citizen"
+        ],
+        "when": {
+          "field": "nationalityType",
+          "equals": "Cá nhân nước ngoài tại Việt Nam"
+        }
+      },
+      {
+        "id": "passport",
+        "label": "Số hộ chiếu",
+        "required": true,
+        "applicantTypes": [
+          "citizen"
+        ],
+        "when": {
+          "field": "nationalityType",
+          "equals": "Cá nhân nước ngoài tại Việt Nam"
+        }
+      },
+      {
+        "id": "representative",
+        "label": "Người ký, đại diện tổ chức",
+        "required": true,
+        "applicantTypes": [
+          "organization"
+        ]
+      },
+      {
+        "id": "fax",
+        "label": "Số fax (nếu có)"
+      },
+      {
+        "id": "dataRequested",
+        "label": "Danh mục và nội dung dữ liệu đề nghị cung cấp",
+        "type": "textarea",
+        "required": true,
+        "maxLength": 3000,
+        "help": "Nêu rõ loại dữ liệu, khu vực, khoảng thời gian hoặc tài liệu cần khai thác."
+      },
+      {
+        "id": "purpose",
+        "label": "Mục đích sử dụng dữ liệu",
+        "type": "textarea",
+        "required": true,
+        "maxLength": 2000
+      },
+      {
+        "id": "exploitationMethod",
+        "label": "Hình thức khai thác và sử dụng",
+        "type": "textarea",
+        "required": true,
+        "help": "Ví dụ: xem, đọc tại chỗ; sao chụp; nhận dữ liệu điện tử. Cơ quan sẽ xem xét theo khả năng cung cấp."
+      },
+      {
+        "id": "commitment",
+        "label": "Cam kết sử dụng dữ liệu",
+        "type": "textarea",
+        "required": true,
+        "maxLength": 2000
+      }
+    ],
+    "documents": [
+      {
+        "id": "request02",
+        "label": "Phiếu yêu cầu theo Mẫu số 02",
+        "required": true,
+        "when": {
+          "field": "nationalityType",
+          "not": "Cá nhân nước ngoài tại Việt Nam"
+        },
+        "help": "01 bản chính có chữ ký; tổ chức do người đứng đầu ký và đóng dấu."
+      },
+      {
+        "id": "request03",
+        "label": "Phiếu yêu cầu theo Mẫu số 03",
+        "required": true,
+        "applicantTypes": [
+          "citizen"
+        ],
+        "when": {
+          "field": "nationalityType",
+          "equals": "Cá nhân nước ngoài tại Việt Nam"
+        },
+        "help": "01 bản chính có chữ ký người yêu cầu và xác nhận, đóng dấu của nơi làm việc hoặc học tập."
+      },
+      {
+        "id": "other",
+        "label": "Tài liệu làm rõ yêu cầu (nếu có)",
+        "required": false
+      },
+      {
+        "id": "authorization",
+        "label": "Văn bản ủy quyền hoặc giấy tờ liên quan (nếu có)",
+        "required": false,
+        "when": {
+          "field": "submissionRole",
+          "equals": "Nộp thay theo ủy quyền"
+        },
+        "help": "Đính kèm để cơ quan kiểm tra tư cách nộp thay. Không thay thế chữ ký, xác nhận phải có trên Mẫu 02 hoặc Mẫu 03."
+      }
+    ],
+    "deliveryMethods": [
+      "Điện tử",
+      "Trực tiếp",
+      "Bưu chính"
+    ],
+    "deliveryNote": "Lựa chọn nhận kết quả là yêu cầu của người nộp; cơ quan xác nhận phương thức phù hợp với dữ liệu được cung cấp."
+  },
+  "2.000908": {
+    "version": "2.000908-858-2026-v1",
+    "title": "Yêu cầu cấp bản sao từ sổ gốc",
+    "sourceUrl": "https://dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=2989&open_popup=1",
+    "legalBasis": "Quyết định 858/QĐ-BTP; Nghị định 23/2015/NĐ-CP và các văn bản sửa đổi, gồm Nghị định 18/2026/NĐ-CP.",
+    "deadlineText": "Trong ngày nhận đủ hồ sơ hợp lệ; chuyển sang ngày làm việc tiếp theo nếu nhận sau 15 giờ. Cơ quan cần kiểm tra sổ gốc và ghi nhận hồ sơ hợp lệ trước khi xác định hạn.",
+    "feeText": "Không tự xác định khoản thu; chi phí gửi kết quả qua bưu chính, nếu có, được thông báo riêng.",
+    "fields": [
+      {
+        "id": "address",
+        "label": "Địa chỉ liên hệ",
+        "required": true
+      },
+      {
+        "id": "representative",
+        "label": "Người đại diện nộp yêu cầu",
+        "required": true,
+        "applicantTypes": [
+          "organization"
+        ]
+      },
+      {
+        "id": "identityType",
+        "label": "Loại giấy tờ nhận dạng",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Thẻ căn cước",
+          "Thẻ căn cước công dân",
+          "Giấy chứng nhận căn cước",
+          "Hộ chiếu",
+          "Giấy tờ xuất nhập cảnh hoặc đi lại quốc tế"
+        ]
+      },
+      {
+        "id": "identityNumber",
+        "label": "Số giấy tờ nhận dạng",
+        "required": true
+      },
+      {
+        "id": "relation",
+        "label": "Tư cách yêu cầu cấp bản sao",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Người được cấp bản chính",
+          "Người đại diện theo pháp luật",
+          "Người được ủy quyền",
+          "Thân nhân hoặc người thừa kế của người đã chết"
+        ]
+      },
+      {
+        "id": "originalOwner",
+        "label": "Tên người hoặc tổ chức được cấp bản chính",
+        "required": true
+      },
+      {
+        "id": "documentName",
+        "label": "Tên giấy tờ đề nghị cấp bản sao",
+        "required": true
+      },
+      {
+        "id": "originalNumber",
+        "label": "Số, ký hiệu bản chính (nếu biết)"
+      },
+      {
+        "id": "issuedDate",
+        "label": "Ngày cấp bản chính (nếu biết)",
+        "type": "date"
+      },
+      {
+        "id": "registerAuthority",
+        "label": "Cơ quan hoặc tổ chức đang lưu sổ gốc",
+        "required": true,
+        "help": "Cần chọn cơ quan tiếp nhận đang quản lý sổ gốc tương ứng; ứng dụng không tự tra được sổ gốc."
+      },
+      {
+        "id": "copies",
+        "label": "Số bản sao đề nghị cấp",
+        "type": "number",
+        "required": true,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "id": "additionalDetails",
+        "label": "Thông tin giúp tìm bản ghi trong sổ gốc",
+        "type": "textarea"
+      }
+    ],
+    "documents": [
+      {
+        "id": "identity",
+        "label": "Giấy tờ nhận dạng còn giá trị sử dụng",
+        "required": true,
+        "help": "Trên cổng thật có thể được miễn nộp khi cơ quan khai thác được từ cơ sở dữ liệu. Ứng dụng này chưa kết nối các cơ sở dữ liệu đó."
+      },
+      {
+        "id": "relationProof",
+        "label": "Giấy tờ chứng minh tư cách đại diện hoặc quan hệ",
+        "required": true,
+        "when": {
+          "field": "relation",
+          "not": "Người được cấp bản chính"
+        },
+        "help": "Bản chính hoặc bản sao có chứng thực theo trường hợp. Chưa tự miễn giấy tờ khi chưa khai thác được dữ liệu hộ tịch."
+      },
+      {
+        "id": "reference",
+        "label": "Thông tin bản chính để đối chiếu sổ gốc (nếu có)",
+        "required": false
+      }
+    ],
+    "deliveryMethods": [
+      "Điện tử",
+      "Trực tiếp",
+      "Bưu chính"
+    ],
+    "deliveryNote": "Bản sao phải được cấp từ sổ gốc. Hình thức trả bản điện tử cần được cơ quan xác nhận; ứng dụng chưa ký số hoặc phát hành bản sao có giá trị pháp lý."
+  }
+}

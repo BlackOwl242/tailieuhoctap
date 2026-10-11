@@ -127,12 +127,12 @@ async function seedFrappeHrms() {
     update: {},
     create: {
       id: 'cycle-annual-2026',
-      name: 'Kỳ Đánh giá Hiệu suất & Năng lực Toàn diện 2026',
+      name: 'Chu kỳ đánh giá KPI 2026',
       year: 2026,
       startDate: new Date('2026-01-01'),
       endDate: new Date('2026-12-31'),
       status: 'ACTIVE',
-      description: 'Chu kỳ đánh giá mục tiêu KPI/KRA và phản hồi 360 độ thường niên',
+      description: 'Chu kỳ đánh giá theo mục tiêu KPI, kết quả thực tế, minh chứng và điểm do quản lý chấm',
     },
   });
 

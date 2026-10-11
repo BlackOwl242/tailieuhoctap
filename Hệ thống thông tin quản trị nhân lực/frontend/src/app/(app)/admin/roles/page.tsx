@@ -90,7 +90,7 @@ const CRITICAL_PERMISSION_ROWS = [
   { moduleKey: 'PAYROLL_APPROVE', moduleName: 'Lương · Phê duyệt và khóa kỳ', roles: ['ADMIN', 'BOD'], note: 'Chỉ sau khi kỳ đã đối soát và phê duyệt.' },
   { moduleKey: 'PAYROLL_PAY', moduleName: 'Lương · Xác nhận thanh toán', roles: ['ADMIN', 'ACCOUNTANT'], note: 'Chỉ thanh toán sau khi khóa kỳ và lưu mã giao dịch/chứng từ.' },
   { moduleKey: 'PERFORMANCE_GOAL', moduleName: 'Đánh giá · Tạo/giao mục tiêu', roles: ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER'], note: 'Trưởng nhóm chỉ được giao trong cùng đơn vị; nhân viên và BOD không tự tạo mục tiêu.' },
-  { moduleKey: 'PERFORMANCE_SCORE', moduleName: 'Đánh giá · Tự chấm / chấm quản lý', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER'], note: 'Nhân viên chỉ tự chấm; quản lý chấm trong phạm vi được giao. HR Trainer và BOD không ghi điểm mục tiêu ở API.' },
+  { moduleKey: 'PERFORMANCE_SCORE', moduleName: 'Đánh giá · Chấm điểm KPI', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER'], note: 'Quản lý chấm điểm KPI trong phạm vi được giao sau khi đối chiếu kết quả và minh chứng; nhân viên cập nhật kết quả KPI của mình.' },
   { moduleKey: 'PERFORMANCE_CYCLE', moduleName: 'Đánh giá · Tạo, sửa và xóa chu kỳ', roles: ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'BOD'], note: 'Quyền quản trị chu kỳ; nhân viên chỉ xem chu kỳ được áp dụng.' },
   { moduleKey: 'PERFORMANCE_PERSONAL', moduleName: 'Đánh giá · Tự đánh giá và nộp minh chứng', roles: ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER'], note: 'Đánh giá bản thân và minh chứng chỉ gắn với mục tiêu của chính tài khoản.' },
 ];

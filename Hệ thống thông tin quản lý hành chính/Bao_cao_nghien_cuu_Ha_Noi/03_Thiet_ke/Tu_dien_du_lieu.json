@@ -2238,5 +2238,211 @@
         "Kiểm soát cập nhật đồng thời"
       ]
     ]
+  ],
+  "yeu_cau_dung": [
+    "Yêu cầu dừng và Thông báo dừng",
+    [
+      [
+        "id",
+        "uuid",
+        "PK",
+        "Không",
+        "Định danh yêu cầu dừng"
+      ],
+      [
+        "ho_so_id",
+        "uuid",
+        "FK ho_so",
+        "Không",
+        "Hồ sơ được đề nghị dừng"
+      ],
+      [
+        "kenh_yeu_cau",
+        "varchar(20)",
+        "",
+        "Không",
+        "Trực tiếp hoặc bưu chính; trực tuyến đi qua chức năng Cổng quốc gia"
+      ],
+      [
+        "ma_phieu_yeu_cau",
+        "varchar(100)",
+        "",
+        "Không",
+        "Mã/biên nhận Mẫu 05 hoặc mã tham chiếu bưu chính"
+      ],
+      [
+        "nguoi_yeu_cau_id",
+        "uuid",
+        "FK chu_the",
+        "Không",
+        "Cá nhân/tổ chức yêu cầu"
+      ],
+      [
+        "uy_quyen_id",
+        "uuid",
+        "FK uy_quyen",
+        "Có",
+        "Căn cứ đại diện nếu người yêu cầu không phải chủ thể"
+      ],
+      [
+        "thoi_diem_nhan",
+        "timestamptz",
+        "",
+        "Không",
+        "Thời điểm hệ thống/cán bộ nhận yêu cầu"
+      ],
+      [
+        "can_cu",
+        "text",
+        "",
+        "Không",
+        "Lý do dừng do người yêu cầu nêu"
+      ],
+      [
+        "tep_mau05_id",
+        "uuid",
+        "FK thanh_phan_ho_so",
+        "Không",
+        "Bản yêu cầu có chữ ký hoặc chứng cứ tiếp nhận"
+      ],
+      [
+        "trang_thai",
+        "varchar(30)",
+        "",
+        "Không",
+        "TIEP_NHAN, CHO_KY_PHAT_HANH, KHONG_DU_DIEU_KIEN hoặc DA_PHAT_HANH"
+      ],
+      [
+        "ket_qua_kiem_tra",
+        "jsonb",
+        "",
+        "Không",
+        "Chủ thể, mốc thời gian, tình trạng, quyết định và thông báo đã kiểm tra"
+      ],
+      [
+        "nguoi_kiem_tra_id",
+        "uuid",
+        "FK tai_khoan",
+        "Có",
+        "Cán bộ Một cửa kiểm tra"
+      ],
+      [
+        "kiem_tra_luc",
+        "timestamptz",
+        "",
+        "Có",
+        "Thời điểm kiểm tra ngay khi nhận yêu cầu"
+      ],
+      [
+        "tep_mau06_du_thao_id",
+        "uuid",
+        "FK thanh_phan_ho_so",
+        "Có",
+        "Dự thảo thông báo, chưa làm đổi trạng thái hồ sơ"
+      ],
+      [
+        "tep_mau06_da_ky_id",
+        "uuid",
+        "FK thanh_phan_ho_so",
+        "Có",
+        "Bản Thông báo dừng đã ký"
+      ],
+      [
+        "nguoi_ky_id",
+        "uuid",
+        "FK tai_khoan",
+        "Có",
+        "Người có thẩm quyền ký thông báo"
+      ],
+      [
+        "quyen_ky_id",
+        "uuid",
+        "FK su_kien_quyen_ky_mau06",
+        "Có",
+        "Quyền ký còn hiệu lực tại thời điểm ký"
+      ],
+      [
+        "phat_hanh_luc",
+        "timestamptz",
+        "",
+        "Có",
+        "Mốc phát hành Mẫu 06"
+      ],
+      [
+        "thong_bao_id",
+        "uuid",
+        "FK thong_bao",
+        "Có",
+        "Bằng chứng gửi/giao thông báo"
+      ],
+      [
+        "ly_do_khong_du_dieu_kien",
+        "text",
+        "",
+        "Có",
+        "Kết quả khi đã có quyết định/thông báo hoặc ngoài điều kiện"
+      ],
+      [
+        "phien_ban",
+        "integer",
+        "",
+        "Không",
+        "Kiểm soát cập nhật đồng thời"
+      ]
+    ]
+  ],
+  "su_kien_quyen_ky_mau06": [
+    "Lịch sử cấp và thu hồi quyền ký Mẫu 06",
+    [
+      [
+        "id",
+        "uuid",
+        "PK",
+        "Không",
+        "Định danh sự kiện quyền ký"
+      ],
+      [
+        "tai_khoan_id",
+        "uuid",
+        "FK tai_khoan",
+        "Không",
+        "Tài khoản được cấp hoặc thu hồi"
+      ],
+      [
+        "nguoi_thay_doi_id",
+        "uuid",
+        "FK tai_khoan",
+        "Không",
+        "Quản trị viên khác người đề nghị"
+      ],
+      [
+        "hanh_dong",
+        "varchar(30)",
+        "",
+        "Không",
+        "CAP hoặc THU_HOI"
+      ],
+      [
+        "van_ban_phan_cong",
+        "text",
+        "",
+        "Không",
+        "Số văn bản làm căn cứ thẩm quyền"
+      ],
+      [
+        "can_cu",
+        "text",
+        "",
+        "Không",
+        "Lý do cấp/thu hồi và dấu vết đối chiếu"
+      ],
+      [
+        "thoi_diem",
+        "timestamptz",
+        "",
+        "Không",
+        "Thời điểm sự kiện quyền"
+      ]
+    ]
   ]
 }

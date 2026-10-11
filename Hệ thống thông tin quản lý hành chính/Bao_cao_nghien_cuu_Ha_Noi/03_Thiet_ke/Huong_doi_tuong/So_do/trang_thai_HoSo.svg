@@ -1,54 +1,58 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3600" height="2880" viewBox="0 0 1200 960"><rect width="1200" height="960" fill="white"/>
-<text x="600" y="36.75" font-family="Arial" font-size="25" font-weight="bold" text-anchor="middle">Trạng thái tiếp nhận và giải quyết hồ sơ</text>
-<rect x="45" y="115" width="310" height="70" rx="14" fill="#F1F1F1" stroke="#181818"/>
-<text x="200" y="155.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Nháp</text>
-<rect x="445" y="115" width="310" height="70" rx="14" fill="#F1F1F1" stroke="#181818"/>
-<text x="600" y="155.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Chờ tiếp nhận</text>
-<rect x="845" y="115" width="310" height="70" rx="14" fill="#F1F1F1" stroke="#181818"/>
-<text x="1000" y="155.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Chờ bổ sung</text>
-<rect x="445" y="405" width="310" height="70" rx="14" fill="#F1F1F1" stroke="#181818"/>
-<text x="600" y="445.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Đã tiếp nhận</text>
-<rect x="845" y="405" width="310" height="70" rx="14" fill="#F1F1F1" stroke="#181818"/>
-<text x="1000" y="445.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Từ chối tiếp nhận</text>
-<rect x="445" y="625" width="310" height="70" rx="14" fill="#F1F1F1" stroke="#181818"/>
-<text x="600" y="665.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Đang thụ lý</text>
-<rect x="45" y="625" width="310" height="70" rx="14" fill="#F1F1F1" stroke="#181818"/>
-<text x="200" y="665.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Dừng giải quyết</text>
-<rect x="845" y="625" width="310" height="70" rx="14" fill="#F1F1F1" stroke="#181818"/>
-<text x="1000" y="665.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Không giải quyết</text>
-<rect x="445" y="835" width="310" height="70" rx="14" fill="#F1F1F1" stroke="#181818"/>
-<text x="600" y="875.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">Chờ phê duyệt</text>
-<circle cx="100" cy="82" r="11" fill="#222222" stroke="#181818"/>
-<polyline points="100,93 100,115" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="104.0,105.0 100,115 96.0,105.0" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="355,150 445,150" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="435.0,146.0 445,150 435.0,154.0" fill="none" stroke="#181818" stroke-width="1"/>
-<text x="400.0" y="81.6" font-family="Arial" font-size="20" font-weight="normal" text-anchor="middle">Gửi hồ sơ đủ trường</text>
-<polyline points="755,150 845,150" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="835.0,146.0 845,150 835.0,154.0" fill="none" stroke="#181818" stroke-width="1"/>
-<text x="800.0" y="81.6" font-family="Arial" font-size="20" font-weight="normal" text-anchor="middle">Yêu cầu bổ sung</text>
-<polyline points="445,660 355,660" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="365.0,664.0 355,660 365.0,656.0" fill="none" stroke="#181818" stroke-width="1"/>
-<text x="400.0" y="591.6" font-family="Arial" font-size="20" font-weight="normal" text-anchor="middle">Quyết định dừng</text>
-<polyline points="755,660 845,660" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="835.0,656.0 845,660 835.0,664.0" fill="none" stroke="#181818" stroke-width="1"/>
-<text x="800.0" y="571.6" font-family="Arial" font-size="20" font-weight="normal" text-anchor="middle">Có căn cứ không giải quyết</text>
-<polyline points="600,185 600,405" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="604.0,395.0 600,405 596.0,395.0" fill="none" stroke="#181818" stroke-width="1"/>
-<rect x="400.6666666666667" y="259.0" width="128.66666666666669" height="27.25" fill="white"/>
-<text x="465" y="277.43" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Hồ sơ hợp lệ</text>
-<polyline points="1000,185 1000,405" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="1004.0,395.0 1000,405 996.0,395.0" fill="none" stroke="#181818" stroke-width="1"/>
-<rect x="906.8333333333334" y="259.0" width="186.33333333333334" height="27.25" fill="white"/>
-<text x="1000" y="277.43" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Không đủ điều kiện</text>
-<rect x="912.8333333333334" y="285.25" width="174.33333333333334" height="27.25" fill="white"/>
-<text x="1000" y="303.68" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Có căn cứ từ chối</text>
-<polyline points="600,475 600,625" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="604.0,615.0 600,625 596.0,615.0" fill="none" stroke="#181818" stroke-width="1"/>
-<rect x="591.3333333333334" y="529.0" width="137.33333333333334" height="27.25" fill="white"/>
-<text x="660" y="547.43" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Đã phân công</text>
-<polyline points="600,695 600,835" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="604.0,825.0 600,835 596.0,825.0" fill="none" stroke="#181818" stroke-width="1"/>
-<rect x="609.3333333333334" y="756.0" width="201.33333333333334" height="27.25" fill="white"/>
-<text x="710" y="774.43" font-family="Arial" font-size="21" font-weight="normal" text-anchor="middle">Đủ ý kiến và dự thảo</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1810"><rect width="100%" height="100%" fill="white"/>
+<text x="1100" y="64" font-family="Times New Roman" font-size="48" font-weight="bold" text-anchor="middle">HoSo các nhánh tiếp nhận và giải quyết</text>
+<rect x="50" y="150" width="560" height="130" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="330.0" y="212" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">NHAP</text>
+<rect x="820" y="150" width="560" height="130" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1100.0" y="212" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">CHO_TIEP_NHAN</text>
+<rect x="1590" y="150" width="560" height="130" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1870.0" y="212" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">CHO_BO_SUNG</text>
+<rect x="820" y="570" width="560" height="130" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1100.0" y="632" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">DA_TIEP_NHAN</text>
+<rect x="820" y="990" width="560" height="130" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1100.0" y="1052" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">DANG_THU_LY</text>
+<rect x="820" y="1410" width="560" height="130" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1100.0" y="1472" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">TRINH_DUYET</text>
+<rect x="1590" y="570" width="560" height="130" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1870.0" y="632" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">TU_CHOI</text>
+<rect x="1590" y="990" width="560" height="130" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1870.0" y="1052" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">KHONG_GIAI_QUYET</text>
+<rect x="50" y="990" width="560" height="130" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="330.0" y="1052" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">DUNG</text>
+<circle cx="100" cy="95" r="20" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="100,115 100,150" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="100,150 108.0,130.0 92.0,130.0" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="610,215 820,215" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="820,215 800.0,207.0 800.0,223.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="715.0" y="114" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">gửi [đủ trường]</text>
+<polyline points="1380,215 1590,215" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1590,215 1570.0,207.0 1570.0,223.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="1485.0" y="114" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">thiếu [có căn cứ]</text>
+<polyline points="1100,280 1100,425.0 1100,425.0 1100,570" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1100,570 1108.0,550.0 1092.0,550.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="1275.5" y="338.0" width="349.0" height="55" fill="white"/>
+<text x="1450" y="384.0" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">tiếp nhận [hợp lệ]</text>
+<polyline points="1100,700 1100,845.0 1100,845.0 1100,990" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1100,990 1108.0,970.0 1092.0,970.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="1225.0" y="758.0" width="450.0" height="55" fill="white"/>
+<text x="1450" y="804.0" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">phân công [còn quyền]</text>
+<polyline points="1100,1120 1100,1265.0 1100,1265.0 1100,1410" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1100,1410 1108.0,1390.0 1092.0,1390.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="1289.0" y="1178.0" width="322.0" height="55" fill="white"/>
+<text x="1450" y="1224.0" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">trình [đủ ý kiến]</text>
+<polyline points="1870,280 1870,425.0 1870,425.0 1870,570" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1870,570 1878.0,550.0 1862.0,550.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="1262.0" y="338.0" width="536.0" height="55" fill="white"/>
+<text x="1530" y="384.0" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">không thể hoàn thiện [được</text>
+<rect x="1464.0" y="395.0" width="132.0" height="55" fill="white"/>
+<text x="1530" y="441.0" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">duyệt]</text>
+<polyline points="1380,1055 1590,1055" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1590,1055 1570.0,1047.0 1570.0,1063.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="1485.0" y="954" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">kết luận [có căn cứ]</text>
+<polyline points="820,1055 610,1055" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="610,1055 630.0,1063.0 630.0,1047.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="715.0" y="954" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Mẫu 06 đã ký, phát hành</text>
+<rect x="80.0" y="1658" width="2040.0" height="55" fill="white"/>
+<text x="1100" y="1704" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Yêu cầu trực tiếp/bưu chính: lập yêu cầu → kiểm tra ngay → dự thảo Mẫu 06 → ký/phát hành → DUNG.</text>
+<rect x="297.5" y="1715" width="1605.0" height="55" fill="white"/>
+<text x="1100" y="1761" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Không dừng sau khi đã ban hành kết quả; yêu cầu trực tuyến đi qua Cổng quốc gia.</text>
 </svg>

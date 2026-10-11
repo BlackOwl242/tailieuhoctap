@@ -3,6 +3,7 @@ from copy import deepcopy
 from zipfile import ZipFile,ZIP_DEFLATED
 import json,re,csv,html
 from PIL import Image
+from docx import Document
 from docx.oxml.ns import qn
 ROOT=Path(__file__).resolve().parents[1]
 MODEL=json.loads((ROOT/'03_Thiet_ke/Huong_doi_tuong/Danh_muc_ca_su_dung.json').read_text('utf-8'))
@@ -15,17 +16,17 @@ MACHINE=json.loads((BASE/'May_trang_thai_ho_so.json').read_text('utf-8'))
 CHECK=json.loads((BASE/'Ket_qua_kiem_tra_mo_hinh.json').read_text('utf-8'))
 CAT=json.loads((ROOT/'07_Huong_dan/Thu_tuc_theo_QD_492/Danh_muc.json').read_text('utf-8'))
 GROUPS={1:'Tài khoản và quyền',2:'Danh mục và quy trình',3:'Chữ ký số',4:'Tiếp nhận và giải quyết',5:'Tiện ích',6:'Thống kê và báo cáo',7:'Điều hành tác nghiệp',8:'Kho dữ liệu',9:'Tích hợp và liên thông'}
-SOURCES=[
-('[1]','Tài liệu công dân của Hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội, bản 1.0 năm 2023, Công ty TNHH Hệ thống thông tin FPT; tư liệu lịch sử','https://sqhx-hanoi.mediacdn.vn/documents/49866/0/_VB_1684301998055_VB_HDSD.pdf'),
-('[2]','Trung tâm Phục vụ hành chính công: từ 01/07/2025, người dân thực hiện thủ tục trên Cổng Dịch vụ công quốc gia','https://ttpvhcc.hanoi.gov.vn/tien-ich-cong-dan/tu-ngay-01-07-2025-nguoi-dan-thuc-hien-thu-tuc-hanh-chinh-tren-dia-ban-thanh-pho-ha-noi-se-thuc-hien-tren-cong-dich-vu-cong-quoc-gia-2850250629165651829.htm'),
-('[3]','Thông tư 21/2023/TT-BTTTT đọc cùng Thông tư 11/2025/TT-BKHCN; căn cứ xây dựng khung đối chiếu chức năng','https://vanban.chinhphu.vn/?classid=1&docid=214528&pageid=27160&typegroupid=6'),
-('[4]','Quyết định 492/QĐ-TTPVHCC ngày 14/04/2026, ba phụ lục phân loại mức cung cấp trực tuyến','https://datafiles.hanoi.gov.vn/gov-hni/8123/VanBan/2026/4/22/QD%20492.pdf'),
-('[5]','Quyết định 1811/QĐ-TTPVHCC ngày 24/12/2025, phương án tái cấu trúc thủ tục cấp bản sao trích lục hộ tịch','https://vanban.hanoi.gov.vn/chi-tiet-van-ban/ve-viec-phe-duyet-phuong-an-tai-cau-truc-thu-tuc-hanh-chinh-cap-ban-sao-trich-luc-ho-tich-ban-sao-g-230492'),
-('[6]','Quyết định 663/QĐ-TTPVHCC ngày 13/05/2026, phụ lục trang 65 đến 69, cấp bản sao từ sổ gốc','https://datafiles.hanoi.gov.vn/gov-hni/6244/VanBan/2026/5/13/PLQDPVHCC-663-2026.pdf'),
-('[7]','Cổng Dịch vụ công quốc gia, chi tiết công khai mã 2.000635, quan sát ngày 02/10/2026','https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019d2bfd-867c-72db-b6a7-dcbd8c763807'),
-('[8]','OMG, đặc tả UML 2.5.1, tháng 12/2017; căn cứ ký pháp, không phải căn cứ pháp lý của thủ tục','https://www.omg.org/spec/UML/2.5.1'),
-('[9]','UBND Hà Nội, chỉ đạo tại Công văn 1747/UBND-NC ngày 25/04/2026 về phân tuyến hệ thống Thành phố và hệ thống tập trung của bộ','https://hanoi.gov.vn/chi-dao-cua-ubnd-thanh-pho-ha-noi/thuc-hien-tthc-dich-vu-cong-truc-tuyen-lien-thong-dong-bo-hieu-qua-4260429145849633.htm'),
-('[10]','Nguồn chứng minh hệ thống Hà Nội vận hành từ 11/04/2023, công bố 03/07/2023','https://thanglong.chinhphu.vn/hoan-thanh-25-25-dich-vu-cong-thiet-yeu-theo-dung-lo-trinh-de-an-06-10323070313374254.htm')]
+def load_sources():
+ result=[]
+ for line in (ROOT/'02_Noi_dung/08_Tai_lieu_tham_khao.md').read_text(encoding='utf-8').splitlines():
+  match=re.match(r'^\[(\d+)\]\s+(.*)$',line)
+  if not match:continue
+  number,entry=match.groups();url_match=re.search(r'https?://\S+',entry)
+  url=url_match.group(0).rstrip('.,;)') if url_match else ''
+  title=entry[:url_match.start()].rstrip(' .') if url_match else entry
+  result.append((f'[{number}]',title.replace('`',''),url))
+ return result
+SOURCES=load_sources()
 
 class Book:
  def __init__(self,name,title):
@@ -40,26 +41,49 @@ class Book:
   file=path or BASE/'So_do'/(name+'.png');im=Image.open(file);w,h=im.size;wt=min(9072,10400*w/h)
   p=self.d.add_paragraph();p.paragraph_format.alignment=self.e['WD_ALIGN_PARAGRAPH'].CENTER;p.paragraph_format.first_line_indent=self.e['Twips'](0);p.paragraph_format.keep_with_next=True;p.add_run().add_picture(str(file),width=self.e['Twips'](int(wt)));self.e['caption']('Hình',str(ch),title)
  def front(self,brief=False):
-  self.h('LỜI CẢM ƠN');self.p('Em trân trọng cảm ơn giảng viên Hoàng Minh Ngọc đã hướng dẫn học phần Hệ thống thông tin quản lý hành chính. Tài liệu công khai của các cơ quan nhà nước và những kiến thức của học phần là căn cứ để em nghiên cứu đối tượng thực tế, phân tích trách nhiệm và xây dựng bản thiết kế.')
-  self.h('LỜI CAM ĐOAN');self.p('Tài liệu được xây dựng từ nguồn công khai và hồ sơ nghiên cứu. Các mô hình lớp, giao tiếp, màn hình và hạ tầng là thiết kế đề xuất. Em chưa khảo sát tài khoản cán bộ, mã nguồn, dữ liệu nội bộ hoặc kiểm thử phần mềm đang vận hành của thành phố Hà Nội. Mọi kịch bản kiểm thử đều ghi trạng thái chưa thực hiện.')
-  self.p('Giảng viên hướng dẫn: Hoàng Minh Ngọc. Sinh viên: Lê Quóc Huy, mã số 2305HTTB011. Mốc quan sát giao diện: 02/10/2026. Số liệu danh mục thủ tục được giữ đúng ngày của văn bản công bố.')
+  self.h('LỜI CẢM ƠN')
+  self.p('Em xin trân trọng cảm ơn giảng viên hướng dẫn học phần Hệ thống thông tin quản lý hành chính đã góp ý cách tiếp cận đề tài. Những nhận xét về quy trình, dữ liệu, trách nhiệm nghiệp vụ và vận hành giúp em xác định rõ phần việc cần nghiên cứu cũng như giới hạn của đề tài.')
+  self.p('Em cảm ơn các cơ quan đã công khai văn bản, hướng dẫn thủ tục, thông tin về Trung tâm Phục vụ hành chính công Hà Nội và các trang dịch vụ trực tuyến. Việc đối chiếu nguồn giúp em phân biệt thông tin hiện hành, tư liệu lịch sử và nội dung chỉ có thể đề xuất khi chưa được tiếp cận hệ thống nội bộ.')
+  self.p('Trong quá trình thực hiện, em đã tổng hợp các nhánh dịch vụ, xây dựng 36 Use case, mô hình dữ liệu và phần mềm nghiên cứu cục bộ để minh họa giao diện cùng một số luồng xử lý. Các kết quả này là sản phẩm học tập và là cơ sở để tiếp tục nhận góp ý; chúng chưa được cơ quan nghiệp vụ xác nhận hoặc kết nối vào hệ thống đang vận hành.')
+  self.p('Em mong nhận được nhận xét của giảng viên về căn cứ, cách trình bày và những điểm cần khảo sát thêm. Em sẽ dùng các góp ý đó để sửa các nội dung chưa rõ, bổ sung nguồn kiểm chứng và hoàn thiện thiết kế trong phạm vi dữ liệu được phép tiếp cận.')
+  self.h('LỜI CAM ĐOAN')
+  self.p('Em cam đoan báo cáo do em thực hiện trên cơ sở tài liệu được dẫn nguồn và hồ sơ nghiên cứu của đề tài. Các số liệu, quyết định và ảnh giao diện công khai được ghi theo xuất xứ; nội dung tổng hợp, nhận định và thiết kế do em xây dựng được trình bày rõ theo phạm vi của chúng.')
+  self.p('Các mô hình, màn hình và quy tắc trong báo cáo là phương án phân tích, thiết kế cho ứng dụng nghiên cứu cục bộ. Ảnh ứng dụng tại mục 4.6 được chụp từ phần mềm React/Python do em xây dựng trong thư mục dự án; đó không phải ảnh bàn cán bộ hay giao dịch đang chạy trên hệ thống chính thức của thành phố Hà Nội.')
+  self.p('Em chưa được cấp quyền khảo sát tài khoản cán bộ, mã nguồn, dữ liệu nội bộ hoặc các hợp đồng kết nối của hệ thống Hà Nội. Vì vậy, báo cáo không khẳng định đã sao chép đầy đủ cấu hình nội bộ, đã tích hợp hoặc đã kiểm thử trên môi trường thật. Những nội dung chưa thể xác nhận được nêu thành giới hạn hoặc yêu cầu khảo sát tiếp; kết quả kiểm thử phần mềm thật không được suy ra từ tính nhất quán của mô hình.')
   fields=[('MỤC LỤC','TOC \\o "1-2" \\h \\z')]
   if not brief:fields += [('DANH MỤC BẢNG BIỂU','TOC \\h \\z \\c "Bảng"'),('DANH MỤC HÌNH VÀ SƠ ĐỒ','TOC \\h \\z \\c "Hình"')]
   for t,f in fields:
    p=self.e['cloned_caption'](116,t);p.paragraph_format.page_break_before=True;p=self.d.add_paragraph();self.e['add_field'](p,f,'Cập nhật trường trong Microsoft Word')
   if not brief:
-   self.h('DANH MỤC TỪ VIẾT TẮT');self.e['table']([['Ký hiệu','Nội dung'],['TTHC','Thủ tục hành chính'],['UBND','Ủy ban nhân dân'],['UML','Ngôn ngữ mô hình hóa thống nhất'],['UC','Mã Use case của bản thiết kế mới'],['CN','Mã chức năng dùng chung'],['MR','Mã chức năng mở rộng nghiên cứu'],['MH','Mã màn hình đề xuất'],['API','Giao diện lập trình ứng dụng']])
+   self.h('DANH MỤC TỪ VIẾT TẮT');self.e['table']([['Ký hiệu','Nội dung'],['TTHC','Thủ tục hành chính'],['UBND','Ủy ban nhân dân'],['UML','Ngôn ngữ mô hình hóa thống nhất'],['UC','Mã Use case của bản thiết kế mới'],['CN','Mã chức năng dùng chung'],['MR','Mã chức năng mở rộng nghiên cứu'],['API','Giao diện lập trình ứng dụng']])
  def finish(self):
-  self.d.core_properties.author='Lê Quóc Huy';self.d.core_properties.title=self.file.stem;self.d.save(self.file)
+  self.d.core_properties.author='';self.d.core_properties.title=self.file.stem;self.d.save(self.file)
   ref=self.e['REF'];editable={'word/document.xml','word/_rels/document.xml.rels','[Content_Types].xml','word/settings.xml','docProps/core.xml','docProps/app.xml'}
   with ZipFile(ref) as zr,ZipFile(self.file) as zf:
    data={n:zf.read(n) for n in zf.namelist()}
    for n in zr.namelist():
     if n not in editable:data[n]=zr.read(n)
+  styles=data['word/styles.xml']
+  start=styles.find(b'<w:style w:type="paragraph" w:styleId="TableofFigures">')
+  if start<0:
+   style=b'<w:style w:type="paragraph" w:styleId="TableofFigures"><w:name w:val="table of figures"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:ind w:left="0" w:firstLine="0"/></w:pPr></w:style>'
+   if b'</w:styles>' not in styles:raise ValueError('Missing styles root closing tag')
+   styles=styles.replace(b'</w:styles>',style+b'</w:styles>',1)
+  else:
+   end=styles.find(b'</w:style>',start)
+   if end<0:raise ValueError('Malformed TableofFigures paragraph style')
+   block=styles[start:end]
+   updated=block.replace(b'<w:pPr><w:spacing w:after="0"/></w:pPr>',b'<w:pPr><w:spacing w:after="0"/><w:ind w:left="0" w:firstLine="0"/></w:pPr>')
+   if updated==block and b'<w:ind w:left="0" w:firstLine="0"/>' not in block:raise ValueError('Cannot align table and figure lists')
+   styles=styles[:start]+updated+styles[end:]
+  data['word/styles.xml']=styles
   with ZipFile(self.file,'w',ZIP_DEFLATED) as z:
    for n,b in data.items():z.writestr(n,b)
+  # Normalize the package through python-docx so Word can open the generated
+  # report reliably and cache its table-of-contents fields on final export.
+  Document(self.file).save(self.file)
   manifest={'file':str(self.file),'tables':self.e['caps'],'figures':self.e['figcaps'],'paragraphs':len(self.d.paragraphs)}
-  (ROOT/'05_Doi_chieu/Kiem_tra_huong_doi_tuong_20261002'/ (self.file.stem+'_danh_muc.json')).write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8');print(self.file.name,len(manifest['tables']),len(manifest['figures']))
+  manifest_path=ROOT/'05_Doi_chieu/Kiem_tra_huong_doi_tuong_20261002'/ (self.file.stem+'_danh_muc.json');manifest_path.parent.mkdir(parents=True,exist_ok=True);manifest_path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8');print(self.file.name,len(manifest['tables']),len(manifest['figures']))
 
 b=Book('Phan_tich_thiet_ke_huong_doi_tuong_Ha_Noi.docx',('Phân tích và thiết kế hướng đối tượng','Hệ thống giải quyết thủ tục hành chính Hà Nội'));b.front()
 b.h('CHƯƠNG 1. ĐỐI TƯỢNG VÀ PHẠM VI NGHIÊN CỨU')
@@ -67,17 +91,17 @@ b.h('1.1. Hệ thống thực tế và các địa chỉ truy cập',2)
 b.p('Đối tượng nghiên cứu là Hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội. Nguồn [10] ghi nhận hệ thống vận hành từ ngày 11/04/2023; tài liệu công dân [1] thể hiện tên hệ thống và các chức năng giao diện lịch sử. Địa chỉ dichvucong.hanoi.gov.vn là địa chỉ gắn với hệ thống Thành phố. Từ 01/07/2025, người dân được hướng dẫn sử dụng Cổng Dịch vụ công quốc gia theo [2]. Việc chuyển cửa truy cập công dân không đủ để kết luận hệ thống xử lý phía sau của Hà Nội đã ngừng hoạt động.')
 b.tab(1,'Địa chỉ và bằng chứng sử dụng',[['Địa chỉ','Vai trò và giới hạn'],['https://dichvucong.hanoi.gov.vn/','Địa chỉ Hà Nội; khi quan sát chuyển đến cổng quốc gia'],['https://dichvucong.gov.vn/','Cửa công dân hiện được quan sát công khai; chưa đăng nhập hoặc gửi hồ sơ'],['https://ttpvhcc.hanoi.gov.vn/','Công bố hướng dẫn, quyết định, phương án và hoạt động của Trung tâm'],['Hệ thống cán bộ và kết nối nội bộ','Chưa có quyền truy cập; thiết kế phía sau được đề xuất từ quy trình công khai']])
 b.h('1.2. Đơn vị đếm chức năng và quy trình',2)
-b.tab(1,'Bốn phạm vi không được đếm lẫn',[['Đơn vị','Số lượng','Cách hiểu'],['Nhóm chức năng','9','Khung đối chiếu chức năng dùng chung theo [3]'],['Chức năng dùng chung','31','Được mã hóa CN01 đến CN31 trong nghiên cứu; chưa xác nhận đúng 31 mục thực tế trong tài khoản cán bộ'],['Use case thiết kế','36','31 ca truy vết chức năng chuẩn và 5 ca mở rộng phục vụ tài chính, số hóa, phản ánh, nộp lưu'],['Dòng thủ tục tại QĐ 492','2.075','Danh mục ngày 14/04/2026: 1.120 toàn trình, 921 một phần, 34 cung cấp thông tin; chưa khẳng định toàn bộ còn hiệu lực ngày 02/10/2026']])
+b.tab(1,'Bốn phạm vi không được đếm lẫn',[['Đơn vị','Số lượng','Cách hiểu'],['Nhóm chức năng','9','Khung đối chiếu chức năng dùng chung theo [3]'],['Chức năng dùng chung','31','Được mã hóa CN01 đến CN31 trong nghiên cứu; chưa xác nhận đúng 31 mục thực tế trong tài khoản cán bộ'],['Use case thiết kế','36','31 ca truy vết chức năng chuẩn và 5 ca mở rộng phục vụ tài chính, số hóa, phản ánh, nộp lưu'],['Dòng thủ tục tại QĐ 492','2.075','1.120 toàn trình, 921 một phần, 34 cung cấp thông tin theo danh mục công bố']])
 b.p('Một chức năng có thể phục vụ hàng nghìn thủ tục. Một thủ tục lại có nhiều nhánh theo chủ thể, cơ quan, kênh, thành phần, phối hợp và ngoại lệ. Vì vậy không thể suy ra hệ thống có 2.075 quy trình duy nhất, cũng không thể dùng 31 để trả lời số thủ tục của thành phố. Số nhánh cấu hình nội bộ chưa được nguồn công khai chứng minh.')
 b.h('1.3. Phương pháp và mức độ chứng minh',2)
-b.p('Nguồn được chia theo thời điểm và loại bằng chứng. Ảnh công khai năm 2026 chứng minh nội dung có thể xem khi chưa đăng nhập. Ảnh trong hướng dẫn 2023 chỉ chứng minh giao diện lịch sử. Quyết định công bố chứng minh quy trình được phê duyệt trong phạm vi văn bản; không chứng minh đã thực hiện mọi bước trên phần mềm. Mô hình đề xuất được kiểm tra tính nhất quán, không được gọi là kiến trúc nội bộ đã khảo sát.')
+b.p('Nguồn được phân biệt theo loại bằng chứng. Ảnh cổng công khai minh họa thông tin có thể xem khi chưa đăng nhập. Ảnh trong hướng dẫn 2023 được dùng để tìm hiểu giao diện lịch sử. Quyết định công bố chứng minh quy trình được phê duyệt trong phạm vi văn bản; không chứng minh đã thực hiện mọi bước trên phần mềm. Mô hình đề xuất được kiểm tra tính nhất quán, không được gọi là kiến trúc nội bộ đã khảo sát.')
 b.p('Ký pháp được đối chiếu với [8]. Đường sống xác định đối tượng tương tác; thông điệp phải có bên gửi, bên nhận và thứ tự. Khung alt phân tách điều kiện. Hoạt động dùng nút đầu, quyết định, kết thúc; phối hợp đồng thời dùng thanh phân nhánh và hợp nhánh. Lớp thể hiện thuộc tính, thao tác và bội số. Mũi tên khái quát hóa hướng về vai trò chung. Các nhãn Giao diện, Điều khiển, Thực thể trong hình phân tích là quy ước của bản nghiên cứu, được giải thích tại chương 4.')
 
 b.h('CHƯƠNG 2. GIAO DIỆN THỰC TẾ VÀ CÁC NHÁNH DỊCH VỤ')
-b.h('2.1. Quan sát công khai ngày 02/10/2026',2)
+b.h('2.1. Giao diện cổng công khai',2)
 UI=ROOT/'03_Thiet_ke/Anh_he_thong'
 for f,t in [('01_cong_quoc_gia_20261002.jpg','Cổng quốc gia sau khi truy cập địa chỉ Hà Nội'),('02_tra_cuu_thu_tuc_20261002.jpg','Tra cứu thủ tục hộ tịch trên cửa công dân hiện tại'),('03_chi_tiet_trich_luc_20261002.jpg','Chi tiết công khai thủ tục 2.000635'),('04_chon_co_quan_hanoi_20261002.jpg','Chọn Hà Nội và Phường Hoàn Kiếm trước khi nộp')]:
- b.fig(2,'',t+'; ảnh quan sát 02/10/2026',UI/f)
+ b.fig(2,'',t,UI/f)
 b.p('Các ảnh trên dừng ở phần công khai; chưa thao tác gửi yêu cầu, thanh toán hoặc ký. Người dùng cần chọn đúng cơ quan trước khi xác nhận thủ tục áp dụng. Thông tin chung trên trang quốc gia và phương án riêng của Hà Nội phải được đối chiếu thay vì sao chép thành một cấu hình thống nhất.')
 b.h('2.2. Giao diện lịch sử có nguồn',2)
 hist={27:'Danh sách thủ tục',28:'Chi tiết thủ tục và nút nộp',29:'Kê khai thành phần hồ sơ',30:'Chọn tài liệu trong kho',31:'Kê khai người được ủy quyền',32:'Xác nhận và gửi hồ sơ',33:'Tình trạng hồ sơ sau tra cứu',34:'Mở hồ sơ của người sử dụng',36:'Cửa phản ánh và kiến nghị',38:'Gửi phản ánh'}
@@ -89,41 +113,42 @@ b.tab(2,'Nhánh dịch vụ và tác động lên thiết kế',[['Nhánh','Đi�
 
 b.h('CHƯƠNG 3. TÁC NHÂN, Use case VÀ HƯỚNG DẪN CHỨC NĂNG')
 b.h('3.1. Tác nhân và phạm vi trách nhiệm',2)
-b.fig(3,'phan_cap_tac_nhan','Phân cấp vai trò cán bộ')
-b.fig(3,'ca_su_dung_tong_the','Use case tổng thể theo mục tiêu')
+b.fig(3,'phan_cap_tac_nhan','Biểu đồ tổng quát hóa tác nhân cán bộ theo vai trò')
+b.fig(3,'ca_su_dung_tong_the','Biểu đồ Use Case tổng thể theo mục tiêu')
 b.p('Tác nhân là vai trò tương tác, không đồng nhất với tên cơ quan. Một cá nhân có nhiều vai trò nhưng chỉ thực hiện thao tác trong phạm vi được giao tại thời điểm thao tác. Quản trị kỹ thuật không mặc nhiên có quyền đọc hồ sơ, cấp quyền cho bản thân hoặc ký thay lãnh đạo. Các hệ thống ngoài chỉ tham gia qua giao tiếp đã được phê duyệt.')
 b.tab(3,'Phân tách trách nhiệm quan trọng',[['Hành động','Vai trò chịu trách nhiệm','Điểm kiểm soát'],['Tiếp nhận','Cán bộ tiếp nhận','Thẩm quyền, thành phần, phiên bản và giấy hẹn'],['Thẩm định','Chuyên viên được phân công','Bằng chứng và nhiệm vụ phối hợp'],['Duyệt và ký','Người có thẩm quyền','Đúng bản dự thảo và chứng thư'],['Phát hành','Văn thư được giao','Số văn bản và bản ký bất biến'],['Thu, hoàn, đối soát','Cán bộ tài chính và bên thanh toán','Không dùng ảnh thanh toán để ghi nhận'],['Nộp lưu','Cán bộ lưu trữ','Gói toàn vẹn, thành phần và biên nhận'],['Cấp quyền','Quản trị được ủy quyền và người phê duyệt','Không tự duyệt quyền của bản thân']])
+b.h('3.2. Phân nhóm mục tiêu nghiệp vụ',2)
 for g in GROUPS:
- b.h(f'3.{g+1}. Nhóm {g}: {GROUPS[g]}',2)
+ b.h(f'3.2.{g}. Nhóm {g}: {GROUPS[g]}',3)
  items=[u for u in MODEL if u['group']==g]
  if g in [2,4]:
-  for i in range(0,len(items),5):b.fig(3,f'ca_su_dung_nhom_{g}_phan_{i//5+1}',f'Use case nhóm {g}, phần {i//5+1}')
- else:b.fig(3,f'ca_su_dung_nhom_{g}',f'Use case nhóm {g}')
- for u in items:
-  c=next(x for x in CONTRACT if x['uc']==u['id']);b.h(u['id']+'. '+u['name'],3)
-  b.tab(3,'Đặc tả '+u['id'],[['Thành phần','Nội dung'],['Mã và mục tiêu',u['function']+'; '+u['name']],['Tác nhân chính',u['actor']],['Tiền điều kiện',u['guard']],['Đầu vào',u['inputs']],['Luồng chính','; '.join(f'{i}. {s}' for i,s in enumerate(u['steps'],1))],['Ngoại lệ',u['exception']],['Hậu điều kiện','Trả đúng phạm vi dữ liệu; không thay đổi trạng thái nghiệp vụ' if u['read_only'] else 'Kết quả đã xác nhận và nhật ký được lưu cùng giao dịch; thử lại không ghi trùng'],['Truy vết',u['screen']+'; '+u['controller']+'.'+u['operation']+'; '+u['test']+'A đến '+u['test']+('C' if u['read_only'] else 'E')]])
-  b.p('Hướng dẫn thực hiện theo thiết kế: ' + ' '.join(f'Bước {i}: {s}.' for i,s in enumerate(u['steps'],1)))
-  b.p(u['exception']+'.')
-  b.fig(3,u['id']+'_man_hinh',u['screen']+'; bản thiết kế màn hình '+u['name'].lower())
-  b.fig(3,u['id']+'_trinh_tu','Tương tác một thao tác của '+u['id'])
-  b.fig(3,u['id']+'_hoat_dong','Hoạt động một thao tác của '+u['id'])
-b.h('3.11. Phối hợp đồng thời và xử lý trả lại',2)
-b.fig(3,'hoat_dong_phoi_hop_song_song','Hai nhiệm vụ phối hợp bắt buộc trong UC15')
-b.p('Biểu đồ tương tác của mỗi ca thể hiện một thao tác tại một thời điểm, không gom toàn bộ nhiều ngày xử lý vào một lần gọi. UC13 gồm lệnh lập yêu cầu và lệnh đối chiếu bổ sung của vai trò tương ứng; UC16 gồm phê duyệt, ký và phát hành bằng các lệnh tách theo quyền. Hình tổng quát không thay cho bảng chuyển bước ở chương 4. Khi một cơ quan phối hợp chậm, tạo sự kiện giám sát và quyết định ngoại lệ; không dùng thanh hợp nhánh để giả định đã nhận ý kiến.')
+   for i in range(0,len(items),5):b.fig(3,f'ca_su_dung_nhom_{g}_phan_{i//5+1}',f'Biểu đồ Use Case nhóm {g}, phần {i//5+1}')
+ else:b.fig(3,f'ca_su_dung_nhom_{g}',f'Biểu đồ Use Case nhóm {g}')
+b.h('3.3. Đặc tả 36 Use case theo mã',2)
+for u in sorted(MODEL,key=lambda item:int(item['id'][2:])):
+ c=next(x for x in CONTRACT if x['uc']==u['id']);b.h(u['id']+'. '+u['name'],3)
+ b.tab(3,'Đặc tả '+u['id'],[['Thành phần','Nội dung'],['Mã và mục tiêu',u['function']+'; '+u['name']],['Tác nhân chính',u['actor']],['Tiền điều kiện',u['guard']],['Đầu vào',u['inputs']],['Luồng chính','; '.join(f'{i}. {s}' for i,s in enumerate(u['steps'],1))],['Ngoại lệ',u['exception']],['Hậu điều kiện','Trả đúng phạm vi dữ liệu; không thay đổi trạng thái nghiệp vụ' if u['read_only'] else 'Kết quả đã xác nhận và nhật ký được lưu cùng giao dịch; thử lại không ghi trùng'],['Truy vết',u['controller']+'.'+u['operation']+'; '+u['test']+'A đến '+u['test']+('C' if u['read_only'] else 'E')]])
+ b.p('Hướng dẫn thực hiện theo thiết kế: ' + ' '.join(f'Bước {i}: {s}.' for i,s in enumerate(u['steps'],1)))
+ b.p(u['exception']+'.')
+ b.fig(3,u['id']+'_trinh_tu','Biểu đồ trình tự '+u['id']+': '+u['name'])
+ b.fig(3,u['id']+'_hoat_dong','Biểu đồ hoạt động '+u['id']+': '+u['name'])
+b.h('3.4. Phối hợp đồng thời và xử lý trả lại',2)
+b.fig(3,'hoat_dong_phoi_hop_song_song','Biểu đồ hoạt động phối hợp đồng thời trong UC15')
+b.p('Biểu đồ trình tự của mỗi ca thể hiện một kịch bản tại một thời điểm, không gom toàn bộ nhiều ngày xử lý vào một lần gọi. Đầu mỗi đường sống dùng ký hiệu theo mẫu: tác nhân dạng người; giao diện là vòng tròn gắn nét biên bên trái; điều khiển là vòng tròn có đầu mũi tên gấp khúc chạm cung trên-trái; đối tượng dữ liệu là vòng tròn có gạch ngang chạm đáy; cơ sở dữ liệu dùng hình trụ để phân biệt với lớp thực thể. Tên lớp đặt ngay dưới ký hiệu. UC13 gồm lệnh lập yêu cầu và lệnh đối chiếu bổ sung của vai trò tương ứng; UC16 gồm phê duyệt, ký và phát hành bằng các lệnh tách theo quyền. Hình tổng quát không thay cho bảng chuyển bước ở chương 4. Khi một cơ quan phối hợp chậm, tạo sự kiện giám sát và quyết định ngoại lệ; không dùng thanh hợp nhánh để giả định đã nhận ý kiến.')
 
 b.h('CHƯƠNG 4. MÔ HÌNH LỚP, TRẠNG THÁI VÀ KIẾN TRÚC')
 b.h('4.1. Trách nhiệm của lớp phân tích',2)
-b.fig(4,'lop_phan_tich_tiep_nhan','Phân tách giao diện, điều khiển, thực thể và truy xuất')
-b.fig(4,'lop_mien_cot_loi','Quan hệ miền cốt lõi quanh hồ sơ')
+b.fig(4,'lop_phan_tich_tiep_nhan','Biểu đồ lớp phân tích theo mô hình Boundary–Control–Entity')
+b.fig(4,'lop_mien_cot_loi','Biểu đồ lớp miền cốt lõi quanh hồ sơ')
 b.p('Lớp giao diện tiếp nhận dữ liệu và thể hiện lỗi, không quyết định thẩm quyền hoặc tự đổi trạng thái. Lớp điều khiển tổ chức một thao tác, xác thực phạm vi, lấy phiên bản và mở giao dịch. Thực thể giữ các bất biến của hồ sơ, kết quả, nghĩa vụ thu và nhiệm vụ phối hợp. Lớp truy xuất chỉ đọc và ghi theo điều kiện được lớp ứng dụng xác lập. Dịch vụ ngoài được bọc qua bộ chuyển đổi, không gọi trực tiếp từ thực thể miền.')
 b.h('4.2. Lớp miền và quan hệ đầy đủ',2)
-for g,name,keys in MAPPING['diagrams']:b.fig(4,name,f'Các lớp miền nhóm {g}: '+GROUPS[int(g)])
-b.tab(4,'Ánh xạ 35 lớp miền sang dữ liệu',[['Lớp','Bảng','Trách nhiệm'],*[[MAPPING['classes'][k],k,v[0]] for k,v in SCHEMA.items()]], [2200,2400,4472])
-b.p('Các hình lớp trình bày một số thuộc tính và quan hệ chính để đọc rõ. Bảng dưới liệt kê toàn bộ 62 khóa ngoại trong mô hình dữ liệu; ký hiệu 0..* ở phía lớp con biểu thị số đối tượng con của một đối tượng cha. Phía cha là 1 hoặc 0..1 theo tính bắt buộc của tham chiếu. Quan hệ lưu trữ không mặc nhiên là hợp thành: hồ sơ, tài liệu ký và nhật ký không bị xóa dây chuyền theo thao tác xóa giao diện.')
+for g,name,keys in MAPPING['diagrams']:b.fig(4,name,f'Biểu đồ lớp miền nhóm {g}: '+GROUPS[int(g)])
+b.tab(4,'Ánh xạ 37 lớp miền sang dữ liệu',[['Lớp','Bảng','Trách nhiệm'],*[[MAPPING['classes'][k],k,v[0]] for k,v in SCHEMA.items()]], [2200,2400,4472])
+b.p('Các hình lớp trình bày một số thuộc tính và quan hệ chính để đọc rõ. Bảng dưới liệt kê toàn bộ 74 khóa ngoại trong mô hình dữ liệu; ký hiệu 0..* ở phía lớp con biểu thị số đối tượng con của một đối tượng cha. Phía cha là 1 hoặc 0..1 theo tính bắt buộc của tham chiếu. Quan hệ lưu trữ không mặc nhiên là hợp thành: hồ sơ, tài liệu ký và nhật ký không bị xóa dây chuyền theo thao tác xóa giao diện.')
 b.tab(4,'Toàn bộ quan hệ tham chiếu và bội số',[['Lớp nguồn','Thuộc tính','Lớp đích','Bội số tại đích'],*[[MAPPING['classes'][a['source']],a['field'],MAPPING['classes'][a['target']],a['target_multiplicity']+'; phía nguồn 0..*'] for a in ASSOC]], [2500,2250,2700,1622])
-b.p('Từ điển 35 bảng với đầy đủ kiểu, khóa và tính bắt buộc được giữ trong 03_Thiet_ke/Tu_dien_du_lieu.json và phần thiết kế của báo cáo nghiên cứu tổng hợp. Những cột cấu trúc linh hoạt phải có lược đồ theo phiên bản; chưa được đưa dữ liệu bất kỳ vào môi trường vận hành. Quan hệ miền, quyền truy cập và vòng đời phải được thực hiện trong lớp ứng dụng, không chỉ dựa vào khóa ngoại.')
+b.p('Từ điển 37 bảng với đầy đủ kiểu, khóa và tính bắt buộc được giữ trong 03_Thiet_ke/Tu_dien_du_lieu.json và phần thiết kế của báo cáo nghiên cứu tổng hợp. Những cột cấu trúc linh hoạt phải có lược đồ theo phiên bản; chưa được đưa dữ liệu bất kỳ vào môi trường vận hành. Quan hệ miền, quyền truy cập và vòng đời phải được thực hiện trong lớp ứng dụng, không chỉ dựa vào khóa ngoại.')
 b.h('4.3. Máy trạng thái hồ sơ',2)
-b.tab(4,'12 trạng thái và ý nghĩa',[['Mã','Ý nghĩa'],['NHAP','Chưa gửi; chưa tạo trách nhiệm tiếp nhận'],['CHO_TIEP_NHAN','Đã gửi, chờ kiểm tra'],['CHO_BO_SUNG','Chờ đáp ứng yêu cầu; lưu giai đoạn quay lại'],['DA_TIEP_NHAN','Đã xác nhận tiếp nhận'],['DANG_THU_LY','Đang xử lý theo phân công'],['TRINH_DUYET','Dự thảo đang chờ quyết định'],['DA_PHE_DUYET','Đúng bản đã được ký duyệt'],['DA_PHAT_HANH','Đã cấp số và phát hành'],['HOAN_THANH','Có bằng chứng giao hợp lệ'],['TU_CHOI','Không tiếp nhận theo căn cứ'],['KHONG_GIAI_QUYET','Kết luận không giải quyết theo căn cứ'],['DUNG','Có quyết định dừng được duyệt']])
+b.tab(4,'12 trạng thái và ý nghĩa',[['Mã','Ý nghĩa'],['NHAP','Chưa gửi; chưa tạo trách nhiệm tiếp nhận'],['CHO_TIEP_NHAN','Đã gửi, chờ kiểm tra'],['CHO_BO_SUNG','Chờ đáp ứng yêu cầu; lưu giai đoạn quay lại'],['DA_TIEP_NHAN','Đã xác nhận tiếp nhận'],['DANG_THU_LY','Đang xử lý theo phân công'],['TRINH_DUYET','Dự thảo đang chờ quyết định'],['DA_PHE_DUYET','Đúng bản đã được ký duyệt'],['DA_PHAT_HANH','Đã cấp số và phát hành'],['HOAN_THANH','Có bằng chứng giao hợp lệ'],['TU_CHOI','Không tiếp nhận theo căn cứ'],['KHONG_GIAI_QUYET','Kết luận không giải quyết theo căn cứ'],['DUNG','Thông báo dừng theo Mẫu 06 đã ký và phát hành']])
 for name,title in [('trang_thai_HoSo','Các nhánh tiếp nhận và kết luận'),('trang_thai_HoSo_bo_sung','Bổ sung quay lại đúng giai đoạn'),('trang_thai_HoSo_phat_hanh','Ký duyệt, phát hành và xác nhận giao')]:b.fig(4,name,title)
 b.tab(4,'18 chuyển bước kiểm soát hồ sơ',[['Nguồn','Sự kiện và đích','Điều kiện','Vai trò'],*[[t['source'],t['event']+' → '+t['target'],t['guard'],t['role']] for t in MACHINE['transitions']]], [1850,2600,2922,1700])
 b.p('Bốn trạng thái kết thúc không có lệnh chuyển thông thường. Đính chính, hủy văn bản, giải quyết khiếu nại hoặc mở lại phải được thiết kế thành nghiệp vụ riêng có căn cứ, không sửa trực tiếp lịch sử. Hạn xử lý là kết quả tính theo phiên bản quy tắc và lịch làm việc; không dùng trạng thái QUÁ HẠN thay cho trạng thái chuyên môn. Việc bổ sung hoặc mất kết nối không tự dừng hay tính lại hạn.')
@@ -137,6 +162,33 @@ b.tab(4,'Phân bố thực thi và giao tiếp',[['Vùng','Thành phần','Giao 
 b.tab(4,'Ma trận phụ thuộc các gói đề xuất',[['Gói','Phụ thuộc được phép','Lý do'],['1','Lõi miền và hợp đồng chung','Quyền, chủ thể và cơ quan'],['2','1','Quyền quản trị, danh mục và hiệu lực'],['3','1 và hợp đồng kết quả của lõi miền','Thẩm quyền ký; không phụ thuộc nhà cung cấp cụ thể'],['4','1, 2, 3, 8','Quyền, quy trình, chữ ký và tài liệu hợp lệ'],['5','1, 4','Thông báo, hỗ trợ và tra cứu theo hồ sơ'],['6','1 và mô hình đọc của 4','Báo cáo dùng bản dữ liệu có thời điểm chốt'],['7','1, 4','Chỉ đạo và giám sát trách nhiệm'],['8','1, 2 và lõi miền','Quyền khai thác, phân loại và phiên bản tài liệu'],['9','1 và giao diện dịch vụ của 4','Bộ chuyển đổi thực hiện hợp đồng được nghiệp vụ cung cấp']])
 b.p('Lõi miền và hợp đồng chung không phụ thuộc lớp giao diện, cơ sở dữ liệu hoặc nhà cung cấp ngoài. Hình gói minh họa ba phụ thuộc để giữ đường nối rõ; ma trận ghi đầy đủ quy tắc đề xuất. Gói 6 dùng mô hình đọc, không gọi thao tác đổi trạng thái. Gói 9 thực hiện giao diện trừu tượng của nghiệp vụ; gói 4 không nhập mã nhà cung cấp của gói 9.')
 
+b.h('4.6. Giao diện hệ thống',2)
+b.p('Các ảnh sau ghi lại giao diện của phần mềm React/Python trong bộ hồ sơ này, gồm cổng tra cứu, bố cục điện thoại, các phân hệ cán bộ và CMS tin tức. Dữ liệu nhận diện trong ảnh là dữ liệu minh họa do ứng dụng nghiên cứu tạo ra; ảnh không phải giao diện hay dữ liệu của hệ thống cán bộ Hà Nội. Màn hình cán bộ chỉ mở sau khi đăng nhập; hành động thay đổi dữ liệu được máy chủ kiểm tra quyền, phạm vi và trạng thái hồ sơ. Tin tức được lưu trong cơ sở dữ liệu ứng dụng; chỉ quản trị viên được biên tập và xuất bản.')
+b.p('Thiết kế quy trình tham chiếu Nghị định 118/2025/NĐ-CP và các sửa đổi có hiệu lực tại thời điểm nghiên cứu; phần thủ tục trên môi trường điện tử được đối chiếu Nghị định 310/2026/NĐ-CP và Thông tư 14/2026/TT-BTP. Nhánh yêu cầu dừng được tách thành tiếp nhận, kiểm tra lại điều kiện tại thời điểm phát hành, lập Mẫu 06 và ghi nhận số văn bản cùng chứng cứ giao theo hướng dẫn hiện hành. Ứng dụng chỉ lưu bản đã ký do cán bộ cung cấp và thông tin xác nhận; nó không ký số, kiểm tra chứng thư hoặc phát hành thay cơ quan. [11]–[15]')
+b.tab(4,'Các màn hình hệ thống',[['Khu vực','Màn hình thể hiện'],['Cổng công dân','Trang chủ trên máy tính và điện thoại; tin đã xuất bản; tra cứu thủ tục công khai'],['Bàn cán bộ','Đăng nhập; tổng quan; hộp xử lý; chi tiết hồ sơ'],['Quản trị và kiểm soát','Tài khoản cán bộ; CMS tin tức; giám sát quy trình; danh mục; nhật ký; tình trạng kết nối']])
+b.p('CMS tin tức được triển khai trong tài khoản quản trị viên, dùng chung cơ sở dữ liệu của ứng dụng. Quản trị viên tìm và lọc bài, tạo hoặc sửa bản nháp, chọn chuyên mục và ảnh trong thư viện, khai báo đường dẫn nguồn, đánh dấu tin nổi bật, xuất bản hoặc lưu trữ. Máy chủ giới hạn nguồn ở miền HTTPS .gov.vn, kiểm tra ảnh cục bộ và trường bắt buộc, kiểm tra phiên bản để tránh ghi đè đồng thời, đồng thời lưu người thao tác và trạng thái trước/sau. Cổng công dân chỉ đọc bài đã xuất bản; chưa có luồng duyệt độc lập thứ hai hoặc đồng bộ tự động từ trang Trung tâm.')
+b.tab(4,'Trạng thái và kiểm soát của CMS tin tức',[['Trạng thái/thao tác','Ai thực hiện','Kết quả công khai và dấu vết'],['Bản nháp','Quản trị viên hệ thống','Lưu trong cơ sở dữ liệu; không hiển thị ở cổng công dân; ghi người tạo'],['Xuất bản hoặc cập nhật','Quản trị viên hệ thống','Hiện ở trang chủ và chi tiết tin; lưu thời điểm, phiên bản và nhật ký trước/sau'],['Lưu trữ','Quản trị viên hệ thống','Ẩn khỏi cổng công dân nhưng giữ lịch sử và nội dung để tra cứu nội bộ'],['Khôi phục bản nháp','Quản trị viên hệ thống','Tin lưu trữ trở về trạng thái nháp; cần xuất bản lại mới xuất hiện công khai'],['Lưu khi bản đã đổi','Máy chủ kiểm tra phiên bản','Từ chối yêu cầu cũ và yêu cầu tải lại để tránh ghi đè thay đổi mới']])
+b.p('Tên người dùng trên thanh đầu trang mở Tài khoản cá nhân. Mục này hiển thị vai trò, phạm vi cơ quan, thời hạn và căn cứ phê duyệt; cho phép cập nhật điện thoại bằng mật khẩu hiện tại, đổi mật khẩu và kết thúc các phiên khác. Email hiện chưa được xác minh qua mã hoặc liên kết. Nút Đăng xuất được đặt ở cuối thanh bên. Trạng thái và số lượng được trình bày bằng chữ; không dùng chấm báo hoạt động. Các lối tắt trùng với điều hướng đã được bỏ.')
+APP_UI=ROOT/'03_Thiet_ke/Anh_giao_dien_he_thong'
+for file,title in [
+ ('01_cong_dan_may_tinh.jpg','Cổng tra cứu công dân trên máy tính'),
+ ('02_cong_dan_dien_thoai.jpg','Bố cục cổng công dân trên điện thoại'),
+ ('03_dang_nhap_can_bo.jpg','Màn hình đăng nhập cán bộ hiện tại'),
+ ('04_tong_quan_can_bo.jpg','Tổng quan công việc trong phạm vi tài khoản'),
+ ('05_hop_xu_ly.jpg','Hộp xử lý và lọc hồ sơ'),
+ ('06_chi_tiet_ho_so.jpg','Chi tiết hồ sơ và lịch sử xử lý'),
+ ('07_quan_ly_tai_khoan.jpg','Quản lý đề nghị cấp quyền và tài khoản cán bộ'),
+ ('08_giam_sat_quy_trinh.jpg','Giám sát tiến độ theo phạm vi được phép'),
+ ('09_danh_muc_thu_tuc.jpg','Tra cứu danh mục thủ tục tham chiếu'),
+ ('10_nhat_ky_ho_so.jpg','Nhật ký sự kiện theo hồ sơ'),
+ ('11_ket_noi_dich_vu.jpg','Trạng thái kết nối và hàng chờ cục bộ'),
+ ('12_cong_dan_tin_tuc.jpg','Trang chủ công dân hiển thị tin lấy từ dữ liệu đã xuất bản'),
+ ('13_quan_ly_tin_tuc.jpg','Danh sách và trạng thái tin trong tài khoản quản trị viên'),
+ ('14_soan_tin_tuc.jpg','Biểu mẫu biên tập tin với chuyên mục, ảnh và nguồn chính thức'),
+ ('15_tai_khoan_ca_nhan.jpg','Tài khoản cá nhân, quyền công tác và tình trạng xác minh email'),
+ ('16_bao_mat_tai_khoan.jpg','Cập nhật liên hệ, đổi mật khẩu và quản lý phiên đăng nhập')]:
+ b.fig(4,'',title,APP_UI/file)
+
 b.h('CHƯƠNG 5. HƯỚNG DẪN THEO THỦ TỤC CỤ THỂ')
 b.h('5.1. Thư viện 2.075 hồ sơ thủ tục',2)
 b.p('Thư viện tại 07_Huong_dan/Thu_tuc_theo_QD_492 có một tệp cho mỗi dòng của ba phụ lục [4]. Trang Tra_cuu_danh_muc.html cho phép tìm theo tên, mã, cơ quan và lĩnh vực. Mỗi hồ sơ có mức cung cấp trực tuyến, trang nguồn và hướng dẫn tiếp cận theo mức. Đây là phủ danh mục lịch sử, chưa phải 2.075 hướng dẫn chuyên biệt đã xác minh đầy đủ hiện hành.')
@@ -144,7 +196,7 @@ b.tab(5,'Mức cung cấp và phạm vi hướng dẫn',[['Mức','Số dòng','
 b.p('Một số mã trong bản phụ lục có cách ghi không theo khuôn phổ biến. Thư viện giữ nguyên chữ của nguồn và đánh dấu cần xác minh, không tự thêm dấu hoặc chữ số. Số thứ tự hồ sơ thư viện là mã kỹ thuật độc lập với số thứ tự in, nhằm tránh mất dòng khi phụ lục in trùng số. Các trường thành phần, số lượng, mẫu, phí, hạn, điều kiện và kết quả chưa có nguồn chi tiết được ghi rõ chưa xác minh.')
 b.tab(5,'Điều kiện để một hướng dẫn chuyên biệt được coi là đầy đủ',[['Nội dung','Bằng chứng phải có'],['Hiệu lực','Quyết định công bố hoặc cập nhật, ngày áp dụng và phạm vi cơ quan'],['Chủ thể và thẩm quyền','Người có quyền yêu cầu, quan hệ đại diện, cơ quan xử lý hiện hành'],['Hồ sơ và biểu mẫu','Danh sách thành phần, số lượng, mẫu và bản phải xuất trình'],['Thời hạn và khoản thu','Quy tắc mốc nhận, ngày làm việc, ngoại lệ, miễn giảm và căn cứ'],['Luồng và các nhánh','Trực tuyến, trực tiếp, bưu chính, bổ sung, từ chối, phối hợp, trả kết quả'],['Ảnh và minh chứng','Ảnh đúng thời điểm và phiên bản, hoặc bản thiết kế ghi rõ là đề xuất'],['Kiểm tra đối chiếu','Hai người hoặc một lần rà soát độc lập đối chiếu với nguồn; chưa áp dụng trong nghiên cứu cho toàn bộ danh mục']])
 b.h('5.2. Cấp bản sao trích lục hộ tịch, bản sao giấy khai sinh',2)
-b.p('Mã thủ tục là 2.000635. Nghiên cứu có hai lớp nguồn: trang công khai [7] quan sát ngày 02/10/2026 và phương án tái cấu trúc tại [5] ngày 24/12/2025. Chọn Hà Nội và cơ quan cụ thể trên cửa công dân là bước xác định phạm vi, chưa chứng minh toàn bộ thông tin chung của trang áp dụng đúng phương án địa phương.')
+b.p('Mã thủ tục là 2.000635. Nghiên cứu có hai lớp nguồn: trang công khai [7] và phương án tái cấu trúc tại [5] ngày 24/12/2025. Chọn Hà Nội và cơ quan cụ thể trên cửa công dân là bước xác định phạm vi, chưa chứng minh toàn bộ thông tin chung của trang áp dụng đúng phương án địa phương.')
 b.tab(5,'Hướng dẫn tiếp cận và kiểm soát cho thủ tục hộ tịch',[['Bước','Người yêu cầu','Cơ quan và kiểm soát'],['1. Chọn','Tìm 2.000635; chọn Hà Nội và cơ quan đúng thẩm quyền','Đối chiếu phiên bản, nguồn hộ tịch và tuyến dữ liệu'],['2. Chuẩn bị','Đọc thành phần, điều kiện đại diện và mẫu được công bố; kê khai chính xác sự kiện cần trích lục','Không yêu cầu thêm giấy tờ ngoài quy định; xác định dữ liệu có thể khai thác'],['3. Gửi','Xem lại tờ khai, tài liệu, kênh trả; lưu mã giao dịch','Kiểm tra quan hệ chủ thể, khử trùng và trả biên nhận'],['4. Kiểm tra','Đọc yêu cầu bổ sung hoặc thông báo tiếp nhận','Bổ sung có nội dung và căn cứ; không nhầm với kết luận từ chối'],['5. Thẩm định','Phản hồi nội dung được yêu cầu trong phạm vi quyền','Kiểm tra dữ liệu nguồn; lỗi kết nối không chứng minh sự kiện hộ tịch không tồn tại'],['6. Xác nhận và thu','Đọc bản dự thảo khi quy trình áp dụng yêu cầu; kiểm tra khoản thu và miễn giảm','Áp dụng quy tắc của phiên bản địa phương; đối soát đúng khoản thu'],['7. Nhận','Kiểm tra thông tin trích lục; nhận bản được phát hành qua kênh đã chọn','Ký, phát hành và lưu chứng cứ giao; xử lý sai sót qua nghiệp vụ có căn cứ']])
 b.tab(5,'Những khác biệt phải xác nhận trước cấu hình',[['Điểm đối chiếu','Trang quốc gia quan sát','Yêu cầu trước khi áp dụng Hà Nội'],['Cơ quan','Có lựa chọn địa phương; nguồn công bố chung','Xác nhận cơ quan lưu sổ và phân tuyến theo phương án được duyệt'],['Khoản thu','Trang chung hiển thị mức 8.000 đồng','Chưa lấy mức chung làm khoản thu mặc định mọi kênh tại Hà Nội; đối chiếu miễn giảm và quyết định còn hiệu lực'],['Bản dự thảo','Trang có hướng dẫn xác nhận dự thảo trong thời gian tối đa một ngày','Xác định bước này có thuộc cấu hình địa phương hiện hành không'],['Hạn','Thông tin chung có quy tắc xử lý theo mốc nhận và nhánh xác minh','Đối chiếu hạn pháp lý, các bước nội bộ và nguồn dữ liệu của phiên bản Hà Nội'],['Tái cấu trúc','Thông tin chung chưa chứng minh toàn bộ phương án [5]','Giữ hai phiên bản nguồn; cần đầu mối nghiệp vụ xác nhận mô hình áp dụng']])
 b.h('5.3. Cấp bản sao từ sổ gốc',2)
@@ -169,13 +221,13 @@ b.h('6.3. Cấu hình theo phiên bản thủ tục',2)
 b.p('Mỗi phiên bản thủ tục phải có quyết định, hiệu lực, cơ quan, thành phần, mẫu, quy tắc hạn, khoản thu, tuyến xử lý và quy tắc ký. Hồ sơ chốt phiên bản ngay lúc gửi hoặc tiếp nhận theo chính sách đã được nghiệp vụ xác nhận. Công bố bản mới không sửa ngầm hồ sơ đang xử lý. Nếu chuyển đổi hồ sơ cũ được phép, phải lưu căn cứ, ánh xạ trạng thái, kết quả kiểm tra và người phê duyệt.')
 b.tab(6,'Bảng cấu hình cần hoàn thiện trước lập trình một thủ tục',[['Cấu hình','Kiểu và kiểm tra'],['Thông tin phiên bản','Định danh, mã quốc gia nguyên bản, số quyết định, ngày bắt đầu và kết thúc; khoảng hiệu lực không chồng lấn trong cùng phạm vi'],['Tờ khai và thành phần','Kiểu từng trường, bắt buộc theo nhánh chủ thể, số lượng, định dạng, mẫu, nguồn có thể tái sử dụng'],['Quy trình','Bước, vai trò, trạng thái, sự kiện, điều kiện và nhiệm vụ song song; có đường kết thúc hợp lệ'],['Hạn','Đơn vị, mốc bắt đầu, lịch làm việc, mốc trong ngày, nhánh xác minh, quy tắc bổ sung có căn cứ'],['Khoản thu','Số tiền nguyên đơn vị đồng, đối tượng, kênh, miễn giảm, thời điểm thu, hoàn và chứng từ'],['Kết quả','Mẫu, người duyệt, người ký, số văn bản, kênh giao và bằng chứng'],['Kết nối','Phiên bản hợp đồng, nguồn dữ liệu, mã tương quan, chữ ký, thời gian chờ, thử lại và đối soát']])
 b.h('6.4. Mức độ sẵn sàng và giới hạn bàn giao',2)
-b.p('Bộ hồ sơ đủ để bắt đầu xây dựng ứng dụng nghiên cứu cho các thao tác dùng chung, có dữ liệu giả lập và các kết nối được mô phỏng rõ ràng. Chưa đủ để sao chép đầy đủ hệ thống thực đang vận hành hoặc đưa 2.075 thủ tục vào sản xuất. Phần còn thiếu gồm quyền khảo sát cán bộ, cấu hình thực từng thủ tục, hợp đồng đối tác, mẫu tờ khai chi tiết, dữ liệu kiểm thử được cho phép và xác nhận quy trình địa phương hiện hành. Nghiên cứu không có yêu cầu tạo phần mềm chạy trong lần bàn giao này.')
+b.p('Ứng dụng nghiên cứu cục bộ đã được xây dựng bằng React, TypeScript, Python và SQLite để minh họa luồng người dân tra cứu công khai cùng bàn xử lý cán bộ. Ứng dụng có thể chạy tại máy phát triển và lưu dữ liệu trong cơ sở dữ liệu cục bộ. Ứng dụng chưa kết nối tài khoản, hồ sơ, thanh toán, ký số hoặc đồng bộ với hệ thống nhà nước; vì vậy không thay thế hệ thống thật và không đủ căn cứ để đưa 2.075 thủ tục vào sản xuất. Phần còn thiếu gồm quyền khảo sát cán bộ, cấu hình từng thủ tục, hợp đồng đối tác, mẫu tờ khai, dữ liệu kiểm thử được cho phép và xác nhận quy trình địa phương hiện hành.')
 
 b.h('CHƯƠNG 7. TRIỂN KHAI, KIỂM THỬ, VẬN HÀNH VÀ QUẢN TRỊ')
 b.h('7.1. Lộ trình triển khai đề xuất',2)
 b.tab(7,'Các giai đoạn và điều kiện chuyển tiếp',[['Giai đoạn','Công việc','Điều kiện kết thúc'],['Chuẩn bị','Chốt phạm vi, phiên bản nguồn, vai trò và dữ liệu được phép','Nghiệp vụ phê duyệt cấu hình thử nghiệm'],['Xây dựng nền','Quyền, danh mục, hồ sơ, phiên bản, nhật ký, kho và hàng đợi','Kiểm thử bất biến và phục hồi dữ liệu đạt'],['Hai thủ tục mẫu','Cấu hình riêng hộ tịch và bản sao từ sổ gốc; không dùng chung phí, hạn','Đối chiếu từng bước với quy trình được phê duyệt'],['Thí điểm','Môi trường riêng; kết nối mô phỏng hoặc đối tác cho phép','Không tồn tại lỗi làm sai thẩm quyền, mất hồ sơ hoặc thu trùng'],['Mở rộng','Nạp từng thủ tục đã xác minh; đào tạo và giám sát','Đủ hướng dẫn, cấu hình và bằng chứng nghiệm thu từng thủ tục'],['Vận hành','Giám sát, sao lưu, phục hồi, quản trị thay đổi','Có người trực, quy trình sự cố và lịch kiểm tra được duyệt']])
 b.h('7.2. Kiểm thử và bằng chứng',2)
-b.p(f"Bộ kiểm thử hướng đối tượng gồm {CHECK['test_cases']} ca dự kiến, truy vết 36 Use case: luồng đạt, không đạt điều kiện, sai phạm vi và với lệnh thay đổi có thêm gửi lặp, xung đột phiên bản. Tất cả ca chưa thực hiện. 11 kiểm tra dữ liệu mô hình đã chạy kiểm tra tính duy nhất, tham chiếu bảng, ca đọc, khóa ngoại và tính tới được của máy trạng thái; kết quả này không thay cho kiểm thử phần mềm. Bộ 95 ca của báo cáo tổng hợp vẫn là kế hoạch riêng, không cộng thành số ca đã đạt.")
+b.p(f"Bộ kiểm thử hướng đối tượng gồm {CHECK['test_cases']} ca dự kiến, truy vết 36 Use case: luồng đạt, không đạt điều kiện, sai phạm vi và với lệnh thay đổi có thêm gửi lặp, xung đột phiên bản. Bộ ca thiết kế này chưa chạy đầy đủ. Trong lần rà soát ứng dụng hiện tại, 22 bài kiểm tra HTTP hồi quy chạy trên cơ sở dữ liệu tạm đã đạt, trong đó có kiểm tra quyền CMS, vòng đời bài viết, nhật ký và xung đột phiên bản; đây là phạm vi riêng, không thay thế kiểm thử toàn bộ Use case. 11 kiểm tra dữ liệu mô hình đã chạy kiểm tra tính duy nhất, tham chiếu bảng, ca đọc, khóa ngoại và tính tới được của máy trạng thái; kết quả này cũng không thay cho kiểm thử phần mềm. Bộ kiểm thử tổng hợp 101 ca là danh mục riêng và chưa thực hiện đầy đủ.")
 b.tab(7,'Nhóm kiểm thử bắt buộc khi có phần mềm',[['Nhóm','Tình huống','Tiêu chí'],['Nghiệp vụ','Đủ, thiếu, từ chối, dừng, trả chỉnh sửa, nhiều cơ quan','Đúng căn cứ, vai trò và trạng thái'],['Đồng thời','Hai chuyên viên, hai lần gửi, hai phản hồi thanh toán','Không ghi đè, trùng hồ sơ hoặc trùng tiền'],['Tích hợp','Mất kết nối, lặp, đảo thứ tự, chữ ký sai','Không ghi nhận dữ liệu lỗi là kết quả hợp lệ'],['An toàn','Truy cập hồ sơ người khác, đổi cơ quan, tệp độc hại','Từ chối trước trả dữ liệu; cách ly tệp và nhật ký cần thiết'],['Khả năng tiếp cận','Bàn phím, phóng to, nhãn lỗi, đọc bằng công cụ hỗ trợ','Thao tác và thông báo hiểu được, không chỉ dựa vào màu'],['Hiệu năng','Kỳ báo cáo, giờ nộp cao, kho tệp lớn','Đạt mục tiêu được phê duyệt trên tải và dữ liệu thử'],['Phục hồi','Mất nút, mất tệp, khôi phục bản sao, hàng đợi gửi lại','Đối chiếu toàn vẹn và không nhân đôi sự kiện'],['Chấp nhận','Cán bộ thực hiện đủ nhánh hai thủ tục mẫu','Có biên bản, nguồn phiên bản và hồ sơ thử được phép']])
 b.h('7.3. Vận hành và xử lý sự cố',2)
 b.p('Giám sát tách thời gian phản hồi, lỗi kỹ thuật, độ trễ hàng đợi, hồ sơ đến hạn, phản hồi phối hợp và chênh lệch tài chính. Không dùng trạng thái máy chủ ổn định để kết luận hồ sơ đang được giải quyết đúng hạn. Khi đối tác lỗi, ghi mã tương quan, dừng khẳng định thành công và giữ trách nhiệm xử lý tại đầu mối; tiếp tục hoạt động nội bộ theo phương án được phê duyệt.')
@@ -184,10 +236,10 @@ b.h('7.4. Quản trị dữ liệu, thay đổi và chất lượng',2)
 b.p('Chủ quản nghiệp vụ phê duyệt danh mục và quy trình; chủ quản dữ liệu quyết định phạm vi khai thác; đơn vị vận hành quản lý dịch vụ và phục hồi; đầu mối an toàn kiểm soát quyền, sự kiện và tệp; cán bộ lưu trữ kiểm tra hạn bảo quản và gói nộp lưu. Những vai trò này phải được giao bằng căn cứ tổ chức thực tế trước vận hành.')
 b.tab(7,'Chỉ số, mẫu số và hạn chế diễn giải',[['Chỉ số','Cách xác định','Cảnh báo'],['Đúng hạn','Số hồ sơ kết thúc đúng hạn trên tập hồ sơ kết thúc trong kỳ đã chốt','Không trộn ngày nhận và ngày trả; công bố quy tắc loại trừ'],['Bổ sung','Số hồ sơ có ít nhất một yêu cầu bổ sung trên tập hồ sơ tiếp nhận','Tách số lần và số hồ sơ; không kết luận lỗi cán bộ từ tỷ lệ đơn lẻ'],['Tái sử dụng','Hồ sơ thực sự dùng tài liệu hợp lệ đã có trên tập hồ sơ có khả năng dùng lại','Có chứng cứ nguồn và quyền; không đếm chỉ vì mở kho'],['Đồng bộ','Thông điệp được bên nhận xác nhận áp dụng trên tập phải trao đổi','Đã gửi hoặc có biên nhận kỹ thuật chưa đủ'],['Thu và hoàn','Khoản thu, giao dịch, chứng từ, kỳ đã đối soát','Không cộng giao dịch lặp hoặc tiền đã hoàn vào thu ròng'],['Phục hồi','Kết quả diễn tập theo mục tiêu được duyệt','Mục tiêu và kết quả đo khác nhau; chưa có diễn tập trong nghiên cứu']])
 b.h('TÀI LIỆU THAM KHẢO')
-for code,title,url in SOURCES:b.p('['+code+'] '+title+'. '+url)
+for code,title,url in SOURCES:b.p(code+' '+title+('. '+url if url else ''))
 b.h('PHỤ LỤC. TỆP BÀN GIAO VÀ NỘI DUNG CÒN THIẾU')
-b.tab('A','Đường dẫn tương đối trong thư mục nghiên cứu',[['Tệp hoặc thư mục','Nội dung'],['03_Thiet_ke/Huong_doi_tuong','36 ca, 35 lớp, 62 quan hệ, máy trạng thái, hợp đồng và 168 ca kiểm thử dự kiến'],['03_Thiet_ke/Huong_doi_tuong/So_do','Bản ảnh để đọc và bản véc tơ để chỉnh sửa sơ đồ'],['03_Thiet_ke/Anh_he_thong','4 ảnh công khai 2026 và 10 ảnh nguồn lịch sử 2023'],['07_Huong_dan/Chuc_nang_dung_chung','36 hướng dẫn theo bản thiết kế'],['07_Huong_dan/Thu_tuc_theo_QD_492','2.075 hồ sơ hướng dẫn tiếp cận, danh mục, trang tra cứu và nguồn theo trang'],['07_Huong_dan/Thu_tuc_phan_tich_sau','Hướng dẫn chuyên sâu theo hai thủ tục đã phân tích']])
-b.p('Trạng thái cần tiếp tục: chưa xác minh đầy đủ chi tiết và hiệu lực hiện hành của 2.075 thủ tục; chưa có ảnh tài khoản cán bộ hoặc thực hiện nộp, ký, thanh toán; chưa kiểm thử phần mềm; chưa có lược đồ đầy đủ tờ khai cho toàn bộ thủ tục. Bản thiết kế không tuyên bố đạt 100% mọi yêu cầu của hệ thống thực.')
+b.tab('A','Đường dẫn tương đối trong thư mục nghiên cứu',[['Tệp hoặc thư mục','Nội dung'],['03_Thiet_ke/Huong_doi_tuong','36 Use case, 37 lớp, 74 quan hệ, máy trạng thái, hợp đồng và bộ 180 ca kiểm thử hướng đối tượng'],['03_Thiet_ke/Huong_doi_tuong/So_do','Bản ảnh để đọc và bản véc tơ để chỉnh sửa sơ đồ'],['03_Thiet_ke/Kich_ban_kiem_thu.csv','Bộ kiểm thử tổng hợp 101 ca; tất cả chưa thực hiện'],['03_Thiet_ke/Anh_he_thong','4 ảnh công khai 2026 và 10 ảnh nguồn lịch sử 2023'],['03_Thiet_ke/Anh_giao_dien_he_thong','Ảnh giao diện phần mềm nghiên cứu cục bộ, phân biệt với ảnh hệ thống chính thức'],['07_Huong_dan/Chuc_nang_dung_chung','36 hướng dẫn theo bản thiết kế'],['07_Huong_dan/Thu_tuc_theo_QD_492','2.075 hồ sơ hướng dẫn tiếp cận, danh mục, trang tra cứu và nguồn theo trang'],['07_Huong_dan/Thu_tuc_phan_tich_sau','Hướng dẫn chuyên sâu theo hai thủ tục đã phân tích']])
+b.p('Trạng thái cần tiếp tục: chưa xác minh đầy đủ chi tiết và hiệu lực hiện hành của 2.075 thủ tục; chưa có tài khoản, ảnh màn hình hoặc phiên thực hiện nộp, ký, thanh toán trên hệ thống Hà Nội; phần mềm cục bộ đã chạy 22 bài kiểm thử HTTP hồi quy trên dữ liệu tạm nhưng chưa được kiểm thử đầy đủ; chưa có lược đồ đầy đủ tờ khai cho toàn bộ thủ tục. Bản thiết kế không tuyên bố đạt 100% mọi yêu cầu của hệ thống thực.')
 b.finish()
 
 

@@ -93,7 +93,7 @@ export default function FrappeHrmsDeskDashboard() {
         links: [
           { label: 'Sơ đồ Tổ chức Động (Interactive Tree)', href: '/org-chart' },
           { label: 'Danh sách Nhân sự Toàn diện', href: '/employees', count: hr?.totalEmployees },
-          { label: 'Hồ sơ Nhân sự & Cán bộ', href: '/personnel-profiles' },
+          { label: 'Hồ sơ Nhân sự & Cán bộ', href: '/employees?tab=civil-servant' },
           { label: 'Quản trị Tài sản & Thiết bị', href: '/assets' },
           { label: 'Quyết định & Biến động Nhân sự', href: '/personnel' },
           { label: 'Ngạch bậc & Thang bảng lương', href: '/salary-ranks' },
@@ -109,7 +109,7 @@ export default function FrappeHrmsDeskDashboard() {
           { label: 'Bảng Chấm công Thực tế', href: '/attendance' },
           { label: 'Quản lý Đơn Nghỉ phép', href: '/leave', count: hr?.pendingLeave },
           { label: 'Đăng ký Làm thêm giờ / Trực ca', href: '/overtime', count: hr?.pendingOvertime },
-          { label: 'Điểm danh khuôn mặt & IR', href: '/check-in' },
+          { label: 'Điểm danh bằng khuôn mặt', href: '/check-in' },
         ],
       },
       {
@@ -122,7 +122,7 @@ export default function FrappeHrmsDeskDashboard() {
           { label: 'Quản trị Khoản Vay & Tạm ứng', href: '/loans' },
           { label: 'Xuất File Chi Lương Ngân Hàng', href: '/payroll-engine' },
           { label: 'Thành phần Lương (Thu nhập & Khấu trừ)', href: '/payroll-engine' },
-          { label: 'Phiếu lương & Lịch sử chi trả', href: '/payroll' },
+          { label: 'Phiếu lương & Lịch sử chi trả', href: '/payroll-engine?tab=runs' },
         ],
       },
       {
@@ -139,15 +139,14 @@ export default function FrappeHrmsDeskDashboard() {
         ],
       },
       {
-        title: 'Hiệu suất & 360',
+        title: 'Đánh giá KPI',
         subtitle: 'Performance & KRA',
         icon: Target,
-        description: 'Mục tiêu KRA/KPI theo trọng số %, tự đánh giá, quản lý chấm và phản hồi 360 độ.',
+        description: 'Mục tiêu KRA/KPI theo trọng số, kết quả thực tế, minh chứng và điểm do quản lý chấm.',
         links: [
-          { label: 'Đánh giá 360 Độ Toàn diện', href: '/performance-360' },
-          { label: 'Mục tiêu KPI Trọng số (KRA Goals)', href: '/performance-360' },
-          { label: 'Phản hồi Đánh giá Đồng nghiệp', href: '/performance-360' },
-          { label: 'Chu kỳ Đánh giá Hiệu suất', href: '/performance-360' },
+          { label: 'Mục tiêu KPI Trọng số (KRA Goals)', href: '/performance' },
+          { label: 'Cách đánh giá KPI', href: '/performance-guide' },
+          { label: 'Chu kỳ đánh giá KPI', href: '/performance' },
         ],
       },
       {
@@ -263,7 +262,7 @@ export default function FrappeHrmsDeskDashboard() {
               { label: 'Phân Ca Tuần', href: '/shifts', icon: Clock4 },
               { label: 'Tính Lương', href: '/payroll-engine', icon: Calculator },
               { label: 'Tuyển Dụng ATS', href: '/recruitment-ats', icon: Briefcase },
-              { label: 'Đánh Giá 360', href: '/performance-360', icon: Target },
+              { label: 'Đánh giá KPI', href: '/performance', icon: Target },
               { label: 'Công Tác Phí', href: '/expense-claims', icon: Receipt },
               { label: 'Báo Cáo 2C', href: '/personnel-reports', icon: FileSpreadsheet },
             ].map((s, i) => {
@@ -366,7 +365,7 @@ export default function FrappeHrmsDeskDashboard() {
       icon: Clock4,
       description: 'Điểm danh vào/ra ca, xem lịch sử chấm công và nộp đơn giải trình giờ công.',
       links: [
-        { label: 'Điểm danh khuôn mặt & IR', href: '/check-in' },
+        { label: 'Điểm danh bằng khuôn mặt', href: '/check-in' },
         { label: 'Giải trình bổ sung giờ công', href: '/ess' },
         { label: 'Lịch sử chấm công cá nhân', href: '/ess' },
         { label: 'Ca làm việc được phân công', href: '/ess' },

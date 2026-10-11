@@ -2,7 +2,7 @@
 
 ## 6.1. Mục tiêu và phạm vi kiểm thử
 
-Kiểm thử nhằm chứng minh thiết kế được triển khai đúng quy trình đã phê duyệt và không làm sai quyền, thời hạn, dữ liệu hoặc chứng từ. Bộ kịch bản trong chương này là kế hoạch kiểm thử dành cho giai đoạn phát triển tiếp theo. Chưa có phần mềm hoặc môi trường được cấp để thực thi, nên trạng thái của các ca là chưa thực hiện. Báo cáo không ghi tỷ lệ đạt, thời gian đo hoặc số lỗi đã sửa như kết quả thực nghiệm.
+Kiểm thử nhằm xác minh phần mềm nghiên cứu và các cấu hình được triển khai theo đúng quy trình đã phê duyệt, không làm sai quyền, thời hạn, dữ liệu hoặc chứng từ. Hiện đã có ứng dụng nghiên cứu chạy cục bộ bằng React, Python và SQLite; ứng dụng chưa kết nối hệ thống tác nghiệp thật của Hà Nội. Bộ 101 kịch bản trong chương này chưa được chạy như một đợt kiểm thử có kiểm soát; chưa có môi trường tích hợp, tài khoản thử và dữ liệu do cơ quan vận hành cấp. Báo cáo không ghi tỷ lệ đạt, thời gian đo hoặc số lỗi đã sửa như kết quả thực nghiệm.
 
 Phạm vi gồm yêu cầu chức năng YC01 đến YC14 và chỉ tiêu phi chức năng PC01 đến PC08. Thử tích hợp phải kiểm tra cả thành công, thất bại, thông báo trùng và phản hồi đến muộn. Thử nghiệp vụ tập trung hồ sơ của thủ tục chuyên sâu tại đúng cơ quan giải quyết. Dữ liệu, chứng thư và thanh toán đều sử dụng môi trường thử được phép.
 
@@ -48,6 +48,7 @@ Bảng 6.3: Kiểm thử danh mục và quyền
 | --- | --- | --- | --- |
 | KT01 | Hai phiên bản có thời gian hiệu lực khác | Tiếp nhận trước và sau ngày đổi | Mỗi hồ sơ giữ đúng phiên bản áp dụng |
 | KT02 | Phiên bản của cơ quan khác | Chọn sai cơ quan rồi gửi | Không nhận sai nhánh; có hướng dẫn |
+| KT25 | Cùng mã 2.000908 được tra ở hai địa bàn; một kết quả đã quan sát là Hà Nội → Phường Tây Hồ | Chọn địa bàn/cơ quan trên Cổng quốc gia rồi đối chiếu bản ghi tuyến | Không dùng UBND phường Tây Hồ làm mặc định cho địa bàn khác; hồ sơ lưu đúng tuyến và thời điểm đã chọn |
 | KT03 | Người A và hồ sơ của B không có quan hệ | Đổi mã hồ sơ trong truy cập | Không xem hoặc tải được dữ liệu của B |
 | KT04 | Hồ sơ đại diện DL02 và DL03 | Thử nộp và nhận kết quả | Chỉ trường hợp đủ căn cứ được tiếp tục |
 
@@ -68,7 +69,7 @@ Bảng 6.5: Kiểm thử tác nghiệp chuyên môn
 
 | Mã | Dữ liệu, điều kiện | Thao tác | Kết quả mong đợi |
 | --- | --- | --- | --- |
-| KT09 | Thiếu thành phần áp dụng DL04 | Yêu cầu bổ sung rồi nhận bản bổ sung | Lưu giai đoạn, căn cứ và lịch sử; đúng nhánh quay lại |
+| KT09 | Thiếu/sai thành phần đầu vào hoặc dữ liệu liên thông chưa khai thác được | Gửi phiếu bổ sung có danh sách từng mục; thử gửi yêu cầu thứ hai ở bước đầu vào | Phiếu đầu tiên đầy đủ; yêu cầu lần hai bị chặn; lỗi kết nối không bị ghi thành dữ liệu công dân khai sai |
 | KT10 | Yêu cầu ngoài thẩm quyền | Từ chối thiếu hoặc đủ lý do | Thiếu lý do bị chặn; đủ căn cứ sinh đúng phiếu |
 | KT11 | Người xử lý khác cơ quan | Phân công rồi đổi người | Không cấp sai quyền; lịch sử được giữ |
 | KT12 | Kết quả tra cứu mâu thuẫn DL05 | Đối chiếu và trình duyệt | Không tự sửa nguồn; lưu ý kiến và bằng chứng |
@@ -101,10 +102,15 @@ Bảng 6.8: Kiểm thử trách nhiệm và truy vết
 
 | Mã | Dữ liệu, điều kiện | Thao tác | Kết quả mong đợi |
 | --- | --- | --- | --- |
-| KT21 | Đề nghị dừng trước và sau phát hành | Xem xét và quyết định | Xử lý theo giai đoạn; không thu hồi kết quả bằng sửa trạng thái |
+| KT21 | Yêu cầu dừng theo kênh và thời điểm | Sau tiếp nhận hợp lệ, kiểm tra Mẫu 05, chủ thể/đại diện, kết quả; trước khi ký yêu cầu đủ tên cơ quan, Bộ phận Một cửa, địa danh, ngày và số Mẫu 06 | Sinh bản xem/in theo Phụ lục I TT13; giữ nguyên trạng thái lúc chờ ký; thiếu trường mẫu hoặc kết quả đã ban hành thì chặn; chỉ người có quyền ký được cấp riêng mới ghi nhận bản ký và chứng cứ giao, rồi chuyển DUNG; yêu cầu trực tuyến đi qua NQG |
 | KT22 | Hai phiên mở cùng hồ sơ DL10 | Cùng cập nhật | Một cập nhật thành công; bản cũ nhận xung đột |
 | KT23 | Quyền cán bộ bị thu hồi | Dùng phiên cũ tiếp tục | Thao tác bị từ chối; có sự kiện theo dõi |
 | KT24 | Cấu hình thủ tục sửa chưa duyệt | Áp dụng vào hồ sơ mới | Bản nháp không có hiệu lực; truy được người sửa và duyệt |
+| KT26 | Quyết định/văn bản kết quả phát sinh giữa lúc nhận yêu cầu và ký Mẫu 06 | Người ký mở yêu cầu đang chờ phát hành | Kiểm tra lại điều kiện; giữ nguyên trạng thái, không phát hành Mẫu 06 |
+| KT27 | Lãnh đạo chưa được cấp quyền ký Mẫu 06 | Gửi yêu cầu ghi nhận phát hành | Từ chối tại máy chủ; không đổi trạng thái hồ sơ |
+| KT28 | Hồ sơ đã có kết luận KHONG_GIAI_QUYET | Tiếp nhận yêu cầu dừng | Không mở lại nhánh đã kết luận |
+| KT29 | Người ngoài hồ sơ đoán đường dẫn tệp Mẫu 06 | Tải tài liệu | Từ chối; chỉ người trong phạm vi hồ sơ mới truy cập được |
+| KT30 | Người đại diện nộp Mẫu 05 nhưng thiếu chứng cứ đại diện | Tiếp nhận yêu cầu | Không chuyển sang chờ ký; giữ trạng thái hồ sơ và yêu cầu bổ sung chứng cứ |
 
 ## 6.4. Kiểm thử chuyên sâu về thời hạn
 
@@ -250,7 +256,7 @@ Bảng 6.15: Kịch bản đối chiếu từng chức năng
 | CF14 | Hai người cùng phân công hồ sơ | Lưu bằng cùng phiên bản ban đầu | Một cập nhật thành công; người sau nhận xung đột, không ghi đè |
 | CF15 | Hai ý kiến bắt buộc, chỉ có một bản trả | Đề nghị tổng hợp và trình | Chặn hoặc yêu cầu căn cứ được phép; không coi im lặng là đồng ý |
 | CF16 | Người phê duyệt ngoài thẩm quyền phiên bản | Thử duyệt bằng quyền cơ quan khác | Bị từ chối, giữ trạng thái và ghi nhật ký |
-| CF17 | Hồ sơ có khoản thu và nhiệm vụ còn mở | Quyết định dừng theo căn cứ | Có thông báo và xử lý nghĩa vụ còn lại, không xóa lịch sử |
+| CF17 | Hồ sơ có khoản thu và nhiệm vụ còn mở | Cán bộ tiếp nhận kiểm tra yêu cầu, trạng thái và Mẫu 06; cán bộ tài chính theo dõi riêng | Chỉ chuyển DUNG sau khi Mẫu 06 được ký/phát hành; trả giấy/hoàn phí theo quy trình riêng; không tự hoàn tiền hoặc xóa giao dịch |
 | CF18 | Thông báo đã gửi nhưng chưa có biên nhận | Thử ghi đã giao kết quả | Không xác nhận giao chỉ từ trạng thái gửi thông báo |
 | CF19 | Tài khoản chỉ có quyền xem một phạm vi | Kết xuất danh sách ngoài phạm vi | Bị chặn hoặc lọc đúng quyền; có nhật ký xuất |
 | CF20 | Một sự kiện nhắc việc gửi lặp | Xử lý lại sự kiện nhiều lần | Không gửi trùng ngoài chính sách; không lộ nội dung nhạy cảm |
@@ -266,4 +272,6 @@ Bảng 6.15: Kịch bản đối chiếu từng chức năng
 | CF30 | Một mã sự kiện đến lại với nội dung khác | Nhận hai bản thông điệp | Giữ chứng cứ, phát hiện xung đột, không ghi đè im lặng |
 | CF31 | Kết quả có mã địa phương và mã quốc gia | Đồng bộ, mất phản hồi rồi gửi lại | Giữ liên kết mã và phiên bản; chỉ một bản tác động hợp lệ |
 
-Tổng bộ thiết kế có 95 ca, gồm 44 ca trọng tâm, 20 ca mở rộng và 31 ca chức năng; tất cả chưa thực hiện. Bao phủ 31 mục chức năng vẫn chưa đồng nghĩa bao phủ mọi nhánh pháp luật chuyên ngành. Khi có thêm thủ tục, phải bổ sung ca cho khác biệt về thành phần, chủ thể, thẩm quyền, thời hạn, phối hợp, phí và kết quả, rồi truy vết tới phiên bản áp dụng.
+Tổng bộ thiết kế hiện có 101 ca, gồm 50 ca trọng tâm, 20 ca mở rộng và 31 ca chức năng; tất cả chưa thực hiện. KT25 được bổ sung sau khi quan sát Cổng quốc gia yêu cầu chọn cơ quan theo địa bàn; KT26–KT30 kiểm tra nhánh Mẫu 05/06, quyền ký và bảo vệ tệp. Bao phủ 31 mục chức năng vẫn chưa đồng nghĩa bao phủ mọi nhánh pháp luật chuyên ngành. Khi có thêm thủ tục, phải bổ sung ca cho khác biệt về thành phần, chủ thể, thẩm quyền, thời hạn, phối hợp, phí và kết quả, rồi truy vết tới phiên bản áp dụng.
+
+Trong lượt rà soát phần mềm hiện tại, năm bài kiểm tra HTTP hồi quy đã chạy trên cơ sở dữ liệu tạm và đều đạt: truy cập cổng công khai, chặn đăng ký công dân; tài khoản quản trị không xem hoặc xuất hồ sơ; CSRF, phạm vi cơ quan, phân công, phiên bản và luồng tiếp nhận, phân công, dự thảo, trình duyệt, phê duyệt; API phát hành từ chối khi chưa có kết nối; cấp tài khoản qua hai quản trị viên, đổi mật khẩu lần đầu, cấp và thu hồi quyền ký Mẫu 06; đề nghị đổi quyền hoặc tạm ngưng/khôi phục tài khoản cần người duyệt độc lập và làm mất hiệu lực phiên cũ. Đây là nhóm kiểm tra riêng, không tính vào 101 ca thiết kế và không xác nhận tích hợp với môi trường nhà nước. Cơ sở dữ liệu kiểm thử được tạo tạm; dữ liệu của ứng dụng đang chạy không bị thay đổi.

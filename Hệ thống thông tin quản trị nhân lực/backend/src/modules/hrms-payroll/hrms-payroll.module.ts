@@ -470,7 +470,22 @@ export class HrmsPayrollService {
       const rows = attendancePeriod.snapshot as unknown as { userId: string; workDate: string; status: string; workedMinutes: number; nightWorkedMinutes?: number; scheduledMinutes?: number; paidLeave?: boolean; leaveType?: string | null; lateMinutes?: number; earlyMinutes?: number }[];
       const users = await tx.user.findMany({
         where: { deletedAt: null, id: { in: [...new Set(rows.map(r => r.userId))] } },
-        select: { id: true, fullName: true, employeeCode: true, jobTitle: true, orgUnitId: true, salaryBandId: true, baseSalary: true, hireDate: true, taxDependentCount: true, taxResidency: true, minimumWageRegion: true, bankAccount: true, bankName: true, orgUnit: { select: { id: true, name: true } } },
+        select: {
+          id: true, fullName: true, employeeCode: true, jobTitle: true, orgUnitId: true, salaryBandId: true,
+          baseSalary: true, hireDate: true, taxDependentCount: true, taxResidency: true, minimumWageRegion: true,
+          bankAccount: true, bankName: true, orgUnit: { select: { id: true, name: true } },
+          comprehensiveProfile: {
+            select: {
+              rankCode: true, salaryStep: true, salaryCoefficient: true, salaryStepDate: true, positionAllowance: true, overGradePercent: true, otherAllowance: true,
+              rank: { select: { coefficients: true, totalSteps: true } },
+              salaryHistories: {
+                where: { fromDate: { lte: to }, OR: [{ toDate: null }, { toDate: { gte: from } }] },
+                orderBy: { fromDate: 'desc' },
+                select: { rankCode: true, step: true, coefficient: true, baseAmount: true, overGradeRate: true, positionAllowance: true, otherAllowance: true, fromDate: true, toDate: true, decisionNo: true, rank: { select: { coefficients: true, totalSteps: true } } },
+              },
+            },
+          },
+        },
       });
       const positionStructures = await tx.hrmsSalaryStructure.findMany({
         where: { isActive: true, OR: [{ salaryBandId: { not: null } }, { jobTitle: { not: null } }, { orgUnitId: { not: null } }] },
@@ -501,8 +516,13 @@ export class HrmsPayrollService {
         }
         if (!dates.length) throw new ConflictException(`Không có lịch làm việc cho ${user.fullName} trong kỳ lương`);
         const totalScheduledHours = [...scheduledMinutesByDate.values()].reduce((sum, minutes) => sum + minutes, 0) / 60;
-        const assignments = await tx.hrmsSalaryStructureAssignment.findMany({ where: { userId: user.id, isActive: true, fromDate: { lte: to } }, include: { structure: { include: { items: { include: { component: true } } } } }, orderBy: [{ fromDate: 'desc' }, { createdAt: 'desc' }] });
-        const contracts = await tx.contract.findMany({ where: { userId: user.id, status: 'ACTIVE', startDate: { lte: to } }, orderBy: { startDate: 'desc' } });
+        // Assignment rows are effective-dated history. A later assignment closes
+        // the prior rate for dates before it, even when the old row is now inactive.
+        const assignments = await tx.hrmsSalaryStructureAssignment.findMany({ where: { userId: user.id, fromDate: { lte: to } }, include: { structure: { include: { items: { include: { component: true } } } } }, orderBy: [{ fromDate: 'desc' }, { createdAt: 'desc' }] });
+        // Keep expired/terminated contracts for historical periods. Selecting only
+        // today's ACTIVE contract made old-period recalculations fall back to the
+        // employee's current profile salary.
+        const contracts = await tx.contract.findMany({ where: { userId: user.id, startDate: { lte: to } }, orderBy: { startDate: 'desc' } });
         const actions = await tx.personnelAction.findMany({ where: { subjectId: user.id, status: 'APPROVED', effectiveAt: { lte: to } }, orderBy: { effectiveAt: 'asc' } });
         const transfers = await tx.personnelAction.findMany({ where: { subjectId: user.id, type: 'TRANSFER', status: 'APPROVED', effectiveAt: { not: null } }, orderBy: { effectiveAt: 'asc' } });
         const resignation = actions.find(a => a.type === 'RESIGNATION');
@@ -511,8 +531,10 @@ export class HrmsPayrollService {
         let baseTotal = 0, overtimeBaseTotal = 0, insuranceBaseTotal = 0, expectedBase = 0, earnedBase = 0, expectedComponents = 0, earnedComponents = 0, paidDays = 0, attendanceDays = 0, unpaidFullDays = 0, standardHours = 0;
         let lateMinutesTotal = 0, earlyMinutesTotal = 0, workedMinutesTotal = 0, shortMinutesTotal = 0;
         let lateDays = 0, earlyLeaveDays = 0, absenceDays = 0, paidLeaveDays = 0, unpaidLeaveDays = 0, socialInsuranceLeaveDays = 0, missingPairDays = 0;
+        const publicSectorSalaryByDate = new Map<string, Record<string, number | string | null>>();
+        const contractNosUsed = new Set<string>();
         const salaryStructuresUsed = new Set<string>();
-        const salarySourcesUsed = new Set<'EMPLOYEE_ASSIGNMENT' | 'CONTRACT' | 'PROFILE_FALLBACK'>();
+        const salarySourcesUsed = new Set<'EMPLOYEE_ASSIGNMENT' | 'CONTRACT' | 'PROFILE_FALLBACK' | 'PUBLIC_SECTOR_PAY_SCALE'>();
         const salaryStructureSourcesUsed = new Set<'EMPLOYEE_ASSIGNMENT' | 'POSITION_RULE'>();
         const payRatesUsed = new Map<string, { basis: string; rate: number }>();
         const overtimeHourlyRateByDate = new Map<string, number>();
@@ -520,7 +542,7 @@ export class HrmsPayrollService {
         let daysWithoutApprovedBand = 0;
         const componentTotals = new Map<string, { code: string; name: string; type: 'EARNING' | 'DEDUCTION'; amount: number; taxable: boolean; periodAmount: true; basisReference: string | null }>();
         for (const day of dates) {
-          const assignment = assignments.find(a => a.structure.isActive && dateKey(a.fromDate) <= day);
+          const assignment = assignments.find(a => dateKey(a.fromDate) <= day);
           const transferBefore = transfers.filter((action) => dateKey(action.effectiveAt!) <= day).at(-1);
           const transferAfter = transfers.find((action) => dateKey(action.effectiveAt!) > day);
           const beforePayload = transferBefore?.payload as { newJobTitle?: string; newOrgUnitId?: string } | undefined;
@@ -536,14 +558,79 @@ export class HrmsPayrollService {
           const unitMatches = positionStructures.filter((structure) => !structure.jobTitle && Boolean(structure.orgUnitId) && structure.orgUnitId === effectiveOrgUnitId);
           const selectedPositionMatches = titleAndUnitMatches.length ? titleAndUnitMatches : titleMatches.length ? titleMatches : unitMatches;
           if (selectedPositionMatches.length > 1) throw new ConflictException(`Có nhiều cấu trúc lương áp dụng cho ${user.fullName} (${effectiveJobTitle || 'chưa có chức danh'} / ${effectiveOrgUnitId || 'chưa có đơn vị'}). Hãy xử lý cấu hình trùng trước khi tính kỳ.`);
-          const contract = contracts.find(c => dateKey(c.startDate) <= day && (!c.endDate || dateKey(c.endDate) >= day));
+          const contract = contracts.find(c => dateKey(c.startDate) <= day
+            && (c.endDate ? dateKey(c.endDate) >= day : c.status === 'ACTIVE'));
+          let publicPay: { monthlyTotal: number; detail: Record<string, number | string | null> } | null = null;
+          if (isStateOrganization) {
+            const profile = user.comprehensiveProfile;
+            const effectiveHistories = (profile?.salaryHistories ?? []).filter(history => dateKey(history.fromDate) <= day && (!history.toDate || dateKey(history.toDate) >= day));
+            if (effectiveHistories.length > 1) throw new ConflictException(`Có nhiều quyết định ngạch/bậc cùng hiệu lực cho ${user.fullName} ngày ${day.toISOString().slice(0, 10)}.`);
+            const salaryHistory = effectiveHistories[0];
+            const hasSalaryHistoryInPeriod = (profile?.salaryHistories ?? []).length > 0;
+            const profileRateEffective = !hasSalaryHistoryInPeriod && Boolean(profile?.salaryStepDate) && dateKey(profile!.salaryStepDate!) <= day;
+            const step = salaryHistory ? salaryHistory.step : profileRateEffective ? profile?.salaryStep ?? null : null;
+            const rankCode = salaryHistory ? salaryHistory.rankCode : profileRateEffective ? profile?.rankCode ?? null : null;
+            const effectiveRank = salaryHistory?.rank ?? profile?.rank;
+            const rankCoefficients = effectiveRank?.coefficients as number[] | undefined;
+            const coefficient = salaryHistory ? salaryHistory.coefficient
+              : profileRateEffective ? profile?.salaryCoefficient ?? (step ? rankCoefficients?.[step - 1] : undefined) : undefined;
+            const stateBaseSalary = Number(policy.stateBaseSalary ?? 0);
+            const profilePositionCoefficient = Number(profile?.positionAllowance ?? 0);
+            const profileOtherAllowanceCoefficient = Number(profile?.otherAllowance ?? 0);
+            const profileOverGradePercent = Number(profile?.overGradePercent ?? 0);
+            const historicalAllowanceMissing = Boolean(salaryHistory)
+              && ((salaryHistory!.positionAllowance == null && profilePositionCoefficient > 0)
+                || (salaryHistory!.otherAllowance == null && profileOtherAllowanceCoefficient > 0)
+                || (salaryHistory!.overGradeRate == null && profileOverGradePercent > 0));
+            const positionCoefficient = Number(salaryHistory?.positionAllowance ?? profilePositionCoefficient);
+            const otherAllowanceCoefficient = Number(salaryHistory?.otherAllowance ?? profileOtherAllowanceCoefficient);
+            const overGradePercent = Number(salaryHistory?.overGradeRate ?? profileOverGradePercent);
+            if (!rankCode || !step || !Number.isInteger(step) || !Number.isFinite(coefficient) || Number(coefficient) <= 0
+              || (effectiveRank?.totalSteps !== undefined && step > effectiveRank.totalSteps)
+              || (!salaryHistory && (!Array.isArray(rankCoefficients) || !Number.isFinite(rankCoefficients[step - 1]) || Math.abs(Number(rankCoefficients[step - 1]) - Number(coefficient)) > 0.000001))
+              || !Number.isFinite(stateBaseSalary) || stateBaseSalary <= 0
+              || historicalAllowanceMissing
+              || !Number.isFinite(positionCoefficient) || positionCoefficient < 0
+              || !Number.isFinite(otherAllowanceCoefficient) || otherAllowanceCoefficient < 0
+              || !Number.isFinite(overGradePercent) || overGradePercent < 0 || overGradePercent > 100) {
+              throw new ConflictException(`Thiếu hoặc sai hồ sơ lương khu vực công của ${user.fullName} ngày ${day.toISOString().slice(0, 10)}: cần một quyết định ngạch/bậc hiệu lực, hệ số phụ cấp (nếu có) và mức lương cơ sở.`);
+            }
+            const rankSalary = stateBaseSalary * Number(coefficient);
+            const positionAllowance = stateBaseSalary * positionCoefficient;
+            const overGradeAllowance = rankSalary * overGradePercent / 100;
+            const otherAllowance = stateBaseSalary * otherAllowanceCoefficient;
+            publicPay = {
+              monthlyTotal: rankSalary + positionAllowance + overGradeAllowance + otherAllowance,
+              detail: {
+                effectiveFrom: salaryHistory ? dateKey(salaryHistory.fromDate).toISOString().slice(0, 10) : null,
+                decisionNo: salaryHistory?.decisionNo ?? null, rankCode, step, coefficient: Number(coefficient),
+                stateBaseSalary, rankSalary, positionCoefficient, positionAllowance,
+                overGradePercent, overGradeAllowance, otherAllowanceCoefficient, otherAllowance,
+              },
+            };
+            publicSectorSalaryByDate.set(day.toISOString().slice(0, 10), publicPay.detail);
+          }
           const assignmentSalary = assignment && (!contract || dateKey(assignment.fromDate) >= dateKey(contract.startDate)) ? assignment.baseSalary : null;
-          const dailyBase = assignmentSalary ?? contract?.baseSalary ?? user.baseSalary ?? 0;
-          if (assignmentSalary !== null) salarySourcesUsed.add('EMPLOYEE_ASSIGNMENT');
-          else if (contract) salarySourcesUsed.add('CONTRACT');
-          else salarySourcesUsed.add('PROFILE_FALLBACK');
-          if (!Number.isFinite(dailyBase) || dailyBase <= 0) throw new ConflictException(`Không có lương hợp đồng/quyết định hợp lệ cho ${user.fullName} từ ${day.toISOString().slice(0, 10)}; chưa thể tính bảng lương.`);
-          const compensationBasis = contract?.compensationBasis ?? 'MONTHLY';
+          const hasAnyContractHistory = contracts.length > 0;
+          const hasApplicableSalarySource = Boolean(publicPay) || assignmentSalary !== null || contract !== undefined;
+          const profileFallback = !isStateOrganization && !hasAnyContractHistory && assignmentSalary === null ? Number(user.baseSalary ?? 0) : 0;
+          const dailyBase = publicPay?.monthlyTotal ?? assignmentSalary ?? contract?.baseSalary ?? profileFallback;
+          if (publicPay) salarySourcesUsed.add('PUBLIC_SECTOR_PAY_SCALE');
+          else if (assignmentSalary !== null) salarySourcesUsed.add('EMPLOYEE_ASSIGNMENT');
+          else if (contract) {
+            salarySourcesUsed.add('CONTRACT');
+            if (contract.contractNo) contractNosUsed.add(contract.contractNo);
+          }
+          else if (profileFallback > 0) salarySourcesUsed.add('PROFILE_FALLBACK');
+          if (!Number.isFinite(dailyBase) || dailyBase <= 0) {
+            const reason = hasAnyContractHistory && !hasApplicableSalarySource
+              ? 'không có hợp đồng hoặc quyết định lương hiệu lực cho ngày này'
+              : isStateOrganization
+                ? 'thiếu hồ sơ ngạch/bậc hoặc quyết định lương hiệu lực'
+                : 'chưa có hợp đồng, quyết định hoặc lương hồ sơ hợp lệ';
+            throw new ConflictException(`Nhân sự ${user.fullName} từ ${day.toISOString().slice(0, 10)} ${reason}; chưa thể tính bảng lương.`);
+          }
+          const compensationBasis = isStateOrganization ? 'MONTHLY' : contract?.compensationBasis ?? 'MONTHLY';
           payRatesUsed.set(`${compensationBasis}:${dailyBase}`, { basis: compensationBasis, rate: dailyBase });
           const monthlyEquivalentBase = compensationBasis === 'DAILY' ? dailyBase * dates.length
             : compensationBasis === 'HOURLY' ? dailyBase * totalScheduledHours
@@ -556,7 +643,8 @@ export class HrmsPayrollService {
           const positionStructure = salaryBandStructure ?? selectedPositionMatches[0] ?? null;
           const appliedStructure = assignment?.structure ?? positionStructure;
           const appliedComponentItems = (appliedStructure?.items ?? []).filter((item) =>
-            !(isStateOrganization && item.component.code === 'RESPONSIBILITY_ALLOW' && item.component.basisType === 'COMPANY_POLICY'));
+            !(isStateOrganization && item.component.code === 'POSITION_ALLOW')
+            && !(isStateOrganization && item.component.code === 'RESPONSIBILITY_ALLOW' && item.component.basisType === 'COMPANY_POLICY'));
           if (appliedStructure) {
             salaryStructuresUsed.add(appliedStructure.name);
             salaryStructureSourcesUsed.add(assignment ? 'EMPLOYEE_ASSIGNMENT' : 'POSITION_RULE');
@@ -586,7 +674,9 @@ export class HrmsPayrollService {
           }
           overtimeBaseTotal += monthlyEquivalentBase + overtimeApplicableAllowances;
           overtimeHourlyRateByDate.set(day.toISOString().slice(0, 10), monthlyHourlyRate(monthlyEquivalentBase + overtimeApplicableAllowances, totalScheduledHours));
-          insuranceBaseTotal += Math.max(contract?.insuranceSalary ?? 0, monthlyEquivalentBase + insurableAllowances);
+          insuranceBaseTotal += isStateOrganization
+            ? monthlyEquivalentBase + insurableAllowances
+            : Math.max(contract?.insuranceSalary ?? 0, monthlyEquivalentBase + insurableAllowances);
           const row = attendanceByDate.get(day.toISOString().slice(0, 10));
           const scheduledHours = (scheduledMinutesByDate.get(day.toISOString().slice(0, 10)) ?? 480) / 60;
           standardHours += scheduledHours;
@@ -597,7 +687,10 @@ export class HrmsPayrollService {
                 : monthlyEquivalentBase / dates.length;
           }
           if (eligibleKeys.has(day.toISOString().slice(0, 10)) && row) {
-            actual = ['PRESENT', 'LATE', 'EARLY_LEAVE'].includes(row.status) ? Math.min(1, row.workedMinutes / (row.scheduledMinutes ?? 480)) : 0;
+            // PRESENT means the configured grace window has been honored. Do not
+            // mark a day present in attendance and still prorate its pay by minutes.
+            actual = row.status === 'PRESENT' ? 1
+              : ['LATE', 'EARLY_LEAVE'].includes(row.status) ? Math.min(1, row.workedMinutes / (row.scheduledMinutes ?? 480)) : 0;
             workedMinutesTotal += Number(row.workedMinutes ?? 0);
             if (row.status === 'LATE') lateDays++;
             if (row.status === 'EARLY_LEAVE') earlyLeaveDays++;
@@ -671,8 +764,10 @@ export class HrmsPayrollService {
         const region = ['I','II','III','IV'].includes(user.minimumWageRegion) ? user.minimumWageRegion : 'I';
         const unemploymentCap = Number(await this.settings.get(`INSURANCE_CAP_BHTN_${region}_${year}`, policy.unemploymentCapByRegion[region]));
         const resident = user.taxResidency !== 'NON_RESIDENT';
-        const taxContract = contracts.find(c => c.type !== 'AMENDMENT' && dateKey(c.startDate) <= to && (!c.endDate || dateKey(c.endDate) >= from));
-        const hasSalaryAmendment = contracts.some(c => c.type === 'AMENDMENT' && dateKey(c.startDate) <= to && (!c.endDate || dateKey(c.endDate) >= from));
+        const taxContract = contracts.find(c => c.type !== 'AMENDMENT' && dateKey(c.startDate) <= to
+          && (c.endDate ? dateKey(c.endDate) >= from : c.status === 'ACTIVE'));
+        const hasSalaryAmendment = contracts.some(c => c.type === 'AMENDMENT' && dateKey(c.startDate) <= to
+          && (c.endDate ? dateKey(c.endDate) >= from : c.status === 'ACTIVE'));
         const flatTenPercent = resident && !hasSalaryAmendment && (!taxContract || Boolean(taxContract.type !== 'INDEFINITE' && taxContract.endDate && isUnderThreeMonths(taxContract.startDate, taxContract.endDate)));
         let calculated: ReturnType<typeof calculatePayroll>;
         try {
@@ -681,7 +776,8 @@ export class HrmsPayrollService {
           const message = error instanceof Error ? error.message : 'Dữ liệu lương không hợp lệ';
           throw new ConflictException(`Không thể tính lương cho ${user.fullName} (${user.employeeCode ?? 'chưa có mã'}): ${message}`);
         }
-        const compensationBases = [...new Set(contracts.filter(c => dateKey(c.startDate) <= to && (!c.endDate || dateKey(c.endDate) >= from)).map(c => c.compensationBasis))];
+        const compensationBases = [...new Set(contracts.filter(c => dateKey(c.startDate) <= to
+          && (c.endDate ? dateKey(c.endDate) >= from : c.status === 'ACTIVE')).map(c => c.compensationBasis))];
         const breakdown = {
           ...calculated.breakdown,
           calculation: {
@@ -692,6 +788,11 @@ export class HrmsPayrollService {
             earnedCompensation: Math.round(earnedBase + earnedComponents),
             attendanceWageReduction: Math.max(0, Math.round(expectedBase + expectedComponents - earnedBase - earnedComponents)),
             salarySource: salarySourcesUsed.size > 1 ? 'MIXED' : [...salarySourcesUsed][0] ?? 'PROFILE_FALLBACK',
+            publicSectorSalary: isStateOrganization ? {
+              stateBaseSalary: policy.stateBaseSalary,
+              basisReference: policy.basisReference,
+              effectiveRates: [...new Map([...publicSectorSalaryByDate.values()].map(value => [JSON.stringify(value), value])).values()],
+            } : null,
             salaryStructureSource: salaryStructureSourcesUsed.size > 1 ? 'MIXED' : [...salaryStructureSourcesUsed][0] ?? 'NONE',
             salaryStructureName: [...salaryStructuresUsed].join(' · ') || null,
             salaryBandReview: {
@@ -702,7 +803,7 @@ export class HrmsPayrollService {
               })),
               daysWithoutApprovedBand,
             },
-            contractNo: contracts[0]?.contractNo ?? null,
+            contractNo: [...contractNosUsed].join(' · ') || null,
             payRatesUsed: [...payRatesUsed.values()],
             attendance: {
               standardDays: dates.length,

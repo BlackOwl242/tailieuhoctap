@@ -169,6 +169,7 @@ model OrgUnit {
   parent          OrgUnit?         @relation("OrgUnitTree", fields: [parentId], references: [id])
   children        OrgUnit[]        @relation("OrgUnitTree")
   users           User[]           @relation("UserOrgUnit")
+  assignedKpiGoals HrmsAppraisalGoal[] @relation("KpiAssignmentOrgUnit")
   salaryStructures HrmsSalaryStructure[]
   spaces          Space[]
   onboardingPaths OnboardingPath[]
@@ -1016,6 +1017,7 @@ enum PerfReviewStatus {
 }
 
 model PerformanceReview {
+  // Phiếu tự do cũ; không còn API hoặc giao diện nghiệp vụ đang hoạt động.
   id           String           @id @default(uuid())
   userId       String // người được đánh giá
   reviewerId   String // người đánh giá (trưởng nhóm)
@@ -1316,6 +1318,8 @@ model PersonnelSalaryHistory {
   coefficient   Float // Hệ số
   baseAmount    Float?
   overGradeRate Float?                        @default(0) // % Vượt khung
+  positionAllowance Float?                     // Hệ số phụ cấp chức vụ theo quyết định hiệu lực
+  otherAllowance    Float?                     // Hệ số phụ cấp khác theo quyết định hiệu lực
   fromDate      DateTime // Từ ngày
   toDate        DateTime? // Đến ngày
   decisionNo    String? // Số quyết định
@@ -1868,12 +1872,12 @@ model HrmsOnboardingTask {
 }
 
 // ---------------------------------------------------------------------------
-// Domain 14: Performance & 360 Appraisals
+// Domain 14: KPI and statutory appraisal. Historical review and competency records remain stored but are not active scoring inputs.
 // ---------------------------------------------------------------------------
 
 model HrmsAppraisalCycle {
   id                    String                        @id @default(uuid())
-  name                  String // Đánh giá Hiệu suất Q3/2026, Đánh giá Thường niên 2026
+  name                  String // Chu kỳ đánh giá KPI hoặc chu kỳ đánh giá công vụ
   year                  Int
   startDate             DateTime
   endDate               DateTime
@@ -1881,18 +1885,18 @@ model HrmsAppraisalCycle {
   description           String?
   organizationSector    String                        @default("enterprise") // enterprise | state; snapshot when cycle is created
   publicPersonnelType   String? // CIVIL_SERVANT | PUBLIC_EMPLOYEE
-  selfWeight            Float                         @default(20)
-  peerWeight            Float                         @default(30)
-  managerWeight         Float                         @default(50)
-  subordinateWeight     Float                         @default(10)
+  selfWeight            Float                         @default(0) // Trường lịch sử; KPI hiện hành do quản lý chấm
+  peerWeight            Float                         @default(0) // Trường lịch sử; KPI hiện hành do quản lý chấm
+  managerWeight         Float                         @default(100)
+  subordinateWeight     Float                         @default(0) // Trường lịch sử; KPI hiện hành do quản lý chấm
   generalCriteriaWeight Float                         @default(30) // public-sector general criteria
   taskCriteriaWeight    Float                         @default(70) // public-sector assigned work results
   createdAt             DateTime                      @default(now())
   goals                 HrmsAppraisalGoal[]
-  reviews               HrmsAppraisalReview[]
+  reviews               HrmsAppraisalReview[]          // Bản ghi lịch sử; không tham gia tính điểm hiện hành
   publicDecisions       HrmsPublicAppraisalDecision[]
-  competencies          HrmsCompetencyAssessment[]
-  developmentPlans      HrmsDevelopmentPlan[]
+  competencies          HrmsCompetencyAssessment[]     // Bản ghi lịch sử; không tham gia luồng KPI hiện hành
+  developmentPlans      HrmsDevelopmentPlan[]          // Bản ghi lịch sử; không tham gia luồng KPI hiện hành
 
   @@index([organizationSector, year])
   @@map("hrms_appraisal_cycles")
@@ -1908,7 +1912,11 @@ model HrmsAppraisalGoal {
   weightage     Float    @default(20) // Trọng số %
   targetMetric  String // KPI mục tiêu: "Hoàn thành 100% sprint đúng hạn"
   criteriaGroup String   @default("RESULT") // RESULT for enterprise KPIs; GENERAL or RESULT in public-sector assessment
-  selfScore     Float? // Tự chấm (thang 100)
+  assignmentScope String @default("INDIVIDUAL") // INDIVIDUAL or ORG_UNIT; org-unit assignments are copied to each eligible employee
+  assignmentOrgUnitId String?
+  assignmentOrgUnitName String?
+  assignmentOrgUnitCode String?
+  selfScore     Float? // Dữ liệu lịch sử; điểm KPI hiện hành lấy từ managerScore
   managerScore  Float? // Quản lý chấm
   finalScore    Float?
   status        String   @default("DRAFT") // DRAFT, SUBMITTED, APPROVED
@@ -1917,8 +1925,10 @@ model HrmsAppraisalGoal {
 
   cycle     HrmsAppraisalCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
   evidences HrmsKraEvidence[]
+  assignmentOrgUnit OrgUnit? @relation("KpiAssignmentOrgUnit", fields: [assignmentOrgUnitId], references: [id], onDelete: SetNull)
 
   @@index([cycleId, userId])
+  @@index([assignmentOrgUnitId])
   @@map("hrms_appraisal_goals")
 }
 
@@ -2029,6 +2039,7 @@ model HrmsDevelopmentPlan {
 }
 
 model HrmsAppraisalReview {
+  // Phản hồi lịch sử; hiện không có API hoặc giao diện ghi mới.
   reviewerId   String?
   id           String   @id @default(uuid())
   cycleId      String

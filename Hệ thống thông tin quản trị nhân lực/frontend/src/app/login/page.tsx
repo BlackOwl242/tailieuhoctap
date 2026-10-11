@@ -185,7 +185,7 @@ function LoginInner() {
         {/* Mục 2 — mở màn hình điểm danh ngay từ trang đăng nhập (không cần đăng nhập) */}
         <div className="mt-6 flex items-center justify-center gap-4 text-center text-xs text-muted-foreground">
           <Link href="/check-in" className="inline-flex items-center gap-1.5 underline underline-offset-2 hover:text-foreground">
-            <Camera className="h-3.5 w-3.5" /> Điểm danh khuôn mặt &amp; Hồng ngoại IR
+            <Camera className="h-3.5 w-3.5" /> Điểm danh bằng khuôn mặt
           </Link>
         </div>
       </div>

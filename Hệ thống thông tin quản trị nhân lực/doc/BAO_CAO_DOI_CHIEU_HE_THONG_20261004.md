@@ -2,6 +2,8 @@
 
 **Lưu ý trạng thái:** Báo cáo này là ảnh chụp trước khi sửa, giữ nguyên để truy vết 23 phát hiện ban đầu; không dùng kết luận lỗi cũ làm trạng thái hiện tại. Báo cáo cập nhật sau sửa: [BAO_CAO_TRANG_THAI_SAU_SUA_20261004.md](BAO_CAO_TRANG_THAI_SAU_SUA_20261004.md).
 
+**Cập nhật F16 ngày 11/10/2026:** Phát hiện về công thức KPI/đánh giá nhiều nguồn đã được xử lý bằng cách dùng một luồng KPI thống nhất cho doanh nghiệp: quản lý chấm theo kết quả và minh chứng; điểm kỳ tổng hợp theo trọng số. Các bản ghi phản hồi cũ được giữ để tra cứu, không tham gia tính điểm. Đánh giá công chức, viên chức thuộc nhánh công vụ riêng.
+
 Ngày kiểm tra: 04/10/2026. Phạm vi: thư mục `Hệ thống thông tin quản trị nhân lực`, gồm tài liệu Word/Markdown, frontend, backend, lược đồ dữ liệu, dữ liệu mẫu và bộ kiểm tra hiện có. Đây là báo cáo kiểm tra; không sửa mã nguồn hoặc tài liệu gốc.
 
 **1. Kết luận trực tiếp**
@@ -274,4 +276,6 @@ Nên giảm phạm vi các nhánh mở rộng chưa hoàn thiện nếu thời g
 
 Nguồn pháp lý được liên kết trực tiếp tại F06. Những đánh giá còn lại dựa trên tài liệu và mã trong dự án, không giả định dữ liệu DB thật hoặc thiết bị thật đã được xác minh.
 
+## Cập nhật kết quả KPI — 11/10/2026
 
+Phát hiện F16 phản ánh trạng thái tại ngày 04/10/2026. Sau đợt cập nhật 11/10/2026, luồng đánh giá doanh nghiệp đã được thống nhất theo KPI: nhân viên cập nhật kết quả và minh chứng; quản lý trực tiếp chấm từng KPI; điểm kỳ được tính theo trọng số mục tiêu. Tự đánh giá và đánh giá chéo 360 không còn là luồng đang dùng. Các bản ghi cũ được giữ để tra cứu, không tham gia tính điểm. Nhánh đánh giá công vụ vẫn tách riêng theo chế độ tổ chức và căn cứ áp dụng.

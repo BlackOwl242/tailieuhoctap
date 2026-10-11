@@ -5,7 +5,10 @@ FIG=OUT/'So_do';FIG.mkdir(exist_ok=True)
 class Canvas:
  def __init__(self,w=2000,h=1200):
   self.w=w;self.h=h;self.im=Image.new('RGB',(w,h),'white');self.d=ImageDraw.Draw(self.im);self.svg=[f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}"><rect width="100%" height="100%" fill="white"/>'];self.records=[]
+ def _bounds(self,label,x1,y1,x2,y2):
+  if x1<0 or y1<0 or x2>self.w or y2>self.h:self.records.append(f'{label} ngoài khung: ({x1},{y1})–({x2},{y2})')
  def line(self,pts,dash=False,arrow=False):
+  self._bounds('Đường',min(p[0] for p in pts)-22,min(p[1] for p in pts)-10,max(p[0] for p in pts)+22,max(p[1] for p in pts)+10)
   self.svg.append('<polyline points="'+' '.join(f'{x},{y}' for x,y in pts)+'" fill="none" stroke="black" stroke-width="3"'+(' stroke-dasharray="14 10"' if dash else '')+'/>')
   for p,q in zip(pts,pts[1:]):
    if dash:
@@ -16,13 +19,15 @@ class Canvas:
   if arrow:
    p,q=pts[-2:];ang=math.atan2(q[1]-p[1],q[0]-p[0]);tri=[q,(q[0]-20*math.cos(ang)+8*math.sin(ang),q[1]-20*math.sin(ang)-8*math.cos(ang)),(q[0]-20*math.cos(ang)-8*math.sin(ang),q[1]-20*math.sin(ang)+8*math.cos(ang))];self.poly(tri,fill='black')
  def poly(self,pts,fill='white'):
+  self._bounds('Đa giác',min(p[0] for p in pts)-2,min(p[1] for p in pts)-2,max(p[0] for p in pts)+2,max(p[1] for p in pts)+2)
   self.d.polygon(pts,fill=fill,outline='black',width=3);self.svg.append('<polygon points="'+' '.join(f'{x},{y}' for x,y in pts)+f'" fill="{fill}" stroke="black" stroke-width="3"/>')
  def rect(self,x,y,w,h,round=False,fill='white'):
+  self._bounds('Hình chữ nhật',x-2,y-2,x+w+2,y+h+2)
   self.d.rounded_rectangle((x,y,x+w,y+h),radius=25 if round else 0,fill=fill,outline='black',width=3);self.svg.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{25 if round else 0}" fill="{fill}" stroke="black" stroke-width="3"/>')
  def circle(self,x,y,r,fill='white'):
+  self._bounds('Đường tròn',x-r-2,y-r-2,x+r+2,y+r+2)
   self.d.ellipse((x-r,y-r,x+r,y+r),fill=fill,outline='black',width=3);self.svg.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{fill}" stroke="black" stroke-width="3"/>')
  def text(self,x,y,t,width=900,size=38,bold=False,anchor='middle',background=False):
-  size=max(size,48)
   f=ImageFont.truetype('C:/Windows/Fonts/timesbd.ttf' if bold else 'C:/Windows/Fonts/times.ttf',size);lines=[]
   for raw in t.split('\n'):
    words=[]
@@ -46,60 +51,86 @@ class Canvas:
     self.d.rectangle((xx-5,yy-2,xx+ww+5,yy+size+5),fill='white')
     self.svg.append(f'<rect x="{xx-5}" y="{yy-2}" width="{ww+10}" height="{size+7}" fill="white"/>')
    self.d.text((xx,yy),s,font=f,fill='black');self.svg.append(f'<text x="{x}" y="{yy+size-4}" font-family="Times New Roman" font-size="{size}" font-weight="{"bold" if bold else "normal"}" text-anchor="{anchor}">{html.escape(s)}</text>')
-   if xx<0 or xx+self.d.textlength(s,font=f)>self.w or yy+size>self.h:self.records.append('Texte hors cadre: '+s)
+   if xx<0 or yy<0 or xx+self.d.textlength(s,font=f)>self.w or yy+size>self.h:self.records.append('Texte ngoài khung: '+s)
   return len(lines)*(size+9)
  def box(self,x,y,w,h,t,round=False):self.rect(x,y,w,h,round);self.text(x+w/2,y+18,t,w-40)
  def actor(self,x,y,label):
   self.circle(x,y+22,22);self.line([(x,y+44),(x,y+100)]);self.line([(x-40,y+64),(x+40,y+64)]);self.line([(x,y+100),(x-35,y+143)]);self.line([(x,y+100),(x+35,y+143)]);self.text(x,y+150,label,380)
+ def database_icon(self,x,y,w=76,h=66):
+  left=x-w//2;right=x+w//2;top=y;bottom=y+h;rim=max(12,h//4)
+  self.d.rectangle((left,top+rim//2,right,bottom-rim//2),fill='white',outline='black',width=3)
+  self.d.ellipse((left,top,right,top+rim),fill='white',outline='black',width=3)
+  self.d.arc((left,bottom-rim,right,bottom+rim//2),0,180,fill='black',width=3)
+  self.d.line((left,top+rim//2,left,bottom-rim//2),fill='black',width=3)
+  self.d.line((right,top+rim//2,right,bottom-rim//2),fill='black',width=3)
+  self.svg.append(f'<path d="M {left} {top+rim//2} V {bottom-rim//2} A {w//2} {rim//2} 0 0 0 {right} {bottom-rim//2} V {top+rim//2} A {w//2} {rim//2} 0 0 0 {left} {top+rim//2} Z" fill="white" stroke="black" stroke-width="3"/>')
+  self.svg.append(f'<ellipse cx="{x}" cy="{top+rim//2}" rx="{w//2}" ry="{rim//2}" fill="white" stroke="black" stroke-width="3"/>')
+  self.svg.append(f'<path d="M {left} {bottom-rim//2} A {w//2} {rim//2} 0 0 0 {right} {bottom-rim//2}" fill="none" stroke="black" stroke-width="3"/>')
+ def participant(self,x,kind,label):
+  cy=132
+  if kind=='boundary':
+   # Ký hiệu Boundary theo tài liệu mẫu: vòng tròn gắn với nét gấp ở bên trái.
+   self.circle(x,cy,33);self.line([(x-55,cy-28),(x-55,cy+28)]);self.line([(x-55,cy),(x-33,cy)])
+  elif kind=='control':
+   # Ký hiệu ControlClass theo mẫu BCE: đầu mũi tên chạm cung trên-trái; hai cạnh cân bằng.
+   self.circle(x,cy,33)
+   self.line([(x+9,cy-47),(x-11,cy-31),(x+9,cy-15)])
+  elif kind=='entity':
+   # Entity: vòng tròn có đường gạch chạm đáy, theo ký hiệu lớp phân tích.
+   self.circle(x,cy,33)
+   self.line([(x-44,cy+33),(x+44,cy+33)])
+  else:
+   # CSDL là kho dữ liệu, dùng ký hiệu hình trụ để phân biệt với Entity.
+   self.database_icon(x,cy-34)
+  self.text(x,194,label,370,size=27)
  def final(self,x,y):self.circle(x,y,26);self.circle(x,y,16,'black')
  def save(self,name):
   assert not self.records,self.records
   self.im.save(FIG/(name+'.png'));(FIG/(name+'.svg')).write_text('\n'.join(self.svg+['</svg>']),encoding='utf-8')
 
 def sequence(u):
- c=Canvas(2400,3500);xs=[210,680,1160,1660,2160]
- c.text(1200,15,u['id']+' '+u['name'],2280,bold=True)
+ c=Canvas(2600,2060);xs=[220,700,1280,1850,2400]
+ c.text(1300,16,'Biểu đồ trình tự — '+u['id']+': '+u['name'],2480,size=48,bold=True)
  actor='Văn thư được giao' if u['id']=='UC16' else u['actor']
- c.actor(xs[0],105,actor)
- labels=[u['screen']+' : Giao diện','dk : Điều khiển', 'dt : '+u['entity'],'kho : Kho dữ liệu']
- for x,lab in zip(xs[1:],labels):c.rect(x-200,130,400,240);c.text(x,148,lab,360,size=60)
- for x in xs:c.line([(x,390),(x,3380)],dash=True)
- # Các thanh thực thi của lời gọi đồng bộ và phản hồi tương ứng.
- for i,a,b in [(1,470,2750),(2,650,2580),(4,850,1010),(3,1190,1350),(3,1870,2050),(4,2230,2390),(1,3060,3230),(2,3030,3060)]:
+ c.actor(xs[0],72,actor)
+ labels=[('boundary','GiaoDien'+u['id']),('control',u['controller']),('entity',u['entity']),('database','CSDL')]
+ for x,(kind,label) in zip(xs[1:],labels):c.participant(x,kind,label)
+ for x in xs:c.line([(x,275),(x,1980)],dash=True)
+ for i,a,b in [(1,365,1880),(2,455,1540),(3,555,1435),(4,655,745),(4,1175,1285)]:
   c.rect(xs[i]-10,a,20,b-a)
  def msg(a,b,y,t,ret=False):
-  width=abs(xs[a]-xs[b])-45
-  h=Canvas(2400,3300).text((xs[a]+xs[b])/2,0,t,width,size=60)
+  width=abs(xs[a]-xs[b])-70
+  measure=Canvas(2600,400);h=measure.text((xs[a]+xs[b])/2,0,t,width,size=32)
   direction=1 if b>a else -1
   start=xs[a]+(10*direction if a else 0);end=xs[b]-(10*direction if b else 0)
   c.line([(start,y),(end,y)],dash=ret,arrow=not ret)
   if ret:
-   sgn=direction
-   c.line([(end-sgn*20,y-10),(end,y),(end-sgn*20,y+10)])
-  c.text((xs[a]+xs[b])/2,y-h-16,t,width,size=60,background=True)
- msg(0,1,470,'1. '+('Nhập bộ lọc' if u['read_only'] else 'Gửi dữ liệu'))
- msg(1,2,650,'2. '+u['operation']+'()')
- msg(2,4,850,'3. Đọc dữ liệu trong phạm vi quyền')
- msg(4,2,1010,'4. Dữ liệu và phiên bản',True)
- msg(2,3,1190,'5. Kiểm tra điều kiện')
- msg(3,2,1350,'6. Kết quả kiểm tra',True)
- c.line([(450,1420),(2300,1420),(2300,3330),(450,3330),(450,1420)]);c.text(475,1435,'alt',100,bold=True,anchor='start')
- c.text(1400,1435,'['+u['guard']+']',1630,size=60,background=True)
- msg(2,3,1870,'7. '+u['operation']+'()')
- msg(3,2,2050,'8. '+('Dữ liệu đã lọc' if u['read_only'] else 'Thay đổi hợp lệ'),True)
- msg(2,4,2230,'9. '+('Ghi nhật ký truy cập' if u['read_only'] else 'Lưu thay đổi, nhật ký và thông điệp chờ gửi'))
- msg(4,2,2390,'10. Xác nhận giao dịch đã lưu',True)
- msg(2,1,2570,'11. '+('Kết quả tra cứu' if u['read_only'] else 'Kết quả và phiên bản'),True)
- msg(1,0,2750,'12. Hiển thị kết quả',True)
- c.line([(450,2810),(2300,2810)],dash=True)
- c.text(1400,2825,'[Điều kiện trên không được đáp ứng]',1630,size=60,background=True)
- msg(2,1,3060,'13. Báo lý do',True)
- msg(1,0,3230,'14. Hiển thị lỗi',True)
- c.text(1200,3400,'Đã xác thực và kiểm tra quyền. Chỉ trả thành công khi có xác nhận lưu dữ liệu.',2240,size=60)
+   sgn=direction;c.line([(end-sgn*20,y-10),(end,y),(end-sgn*20,y+10)])
+  c.text((xs[a]+xs[b])/2,y-h-9,t,width,size=32,background=True)
+ msg(0,1,365,'Yêu cầu: '+u['name'])
+ msg(1,2,455,'guiYeuCau('+u['operation']+')')
+ msg(2,3,555,'kiemTraDieuKien()')
+ msg(3,4,655,'docTheoPhamVi()')
+ msg(4,3,745,'DuLieuVaTrangThai',True)
+ msg(3,2,835,'ketQuaKiemTra',True)
+ c.line([(78,930),(2520,930),(2520,1950),(78,1950),(78,930)])
+ c.text(102,938,'alt',100,size=32,bold=True,anchor='start')
+ c.text(205,938,'[Điều kiện: '+u['guard']+']',2260,size=29,anchor='start',background=True)
+ msg(2,3,1080,'thucHien('+u['operation']+')')
+ msg(3,4,1175,'ghiGiaoDich()' if not u['read_only'] else 'truyVanTheoDieuKien()')
+ msg(4,3,1270,'xacNhanCommit()' if not u['read_only'] else 'KetQuaTruyVan',True)
+ msg(3,2,1365,'ketQuaNghiepVu',True)
+ msg(2,1,1455,'traKetQua()',True)
+ msg(1,0,1545,'hienThiKetQua()',True)
+ c.line([(78,1635),(2520,1635)],dash=True)
+ c.text(205,1642,'[Điều kiện không đạt]',2260,size=29,anchor='start',background=True)
+ msg(2,1,1745,'traMaLoiVaLyDo()',True)
+ msg(1,0,1840,'hienThiLoi; cho phép nhập lại',True)
+ c.text(1300,1970,'Không ghi nhận thay đổi khi điều kiện nghiệp vụ không đạt.',2440,size=27)
  c.save(u['id']+'_trinh_tu')
 
 def activity_supplement(u):
- c=Canvas(2000,1490);c.text(1000,18,u['id']+' '+u['name'],1850,bold=True)
+ c=Canvas(2000,1490);c.text(1000,18,'Biểu đồ hoạt động — '+u['id']+': '+u['name'],1850,bold=True)
  for x,lab in [(360,'Cán bộ tiếp nhận'),(980,'Người yêu cầu'),(1600,'Hệ thống')]:c.text(x,120,lab,560,bold=True)
  for x in [660,1280]:c.line([(x,205),(x,1390)],dash=True)
  c.circle(360,210,20,'black');c.line([(360,230),(360,250)],arrow=True)
@@ -123,7 +154,7 @@ def activity_supplement(u):
  c.save(u['id']+'_hoat_dong')
 
 def activity_release(u):
- c=Canvas(2000,1490);c.text(1000,18,u['id']+' '+u['name'],1850,bold=True)
+ c=Canvas(2000,1490);c.text(1000,18,'Biểu đồ hoạt động — '+u['id']+': '+u['name'],1850,bold=True)
  c.circle(750,120,20,'black');c.line([(750,140),(750,190)],arrow=True)
  c.box(230,190,1040,130,'Lãnh đạo đọc dự thảo và căn cứ',True)
  c.line([(750,320),(750,340)],arrow=True)
@@ -149,29 +180,33 @@ def activity_release(u):
 def activity(u):
  if u['id']=='UC13':return activity_supplement(u)
  if u['id']=='UC16':return activity_release(u)
- c=Canvas(2000,1490);c.text(1000,18,u['id']+' '+u['name'],1870,bold=True)
- c.circle(680,110,20,'black');c.line([(680,130),(680,175)],arrow=True)
- c.box(160,175,1040,135,u['steps'][0],True);c.line([(680,310),(680,360)],arrow=True)
- c.box(160,360,1040,135,u['steps'][1],True);c.line([(680,495),(680,550)],arrow=True)
- c.poly([(680,550),(840,640),(680,730),(520,640)]);c.text(680,605,'Hợp lệ?',275,size=36)
- c.line([(840,640),(1570,640),(1570,760)],arrow=True);c.text(1100,580,'[Không đạt]',380,size=36)
- c.box(1280,760,570,215,'Thông báo lỗi\nCho phép sửa dữ liệu\nKhông ghi thay đổi',True)
- c.line([(1570,975),(1570,1360),(1080,1360)],arrow=True)
- c.line([(680,730),(680,810)],arrow=True);c.text(855,748,'[Đạt]',200,size=36)
- c.box(160,810,1040,160,u['steps'][2],True);c.line([(680,970),(680,1040)],arrow=True)
- c.box(160,1040,1040,185,u['steps'][3]+'\n'+('Trả dữ liệu theo quyền' if u['read_only'] else 'Xác nhận kết quả và nhật ký'),True)
- c.line([(680,1225),(680,1360),(1040,1360)],arrow=True);c.final(1060,1360)
- c.text(1000,1420,'Điều kiện chi tiết và ngoại lệ nằm trong đặc tả '+u['id']+'.',1840,size=34)
+ c=Canvas(2600,1940);left=(80,180,920,1640);right=(1000,180,1520,1640)
+ c.text(1300,16,'Biểu đồ hoạt động — '+u['id']+': '+u['name'],2480,size=48,bold=True)
+ c.text(1300,78,'Điều kiện kiểm tra: '+u['guard'],2460,size=28)
+ c.rect(left[0],left[1],left[2],left[3]);c.rect(right[0],right[1],right[2],right[3])
+ c.line([(80,290),(2520,290)]);c.line([(1000,180),(1000,1820)])
+ c.text(540,198,'Tác nhân: '+u['actor'],860,size=30,bold=True)
+ c.text(1760,198,'Ứng dụng',1460,size=30,bold=True)
+ ax=540;sx=1750
+ c.circle(ax,335,20,'black');c.line([(ax,355),(ax,380)],arrow=True)
+ c.box(190,380,700,130,u['steps'][0],True);c.line([(ax,510),(ax,545)],arrow=True)
+ c.box(190,545,700,130,u['steps'][1],True)
+ c.line([(890,610),(1050,610),(1050,790),(1150,790)],arrow=True)
+ c.box(1150,715,1200,150,'Kiểm tra điều kiện nghiệp vụ',True)
+ c.line([(sx,865),(sx,920)],arrow=True)
+ c.poly([(sx,920),(1930,1020),(sx,1120),(1570,1020)]);c.text(sx,972,'Đạt điều kiện?',310,size=32)
+ c.line([(sx,1120),(sx,1190),(1010,1190),(1010,1320),(890,1320)],arrow=True)
+ c.text(1265,1155,'[Đạt]',200,size=30,background=True)
+ c.box(190,1250,700,140,u['steps'][2],True)
+ c.line([(ax,1390),(ax,1480),(1150,1480)],arrow=True)
+ c.box(1150,1480,1200,170,u['steps'][3]+'\n'+('Trả dữ liệu theo quyền' if u['read_only'] else 'Xác nhận kết quả và nhật ký'),True)
+ c.line([(sx,1650),(sx,1730)],arrow=True);c.final(sx,1755)
+ c.line([(1930,1020),(1980,1020),(1980,1230),(2010,1230)],arrow=True)
+ c.text(2165,975,'[Không đạt]',420,size=29,background=True)
+ c.box(2010,1150,460,170,'Trả lý do; cho phép sửa\nKhông ghi thay đổi',True)
+ c.line([(2470,1230),(2480,1230),(2480,1420)],arrow=True);c.final(2480,1445)
+ c.text(1300,1840,'Ngoại lệ UC'+u['id'][2:]+': '+u['exception'],2460,size=26)
  c.save(u['id']+'_hoat_dong')
-
-def wireframe(u):
- c=Canvas(2000,890);c.rect(30,30,1940,850);c.box(30,30,1940,125,u['screen']+' '+u['name'])
- c.box(70,195,430,580,'Phạm vi cơ quan\nVai trò hiện hành\nThủ tục và phiên bản\nNhật ký thao tác')
- c.box(560,195,1340,205,'Dữ liệu đầu vào\n'+u['inputs'])
- c.box(560,445,1340,185,'Điều kiện cần kiểm tra\n'+u['guard'])
- c.box(560,680,760,110,'Thao tác: '+u['operation']+'()');c.box(1370,680,530,110,'Hủy hoặc quay lại')
- c.text(1000,810,'Bản thiết kế đề xuất; không phải ảnh giao diện Hà Nội đang vận hành.',1800,size=34)
- c.save(u['id']+'_man_hinh')
 
 def usecases(group,items,name):
  actors=list(dict.fromkeys(u['actor'] for u in items))
@@ -185,10 +220,10 @@ def usecases(group,items,name):
 
 SCHEMA=json.loads((ROOT/'03_Thiet_ke/Tu_dien_du_lieu.json').read_text('utf-8'))
 CLASSES={k:''.join(w.capitalize() for w in k.split('_')) for k in SCHEMA}
-aliases={'ho_so':'HoSo','ket_qua':'KetQua','tai_khoan':'TaiKhoan','co_quan':'CoQuan','phien_ban_thu_tuc':'PhienBanThuTuc','yeu_cau_bo_sung':'YeuCauBoSung','phan_cong':'PhanCong','nhiem_vu_phoi_hop':'NhiemVuPhoiHop','giao_nhan':'GiaoNhan','he_thong_ket_noi':'HeThongKetNoi','tai_lieu_huong_dan':'TaiLieuHuongDan','mau_bao_cao':'MauBaoCao','chi_dao_dieu_hanh':'ChiDaoDieuHanh','tai_lieu_kho':'TaiLieuKho','thong_diep_nhan':'ThongDiepNhan','hang_doi_gui':'HangDoiGui','khoan_thu':'KhoanThu','giao_dich':'GiaoDich','thanh_phan_ho_so':'ThanhPhanHoSo','phan_anh':'PhanAnh','ho_so_nop_luu':'HoSoNopLuu','thong_bao':'ThongBao'}
+aliases={'ho_so':'HoSo','ket_qua':'KetQua','tai_khoan':'TaiKhoan','co_quan':'CoQuan','phien_ban_thu_tuc':'PhienBanThuTuc','yeu_cau_bo_sung':'YeuCauBoSung','yeu_cau_dung':'YeuCauDung','su_kien_quyen_ky_mau06':'SuKienQuyenKyMau06','phan_cong':'PhanCong','nhiem_vu_phoi_hop':'NhiemVuPhoiHop','giao_nhan':'GiaoNhan','he_thong_ket_noi':'HeThongKetNoi','tai_lieu_huong_dan':'TaiLieuHuongDan','mau_bao_cao':'MauBaoCao','chi_dao_dieu_hanh':'ChiDaoDieuHanh','tai_lieu_kho':'TaiLieuKho','thong_diep_nhan':'ThongDiepNhan','hang_doi_gui':'HangDoiGui','khoan_thu':'KhoanThu','giao_dich':'GiaoDich','thanh_phan_ho_so':'ThanhPhanHoSo','phan_anh':'PhanAnh','ho_so_nop_luu':'HoSoNopLuu','thong_bao':'ThongBao'}
 CLASSES.update(aliases)
 CLASSES={k:v for k,v in CLASSES.items() if k in SCHEMA}
-PARTS={1:['co_quan','chu_the','tai_khoan','quyen_pham_vi'],2:['thu_tuc','phien_ban_thu_tuc','tuyen_xu_ly','lich_lam_viec'],3:['ket_qua','chu_ky','giao_nhan'],4:['ho_so','uy_quyen','thanh_phan_ho_so','phan_cong','su_kien_xu_ly','yeu_cau_bo_sung','nhiem_vu_phoi_hop'],5:['thong_bao','phan_anh','tai_lieu_huong_dan','diem_tiep_nhan'],6:['khoan_thu','giao_dich','mau_bao_cao'],7:['chi_dao_dieu_hanh','nhat_ky'],8:['tai_lieu_kho','quyen_khai_thac_kho','dot_nop_luu','ho_so_nop_luu'],9:['he_thong_ket_noi','tham_chieu_lien_thong','thong_diep_nhan','hang_doi_gui']}
+PARTS={1:['co_quan','chu_the','tai_khoan','quyen_pham_vi'],2:['thu_tuc','phien_ban_thu_tuc','tuyen_xu_ly','lich_lam_viec'],3:['ket_qua','chu_ky','giao_nhan'],4:['ho_so','uy_quyen','thanh_phan_ho_so','phan_cong','su_kien_xu_ly','yeu_cau_bo_sung','nhiem_vu_phoi_hop','yeu_cau_dung','su_kien_quyen_ky_mau06'],5:['thong_bao','phan_anh','tai_lieu_huong_dan','diem_tiep_nhan'],6:['khoan_thu','giao_dich','mau_bao_cao'],7:['chi_dao_dieu_hanh','nhat_ky'],8:['tai_lieu_kho','quyen_khai_thac_kho','dot_nop_luu','ho_so_nop_luu'],9:['he_thong_ket_noi','tham_chieu_lien_thong','thong_diep_nhan','hang_doi_gui']}
 PARTS[5][1]='phan_anh_kien_nghi';CLASSES['phan_anh_kien_nghi']='PhanAnh'
 assert set(k for v in PARTS.values() for k in v)==set(SCHEMA)
 CLASS_DIAGRAMS=[]
@@ -217,9 +252,9 @@ def classes(g,keys,part):
  c.text(1100,1410,'Bội số đặt ở phía đối tượng tương ứng; các quan hệ còn lại được đặc tả trong bảng ánh xạ.',2060,size=34)
  name=f'lop_nhom_{g}_{part}';c.save(name);CLASS_DIAGRAMS.append((g,name,keys))
 
-for u in MODEL:sequence(u);activity(u);wireframe(u)
+for u in MODEL:sequence(u);activity(u)
 for g in GROUPS:usecases(g,[u for u in MODEL if u['group']==g],f'ca_su_dung_nhom_{g}')
 for g,ks in PARTS.items():
  for i in range(0,len(ks),4):classes(g,ks[i:i+4],i//4+1)
 (OUT/'Anh_xa_lop.json').write_text(json.dumps({'classes':CLASSES,'parts':PARTS,'diagrams':CLASS_DIAGRAMS},ensure_ascii=False,indent=2),encoding='utf-8')
-print('Đã tạo',len(list(FIG.glob('*.svg'))),'biểu đồ và bản thiết kế màn hình.')
+print('Generated',len(list(FIG.glob('*.svg'))),'UML diagram files.')

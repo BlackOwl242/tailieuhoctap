@@ -103,7 +103,11 @@ interface PayrollSlip {
       minimumWageReview?: { region: string; contractualMonthlyWage: number; standardHours: number; monthlyMinimum: number | null; hourlyEquivalent: number; hourlyMinimum: number | null; monthlyBelowMinimum: boolean; hourlyBelowMinimum: boolean; status: 'PASS' | 'REVIEW' | 'UNCONFIGURED' };
       salaryBandReview?: { bands: { code: string; name: string; minSalary: number; midSalary: number; maxSalary: number; compensationBasis: string; status: string; days: number }[]; daysWithoutApprovedBand: number };
       overtimeBasis?: { contractualMonthlyWage: number; standardHours: number; hourlyRate: number };
-      salarySource?: 'EMPLOYEE_ASSIGNMENT' | 'CONTRACT' | 'PROFILE_FALLBACK' | 'MIXED';
+      salarySource?: 'EMPLOYEE_ASSIGNMENT' | 'CONTRACT' | 'PROFILE_FALLBACK' | 'PUBLIC_SECTOR_PAY_SCALE' | 'MIXED';
+      publicSectorSalary?: {
+        stateBaseSalary: number; basisReference: string;
+        effectiveRates: { effectiveFrom: string | null; decisionNo: string | null; rankCode: string; step: number; coefficient: number; stateBaseSalary: number; rankSalary: number; positionCoefficient: number; positionAllowance: number; overGradePercent: number; overGradeAllowance: number; otherAllowanceCoefficient: number; otherAllowance: number }[];
+      } | null;
       salaryStructureSource?: 'EMPLOYEE_ASSIGNMENT' | 'POSITION_RULE' | 'MIXED' | 'NONE';
       salaryStructureName?: string | null;
       contractNo?: string | null;
@@ -167,6 +171,7 @@ interface PayrollRun {
 interface PayrollPolicyForm {
   version: string; effectiveFrom: string; effectiveTo: string | null; basisReference: string;
   personalRelief: number; dependentRelief: number; taxBrackets: [number | null, number][];
+  stateBaseSalary: number;
   nonResidentTaxRate: number; overtimeExemptMode: 'ALL' | 'PREMIUM_ONLY' | 'TAXABLE'; nightWorkExemptMode: 'ALL' | 'PREMIUM_ONLY' | 'TAXABLE';
   employeeRates: { socialInsurance: number; healthInsurance: number; unemployment: number };
   employerRates: { socialInsurance: number; healthInsurance: number; unemployment: number; occupationalAccident: number; tradeUnionFund: number };
@@ -1157,6 +1162,11 @@ export default function PayrollEnginePage() {
               </section>
 
               <section className="rounded-lg border border-border bg-card p-4 space-y-3">
+                <div><h3 className="text-sm font-semibold">Lương cơ sở khu vực công</h3><p className="mt-1 text-xs text-muted-foreground">Dùng cùng hệ số ngạch/bậc và các hệ số phụ cấp trong hồ sơ công chức, viên chức; giá trị được lưu theo phiên bản hiệu lực này.</p></div>
+                {policyNumberField('Mức lương cơ sở/tháng', policyDraft.stateBaseSalary, (v) => updatePolicy('stateBaseSalary', v))}
+              </section>
+
+              <section className="rounded-lg border border-border bg-card p-4 space-y-3">
                 <h3 className="text-sm font-semibold">Bảo hiểm và giới hạn đóng</h3>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {policyRateField('NLĐ · BHXH', policyDraft.employeeRates.socialInsurance, (v) => updatePolicy('employeeRates', { ...policyDraft.employeeRates, socialInsurance: v }))}
@@ -1656,9 +1666,10 @@ export default function PayrollEnginePage() {
                     const overtime = selectedSlip.breakdown!.calculation!.approvedOvertime ?? [];
                     const requests = selectedSlip.breakdown!.calculation!.overtimeRequests ?? [];
                     return <section className="rounded-md border border-border bg-background p-3 space-y-2">
-                      <div className="flex flex-wrap justify-between gap-2"><b>Nguồn tính và đối soát ngày công</b><span>{selectedSlip.breakdown!.calculation!.salarySource === 'EMPLOYEE_ASSIGNMENT' ? 'Lương cơ bản theo gán riêng cho nhân sự' : selectedSlip.breakdown!.calculation!.salarySource === 'CONTRACT' ? 'Lương cơ bản theo hợp đồng hiệu lực' : selectedSlip.breakdown!.calculation!.salarySource === 'PROFILE_FALLBACK' ? 'Lương cơ bản lấy từ hồ sơ nhân sự — chưa có hợp đồng hiệu lực' : selectedSlip.breakdown!.calculation!.salarySource === 'MIXED' ? 'Có nhiều nguồn lương trong kỳ; xem chi tiết từng khoản' : 'Phiếu lịch sử chưa lưu thông tin nguồn lương'}</span></div>
+                      <div className="flex flex-wrap justify-between gap-2"><b>Nguồn tính và đối soát ngày công</b><span>{selectedSlip.breakdown!.calculation!.salarySource === 'PUBLIC_SECTOR_PAY_SCALE' ? 'Lương theo ngạch/bậc và mức lương cơ sở' : selectedSlip.breakdown!.calculation!.salarySource === 'EMPLOYEE_ASSIGNMENT' ? 'Lương cơ bản theo gán riêng cho nhân sự' : selectedSlip.breakdown!.calculation!.salarySource === 'CONTRACT' ? 'Lương cơ bản theo hợp đồng hiệu lực' : selectedSlip.breakdown!.calculation!.salarySource === 'PROFILE_FALLBACK' ? 'Lương cơ bản lấy từ hồ sơ nhân sự — chưa có hợp đồng hiệu lực' : selectedSlip.breakdown!.calculation!.salarySource === 'MIXED' ? 'Có nhiều nguồn lương trong kỳ; xem chi tiết từng khoản' : 'Phiếu lịch sử chưa lưu thông tin nguồn lương'}</span></div>
                       <p>Cấu trúc phụ cấp: <b>{selectedSlip.breakdown!.calculation!.salaryStructureName || 'Không áp dụng'}</b> ({selectedSlip.breakdown!.calculation!.salaryStructureSource === 'EMPLOYEE_ASSIGNMENT' ? 'gán riêng' : selectedSlip.breakdown!.calculation!.salaryStructureSource === 'POSITION_RULE' ? 'theo chức danh / đơn vị' : selectedSlip.breakdown!.calculation!.salaryStructureSource === 'MIXED' ? 'thay đổi trong kỳ' : selectedSlip.breakdown!.calculation!.salaryStructureSource === 'NONE' ? 'chưa cấu hình' : 'phiếu lịch sử chưa lưu nguồn cấu trúc'}) · Hợp đồng: <b>{selectedSlip.breakdown!.calculation!.contractNo || (selectedSlip.breakdown!.calculation!.salarySource ? 'Không có hợp đồng hiệu lực' : 'Phiếu lịch sử chưa lưu mã hợp đồng')}</b></p>
                       {selectedSlip.breakdown!.calculation!.payRatesUsed?.length ? <p>Mức căn cứ: {selectedSlip.breakdown!.calculation!.payRatesUsed!.map((item) => `${item.rate.toLocaleString('vi-VN')} đ/${item.basis === 'DAILY' ? 'ngày' : item.basis === 'HOURLY' ? 'giờ' : 'tháng'}`).join(' · ')}. Số ở cột lương cơ bản là giá trị quy đổi theo kỳ để đối soát.</p> : null}
+                      {selectedSlip.breakdown!.calculation!.publicSectorSalary ? <div className="rounded border border-border bg-muted/30 p-2"><b>Căn cứ lương khu vực công</b>{selectedSlip.breakdown!.calculation!.publicSectorSalary.effectiveRates.map((rate, index) => <p key={`${rate.effectiveFrom}-${rate.decisionNo}-${index}`}>Từ {rate.effectiveFrom || 'ngày hiệu lực trong hồ sơ'} · {rate.rankCode}, bậc {rate.step}, hệ số {rate.coefficient}: lương ngạch/bậc {rate.rankSalary.toLocaleString('vi-VN')} đ + phụ cấp chức vụ {rate.positionCoefficient} ({rate.positionAllowance.toLocaleString('vi-VN')} đ) + vượt khung {rate.overGradePercent}% ({rate.overGradeAllowance.toLocaleString('vi-VN')} đ) + phụ cấp khác {rate.otherAllowanceCoefficient} ({rate.otherAllowance.toLocaleString('vi-VN')} đ), tính theo mức cơ sở {rate.stateBaseSalary.toLocaleString('vi-VN')} đ/tháng. {rate.decisionNo ? `Quyết định: ${rate.decisionNo}.` : ''}</p>)}<small className="text-muted-foreground">Căn cứ phiên bản: {selectedSlip.breakdown!.calculation!.publicSectorSalary.basisReference}</small></div> : null}
                       {(selectedSlip.breakdown!.calculation!.salaryBandReview?.bands ?? []).map((band) => <p key={band.code}>Khung {band.code} – {band.name}: {band.minSalary.toLocaleString('vi-VN')}–{band.maxSalary.toLocaleString('vi-VN')} đ/{band.compensationBasis === 'DAILY' ? 'ngày' : band.compensationBasis === 'HOURLY' ? 'giờ' : 'tháng'}; {band.status === 'IN_RANGE' ? 'lương căn cứ trong khoảng' : band.status === 'BELOW_RANGE' ? 'lương căn cứ dưới sàn, cần rà soát hợp đồng/quyết định' : band.status === 'ABOVE_RANGE' ? 'lương căn cứ trên trần, cần rà soát' : band.status === 'BASIS_MISMATCH' ? 'khác cơ sở trả lương, cần đối chiếu' : 'có thay đổi khung trong kỳ'} ({band.days} ngày).</p>)}
                       <p>Lịch chuẩn {attendance.standardDays} ngày / {attendance.scheduledHours} giờ; công hưởng lương {attendance.paidDays}; thời gian ghi nhận {attendance.workedHours} giờ; thiếu giờ {attendance.shortHours} giờ.</p>
                       {selectedSlip.breakdown!.calculation!.attendanceWageReduction !== undefined ? <p className="font-semibold">Thu nhập theo đủ lịch − thu nhập được hưởng theo công = giảm do thiếu công: {selectedSlip.breakdown!.calculation!.expectedCompensation?.toLocaleString('vi-VN')} đ − {selectedSlip.breakdown!.calculation!.earnedCompensation?.toLocaleString('vi-VN')} đ = <span className="text-rose-700">{selectedSlip.breakdown!.calculation!.attendanceWageReduction!.toLocaleString('vi-VN')} đ</span>. Con số này gồm lương căn cứ và các khoản thu nhập trong cấu trúc bị tính theo tỷ lệ công; thuế, bảo hiểm, OT và khấu trừ khác được tính riêng.</p> : null}
@@ -1726,10 +1737,10 @@ export default function PayrollEnginePage() {
                     other: detail.days.filter((day) => categoryFor(day) === 'other').length,
                   };
                   const legend = {
-                    full: { label: 'Đủ công', swatch: 'bg-emerald-400/70 border-emerald-600/30', cell: 'bg-emerald-400/70 border-emerald-600/30', help: 'Xanh dịu: có dữ liệu chấm công, không muộn/về sớm và số giờ đạt lịch chuẩn.' },
-                    late: { label: 'Cần xem lại', swatch: 'bg-amber-300/80 border-amber-600/30', cell: 'bg-amber-300/80 border-amber-600/30', help: 'Vàng dịu: đi muộn, về sớm, thiếu lượt vào/ra hoặc còn thiếu tệp hồ sơ hỗ trợ.' },
-                    absent: { label: 'Vắng', swatch: 'bg-rose-300/80 border-rose-700/30', cell: 'bg-rose-300/80 border-rose-700/30', help: 'Đỏ dịu: hệ thống ghi nhận vắng trong ngày. Mở ngày để xem dữ liệu và hồ sơ liên quan.' },
-                    other: { label: 'Nghỉ / ngày lễ', swatch: 'bg-slate-300/80 border-slate-500/30', cell: 'bg-slate-300/80 border-slate-500/30', help: 'Xám dịu: ngày nghỉ hoặc ngày lễ, xem đơn nghỉ và trạng thái phê duyệt ở chi tiết ngày.' },
+                    full: { label: 'Đủ công', swatch: 'bg-emerald-100 border-emerald-300', cell: 'bg-emerald-100 border-emerald-300 text-emerald-950', help: 'Xanh dịu: có dữ liệu chấm công, không muộn/về sớm và số giờ đạt lịch chuẩn.' },
+                    late: { label: 'Cần xem lại', swatch: 'bg-amber-100 border-amber-300', cell: 'bg-amber-100 border-amber-300 text-amber-950', help: 'Vàng dịu: đi muộn, về sớm, thiếu lượt vào/ra hoặc còn thiếu tệp hồ sơ hỗ trợ.' },
+                    absent: { label: 'Vắng', swatch: 'bg-rose-100 border-rose-300', cell: 'bg-rose-100 border-rose-300 text-rose-950', help: 'Đỏ dịu: hệ thống ghi nhận vắng trong ngày. Mở ngày để xem dữ liệu và hồ sơ liên quan.' },
+                    other: { label: 'Nghỉ / ngày lễ', swatch: 'bg-slate-100 border-slate-200', cell: 'bg-slate-100 border-slate-200 text-slate-800', help: 'Xám dịu: ngày nghỉ hoặc ngày lễ, xem đơn nghỉ và trạng thái phê duyệt ở chi tiết ngày.' },
                   } as const;
                   return <>
                     <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-muted/20 p-4">
@@ -1746,7 +1757,7 @@ export default function PayrollEnginePage() {
                             <div className="grid grid-cols-7 gap-2" aria-label="Lịch chấm công theo ngày">
                             {calendarCells.map(({ key, inRange, day }) => {
                               const category = categoryFor(day);
-                              const cellColor = category === 'none' ? 'border-border bg-muted/20 text-muted-foreground' : category === 'full' ? 'border-emerald-600/45 bg-emerald-300/85 text-emerald-950' : category === 'late' ? 'border-amber-600/45 bg-amber-300/90 text-amber-950' : category === 'absent' ? 'border-rose-600/40 bg-rose-300/90 text-rose-950' : 'border-slate-500/35 bg-slate-200 text-slate-900';
+                              const cellColor = category === 'none' ? 'border-border bg-muted/20 text-muted-foreground' : legend[category].cell;
                               const isSelected = selectedDay?.workDate.slice(0, 10) === key;
                               const content = inRange ? `${dateText(key)} · ${day ? statusText(day) : 'Không có dữ liệu chấm công'}${day?.missingEvidence ? ' · Chưa có tệp hồ sơ' : ''}` : '';
                               return inRange ? <button key={key} type="button" disabled={!day} onClick={() => day && setSelectedAttendanceDate(key)} title={content} aria-label={content} aria-pressed={Boolean(day && isSelected)} className={`flex min-h-[76px] flex-col items-start justify-between rounded-md border p-2 text-left transition-shadow sm:min-h-[90px] sm:p-2.5 ${cellColor} ${day ? 'cursor-pointer hover:ring-2 hover:ring-foreground/25' : 'cursor-default'} ${day && isSelected ? 'outline outline-2 outline-foreground/70 outline-offset-1' : ''}`}><span className="text-sm font-semibold">{Number(key.slice(-2))}</span>{day ? <span className="w-full"><span className="block truncate text-[11px] font-medium">{statusText(day)}</span><span className="mt-1 block truncate text-[10px] opacity-80">{timeText(day.firstInAt)}–{timeText(day.lastOutAt)}</span><span className="block truncate text-[10px] opacity-80">{(day.workedMinutes / 60).toFixed(1)} / {(day.scheduledMinutes / 60).toFixed(1)} giờ</span></span> : <span className="text-[10px] opacity-70">{inRange ? 'Không có dữ liệu' : ''}</span>}</button> : <span key={key} aria-hidden="true" className="min-h-[76px] sm:min-h-[90px]" />;

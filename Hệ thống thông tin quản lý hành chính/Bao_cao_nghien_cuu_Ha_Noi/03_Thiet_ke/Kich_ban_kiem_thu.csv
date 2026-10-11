@@ -1,13 +1,14 @@
 ﻿Mã,Điều kiện hoặc tình huống,Thao tác hoặc tiêu chí,Kết quả mong đợi,Trạng thái
 KT01,Hai phiên bản có thời gian hiệu lực khác,Tiếp nhận trước và sau ngày đổi,Mỗi hồ sơ giữ đúng phiên bản áp dụng,Chưa thực hiện
 KT02,Phiên bản của cơ quan khác,Chọn sai cơ quan rồi gửi,Không nhận sai nhánh; có hướng dẫn,Chưa thực hiện
+KT25,Cùng mã 2.000908 được tra ở hai địa bàn; một kết quả đã quan sát là Hà Nội → Phường Tây Hồ,Chọn địa bàn/cơ quan trên Cổng quốc gia rồi đối chiếu bản ghi tuyến,Không dùng UBND phường Tây Hồ làm mặc định cho địa bàn khác; hồ sơ lưu đúng tuyến và thời điểm đã chọn,Chưa thực hiện
 KT03,Người A và hồ sơ của B không có quan hệ,Đổi mã hồ sơ trong truy cập,Không xem hoặc tải được dữ liệu của B,Chưa thực hiện
 KT04,Hồ sơ đại diện DL02 và DL03,Thử nộp và nhận kết quả,Chỉ trường hợp đủ căn cứ được tiếp tục,Chưa thực hiện
 KT05,Dữ liệu xác thực đầy đủ,Nạp dữ liệu và gửi,Nguồn được lưu; không yêu cầu lại giấy đã thay hợp lệ,Chưa thực hiện
 KT06,Dữ liệu không có hoặc kết nối lỗi,Thực hiện kê khai,Có nhánh xử lý rõ; không tự kết luận sai,Chưa thực hiện
 KT07,Yêu cầu hợp lệ DL01,Cán bộ tiếp nhận,Cấp một mã; giấy hẹn khớp hạn và phiên bản,Chưa thực hiện
 KT08,Cùng mã yêu cầu gửi hai lần,Gửi lại sau mất phản hồi,Chỉ một hồ sơ; phản hồi định danh đã tạo,Chưa thực hiện
-KT09,Thiếu thành phần áp dụng DL04,Yêu cầu bổ sung rồi nhận bản bổ sung,"Lưu giai đoạn, căn cứ và lịch sử; đúng nhánh quay lại",Chưa thực hiện
+KT09,Thiếu/sai thành phần đầu vào hoặc dữ liệu liên thông chưa khai thác được,Gửi phiếu bổ sung có danh sách từng mục; thử gửi yêu cầu thứ hai ở bước đầu vào,Phiếu đầu tiên đầy đủ; yêu cầu lần hai bị chặn; lỗi kết nối không bị ghi thành dữ liệu công dân khai sai,Chưa thực hiện
 KT10,Yêu cầu ngoài thẩm quyền,Từ chối thiếu hoặc đủ lý do,Thiếu lý do bị chặn; đủ căn cứ sinh đúng phiếu,Chưa thực hiện
 KT11,Người xử lý khác cơ quan,Phân công rồi đổi người,Không cấp sai quyền; lịch sử được giữ,Chưa thực hiện
 KT12,Kết quả tra cứu mâu thuẫn DL05,Đối chiếu và trình duyệt,Không tự sửa nguồn; lưu ý kiến và bằng chứng,Chưa thực hiện
@@ -19,10 +20,15 @@ KT17,Kho nhận không đáp ứng DL09,Gửi kết quả,Đã phát hành giữ
 KT18,Đích đã nhận nhưng phản hồi mất,Gửi lại cùng mã,Không tạo hai lần giao; có bằng chứng đối chiếu,Chưa thực hiện
 KT19,"DL06 trước, đúng, sau 15 giờ và ngày nghỉ",Tiếp nhận và tính hạn,Khớp bảng ranh giới đã được nghiệp vụ duyệt,Chưa thực hiện
 KT20,Hồ sơ quá hạn và có điều chỉnh,Kiểm tra cảnh báo rồi trả,Giữ hạn ban đầu; có giải trình; không chặn giao vì quá hạn,Chưa thực hiện
-KT21,Đề nghị dừng trước và sau phát hành,Xem xét và quyết định,Xử lý theo giai đoạn; không thu hồi kết quả bằng sửa trạng thái,Chưa thực hiện
+KT21,Yêu cầu dừng theo kênh và thời điểm,"Sau tiếp nhận hợp lệ, kiểm tra Mẫu 05, chủ thể/đại diện, quyết định/văn bản kết quả",Sinh bản xem/in Mẫu 06 khi đủ điều kiện; giữ nguyên trạng thái lúc chờ ký; chỉ người có quyền ký được cấp riêng mới ghi nhận phát hành và chuyển DUNG; yêu cầu trực tuyến đi qua NQG,Chưa thực hiện
 KT22,Hai phiên mở cùng hồ sơ DL10,Cùng cập nhật,Một cập nhật thành công; bản cũ nhận xung đột,Chưa thực hiện
 KT23,Quyền cán bộ bị thu hồi,Dùng phiên cũ tiếp tục,Thao tác bị từ chối; có sự kiện theo dõi,Chưa thực hiện
 KT24,Cấu hình thủ tục sửa chưa duyệt,Áp dụng vào hồ sơ mới,Bản nháp không có hiệu lực; truy được người sửa và duyệt,Chưa thực hiện
+KT26,Quyết định/văn bản kết quả phát sinh giữa lúc nhận yêu cầu và ký Mẫu 06,Người ký mở yêu cầu đang chờ phát hành,"Kiểm tra lại điều kiện; giữ nguyên trạng thái, không phát hành Mẫu 06",Chưa thực hiện
+KT27,Lãnh đạo chưa được cấp quyền ký Mẫu 06,Gửi yêu cầu ghi nhận phát hành,Từ chối tại máy chủ; không đổi trạng thái hồ sơ,Chưa thực hiện
+KT28,Hồ sơ đã có kết luận KHONG_GIAI_QUYET,Tiếp nhận yêu cầu dừng,Không mở lại nhánh đã kết luận,Chưa thực hiện
+KT29,Người ngoài hồ sơ đoán đường dẫn tệp Mẫu 06,Tải tài liệu,Từ chối; chỉ người trong phạm vi hồ sơ mới truy cập được,Chưa thực hiện
+KT30,Người đại diện nộp Mẫu 05 nhưng thiếu chứng cứ đại diện,Tiếp nhận yêu cầu,Không chuyển sang chờ ký; giữ trạng thái hồ sơ và yêu cầu bổ sung chứng cứ,Chưa thực hiện
 AT01,Truy cập hồ sơ ngoài quyền qua giao tiếp trực tiếp,Theo mô tả kịch bản,Từ chối ở máy chủ; không lộ tệp,Chưa thực hiện
 AT02,Dùng phiên hết hạn hoặc đã thu hồi,Theo mô tả kịch bản,Không thực hiện được hành động,Chưa thực hiện
 AT03,Đầu vào chứa lệnh hoặc mã thực thi,Theo mô tả kịch bản,Không thực thi; dữ liệu được xử lý an toàn,Chưa thực hiện
@@ -79,7 +85,7 @@ CF13,Bổ sung trong hai giai đoạn khác nhau,Yêu cầu và nộp bổ sung,
 CF14,Hai người cùng phân công hồ sơ,Lưu bằng cùng phiên bản ban đầu,"Một cập nhật thành công; người sau nhận xung đột, không ghi đè",Chưa thực hiện
 CF15,"Hai ý kiến bắt buộc, chỉ có một bản trả",Đề nghị tổng hợp và trình,Chặn hoặc yêu cầu căn cứ được phép; không coi im lặng là đồng ý,Chưa thực hiện
 CF16,Người phê duyệt ngoài thẩm quyền phiên bản,Thử duyệt bằng quyền cơ quan khác,"Bị từ chối, giữ trạng thái và ghi nhật ký",Chưa thực hiện
-CF17,Hồ sơ có khoản thu và nhiệm vụ còn mở,Quyết định dừng theo căn cứ,"Có thông báo và xử lý nghĩa vụ còn lại, không xóa lịch sử",Chưa thực hiện
+CF17,Hồ sơ có khoản thu và nhiệm vụ còn mở,"Cán bộ tiếp nhận kiểm tra yêu cầu, trạng thái và Mẫu 06; cán bộ tài chính theo dõi riêng",Chỉ chuyển DUNG sau khi Mẫu 06 được ký/phát hành; trả giấy/hoàn phí theo quy trình riêng; không tự hoàn tiền hoặc xóa giao dịch,Chưa thực hiện
 CF18,Thông báo đã gửi nhưng chưa có biên nhận,Thử ghi đã giao kết quả,Không xác nhận giao chỉ từ trạng thái gửi thông báo,Chưa thực hiện
 CF19,Tài khoản chỉ có quyền xem một phạm vi,Kết xuất danh sách ngoài phạm vi,Bị chặn hoặc lọc đúng quyền; có nhật ký xuất,Chưa thực hiện
 CF20,Một sự kiện nhắc việc gửi lặp,Xử lý lại sự kiện nhiều lần,Không gửi trùng ngoài chính sách; không lộ nội dung nhạy cảm,Chưa thực hiện

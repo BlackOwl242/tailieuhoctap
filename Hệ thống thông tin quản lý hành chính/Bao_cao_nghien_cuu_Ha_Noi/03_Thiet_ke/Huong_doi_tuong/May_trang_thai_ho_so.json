@@ -129,30 +129,49 @@
     },
     {
       "source": "DA_TIEP_NHAN",
-      "event": "dung",
+      "event": "phatHanhThongBaoDung",
       "target": "DUNG",
-      "guard": "Quyết định dừng có căn cứ",
-      "role": "Lãnh đạo có thẩm quyền"
+      "guard": "Có yêu cầu trực tiếp/bưu chính hợp lệ; chưa ban hành quyết định hoặc văn bản thông báo kết quả; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền",
+      "role": "Người có thẩm quyền được cấp quyền ký Mẫu 06"
+    },
+    {
+      "source": "CHO_BO_SUNG",
+      "event": "phatHanhThongBaoDung",
+      "target": "DUNG",
+      "guard": "Hồ sơ đã được tiếp nhận; yêu cầu thuộc khoảng thời gian được phép; chưa ban hành quyết định/thông báo; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền",
+      "role": "Người có thẩm quyền được cấp quyền ký Mẫu 06"
     },
     {
       "source": "DANG_THU_LY",
-      "event": "dung",
+      "event": "phatHanhThongBaoDung",
       "target": "DUNG",
-      "guard": "Quyết định dừng có căn cứ",
-      "role": "Lãnh đạo có thẩm quyền"
+      "guard": "Có yêu cầu trực tiếp/bưu chính hợp lệ; chưa ban hành quyết định hoặc văn bản thông báo kết quả; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền",
+      "role": "Người có thẩm quyền được cấp quyền ký Mẫu 06"
     },
     {
       "source": "TRINH_DUYET",
-      "event": "dung",
+      "event": "phatHanhThongBaoDung",
       "target": "DUNG",
-      "guard": "Quyết định dừng và xử lý dự thảo",
-      "role": "Lãnh đạo có thẩm quyền"
+      "guard": "Có yêu cầu trực tiếp/bưu chính hợp lệ; chưa ban hành quyết định hoặc văn bản thông báo kết quả; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền",
+      "role": "Người có thẩm quyền được cấp quyền ký Mẫu 06"
+    },
+    {
+      "source": "DA_PHE_DUYET",
+      "event": "phatHanhThongBaoDung",
+      "target": "DUNG",
+      "guard": "Chưa ban hành quyết định hoặc văn bản thông báo kết quả; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền",
+      "role": "Người có thẩm quyền được cấp quyền ký Mẫu 06"
     }
   ],
   "invariants": [
     "Mỗi chuyển bước kiểm tra phiên bản và phạm vi quyền",
     "Chuyển bước và nhật ký cùng giao dịch",
     "Không tự điều chỉnh hạn khi bổ sung hoặc sự cố",
-    "Tài chính, giao nhận, đồng bộ là các chiều độc lập"
+    "Tài chính, giao nhận, đồng bộ là các chiều độc lập",
+    "Yêu cầu dừng và Thông báo dừng là hai sự kiện riêng; chỉ chuyển DUNG sau khi Mẫu 06 được ký và phát hành bởi người có thẩm quyền còn quyền ký",
+    "Quyền ký Mẫu 06 phải gắn với tài khoản, cơ quan, văn bản phân công, thời hạn; cấp, thu hồi và đối chiếu phải có nhật ký riêng",
+    "Trực tiếp/bưu chính: yêu cầu sau tiếp nhận hợp lệ và trước khi ban hành quyết định/thông báo kết quả; trực tuyến: xử lý qua chức năng Cổng Dịch vụ công quốc gia",
+    "KHONG_GIAI_QUYET là nhánh kết thúc; không mở lại để xử lý yêu cầu dừng",
+    "Trả hồ sơ giấy, hoàn phí/lệ phí và thông báo dừng là các việc có bằng chứng riêng"
   ]
 }

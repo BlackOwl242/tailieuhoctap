@@ -105,12 +105,14 @@ for k,(title,fields) in tables.items():
  if k=='giao_dich':cols+=['    UNIQUE (doi_tac, ma_ngoai)']
  if k=='lich_lam_viec':cols+=['    UNIQUE (co_quan_id, ngay)']
  if k=='tham_chieu_lien_thong':cols+=['    UNIQUE (he_thong_id, ma_ngoai)', '    UNIQUE (ho_so_id, he_thong_id)']
+ if k=='yeu_cau_dung':cols+=['    UNIQUE (ho_so_id, ma_phieu_yeu_cau)','    CHECK (kenh_yeu_cau IN (\'TRUC_TIEP\', \'BUU_CHINH\'))','    CHECK (trang_thai IN (\'TIEP_NHAN\', \'CHO_KY_PHAT_HANH\', \'KHONG_DU_DIEU_KIEN\', \'DA_PHAT_HANH\'))','    CHECK (phien_ban > 0)']
+ if k=='su_kien_quyen_ky_mau06':cols+=['    CHECK (hanh_dong IN (\'CAP\', \'THU_HOI\'))']
  if k=='thong_diep_nhan':cols+=['    UNIQUE (he_thong_id, ma_thong_diep)']
  if k=='tuyen_xu_ly':cols+=['    CHECK (hieu_luc_den IS NULL OR hieu_luc_den > hieu_luc_tu)']
  if k=='mau_bao_cao':cols+=['    UNIQUE (ma, so_phien_ban)']
  if k in ['diem_tiep_nhan','mau_bao_cao','tai_lieu_huong_dan','tai_lieu_kho','quyen_khai_thac_kho']:cols+=['    CHECK (hieu_luc_den IS NULL OR hieu_luc_tu IS NULL OR hieu_luc_den > hieu_luc_tu)']
  sql+=['CREATE TABLE '+k+' (',',\n'.join(cols),');','']
-sql+=['CREATE INDEX ix_ho_so_xu_ly ON ho_so (trang_thai, han_hien_hanh);','CREATE INDEX ix_su_kien ON su_kien_xu_ly (ho_so_id, thoi_diem);','CREATE UNIQUE INDEX uq_phan_cong_hien_hanh ON phan_cong (ho_so_id) WHERE ket_thuc_luc IS NULL;']
+sql+=['CREATE INDEX ix_ho_so_xu_ly ON ho_so (trang_thai, han_hien_hanh);','CREATE INDEX ix_su_kien ON su_kien_xu_ly (ho_so_id, thoi_diem);','CREATE INDEX ix_su_kien_quyen_ky_mau06 ON su_kien_quyen_ky_mau06 (tai_khoan_id, thoi_diem);','CREATE UNIQUE INDEX uq_phan_cong_hien_hanh ON phan_cong (ho_so_id) WHERE ket_thuc_luc IS NULL;']
 (OUT/'Tu_dien_du_lieu.md').write_text('\n'.join(md),encoding='utf-8')
 (OUT/'Mo_hinh_du_lieu.sql').write_text('\n'.join(sql),encoding='utf-8')
 
@@ -203,18 +205,18 @@ with (OUT/'Kich_ban_kiem_thu.csv').open('w',encoding='utf-8-sig',newline='') as 
  for cells in tests:
   if len(cells)==4:cells.insert(2,'Theo mô tả kịch bản')
   w.writerow(cells)
-(OUT/'README.md').write_text('''# Bộ thiết kế hệ thống giải quyết thủ tục hành chính Hà Nội
+(OUT/'README.md').write_text(f'''# Bộ thiết kế hệ thống giải quyết thủ tục hành chính Hà Nội
 
 Đối tượng thực tế là Hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội. Phạm vi gồm chín nhóm, 31 chức năng và hai mươi khía cạnh. Hai trường hợp đối chiếu là nhánh hộ tịch theo Quyết định 1811 và cấp bản sao từ sổ gốc theo Quyết định 663. Các địa chỉ công khai và nhánh hoạt động được giải thích tại mục 2.10 của báo cáo.
 
-Các lược đồ và giao tiếp ở đây là phương án thiết kế nghiên cứu, không phải bản sao thiết kế nội bộ. Chưa có phần mềm chạy hoặc kết quả kiểm thử trên hệ thống vận hành.
+Các lược đồ và giao tiếp ở đây là phương án thiết kế nghiên cứu, không phải bản sao thiết kế nội bộ. Ứng dụng React/Python/SQLite chạy cục bộ; chưa kết nối, kiểm thử hoặc được cấp quyền trên hệ thống vận hành Hà Nội.
 
 * `So_do`: sơ đồ PNG để chèn báo cáo và SVG để chỉnh sửa; ảnh giao diện năm 2023 được trích từ tài liệu công khai, ghi rõ là phiên bản lịch sử.
-* `Tu_dien_du_lieu.md`, `Tu_dien_du_lieu.json`: 35 bảng với kiểu dữ liệu, quan hệ, ràng buộc và diễn giải.
+* `Tu_dien_du_lieu.md`, `Tu_dien_du_lieu.json`: {len(tables)} bảng với kiểu dữ liệu, quan hệ, ràng buộc và diễn giải.
 * `Mo_hinh_du_lieu.sql`: lược đồ tham chiếu PostgreSQL; cần kiểm tra khi lựa chọn công nghệ thực tế.
 * `Giao_tiep_OpenAPI.json`: 10 thao tác, cấu trúc yêu cầu và phản hồi tham chiếu.
 * `Giao_tiep_mo_rong_OpenAPI.json`: 7 thao tác về tuyến, liên thông, phối hợp, nộp lưu, phản ánh và báo cáo.
-* `Kich_ban_kiem_thu.csv`: 95 ca, gồm 31 ca CF tương ứng 31 chức năng CN; tất cả chưa thực hiện.
+* `Kich_ban_kiem_thu.csv`: {len(tests)} ca; tất cả chưa thực hiện.
 
 Quy trình, quyền và nguyên tắc chuyển bước ở các chương III, IV, VII trong `02_Noi_dung`. Điều kiện khảo sát bổ sung ở phụ lục A.
 ''',encoding='utf-8')

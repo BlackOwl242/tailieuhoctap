@@ -18,11 +18,13 @@ T=[
 ('TRINH_DUYET','kyDuyet','DA_PHE_DUYET','Đúng bản và chữ ký hợp lệ','Lãnh đạo có thẩm quyền'),
 ('DA_PHE_DUYET','phatHanh','DA_PHAT_HANH','Văn thư cấp số; tệp bất biến','Văn thư'),
 ('DA_PHAT_HANH','xacNhanGiao','HOAN_THANH','Có chứng cứ giao đúng người','Cán bộ trả kết quả'),
-('DA_TIEP_NHAN','dung','DUNG','Quyết định dừng có căn cứ','Lãnh đạo có thẩm quyền'),
-('DANG_THU_LY','dung','DUNG','Quyết định dừng có căn cứ','Lãnh đạo có thẩm quyền'),
-('TRINH_DUYET','dung','DUNG','Quyết định dừng và xử lý dự thảo','Lãnh đạo có thẩm quyền'),
+('DA_TIEP_NHAN','phatHanhThongBaoDung','DUNG','Có yêu cầu trực tiếp/bưu chính hợp lệ; chưa ban hành quyết định hoặc văn bản thông báo kết quả; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền','Người có thẩm quyền được cấp quyền ký Mẫu 06'),
+('CHO_BO_SUNG','phatHanhThongBaoDung','DUNG','Hồ sơ đã được tiếp nhận; yêu cầu thuộc khoảng thời gian được phép; chưa ban hành quyết định/thông báo; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền','Người có thẩm quyền được cấp quyền ký Mẫu 06'),
+('DANG_THU_LY','phatHanhThongBaoDung','DUNG','Có yêu cầu trực tiếp/bưu chính hợp lệ; chưa ban hành quyết định hoặc văn bản thông báo kết quả; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền','Người có thẩm quyền được cấp quyền ký Mẫu 06'),
+('TRINH_DUYET','phatHanhThongBaoDung','DUNG','Có yêu cầu trực tiếp/bưu chính hợp lệ; chưa ban hành quyết định hoặc văn bản thông báo kết quả; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền','Người có thẩm quyền được cấp quyền ký Mẫu 06'),
+('DA_PHE_DUYET','phatHanhThongBaoDung','DUNG','Chưa ban hành quyết định hoặc văn bản thông báo kết quả; Mẫu 06 đã được ký và phát hành bởi người có thẩm quyền còn được giao quyền','Người có thẩm quyền được cấp quyền ký Mẫu 06'),
 ]
-machine={'object':'HoSo','initial':'NHAP','states':sorted({s for a,_,b,_,_ in T for s in [a,b]}),'terminal':['TU_CHOI','KHONG_GIAI_QUYET','DUNG','HOAN_THANH'],'transitions':[dict(source=a,event=e,target=b,guard=g,role=r) for a,e,b,g,r in T],'invariants':['Mỗi chuyển bước kiểm tra phiên bản và phạm vi quyền','Chuyển bước và nhật ký cùng giao dịch','Không tự điều chỉnh hạn khi bổ sung hoặc sự cố','Tài chính, giao nhận, đồng bộ là các chiều độc lập']}
+machine={'object':'HoSo','initial':'NHAP','states':sorted({s for a,_,b,_,_ in T for s in [a,b]}),'terminal':['TU_CHOI','KHONG_GIAI_QUYET','DUNG','HOAN_THANH'],'transitions':[dict(source=a,event=e,target=b,guard=g,role=r) for a,e,b,g,r in T],'invariants':['Mỗi chuyển bước kiểm tra phiên bản và phạm vi quyền','Chuyển bước và nhật ký cùng giao dịch','Không tự điều chỉnh hạn khi bổ sung hoặc sự cố','Tài chính, giao nhận, đồng bộ là các chiều độc lập','Yêu cầu dừng và Thông báo dừng là hai sự kiện riêng; chỉ chuyển DUNG sau khi Mẫu 06 được ký và phát hành bởi người có thẩm quyền còn quyền ký','Quyền ký Mẫu 06 phải gắn với tài khoản, cơ quan, văn bản phân công, thời hạn; cấp, thu hồi và đối chiếu phải có nhật ký riêng','Trực tiếp/bưu chính: yêu cầu sau tiếp nhận hợp lệ và trước khi ban hành quyết định/thông báo kết quả; trực tuyến: xử lý qua chức năng Cổng Dịch vụ công quốc gia','KHONG_GIAI_QUYET là nhánh kết thúc; không mở lại để xử lý yêu cầu dừng','Trả hồ sơ giấy, hoàn phí/lệ phí và thông báo dừng là các việc có bằng chứng riêng']}
 (OUT/'May_trang_thai_ho_so.json').write_text(json.dumps(machine,ensure_ascii=False,indent=2),encoding='utf-8')
 
 def state_linear(name,states,events,back=None):
@@ -51,8 +53,8 @@ def edge(a,b,label,side=False):
  if y==yy:p=(x+560 if xx>x else x,y+65);q=(xx if xx>x else xx+560,yy+65);c.line([p,q],arrow=True);c.text((p[0]+q[0])/2,y-80,label,650,size=34)
  else:
   p=(x+280,y+130);q=(xx+280,yy);mid=(p[1]+q[1])/2;c.line([p,(p[0],mid),(q[0],mid),q],arrow=True);c.text(1530 if p[0]==1870 else 1450,mid-85,label,560,size=34,background=True)
-edge('NHAP','CHO_TIEP_NHAN','gửi [đủ trường]');edge('CHO_TIEP_NHAN','CHO_BO_SUNG','thiếu [có căn cứ]');edge('CHO_TIEP_NHAN','DA_TIEP_NHAN','tiếp nhận [hợp lệ]');edge('DA_TIEP_NHAN','DANG_THU_LY','phân công [còn quyền]');edge('DANG_THU_LY','TRINH_DUYET','trình [đủ ý kiến]');edge('CHO_BO_SUNG','TU_CHOI','không thể hoàn thiện [được duyệt]');edge('DANG_THU_LY','KHONG_GIAI_QUYET','kết luận [có căn cứ]');edge('DANG_THU_LY','DUNG','dừng [có quyết định]')
-c.text(1100,1660,'Bổ sung quay lại giai đoạn đã lưu. Sau TRINH_DUYET: ký duyệt, phát hành, xác nhận giao.',2060,size=36,background=True);c.save('trang_thai_HoSo')
+edge('NHAP','CHO_TIEP_NHAN','gửi [đủ trường]');edge('CHO_TIEP_NHAN','CHO_BO_SUNG','thiếu [có căn cứ]');edge('CHO_TIEP_NHAN','DA_TIEP_NHAN','tiếp nhận [hợp lệ]');edge('DA_TIEP_NHAN','DANG_THU_LY','phân công [còn quyền]');edge('DANG_THU_LY','TRINH_DUYET','trình [đủ ý kiến]');edge('CHO_BO_SUNG','TU_CHOI','không thể hoàn thiện [được duyệt]');edge('DANG_THU_LY','KHONG_GIAI_QUYET','kết luận [có căn cứ]');edge('DANG_THU_LY','DUNG','Mẫu 06 đã ký, phát hành')
+c.text(1100,1660,'Yêu cầu trực tiếp/bưu chính: lập yêu cầu → kiểm tra ngay → dự thảo Mẫu 06 → ký/phát hành → DUNG. Không dừng sau khi đã ban hành kết quả; yêu cầu trực tuyến đi qua Cổng quốc gia.',2060,size=36,background=True);c.save('trang_thai_HoSo')
 
 # Vai trò chung kế thừa quyền dùng chung; đây không phải cây cơ cấu tổ chức.
 c=Canvas(2000,900);c.text(1000,20,'Phân cấp tác nhân cán bộ theo vai trò',1870,bold=True);c.actor(1000,100,'Cán bộ được phân quyền')

@@ -1,48 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3300" height="2550" viewBox="0 0 1100 850"><rect width="1100" height="850" fill="white"/>
-<text x="550" y="35.75" font-family="Arial" font-size="25" font-weight="bold" text-anchor="middle">Biểu đồ hoạt động UC13 Yêu cầu và nhận bổ sung</text>
-<text x="190" y="85.09" font-family="Arial" font-size="23" font-weight="bold" text-anchor="middle">Cán bộ xử lý</text>
-<text x="550" y="85.09" font-family="Arial" font-size="23" font-weight="bold" text-anchor="middle">Người nộp</text>
-<text x="910" y="85.09" font-family="Arial" font-size="23" font-weight="bold" text-anchor="middle">Hệ thống</text>
-<polyline points="370,108 370,817" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
-<polyline points="730,108 730,817" fill="none" stroke="#181818" stroke-width="1" stroke-dasharray="5 4"/>
-<circle cx="190" cy="118" r="11" fill="#222222" stroke="#181818"/>
-<polyline points="190,129 190,151" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="194.0,141.0 190,151 186.0,141.0" fill="none" stroke="#181818" stroke-width="1"/>
-<rect x="40" y="151" width="300" height="90" rx="0" fill="#F1F1F1" stroke="#181818"/>
-<text x="190" y="187.09" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">Nêu nội dung thiếu và căn</text>
-<text x="190" y="215.84" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">cứ bổ sung</text>
-<polyline points="190,241 190,270 760,270" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="750.0,266.0 760,270 750.0,274.0" fill="none" stroke="#181818" stroke-width="1"/>
-<rect x="760" y="228" width="300" height="95" rx="0" fill="#F1F1F1" stroke="#181818"/>
-<text x="910" y="263.09" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">Lưu giai đoạn xử lý và gửi</text>
-<text x="910" y="291.84" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">yêu cầu</text>
-<polyline points="910,323 910,354 567,354" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="577.0,358.0 567,354 577.0,350.0" fill="none" stroke="#181818" stroke-width="1"/>
-<polygon points="550,338 566,354 550,370 534,354" fill="white" stroke="#181818"/>
-<polyline points="550,370 550,402" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="554.0,392.0 550,402 546.0,392.0" fill="none" stroke="#181818" stroke-width="1"/>
-<rect x="400" y="402" width="300" height="100" rx="0" fill="#F1F1F1" stroke="#181818"/>
-<text x="550" y="438.09" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">Gửi tài liệu theo yêu cầu</text>
-<text x="550" y="466.84" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">đã nhận</text>
-<polyline points="550,502 190,502 190,544" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="194.0,534.0 190,544 186.0,534.0" fill="none" stroke="#181818" stroke-width="1"/>
-<rect x="40" y="544" width="300" height="85" rx="0" fill="#F1F1F1" stroke="#181818"/>
-<text x="190" y="579.09" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">Kiểm tra tài liệu bổ sung</text>
-<polyline points="190,629 190,660" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="194.0,650.0 190,660 186.0,650.0" fill="none" stroke="#181818" stroke-width="1"/>
-<polygon points="190,660 273,707 190,754 107,707" fill="#F1F1F1" stroke="#181818"/>
-<text x="190" y="713.09" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">Đạt?</text>
-<polyline points="273,707 760,707" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="750.0,703.0 760,707 750.0,711.0" fill="none" stroke="#181818" stroke-width="1"/>
-<text x="520" y="693.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">có</text>
-<rect x="760" y="665" width="300" height="100" rx="0" fill="#F1F1F1" stroke="#181818"/>
-<text x="910" y="703.09" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">Lưu bổ sung và tiếp tục</text>
-<text x="910" y="731.84" font-family="Arial" font-size="23" font-weight="normal" text-anchor="middle">đúng giai đoạn</text>
-<polyline points="107,707 20,707 20,370 390,370 390,354 534,354" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="524.0,350.0 534,354 524.0,358.0" fill="none" stroke="#181818" stroke-width="1"/>
-<text x="180" y="359.26" font-family="Arial" font-size="22" font-weight="normal" text-anchor="middle">chưa đạt</text>
-<polyline points="910,765 910,797" fill="none" stroke="#181818" stroke-width="1"/>
-<polyline points="914.0,787.0 910,797 906.0,787.0" fill="none" stroke="#181818" stroke-width="1"/>
-<circle cx="910" cy="807" r="10" fill="white" stroke="#181818"/>
-<circle cx="910" cy="807" r="6" fill="#222222" stroke="#181818"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1490"><rect width="100%" height="100%" fill="white"/>
+<text x="1000" y="52" font-family="Times New Roman" font-size="38" font-weight="bold" text-anchor="middle">Biểu đồ hoạt động — UC13: Yêu cầu và nhận bổ sung</text>
+<text x="360" y="154" font-family="Times New Roman" font-size="38" font-weight="bold" text-anchor="middle">Cán bộ tiếp nhận</text>
+<text x="980" y="154" font-family="Times New Roman" font-size="38" font-weight="bold" text-anchor="middle">Người yêu cầu</text>
+<text x="1600" y="154" font-family="Times New Roman" font-size="38" font-weight="bold" text-anchor="middle">Hệ thống</text>
+<polyline points="660,205 660,1390" fill="none" stroke="black" stroke-width="3" stroke-dasharray="14 10"/>
+<polyline points="1280,205 1280,1390" fill="none" stroke="black" stroke-width="3" stroke-dasharray="14 10"/>
+<circle cx="360" cy="210" r="20" fill="black" stroke="black" stroke-width="3"/>
+<polyline points="360,230 360,250" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="360,250 368.0,230.0 352.0,230.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="80" y="250" width="560" height="170" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="360.0" y="302" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">Lập yêu cầu bổ sung</text>
+<text x="360.0" y="349" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">Ghi giai đoạn xử lý</text>
+<polyline points="360,420 360,500 1320,500" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1320,500 1300.0,492.0 1300.0,508.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="1320" y="440" width="560" height="180" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1600.0" y="492" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">Gửi thông báo</text>
+<text x="1600.0" y="539" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">Giữ giai đoạn và mốc hạn</text>
+<polyline points="1600,620 1600,660 1010,660" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1010,660 1030.0,668.0 1030.0,652.0" fill="black" stroke="black" stroke-width="3"/>
+<polygon points="980,630 1010,660 980,690 950,660" fill="white" stroke="black" stroke-width="3"/>
+<polyline points="980,690 980,730" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="980,730 988.0,710.0 972.0,710.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="700" y="730" width="560" height="170" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="980.0" y="782" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">Gửi tài liệu theo đúng yêu cầu</text>
+<polyline points="980,900 360,900 360,940" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="360,940 368.0,920.0 352.0,920.0" fill="black" stroke="black" stroke-width="3"/>
+<rect x="80" y="940" width="560" height="150" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="360.0" y="992" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">Đối chiếu tài liệu và căn cứ</text>
+<polyline points="360,1090 360,1110" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="360,1110 368.0,1090.0 352.0,1090.0" fill="black" stroke="black" stroke-width="3"/>
+<polygon points="360,1110 480,1160 360,1210 240,1160" fill="white" stroke="black" stroke-width="3"/>
+<text x="360" y="1164" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">Đạt?</text>
+<polyline points="480,1160 1320,1160" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1320,1160 1300.0,1152.0 1300.0,1168.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="900" y="1134" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">[Đạt]</text>
+<rect x="1320" y="1120" width="560" height="190" rx="25" fill="white" stroke="black" stroke-width="3"/>
+<text x="1600.0" y="1172" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">Ghi nhận bổ sung</text>
+<text x="1600.0" y="1219" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">Trở lại đúng giai đoạn</text>
+<polyline points="240,1160 50,1160 50,700 680,700 680,660 950,660" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="950,660 930.0,652.0 930.0,668.0" fill="black" stroke="black" stroke-width="3"/>
+<text x="360" y="669" font-family="Times New Roman" font-size="38" font-weight="normal" text-anchor="middle">[Chưa đạt]</text>
+<polyline points="1600,1310 1600,1340" fill="none" stroke="black" stroke-width="3"/>
+<polygon points="1600,1340 1608.0,1320.0 1592.0,1320.0" fill="black" stroke="black" stroke-width="3"/>
+<circle cx="1600" cy="1370" r="26" fill="white" stroke="black" stroke-width="3"/>
+<circle cx="1600" cy="1370" r="16" fill="black" stroke="black" stroke-width="3"/>
+<text x="1000" y="1464" font-family="Times New Roman" font-size="48" font-weight="normal" text-anchor="middle">Bổ sung giữ giai đoạn xử lý và áp dụng thời hạn của thủ tục.</text>
 </svg>

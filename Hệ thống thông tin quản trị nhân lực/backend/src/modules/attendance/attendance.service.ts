@@ -74,12 +74,9 @@ export class AttendanceService {
   async checkIn(
     user: AuthUser,
     dto: {
-      method: 'QR' | 'FACE' | 'WEB' | 'WINDOWS_HELLO' | 'FACE_ID' | 'BIOMETRIC_3D';
+      method: 'QR' | 'FACE' | 'WEB';
       qrToken?: string;
       descriptor?: number[];
-      biometricCredentialId?: string;
-      clientDataJSON?: string;
-      signature?: string;
     },
   ) {
     let deviceId: string | null = null;
@@ -128,8 +125,6 @@ export class AttendanceService {
           HttpStatus.UNAUTHORIZED,
         );
       }
-    } else if (['WINDOWS_HELLO', 'FACE_ID', 'BIOMETRIC_3D'].includes(dto.method)) {
-      throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Xác thực phần cứng chưa được triển khai; hãy dùng QR hoặc điểm danh web', HttpStatus.BAD_REQUEST);
     }
 
     // Xác định loại lần chấm kế tiếp: số sự kiện hôm nay chẵn → VÀO, lẻ → RA
@@ -219,10 +214,6 @@ export class AttendanceService {
     const templates = rows.map((r) => this.faceCrypto.decryptEmbedding(r.encryptedData));
     return { count: templates.length, templates, threshold: Number(await this.settings.get('FACE_THRESHOLD', Number(process.env.FACE_MATCH_THRESHOLD || 0.95))) };
   }
-
-  // ----------------------------------------------------------- 3D Biometrics
-  getBiometricChallenge(_userId: string) { throw new BusinessException(ErrorCodes.INVALID_STATE_TRANSITION, 'WebAuthn/Windows Hello chưa được tích hợp và xác minh phía máy chủ', HttpStatus.NOT_IMPLEMENTED); }
-  async enrollBiometric3D(_userId: string, _dto: unknown) { throw new BusinessException(ErrorCodes.INVALID_STATE_TRANSITION, 'Chưa hỗ trợ đăng ký sinh trắc học 3D', HttpStatus.NOT_IMPLEMENTED); }
 
   /** Xóa mẫu khuôn mặt (quyền riêng tư — cũng là mục mặc định của handover). */
   async deleteFaceEnrollment(userId: string, embeddingId?: string) {

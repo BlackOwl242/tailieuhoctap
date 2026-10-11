@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="760" viewBox="0 0 1000 760">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 z" fill="#111"/>
+    </marker>
+    <style>
+      text { font-family: Arial, sans-serif; fill: #111; }
+      .title { font-size: 25px; font-weight: 700; }
+      .node { fill: #fff; stroke: #111; stroke-width: 1.5; }
+      .label { font-size: 18px; text-anchor: middle; }
+      .small { font-size: 16px; }
+      .line { fill: none; stroke: #111; stroke-width: 1.5; }
+      .arrow { fill: none; stroke: #111; stroke-width: 1.5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1000" height="760" fill="#fff"/>
+  <text x="500" y="35" class="title" text-anchor="middle">Biểu đồ hoạt động - UC18: Ghi nhận sự kiện chấm công</text>
+
+  <circle cx="500" cy="68" r="10" fill="#111"/>
+  <path d="M500 78V112 M180 112H820" class="line"/>
+  <path d="M180 112V138 M500 112V138 M820 112V138" class="arrow"/>
+
+  <rect x="55" y="140" width="250" height="58" rx="2" class="node"/>
+  <text x="180" y="175" class="label">Web / ESS</text>
+  <rect x="375" y="140" width="250" height="58" rx="2" class="node"/>
+  <text x="500" y="165" class="label"><tspan x="500">Khuôn mặt qua</tspan><tspan x="500" dy="22">camera thường</tspan></text>
+  <rect x="695" y="140" width="250" height="58" rx="2" class="node"/>
+  <text x="820" y="165" class="label"><tspan x="820">Webhook / CSV /</tspan><tspan x="820" dy="22">Simulator đã cấu hình</tspan></text>
+
+  <path d="M180 198V220 M500 198V220 M820 198V220 M180 220H820 M500 220V238" class="line"/>
+  <path d="M500 238L512 250L500 262L488 250Z" class="node"/>
+  <path d="M500 262V285" class="arrow"/>
+
+  <rect x="330" y="287" width="340" height="52" rx="2" class="node"/>
+  <text x="500" y="319" class="label">Ghi AttendanceEvent theo nguồn</text>
+  <path d="M500 339V367" class="arrow"/>
+  <rect x="330" y="369" width="340" height="52" rx="2" class="node"/>
+  <text x="500" y="401" class="label">Tổng hợp công ngày</text>
+  <path d="M500 421V438" class="arrow"/>
+
+  <path d="M500 440L560 488L500 536L440 488Z" class="node"/>
+  <text x="500" y="482" class="label"><tspan x="500">Thiếu lượt</tspan><tspan x="500" dy="22">vào hoặc ra?</tspan></text>
+  <text x="315" y="476" class="label small">Có</text>
+  <text x="685" y="476" class="label small">Không</text>
+  <path d="M440 488H250V548" class="arrow"/>
+  <path d="M560 488H750V548" class="arrow"/>
+
+  <rect x="65" y="550" width="370" height="58" rx="2" class="node"/>
+  <text x="250" y="574" class="label"><tspan x="250">Đánh dấu lệch,</tspan><tspan x="250" dy="22">chuyển vào hàng đợi xử lý</tspan></text>
+  <rect x="565" y="550" width="370" height="58" rx="2" class="node"/>
+  <text x="750" y="584" class="label">Công chuẩn</text>
+
+  <path d="M250 608V635 M750 608V635 M250 635H750 M500 635V650" class="line"/>
+  <path d="M500 650L512 662L500 674L488 662Z" class="node"/>
+  <path d="M500 674V693" class="arrow"/>
+  <circle cx="500" cy="707" r="10" fill="#fff" stroke="#111" stroke-width="2"/>
+  <circle cx="500" cy="707" r="5" fill="#111"/>
+
+  <!-- Draw arrowheads last so each path visibly meets its destination. -->
+  <path d="M180 112V140" class="arrow"/>
+  <path d="M500 112V140" class="arrow"/>
+  <path d="M820 112V140" class="arrow"/>
+  <path d="M174 132L180 140L186 132Z M494 132L500 140L506 132Z M814 132L820 140L826 132Z" fill="#111"/>
+  <path d="M500 421V440" class="arrow"/>
+  <path d="M440 488H250V550 M560 488H750V550" class="arrow"/>
+
+  <text x="500" y="746" class="small" text-anchor="middle">Lượt khuôn mặt được so với mẫu đã đăng ký; hệ thống chưa xác minh người thật.</text>
+</svg>

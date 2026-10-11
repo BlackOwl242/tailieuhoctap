@@ -415,6 +415,46 @@ CREATE TABLE chi_dao_dieu_hanh (
     phien_ban integer NOT NULL CHECK (phien_ban > 0)
 );
 
+CREATE TABLE yeu_cau_dung (
+    id uuid NOT NULL PRIMARY KEY,
+    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
+    kenh_yeu_cau varchar(20) NOT NULL,
+    ma_phieu_yeu_cau varchar(100) NOT NULL,
+    nguoi_yeu_cau_id uuid NOT NULL REFERENCES chu_the(id),
+    uy_quyen_id uuid REFERENCES uy_quyen(id),
+    thoi_diem_nhan timestamptz NOT NULL,
+    can_cu text NOT NULL,
+    tep_mau05_id uuid NOT NULL REFERENCES thanh_phan_ho_so(id),
+    trang_thai varchar(30) NOT NULL,
+    ket_qua_kiem_tra jsonb NOT NULL,
+    nguoi_kiem_tra_id uuid REFERENCES tai_khoan(id),
+    kiem_tra_luc timestamptz,
+    tep_mau06_du_thao_id uuid REFERENCES thanh_phan_ho_so(id),
+    tep_mau06_da_ky_id uuid REFERENCES thanh_phan_ho_so(id),
+    nguoi_ky_id uuid REFERENCES tai_khoan(id),
+    quyen_ky_id uuid REFERENCES su_kien_quyen_ky_mau06(id),
+    phat_hanh_luc timestamptz,
+    thong_bao_id uuid REFERENCES thong_bao(id),
+    ly_do_khong_du_dieu_kien text,
+    phien_ban integer NOT NULL CHECK (phien_ban > 0),
+    UNIQUE (ho_so_id, ma_phieu_yeu_cau),
+    CHECK (kenh_yeu_cau IN ('TRUC_TIEP', 'BUU_CHINH')),
+    CHECK (trang_thai IN ('TIEP_NHAN', 'CHO_KY_PHAT_HANH', 'KHONG_DU_DIEU_KIEN', 'DA_PHAT_HANH')),
+    CHECK (phien_ban > 0)
+);
+
+CREATE TABLE su_kien_quyen_ky_mau06 (
+    id uuid NOT NULL PRIMARY KEY,
+    tai_khoan_id uuid NOT NULL REFERENCES tai_khoan(id),
+    nguoi_thay_doi_id uuid NOT NULL REFERENCES tai_khoan(id),
+    hanh_dong varchar(30) NOT NULL,
+    van_ban_phan_cong text NOT NULL,
+    can_cu text NOT NULL,
+    thoi_diem timestamptz NOT NULL,
+    CHECK (hanh_dong IN ('CAP', 'THU_HOI'))
+);
+
 CREATE INDEX ix_ho_so_xu_ly ON ho_so (trang_thai, han_hien_hanh);
 CREATE INDEX ix_su_kien ON su_kien_xu_ly (ho_so_id, thoi_diem);
+CREATE INDEX ix_su_kien_quyen_ky_mau06 ON su_kien_quyen_ky_mau06 (tai_khoan_id, thoi_diem);
 CREATE UNIQUE INDEX uq_phan_cong_hien_hanh ON phan_cong (ho_so_id) WHERE ket_thuc_luc IS NULL;

@@ -7,6 +7,8 @@ export interface PayrollPolicy {
   nonResidentTaxRate: number; overtimeExemptMode: 'ALL' | 'PREMIUM_ONLY' | 'TAXABLE'; nightWorkExemptMode: 'ALL' | 'PREMIUM_ONLY' | 'TAXABLE';
   employeeRates: { socialInsurance: number; healthInsurance: number; unemployment: number };
   employerRates: { socialInsurance: number; healthInsurance: number; unemployment: number; occupationalAccident: number; tradeUnionFund: number };
+  /** Effective monthly base used by public-sector rank/step coefficients. */
+  stateBaseSalary?: number;
   bhxhCap: number; unemploymentCapByRegion: Record<string, number>; minimumWageByRegion: Record<string, number>; minimumHourlyWageByRegion?: Record<string, number>;
   overtimeRates: { weekday: number; weeklyRest: number; publicHoliday: number; nightAdditional: number; nightOvertimeFactor: number };
   maxMonthlyOvertimeHours: number; maxAnnualOvertimeHours: number; loanDeductionCapRate: number;
@@ -21,6 +23,7 @@ export const VN_PAYROLL_POLICIES: PayrollPolicy[] = [
     nonResidentTaxRate: .2, overtimeExemptMode: 'PREMIUM_ONLY', nightWorkExemptMode: 'PREMIUM_ONLY',
     employeeRates: { socialInsurance: .08, healthInsurance: .015, unemployment: .01 },
     employerRates: { socialInsurance: .17, healthInsurance: .03, unemployment: .01, occupationalAccident: .005, tradeUnionFund: .02 },
+    stateBaseSalary: 2_340_000,
     bhxhCap: 46_800_000,
     minimumWageByRegion: { I: 4_960_000, II: 4_410_000, III: 3_860_000, IV: 3_450_000 },
     minimumHourlyWageByRegion: { I: 23_800, II: 21_200, III: 18_600, IV: 16_600 },
@@ -36,6 +39,7 @@ export const VN_PAYROLL_POLICIES: PayrollPolicy[] = [
     nonResidentTaxRate: .2, overtimeExemptMode: 'ALL', nightWorkExemptMode: 'ALL',
     employeeRates: { socialInsurance: .08, healthInsurance: .015, unemployment: .01 },
     employerRates: { socialInsurance: .17, healthInsurance: .03, unemployment: .01, occupationalAccident: .005, tradeUnionFund: .02 },
+    stateBaseSalary: 2_340_000,
     bhxhCap: 46_800_000,
     minimumWageByRegion: { I: 5_310_000, II: 4_730_000, III: 4_140_000, IV: 3_700_000 },
     minimumHourlyWageByRegion: { I: 25_500, II: 22_700, III: 20_000, IV: 17_800 },
@@ -50,6 +54,7 @@ VN_PAYROLL_POLICIES.push({
   version: 'VN-PAYROLL-2026.07.02',
   effectiveFrom: '2026-07-01',
   effectiveTo: null,
+  stateBaseSalary: 2_530_000,
   basisReference: 'Luật BHXH 41/2024/QH15; Luật BHYT 51/2024/QH15 và Nghị định 188/2025/NĐ-CP; Luật Việc làm 74/2025/QH15 và Nghị định 374/2025/NĐ-CP; Luật TNCN 109/2025/QH15 và Nghị định 253/2026/NĐ-CP (hiệu lực 01/07/2026).',
   bhxhCap: 50_600_000,
 });
@@ -82,6 +87,7 @@ export function currentPayrollPolicies(value: unknown): PayrollPolicy[] {
     return {
       ...normalized,
       basisReference: normalized.basisReference || source?.basisReference || 'Cần quản trị cập nhật căn cứ pháp lý chính thức áp dụng cho kỳ này.',
+      stateBaseSalary: normalized.stateBaseSalary ?? source?.stateBaseSalary ?? 2_340_000,
       minimumHourlyWageByRegion: normalized.minimumHourlyWageByRegion || source?.minimumHourlyWageByRegion,
     };
   });
@@ -93,6 +99,7 @@ export function payrollPolicyFor(date: Date, policies: PayrollPolicy[] = VN_PAYR
     .sort((a, b) => b.effectiveFrom.localeCompare(a.effectiveFrom))[0];
   if (!policy) throw new Error(`Chưa cấu hình chính sách lương có hiệu lực ngày ${key}`);
   if (!Number.isFinite(policy.personalRelief) || !Number.isFinite(policy.dependentRelief)
+    || (policy.stateBaseSalary !== undefined && (!Number.isFinite(policy.stateBaseSalary) || policy.stateBaseSalary <= 0))
     || !Array.isArray(policy.taxBrackets) || !policy.taxBrackets.length
     || !Number.isFinite(policy.employeeRates.socialInsurance) || !Number.isFinite(policy.employerRates.socialInsurance)
     || !Number.isFinite(policy.employerRates.tradeUnionFund) || !Number.isFinite(policy.loanDeductionCapRate) || policy.loanDeductionCapRate < 0 || policy.loanDeductionCapRate > 1

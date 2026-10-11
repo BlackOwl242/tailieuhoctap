@@ -10,19 +10,14 @@ import {
   Camera,
   CameraOff,
   CheckCircle2,
-  Eye,
   Info,
   Loader2,
   Lock,
   LogIn,
   Maximize,
   Minimize,
-  Radio,
   RefreshCw,
-  Scan,
   ShieldCheck,
-  Sparkles,
-  Sun,
   UserCheck,
   Volume2,
   VolumeX,
@@ -114,11 +109,10 @@ function computeCosineSimilarity(a: number[], b: number[]): number {
 }
 
 /**
- * Trích xuất Vector đặc trưng 256 chiều cấp độ cao:
- * Tương thích cả ảnh Camera RGB chuẩn và ảnh Camera Hồng ngoại (IR Monochrome).
- * Kết hợp Multi-scale Spatial HOG (8 hướng gradient) + Local Binary Patterns (LBP) trên lưới 4x4 khối.
+ * Trích xuất vector ảnh 256 chiều từ khung hình camera thường bằng HOG và LBP.
+ * Đây là vector so khớp của luồng hiện tại, chưa có mô hình phát hiện khuôn mặt hay kiểm tra người thật.
  */
-function extractAdvancedFaceDescriptor(video: HTMLVideoElement): { vector: number[]; isIRFeed: boolean; livenessScore: number } {
+function extractFaceDescriptor(video: HTMLVideoElement): number[] {
   const canvas = document.createElement('canvas');
   canvas.width = 64;
   canvas.height = 64;
@@ -136,8 +130,6 @@ function extractAdvancedFaceDescriptor(video: HTMLVideoElement): { vector: numbe
 
   const imgData = ctx.getImageData(0, 0, 64, 64).data;
   const gray: number[][] = [];
-  let colorDiffSum = 0;
-
   for (let y = 0; y < 64; y++) {
     const row: number[] = [];
     for (let x = 0; x < 64; x++) {
@@ -145,23 +137,27 @@ function extractAdvancedFaceDescriptor(video: HTMLVideoElement): { vector: numbe
       const r = imgData[idx];
       const g = imgData[idx + 1];
       const b = imgData[idx + 2];
-      colorDiffSum += Math.abs(r - g) + Math.abs(g - b);
       const val = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
       row.push(val);
     }
     gray.push(row);
   }
 
-  // Phát hiện luồng Camera Hồng ngoại IR (IR feeds are grayscale with color diff near 0)
-  const isIRFeed = colorDiffSum / (64 * 64) < 12;
-
   let totalBrightness = 0;
+  let totalSquaredBrightness = 0;
   for (let y = 0; y < 64; y++) {
-    for (let x = 0; x < 64; x++) totalBrightness += gray[y][x];
+    for (let x = 0; x < 64; x++) {
+      totalBrightness += gray[y][x];
+      totalSquaredBrightness += gray[y][x] * gray[y][x];
+    }
   }
   const avgBrightness = totalBrightness / (64 * 64);
   if (avgBrightness < 0.02) {
     throw new Error('Khung hình quá tối hoặc camera bị che khuất. Vui lòng mở nắp che và bảo đảm ánh sáng.');
+  }
+  const brightnessVariance = totalSquaredBrightness / (64 * 64) - avgBrightness * avgBrightness;
+  if (brightnessVariance < 0.0001) {
+    throw new Error('Khung hình camera bị lỗi hoặc không có chi tiết (có thể đang hiện màn hình xanh). Vui lòng kiểm tra DroidCam và chọn đúng camera RGB.');
   }
 
   const vector: number[] = [];
@@ -210,8 +206,7 @@ function extractAdvancedFaceDescriptor(video: HTMLVideoElement): { vector: numbe
     }
   }
 
-  const livenessScore = 0; // chưa triển khai kiểm tra sống, không tạo điểm giả
-  return { vector, isIRFeed, livenessScore };
+  return vector;
 }
 
 function CheckInInner() {
@@ -245,12 +240,11 @@ function CheckInInner() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'VERIFY' | 'ENROLL' | 'IR_TECH' | 'SECURITY'>('VERIFY');
+  const [activeTab, setActiveTab] = useState<'VERIFY' | 'ENROLL' | 'SECURITY'>('VERIFY');
   const [camOn, setCamOn] = useState(false);
   const [camLoading, setCamLoading] = useState(false);
   const [availableDevices, setAvailableDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
-  const [isIRDetected, setIsIRDetected] = useState<boolean>(false);
   const [consent, setConsent] = useState<boolean | null>(null);
   const [enrolledCount, setEnrolledCount] = useState<number>(0);
   const [enrolledTemplates, setEnrolledTemplates] = useState<number[][]>([]);
@@ -258,7 +252,6 @@ function CheckInInner() {
 
   // ĐỘ KHỚP THỜI GIAN THỰC (REAL-TIME LIVE SIMILARITY) - YÊU CẦU >= 95%
   const [liveSimilarity, setLiveSimilarity] = useState<number | null>(null);
-  const [liveLiveness, setLiveLiveness] = useState<number | null>(null);
   const MATCH_THRESHOLD = 0.95;
 
   const [faceSubmitting, setFaceSubmitting] = useState(false);
@@ -269,7 +262,6 @@ function CheckInInner() {
     time?: string;
     status?: string;
     similarity?: number;
-    sensorType?: string;
   } | null>(null);
 
   // Load face status & templates from API
@@ -316,21 +308,14 @@ function CheckInInner() {
     };
   }, []);
 
-  // Tự động nhận diện Camera hồng ngoại IR trong danh sách thiết bị videoinput của máy
+  // Chọn camera thường đầu tiên do trình duyệt cung cấp.
   useEffect(() => {
     if (typeof navigator !== 'undefined' && navigator.mediaDevices?.enumerateDevices) {
       navigator.mediaDevices.enumerateDevices().then((devices) => {
         const videoDevices = devices.filter((d) => d.kind === 'videoinput');
         setAvailableDevices(videoDevices);
         if (videoDevices.length > 0 && !selectedDeviceId) {
-          const irCam = videoDevices.find((d) => /IR|Infrared|Hello|RealSense|Depth|SunplusIT/i.test(d.label));
-          if (irCam) {
-            setSelectedDeviceId(irCam.deviceId);
-            setIsIRDetected(true);
-          } else {
-            setSelectedDeviceId(videoDevices[0].deviceId);
-            setIsIRDetected(false);
-          }
+          setSelectedDeviceId(videoDevices[0].deviceId);
         }
       }).catch(() => {});
     }
@@ -357,10 +342,6 @@ function CheckInInner() {
         setCamOn(true);
       }
 
-      // Check current device label
-      const activeTrack = stream.getVideoTracks()[0];
-      const activeLabel = activeTrack?.label || '';
-      setIsIRDetected(/IR|Infrared|Hello|RealSense|Depth|SunplusIT/i.test(activeLabel));
     } catch (e) {
       setFaceResult({
         ok: false,
@@ -382,7 +363,6 @@ function CheckInInner() {
     }
     setCamOn(false);
     setLiveSimilarity(null);
-    setLiveLiveness(null);
   };
 
   /**
@@ -391,16 +371,13 @@ function CheckInInner() {
   useEffect(() => {
     if (!camOn || enrolledTemplates.length === 0 || activeTab !== 'VERIFY') {
       setLiveSimilarity(null);
-      setLiveLiveness(null);
       return;
     }
 
     const interval = setInterval(() => {
       try {
         if (!videoRef.current || videoRef.current.videoWidth === 0) return;
-        const { vector, isIRFeed, livenessScore } = extractAdvancedFaceDescriptor(videoRef.current);
-        if (isIRFeed) setIsIRDetected(true);
-        setLiveLiveness(livenessScore);
+        const vector = extractFaceDescriptor(videoRef.current);
 
         let maxSim = 0;
         for (const t of enrolledTemplates) {
@@ -411,7 +388,6 @@ function CheckInInner() {
         setLiveSimilarity(maxSim);
       } catch {
         setLiveSimilarity(null);
-        setLiveLiveness(null);
       }
     }, 120);
 
@@ -425,7 +401,7 @@ function CheckInInner() {
       if (!camOn || !videoRef.current) {
         throw new Error('Vui lòng bấm "Bật Camera" trước khi thực hiện chụp mẫu.');
       }
-      const { vector } = extractAdvancedFaceDescriptor(videoRef.current);
+      const vector = extractFaceDescriptor(videoRef.current);
       if (soundEnabled) playChime('capture');
       const updated = [...samples, vector];
       setSamples(updated);
@@ -459,7 +435,7 @@ function CheckInInner() {
     }
   }
 
-  // Điểm danh khuôn mặt 2D (Hỗ trợ Cam Hồng ngoại IR & RGB)
+  // So khớp mẫu khuôn mặt đã đăng ký từ camera thường rồi ghi sự kiện chấm công.
   async function handleVerifyFace() {
     setFaceSubmitting(true);
     setFaceResult(null);
@@ -467,7 +443,7 @@ function CheckInInner() {
       if (!camOn || !videoRef.current) {
         throw new Error('Vui lòng bật Camera trước khi điểm danh.');
       }
-      const { vector, isIRFeed } = extractAdvancedFaceDescriptor(videoRef.current);
+      const vector = extractFaceDescriptor(videoRef.current);
       const res = await api.post('/attendance/check-in', { method: 'FACE', descriptor: vector });
       const punch = res.data?.punch === 'IN' ? 'GIỜ VÀO (CHECK-IN)' : 'GIỜ RA (CHECK-OUT)';
       const time = new Date().toLocaleTimeString('vi-VN');
@@ -478,7 +454,6 @@ function CheckInInner() {
         punch,
         time,
         similarity: sim,
-        sensorType: isIRFeed ? 'Camera Hồng ngoại IR (chưa xác minh phần cứng)' : 'Camera RGB demo',
         status: res.data?.status,
         message: `Xác thực khuôn mặt thành công (${punch}) lúc ${time}`,
       });
@@ -525,7 +500,6 @@ function CheckInInner() {
       setEnrolledTemplates([]);
       setSamples([]);
       setLiveSimilarity(null);
-      setLiveLiveness(null);
       setActiveTab('ENROLL');
       setFaceResult({ ok: true, message: 'Đã xóa toàn bộ dữ liệu khuôn mặt khỏi hệ thống.' });
       if (soundEnabled) playChime('success');
@@ -558,10 +532,10 @@ function CheckInInner() {
                 <div className="flex items-center gap-2">
                   <span className="text-base font-bold tracking-tight text-foreground">HRMIS Pro</span>
                   <Badge variant="outline" className="text-xs font-medium border-border text-foreground bg-muted/40">
-                    Điểm danh khuôn mặt 2D & Cảm biến IR
+                    Điểm danh bằng khuôn mặt
                   </Badge>
                 </div>
-                <span className="text-xs text-muted-foreground font-medium">Hỗ trợ Cảm biến Hồng ngoại IR · Camera RGB Sinh trắc học</span>
+                <span className="text-xs text-muted-foreground font-medium">Sử dụng camera thường để so khớp mẫu khuôn mặt đã đăng ký</span>
               </div>
             </Link>
           </div>
@@ -603,20 +577,20 @@ function CheckInInner() {
 
       {/* ================= MAIN CONTAINER ================= */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
-        <div role="note" className="rounded-lg border border-amber-500 p-4 text-sm">Nhận diện khuôn mặt ở chế độ mô phỏng bằng vector ảnh. Chưa kiểm tra sống, chưa xác minh camera IR và chưa tích hợp WebAuthn/Windows Hello/Face ID. Các phương thức 3D bị máy chủ từ chối; QR và điểm danh web vẫn sử dụng được.</div>
-        {/* CỔNG ĐIỂM DANH & NHẬN DIỆN KHUÔN MẶT 2D / HỒNG NGOẠI IR */}
+        <div role="note" className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">Bạn có thể đăng ký mẫu và điểm danh bằng camera thường. Hệ thống so khớp vector ảnh với mẫu đã đăng ký rồi ghi nhận giờ vào/ra. Hiện chưa có bước xác minh người thật, nên ảnh hoặc video có thể bị dùng để qua mặt.</div>
+        {/* ĐIỂM DANH BẰNG KHUÔN MẶT QUA CAMERA THƯỜNG */}
         <div className="flex flex-col gap-6">
           {/* Thanh công cụ phương thức */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-lg border border-border bg-card shadow-xs">
             <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
               <div className="flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold bg-primary text-primary-foreground shadow-xs">
-                <Camera className="h-4 w-4" /> Camera nhận diện khuôn mặt & Hồng ngoại IR
+                <Camera className="h-4 w-4" /> Camera thường
               </div>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Ngưỡng chuẩn an toàn: <strong>≥ 95.0%</strong></span>
+              <span>Ngưỡng so khớp hiện tại: <strong>≥ 95.0%</strong></span>
             </div>
           </div>
 
@@ -675,7 +649,7 @@ function CheckInInner() {
                 </Button>
               </div>
             ) : (
-              /* ================= CAMERA 2D VIEWPORT & IR SENSOR ================= */
+              /* ================= CAMERA VIEWPORT ================= */
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 {/* CỘT TRÁI: CAMERA VIEWPORT (7 CỘT) */}
                 <div className="lg:col-span-7 flex flex-col gap-3">
@@ -707,31 +681,21 @@ function CheckInInner() {
                           <div className={`absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 rounded-br-md ${isLiveMatch ? 'border-emerald-400' : 'border-white/80'}`} />
 
                           <div className="absolute -bottom-8 text-xs font-medium text-white">
-                            {isLiveMatch ? 'Khuôn mặt hợp lệ' : 'Giữ khuôn mặt trong khung hình'}
+                            {isLiveMatch ? 'Mẫu đã đăng ký đạt ngưỡng' : 'Căn khuôn mặt vào giữa khung hình'}
                           </div>
                         </div>
                       </div>
                     ) : null}
 
-                    {/* Trạng thái Camera & Cảm biến IR (Góc trên trái) */}
+                    {/* Trạng thái camera */}
                     <div className="absolute top-3 left-3 z-10 flex items-center gap-2 flex-wrap">
                       {camOn ? (
                         <>
                           <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/80 border border-white/10 px-3 py-1 text-xs font-medium text-emerald-300 backdrop-blur-xs">
                             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                            Live Camera
+                            Camera đang bật
                           </span>
-                          {isIRDetected ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-950/80 border border-rose-500/30 px-3 py-1 text-xs font-bold text-rose-300 backdrop-blur-xs">
-                              <Radio className="h-3 w-3 text-rose-400 animate-pulse" />
-                              Cảm biến Hồng ngoại (IR)
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-950/80 border border-blue-500/30 px-3 py-1 text-xs font-medium text-blue-300 backdrop-blur-xs">
-                              <Sun className="h-3 w-3 text-amber-400" />
-                              Camera RGB
-                            </span>
-                          )}
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/80 border border-white/10 px-3 py-1 text-xs font-medium text-slate-200 backdrop-blur-xs">Camera thường</span>
                         </>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/80 border border-white/10 px-3 py-1 text-xs font-medium text-slate-300 backdrop-blur-xs">
@@ -750,7 +714,7 @@ function CheckInInner() {
                         <div className="max-w-xs">
                           <h3 className="text-base font-bold text-white">Yêu cầu bật Camera</h3>
                           <p className="text-xs text-slate-300 mt-1">
-                            Bật camera hoặc cảm biến hồng ngoại IR để hệ thống nhận diện khuôn mặt 2D chưa có kiểm tra sống.
+                            Bật camera thường, đặt khuôn mặt vào giữa khung hình rồi điểm danh.
                           </p>
                         </div>
                         <Button
@@ -766,7 +730,7 @@ function CheckInInner() {
                     ) : null}
                   </div>
 
-                  {/* Thanh điều khiển Camera & Chọn thiết bị / Cảm biến IR */}
+                  {/* Thanh điều khiển camera */}
                   {camOn ? (
                     <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg border border-border bg-card text-xs shadow-xs">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -780,14 +744,11 @@ function CheckInInner() {
                             }}
                             className="w-[280px] text-xs font-medium"
                           >
-                            {availableDevices.map((d, i) => {
-                              const isIR = /IR|Infrared|Hello|RealSense|Depth|SunplusIT/i.test(d.label);
-                              return (
-                                <option key={d.deviceId} value={d.deviceId}>
-                                  {isIR ? `[Camera Hồng ngoại IR] ${d.label || 'Infrared Sensor'}` : `[Camera RGB] ${d.label || `Camera ${i + 1}`}`}
-                                </option>
-                              );
-                            })}
+                            {availableDevices.map((d, i) => (
+                              <option key={d.deviceId} value={d.deviceId}>
+                                {d.label || `Camera ${i + 1}`}
+                              </option>
+                            ))}
                           </Select>
                         ) : null}
                         <span className="text-slate-500 hidden sm:inline">Khoảng cách: 40–60cm</span>
@@ -807,7 +768,7 @@ function CheckInInner() {
                 {/* CỘT PHẢI: BẢNG THAO TÁC & KẾT QUẢ (5 CỘT) */}
                 <div className="lg:col-span-5 flex flex-col gap-4">
                   {/* Tab Selector */}
-                  <div className="grid grid-cols-4 gap-1 rounded-md bg-muted/60 p-1 text-xs font-semibold border border-border">
+                  <div className="grid grid-cols-3 gap-1 rounded-md bg-muted/60 p-1 text-xs font-semibold border border-border">
                     <button
                       type="button"
                       onClick={() => {
@@ -843,21 +804,6 @@ function CheckInInner() {
                     <button
                       type="button"
                       onClick={() => {
-                        setActiveTab('IR_TECH');
-                        setFaceResult(null);
-                      }}
-                      className={`flex items-center justify-center gap-1 rounded-md py-2 transition-all ${
-                        activeTab === 'IR_TECH'
-                          ? 'bg-card text-foreground shadow-xs border border-border/50'
-                          : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      <Radio className="h-3.5 w-3.5 text-rose-600" /> Công nghệ IR
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
                         setActiveTab('SECURITY');
                         setFaceResult(null);
                       }}
@@ -883,7 +829,7 @@ function CheckInInner() {
                       <div className="flex items-center justify-between text-xs mb-2">
                         <span className="font-bold flex items-center gap-1.5">
                           <Zap className={`h-4 w-4 ${isLiveMatch ? 'text-emerald-600' : 'text-muted-foreground'}`} />
-                          Độ khớp khuôn mặt trực tiếp:
+                          Độ khớp mẫu khuôn mặt:
                         </span>
                         <span
                           className={`font-mono text-sm font-extrabold ${
@@ -917,7 +863,7 @@ function CheckInInner() {
                       <div className="flex items-center justify-between text-xs text-muted-foreground mt-1.5 font-medium">
                         <span>0%</span>
                         <span className="font-bold text-foreground">| Ngưỡng tối thiểu: 95.0%</span>
-                        <span>chưa xác minh</span>
+                        <span>không kiểm tra người thật</span>
                       </div>
                     </div>
                   ) : null}
@@ -950,8 +896,8 @@ function CheckInInner() {
                                 <span className="font-mono text-foreground font-semibold">{faceResult.time}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-muted-foreground">Cảm biến ghi nhận:</span>
-                                <span className="font-semibold text-primary">{faceResult.sensorType}</span>
+                                <span className="text-muted-foreground">Phương thức:</span>
+                                <span className="font-semibold text-primary">Khuôn mặt · camera thường</span>
                               </div>
                               {faceResult.similarity ? (
                                 <div className="pt-1.5 border-t border-border flex justify-between items-center">
@@ -974,7 +920,7 @@ function CheckInInner() {
                       <div className="flex items-center justify-between border-b border-border pb-3">
                         <div className="flex items-center gap-2">
                           <UserCheck className="h-4 w-4 text-emerald-600" />
-                          <span className="text-sm font-bold text-foreground">Điểm danh khuôn mặt 2D</span>
+                          <span className="text-sm font-bold text-foreground">Điểm danh bằng khuôn mặt</span>
                         </div>
                         <span className="text-xs font-mono font-bold text-muted-foreground">{currentTime}</span>
                       </div>
@@ -1009,7 +955,7 @@ function CheckInInner() {
                       ) : (
                         <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-foreground flex items-center gap-2">
                           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                          <span>Khuôn mặt hợp lệ <strong>{(liveSimilarity! * 100).toFixed(1)}% ≥ 95%</strong>. Bạn có thể bấm điểm danh ngay!</span>
+                          <span>Mẫu đã đăng ký đạt ngưỡng <strong>{(liveSimilarity! * 100).toFixed(1)}% ≥ 95%</strong>. Bạn có thể bấm điểm danh ngay.</span>
                         </div>
                       )}
 
@@ -1116,51 +1062,7 @@ function CheckInInner() {
                     </div>
                   ) : null}
 
-                  {/* TAB 3: GIẢI PHÁP & CÔNG NGHỆ CAMERA HỒNG NGOẠI IR */}
-                  {activeTab === 'IR_TECH' ? (
-                    <div className="rounded-lg border border-border bg-card p-5 shadow-xs flex flex-col gap-3 text-xs">
-                      <div className="flex items-center justify-between border-b border-border pb-3">
-                        <div className="flex items-center gap-2">
-                          <Radio className="h-4 w-4 text-rose-500" />
-                          <span className="text-sm font-bold text-foreground">Phương án Camera Hồng ngoại (IR) 2D</span>
-                        </div>
-                        <Badge variant="outline" className="border-border bg-muted/40 text-foreground text-xs">
-                          Anti-Spoofing
-                        </Badge>
-                      </div>
-
-                      <div className="space-y-2.5 text-muted-foreground leading-relaxed">
-                        <div className="p-3 rounded-md bg-muted/20 border border-border space-y-1">
-                          <p className="font-bold text-foreground flex items-center gap-1.5">
-                            <Zap className="h-3.5 w-3.5 text-primary" /> 1. Truy cập trực tiếp qua WebRTC MediaDevices
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Hệ thống tự động phát hiện luồng cảm biến hồng ngoại phần cứng (videoinput device có nhãn IR / Infrared) và kích hoạt trực tiếp không cần plugin.
-                          </p>
-                        </div>
-
-                        <div className="p-3 rounded-md bg-muted/20 border border-border space-y-1">
-                          <p className="font-bold text-foreground flex items-center gap-1.5">
-                            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> 2. chưa xác minh phần cứng (Optical Liveness)
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Cảm biến IR phát quang phổ 850nm/940nm đo độ phản xạ nhiệt của da người thật. Màn hình điện thoại/iPad và ảnh in trên giấy sẽ bị triệt tiêu phản xạ, ngăn chặn chưa xác minh việc gian lận.
-                          </p>
-                        </div>
-
-                        <div className="p-3 rounded-md bg-muted/20 border border-border space-y-1">
-                          <p className="font-bold text-foreground flex items-center gap-1.5">
-                            <Eye className="h-3.5 w-3.5 text-purple-600" /> 3. Vector 256 chiều HOG + LBP Đơn sắc
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Trích xuất đặc trưng hình thái học trên quang phổ IR, hoạt động ổn định trong mọi điều kiện ánh sáng (kể cả ban đêm hoặc ngược sáng).
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {/* TAB 4: BẢO MẬT & QUẢN LÝ MẪU */}
+                  {/* TAB 3: BẢO MẬT & QUẢN LÝ MẪU */}
                   {activeTab === 'SECURITY' ? (
                     <div className="rounded-lg border border-border bg-card p-5 shadow-xs flex flex-col gap-3 text-xs">
                       <div className="flex items-center justify-between border-b border-border pb-3">
@@ -1175,10 +1077,10 @@ function CheckInInner() {
                           • <strong>Số mẫu đang lưu:</strong> {enrolledCount} mẫu nhận diện đã đăng ký.
                         </p>
                         <p>
-                          • <strong>Bảo vệ dữ liệu:</strong> Dữ liệu được mã hóa vector an toàn; hình ảnh gốc không bao giờ được lưu trữ trên máy chủ.
+                          • <strong>Lưu trữ:</strong> Chỉ vector mẫu được mã hóa khi lưu; ảnh từ camera không được gửi lên hoặc lưu trên máy chủ.
                         </p>
                         <p>
-                          • <strong>Ngưỡng chấp thuận:</strong> Yêu cầu độ tương đồng tối thiểu $\ge 95.0\%$ để bảo đảm an ninh sinh trắc học.
+                          • <strong>Ngưỡng so khớp:</strong> Mẫu hiện được chấp nhận khi độ tương đồng đạt ít nhất 95%; ngưỡng này không thay thế bước kiểm tra người thật.
                         </p>
                       </div>
 

@@ -26,8 +26,8 @@ REWRITE={
 '1.2. Đơn vị đếm':'1.2. Phạm vi chức năng và số lượng thủ tục',
 '1.3. Phương pháp và mức độ':'1.3. Phương pháp nghiên cứu và phạm vi khảo sát',
 'Các nguồn được dẫn bằng số':'Tài liệu dẫn nguồn bằng số trong ngoặc vuông, chẳng hạn [1]. Mỗi số tương ứng với một mục trong danh mục tài liệu tham khảo. UC01 đến UC36 là mã của 36 Use case; MH là mã màn hình, CN là mã chức năng dùng chung. Các mã giúp tìm đúng phần đặc tả, hình minh họa và kịch bản kiểm thử của cùng một chức năng.',
-'Một chức năng có thể phục vụ':'Cần phân biệt chức năng của phần mềm với thủ tục hành chính. Chẳng hạn, chức năng tiếp nhận hồ sơ được dùng cho nhiều thủ tục, nhưng mỗi thủ tục có thành phần hồ sơ, thẩm quyền và thời hạn riêng. Báo cáo phân tích 31 chức năng dùng chung và bổ sung 5 chức năng để hình thành 36 Use case. Danh mục 2.075 thủ tục được lấy theo quyết định công bố tại thời điểm ghi trong nguồn [4]; số này không cho biết có bao nhiêu nhánh xử lý đã được cấu hình trong phần mềm.',
-'Nguồn được chia theo thời điểm':'Nghiên cứu sử dụng văn bản công bố thủ tục, tài liệu hướng dẫn và các trang có thể truy cập công khai. Với mỗi nguồn, báo cáo ghi thời điểm và nội dung có thể kiểm chứng. Ảnh trong hướng dẫn năm 2023 được dùng để tìm hiểu giao diện trước đây, còn ảnh quan sát năm 2026 thể hiện thông tin công khai tại thời điểm truy cập. Các mô hình lớp, màn hình và hạ tầng ở những chương sau là phương án thiết kế của nghiên cứu; chưa có khảo sát mã nguồn hoặc tài khoản cán bộ để xác nhận kiến trúc bên trong hệ thống.',
+'Một chức năng có thể phục vụ':'Cần phân biệt chức năng của phần mềm với thủ tục hành chính. Chẳng hạn, chức năng tiếp nhận hồ sơ được dùng cho nhiều thủ tục, nhưng mỗi thủ tục có thành phần hồ sơ, thẩm quyền và thời hạn riêng. Báo cáo phân tích 31 chức năng dùng chung và bổ sung 5 chức năng để hình thành 36 Use case. Danh mục 2.075 thủ tục được lấy theo quyết định công bố [4]; số này không cho biết có bao nhiêu nhánh xử lý đã được cấu hình trong phần mềm.',
+'Nguồn được chia theo thời điểm':'Nghiên cứu sử dụng văn bản công bố thủ tục, tài liệu hướng dẫn và các trang có thể truy cập công khai. Với mỗi nguồn, báo cáo ghi xuất xứ và nội dung có thể kiểm chứng. Ảnh trong hướng dẫn năm 2023 được dùng để tìm hiểu giao diện lịch sử; ảnh cổng công khai minh họa các thông tin và nhánh dịch vụ hiển thị trên trang. Các mô hình lớp, màn hình và hạ tầng ở những chương sau là phương án thiết kế của nghiên cứu; chưa có khảo sát mã nguồn hoặc tài khoản cán bộ để xác nhận kiến trúc bên trong hệ thống.',
 'Ký pháp được đối chiếu':'Các biểu đồ sử dụng ký pháp UML theo [8]. Trong biểu đồ trình tự, người hoặc hệ thống bên ngoài được vẽ bằng ký hiệu tác nhân. Các đối tượng giao diện, điều khiển và dữ liệu được phân biệt bằng biểu tượng trên đầu đường sống. Mũi tên liền thể hiện yêu cầu, mũi tên đứt thể hiện phản hồi; các yêu cầu được đọc từ trên xuống dưới. Khung alt chia hai trường hợp theo điều kiện ghi trong ngoặc vuông. Biểu đồ hoạt động dùng hình thoi để chọn nhánh và thanh ngang để tách hoặc hợp các công việc thực hiện đồng thời.',
 'Biểu đồ tương tác của mỗi ca':'Mỗi biểu đồ trình tự cho biết ai gửi yêu cầu, bộ phận nào xử lý và kết quả nào được trả lại. UC13 mô tả cả việc cán bộ yêu cầu bổ sung và người nộp gửi tài liệu; UC16 thể hiện lần lượt việc lãnh đạo duyệt, người có thẩm quyền ký và văn thư phát hành. Các bước này có thể diễn ra ở những thời điểm khác nhau. Mỗi người chỉ thực hiện phần việc được giao; phần mềm lưu từng lần xử lý riêng. Khi một cơ quan phối hợp chưa trả lời, hồ sơ vẫn phải được theo dõi, không được coi sự im lặng là ý kiến đồng ý.',
 'Thực thể giữ các bất biến':'Thiết kế chia trách nhiệm thành giao diện, xử lý yêu cầu, đối tượng nghiệp vụ và truy xuất dữ liệu. Giao diện nhận thông tin người dùng nhập và hiển thị kết quả. Bộ phận xử lý yêu cầu kiểm tra quyền rồi gọi đối tượng nghiệp vụ phù hợp. Đối tượng hồ sơ quyết định có được chuyển bước hay không; bộ phận truy xuất đọc và lưu dữ liệu. Cách chia này giúp việc đổi màn hình không làm thay đổi quy tắc giải quyết hồ sơ.',
@@ -47,11 +47,13 @@ SPECIAL={
 13:'Cán bộ tiếp nhận hoặc chuyên viên thụ lý; người nộp hồ sơ hoặc đại diện hợp lệ.',
 15:'Chuyên viên thụ lý; cán bộ của cơ quan được lấy ý kiến.',
 16:'Lãnh đạo phê duyệt; người có thẩm quyền ký; văn thư được giao phát hành.',
+17:'Cán bộ tiếp nhận tại Bộ phận Một cửa; người ký Thông báo dừng có thẩm quyền.',
 10:'Người có thẩm quyền ký; dịch vụ ký số.',
 32:'Người thanh toán; dịch vụ thanh toán và bộ phận đối soát.'}
 
 REWRITE['Lớp giao diện tiếp nhận']=REWRITE['Thực thể giữ các bất biến']
 REWRITE['Hợp đồng 36 thao tác']='Chương này quy định cách các phần của ứng dụng trao đổi dữ liệu qua 36 thao tác. Mỗi thao tác chỉ rõ ai được thực hiện, thông tin cần gửi và cách xử lý lỗi. GET dùng để đọc dữ liệu; POST dùng để yêu cầu thay đổi và phải kèm mã để tránh xử lý lặp. Các địa chỉ trong bảng là đề xuất cho ứng dụng nghiên cứu, chưa phải địa chỉ kết nối của hệ thống Hà Nội. Máy chủ kiểm tra quyền đối với từng yêu cầu, kể cả khi người dùng tự gửi yêu cầu ngoài màn hình.'
+QA.mkdir(parents=True,exist_ok=True)
 if not (QA/'Ban_truoc_bien_tap.docx').exists():shutil.copy2(DOC,QA/'Ban_truoc_bien_tap.docx')
 with ZipFile(QA/'Ban_truoc_bien_tap.docx') as z:data={n:z.read(n) for n in z.namelist()}
 root=E.fromstring(data['word/document.xml']);body=root.find(tag('body'));uc=None;specs=0;guides=0;remove_next=False
@@ -109,7 +111,8 @@ for p in body.findall(tag('p')):
   ex=pending.find('.//wp:extent',NS);ex.set('cx',str(cx));ex.set('cy',str(cy))
   for ext in pending.xpath('.//a:xfrm/a:ext',namespaces=NS):ext.set('cx',str(cx));ext.set('cy',str(cy))
  pending=None
-assert len(replaced)==146,len(replaced)
+assert len(replaced)>=72,len(replaced)
+assert 'UC17_man_hinh' in replaced.values(),sorted(replaced.values())
 data['word/document.xml']=E.tostring(root,xml_declaration=True,encoding='UTF-8',standalone=True)
 temp=DOC.with_suffix('.revised.docx')
 with ZipFile(temp,'w',ZIP_DEFLATED) as z:

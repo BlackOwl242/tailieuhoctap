@@ -191,14 +191,6 @@ async function main() {
           { requisitionId: requisition.id, fullName: 'Hoàng Văn Offer', email: 'hoangoffer@example.com', source: 'Giới thiệu nội bộ', stage: 'OFFER', rating: 5 },
         ],
       });
-      await tx.performanceReview.create({
-        data: {
-          userId: pm.id, reviewerId: km.id, period: `${thisYear}-H1`, score: 88,
-          strengths: 'Quản lý tiến độ tốt, giữ chân được nhân sự chủ chốt',
-          improvements: 'Cần tăng cường tài liệu hóa kiến trúc dự án',
-          status: 'SUBMITTED',
-        },
-      });
       const course = await tx.trainingCourse.create({
         data: {
           title: 'Chuyển đổi nền tảng NodeJS cho nhóm PHP', description: 'Khóa chuyển đổi 6 tuần theo lộ trình công nghệ',

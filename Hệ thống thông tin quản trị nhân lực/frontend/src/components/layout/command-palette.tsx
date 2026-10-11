@@ -31,7 +31,7 @@ const COMMANDS: CommandItem[] = [
   { id: 'loans', title: 'Tạm ứng & Vay', category: 'Thao tác nghiệp vụ', href: '/loans', icon: CreditCard, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
   { id: 'assets', title: 'Quản lý tài sản', category: 'Thao tác nghiệp vụ', href: '/assets', icon: Laptop, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER'] },
   { id: 'recruitment-ats', title: 'Tuyển dụng', category: 'Thao tác nghiệp vụ', href: '/recruitment-ats', icon: Briefcase, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER'] },
-  { id: 'performance-360', title: 'Đánh giá KPI', category: 'Thao tác nghiệp vụ', href: '/performance-360', icon: Target, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER', 'HR_TRAINER'] },
+  { id: 'performance-kpi', title: 'Đánh giá KPI', category: 'Thao tác nghiệp vụ', href: '/performance', icon: Target, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER', 'HR_TRAINER'] },
   { id: 'expense-claims', title: 'Công tác phí', category: 'Thao tác nghiệp vụ', href: '/expense-claims', icon: Receipt, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
   { id: 'reports', title: 'Báo cáo nhân sự', category: 'Điều hướng nhanh', href: '/personnel-reports', icon: FileSpreadsheet, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR', 'ACCOUNTANT'] },
   { id: 'salary-ranks', title: 'Ngạch bậc lương', category: 'Điều hướng nhanh', href: '/salary-ranks', icon: Layers, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB'] },

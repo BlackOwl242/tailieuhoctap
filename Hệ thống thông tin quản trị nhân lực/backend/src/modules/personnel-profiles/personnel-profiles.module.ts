@@ -1,6 +1,6 @@
 import { HrAccessService } from '../../common/services/hr-access.service';
 import {
-  Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Put, Query,
+  Body, Controller, Delete, Get, Injectable, Module, ConflictException, NotFoundException, Param, Patch, Post, Put, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import {
@@ -118,11 +118,19 @@ export class CreateSalaryHistoryDto {
   @ApiProperty() @IsNumber() step!: number;
   @ApiProperty() @IsNumber() coefficient!: number;
   @ApiPropertyOptional() @IsOptional() @IsNumber() overGradeRate?: number;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() positionAllowance?: number;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() otherAllowance?: number;
   @ApiProperty() @IsDateString() fromDate!: string;
   @ApiPropertyOptional() @IsOptional() @IsDateString() toDate?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() decisionNo?: string;
   @ApiPropertyOptional() @IsOptional() @IsDateString() decisionDate?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() signer?: string;
+}
+
+export class UpdateSalaryHistoryAllowancesDto {
+  @ApiPropertyOptional() @IsOptional() @IsNumber() overGradeRate?: number;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() positionAllowance?: number;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() otherAllowance?: number;
 }
 
 export class CreateAppointmentDto {
@@ -319,6 +327,34 @@ export class PersonnelProfilesService {
   async updateProfile(userId: string, dto: UpdateComprehensiveProfileDto, actor: AuthUser) {
     let profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
 
+    if ((dto.positionAllowance !== undefined && (!Number.isFinite(dto.positionAllowance) || dto.positionAllowance < 0))
+      || (dto.otherAllowance !== undefined && (!Number.isFinite(dto.otherAllowance) || dto.otherAllowance < 0))
+      || (dto.overGradePercent !== undefined && (!Number.isFinite(dto.overGradePercent) || dto.overGradePercent < 0 || dto.overGradePercent > 100))) {
+      throw new ConflictException('Hệ số phụ cấp hoặc tỷ lệ vượt khung không hợp lệ.');
+    }
+
+    const currentSalaryFields = {
+      rankCode: dto.rankCode ?? profile?.rankCode ?? null,
+      salaryStep: dto.salaryStep ?? profile?.salaryStep ?? null,
+      salaryCoefficient: dto.salaryCoefficient ?? profile?.salaryCoefficient ?? null,
+      salaryStepDate: dto.salaryStepDate ?? profile?.salaryStepDate?.toISOString().slice(0, 10) ?? null,
+    };
+    const salaryFieldsChanged = dto.rankCode !== undefined || dto.salaryStep !== undefined
+      || dto.salaryCoefficient !== undefined || dto.salaryStepDate !== undefined;
+    if (salaryFieldsChanged) {
+      if (!currentSalaryFields.rankCode || !currentSalaryFields.salaryStep || !currentSalaryFields.salaryCoefficient || !currentSalaryFields.salaryStepDate) {
+        throw new ConflictException('Cần lưu đủ ngạch, bậc, hệ số và ngày hiệu lực theo quyết định lương.');
+      }
+      const rank = await this.prisma.personnelRank.findUnique({ where: { code: currentSalaryFields.rankCode } });
+      const coefficients = rank?.coefficients as number[] | undefined;
+      const expectedCoefficient = coefficients?.[currentSalaryFields.salaryStep - 1];
+      if (!rank || !Number.isInteger(currentSalaryFields.salaryStep) || currentSalaryFields.salaryStep < 1
+        || currentSalaryFields.salaryStep > rank.totalSteps || !Number.isFinite(expectedCoefficient)
+        || Math.abs(Number(expectedCoefficient) - currentSalaryFields.salaryCoefficient) > 0.000001) {
+        throw new ConflictException('Ngạch, bậc và hệ số lương phải khớp danh mục ngạch đã cấu hình.');
+      }
+    }
+
     const data: any = { ...dto };
     if (dto.recruitDate) data.recruitDate = new Date(dto.recruitDate);
     if (dto.currentOrgDate) data.currentOrgDate = new Date(dto.currentOrgDate);
@@ -487,26 +523,112 @@ export class PersonnelProfilesService {
 
   async addSalaryHistory(userId: string, dto: CreateSalaryHistoryDto) {
     const profile = await this.getOrCreateProfile(userId);
+    const fromDate = new Date(dto.fromDate);
+    fromDate.setUTCHours(0, 0, 0, 0);
+    const requestedToDate = dto.toDate ? new Date(dto.toDate) : null;
+    if (!dto.rankCode || !Number.isInteger(dto.step) || dto.step < 1 || !Number.isFinite(dto.coefficient) || dto.coefficient <= 0
+      || Number.isNaN(fromDate.getTime()) || (requestedToDate && (Number.isNaN(requestedToDate.getTime()) || requestedToDate < fromDate))
+      || (dto.overGradeRate !== undefined && (!Number.isFinite(dto.overGradeRate) || dto.overGradeRate < 0 || dto.overGradeRate > 100))
+      || (dto.positionAllowance !== undefined && (!Number.isFinite(dto.positionAllowance) || dto.positionAllowance < 0))
+      || (dto.otherAllowance !== undefined && (!Number.isFinite(dto.otherAllowance) || dto.otherAllowance < 0))) {
+      throw new ConflictException('Bậc, hệ số, ngày hiệu lực hoặc hệ số phụ cấp không hợp lệ.');
+    }
+    if (dto.rankCode) {
+      const rank = await this.prisma.personnelRank.findUnique({ where: { code: dto.rankCode } });
+      const coefficients = rank?.coefficients as number[] | undefined;
+      const expectedCoefficient = coefficients?.[dto.step - 1];
+      if (!rank || dto.step > rank.totalSteps || !Number.isFinite(expectedCoefficient)
+        || Math.abs(Number(expectedCoefficient) - dto.coefficient) > 0.000001) {
+        throw new ConflictException('Ngạch, bậc và hệ số không khớp danh mục ngạch đã cấu hình. Hãy kiểm tra quyết định hoặc cập nhật danh mục trước.');
+      }
+    }
 
-    return this.prisma.personnelSalaryHistory.create({
-      data: {
-        profileId: profile.id,
-        rankCode: dto.rankCode,
-        step: dto.step,
-        coefficient: dto.coefficient,
-        overGradeRate: dto.overGradeRate ?? 0,
-        fromDate: new Date(dto.fromDate),
-        toDate: dto.toDate ? new Date(dto.toDate) : null,
-        decisionNo: dto.decisionNo,
-        decisionDate: dto.decisionDate ? new Date(dto.decisionDate) : null,
-        signer: dto.signer,
-      },
-      include: { rank: true },
-    });
+    return this.prisma.$transaction(async tx => {
+      const dayAfterStart = new Date(fromDate.getTime() + 24 * 60 * 60 * 1000);
+      const sameStart = await tx.personnelSalaryHistory.findFirst({ where: { profileId: profile.id, fromDate: { gte: fromDate, lt: dayAfterStart } } });
+      if (sameStart) throw new ConflictException('Đã có quyết định lương bắt đầu hiệu lực cùng ngày. Hãy sửa hoặc xóa bản ghi trùng trước.');
+      const next = await tx.personnelSalaryHistory.findFirst({
+        where: { profileId: profile.id, fromDate: { gte: dayAfterStart } }, orderBy: { fromDate: 'asc' }, select: { fromDate: true },
+      });
+      const nextDayBefore = next ? new Date(next.fromDate.getTime() - 24 * 60 * 60 * 1000) : null;
+      if (requestedToDate && next && requestedToDate >= next.fromDate) {
+        throw new ConflictException('Khoảng hiệu lực của quyết định mới chồng lên quyết định lương đã có.');
+      }
+      const toDate = requestedToDate ?? nextDayBefore;
+      if (toDate && toDate < fromDate) throw new ConflictException('Ngày kết thúc hiệu lực phải sau ngày bắt đầu.');
+      const priorHistory = await tx.personnelSalaryHistory.findFirst({ where: { profileId: profile.id, fromDate: { lt: fromDate } } });
+      const profileStartDate = profile.salaryStepDate ? new Date(profile.salaryStepDate) : null;
+      if (!priorHistory && profile.rankCode && profile.salaryStep && profile.salaryCoefficient && profileStartDate && profileStartDate < fromDate) {
+        profileStartDate.setUTCHours(0, 0, 0, 0);
+        await tx.personnelSalaryHistory.create({ data: {
+          profileId: profile.id, rankCode: profile.rankCode, step: profile.salaryStep,
+          coefficient: profile.salaryCoefficient, overGradeRate: profile.overGradePercent ?? 0,
+          positionAllowance: profile.positionAllowance ?? 0, otherAllowance: profile.otherAllowance ?? 0,
+          fromDate: profileStartDate, toDate: new Date(fromDate.getTime() - 24 * 60 * 60 * 1000),
+        } });
+      }
+      await tx.personnelSalaryHistory.updateMany({
+        where: { profileId: profile.id, fromDate: { lt: fromDate }, OR: [{ toDate: null }, { toDate: { gte: fromDate } }] },
+        data: { toDate: new Date(fromDate.getTime() - 24 * 60 * 60 * 1000) },
+      });
+      const created = await tx.personnelSalaryHistory.create({
+        data: {
+          profileId: profile.id,
+          rankCode: dto.rankCode,
+          step: dto.step,
+          coefficient: dto.coefficient,
+          overGradeRate: dto.overGradeRate ?? 0,
+          positionAllowance: dto.positionAllowance ?? profile.positionAllowance ?? 0,
+          otherAllowance: dto.otherAllowance ?? profile.otherAllowance ?? 0,
+          fromDate,
+          toDate,
+          decisionNo: dto.decisionNo,
+          decisionDate: dto.decisionDate ? new Date(dto.decisionDate) : null,
+          signer: dto.signer,
+        },
+        include: { rank: true },
+      });
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      if (fromDate <= today && (!toDate || toDate >= today)) {
+        await tx.personnelComprehensiveProfile.update({ where: { id: profile.id }, data: {
+          rankCode: dto.rankCode, salaryStep: dto.step, salaryCoefficient: dto.coefficient,
+          salaryStepDate: fromDate, overGradePercent: dto.overGradeRate ?? 0,
+          positionAllowance: dto.positionAllowance ?? profile.positionAllowance ?? 0,
+          otherAllowance: dto.otherAllowance ?? profile.otherAllowance ?? 0,
+        } });
+      }
+      return created;
+    }, { isolationLevel: 'Serializable' });
   }
 
   async deleteSalaryHistory(id: string) {
     return this.prisma.personnelSalaryHistory.delete({ where: { id } });
+  }
+
+  async updateSalaryHistoryAllowances(userId: string, id: string, dto: UpdateSalaryHistoryAllowancesDto) {
+    if (dto.overGradeRate === undefined && dto.positionAllowance === undefined && dto.otherAllowance === undefined) throw new ConflictException('Nhập ít nhất một tỷ lệ/hệ số cần cập nhật.');
+    if ((dto.overGradeRate !== undefined && (!Number.isFinite(dto.overGradeRate) || dto.overGradeRate < 0 || dto.overGradeRate > 100))
+      || (dto.positionAllowance !== undefined && (!Number.isFinite(dto.positionAllowance) || dto.positionAllowance < 0))
+      || (dto.otherAllowance !== undefined && (!Number.isFinite(dto.otherAllowance) || dto.otherAllowance < 0))) {
+      throw new ConflictException('Tỷ lệ vượt khung hoặc hệ số phụ cấp không hợp lệ.');
+    }
+    const history = await this.prisma.personnelSalaryHistory.findFirst({ where: { id, profile: { userId } } });
+    if (!history) throw new NotFoundException('Không tìm thấy quyết định lương của nhân sự này.');
+    const updated = await this.prisma.$transaction(async tx => {
+      const result = await tx.personnelSalaryHistory.update({ where: { id }, data: dto, include: { rank: true } });
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      if (history.fromDate <= today && (!history.toDate || history.toDate >= today)) {
+        await tx.personnelComprehensiveProfile.update({ where: { id: history.profileId }, data: {
+          ...(dto.overGradeRate !== undefined ? { overGradePercent: dto.overGradeRate } : {}),
+          ...(dto.positionAllowance !== undefined ? { positionAllowance: dto.positionAllowance } : {}),
+          ...(dto.otherAllowance !== undefined ? { otherAllowance: dto.otherAllowance } : {}),
+        } });
+      }
+      return result;
+    }, { isolationLevel: 'Serializable' });
+    return updated;
   }
 
   async addAppointment(userId: string, dto: CreateAppointmentDto) {
@@ -705,6 +827,12 @@ export class PersonnelProfilesController {
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   addSalaryHistory(@Param('userId') userId: string, @Body() dto: CreateSalaryHistoryDto) {
     return this.service.addSalaryHistory(userId, dto);
+  }
+
+  @Patch(':userId/salary-histories/:id/allowances')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
+  updateSalaryHistoryAllowances(@Param('userId') userId: string, @Param('id') id: string, @Body() dto: UpdateSalaryHistoryAllowancesDto) {
+    return this.service.updateSalaryHistoryAllowances(userId, id, dto);
   }
 
   @Delete(':userId/salary-histories/:id')

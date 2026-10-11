@@ -1,11 +1,13 @@
 # Quy trình tính lương Việt Nam — tham chiếu kỳ 2026
 
-**Ngày rà soát:** 04/10/2026  
+**Ngày rà soát:** 07/10/2026  
 **Mục đích:** đặc tả quy trình nghiệp vụ cho bài tập HRMS và ghi rõ phần mã đã chạy so với phần chưa đủ căn cứ để coi là vận hành doanh nghiệp.
 
 ## Kết luận
 
-Hệ thống đã có luồng chốt công → tính → đối soát → duyệt → khóa → ghi nhận thanh toán; tính lương dùng chính sách có phiên bản và lưu snapshot theo kỳ. Đợt sửa gần đây bổ sung lịch làm việc theo nhân viên, căn cứ bảo hiểm có thể đánh dấu theo cấu phần, cờ cấu phần làm căn cứ OT, quy đổi khoản lương thường xuyên đủ điều kiện ra đơn giá OT, cảnh báo đối chiếu lương tối thiểu tháng/giờ theo vùng, khấu trừ 10% cơ bản cho người cư trú không có hợp đồng/ngắn hạn đủ điều kiện và yêu cầu mã chứng từ trước khi kỳ được ghi là đã trả. Đây vẫn là nền tảng học tập/chạy thử, chưa phải dịch vụ C&B hoàn chỉnh: còn thiếu xác minh chứng từ thuế/BHXH, áp dụng các ngoại lệ theo hồ sơ, phân loại lương tháng/giờ/bán thời gian đầy đủ, quyết toán năm và đối soát tiền chi thực tế.
+HRMS hiện hỗ trợ quy trình chốt công, tính lương, đối soát, phê duyệt, khóa kỳ và ghi nhận thanh toán. Mỗi kỳ lưu lại phiên bản chính sách đã áp dụng để có thể tra cứu căn cứ tính. Hệ thống cũng có lịch làm theo từng nhân viên, cấu hình căn cứ đóng bảo hiểm và tiền lương làm căn cứ tính OT, cảnh báo mức lương tối thiểu theo vùng, cùng yêu cầu mã chứng từ khi ghi nhận thanh toán.
+
+Để hoàn thiện quy trình C&B, cần tiếp tục xử lý xác minh chứng từ thuế và bảo hiểm, các ngoại lệ theo hồ sơ, phân loại đầy đủ lao động hưởng lương tháng/giờ/bán thời gian, quyết toán thuế năm và đối soát khoản tiền thực chi. Những nội dung này cần được hoàn thiện trước khi áp dụng vào vận hành chính thức.
 
 ## Trình tự nghiệp vụ đề xuất
 
@@ -24,6 +26,7 @@ Hệ thống đã có luồng chốt công → tính → đối soát → duyệ
 
 - **Thuế TNCN năm 2025:** áp dụng biểu 7 bậc và giảm trừ 11 triệu đồng/tháng cho bản thân, 4,4 triệu cho mỗi người phụ thuộc.
 - **Thuế TNCN kỳ năm 2026:** biểu lũy tiến 5 bậc: đến 10 triệu 5%; trên 10–30 triệu 10%; trên 30–60 triệu 20%; trên 60–100 triệu 30%; trên 100 triệu 35%. Mức giảm trừ là 15,5 triệu/tháng cho bản thân và 6,2 triệu/người phụ thuộc. Riêng từ 01/07/2026, Nghị định 253/2026 hướng dẫn khấu trừ: người không ký HĐLĐ hoặc hợp đồng dưới 3 tháng bị khấu trừ 10% khi trả từ 5 triệu đồng/lần (dưới mức này, khấu trừ 10% nếu cá nhân yêu cầu). Nghị định cũng cho phép cá nhân cư trú có hồ sơ đủ điều kiện giảm trừ chi y tế trong nước tối đa 23 triệu/năm và giáo dục/đào tạo trong nước tối đa 24 triệu/năm; hệ thống hiện chưa quản lý chứng từ và phép giảm trừ này. Cần xử lý riêng người không cư trú, miễn thuế, các khoản chịu thuế và quyết toán năm. Thu nhập chịu thuế trừ bảo hiểm bắt buộc trước giảm trừ hợp lệ; cần nhận diện riêng miễn thuế đối với lương làm việc ban đêm và làm thêm giờ.
+- **Nghị quyết 43/2026/QH16 (hiệu lực 24/08/2026):** khoản giảm 30% thuế TNCN của nghị quyết chỉ áp dụng cho thu nhập từ kinh doanh của cá nhân cư trú đủ điều kiện doanh thu; không phải giảm 30% thuế khấu trừ trên tiền lương/tiền công của nhân viên. Vì vậy nghị quyết này không làm thay đổi biểu PIT tiền lương đang cấu hình cho kỳ lương tháng 09/2026. Cần tách quy tắc thu nhập kinh doanh khỏi bộ tính lương nhân viên nếu hệ thống bổ sung nghiệp vụ đó.
 - **Ngày nghỉ hưởng lương năm 2026:** ngoài 11 ngày lễ/Tết theo Bộ luật Lao động, Nghị quyết 28/2026/QH16 bổ sung Ngày Văn hóa Việt Nam 24/11, thành 12 ngày hưởng lương. Mã đã được cập nhật để ngày 24/11 hằng năm từ 2026 được loại khỏi ngày công/ngày phép, kể cả khi cấu hình cơ sở dữ liệu đang có danh sách lễ rỗng. Các ngày lễ thay đổi theo lịch từng năm vẫn phải được C&B cấu hình và xác nhận; ngày nghỉ bù phụ thuộc lịch làm việc cũng cần được ghi vào lịch theo năm.
 - **Mức lương tối thiểu vùng từ 01/01/2026:** vùng I 5.310.000 đồng/tháng hoặc 25.500 đồng/giờ; vùng II 4.730.000 hoặc 22.700; vùng III 4.140.000 hoặc 20.000; vùng IV 3.700.000 hoặc 17.800. Vùng lấy theo nơi hoạt động của người sử dụng lao động/chi nhánh; với hình thức trả lương khác phải quy đổi đúng thời giờ bình thường.
 - **Trần căn cứ BHXH:** 20 lần mức tham chiếu; 46,8 triệu đồng/tháng đến hết 30/06/2026 và 50,6 triệu từ 01/07/2026 khi mức tham chiếu là 2,53 triệu. Tỷ lệ trong chính sách mặc định đang là người lao động 8% BHXH, 1,5% BHYT, 1% BHTN; doanh nghiệp 17% BHXH, 0,5% TNLĐ-BNN, 3% BHYT, 1% BHTN và 2% kinh phí công đoàn. Phải xác nhận đối tượng, căn cứ đóng và trường hợp được áp dụng tỷ lệ TNLĐ-BNN khác trước khi dùng.

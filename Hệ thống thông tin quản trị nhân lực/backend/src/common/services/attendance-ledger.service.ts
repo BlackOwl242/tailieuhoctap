@@ -1,10 +1,15 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { DayStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
-import { atClock, clockMinutes, dateKey, DAY_MS, VN_OFFSET, workDate } from '../hr-time';
+import { atClock, clockMinutes, dateKey, DAY_MS, DEFAULT_WORK_DAYS, isScheduledWorkday, VN_OFFSET, workDate } from '../hr-time';
 import { RuntimeSettingsService } from './runtime-settings.service';
 
 type Database = Prisma.TransactionClient | PrismaService;
+
+function paidWorkMinutes(startAt: Date, endAt: Date, breakStart: Date, breakEnd: Date): number {
+  return Math.max(0, Math.round((endAt.getTime() - startAt.getTime()) / 60_000
+    - Math.max(0, (Math.min(endAt.getTime(), breakEnd.getTime()) - Math.max(startAt.getTime(), breakStart.getTime())) / 60_000)));
+}
 @Injectable()
 export class AttendanceLedgerService {
   constructor(private readonly prisma: PrismaService, private readonly settings: RuntimeSettingsService) {}
@@ -32,7 +37,7 @@ export class AttendanceLedgerService {
     const startAt = atClock(key, start);
     const endAt = atClock(key, end);
     if (endAt <= startAt) endAt.setTime(endAt.getTime() + DAY_MS);
-    return { key, startAt, endAt, breakStart, breakEnd, shift, lateTolerance: shift?.lateToleranceMinutes ?? 15, earlyTolerance: shift?.earlyExitToleranceMinutes ?? 15 };
+    return { key, startAt, endAt, breakStart, breakEnd, shift, scheduledMinutes: paidWorkMinutes(startAt, endAt, breakStart, breakEnd), lateTolerance: shift?.lateToleranceMinutes ?? 15, earlyTolerance: shift?.earlyExitToleranceMinutes ?? 15 };
   }
 
   async dayForPunch(userId: string, at: Date): Promise<Date> {
@@ -58,7 +63,7 @@ export class AttendanceLedgerService {
     let firstIn: Date | null = null, lastOut: Date | null = null, open: Date | null = null;
     let workedIntervals: [Date, Date][] = [];
     const minutes = (a:Date,b:Date) => Math.max(0, (b.getTime()-a.getTime())/60000 - Math.max(0,(Math.min(b.getTime(),schedule.breakEnd.getTime())-Math.max(a.getTime(),schedule.breakStart.getTime()))/60000));
-    const scheduledMinutes = Math.round(minutes(schedule.startAt,schedule.endAt));
+    const scheduledMinutes = schedule.scheduledMinutes;
     if (scheduledMinutes <= 0) throw new BadRequestException('Ca không có thời gian làm việc sau giờ nghỉ');
     let pairedMinutes = 0;
     for (const event of selected) {
@@ -135,6 +140,11 @@ export class AttendanceLedgerService {
     });
     for (const row of unresolvedRows) await this.recompute(row.userId, row.workDate);
 
+    // Close the gap between recorded punches and the employee schedule before
+    // freezing the period. Otherwise a no-punch employee has no snapshot rows
+    // and is silently omitted from payroll.
+    await this.materializeScheduledDays(from, to);
+
     return this.prisma.$transaction(async tx => {
       const existing = await tx.attendancePeriod.findUnique({ where: { month_year: { month, year } } });
       if (existing?.status === 'FINALIZED') throw new ConflictException('Kỳ công đã chốt');
@@ -150,6 +160,100 @@ export class AttendanceLedgerService {
       await tx.auditLog.create({ data: { actorId, action: 'ATTENDANCE_FINALIZED', entityType: 'AttendancePeriod', entityId: period.id, afterData: { version: period.version, month, year } } });
       return period;
     }, { isolationLevel: 'Serializable', timeout: 120_000 });
+  }
+
+  private async materializeScheduledDays(from: Date, to: Date) {
+    const currentUsers = await this.prisma.user.findMany({
+      where: { deletedAt: null, employmentStatus: { in: ['PROBATION', 'ACTIVE'] } },
+      select: { id: true, hireDate: true },
+    });
+    const resignationActions = await this.prisma.personnelAction.findMany({
+      where: { type: 'RESIGNATION', status: 'APPROVED', effectiveAt: { lte: to } },
+      select: { subjectId: true, effectiveAt: true },
+      orderBy: { effectiveAt: 'asc' },
+    });
+    const firstResignationByUser = new Map<string, Date>();
+    for (const action of resignationActions) {
+      if (action.effectiveAt && !firstResignationByUser.has(action.subjectId)) firstResignationByUser.set(action.subjectId, dateKey(action.effectiveAt));
+    }
+    const currentIds = new Set(currentUsers.map(user => user.id));
+    const resignationIds = [...firstResignationByUser]
+      .filter(([, effectiveAt]) => effectiveAt >= from && effectiveAt <= to)
+      .map(([userId]) => userId)
+      .filter(userId => !currentIds.has(userId));
+    const resignedInPeriod = resignationIds.length
+      ? await this.prisma.user.findMany({ where: { id: { in: resignationIds }, deletedAt: null }, select: { id: true, hireDate: true } })
+      : [];
+    const users = [...currentUsers, ...resignedInPeriod]
+      .filter(user => (firstResignationByUser.get(user.id) ?? to) >= from)
+      .filter((user, index, all) => all.findIndex(candidate => candidate.id === user.id) === index);
+    if (!users.length) return;
+
+    const userIds = users.map(user => user.id);
+    const [assignments, existingDays, approvedLeaves, events, corrections, approvedRegularizations, holidays, defaultStart, defaultEnd, breakStartClock, breakEndClock] = await Promise.all([
+      this.prisma.hrmsShiftAssignment.findMany({
+        where: { userId: { in: userIds }, status: 'ACTIVE', startDate: { lte: to }, OR: [{ endDate: null }, { endDate: { gte: from } }] },
+        include: { shiftType: true }, orderBy: { startDate: 'desc' },
+      }),
+      this.prisma.attendanceDay.findMany({ where: { userId: { in: userIds }, workDate: { gte: from, lte: to } }, select: { userId: true, workDate: true } }),
+      this.prisma.leaveRequest.findMany({ where: { userId: { in: userIds }, status: 'APPROVED', startDate: { lte: to }, endDate: { gte: from } }, select: { userId: true, startDate: true, endDate: true, type: true } }),
+      this.prisma.attendanceEvent.findMany({
+        where: { userId: { in: userIds }, occurredAt: { gte: new Date(from.getTime() - VN_OFFSET), lt: new Date(to.getTime() + DAY_MS + VN_OFFSET) } },
+        select: { userId: true, occurredAt: true, payload: true },
+      }),
+      this.prisma.attendanceCorrection.findMany({ where: { userId: { in: userIds }, workDate: { gte: from, lte: to } }, select: { userId: true, workDate: true } }),
+      this.prisma.hrmsAttendanceRegularization.findMany({ where: { userId: { in: userIds }, workDate: { gte: from, lte: to }, status: 'APPROVED' }, select: { userId: true, workDate: true } }),
+      this.settings.get<string[]>('HOLIDAYS', []),
+      this.settings.get('WORK_START', process.env.ATTENDANCE_WORK_START || '08:00'),
+      this.settings.get('WORK_END', process.env.ATTENDANCE_WORK_END || '17:30'),
+      this.settings.get('WORK_BREAK_START', '12:00'),
+      this.settings.get('WORK_BREAK_END', '13:30'),
+    ]);
+    const assignmentByUser = new Map<string, typeof assignments>();
+    for (const assignment of assignments) assignmentByUser.set(assignment.userId, [...(assignmentByUser.get(assignment.userId) ?? []), assignment]);
+    const existingKeys = new Set(existingDays.map(row => `${row.userId}:${dateKey(row.workDate).toISOString().slice(0, 10)}`));
+    const evidenceKeys = new Set<string>();
+    for (const event of events) {
+      const payload = event.payload as { workDate?: unknown } | null;
+      const logicalDate = typeof payload?.workDate === 'string' ? dateKey(payload.workDate) : workDate(event.occurredAt);
+      evidenceKeys.add(`${event.userId}:${logicalDate.toISOString().slice(0, 10)}`);
+    }
+    for (const row of [...corrections, ...approvedRegularizations]) evidenceKeys.add(`${row.userId}:${dateKey(row.workDate).toISOString().slice(0, 10)}`);
+
+    const rowsToCreate: Prisma.AttendanceDayCreateManyInput[] = [];
+    for (const user of users) {
+      const startDate = user.hireDate ? dateKey(user.hireDate) : from;
+      const resignationDate = firstResignationByUser.get(user.id) ?? to;
+      const userAssignments = assignmentByUser.get(user.id) ?? [];
+      for (let time = Math.max(from.getTime(), startDate.getTime()); time <= Math.min(to.getTime(), resignationDate.getTime()); time += DAY_MS) {
+        const day = new Date(time);
+        const dayText = day.toISOString().slice(0, 10);
+        const assignment = userAssignments.find(candidate => dateKey(candidate.startDate) <= day && (!candidate.endDate || dateKey(candidate.endDate) >= day));
+        if (!isScheduledWorkday(day, assignment?.workDays ?? DEFAULT_WORK_DAYS)) continue;
+        const key = `${user.id}:${dayText}`;
+        if (existingKeys.has(key)) continue;
+        if (evidenceKeys.has(key)) {
+          await this.recompute(user.id, day);
+          continue;
+        }
+
+        const startAt = atClock(day, assignment?.shiftType.startTime ?? defaultStart);
+        const endAt = atClock(day, assignment?.shiftType.endTime ?? defaultEnd);
+        if (endAt <= startAt) endAt.setTime(endAt.getTime() + DAY_MS);
+        const scheduledMinutes = paidWorkMinutes(startAt, endAt, atClock(day, breakStartClock), atClock(day, breakEndClock));
+        if (scheduledMinutes <= 0) throw new ConflictException(`Ca làm việc không hợp lệ của nhân sự ${user.id} ngày ${dayText}`);
+        const leave = approvedLeaves.find(item => item.userId === user.id && dateKey(item.startDate) <= day && dateKey(item.endDate) >= day);
+        const holiday = holidays.includes(dayText);
+        rowsToCreate.push({
+          userId: user.id, workDate: day, scheduledMinutes, workedMinutes: 0, nightWorkedMinutes: 0,
+          lateMinutes: 0, earlyMinutes: 0, firstInAt: null, lastOutAt: null, eventCount: 0,
+          paidLeave: Boolean(leave && leave.type === 'ANNUAL'), leaveType: leave?.type ?? null,
+          status: holiday ? 'HOLIDAY' : leave ? 'ON_LEAVE' : 'ABSENT',
+        });
+        existingKeys.add(key);
+      }
+    }
+    if (rowsToCreate.length) await this.prisma.attendanceDay.createMany({ data: rowsToCreate, skipDuplicates: true });
   }
 
   async reopen(id: string, reason: string, actorId: string) {

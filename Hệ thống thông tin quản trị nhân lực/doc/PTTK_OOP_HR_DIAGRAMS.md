@@ -77,7 +77,7 @@ rectangle "HỆ THỐNG QUẢN TRỊ NHÂN LỰC (47 USE CASE)" {
   usecase "E. Chấm công & Phân ca\n(UC18-UC25)" as GE
   usecase "F. Tiền lương & Phúc lợi\n(UC26-UC31)" as GF
   usecase "D. Cổng tự phục vụ nhân viên\n(UC15-UC17)" as GD_uc
-  usecase "H. Đánh giá hiệu suất & Đào tạo\n(UC37-UC39)" as GH
+  usecase "H. Đánh giá KPI & Đào tạo\n(UC37-UC39)" as GH
 }
 
 ' Tác nhân phía bên phải (5 tác nhân)
@@ -248,7 +248,7 @@ actor "Trưởng dự án" as A3
 actor "Quản trị IT" as A4
 rectangle "Nhóm E - Chấm công, Phân ca & Điểm danh đa nguồn" {
   (UC18 Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca) as UC18
-  (UC19 Điểm danh sinh trắc học khuôn mặt & Cảm biến IR) as UC19
+  (UC19 Điểm danh khuôn mặt qua camera thường) as UC19
   (UC20 Quản trị kết nối thiết bị máy chấm công) as UC20
   (UC21 Đăng ký & Xét duyệt nghỉ phép trực tuyến) as UC21
   (UC22 Đăng ký & Phê duyệt làm thêm giờ (OT)) as UC22
@@ -257,13 +257,21 @@ rectangle "Nhóm E - Chấm công, Phân ca & Điểm danh đa nguồn" {
   (UC25 Tổng hợp & Chốt bảng chấm công tháng) as UC25
 }
 A0 -- UC18
-A1 -- UC19
-A2 -- UC20
+A0 -- UC19
+A1 -- UC20
+A4 -- UC20
+A0 -- UC21
 A3 -- UC21
-A4 -- UC22
-A0 -- UC23
-A1 -- UC24
+A1 -- UC21
+A0 -- UC22
+A2 -- UC22
+A3 -- UC22
+A3 -- UC23
+A0 -- UC24
+A2 -- UC24
+A3 -- UC24
 A2 -- UC25
+A3 -- UC25
 @enduml
 ```
 _Hình D.6. Nhóm E - Chấm công, Phân ca & Điểm danh đa nguồn (UC18, UC19, UC20, UC21, UC22, UC23, UC24, UC25)._
@@ -283,7 +291,7 @@ actor "Nhân viên hành chính" as A4
 rectangle "Nhóm F - Tiền lương, Chế độ đãi ngộ & Phúc lợi" {
   (UC26 Cấu hình công thức và ngạch bậc lương) as UC26
   (UC27 Vận hành chức năng tính lương tự động) as UC27
-  (UC28 Phê duyệt & Khóa bất biến kỳ lương (LOCKED state)) as UC28
+  (UC28 Phê duyệt, khóa và ghi nhận chi trả kỳ lương) as UC28
   (UC29 Quản lý tạm ứng & Khoản vay phúc lợi nhân viên) as UC29
   (UC30 Quản lý đề xuất công tác & Quyết toán chi phí (T&E)) as UC30
   (UC31 Quản lý cấp phát & Thu hồi tài sản làm việc) as UC31
@@ -326,7 +334,7 @@ A4 -- UC36
 ```
 _Hình D.8. Nhóm G - Biến động nhân sự & Thôi việc (UC32, UC33, UC34, UC35, UC36)._
 
-### A.H. Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển
+### A.H. Nhóm H - Đánh giá KPI, Đào tạo & Phát triển
 
 ```plantuml
 @startuml
@@ -336,8 +344,8 @@ left to right direction
 actor "Chuyên viên nhân sự" as A0
 actor "Trưởng dự án" as A1
 actor "Nhân viên" as A2
-rectangle "Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển" {
-  (UC37 Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI) as UC37
+rectangle "Nhóm H - Đánh giá KPI, Đào tạo & Phát triển" {
+  (UC37 Quản lý mục tiêu và đánh giá KPI) as UC37
   (UC38 Quản trị chương trình đào tạo nội bộ) as UC38
   (UC39 Tiếp nhận & Giải quyết khiếu nại lao động bảo mật) as UC39
 }
@@ -346,7 +354,7 @@ A1 -- UC38
 A2 -- UC39
 @enduml
 ```
-_Hình D.9. Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển (UC37, UC38, UC39)._
+_Hình D.9. Nhóm H - Đánh giá KPI, Đào tạo & Phát triển (UC37, UC38, UC39)._
 
 ### A.I. Nhóm I - Chuẩn cán bộ & Báo cáo Nhà nước
 
@@ -805,30 +813,39 @@ C --> B : hiển thị bảng công, đánh dấu bản ghi lệch
 ```
 _Hình D.29. Trình tự UC18 - Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca._
 
-### B.UC19. Điểm danh sinh trắc học khuôn mặt & Cảm biến IR
+### B.UC19. Điểm danh khuôn mặt qua camera thường
 
 ```plantuml
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
 actor "Nhân viên" as NV
-boundary "Trang /attendance" as B
-control "FaceCryptoService" as F
+boundary "Trang /check-in" as B
+control "Trình duyệt: HOG/LBP" as V
 control "AttendanceService" as S
-entity "FaceEmbedding / AttendanceEvent" as E
-NV -> B : đăng ký mẫu (tick đồng thuận)
-B -> F : trích vector, mã hóa AES-256-GCM
+control "FaceCryptoService" as F
+entity "FaceEmbedding / AttendanceEvent / AttendanceDay" as E
+NV -> B : đồng ý xử lý dữ liệu
+NV -> B : đăng ký 3 mẫu qua camera thường
+B -> V : lấy khung giữa 64×64, tạo vector 256 chiều
+V -> S : POST /face/enroll
+S -> F : mã hóa vector AES-256-GCM
 F -> E : lưu FaceEmbedding (không lưu ảnh gốc)
-NV -> B : điểm danh khuôn mặt
-B -> F : so khớp cosine similarity
-alt vượt ngưỡng
-  F -> S : ghi sự kiện (nguồn = khuôn mặt)
-else không khớp
-  S --> NV : từ chối rõ ràng, giới hạn số lần thử
+NV -> B : bật camera và điểm danh
+B -> V : tạo vector từ khung hình hiện tại
+V -> S : POST /check-in (method = FACE)
+S -> E : đọc mẫu đã đăng ký
+S -> F : giải mã mẫu và so cosine similarity
+alt đạt ngưỡng cấu hình
+  S -> E : ghi AttendanceEvent nguồn FACE
+  S -> E : tính lại AttendanceDay
+  S --> NV : xác nhận lượt vào/ra
+else chưa đạt ngưỡng hoặc thiếu điều kiện
+  S --> NV : từ chối và hiển thị lý do
 end
 @enduml
 ```
-_Hình D.30. Trình tự UC19 - Điểm danh sinh trắc học khuôn mặt & Cảm biến IR._
+_Hình D.30. Trình tự UC19 - Điểm danh khuôn mặt qua camera thường._
 
 ### B.UC20. Quản trị kết nối thiết bị máy chấm công
 
@@ -999,7 +1016,7 @@ _Hình D.37. Trình tự UC26 - Cấu hình công thức và ngạch bậc lươ
 skinparam linetype ortho
 skinparam shadowing false
 actor "Chuyên viên tiền lương" as CV
-boundary "Trang /payroll" as B
+boundary "Trang /payroll-engine" as B
 control "PayrollService" as C
 entity "Payslip / PayrollPeriod" as E
 CV -> B : bấm tính lương kỳ đã chốt công
@@ -1016,7 +1033,7 @@ end
 ```
 _Hình D.38. Trình tự UC27 - Vận hành chức năng tính lương tự động._
 
-### B.UC28. Phê duyệt & Khóa bất biến kỳ lương (LOCKED state)
+### B.UC28. Phê duyệt, khóa và ghi nhận chi trả kỳ lương
 
 ```plantuml
 @startuml
@@ -1026,7 +1043,7 @@ actor "Chuyên viên tiền lương" as CV
 actor "Người đối soát HR/Kế toán" as RV
 actor "Giám đốc" as BOD
 actor "Kế toán chi trả" as ACC
-boundary "Trang /payroll" as B
+boundary "Trang /payroll-engine" as B
 control "PayrollService" as C
 entity "HrmsPayrollRun + phiếu lương" as E
 CV -> B : POST /runs · tính lương
@@ -1040,17 +1057,19 @@ B -> C : yêu cầu phê duyệt
 C -> E : APPROVED (BOD ≠ RV, CV)
 BOD -> B : POST /runs/:id/lock
 B -> C : yêu cầu khóa
-C -> E : LOCKED (không cho sửa/tính lại)
+C -> E : LOCKED (không sửa trực tiếp)
 ACC -> B : POST /runs/:id/pay
-B -> C : ghi nhận đã chi
+B -> C : nhập phương thức + mã giao dịch/chứng từ
 C -> E : PAID + áp dụng khấu trừ vay đủ điều kiện
-alt gọi tính lại sau khóa
-  C --> B : chặn lỗi HTTP 409
+alt hủy kỳ để lập lại
+  B -> C : POST /runs/:id/cancel-for-recalculation
+  C -> E : CANCELLED; giữ kỳ cũ, không đảo giao dịch ngân hàng
+  note over C,E : Bị chặn nếu kỳ đã hạch toán khoản vay.
 end
-note over ACC,E : Chưa bắt buộc mã giao dịch/bằng chứng ngân hàng.
+note over ACC,E : Lưu mã tham chiếu; chưa xác minh trực tiếp với ngân hàng.
 @enduml
 ```
-_Hình D.39. Trình tự UC28 - Phê duyệt & Khóa bất biến kỳ lương (LOCKED state)._
+_Hình D.39. Trình tự UC28 - Phê duyệt, khóa và ghi nhận chi trả kỳ lương._
 
 ### B.UC29. Quản lý tạm ứng & Khoản vay phúc lợi nhân viên
 
@@ -1238,7 +1257,7 @@ end
 ```
 _Hình D.47. Trình tự UC36 - Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận._
 
-### B.UC37. Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI
+### B.UC37. Quản lý mục tiêu và đánh giá KPI
 
 ```plantuml
 @startuml
@@ -1246,18 +1265,27 @@ skinparam linetype ortho
 skinparam shadowing false
 actor "Chuyên viên nhân sự" as HR
 actor "Nhân viên" as NV
-actor "Quản lý" as QL
-boundary "Trang /performance-360" as B
+actor "Quản lý trực tiếp" as QL
+boundary "Trang /performance" as B
 control "HrmsPerformanceService" as C
-entity "HrmsAppraisalGoal / HrmsAppraisalReview" as E
-HR -> B : tạo kỳ đánh giá, gán KRA/KPI theo trọng số %
-NV -> C : tự đánh giá
-QL -> C : chấm điểm + phản hồi 360 độ
-NV -> C : xác nhận kết quả
-C -> E : lưu kết quả làm căn cứ tăng lương
+entity "HrmsAppraisalCycle / Goal / Evidence" as E
+HR -> B : tạo chu kỳ KPI
+B -> C : lưu chu kỳ
+QL -> B : giao KPI, chỉ số đo, mức cần đạt, trọng số
+B -> C : kiểm tra tổng trọng số = 100%
+NV -> B : cập nhật kết quả thực tế và minh chứng
+B -> C : lưu minh chứng theo mục tiêu
+QL -> B : xem kết quả, chấm KPI từ 0 đến 100
+B -> C : lưu điểm quản lý
+C -> E : tính điểm chu kỳ theo trọng số KPI
+C -> E : lưu kết quả, người chấm và lịch sử thao tác
+note over C,E
+  Điểm KPI không tự tạo thưởng hoặc thay đổi lương.
+  Đánh giá công chức/viên chức được xử lý ở nhánh công vụ riêng.
+end note
 @enduml
 ```
-_Hình D.48. Trình tự UC37 - Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI._
+_Hình D.48. Trình tự UC37 - Quản lý mục tiêu và đánh giá KPI._
 
 ### B.UC38. Quản trị chương trình đào tạo nội bộ
 
@@ -1306,7 +1334,7 @@ _Hình D.50. Trình tự UC39 - Tiếp nhận & Giải quyết khiếu nại lao
 skinparam linetype ortho
 skinparam shadowing false
 actor "Chuyên viên hồ sơ" as A
-boundary "Trang /personnel-profiles" as B
+boundary "Trang /employees?tab=civil-servant" as B
 control "PersonnelProfilesService" as C
 entity "PersonnelComprehensiveProfile + 8 bảng quá trình" as E
 A -> B : mở trang quản lý
@@ -1835,7 +1863,7 @@ start
 fork
 :Điểm danh web ESS;
 fork again
-:Điểm danh khuôn mặt sinh trắc học & IR;
+:Điểm danh bằng khuôn mặt qua camera thường;
 fork again
 :Máy chấm công đẩy webhook/CSV/Simulator;
 end fork
@@ -1851,26 +1879,28 @@ stop
 ```
 _Hình D.76. Hoạt động UC18 - Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca._
 
-### C.UC19. Điểm danh sinh trắc học khuôn mặt & Cảm biến IR
+### C.UC19. Điểm danh khuôn mặt qua camera thường
 
 ```plantuml
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Tick đồng thuận dữ liệu sinh trắc học;
-:Trích vector từ 3-5 ảnh, mã hóa AES-256-GCM;
-:Lưu FaceEmbedding;
-:Điểm danh khuôn mặt thời gian thực;
-if (Cosine similarity vượt ngưỡng?) then (có)
-:Ghi sự kiện nguồn khuôn mặt;
+:Đồng ý xử lý dữ liệu và đăng ký 3 mẫu;
+:Trình duyệt trích vector từ camera thường;
+:Máy chủ mã hóa và lưu mẫu FaceEmbedding;
+:Mở camera, tạo vector điểm danh;
+:Máy chủ so cosine similarity với mẫu;
+if (Đạt ngưỡng cấu hình?) then (có)
+:Ghi AttendanceEvent nguồn FACE;
+:Tính lại AttendanceDay;
 else (không)
-:Từ chối, giới hạn số lần thử;
+:Từ chối và hiển thị lý do;
 endif
 stop
 @enduml
 ```
-_Hình D.77. Hoạt động UC19 - Điểm danh sinh trắc học khuôn mặt & Cảm biến IR._
+_Hình D.77. Hoạt động UC19 - Điểm danh khuôn mặt qua camera thường._
 
 ### C.UC20. Quản trị kết nối thiết bị máy chấm công
 
@@ -1883,7 +1913,7 @@ start
 if (Phương thức?) then (Webhook API)
   :Nhận payload POST có chữ ký HMAC-SHA256;
   :Kiểm tra chữ ký theo khóa bí mật của thiết bị;
-else (Tệp CSV / Mô phỏng)
+else (Tệp CSV)
   :Tải lên tệp CSV hoặc kích hoạt Simulator;
   :Phân tích cú pháp dòng dữ liệu quẹt thẻ;
 endif
@@ -2037,20 +2067,40 @@ stop
 ```
 _Hình D.85. Hoạt động UC27 - Vận hành chức năng tính lương tự động._
 
-### C.UC28. Phê duyệt & Khóa bất biến kỳ lương (LOCKED state)
+### C.UC28. Phê duyệt, khóa và ghi nhận chi trả kỳ lương
 
 ```plantuml
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
 start
-Mở trang
-Truy vấn theo phạm vi quyền
-Hiển thị dữ liệu
+:Tạo kỳ lương từ công đã chốt;
+:Đối soát; người đối soát khác người tính;
+if (Điều kiện đối soát hợp lệ?) then (có)
+  :REVIEWED;
+else (không)
+  :Từ chối thao tác;
+  stop
+endif
+:Phê duyệt; người duyệt khác người tính và người đối soát;
+if (Điều kiện phê duyệt hợp lệ?) then (có)
+  :APPROVED;
+else (không)
+  :Từ chối thao tác;
+  stop
+endif
+:Khóa kỳ - LOCKED;
+:Kế toán nhập phương thức và mã giao dịch/chứng từ;
+:PAID; hạch toán khoản vay đủ điều kiện;
+note right
+Kỳ đã khóa hoặc đã trả có thể hủy để lập lại.
+Không đảo giao dịch ngân hàng; chặn nếu
+đã hạch toán khoản vay.
+end note
 stop
 @enduml
 ```
-_Hình D.86. Hoạt động UC28 - Phê duyệt & Khóa bất biến kỳ lương (LOCKED state)._
+_Hình D.86. Hoạt động UC28 - Phê duyệt, khóa và ghi nhận chi trả kỳ lương._
 
 ### C.UC29. Quản lý tạm ứng & Khoản vay phúc lợi nhân viên
 
@@ -2202,23 +2252,25 @@ stop
 ```
 _Hình D.94. Hoạt động UC36 - Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận._
 
-### C.UC37. Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI
+### C.UC37. Quản lý mục tiêu và đánh giá KPI
 
 ```plantuml
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Tạo kỳ đánh giá;
-:Gán KRA/KPI theo trọng số %;
-:Nhân viên tự đánh giá;
-:Phản hồi 360 độ từ đồng nghiệp/quản lý;
-:Quản lý chấm điểm;
-:Nhân viên xác nhận kết quả;
+:HR tạo chu kỳ đánh giá KPI;
+:Quản lý giao KPI, chỉ số đo, mức cần đạt và trọng số;
+:Kiểm tra tổng trọng số từng nhân viên bằng 100%;
+:Nhân viên cập nhật kết quả thực tế và minh chứng;
+:Quản lý đối chiếu kết quả, chấm từng KPI từ 0 đến 100;
+:Tính điểm chu kỳ theo trọng số KPI;
+:Lưu kết quả và lịch sử thao tác;
+:HR hoặc quản lý đóng chu kỳ theo quyền;
 stop
 @enduml
 ```
-_Hình D.95. Hoạt động UC37 - Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI._
+_Hình D.95. Hoạt động UC37 - Quản lý mục tiêu và đánh giá KPI._
 
 ### C.UC38. Quản trị chương trình đào tạo nội bộ
 
@@ -2638,7 +2690,7 @@ start
 fork
   :Web ESS;
 fork again
-  :Khuôn mặt sinh trắc học & IR (AES-256-GCM);
+  :Mẫu vector khuôn mặt từ camera thường (AES-256-GCM);
 fork again
   :Máy chấm công Webhook HMAC / CSV / Simulator;
 end fork
@@ -2753,7 +2805,7 @@ package "HRMIS - 10 Nhóm chức năng" {
     [Control_G]
     [Entity_G]
   }
-  package "Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển" {
+  package "Nhóm H - Đánh giá KPI, Đào tạo & Phát triển" {
     [Boundary_H]
     [Control_H]
     [Entity_H]
@@ -2918,7 +2970,7 @@ package "Nhóm E - Chấm công, Phân ca & Điểm danh đa nguồn" {
     [Control: UC18Service]
     [Entity: UC18Entity]
   }
-  package "UC19 - Điểm danh sinh trắc học khuôn mặt & Cảm biến IR" {
+  package "UC19 - Điểm danh khuôn mặt qua camera thường" {
     [Boundary: UC19]
     [Control: UC19Service]
     [Entity: UC19Entity]
@@ -2975,7 +3027,7 @@ package "Nhóm F - Tiền lương, Chế độ đãi ngộ & Phúc lợi" {
     [Control: UC27Service]
     [Entity: UC27Entity]
   }
-  package "UC28 - Phê duyệt & Khóa bất biến kỳ lương (LOCKED state)" {
+  package "UC28 - Phê duyệt, khóa và ghi nhận chi trả kỳ lương" {
     [Boundary: UC28]
     [Control: UC28Service]
     [Entity: UC28Entity]
@@ -3037,14 +3089,14 @@ package "Nhóm G - Biến động nhân sự & Thôi việc" {
 ```
 _Hình D.112. Gói Nhóm G - Biến động nhân sự & Thôi việc, mỗi use case một gói con Boundary-Control-Entity._
 
-### F.H. Gói Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển (mỗi use case một gói con)
+### F.H. Gói Nhóm H - Đánh giá KPI, Đào tạo & Phát triển (mỗi use case một gói con)
 
 ```plantuml
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-package "Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển" {
-  package "UC37 - Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI" {
+package "Nhóm H - Đánh giá KPI, Đào tạo & Phát triển" {
+  package "UC37 - Quản lý mục tiêu và đánh giá KPI" {
     [Boundary: UC37]
     [Control: UC37Service]
     [Entity: UC37Entity]
@@ -3062,7 +3114,7 @@ package "Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển" {
 }
 @enduml
 ```
-_Hình D.113. Gói Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển, mỗi use case một gói con Boundary-Control-Entity._
+_Hình D.113. Gói Nhóm H - Đánh giá KPI, Đào tạo & Phát triển, mỗi use case một gói con Boundary-Control-Entity._
 
 ### F.I. Gói Nhóm I - Chuẩn cán bộ & Báo cáo Nhà nước (mỗi use case một gói con)
 
@@ -3344,7 +3396,7 @@ C_UC24 ..> E_UC24
 B_UC25 ..> C_UC25
 C_UC25 ..> E_UC25
 note bottom of C_UC18
-  Phục vụ use case: UC18=Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca; UC19=Điểm danh sinh trắc học khuôn mặt & Cảm biến IR; UC20=Quản trị kết nối thiết bị máy chấm công; UC21=Đăng ký & Xét duyệt nghỉ phép trực tuyến; UC22=Đăng ký & Phê duyệt làm thêm giờ (OT); UC23=Lập lịch và phân ca làm việc (Shift Scheduling); UC24=Giải trình bổ sung giờ công & Xử lý lệch công; UC25=Tổng hợp & Chốt bảng chấm công tháng
+  Phục vụ use case: UC18=Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca; UC19=Điểm danh khuôn mặt qua camera thường; UC20=Quản trị kết nối thiết bị máy chấm công; UC21=Đăng ký & Xét duyệt nghỉ phép trực tuyến; UC22=Đăng ký & Phê duyệt làm thêm giờ (OT); UC23=Lập lịch và phân ca làm việc (Shift Scheduling); UC24=Giải trình bổ sung giờ công & Xử lý lệch công; UC25=Tổng hợp & Chốt bảng chấm công tháng
 end note
 @enduml
 ```
@@ -3393,7 +3445,7 @@ C_UC30 ..> E_UC30
 B_UC31 ..> C_UC31
 C_UC31 ..> E_UC31
 note bottom of C_UC26
-  Phục vụ use case: UC26=Cấu hình công thức và ngạch bậc lương; UC27=Vận hành chức năng tính lương tự động; UC28=Phê duyệt & Khóa bất biến kỳ lương (LOCKED state); UC29=Quản lý tạm ứng & Khoản vay phúc lợi nhân viên; UC30=Quản lý đề xuất công tác & Quyết toán chi phí (T&E); UC31=Quản lý cấp phát & Thu hồi tài sản làm việc
+  Phục vụ use case: UC26=Cấu hình công thức và ngạch bậc lương; UC27=Vận hành chức năng tính lương tự động; UC28=Phê duyệt, khóa và ghi nhận chi trả kỳ lương; UC29=Quản lý tạm ứng & Khoản vay phúc lợi nhân viên; UC30=Quản lý đề xuất công tác & Quyết toán chi phí (T&E); UC31=Quản lý cấp phát & Thu hồi tài sản làm việc
 end note
 @enduml
 ```
@@ -3443,7 +3495,7 @@ end note
 ```
 _Hình D.122. Lớp Nhóm G - Biến động nhân sự & Thôi việc - gán use case: UC32, UC33, UC34, UC35, UC36._
 
-### G.H. Lớp Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển
+### G.H. Lớp Nhóm H - Đánh giá KPI, Đào tạo & Phát triển
 
 ```plantuml
 @startuml
@@ -3471,11 +3523,11 @@ C_UC38 ..> E_UC38
 B_UC39 ..> C_UC39
 C_UC39 ..> E_UC39
 note bottom of C_UC37
-  Phục vụ use case: UC37=Đánh giá hiệu suất 360 độ & Mục tiêu OKR/KPI; UC38=Quản trị chương trình đào tạo nội bộ; UC39=Tiếp nhận & Giải quyết khiếu nại lao động bảo mật
+  Phục vụ use case: UC37=Quản lý mục tiêu và đánh giá KPI; UC38=Quản trị chương trình đào tạo nội bộ; UC39=Tiếp nhận & Giải quyết khiếu nại lao động bảo mật
 end note
 @enduml
 ```
-_Hình D.123. Lớp Nhóm H - Đánh giá hiệu suất, Đào tạo & Phát triển - gán use case: UC37, UC38, UC39._
+_Hình D.123. Lớp Nhóm H - Đánh giá KPI, Đào tạo & Phát triển - gán use case: UC37, UC38, UC39._
 
 ### G.I. Lớp Nhóm I - Chuẩn cán bộ & Báo cáo Nhà nước
 

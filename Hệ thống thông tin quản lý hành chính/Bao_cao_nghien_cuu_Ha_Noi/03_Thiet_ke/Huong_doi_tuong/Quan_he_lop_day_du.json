@@ -494,5 +494,101 @@
     "source_multiplicity": "0..*",
     "target_multiplicity": "0..1",
     "note": "Người thực hiện"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "ho_so",
+    "field": "ho_so_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Hồ sơ được đề nghị dừng"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "chu_the",
+    "field": "nguoi_yeu_cau_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Cá nhân/tổ chức yêu cầu"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "uy_quyen",
+    "field": "uy_quyen_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Căn cứ đại diện nếu người yêu cầu không phải chủ thể"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "thanh_phan_ho_so",
+    "field": "tep_mau05_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Bản yêu cầu có chữ ký hoặc chứng cứ tiếp nhận"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "tai_khoan",
+    "field": "nguoi_kiem_tra_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Cán bộ Một cửa kiểm tra"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "thanh_phan_ho_so",
+    "field": "tep_mau06_du_thao_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Dự thảo thông báo, chưa làm đổi trạng thái hồ sơ"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "thanh_phan_ho_so",
+    "field": "tep_mau06_da_ky_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Bản Thông báo dừng đã ký"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "tai_khoan",
+    "field": "nguoi_ky_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Người có thẩm quyền ký thông báo"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "su_kien_quyen_ky_mau06",
+    "field": "quyen_ky_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Quyền ký còn hiệu lực tại thời điểm ký"
+  },
+  {
+    "source": "yeu_cau_dung",
+    "target": "thong_bao",
+    "field": "thong_bao_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "0..1",
+    "note": "Bằng chứng gửi/giao thông báo"
+  },
+  {
+    "source": "su_kien_quyen_ky_mau06",
+    "target": "tai_khoan",
+    "field": "tai_khoan_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Tài khoản được cấp hoặc thu hồi"
+  },
+  {
+    "source": "su_kien_quyen_ky_mau06",
+    "target": "tai_khoan",
+    "field": "nguoi_thay_doi_id",
+    "source_multiplicity": "0..*",
+    "target_multiplicity": "1",
+    "note": "Quản trị viên khác người đề nghị"
   }
 ]

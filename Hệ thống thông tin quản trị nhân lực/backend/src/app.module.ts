@@ -23,7 +23,6 @@ import { LeaveModule } from './modules/leave/leave.module';
 import { OvertimeModule } from './modules/overtime/overtime.module';
 import { PayrollModule } from './modules/payroll/payroll.module';
 import { RecruitmentModule } from './modules/recruitment/recruitment.module';
-import { PerformanceModule } from './modules/performance/performance.module';
 import { TrainingModule } from './modules/training/training.module';
 import { PersonnelActionsModule } from './modules/personnel-actions/personnel-actions.module';
 import { DocumentsModule } from './modules/documents/documents.module';
@@ -71,7 +70,6 @@ import { FilesModule } from './modules/files/files.module';
     OvertimeModule,
     PayrollModule,
     RecruitmentModule,
-    PerformanceModule,
     TrainingModule,
     PersonnelActionsModule,
     DocumentsModule,

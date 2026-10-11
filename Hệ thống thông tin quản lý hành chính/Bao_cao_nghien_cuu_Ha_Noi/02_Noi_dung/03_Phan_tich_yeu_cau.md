@@ -19,6 +19,8 @@ Bảng 3.1: Chủ thể nghiệp vụ và phạm vi trách nhiệm
 | Quản trị kỹ thuật | Quản lý tài khoản kỹ thuật, cấu hình vận hành | Không mặc nhiên đọc toàn bộ hồ sơ công dân |
 | Kiểm tra, giám sát | Kiểm tra nhật ký và số liệu theo nhiệm vụ | Quyền chỉ đọc và phạm vi được giao |
 
+Người dân không được cấp tài khoản riêng trong ứng dụng nghiên cứu. Khi thực hiện giao dịch trực tuyến trên Cổng Dịch vụ công quốc gia, công dân xác thực bằng VNeID; tổ chức, doanh nghiệp dùng tài khoản do Cổng quốc gia cấp. Tài khoản cán bộ tác nghiệp là nhánh riêng, do cơ quan quản lý cấp và gắn với vai trò, cơ quan, thời hạn được giao. Không được dùng tài khoản cán bộ để thay danh tính người yêu cầu khi hỗ trợ kê khai. [32]–[34]
+
 ## 3.2. Phân rã chức năng và dữ liệu trao đổi
 
 Hệ thống được phân thành quản lý danh mục, tiếp nhận, thụ lý, kết quả, tài chính, giao tiếp và quản trị. Phân rã này xác định ranh giới trách nhiệm logic; không yêu cầu triển khai mỗi chức năng thành một vi dịch vụ riêng. Chức năng dùng chung như lịch làm việc và kiểm tra quyền được cung cấp thống nhất để các màn hình không tự tính lại theo cách khác nhau.
@@ -32,7 +34,7 @@ Bảng 3.2: Dòng thông tin đầu vào và đầu ra
 | Dòng dữ liệu | Nguồn hoặc nơi nhận | Nội dung kiểm soát |
 | --- | --- | --- |
 | Thông tin thủ tục | Danh mục có quyết định công bố | Phiên bản, hiệu lực, cơ quan và mẫu |
-| Hồ sơ yêu cầu | Người yêu cầu qua cổng giao dịch | Chủ thể, tờ khai, thành phần và căn cứ đại diện |
+| Hồ sơ yêu cầu | Cá nhân hoặc tổ chức qua Cổng Dịch vụ công quốc gia | Danh tính theo phương thức xác thực của chủ thể; thủ tục, địa bàn, cơ quan thực hiện, tờ khai, thành phần và căn cứ đại diện |
 | Kết quả định danh | Nền tảng xác thực được phép | Danh tính, độ tin cậy và thời hạn phiên |
 | Dữ liệu hộ tịch | Hệ thống chuyên ngành | Phạm vi truy vấn, tính phù hợp và nguồn dữ liệu |
 | Thông báo nghiệp vụ | Người yêu cầu và đơn vị xử lý | Nội dung, thời điểm gửi và trạng thái giao |
@@ -52,24 +54,24 @@ Bảng 3.3: Yêu cầu chức năng của thiết kế
 | --- | --- | --- |
 | YC01 | Quản lý phiên bản thủ tục | Hồ sơ giữ đúng phiên bản tại thời điểm tiếp nhận |
 | YC02 | Xác thực và kiểm soát quan hệ hồ sơ | Không xem được hồ sơ ngoài quyền |
-| YC03 | Kê khai và tái sử dụng dữ liệu | Ghi nguồn; cho xử lý khi dữ liệu không khả dụng |
+| YC03 | Kê khai và tái sử dụng dữ liệu | Ghi nguồn, mốc khai thác, trạng thái xác thực; không yêu cầu lại khi dữ liệu được chia sẻ hợp lệ |
 | YC04 | Tiếp nhận hợp lệ và cấp mã | Mã không trùng; giấy hẹn khớp dữ liệu đã lưu |
-| YC05 | Bổ sung và từ chối có căn cứ | Lưu giai đoạn, nội dung, căn cứ và chứng từ |
+| YC05 | Bổ sung và từ chối có căn cứ | Yêu cầu đầu vào liệt kê đủ thiếu sót trong một lần; lưu giai đoạn, nội dung, căn cứ và chứng từ |
 | YC06 | Phân công thụ lý | Có người chịu trách nhiệm và lịch sử thay đổi |
 | YC07 | Tra cứu, thẩm định và trình duyệt | Có bằng chứng tra cứu và phiên bản dự thảo |
 | YC08 | Ký duyệt và phát hành | Bản ký bất biến; chữ ký được kiểm tra |
 | YC09 | Quản lý thu và đối soát | Thông báo lặp không làm tăng khoản thu |
 | YC10 | Trả và đồng bộ kết quả | Lưu chứng cứ giao; phân biệt lỗi đồng bộ |
 | YC11 | Theo dõi thời hạn | Lịch, ngoại lệ và điều chỉnh có căn cứ |
-| YC12 | Dừng hoặc rút yêu cầu | Có quyết định xử lý và kết luận tài chính |
+| YC12 | Dừng theo đề nghị của tổ chức/cá nhân | Với hồ sơ trực tiếp/bưu chính: sau khi tiếp nhận hợp lệ và trước khi cơ quan ban hành quyết định/văn bản thông báo kết quả; Bộ phận Một cửa kiểm tra ngay, lập dự thảo Mẫu 06; chỉ người được cấp quyền ký theo thẩm quyền mới ghi nhận phát hành. Trực tuyến xử lý qua chức năng Cổng quốc gia. |
 | YC13 | Nhật ký và báo cáo điều hành | Truy nguyên hành động; số liệu đối chiếu được |
-| YC14 | Quản trị tài khoản và cấu hình | Có phê duyệt, giới hạn hiệu lực và thu hồi quyền |
+| YC14 | Quản trị tài khoản và cấu hình | Cấp tài khoản theo cơ quan/vai trò/thời hạn; quyền ký văn bản phải có căn cứ thẩm quyền, người khác đối chiếu và có thể thu hồi kèm nhật ký |
 
 ### 3.3.1. Quy tắc về thành phần hồ sơ và dữ liệu dùng lại
 
-Mỗi thành phần hồ sơ có trạng thái cần cung cấp, được thay bằng dữ liệu xác thực, đang chờ kiểm tra hoặc không áp dụng. Một kết nối trả dữ liệu không đồng nghĩa dữ liệu phù hợp với sự kiện hộ tịch cần trích lục. Cán bộ thụ lý phải kiểm tra đúng chủ thể, loại sự kiện và thông tin đăng ký. Khi có dữ liệu phù hợp, thiết kế ghi định danh bản ghi và thời điểm khai thác; không tải toàn bộ hồ sơ dân cư về để dự phòng.
+Mỗi thành phần hồ sơ có trạng thái cần cung cấp, được thay bằng dữ liệu xác thực, đang chờ kiểm tra hoặc không áp dụng. Một kết nối trả dữ liệu không đồng nghĩa dữ liệu phù hợp với sự kiện hộ tịch cần trích lục. Cán bộ thụ lý phải kiểm tra đúng chủ thể, loại sự kiện và thông tin đăng ký. Khi có dữ liệu phù hợp, thiết kế ghi nguồn, định danh bản ghi, thời điểm và kết quả khai thác; không tải toàn bộ hồ sơ dân cư về để dự phòng. Nghị định 309/2026 yêu cầu cơ quan chủ động dùng dữ liệu đã có nếu nguồn được công bố, kết nối/chia sẻ và đủ điều kiện; người dân chỉ bổ sung thông tin chưa có, chưa đủ, sai hoặc luật chuyên ngành yêu cầu. Khi không khai thác được do dữ liệu đầu vào không đầy đủ/chính xác, yêu cầu bổ sung phải nêu hết nội dung trong một lần. Lỗi kết nối riêng lẻ không phải căn cứ kết luận người dân khai sai. [37], [39]
 
-Tái sử dụng tài liệu cần kiểm tra quyền của người yêu cầu, tính toàn vẹn, hiệu lực và mục đích sử dụng. Một tài liệu có chữ ký hợp lệ nhưng đã bị thay thế không được mặc nhiên sử dụng. Nếu dữ liệu đối chiếu chưa đầy đủ, hệ thống đưa hồ sơ sang nhánh cần kiểm tra thay vì suy diễn rằng người yêu cầu khai sai.
+Tái sử dụng tài liệu cần kiểm tra quyền của người yêu cầu, tính toàn vẹn, hiệu lực và mục đích sử dụng. Một tài liệu có chữ ký hợp lệ nhưng đã bị thay thế không được mặc nhiên sử dụng. Nếu dữ liệu đối chiếu chưa đầy đủ, hệ thống đưa hồ sơ sang nhánh cần kiểm tra thay vì suy diễn rằng người yêu cầu khai sai. Không chạy một nhánh “tái sử dụng” bằng dữ liệu giả như thể hệ thống đã kết nối; trong ứng dụng nghiên cứu, trạng thái nguồn chưa kết nối phải được hiện rõ.
 
 ### 3.3.2. Quy tắc thời hạn và quá hạn
 
@@ -160,11 +162,11 @@ Bảng 3.9: Use case UC06 và UC07 về tài chính và dừng yêu cầu
 
 | Thuộc tính | UC06 đối soát | UC07 dừng yêu cầu |
 | --- | --- | --- |
-| Chủ thể | Tài chính và hệ thống thanh toán | Người yêu cầu, cán bộ có trách nhiệm |
-| Điều kiện | Khoản thu có căn cứ và mã giao dịch | Hồ sơ còn khả năng xử lý theo quy định |
-| Luồng | Xác minh thông báo; đối chiếu số tiền; ghi nhận; so sánh sao kê | Tiếp nhận đề nghị; xem giai đoạn; quyết định; thông báo; xử lý tài chính |
-| Ngoại lệ | Trùng thông báo, thiếu tiền, hoàn tiền hoặc sai hồ sơ | Kết quả đã phát hành hoặc quyền đại diện chưa đủ |
-| Kết quả | Giao dịch có trạng thái và bằng chứng đối soát | Hồ sơ dừng có lý do và chứng từ |
+| Chủ thể | Tài chính và hệ thống thanh toán | Người yêu cầu, cán bộ Một cửa, người ký Mẫu 06 có thẩm quyền |
+| Điều kiện | Khoản thu có căn cứ và mã giao dịch | Hồ sơ đã được tiếp nhận hợp lệ; yêu cầu trực tiếp/bưu chính còn trong khoảng thời gian luật định; xác minh người yêu cầu/đại diện |
+| Luồng | Xác minh thông báo; đối chiếu số tiền; ghi nhận; so sánh sao kê | Nhận Mẫu 05; kiểm tra ngay trạng thái và quyết định/văn bản kết quả; lập dự thảo Mẫu 06 để xem/in; chờ người có quyền ký được cấp riêng; lưu bản ký và bằng chứng gửi; chỉ sau đó chuyển hồ sơ sang DUNG |
+| Ngoại lệ | Trùng thông báo, thiếu tiền, hoàn tiền hoặc sai hồ sơ | Kết quả/thông báo đã có; kiểm tra quyền yêu cầu theo quy định áp dụng |
+| Kết quả | Giao dịch có trạng thái và bằng chứng đối soát | Lưu hồ sơ yêu cầu, kết quả kiểm tra, Mẫu 06 đã ký/phát hành hoặc lý do không đủ điều kiện; theo dõi trả giấy/hoàn phí riêng |
 
 ## 3.5. Yêu cầu phi chức năng và rủi ro
 
@@ -210,14 +212,18 @@ Bảng 3.12: Truy vết từ yêu cầu đến thiết kế và kiểm thử
 | YC09 | UC06 | khoan_thu, giao_dich | KT15, KT16 |
 | YC10 | UC05 | giao_nhan, hang_doi_gui | KT17, KT18 |
 | YC11 | UC02, UC03 | lich_lam_viec, hạn và ngoại lệ | KT19, KT20 |
-| YC12 | UC07 | quyết định dừng và liên kết tài chính | KT21 |
+| YC12 | UC07 | kiểm tra kết quả, ghi nhận dừng/thông báo dừng và liên kết nghĩa vụ tài chính | KT21 |
 | YC13, YC14 | Các ca | nhật ký, cấu hình và quyền | KT22, KT23, KT24 |
 
 Ma trận là công cụ quản lý thay đổi. Khi sửa cách tính hạn, cần xem lại kiểm thử KT19 và KT20, giấy hẹn, báo cáo quá hạn và lịch sử điều chỉnh. Nếu thay phiên bản biểu mẫu mà không sửa truy vết, việc kiểm thử lại có thể bỏ qua đầu ra hành chính chịu tác động.
 
 ## 3.7. Yêu cầu bổ sung cho toàn hệ thống
 
-### 3.7.1. Phân biệt quy trình dùng chung và nghiệp vụ chuyên ngành
+### 3.7.1. Cập nhật quy tắc có hiệu lực ngày 10/10/2026
+
+Nghị định 309/2026/NĐ-CP yêu cầu hướng dẫn đầy đủ một lần ở khâu kiểm tra đầu vào khi hồ sơ thiếu, sai thẩm quyền hoặc dữ liệu chia sẻ không khai thác được hay không chính xác. Khi nhận yêu cầu dừng, Thông tư 13/2026/TT-BTP yêu cầu Bộ phận Một cửa kiểm tra ngay tình trạng và kết quả; nếu chưa có quyết định hoặc văn bản thông báo kết quả thì lập, phát hành Thông báo dừng theo mẫu. Thông tư này cũng yêu cầu quy trình điện tử thể hiện từng bước, điều kiện chuyển, nhánh ngoại lệ, biểu mẫu, trạng thái, trách nhiệm, dữ liệu vào/ra và thời hạn. Thông tư 14/2026/TT-BTP quy định quy trình số hóa gồm chụp tài liệu, bóc tách dữ liệu bằng OCR hoặc nhập tay, cấp mã và lưu kết quả. Tài liệu phải đủ trang, đúng thứ tự, toàn vẹn; cần lưu dữ liệu đặc tả để tái sử dụng và dùng chữ ký số của người được giao thực hiện. Phiên bản hiện tại chưa có quy trình số hóa đáp ứng các yêu cầu này; phần tải tệp chỉ dùng cho luồng kiểm tra cục bộ. Mức dịch vụ trực tuyến chủ động chỉ được áp dụng khi dữ liệu, kết nối và quyền xác nhận, từ chối hoặc yêu cầu chỉnh sửa của cá nhân đã sẵn sàng. Thành phần, tuyến và thời hạn từng thủ tục vẫn phải lấy từ quyết định công bố còn hiệu lực của chính thủ tục đó. [37]–[40]
+
+### 3.7.2. Phân biệt quy trình dùng chung và nghiệp vụ chuyên ngành
 
 Các yêu cầu YC01 đến YC14 mô tả lõi xử lý và được đặc tả sâu bằng thủ tục hộ tịch. Khi áp dụng cho toàn hệ thống, cần bổ sung tổ chức giao dịch, tuyến tác nghiệp, phối hợp nhiều cơ quan, quản lý kho, nộp lưu và phản ánh. Một cơ quan có thể xử lý nhiều lĩnh vực; một lĩnh vực có nhiều phiên bản thủ tục; một hồ sơ có nhiều nhiệm vụ phối hợp nhưng vẫn có đầu mối chịu trách nhiệm cuối cùng. Không được lấy cấu trúc của một hồ sơ hộ tịch để bắt mọi hồ sơ đất đai, doanh nghiệp hoặc an sinh phải có chủ thể sự kiện hộ tịch.
 
@@ -246,9 +252,9 @@ Bảng 3.13: Yêu cầu và điều kiện chấp nhận ở phạm vi toàn h�
 | YCT19 | Quản trị phiên bản tương lai | Ngày hiệu lực quyết định áp dụng; hồ sơ chuyển tiếp giữ căn cứ phù hợp |
 | YCT20 | Trợ giúp cán bộ dựa trên nguồn | Câu trả lời có căn cứ, đúng phiên bản; cán bộ xác nhận trước sử dụng |
 
-Yêu cầu YCT01 đến YCT20 là yêu cầu của thiết kế nghiên cứu, được xây dựng từ khung chức năng và rủi ro phát sinh trong bối cảnh Hà Nội. Chúng không phải danh sách thiếu sót đã xác nhận của phần mềm đang vận hành. Các nội dung về danh mục, luân chuyển, phối hợp, nhắc việc, báo cáo, kho và kết nối được đối chiếu với phụ lục Thông tư 11/2025/TT-BKHCN. [18], [19]
+Yêu cầu YCT01 đến YCT20 là yêu cầu của thiết kế nghiên cứu, được xây dựng từ khung chức năng và các rủi ro trong quy trình hành chính tại Hà Nội. Chúng không phải danh sách thiếu sót đã xác nhận của phần mềm đang vận hành. Các nội dung về danh mục, luân chuyển, phối hợp, nhắc việc, báo cáo, kho và kết nối được đối chiếu với phụ lục Thông tư 11/2025/TT-BKHCN. [18], [19]
 
-### 3.7.2. Luồng phối hợp và điều kiện tổng hợp
+### 3.7.3. Luồng phối hợp và điều kiện tổng hợp
 
 Quy trình liên thông có thể gồm các nhiệm vụ song song. Hồ sơ chỉ được tổng hợp trình duyệt khi các ý kiến bắt buộc đã hoàn tất hoặc có căn cứ xử lý trường hợp thiếu ý kiến. Mỗi nhiệm vụ giữ cơ quan nhận, nội dung yêu cầu, hạn phản hồi, người thực hiện và phiên bản trả lời. Nếu một đơn vị gửi lại ý kiến, bản mới thay thế có liên kết nhưng không xóa bản đã dùng để ra quyết định trước đó.
 
@@ -258,7 +264,9 @@ Hình 3.4: Nhiệm vụ phối hợp và điều kiện tổng hợp hồ sơ
 
 Đối với nhiệm vụ trên hệ thống bộ, cán bộ địa phương có thể chỉ có quyền theo dõi hoặc thực hiện bước được giao. Thiết kế cần phân biệt quyền ra quyết định với quyền ghi nhận thông tin từ nguồn. Người dùng không được chọn “hoàn tất” chỉ để làm sạch danh sách công việc khi hệ thống nguồn chưa có quyết định. Sự kiện không đúng thứ tự được giữ để đối chiếu, thay vì áp dụng trực tiếp rồi làm hồ sơ quay ngược trạng thái.
 
-### 3.7.3. Kho, phản ánh và trợ giúp nghiệp vụ
+Trước khi giao dịch, hệ thống phải phân giải tuyến từ mã thủ tục, phiên bản có hiệu lực, địa bàn, loại cơ quan và danh mục cơ quan đã cung cấp dịch vụ trực tuyến. Giao diện công khai của Cổng quốc gia cho phép chọn tỉnh/thành phố rồi chọn phường/xã hoặc Sở; cùng một mã thủ tục có thể hiện cơ quan khác theo lựa chọn. Hồ sơ lưu ảnh chụp tuyến đã chọn và căn cứ phiên bản tại thời điểm gửi; không suy tuyến từ tên thủ tục hoặc một ví dụ ở địa bàn khác. Nếu danh mục hiện hành không trả ra cơ quan, phải dừng thao tác trực tuyến và hướng dẫn tra cứu/hỗ trợ chính thức, không tự gửi đến cơ quan gần đúng. [35]
+
+### 3.7.4. Kho, phản ánh và trợ giúp nghiệp vụ
 
 Kho dữ liệu phục vụ dùng lại giấy tờ phải lưu chủ thể, loại tài liệu, cơ quan cấp, thời điểm, phạm vi hiệu lực, phiên bản và tình trạng thay thế. Không lấy việc người dân từng tải một tệp lên làm bằng chứng tài liệu đã được cơ quan kiểm tra. Một yêu cầu dùng lại tạo dấu vết truy cập và tham chiếu, để có thể biết giấy tờ nào đã được dùng cho quyết định nào.
 
@@ -337,7 +345,7 @@ Bảng 3.18: Đặc tả chức năng nhánh tiếp nhận và giải quyết
 | CN14 Phân công | Hồ sơ đã tiếp nhận, người đúng quyền, năng lực và lịch | Trách nhiệm hiện hành và lịch sử giao; xác định người chịu trách nhiệm chính. Chuyển giao phải xử lý thao tác đang mở và kiểm soát đồng thời |
 | CN15 Thẩm định, phối hợp | Thành phần, dữ liệu nguồn, nhiệm vụ và ý kiến chuyên môn | Kết luận, dự thảo hoặc yêu cầu làm rõ có căn cứ; đủ ý kiến bắt buộc hoặc có căn cứ xử lý khác. Không tự coi bên phối hợp im lặng là đồng ý |
 | CN16 Phê duyệt | Dự thảo đủ chứng cứ; người quyết định theo thẩm quyền | Chấp thuận, trả lại hoặc không giải quyết; ghi lý do, phiên bản và chủ thể. Bản sửa sau ký phải thành phiên bản mới |
-| CN17 Dừng giải quyết | Đề nghị hoặc căn cứ dừng; người được quyết định | Thông báo và trạng thái có lịch sử; xử lý khoản thu, kết nối và nhiệm vụ còn mở. Dừng kỹ thuật không tự trở thành dừng nghiệp vụ |
+| CN17 Dừng giải quyết | Yêu cầu Mẫu 05, kênh/thời điểm, chủ thể/đại diện, kiểm tra kết quả, quyền ký còn hiệu lực và Mẫu 06 đã ký | Tách yêu cầu dừng khỏi hồ sơ TTHC; sinh bản xem/in Mẫu 06; giữ nguyên trạng thái khi chờ ký; chỉ chuyển DUNG khi tài khoản có quyền ký được cấp riêng ghi nhận bản đã ký/phát hành; lưu bằng chứng gửi; không tự hoàn tiền; không nhận yêu cầu trực tuyến như đã gửi NQG |
 | CN18 Trả kết quả | Bản phát hành hợp lệ, quyền nhận và kênh; người giao hoặc hệ thống đích | Chứng cứ giao, phiên bản và trạng thái từng kênh; gửi thông báo không thay bằng chứng người nhận hoặc kho đích đã nhận kết quả |
 
 Hai trường hợp nghiên cứu làm rõ khác biệt của nhánh này. Hộ tịch cần phân biệt người yêu cầu với chủ thể sự kiện và căn cứ đại diện. Cấp bản sao từ sổ gốc không thu phí, áp dụng hạn trong ngày hoặc ngày làm việc tiếp theo theo thời điểm nhận; tổng thời lượng từng bước không thay hạn pháp lý. Thiết kế dùng phiên bản quy tắc, thay vì áp một quy trình cho mọi thủ tục. [2], [22]

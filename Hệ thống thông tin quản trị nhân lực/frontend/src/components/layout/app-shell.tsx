@@ -218,17 +218,16 @@ const DOMAINS: NavDomain[] = [
         label: 'Đánh giá & Đào tạo',
         items: [
           { href: '/performance-guide', label: 'Cách đánh giá nhân sự' },
-          { href: '/performance-360', label: 'Đánh giá KPI & 360' },
-          { href: '/competency-development', label: 'Năng lực & phát triển' },
-          { href: '/performance-360?tab=templates', label: 'Biểu mẫu đánh giá chuẩn' },
-          { href: '/performance-360?tab=rubrics', label: 'Quy ước xếp loại thi đua' },
+          { href: '/performance', label: 'Đánh giá KPI' },
+          { href: '/performance?tab=templates', label: 'Biểu mẫu đánh giá chuẩn' },
+          { href: '/performance?tab=rubrics', label: 'Quy ước xếp loại thi đua' },
           { href: '/training-grievance', label: 'Đào tạo & Khiếu nại' },
         ],
       },
     ],
     tags: [
       { id: 'tag-ats-interview', label: '#Lịch phỏng vấn', href: '/recruitment-ats' },
-      { id: 'tag-kpi-q3', label: '#Đánh giá KPI', href: '/performance-360' },
+      { id: 'tag-kpi-q3', label: '#Đánh giá KPI', href: '/performance' },
       { id: 'tag-cert', label: '#Đào tạo', href: '/training-grievance' },
     ],
   },
@@ -433,8 +432,8 @@ export function AppShell({ profile, children }: { profile: MeProfile; children: 
       });
       return match;
     }
-    // Nếu là /performance-360 (tab mục tiêu mặc định), chỉ active khi không có tab query hoặc tab=goals
-    if (href === '/performance-360') {
+    // Nếu là /performance (tab mục tiêu mặc định), chỉ active khi không có tab query hoặc tab=goals
+    if (href === '/performance') {
       const tab = searchParams.get('tab');
       return pathname === href && (!tab || tab === 'goals');
     }

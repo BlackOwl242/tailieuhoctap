@@ -1,18 +1,18 @@
 import { BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { HrAccessService } from '../../common/services/hr-access.service';
-import { dateKey, workDate } from '../../common/hr-time';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 import {
   Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsDateString, IsIn, IsInt, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ArrayMinSize, IsArray, IsBoolean, IsDateString, IsIn, IsNumber, IsOptional, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 
 export class CreateCycleDto {
-  @ApiProperty({ example: 'Đánh giá Hiệu suất Toàn diện 2026' })
+  @ApiProperty({ example: 'Chu kỳ đánh giá KPI 2026' })
   @IsString()
   name: string;
 
@@ -35,26 +35,61 @@ export class CreateCycleDto {
 
 }
 
+export class CreateGoalItemDto {
+  @ApiProperty({ example: 'Nâng cao chất lượng kiến trúc hệ thống' })
+  @IsString() @MinLength(3) @MaxLength(160)
+  kraTitle!: string;
+
+  @ApiProperty({ example: 'Đảm bảo thời gian phản hồi API sub-100ms và độ bao phủ kiểm thử > 90%' })
+  @IsString() @MinLength(3) @MaxLength(500)
+  description!: string;
+
+  @ApiPropertyOptional({ default: 25 })
+  @IsOptional() @IsNumber()
+  weightage?: number;
+
+  @ApiPropertyOptional({ enum: ['GENERAL', 'RESULT'], default: 'RESULT' })
+  @IsOptional() @IsIn(['GENERAL', 'RESULT'])
+  criteriaGroup?: string;
+
+  @ApiProperty({ example: 'Đạt SLA 99.9%' })
+  @IsString() @MinLength(2) @MaxLength(500)
+  targetMetric!: string;
+}
+
 export class CreateGoalDto {
   @ApiProperty()
   @IsString()
   cycleId: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ description: 'Giao cá nhân; chọn userId hoặc orgUnitId, không gửi đồng thời.' })
+  @IsOptional()
   @IsString()
-  userId: string;
+  userId?: string;
 
-  @ApiProperty({ example: 'Nguyễn Văn An' })
+  @ApiPropertyOptional({ description: 'Giao cho đơn vị và toàn bộ nhân sự đủ điều kiện ở các đơn vị con.' })
+  @IsOptional()
   @IsString()
-  employeeName: string;
+  orgUnitId?: string;
 
-  @ApiProperty({ example: 'Nâng cao chất lượng kiến trúc hệ thống' })
+  @ApiPropertyOptional({ example: 'Nguyễn Văn An', description: 'Tương thích biểu mẫu cũ; tên chính thức luôn lấy từ hồ sơ nhân sự.' })
+  @IsOptional()
   @IsString()
-  kraTitle: string;
+  employeeName?: string;
 
-  @ApiProperty({ example: 'Đảm bảo thời gian phản hồi API sub-100ms và độ bao phủ kiểm thử > 90%' })
+  @ApiPropertyOptional({ example: 'Nâng cao chất lượng kiến trúc hệ thống' })
+  @IsOptional()
   @IsString()
-  description: string;
+  @MinLength(3)
+  @MaxLength(160)
+  kraTitle?: string;
+
+  @ApiPropertyOptional({ example: 'Đảm bảo thời gian phản hồi API sub-100ms và độ bao phủ kiểm thử > 90%' })
+  @IsOptional()
+  @IsString()
+  @MinLength(3)
+  @MaxLength(500)
+  description?: string;
 
   @ApiPropertyOptional({ default: 25 })
   @IsOptional()
@@ -66,9 +101,16 @@ export class CreateGoalDto {
   @IsIn(['GENERAL', 'RESULT'])
   criteriaGroup?: string;
 
-  @ApiProperty({ example: 'Đạt SLA 99.9%' })
+  @ApiPropertyOptional({ example: 'Đạt SLA 99.9%' })
+  @IsOptional()
   @IsString()
-  targetMetric: string;
+  @MinLength(2)
+  @MaxLength(500)
+  targetMetric?: string;
+
+  @ApiPropertyOptional({ type: [CreateGoalItemDto], description: 'Có thể giao một nhóm KPI trong cùng một thao tác; tổng trọng số được kiểm tra riêng theo từng nhân sự và nhóm tiêu chí.' })
+  @IsOptional() @IsArray() @ArrayMinSize(1) @ValidateNested({ each: true }) @Type(() => CreateGoalItemDto)
+  goals?: CreateGoalItemDto[];
 }
 
 export class PublicAppraisalDecisionDto {
@@ -82,80 +124,10 @@ export class PublicAppraisalDecisionDto {
   @ApiPropertyOptional({ maxLength: 2000, description: 'Căn cứ, minh chứng điều kiện xếp loại và quyết định/ngoại lệ; bắt buộc khi kết luận xuất sắc' }) @IsOptional() @IsString() @MaxLength(2000) decisionNote?: string;
 }
 
-export class CreateReview360Dto {
-  @ApiProperty()
-  @IsString()
-  cycleId: string;
-
-  @ApiProperty()
-  @IsString()
-  userId: string;
-
-  @ApiProperty({ example: 'Trần Minh Quang (Tech Lead)' })
-  @IsString()
-  reviewerName: string;
-
-  @ApiProperty({ enum: ['MANAGER', 'PEER', 'SUBORDINATE'] })
-  @IsIn(['MANAGER', 'PEER', 'SUBORDINATE'])
-  relationship: string;
-
-  @ApiProperty({ example: 4.8 })
-  @IsNumber()
-  rating: number;
-
-  @ApiProperty({ example: 'Nhân sự có tinh thần trách nhiệm cao, năng lực chuyên môn vững vàng, dẫn dắt đội ngũ tốt.' })
-  @IsString()
-  feedback: string;
-}
-
 export class CreateKraEvidenceDto {
   @ApiProperty() @IsString() @MinLength(3) @MaxLength(2000) description!: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(300) metricValue?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) evidenceUrl?: string;
-}
-
-export class CreateCompetencyAssessmentDto {
-  @ApiProperty() @IsString() cycleId!: string;
-  @ApiProperty() @IsString() userId!: string;
-  @ApiProperty() @IsString() @MaxLength(80) competencyCode!: string;
-  @ApiProperty({ minimum: 1, maximum: 5 }) @IsInt() @Min(1) @Max(5) currentLevel!: number;
-  @ApiPropertyOptional({ minimum: 1, maximum: 5 }) @IsOptional() @IsInt() @Min(1) @Max(5) targetLevel?: number;
-  @ApiProperty({ minLength: 20, maxLength: 2000, description: 'Ví dụ thực tế, kết quả và bối cảnh làm căn cứ tự đánh giá' }) @IsString() @MinLength(20) @MaxLength(2000) selfNotes!: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) evidenceUrl?: string;
-}
-
-export class CreateCompetencyStandardDto {
-  @ApiProperty({ example: 'CUSTOMER_SERVICE' }) @IsString() @Matches(/^[A-Z0-9][A-Z0-9_.-]{1,79}$/) code!: string;
-  @ApiProperty({ example: 'Phục vụ khách hàng' }) @IsString() @MinLength(2) @MaxLength(160) name!: string;
-  @ApiProperty() @IsString() @MinLength(10) @MaxLength(2000) description!: string;
-  @ApiPropertyOptional({ type: [String] }) @IsOptional() @IsArray() @IsString({ each: true }) applicableJobTitles?: string[];
-  @ApiProperty({ type: [String], minItems: 5, maxItems: 5, description: 'Mô tả hành vi quan sát được tương ứng mức 1 đến 5' }) @IsArray() @ArrayMinSize(5) @ArrayMaxSize(5) @IsString({ each: true }) @MinLength(10, { each: true }) @MaxLength(500, { each: true }) behavioralAnchors!: string[];
-}
-
-export class ReviewCompetencyDto {
-  @ApiProperty({ minimum: 1, maximum: 5 }) @IsInt() @Min(1) @Max(5) managerLevel!: number;
-  @ApiProperty({ minLength: 20, maxLength: 2000 }) @IsString() @MinLength(20) @MaxLength(2000) managerNotes!: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) managerEvidenceUrl?: string;
-}
-
-export class CreateDevelopmentPlanDto {
-  @ApiProperty() @IsString() cycleId!: string;
-  @ApiProperty() @IsString() userId!: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() assessmentId?: string;
-  @ApiProperty() @IsString() @MaxLength(80) competencyCode!: string;
-  @ApiProperty() @IsString() @MinLength(5) @MaxLength(2000) objective!: string;
-  @ApiProperty() @IsString() @MinLength(5) @MaxLength(2000) successCriteria!: string;
-  @ApiProperty({ type: [String] }) @IsArray() @IsString({ each: true }) actions!: string[];
-  @ApiProperty() @IsDateString() dueDate!: string;
-}
-
-export class UpdateDevelopmentPlanDto {
-  @ApiPropertyOptional({ enum: ['IN_PROGRESS', 'COMPLETED', 'CANCELLED'] }) @IsOptional() @IsIn(['IN_PROGRESS', 'COMPLETED', 'CANCELLED']) status?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) evidenceUrl?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) evidenceNote?: string;
-  @ApiPropertyOptional({ minimum: 1, maximum: 5 }) @IsOptional() @IsInt() @Min(1) @Max(5) resultLevel?: number;
-  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(2000) employeeNotes?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(2000) managerNotes?: string;
 }
 
 @Injectable()
@@ -177,28 +149,14 @@ export class HrmsPerformanceService {
       const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId, userId } });
       for (const goal of goals) {
         const finalScore = goal.managerScore === null ? null : Math.round(goal.managerScore * 100) / 100;
-        await this.prisma.hrmsAppraisalGoal.update({ where: { id: goal.id }, data: { finalScore, status: finalScore !== null ? 'APPROVED' : 'SUBMITTED' } });
+        await this.prisma.hrmsAppraisalGoal.update({ where: { id: goal.id }, data: { finalScore, status: 'SUBMITTED' } });
       }
       return;
     }
-    const [subjectManagerRole, reviews] = await Promise.all([
-      this.prisma.userRole.findFirst({ where: { userId, roleCode: 'LINE_MANAGER' }, select: { userId: true } }),
-      this.prisma.hrmsAppraisalReview.findMany({ where: { cycleId, userId, relationship: { in: ['PEER', 'SUBORDINATE'] }, reviewerId: { not: null } } }),
-    ]);
-    const averageScore = (relationship: string) => {
-      const rows = reviews.filter(review => review.relationship === relationship);
-      return rows.length ? rows.reduce((sum, review) => sum + review.rating * 20, 0) / rows.length : null;
-    };
-    const peerScore = averageScore('PEER');
-    const subordinateScore = averageScore('SUBORDINATE');
-    const isManager = Boolean(subjectManagerRole);
     const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId, userId } });
     for (const goal of goals) {
-      const managerPeerWeight = isManager ? cycle.peerWeight - cycle.subordinateWeight : cycle.peerWeight;
-      const finalScore = goal.selfScore !== null && goal.managerScore !== null && peerScore !== null && (!isManager || subordinateScore !== null)
-        ? Math.round((goal.selfScore * cycle.selfWeight / 100 + peerScore * managerPeerWeight / 100 + goal.managerScore * cycle.managerWeight / 100 + (isManager ? subordinateScore! * cycle.subordinateWeight / 100 : 0)) * 100) / 100
-        : null;
-      await this.prisma.hrmsAppraisalGoal.update({ where: { id: goal.id }, data: { finalScore, status: finalScore !== null ? 'APPROVED' : 'SUBMITTED' } });
+      const finalScore = goal.managerScore === null ? null : Math.round(goal.managerScore * 100) / 100;
+      await this.prisma.hrmsAppraisalGoal.update({ where: { id: goal.id }, data: { finalScore, status: 'SUBMITTED' } });
     }
   }
   async summary(cycleId: string, userId: string) {
@@ -221,18 +179,19 @@ export class HrmsPerformanceService {
       return { complete: true, weight: { general: generalWeight, result: resultWeight }, score, classification: decision?.finalClassification ?? scoreClassification, scoreClassification, finalDecision: Boolean(decision), generalScore: Math.round(generalScore * 100) / 100, taskScore: Math.round(taskScore * 100) / 100, missingTaskEvidence: false, framework: cycle.publicPersonnelType === 'PUBLIC_EMPLOYEE' ? 'ND233_2026' : 'ND335_2025' };
     }
     const weight = goals.reduce((sum, goal) => sum + goal.weightage, 0);
-    if (Math.abs(weight - 100) > .001 || !goals.length || goals.some(goal => goal.finalScore === null)) return { complete: false, weight, score: null, classification: null };
+    const missingEvidence = goals.some(goal => goal.evidences.length === 0);
+    if (Math.abs(weight - 100) > .001 || !goals.length || goals.some(goal => goal.finalScore === null) || missingEvidence) return { complete: false, weight, score: null, classification: null, missingEvidence };
     const score = Math.round(goals.reduce((sum, goal) => sum + goal.finalScore! * goal.weightage / 100, 0) * 100) / 100;
     const classification: import('@prisma/client').AppraisalClassification = score >= 90 ? 'EXCELLENT' : score >= 75 ? 'GOOD' : score >= 50 ? 'SATISFACTORY' : 'UNSATISFACTORY';
-    return { complete: true, weight, score, classification, framework: 'ENTERPRISE_360' };
+    return { complete: true, weight, score, classification, missingEvidence: false, framework: 'ENTERPRISE_KPI' };
   }
 
   async listCycles() {
     return this.prisma.hrmsAppraisalCycle.findMany({
       include: {
-        _count: { select: { goals: true, reviews: true } },
+        _count: { select: { goals: true } },
       },
-      orderBy: { year: 'desc' },
+      orderBy: [{ year: 'desc' }, { startDate: 'desc' }],
     });
   }
 
@@ -251,10 +210,10 @@ export class HrmsPerformanceService {
         description: dto.description,
         organizationSector,
         publicPersonnelType,
-        selfWeight: organizationSector === 'enterprise' ? 20 : 0,
-        peerWeight: organizationSector === 'enterprise' ? 30 : 0,
-        managerWeight: organizationSector === 'enterprise' ? 50 : 100,
-        subordinateWeight: organizationSector === 'enterprise' ? 10 : 0,
+        selfWeight: 0,
+        peerWeight: 0,
+        managerWeight: 100,
+        subordinateWeight: 0,
         generalCriteriaWeight: 30,
         taskCriteriaWeight: 70,
       },
@@ -393,11 +352,14 @@ export class HrmsPerformanceService {
 
   async deleteCycle(actorId: string, id: string) {
     await this.assertActive(id);
-    const [goalCount, reviewCount] = await Promise.all([
+    const [goalCount, reviewCount, competencyCount, developmentPlanCount, publicDecisionCount] = await Promise.all([
       this.prisma.hrmsAppraisalGoal.count({ where: { cycleId: id } }),
       this.prisma.hrmsAppraisalReview.count({ where: { cycleId: id } }),
+      this.prisma.hrmsCompetencyAssessment.count({ where: { cycleId: id } }),
+      this.prisma.hrmsDevelopmentPlan.count({ where: { cycleId: id } }),
+      this.prisma.hrmsPublicAppraisalDecision.count({ where: { cycleId: id } }),
     ]);
-    if (goalCount || reviewCount) throw new ConflictException('Không thể xóa kỳ đã phát sinh mục tiêu hoặc phản hồi; hãy đóng kỳ và giữ lịch sử đánh giá');
+    if (goalCount || reviewCount || competencyCount || developmentPlanCount || publicDecisionCount) throw new ConflictException('Không thể xóa kỳ đã có mục tiêu hoặc dữ liệu đánh giá; hãy đóng kỳ để giữ lịch sử');
     const res = await this.prisma.hrmsAppraisalCycle.delete({ where: { id } });
     await this.audit.log({
       actorId,
@@ -423,26 +385,12 @@ export class HrmsPerformanceService {
     return { success: true };
   }
 
-  async deleteReview(actorId: string, id: string) {
-    const review = await this.prisma.hrmsAppraisalReview.findUniqueOrThrow({ where: { id } });
-    await this.assertActive(review.cycleId);
-    await this.prisma.hrmsAppraisalReview.delete({ where: { id } });
-    await this.recompute(review.cycleId, review.userId);
-    await this.audit.log({
-      actorId,
-      action: 'DELETE_REVIEW_360',
-      targetType: 'HrmsAppraisalReview',
-      targetId: id,
-      description: `Xóa phản hồi 360 độ ID: ${id}`,
-    });
-    return { success: true };
-  }
   async listGoals(cycleId?: string, userId?: string, actor?: AuthUser) {
     const where: Record<string, unknown> = {};
     if (cycleId) where.cycleId = cycleId;
     if (userId) where.userId = userId;
 
-    if (actor && !actor.roles.some(role=>['ADMIN','KM_MANAGER','HR_TRAINER','BOD'].includes(role))) {
+    if (actor && !actor.roles.some(role=>['ADMIN','KM_MANAGER','HR_TRAINER','HR_CB','BOD'].includes(role))) {
       if (actor.roles.includes('LINE_MANAGER')) {
         const scope = await this.access.reviewScope(actor);
         const users = await this.prisma.user.findMany({where:scope,select:{id:true}});
@@ -451,7 +399,11 @@ export class HrmsPerformanceService {
     }
     return this.prisma.hrmsAppraisalGoal.findMany({
       where,
-      include: { cycle: true, evidences: { orderBy: { createdAt: 'asc' } } },
+      include: {
+        cycle: true,
+        evidences: { orderBy: { createdAt: 'asc' } },
+        assignmentOrgUnit: { select: { id: true, name: true, code: true } },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -465,229 +417,169 @@ export class HrmsPerformanceService {
     return evidence;
   }
 
-  async listCompetencies(actor: AuthUser, userId = actor.id, cycleId?: string) {
-    await this.assertSubjectAccess(actor, userId);
-    return this.prisma.hrmsCompetencyAssessment.findMany({
-      where: { userId, ...(cycleId ? { cycleId } : {}) },
-      include: { cycle: { select: { id: true, name: true, year: true, startDate: true, endDate: true, status: true } }, developmentPlans: true },
-      orderBy: { createdAt: 'asc' },
-    });
-  }
-
-  listCompetencyStandards() {
-    return this.prisma.hrmsCompetencyStandard.findMany({
-      where: { isActive: true },
-      orderBy: [{ name: 'asc' }],
-    });
-  }
-
-  async createCompetencyStandard(actor: AuthUser, dto: CreateCompetencyStandardDto) {
-    const anchors = dto.behavioralAnchors.map(anchor => anchor.trim());
-    if (anchors.some(anchor => anchor.length < 10)) throw new BadRequestException('Mỗi mức cần mô tả hành vi cụ thể');
-    const titles = (dto.applicableJobTitles ?? []).map(title => title.trim()).filter(Boolean);
-    if (new Set(titles.map(title => title.toLocaleLowerCase('vi'))).size !== titles.length) throw new BadRequestException('Chức danh áp dụng không được lặp');
-    const standard = await this.prisma.hrmsCompetencyStandard.create({ data: {
-      code: dto.code.trim().toUpperCase(),
-      name: dto.name.trim(),
-      description: dto.description.trim(),
-      applicableJobTitles: titles,
-      behavioralAnchors: anchors as unknown as import('@prisma/client').Prisma.InputJsonValue,
-      createdById: actor.id,
-    } });
-    await this.audit.log({ actorId: actor.id, action: 'COMPETENCY_STANDARD_CREATED', entityType: 'HrmsCompetencyStandard', entityId: standard.id });
-    return standard;
-  }
-
-  async deactivateCompetencyStandard(actor: AuthUser, id: string) {
-    const standard = await this.prisma.hrmsCompetencyStandard.findUnique({ where: { id } });
-    if (!standard) throw new NotFoundException('Không tìm thấy chuẩn năng lực');
-    if (!standard.isActive) throw new ConflictException('Chuẩn năng lực đã ngừng áp dụng');
-    const updated = await this.prisma.hrmsCompetencyStandard.update({ where: { id }, data: { isActive: false } });
-    await this.audit.log({ actorId: actor.id, action: 'COMPETENCY_STANDARD_DEACTIVATED', entityType: 'HrmsCompetencyStandard', entityId: id });
-    return updated;
-  }
-
-  async assessCompetency(actor: AuthUser, dto: CreateCompetencyAssessmentDto) {
-    await this.assertActive(dto.cycleId);
-    if (actor.id !== dto.userId) throw new ForbiddenException('Nhân viên tự ghi nhận phần tự đánh giá; quản lý dùng bước thẩm định riêng');
-    const standard = await this.prisma.hrmsCompetencyStandard.findUnique({ where: { code: dto.competencyCode.toUpperCase() } });
-    if (!standard || !standard.isActive) throw new BadRequestException('Chọn một chuẩn năng lực đang áp dụng');
-    const subject = await this.prisma.user.findUniqueOrThrow({ where: { id: dto.userId }, select: { jobTitle: true } });
-    if (standard.applicableJobTitles.length && (!subject.jobTitle || !standard.applicableJobTitles.some(title => title.toLocaleLowerCase('vi') === subject.jobTitle?.trim().toLocaleLowerCase('vi')))) {
-      throw new BadRequestException('Chuẩn năng lực này không áp dụng cho chức danh của nhân viên');
-    }
-    if (dto.selfNotes.trim().length < 20) throw new BadRequestException('Nêu ít nhất một ví dụ công việc cụ thể làm căn cứ đánh giá');
-    if (dto.targetLevel !== undefined && dto.targetLevel < dto.currentLevel) throw new BadRequestException('Mức mục tiêu không được thấp hơn mức hiện tại');
-    const where = { cycleId_userId_competencyCode: { cycleId: dto.cycleId, userId: dto.userId, competencyCode: standard.code } };
-    const existing = await this.prisma.hrmsCompetencyAssessment.findUnique({ where });
-    if (existing?.status === 'MANAGER_REVIEWED') throw new ConflictException('Đã được quản lý thẩm định; không thể sửa tự đánh giá trong kỳ đã thẩm định');
-    const row = await this.prisma.hrmsCompetencyAssessment.upsert({
-      where,
-      create: { cycleId: dto.cycleId, userId: dto.userId, competencyCode: standard.code, competencyName: standard.name, currentLevel: dto.currentLevel, targetLevel: dto.targetLevel, selfNotes: dto.selfNotes.trim(), evidenceUrl: dto.evidenceUrl?.trim() || null, assessedBy: actor.id, status: 'SELF_SUBMITTED' },
-      update: { competencyName: standard.name, currentLevel: dto.currentLevel, targetLevel: dto.targetLevel, selfNotes: dto.selfNotes.trim(), evidenceUrl: dto.evidenceUrl?.trim() || null, assessedBy: actor.id },
-    });
-    await this.audit.log({ actorId: actor.id, action: 'COMPETENCY_ASSESSED', entityType: 'HrmsCompetencyAssessment', entityId: row.id });
-    return row;
-  }
-
-  async reviewCompetency(actor: AuthUser, id: string, dto: ReviewCompetencyDto) {
-    const assessment = await this.prisma.hrmsCompetencyAssessment.findUniqueOrThrow({ where: { id } });
-    await this.assertActive(assessment.cycleId);
-    await this.access.assertReviewer(actor, assessment.userId);
-    if (assessment.status === 'MANAGER_REVIEWED' && assessment.managerAssessedBy !== actor.id) throw new ConflictException('Đánh giá đã được một quản lý khác thẩm định; cần trao đổi với HR để hiệu chỉnh');
-    if (dto.managerNotes.trim().length < 20) throw new BadRequestException('Ghi rõ căn cứ và ví dụ quan sát được trước khi thẩm định');
-    const reviewed = await this.prisma.hrmsCompetencyAssessment.update({ where: { id }, data: {
-      managerLevel: dto.managerLevel,
-      managerNotes: dto.managerNotes.trim(),
-      managerEvidenceUrl: dto.managerEvidenceUrl?.trim() || null,
-      managerAssessedBy: actor.id,
-      managerAssessedAt: new Date(),
-      status: 'MANAGER_REVIEWED',
-    } });
-    await this.audit.log({ actorId: actor.id, action: 'COMPETENCY_MANAGER_REVIEWED', entityType: 'HrmsCompetencyAssessment', entityId: id });
-    return reviewed;
-  }
-
-  async listDevelopmentPlans(actor: AuthUser, userId = actor.id, cycleId?: string) {
-    await this.assertSubjectAccess(actor, userId);
-    return this.prisma.hrmsDevelopmentPlan.findMany({
-      where: { userId, ...(cycleId ? { cycleId } : {}) },
-      include: { cycle: { select: { id: true, name: true, year: true, startDate: true, endDate: true, status: true } } },
-      orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
-    });
-  }
-
-  async createDevelopmentPlan(actor: AuthUser, dto: CreateDevelopmentPlanDto) {
-    await this.assertActive(dto.cycleId);
-    await this.assertSubjectAccess(actor, dto.userId);
-    if (dateKey(dto.dueDate) < workDate()) throw new BadRequestException('Hạn hoàn thành không được ở quá khứ');
-    if (dto.assessmentId) {
-      const assessment = await this.prisma.hrmsCompetencyAssessment.findUniqueOrThrow({ where: { id: dto.assessmentId } });
-      if (assessment.userId !== dto.userId || assessment.cycleId !== dto.cycleId || assessment.competencyCode !== dto.competencyCode) throw new BadRequestException('Đánh giá năng lực phải khớp nhân viên, kỳ và năng lực của kế hoạch');
-    }
-    const plan = await this.prisma.hrmsDevelopmentPlan.create({
-      data: { ...dto, dueDate: dateKey(dto.dueDate), actions: dto.actions as unknown as import('@prisma/client').Prisma.InputJsonValue, createdBy: actor.id },
-    });
-    await this.audit.log({ actorId: actor.id, action: 'DEVELOPMENT_PLAN_CREATED', entityType: 'HrmsDevelopmentPlan', entityId: plan.id });
-    return plan;
-  }
-
-  async updateDevelopmentPlan(actor: AuthUser, id: string, dto: UpdateDevelopmentPlanDto) {
-    return this.prisma.$transaction(async tx => {
-      const plan = await tx.hrmsDevelopmentPlan.findUniqueOrThrow({ where: { id } });
-      await this.assertActive(plan.cycleId);
-      await this.assertSubjectAccess(actor, plan.userId);
-      const isManager = actor.id !== plan.userId;
-      if (!isManager && (dto.managerNotes !== undefined || dto.resultLevel !== undefined || ['COMPLETED','CANCELLED'].includes(dto.status ?? ''))) throw new ForbiddenException('Chỉ quản lý mới được kết luận kết quả kế hoạch');
-      const transitions: Record<string, string[]> = { PROPOSED: ['IN_PROGRESS', 'CANCELLED'], IN_PROGRESS: ['COMPLETED', 'CANCELLED'] };
-      if (dto.status && !transitions[plan.status]?.includes(dto.status)) throw new ConflictException('Không thể chuyển lùi hoặc thay đổi trạng thái kế hoạch đã kết thúc');
-      if (dto.evidenceUrl && !['PROPOSED', 'IN_PROGRESS'].includes(plan.status)) throw new ConflictException('Không thể bổ sung minh chứng cho kế hoạch đã kết thúc');
-      if (dto.status === 'COMPLETED' && dto.resultLevel === undefined && plan.resultLevel === null) throw new BadRequestException('Cần đánh giá mức năng lực sau cải thiện');
-      if (dto.evidenceUrl !== undefined && !dto.evidenceUrl.trim()) throw new BadRequestException('Đường dẫn minh chứng không hợp lệ');
-      const evidence = Array.isArray(plan.evidence) ? [...plan.evidence] : [];
-      if (dto.evidenceUrl) evidence.push({ url: dto.evidenceUrl, note: dto.evidenceNote ?? '', submittedBy: actor.id, submittedAt: new Date().toISOString() });
-      const updated = await tx.hrmsDevelopmentPlan.update({ where: { id }, data: {
-        status: dto.status,
-        evidence: evidence as import('@prisma/client').Prisma.InputJsonValue,
-        resultLevel: dto.resultLevel,
-        employeeNotes: dto.employeeNotes,
-        managerNotes: isManager ? dto.managerNotes : undefined,
-        reviewedBy: isManager && dto.status ? actor.id : undefined,
-        completedAt: dto.status === 'COMPLETED' ? new Date() : undefined,
-      } });
-      await tx.auditLog.create({ data: { actorId: actor.id, action: 'DEVELOPMENT_PLAN_UPDATED', entityType: 'HrmsDevelopmentPlan', entityId: id, afterData: { status: updated.status, resultLevel: updated.resultLevel, evidenceCount: evidence.length } } });
-      return updated;
-    }, { isolationLevel: 'Serializable' });
-  }
-
   async createGoal(actor: AuthUser, dto: CreateGoalDto) {
-    if (actor.roles.includes('LINE_MANAGER')) await this.access.assertReviewer(actor, dto.userId);
+    if (Boolean(dto.userId) === Boolean(dto.orgUnitId)) throw new BadRequestException('Chọn đúng một phạm vi giao: cá nhân hoặc đơn vị tổ chức');
     const cycle = await this.assertActive(dto.cycleId);
-    const criteriaGroup = dto.criteriaGroup ?? 'RESULT';
-    if (cycle.organizationSector === 'enterprise' && criteriaGroup !== 'RESULT') throw new BadRequestException('Kỳ doanh nghiệp chỉ dùng trọng số mục tiêu KPI');
-    const groupFilter = cycle.organizationSector === 'state' ? { criteriaGroup } : {};
-    const total = await this.prisma.hrmsAppraisalGoal.aggregate({ where: { cycleId: dto.cycleId, userId: dto.userId, ...groupFilter }, _sum: { weightage: true } });
-    if ((dto.weightage ?? 20) <= 0 || (total._sum.weightage ?? 0) + (dto.weightage ?? 20) > 100) throw new BadRequestException('Trọng số trong nhóm tiêu chí phải dương và không vượt 100%');
-    const res = await this.prisma.hrmsAppraisalGoal.create({
-      data: {
-        cycleId: dto.cycleId,
-        userId: dto.userId,
-        employeeName: dto.employeeName,
-        kraTitle: dto.kraTitle,
-        description: dto.description,
-        weightage: dto.weightage ?? 20,
-        criteriaGroup,
-        targetMetric: dto.targetMetric,
-      },
-    });
+    const goalItems = dto.goals?.length
+      ? dto.goals.map(item => ({
+        kraTitle: item.kraTitle.trim(),
+        description: item.description.trim(),
+        weightage: item.weightage ?? dto.weightage ?? 20,
+        criteriaGroup: item.criteriaGroup ?? dto.criteriaGroup ?? 'RESULT',
+        targetMetric: item.targetMetric.trim(),
+      }))
+      : dto.kraTitle?.trim() && dto.description?.trim() && dto.targetMetric?.trim()
+        ? [{
+          kraTitle: dto.kraTitle.trim(), description: dto.description.trim(),
+          weightage: dto.weightage ?? 20, criteriaGroup: dto.criteriaGroup ?? 'RESULT', targetMetric: dto.targetMetric.trim(),
+        }]
+        : [];
+    if (!goalItems.length || goalItems.some(item => !item.kraTitle || !item.description || !item.targetMetric)) {
+      throw new BadRequestException('Nhập tên mục tiêu, chỉ số đo và mô tả trước khi giao KPI');
+    }
+    for (const item of goalItems) {
+      if (!Number.isFinite(item.weightage) || item.weightage <= 0 || item.weightage > 100) throw new BadRequestException('Trọng số từng KPI phải lớn hơn 0% và không vượt 100%');
+      if (!['GENERAL', 'RESULT'].includes(item.criteriaGroup)) throw new BadRequestException('Nhóm tiêu chí không hợp lệ');
+      if (cycle.organizationSector === 'enterprise' && item.criteriaGroup !== 'RESULT') throw new BadRequestException('Kỳ doanh nghiệp chỉ dùng trọng số mục tiêu KPI');
+    }
+    const normalizedBatchKeys = goalItems.map(item => `${item.criteriaGroup}:${item.kraTitle.toLocaleLowerCase('vi')}`);
+    if (new Set(normalizedBatchKeys).size !== normalizedBatchKeys.length) throw new BadRequestException('Tên mục tiêu trong cùng một nhóm tiêu chí không được trùng nhau');
+
+    let assignmentOrgUnit: { id: string; name: string; code: string } | null = null;
+    let recipients: Array<{ id: string; fullName: string }>;
+    if (dto.userId) {
+      if (dto.userId === actor.id) throw new BadRequestException('Không thể tự giao KPI cho chính mình; mục tiêu cần được giao và chấm bởi người khác');
+      const user = await this.prisma.user.findFirst({
+        where: { id: dto.userId, status: 'ACTIVE', deletedAt: null, employmentStatus: { in: ['ACTIVE', 'PROBATION'] } },
+        select: { id: true, fullName: true },
+      });
+      if (!user) throw new NotFoundException('Nhân viên không còn làm việc hoặc không tồn tại trong hồ sơ HR');
+      recipients = [user];
+    } else {
+      const selectedUnit = await this.prisma.orgUnit.findUnique({ where: { id: dto.orgUnitId! }, select: { id: true, name: true, code: true } });
+      if (!selectedUnit) throw new NotFoundException('Không tìm thấy phòng ban hoặc đơn vị được chọn');
+      assignmentOrgUnit = selectedUnit;
+
+      // OrgUnit.path is a materialized ancestor path and omits the current node on older rows;
+      // walk parent links so both existing and newly created branches include all descendants.
+      const allUnits = await this.prisma.orgUnit.findMany({ select: { id: true, parentId: true } });
+      const unitIds = new Set([selectedUnit.id]);
+      const restrictedManager = actor.roles.includes('LINE_MANAGER')
+        && !actor.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD'].includes(role));
+      if (!restrictedManager) {
+        let frontier = [selectedUnit.id];
+        while (frontier.length) {
+          const children = allUnits.filter(unit => unit.parentId && frontier.includes(unit.parentId) && !unitIds.has(unit.id));
+          frontier = children.map(unit => unit.id);
+          for (const child of children) unitIds.add(child.id);
+        }
+      }
+      recipients = await this.prisma.user.findMany({
+        where: {
+          orgUnitId: { in: [...unitIds] }, status: 'ACTIVE', deletedAt: null,
+          employmentStatus: { in: ['ACTIVE', 'PROBATION'] },
+        },
+        select: { id: true, fullName: true },
+        orderBy: [{ employeeCode: 'asc' }, { fullName: 'asc' }],
+      });
+      recipients = recipients.filter(user => user.id !== actor.id);
+      if (!recipients.length) throw new BadRequestException('Đơn vị này chưa có nhân sự đang làm việc để nhận mục tiêu');
+    }
+
+    if (actor.roles.includes('LINE_MANAGER')) {
+      for (const user of recipients) await this.access.assertReviewer(actor, user.id);
+    }
+
+    const recipientIds = recipients.map(user => user.id);
+    const createdCount = await this.prisma.$transaction(async tx => {
+      const existing = await tx.hrmsAppraisalGoal.findMany({
+        where: { cycleId: dto.cycleId, userId: { in: recipientIds } },
+        select: { userId: true, kraTitle: true, weightage: true, criteriaGroup: true },
+      });
+      const existingByUserGroup = new Map<string, number>();
+      const existingTitles = new Set<string>();
+      for (const goal of existing) {
+        const groupKey = `${goal.userId}:${goal.criteriaGroup}`;
+        existingByUserGroup.set(groupKey, (existingByUserGroup.get(groupKey) ?? 0) + goal.weightage);
+        existingTitles.add(`${groupKey}:${goal.kraTitle.trim().toLocaleLowerCase('vi')}`);
+      }
+      const overLimit = recipients.find(user => {
+        for (const criteriaGroup of new Set(goalItems.map(item => item.criteriaGroup))) {
+          const assignedWeight = goalItems.filter(item => item.criteriaGroup === criteriaGroup).reduce((sum, item) => sum + item.weightage, 0);
+          if ((existingByUserGroup.get(`${user.id}:${criteriaGroup}`) ?? 0) + assignedWeight > 100.001) return true;
+        }
+        return false;
+      });
+      if (overLimit) throw new BadRequestException(`Tổng trọng số của ${overLimit.fullName} sẽ vượt 100%; hãy rà soát KPI đã giao trong kỳ`);
+      for (const user of recipients) {
+        for (const item of goalItems) {
+          if (existingTitles.has(`${user.id}:${item.criteriaGroup}:${item.kraTitle.toLocaleLowerCase('vi')}`)) {
+            throw new ConflictException(`Mục tiêu “${item.kraTitle}” đã được giao cho ${user.fullName} trong kỳ; hãy kiểm tra trước khi giao lại`);
+          }
+        }
+      }
+
+      const goals = await tx.hrmsAppraisalGoal.createMany({
+        data: recipients.flatMap(user => goalItems.map(item => ({
+          cycleId: dto.cycleId,
+          userId: user.id,
+          employeeName: user.fullName,
+          kraTitle: item.kraTitle,
+          description: item.description,
+          weightage: item.weightage,
+          criteriaGroup: item.criteriaGroup,
+          targetMetric: item.targetMetric,
+          assignmentScope: assignmentOrgUnit ? 'ORG_UNIT' : 'INDIVIDUAL',
+          assignmentOrgUnitId: assignmentOrgUnit?.id ?? null,
+          assignmentOrgUnitName: assignmentOrgUnit?.name ?? null,
+          assignmentOrgUnitCode: assignmentOrgUnit?.code ?? null,
+        }))),
+      });
+      const packageSummary = goalItems.map(item => `${item.kraTitle} (${item.weightage}%)`).join('; ');
+      await tx.notification.createMany({
+        data: recipients.map(user => ({
+          userId: user.id,
+          type: 'GENERIC',
+          title: goalItems.length === 1 ? 'Bạn có mục tiêu KPI mới' : `Bạn có ${goalItems.length} mục tiêu KPI mới`,
+          body: `${cycle.name}: ${packageSummary}${assignmentOrgUnit ? ` · giao theo ${assignmentOrgUnit.name}` : ''}. Hãy xem chỉ số, thống nhất cách đo và cập nhật kết quả cùng minh chứng trong kỳ.`,
+          linkPath: `/performance?tab=goals&cycleId=${encodeURIComponent(cycle.id)}`,
+        })),
+      });
+      return goals.count;
+    }, { isolationLevel: 'Serializable' });
 
     await this.audit.log({
       actorId: actor.id,
-      action: 'CREATE_GOAL',
+      action: assignmentOrgUnit ? 'CREATE_ORG_UNIT_KPI_ASSIGNMENT' : 'CREATE_GOAL',
       targetType: 'HrmsAppraisalGoal',
-      targetId: res.id,
-      description: `Thiết lập mục tiêu KRA [${dto.kraTitle}] cho nhân viên ${dto.employeeName}`,
+      targetId: null,
+      description: assignmentOrgUnit
+        ? `Giao ${goalItems.length} KPI theo đơn vị ${assignmentOrgUnit.name} (${assignmentOrgUnit.code}) cho ${recipients.length} nhân sự (${createdCount} mục tiêu cá nhân); đã gửi thông báo in-app cho từng người.`
+        : `Thiết lập ${goalItems.length} KPI cho nhân viên ${recipients[0].fullName}; đã tạo thông báo in-app.`,
     });
-    return res;
+    return {
+      createdCount,
+      recipientCount: recipients.length,
+      assignmentScope: assignmentOrgUnit ? 'ORG_UNIT' : 'INDIVIDUAL',
+      assignmentOrgUnit,
+      cycleId: cycle.id,
+      kraTitles: goalItems.map(item => item.kraTitle),
+    };
   }
 
-  async scoreGoal(actor: AuthUser, id: string, selfScore?: number, managerScore?: number) {
+  async scoreGoal(actor: AuthUser, id: string, managerScore?: number) {
     const goal = await this.prisma.hrmsAppraisalGoal.findUniqueOrThrow({ where: { id } });
-    await this.assertActive(goal.cycleId);
-    if ([selfScore, managerScore].some(score => score !== undefined && (!Number.isFinite(score) || score < 0 || score > 100))) throw new BadRequestException('Điểm phải trong 0–100');
-    if (selfScore !== undefined && actor.id !== goal.userId) throw new ForbiddenException('Điểm tự chấm phải do chính nhân viên nhập');
-    if (managerScore !== undefined) await this.access.assertReviewer(actor, goal.userId);
-    await this.prisma.hrmsAppraisalGoal.update({ where: { id }, data: { selfScore, managerScore } });
+    const cycle = await this.assertActive(goal.cycleId);
+    if (managerScore === undefined || !Number.isFinite(managerScore) || managerScore < 0 || managerScore > 100) throw new BadRequestException('Điểm KPI phải trong 0–100');
+    await this.access.assertReviewer(actor, goal.userId);
+    if (cycle.organizationSector === 'enterprise') {
+      const evidenceCount = await this.prisma.hrmsKraEvidence.count({ where: { goalId: id } });
+      if (evidenceCount === 0) throw new ConflictException('Cần ghi kết quả thực tế và ít nhất một minh chứng trước khi chấm KPI');
+    }
+    await this.prisma.hrmsAppraisalGoal.update({ where: { id }, data: { managerScore } });
     await this.recompute(goal.cycleId, goal.userId);
     await this.audit.log({ actorId: actor.id, action: 'APPRAISAL_SCORED', entityType: 'HrmsAppraisalGoal', entityId: id });
     return this.prisma.hrmsAppraisalGoal.findUniqueOrThrow({ where: { id } });
-  }
-
-  async listReviews(cycleId?: string, userId?: string, actor?: AuthUser) {
-    const where: Record<string, unknown> = {};
-    if (cycleId) where.cycleId = cycleId;
-    if (userId) where.userId = userId;
-
-    if (actor && !actor.roles.some(role=>['ADMIN','KM_MANAGER','HR_TRAINER','BOD'].includes(role))) {
-      if (actor.roles.includes('LINE_MANAGER')) {
-        const scope = await this.access.reviewScope(actor);
-        const users = await this.prisma.user.findMany({where:scope,select:{id:true}});
-        where.userId = userId && users.some(u=>u.id===userId) ? userId : {in:users.map(u=>u.id)};
-      } else where.userId = actor.id;
-    }
-    const rows = await this.prisma.hrmsAppraisalReview.findMany({
-      where,
-      include: { cycle: true },
-      orderBy: { submittedAt: 'desc' },
-    });
-    const privileged = actor?.roles.some(role=>['ADMIN','KM_MANAGER','HR_TRAINER','BOD','LINE_MANAGER'].includes(role));
-    return rows.map(row=>!privileged&&row.relationship==='PEER'?{...row,reviewerId:null,reviewerName:'Đồng nghiệp (ẩn danh)'}:row);
-  }
-
-  async addReview360(actor: AuthUser, dto: CreateReview360Dto) {
-    const cycle = await this.assertActive(dto.cycleId);
-    if (cycle.organizationSector === 'state') throw new BadRequestException('Kỳ công chức/viên chức dùng khung tiêu chí 30/70; không nhận điểm 360 thay cho đánh giá theo nhiệm vụ');
-    if (!['MANAGER', 'PEER', 'SUBORDINATE'].includes(dto.relationship) || !Number.isFinite(dto.rating) || dto.rating < 0 || dto.rating > 5) throw new BadRequestException('Nguồn đánh giá phải MANAGER/PEER/SUBORDINATE, điểm trong 0–5');
-    if (dto.relationship === 'SELF' && actor.id !== dto.userId) throw new ForbiddenException('Không được tự chấm thay người khác');
-    if (dto.relationship === 'MANAGER') await this.access.assertReviewer(actor, dto.userId);
-    if (dto.relationship === 'PEER') {
-      if (actor.id === dto.userId) throw new ForbiddenException('Không được đánh giá chéo chính mình');
-      const users = await this.prisma.user.findMany({ where: { id: { in: [actor.id, dto.userId] } }, select: { id: true, orgUnitId: true } });
-      if (users.length !== 2 || !users[0].orgUnitId || users[0].orgUnitId !== users[1].orgUnitId) throw new ForbiddenException('Đánh giá chéo trong cùng bộ phận');
-    }
-    if (dto.relationship === 'SUBORDINATE') {
-      if (actor.id === dto.userId) throw new ForbiddenException('Không được đánh giá chính mình');
-      const [targetManagerRole, users, reviewerManagerRole] = await Promise.all([
-        this.prisma.userRole.findFirst({ where: { userId: dto.userId, roleCode: 'LINE_MANAGER' }, select: { userId: true } }),
-        this.prisma.user.findMany({ where: { id: { in: [actor.id, dto.userId] } }, select: { id: true, orgUnitId: true } }),
-        this.prisma.userRole.findFirst({ where: { userId: actor.id, roleCode: 'LINE_MANAGER' }, select: { userId: true } }),
-      ]);
-      if (!targetManagerRole || reviewerManagerRole || users.length !== 2 || !users[0].orgUnitId || users[0].orgUnitId !== users[1].orgUnitId) throw new ForbiddenException('Phản hồi cấp dưới chỉ dành cho nhân viên cùng bộ phận đánh giá quản lý trực tiếp');
-    }
-    const res = await this.prisma.hrmsAppraisalReview.upsert({ where: { cycleId_userId_reviewerId: { cycleId: dto.cycleId, userId: dto.userId, reviewerId: actor.id } }, create: { ...dto, reviewerId: actor.id, reviewerName: actor.fullName ?? actor.email }, update: { relationship: dto.relationship, rating: dto.rating, feedback: dto.feedback, submittedAt: new Date() } });
-    await this.recompute(dto.cycleId, dto.userId);
-    await this.audit.log({ actorId: actor.id, action: 'APPRAISAL_REVIEW_SUBMITTED', entityType: 'HrmsAppraisalReview', entityId: res.id });
-    return res;
   }
 
   /** Đồng bộ kết quả đánh giá cuối kỳ vào hồ sơ cán bộ (QT ĐGCB - Mẫu 2C-BNV / Doanh nghiệp) */
@@ -725,10 +617,10 @@ export class HrmsPerformanceService {
 
 }
 
-@ApiTags('HRMS - Performance & 360 Appraisal')
+@ApiTags('HRMS - KPI Appraisal')
 @ApiBearerAuth()
 @Controller('hrms/performance')
-@Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER')
+@Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD')
 export class HrmsPerformanceController {
   constructor(private readonly service: HrmsPerformanceService) {}
 
@@ -739,13 +631,13 @@ export class HrmsPerformanceController {
   }
 
   @Post('cycles')
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD')
   createCycle(@Body() dto: CreateCycleDto, @CurrentUser() actor: AuthUser) {
     return this.service.createCycle(actor.id, dto);
   }
 
   @Patch('cycles/:id')
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD')
   updateCycle(
     @Param('id') id: string,
     @Body() dto: { name?: string; status?: string; description?: string }, @CurrentUser() actor: AuthUser) {
@@ -770,98 +662,25 @@ export class HrmsPerformanceController {
     return this.service.addGoalEvidence(actor, id, dto);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER')
-  @Get('competencies')
-  competencies(@CurrentUser() actor: AuthUser, @Query('userId') userId?: string, @Query('cycleId') cycleId?: string) {
-    return this.service.listCompetencies(actor, userId, cycleId);
-  }
-
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER')
-  @Get('competency-standards')
-  competencyStandards() {
-    return this.service.listCompetencyStandards();
-  }
-
-  @Roles('ADMIN', 'HR_TRAINER', 'HR_CB', 'BOD')
-  @Post('competency-standards')
-  createCompetencyStandard(@CurrentUser() actor: AuthUser, @Body() dto: CreateCompetencyStandardDto) {
-    return this.service.createCompetencyStandard(actor, dto);
-  }
-
-  @Roles('ADMIN', 'HR_TRAINER', 'HR_CB', 'BOD')
-  @Delete('competency-standards/:id')
-  deactivateCompetencyStandard(@CurrentUser() actor: AuthUser, @Param('id') id: string) {
-    return this.service.deactivateCompetencyStandard(actor, id);
-  }
-
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER')
-  @Post('competencies')
-  assessCompetency(@CurrentUser() actor: AuthUser, @Body() dto: CreateCompetencyAssessmentDto) {
-    return this.service.assessCompetency(actor, dto);
-  }
-
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER')
-  @Post('competencies/:id/review')
-  reviewCompetency(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: ReviewCompetencyDto) {
-    return this.service.reviewCompetency(actor, id, dto);
-  }
-
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER')
-  @Get('development-plans')
-  developmentPlans(@CurrentUser() actor: AuthUser, @Query('userId') userId?: string, @Query('cycleId') cycleId?: string) {
-    return this.service.listDevelopmentPlans(actor, userId, cycleId);
-  }
-
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER')
-  @Post('development-plans')
-  createDevelopmentPlan(@CurrentUser() actor: AuthUser, @Body() dto: CreateDevelopmentPlanDto) {
-    return this.service.createDevelopmentPlan(actor, dto);
-  }
-
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER')
-  @Patch('development-plans/:id')
-  updateDevelopmentPlan(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: UpdateDevelopmentPlanDto) {
-    return this.service.updateDevelopmentPlan(actor, id, dto);
-  }
-
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD')
   @Post('goals')
   createGoal(@Body() dto: CreateGoalDto, @CurrentUser() actor: AuthUser) {
     return this.service.createGoal(actor, dto);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'USER', 'ACCOUNTANT', 'HR_RECRUITER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD')
   @Patch('goals/:id/score')
   scoreGoal(
     @CurrentUser() actor: AuthUser,
     @Param('id') id: string,
-    @Body('selfScore') selfScore?: number,
     @Body('managerScore') managerScore?: number) {
-    return this.service.scoreGoal(actor, id, selfScore, managerScore);
+    return this.service.scoreGoal(actor, id, managerScore);
   }
 
   @Delete('goals/:id')
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD')
   deleteGoal(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
     return this.service.deleteGoal(actor.id, id);
-  }
-
-  @Roles('ADMIN','KM_MANAGER','HR_TRAINER','HR_CB','LINE_MANAGER','BOD','USER','ACCOUNTANT','HR_RECRUITER')
-  @Get('reviews')
-  listReviews(@CurrentUser() actor: AuthUser, @Query('cycleId') cycleId?: string, @Query('userId') userId?: string) {
-    return this.service.listReviews(cycleId,userId,actor);
-  }
-
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER', 'ACCOUNTANT', 'HR_RECRUITER')
-  @Post('reviews')
-  addReview(@Body() dto: CreateReview360Dto, @CurrentUser() actor: AuthUser) {
-    return this.service.addReview360(actor, dto);
-  }
-
-  @Delete('reviews/:id')
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB')
-  deleteReview(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
-    return this.service.deleteReview(actor.id, id);
   }
 
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD')

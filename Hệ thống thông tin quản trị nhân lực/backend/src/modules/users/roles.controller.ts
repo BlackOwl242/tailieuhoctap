@@ -135,10 +135,10 @@ export const DEFAULT_RBAC_MATRIX = [
   },
   {
     moduleKey: 'PERFORMANCE',
-    moduleName: 'Đánh Giá 360, Đào Tạo & Khiếu Nại',
+    moduleName: 'Đánh giá KPI, Đào tạo & Khiếu nại',
     permissions: {
-      USER: 'Tự đánh giá, đánh giá chéo, gửi khiếu nại',
-      LINE_MANAGER: 'Giao KPI, đánh giá hiệu suất nhân viên bộ phận',
+      USER: 'Xem mục tiêu, cập nhật kết quả và minh chứng KPI cá nhân; gửi khiếu nại',
+      LINE_MANAGER: 'Giao mục tiêu và chấm KPI trong phạm vi quản lý',
       HR_RECRUITER: 'Đánh giá năng lực ứng viên trong giai đoạn thử việc',
       HR_CB: 'Căn cứ kết quả KPI để tính thưởng hiệu suất',
       ACCOUNTANT: 'Không có quyền truy cập',

@@ -45,9 +45,9 @@
       "passed": true
     }
   ],
-  "classes": 35,
-  "associations": 62,
-  "test_cases": 168,
+  "classes": 37,
+  "associations": 74,
+  "test_cases": 180,
   "all_passed": true,
   "meaning": "Kiểm tra tính nhất quán dữ liệu thiết kế; không phải thực thi phần mềm"
 }

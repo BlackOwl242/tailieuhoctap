@@ -3,6 +3,8 @@
 **Ngày cập nhật:** 04/10/2026  
 **Phạm vi:** mã nguồn và tài liệu chính trong thư mục dự án HRMS. Báo cáo đối chiếu gốc [`BAO_CAO_DOI_CHIEU_HE_THONG_20261004.md`](BAO_CAO_DOI_CHIEU_HE_THONG_20261004.md) được giữ làm ảnh chụp trước sửa để truy vết phát hiện; các kết luận “chưa có/không đúng” trong ảnh chụp đó không đại diện trạng thái mới.
 
+**Cập nhật sau ảnh chụp:** Ngày 11/10/2026, luồng đánh giá doanh nghiệp được chuyển sang KPI: quản lý chấm từng mục tiêu dựa trên kết quả và minh chứng, hệ thống tổng hợp theo trọng số. Các câu bên dưới về điểm tự đánh giá/đồng nghiệp và luồng đánh giá năng lực phản ánh cấu hình ngày 04/10, đã được thay thế. Đánh giá công chức, viên chức tiếp tục ở nhánh công vụ riêng.
+
 ## Kết quả
 
 Các lỗi cốt lõi về quyền, phạm vi dữ liệu, tính lương, chấm công và ngày hiệu lực đã được sửa trong mã. Những quy trình trước đây dừng ở đổi trạng thái đã được nối thêm điều kiện nghiệp vụ, vai trò duyệt, lịch sử và tác động liên phân hệ. Giao diện các nghiệp vụ mới đã có trang thao tác. Không thể kết luận mọi use case đã hoàn tất toàn diện: một số yêu cầu phần cứng, chứng từ vật lý và vận hành trên DB thật vẫn còn giới hạn được nêu dưới đây.
@@ -51,3 +53,6 @@ Tham chiếu gốc: [Công báo TT99/2025/TT-BTC và mẫu 02-TT](https://congba
 
 Các khẳng định trong báo cáo trước về chưa chạy E2E, chưa có xác nhận tài sản, chưa có hoàn ứng dư và chưa bảo vệ tệp là thông tin trước sửa. Phần “còn một phần” ở trên nêu đúng các giới hạn hiện tại sau sửa.
 
+## Cập nhật sau ngày lập báo cáo — 11/10/2026
+
+Phần KPI trong bảng và phần kiểm chứng ở trên mô tả trạng thái ngày 04/10/2026, trước khi luồng đánh giá được thay đổi. Hiện hệ thống chỉ chấm KPI doanh nghiệp theo điểm do quản lý trực tiếp nhập và trọng số mục tiêu; không còn tự đánh giá hoặc đánh giá chéo 360. Bản ghi phản hồi cũ được giữ làm lịch sử, không tham gia tính điểm. Đánh giá công vụ vẫn là nhánh riêng.

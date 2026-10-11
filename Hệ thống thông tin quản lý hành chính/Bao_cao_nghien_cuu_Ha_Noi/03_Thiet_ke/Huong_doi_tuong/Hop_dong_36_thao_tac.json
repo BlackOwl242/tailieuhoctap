@@ -829,7 +829,7 @@
     "method": "POST",
     "path": "/api/v1/nghiep-vu/ghiNhanBoSung",
     "operationId": "ghiNhanBoSung",
-    "role": "Cán bộ tiếp nhận hoặc chuyên viên đúng giai đoạn",
+    "role": "Cán bộ tiếp nhận",
     "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
     "requestSchema": {
       "type": "object",
@@ -892,8 +892,7 @@
       "ho_so",
       "yeu_cau_bo_sung",
       "thanh_phan_ho_so"
-    ],
-    "description": "Lệnh đối chiếu bổ sung; công dân gửi tài liệu và cán bộ lập yêu cầu dùng các lệnh riêng."
+    ]
   },
   {
     "uc": "UC14",
@@ -1034,7 +1033,7 @@
     "method": "POST",
     "path": "/api/v1/nghiep-vu/phatHanh",
     "operationId": "phatHanh",
-    "role": "Văn thư được giao",
+    "role": "Lãnh đạo có thẩm quyền",
     "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
     "requestSchema": {
       "type": "object",
@@ -1095,15 +1094,14 @@
       "chu_ky",
       "ho_so",
       "hang_doi_gui"
-    ],
-    "description": "Đặc tả này là lệnh phát hành sau phê duyệt và ký. Các lệnh phê duyệt và trả chỉnh sửa được tách riêng."
+    ]
   },
   {
     "uc": "UC17",
     "method": "POST",
-    "path": "/api/v1/nghiep-vu/dungGiaiQuyet",
-    "operationId": "dungGiaiQuyet",
-    "role": "Lãnh đạo có thẩm quyền",
+    "path": "/api/v1/nghiep-vu/chuanBiThongBaoDung",
+    "operationId": "chuanBiThongBaoDung",
+    "role": "Cán bộ tiếp nhận; người ký Mẫu 06 được cấp riêng quyền ký",
     "scope": "Cơ quan và quan hệ hồ sơ được kiểm tra phía máy chủ",
     "requestSchema": {
       "type": "object",
@@ -1113,7 +1111,23 @@
           "type": "string",
           "format": "uuid"
         },
-        "quyetDinhId": {
+        "kenhYeuCau": {
+          "type": "string",
+          "enum": [
+            "TRUC_TIEP",
+            "BUU_CHINH"
+          ]
+        },
+        "maPhieuYeuCau": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "nguoiYeuCauId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "uyQuyenId": {
           "type": "string",
           "format": "uuid"
         },
@@ -1122,10 +1136,12 @@
           "minLength": 1,
           "maxLength": 20000
         },
-        "phuongAnTaiChinh": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 512
+        "tepYeuCauIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
         },
         "phienBanMongDoi": {
           "type": "integer",
@@ -1134,13 +1150,15 @@
       },
       "required": [
         "hoSoId",
-        "quyetDinhId",
+        "kenhYeuCau",
+        "maPhieuYeuCau",
+        "nguoiYeuCauId",
         "canCu",
-        "phuongAnTaiChinh",
+        "tepYeuCauIds",
         "phienBanMongDoi"
       ]
     },
-    "guard": "Không dừng hồ sơ đã kết thúc bằng thao tác thông thường",
+    "guard": "Chỉ nhận yêu cầu trực tiếp/bưu chính sau khi hồ sơ được tiếp nhận hợp lệ và trước khi ban hành quyết định hoặc văn bản thông báo kết quả; không dừng khi đã có kết quả/thông báo hoặc thuộc ngoại lệ chuyên ngành; chỉ tài khoản có quyền ký còn hiệu lực mới ghi nhận phát hành",
     "success": {
       "code": 200,
       "fields": [
@@ -1162,8 +1180,78 @@
     "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
     "tables": [
       "ho_so",
-      "su_kien_xu_ly",
-      "khoan_thu"
+      "yeu_cau_dung",
+      "thanh_phan_ho_so",
+      "thong_bao",
+      "khoan_thu",
+      "su_kien_quyen_ky_mau06"
+    ],
+    "relatedOperations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/nghiep-vu/yeu-cau-dung/{yeuCauDungId}/phat-hanh",
+        "operationId": "phatHanhThongBaoDung",
+        "role": "Tài khoản được cấp riêng quyền ký Mẫu 06 còn hiệu lực",
+        "requestSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "yeuCauDungId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "soThongBao": {
+              "type": "string",
+              "minLength": 3
+            },
+            "tepMau06DaKyId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "kenhThongBao": {
+              "type": "string",
+              "enum": [
+                "TRUC_TIEP",
+                "BUU_CHINH"
+              ]
+            },
+            "bangChungGiaoIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 1
+            },
+            "donViLienHeNhanLai": {
+              "type": "string",
+              "minLength": 3
+            },
+            "xacNhanBanKy": {
+              "type": "boolean"
+            },
+            "phienBanMongDoi": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "yeuCauDungId",
+            "soThongBao",
+            "tepMau06DaKyId",
+            "kenhThongBao",
+            "bangChungGiaoIds",
+            "donViLienHeNhanLai",
+            "xacNhanBanKy",
+            "phienBanMongDoi"
+          ]
+        },
+        "guard": "Yêu cầu đủ điều kiện; quyền ký được duyệt theo văn bản phân công và còn hiệu lực; tại thời điểm phát hành chưa có quyết định/văn bản thông báo kết quả; bản Mẫu 06 đã ký",
+        "success": {
+          "code": 200,
+          "condition": "Ghi nhận Mẫu 06 đã ký/phát hành, bằng chứng gửi và chuyển hồ sơ sang DUNG trong cùng giao dịch; thời gian do máy chủ đóng dấu"
+        }
+      }
     ]
   },
   {

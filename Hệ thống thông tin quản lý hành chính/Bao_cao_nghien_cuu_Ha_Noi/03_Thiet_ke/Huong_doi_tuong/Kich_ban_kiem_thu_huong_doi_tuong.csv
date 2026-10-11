@@ -78,10 +78,22 @@ OO16C,UC16,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không
 OO16D,UC16,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
 OO16E,UC16,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
 OO17A,UC17,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
-OO17B,UC17,Không đáp ứng điều kiện: Không dừng hồ sơ đã kết thúc bằng thao tác thông thường,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
+OO17B,UC17,Không đáp ứng điều kiện: Chỉ nhận yêu cầu trực tiếp/bưu chính sau khi hồ sơ được tiếp nhận hợp lệ và trước khi ban hành quyết định hoặc văn bản thông báo kết quả; không dừng khi đã có kết quả/thông báo hoặc thuộc ngoại lệ chuyên ngành; chỉ tài khoản có quyền ký còn hiệu lực mới ghi nhận phát hành,Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
 OO17C,UC17,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện
 OO17D,UC17,"Gửi lại cùng khóa, nội dung và người gửi",Trả cùng kết quả; không ghi trùng,Chưa thực hiện
 OO17E,UC17,Gửi phiên bản cũ hoặc cùng khóa khác nội dung,Báo xung đột; giữ dữ liệu đã xác nhận,Chưa thực hiện
+OO17F,UC17,Yêu cầu dừng trực tuyến được gửi trực tiếp vào API địa phương,Từ chối; hướng dẫn xử lý qua chức năng Cổng Dịch vụ công quốc gia,Chưa thực hiện
+OO17G,UC17,Hồ sơ chưa được tiếp nhận hợp lệ,Không tạo yêu cầu dừng; không đổi trạng thái hồ sơ,Chưa thực hiện
+OO17H,UC17,Quyết định hoặc văn bản thông báo kết quả đã được ban hành,Không tạo Thông báo dừng; giữ nguyên trạng thái và lịch sử,Chưa thực hiện
+OO17I,UC17,Yêu cầu hợp lệ đã được kiểm tra và Mẫu 06 đang chờ ký,Giữ hồ sơ ở trạng thái hiện tại; chặn phát hành kết quả và thao tác xung đột,Chưa thực hiện
+OO17J,UC17,Chuyển hồ sơ sang DUNG khi chưa có Mẫu 06 đã ký/phát hành,Từ chối; yêu cầu dừng vẫn chờ người ký,Chưa thực hiện
+OO17K,UC17,Kết quả được ban hành giữa lúc kiểm tra và lúc phát hành Mẫu 06,Kiểm tra lại điều kiện; không phát hành Mẫu 06 hoặc chuyển DUNG,Chưa thực hiện
+OO17L,UC17,Có khoản thu đã thanh toán khi phát hành Mẫu 06,Theo dõi trả/hoàn riêng; không tự ghi hoàn tiền hoặc xóa giao dịch,Chưa thực hiện
+OO17M,UC17,Người yêu cầu là đại diện nhưng không có căn cứ đại diện,Không lập yêu cầu đủ điều kiện; lưu lý do và yêu cầu chứng cứ hợp lệ,Chưa thực hiện
+OO17N,UC17,Lãnh đạo không được cấp riêng quyền ký Mẫu 06,Từ chối phát hành; giữ hồ sơ nguyên trạng,Chưa thực hiện
+OO17O,UC17,Hồ sơ ở trạng thái KHONG_GIAI_QUYET,Không mở lại nhánh dừng; giữ kết luận đã ghi nhận,Chưa thực hiện
+OO17P,UC17,"Đại diện chỉ đính kèm Mẫu 05, thiếu căn cứ đại diện",Từ chối ghi nhận yêu cầu đủ điều kiện; không chuyển trạng thái,Chưa thực hiện
+OO17Q,UC17,Người dân tải Mẫu 06 sau khi phát hành,Chủ hồ sơ tải được bản đã ký; người ngoài phạm vi nhận 404,Chưa thực hiện
 OO18A,UC18,"Dữ liệu hợp lệ, đúng quyền, đủ điều kiện",Kết quả đúng đặc tả; chỉ ghi những đối tượng được cho phép,Chưa thực hiện
 OO18B,UC18,"Không đáp ứng điều kiện: Người nhận có quyền, kết quả đã phát hành",Trả lỗi nghiệp vụ; không áp dụng thay đổi,Chưa thực hiện
 OO18C,UC18,Không có quyền trên cơ quan hoặc hồ sơ,Từ chối; không rò dữ liệu hoặc tổng số,Chưa thực hiện

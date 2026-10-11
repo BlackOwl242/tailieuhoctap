@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1040" viewBox="0 0 1000 1040">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 z" fill="#111"/>
+    </marker>
+    <style>
+      text { font-family: Arial, sans-serif; fill: #111; }
+      .title { font-size: 25px; font-weight: 700; }
+      .node { fill: #fff; stroke: #111; stroke-width: 1.5; }
+      .label { font-size: 18px; text-anchor: middle; }
+      .small { font-size: 16px; }
+      .line { fill: none; stroke: #111; stroke-width: 1.5; }
+      .arrow { fill: none; stroke: #111; stroke-width: 1.5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1000" height="1040" fill="#fff"/>
+  <text x="500" y="36" class="title" text-anchor="middle">Biểu đồ hoạt động - UC19: Điểm danh bằng khuôn mặt</text>
+  <circle cx="500" cy="75" r="10" fill="#111"/>
+
+  <path d="M500 85V122" class="arrow"/>
+  <rect x="275" y="124" width="450" height="58" rx="2" class="node"/>
+  <text x="500" y="159" class="label">Đăng nhập và đồng ý xử lý dữ liệu</text>
+  <path d="M500 182V216" class="arrow"/>
+  <rect x="275" y="218" width="450" height="58" rx="2" class="node"/>
+  <text x="500" y="253" class="label">Đăng ký 3 mẫu khuôn mặt qua camera</text>
+  <path d="M500 276V310" class="arrow"/>
+  <rect x="275" y="312" width="450" height="58" rx="2" class="node"/>
+  <text x="500" y="347" class="label">Trình duyệt tạo vector HOG/LBP 256 chiều</text>
+  <path d="M500 370V404" class="arrow"/>
+  <rect x="275" y="406" width="450" height="58" rx="2" class="node"/>
+  <text x="500" y="441" class="label">Mã hóa và lưu mẫu khuôn mặt</text>
+  <path d="M500 464V498" class="arrow"/>
+  <rect x="275" y="500" width="450" height="58" rx="2" class="node"/>
+  <text x="500" y="535" class="label">Mở camera và tạo vector điểm danh</text>
+  <path d="M500 558V592" class="arrow"/>
+  <rect x="275" y="594" width="450" height="58" rx="2" class="node"/>
+  <text x="500" y="617" class="label"><tspan x="500">Máy chủ so cosine similarity</tspan><tspan x="500" dy="22">với mẫu đã lưu</tspan></text>
+  <path d="M500 652V670" class="arrow"/>
+
+  <path d="M500 672L570 724L500 776L430 724Z" class="node"/>
+  <text x="500" y="718" class="label"><tspan x="500">Đạt ngưỡng</tspan><tspan x="500" dy="22">đã cấu hình?</tspan></text>
+  <text x="305" y="710" class="label small">Có</text>
+  <text x="695" y="710" class="label small">Không</text>
+  <path d="M430 724H235V788" class="arrow"/>
+  <path d="M570 724H765V788" class="arrow"/>
+
+  <rect x="55" y="790" width="360" height="66" rx="2" class="node"/>
+  <text x="235" y="816" class="label"><tspan x="235">Ghi AttendanceEvent nguồn FACE</tspan><tspan x="235" dy="22">và tính lại công ngày</tspan></text>
+  <rect x="585" y="790" width="360" height="66" rx="2" class="node"/>
+  <text x="765" y="829" class="label">Từ chối và hiển thị lý do</text>
+
+  <path d="M235 856V888 M765 856V888 M235 888H765 M500 888V907" class="line"/>
+  <path d="M500 907L512 919L500 931L488 919Z" class="node"/>
+  <path d="M500 931V950" class="arrow"/>
+  <circle cx="500" cy="964" r="10" fill="#fff" stroke="#111" stroke-width="2"/>
+  <circle cx="500" cy="964" r="5" fill="#111"/>
+
+  <!-- Draw arrowheads last so each path visibly meets its destination. -->
+  <path d="M500 85V124 M500 182V218 M500 276V312 M500 370V406 M500 464V500 M500 558V594 M500 652V672" class="arrow"/>
+  <path d="M430 724H235V790 M570 724H765V790" class="arrow"/>
+  <text x="500" y="1015" class="small" text-anchor="middle">Luồng dùng camera thường; chưa có bước xác minh người thật.</text>
+</svg>

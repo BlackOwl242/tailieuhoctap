@@ -11,6 +11,7 @@ Bảng 2.1: Các đầu mối công khai phục vụ nhận diện hệ thống
 | dichvucong.hanoi.gov.vn | Nhận diện hệ thống và thông báo chuyển kênh | Tên hệ thống; mốc chuyển tới cổng quốc gia |
 | dichvucong.gov.vn | Kênh giao dịch công dân và tra cứu thủ tục | Danh mục, hướng dẫn và điều kiện của phiên bản công bố |
 | ttpvhcc.hanoi.gov.vn | Nguồn tổ chức thực hiện và hướng dẫn | Quyết định, thông báo và phương án cải cách |
+| Cổng Dịch vụ công quốc gia, đăng nhập | Điểm xác thực giao dịch | Cá nhân dùng VNeID; tài khoản tổ chức/doanh nghiệp do Cổng quốc gia cấp |
 | vanban.hanoi.gov.vn | Tra cứu văn bản của Thành phố | Thông tin Quyết định 1811 và tệp phương án |
 | Hệ thống dùng chung ngành Tư pháp | Đầu mối tích hợp theo phương án 1811 | Yêu cầu kết nối; không xác minh được cấu hình nội bộ |
 
@@ -43,11 +44,33 @@ Hình trên được trích từ trang 27 của tài liệu hướng dẫn năm 
 
 Thông tin tập huấn tháng 09/2026 đề cập việc cán bộ nhận biết tệp hệ thống không đọc được và lỗi trong ký số, tạo kết quả. Đây là căn cứ lựa chọn kiểm thử định dạng, quyền ký và khả năng sử dụng; không đủ để định lượng tỷ lệ lỗi. Việc hướng tới trả trực tuyến toàn bộ kết quả là mục tiêu nêu tại hội nghị, chưa phải tỷ lệ thực hiện đã được đo. [23]
 
+### 2.1.2. Quan sát các cổng công khai
+
+Trang thông tin điện tử Trung tâm Phục vụ hành chính công Hà Nội và Cổng Dịch vụ công quốc gia là hai bề mặt khác nhau. Trang Trung tâm có các mục Trang chủ, Giới thiệu, Tin tức sự kiện, Phản ánh kiến nghị, Thư viện số và Liên hệ; trang chủ còn công khai tin hướng dẫn, thông tin văn bản, liên kết dịch vụ trực tuyến và phản ánh hiện trường trên iHanoi. Cổng quốc gia có mục Thông tin và dịch vụ, Thanh toán trực tuyến, Phản ánh kiến nghị, Đánh giá chất lượng phục vụ và Hỗ trợ; danh mục thủ tục cho phép tìm theo đối tượng và chọn cơ quan thực hiện. [32], [33]
+
+Trên Cổng quốc gia, thao tác Nộp trực tuyến của một thủ tục dẫn đến trang đăng nhập VNeID. Trang đăng nhập/đăng ký công khai phân biệt công dân xác thực bằng VNeID và tổ chức, doanh nghiệp dùng tài khoản do Cổng quốc gia cấp. Do đó, ứng dụng nghiên cứu không được tự tạo tài khoản công dân địa phương hoặc giả lập xác thực; bàn cán bộ là vùng riêng và tài khoản cán bộ phải do cơ quan quản lý cấp theo thẩm quyền. [34]
+
+Tuyến cơ quan được chọn sau khi lọc địa bàn và loại cơ quan. Bản ghi “Thủ tục cấp bản sao từ sổ gốc DVCTT toàn trình” cho thấy khi chọn Thành phố Hà Nội → Phường Tây Hồ, Cổng quốc gia hiển thị cơ quan thực hiện là UBND phường Tây Hồ. Đây là bằng chứng cho đúng tổ hợp thủ tục–địa bàn–cơ quan được quan sát, không chứng minh các phường khác có cùng cơ quan hoặc cùng cấu hình. Danh mục hiển thị các cơ quan đã áp dụng dịch vụ trực tuyến; vì vậy không được lấy một mã thủ tục làm khóa duy nhất để suy ra tuyến thực hiện. [35]
+
+### 2.1.3. Ranh giới các bề mặt và phần chưa quan sát được
+
+Trong mô hình hiện hành cần phân biệt (1) trang thông tin của Trung tâm để công bố hướng dẫn và thông tin điều hành, (2) Cổng Dịch vụ công quốc gia để cá nhân, tổ chức tra cứu và khởi tạo giao dịch, (3) hệ thống của Hà Nội hoặc hệ thống bộ/ngành để cán bộ tiếp nhận và xử lý theo quy trình điện tử được công bố, và (4) nhà cung cấp định danh, thanh toán, ký số, dữ liệu chuyên ngành. Cơ quan xử lý phụ thuộc thủ tục, địa bàn, thẩm quyền và phiên bản có hiệu lực; giao diện công khai không cho biết toàn bộ lược đồ dữ liệu, API, chính sách phân quyền hay thao tác nội bộ sau đăng nhập. [1], [19], [32]–[35]
+
+Kết quả đối chiếu công khai không đủ để khẳng định ứng dụng phát triển trong nghiên cứu là hệ thống thật hoặc tương đương triển khai. Những bước sau đăng nhập cán bộ, cấu hình vai trò, luồng xử lý, ký số, đối soát thanh toán và đồng bộ phải được xác minh bằng tài liệu vận hành hiện hành, tài khoản thử do cơ quan cấp và môi trường tích hợp được phép. Khi chưa có các điều kiện đó, ứng dụng chỉ được ghi là phần mềm nghiên cứu có logic nội bộ; không được tuyên bố tiếp nhận hoặc đồng bộ hồ sơ thật.
+
+### 2.1.4. Quy trình công khai của Trung tâm và giới hạn phiên bản
+
+Phụ lục kèm Quyết định 2265/QĐ-TTPVHCC ngày 29/12/2025 công bố các quy trình QT-01 đến QT-11 cho chi nhánh và điểm hỗ trợ, gồm đón tiếp, tư vấn, hỗ trợ dịch vụ công trực tuyến, số hóa, tiếp nhận, trả kết quả, phản ánh, bưu chính, đính chính kết quả, đối soát và đánh giá. QT-03 mô tả người dân tự đăng nhập Cổng Dịch vụ công quốc gia; cán bộ tại điểm hỗ trợ hướng dẫn và hỗ trợ số hóa. Với hồ sơ toàn trình, điểm tiếp nhận nhận hồ sơ điện tử; với hồ sơ một phần, đối chiếu bản điện tử và bản giấy, ký số xác nhận bản điện tử khi pháp luật chuyên ngành yêu cầu. Hồ sơ đủ điều kiện được chuyển cơ quan có thẩm quyền; hồ sơ không đáp ứng phải được trả kèm lý do và hướng dẫn. Cơ quan giải quyết làm việc trên hồ sơ điện tử theo căn cứ được nêu trong quy trình, kết quả điện tử được trả qua Cổng quốc gia; kết quả giấy có thể theo bưu chính hoặc nhận trực tiếp trong trường hợp phù hợp. [41]
+
+QT-05 nêu các bước kiểm tra tài khoản định danh, dữ liệu điện tử, tính đúng và đủ, rồi chuyển cơ quan giải quyết. Văn bản có hướng dẫn xử lý hồ sơ trực tuyến trong vòng hai giờ kể từ thông báo của Cổng quốc gia và một lần hướng dẫn đầy đủ khi hồ sơ thiếu, sai, sai thẩm quyền hoặc không khai thác được dữ liệu. QT-06 mô tả lựa chọn phương thức trả, ký số và phát hành bởi cơ quan có thẩm quyền, xử lý thanh toán nếu phát sinh, nhận trực tiếp/bưu chính/trực tuyến, cùng yêu cầu báo trước ít nhất một ngày khi xin gia hạn và chỉ gia hạn một lần. Tuy nhiên, phụ lục để trống trường ngày hiệu lực; không có màn hình cán bộ, nhật ký triển khai hay xác nhận cấu hình hiện tại. Do đó đây là quy trình nội bộ được công bố để đối chiếu, chưa phải bằng chứng rằng mọi bước đang chạy trên phần mềm thật đúng như phụ lục. [41]
+
+Quyết định 6470/QĐ-UBND ngày 26/12/2025 mô tả Trung tâm có nhiệm vụ hướng dẫn, hỗ trợ, tiếp nhận, số hóa, phối hợp và trả kết quả; Trung tâm chỉ trực tiếp giải quyết thủ tục khi được giao thẩm quyền. Trung tâm còn được giao quản lý, vận hành hệ thống thông tin giải quyết TTHC Thành phố và kết nối, chia sẻ dữ liệu với Cổng quốc gia. Mô hình vì vậy phải phân biệt điểm hỗ trợ/tiếp nhận với cơ quan chuyên môn quyết định kết quả; nhân viên hỗ trợ không mặc nhiên có quyền phê duyệt hồ sơ. [42]
+
 ## 2.2. Khung pháp lý và quản lý phiên bản quy định
 
 ### 2.2.1. Căn cứ cho cơ chế một cửa và giao dịch điện tử
 
-Nghị định 118/2025/NĐ-CP là căn cứ về cơ chế một cửa, một cửa liên thông trong giai đoạn nghiên cứu. Nghị định 367/2025/NĐ-CP sửa đổi một số nội dung của văn bản này. Thông tư 03/2025/TT-VPCP hướng dẫn tổ chức hoạt động, biểu mẫu, mã hồ sơ và danh mục mã ngành, lĩnh vực. Hồ sơ nghiên cứu năm 2026 cần đối chiếu các văn bản đó thay vì mặc định áp dụng nguyên trạng khung năm 2018. [3], [4], [5]
+Nghị định 118/2025/NĐ-CP, được sửa đổi bởi Nghị định 367/2025/NĐ-CP và Nghị định 309/2026/NĐ-CP, là căn cứ về cơ chế một cửa. Nghị định 310/2026/NĐ-CP cập nhật giao dịch điện tử; Thông tư 13/2026/TT-BTP và 14/2026/TT-BTP cùng có hiệu lực từ ngày 10/10/2026. Thông tư 13 bãi bỏ một phần Thông tư 03/2025/TT-VPCP và ban hành bộ biểu mẫu mới; Thông tư 14 hướng dẫn số hóa, tái cấu trúc và dịch vụ công trực tuyến chủ động. Hồ sơ được tiếp nhận trước mốc hiệu lực của quy định mới phải giữ quy tắc chuyển tiếp theo ngày tiếp nhận. Vì vậy không được tiếp tục dùng bộ mẫu năm 2025 như bộ hiện hành duy nhất. [3]–[5], [37]–[40]
 
 Bảng 2.2: Căn cứ áp dụng và hệ quả đối với thiết kế
 
@@ -55,7 +78,11 @@ Bảng 2.2: Căn cứ áp dụng và hệ quả đối với thiết kế
 | --- | --- | --- |
 | Nghị định 118/2025/NĐ-CP | Cơ chế một cửa và tổ chức tiếp nhận, giải quyết | Tách nơi hỗ trợ, nơi tiếp nhận và cơ quan có thẩm quyền |
 | Nghị định 367/2025/NĐ-CP | Nội dung sửa đổi của Nghị định 118 | Quản lý phiên bản quy tắc có ngày hiệu lực |
-| Thông tư 03/2025/TT-VPCP | Biểu mẫu và mã hóa hồ sơ | Quản lý bộ mẫu theo căn cứ và phiên bản |
+| Nghị định 309/2026/NĐ-CP | Sửa Nghị định 118; Cổng quốc gia tích hợp thông tin, dịch vụ, trạng thái và kết quả; thúc đẩy khai thác lại dữ liệu | Không yêu cầu khai/nộp lại dữ liệu đã có, đủ điều kiện chia sẻ; khi thiếu/sai phải chỉ rõ toàn bộ nội dung cần bổ sung trong một lần |
+| Nghị định 310/2026/NĐ-CP | Sửa quy trình điện tử theo Nghị định 45/2020; xác thực giao dịch điện tử và kiểm tra hồ sơ trên hệ thống | Kiểm tra danh tính, chữ ký điện tử và dữ liệu có thể khai thác; ghi nhận thời điểm và kết quả kiểm tra |
+| Thông tư 13/2026/TT-BTP | Quy trình một cửa, tái sử dụng dữ liệu, chuẩn hóa quy trình điện tử, biểu mẫu; có hiệu lực 10/10/2026 | Mỗi bước khai báo điều kiện, nhánh ngoại lệ, biểu mẫu, trạng thái, người chịu trách nhiệm, hạn, ký và trả kết quả |
+| Thông tư 14/2026/TT-BTP | Số hóa hồ sơ/kết quả, tái cấu trúc và dịch vụ công trực tuyến chủ động; có hiệu lực 10/10/2026 | Không số hóa lại dữ liệu đã chia sẻ có giá trị; lưu metadata/toàn vẹn; mức tự động cao chỉ khi đủ dữ liệu, kết nối, nghĩa vụ tài chính và quyền người dân |
+| Thông tư 03/2025/TT-VPCP | Căn cứ lịch sử; một phần nội dung và biểu mẫu bị bãi bỏ kể từ 10/10/2026 | Chọn mẫu theo ngày tiếp nhận và điều khoản chuyển tiếp, không áp dụng như bộ mẫu hiện hành duy nhất |
 | Nghị định 45/2020/NĐ-CP | Thủ tục trên môi trường điện tử | Đối chiếu phần còn hiệu lực và phần đã sửa đổi |
 | Nghị định 137/2024/NĐ-CP | Giao dịch điện tử của cơ quan nhà nước | Quản lý dữ liệu trao đổi, chuyển đổi và bằng chứng |
 | Nghị định 30/2020/NĐ-CP | Công tác văn thư | Tách ký duyệt, cấp số và phát hành văn bản |
@@ -64,21 +91,25 @@ Bảng 2.2: Căn cứ áp dụng và hệ quả đối với thiết kế
 
 Các căn cứ được chuyển thành tham số và điều kiện có quản lý, không viết cố định rải rác trong từng màn hình. Một phiên bản thủ tục gồm quyết định công bố, thẩm quyền, thành phần hồ sơ, cách tính hạn, mức thu, miễn giảm và mẫu kết quả. Hồ sơ đã tiếp nhận giữ tham chiếu đến phiên bản áp dụng; thay đổi danh mục không tự làm thay đổi thời hạn của hồ sơ cũ. Khi có quy định chuyển tiếp, cán bộ có thẩm quyền phê duyệt việc chuyển phiên bản và hệ thống ghi nhận căn cứ.
 
-### 2.2.2. Biểu mẫu hành chính và giới hạn suy diễn
+### 2.2.2. Biểu mẫu hành chính hiện hành và giới hạn suy diễn
 
-Bảng 2.3: Bộ biểu mẫu theo Phụ lục I Thông tư 03/2025/TT-VPCP
+Bảng 2.3: Bộ biểu mẫu theo Phụ lục I Thông tư 13/2026/TT-BTP, hiệu lực từ 10/10/2026
 
 | Mẫu | Tên biểu mẫu | Điểm phát sinh dữ liệu |
 | --- | --- | --- |
-| 01 | Giấy tiếp nhận hồ sơ và hẹn trả kết quả | Tiếp nhận hợp lệ |
-| 02 | Phiếu yêu cầu bổ sung, hoàn thiện hồ sơ | Yêu cầu làm rõ hoặc bổ sung theo căn cứ |
-| 03 | Phiếu từ chối tiếp nhận giải quyết hồ sơ | Quyết định không tiếp nhận |
-| 04 | Văn bản xin lỗi và đề nghị gia hạn thời gian giải quyết | Trường hợp chậm giải quyết theo quy định |
-| 05 | Thông báo dừng giải quyết hồ sơ | Quyết định dừng sau khi xem xét đề nghị |
-| 06 | Phiếu kiểm soát quá trình giải quyết hồ sơ | Theo dõi luân chuyển và trách nhiệm |
-| 07 | Sổ theo dõi hồ sơ | Tổng hợp tiếp nhận và kết quả |
+| 01 | Giấy tiếp nhận hồ sơ và hẹn trả kết quả | Tiếp nhận hợp lệ; ghi cơ quan có thẩm quyền, thời gian, mã hồ sơ và kênh nhận |
+| 02 | Phiếu yêu cầu bổ sung, hoàn thiện hồ sơ | Nêu rõ từng mục cần bổ sung, hạn và căn cứ |
+| 03 | Phiếu từ chối tiếp nhận giải quyết hồ sơ | Từ chối đầu vào có lý do cụ thể |
+| 04 | Văn bản xin lỗi và đề nghị gia hạn thời gian giải quyết | Xin gia hạn theo đúng thủ tục, hạn và thẩm quyền |
+| 05 | Văn bản yêu cầu dừng giải quyết hồ sơ | Ghi nhận yêu cầu dừng của cá nhân/tổ chức |
+| 06 | Thông báo dừng giải quyết hồ sơ | Bộ phận Một cửa thông báo dừng khi đã kiểm tra trạng thái và chưa có kết quả/văn bản thông báo kết quả |
+| 07 | Phiếu kiểm soát quá trình giải quyết hồ sơ | Theo dõi giao nhận, đơn vị, thời điểm và kết quả luân chuyển |
+| 08 | Sổ theo dõi hồ sơ | Tổng hợp tiếp nhận, cơ quan chủ trì, hạn, kết quả và kênh trả |
+| 9A, 9B | Quyết định công bố thủ tục không phụ thuộc địa giới trong phạm vi tỉnh hoặc toàn quốc | Mẫu công bố danh mục, không phải phiếu phát sinh cho từng hồ sơ |
 
-Biên lai phí, lệ phí thuộc phân hệ tài chính và được quản lý theo quy định chuyên ngành; không đặt tên là Mẫu 07 của bộ biểu mẫu một cửa. Quy tắc bổ sung cần phân biệt giai đoạn kiểm tra đầu vào với yêu cầu làm rõ trong thẩm định và quy định chuyên ngành. Thiết kế sử dụng trường giai đoạn, căn cứ và người phê duyệt, thay cho một giới hạn số lần áp dụng đồng loạt cho mọi tình huống. Tương tự, quá hạn là thuộc tính của thời hạn xử lý, không tự tạo thẩm quyền từ chối trả kết quả cho người dân.
+Biên lai phí, lệ phí thuộc phân hệ tài chính và được quản lý theo quy định chuyên ngành; không đặt tên là Mẫu 08 của bộ biểu mẫu một cửa. Dữ liệu đã được kết nối, chia sẻ và đủ điều kiện khai thác phải được cơ quan chủ động dùng lại; người dân chỉ cung cấp/xác nhận phần chưa có, chưa đủ, không chính xác hoặc pháp luật yêu cầu. Yêu cầu bổ sung đầu vào phải liệt kê đầy đủ nội dung trong một lần. Đối với yêu cầu trực tiếp hoặc bưu chính, cá nhân/tổ chức chỉ yêu cầu dừng sau khi nhận giấy tiếp nhận hợp lệ và trước khi cơ quan ban hành quyết định giải quyết hoặc văn bản thông báo kết quả, trừ luật chuyên ngành. Bộ phận Một cửa kiểm tra ngay; nếu đủ điều kiện, phát hành Thông báo dừng Mẫu 06 có chữ ký của thủ trưởng cơ quan, đơn vị theo biểu mẫu. Yêu cầu trực tuyến đi qua chức năng Cổng Dịch vụ công quốc gia. Vì vậy mô hình có bước lập yêu cầu, kiểm tra, ký/phát hành riêng; không có căn cứ công khai cho một bước “phê duyệt quyết định dừng” độc lập. Trả hồ sơ giấy và hoàn phí/lệ phí được theo dõi riêng; cơ quan được giao thu xem xét, quyết định hoàn trả. Nếu đã có quyết định/văn bản kết quả thì không xóa hoặc đảo trạng thái để giả lập dừng. [37], [39]
+
+Mẫu 06 công khai có các trường tên người nộp, số định danh cá nhân/tổ chức, mã hồ sơ, tên thủ tục, nội dung xác nhận chưa có quyết định/văn bản kết quả, ngày và người yêu cầu, lý do, đầu mối liên hệ nhận lại giấy tờ/khoản đã nộp, cùng phần ký của thủ trưởng cơ quan/đơn vị. Bản xem/in trong ứng dụng nghiên cứu điền các trường có trong hồ sơ; tên cơ quan, số văn bản và đầu mối trả giấy phải được đơn vị xác nhận theo mẫu áp dụng. Tài liệu công khai không cho biết màn hình nội bộ, mã số văn bản, cơ chế ký số, quyền cấu hình hay điểm cuối tích hợp đang dùng ở Hà Nội; các phần đó được ghi là cần đối chiếu, không suy thành cấu hình thật. [39]
 
 ### 2.2.3. Căn cứ kỹ thuật và thay đổi pháp luật năm 2026
 
@@ -86,13 +117,15 @@ Khung chức năng được đọc theo Thông tư 21/2023/TT-BTTTT cùng Thông
 
 Luật Lưu trữ 33/2024/QH15 có hiệu lực từ ngày 01/07/2025 là căn cứ về lưu trữ trong giai đoạn này. Thông tư 13/2023/TT-BNV cung cấp yêu cầu về thành phần hồ sơ nộp lưu và kết nối với hệ thống quản lý tài liệu; các viện dẫn cũ trong thông tư phải được đọc cùng quy định sửa đổi, thay thế. Việc giữ tệp trong kho phục vụ người dân không tự hoàn thành nghĩa vụ lập hồ sơ và nộp lưu. [26], [27]
 
-Luật Hộ tịch 03/2026/QH16 đã được ban hành ngày 23/04/2026 nhưng có hiệu lực từ ngày 01/03/2027. Vì vậy, báo cáo không dùng luật mới như căn cứ đang có hiệu lực cho hồ sơ tại ngày 02/10/2026. Điều khoản chuyển tiếp còn yêu cầu hồ sơ tiếp nhận trước ngày hiệu lực tiếp tục giải quyết theo pháp luật tại thời điểm tiếp nhận. Thiết kế phải chuẩn bị phiên bản tương lai và kiểm thử tại ranh giới hiệu lực, đồng thời giữ phiên bản áp dụng cho hồ sơ cũ. [28]
+Luật Hộ tịch 03/2026/QH16 đã được ban hành ngày 23/04/2026 nhưng có hiệu lực từ ngày 01/03/2027. Vì vậy, báo cáo không dùng luật mới làm căn cứ cho hồ sơ phát sinh trước ngày luật có hiệu lực. Điều khoản chuyển tiếp còn yêu cầu hồ sơ tiếp nhận trước ngày hiệu lực tiếp tục giải quyết theo pháp luật tại thời điểm tiếp nhận. Thiết kế phải chuẩn bị phiên bản tương lai và kiểm thử tại ranh giới hiệu lực, đồng thời giữ phiên bản áp dụng cho hồ sơ cũ. [28]
 
 ## 2.3. Trường hợp nghiên cứu tại Sở Tư pháp
 
 ### 2.3.1. Đặc điểm được xác nhận từ phương án công khai
 
 Phương án kèm Quyết định 1811 xác định thủ tục mã 2.000635, phạm vi giải quyết tại Sở Tư pháp, tiếp nhận trực tuyến và trả kết quả điện tử. Phương án quy định thời gian giải quyết trong ngày; trường hợp tiếp nhận sau 15 giờ thì trả trong ngày làm việc tiếp theo. Thành phần hồ sơ gồm tờ khai hoặc biểu mẫu tương tác, thông tin chứng minh nhân thân được khai thác khi khả dụng và văn bản ủy quyền khi phát sinh. Phân tích này sử dụng đúng phạm vi của phương án, đồng thời yêu cầu xác nhận phiên bản đang cấu hình trước khi triển khai. [2]
+
+Chỉ mục tìm kiếm của Cổng quốc gia trả về một bản ghi `2.000635.H17`, cấp xã, dẫn Quyết định 386/QĐ-UBND; phần trích lục chỉ mục nêu mức 8.000 đồng/bản sao và giải quyết trong ngày. Khi mở URL chi tiết của bản ghi, máy chủ trả 503. Do chưa đọc được trang chi tiết trực tiếp và chưa chọn địa bàn Hà Nội trên cổng, thông tin chỉ mục không đủ để xác định hiệu lực, khoản thu hay cơ quan thực hiện hiện hành. Không trộn tuyến của phương án 1811 với bản ghi này; phải xác nhận lại trước khi lập quy trình vận hành. [36]
 
 Bảng 2.4: Hồ sơ chứng cứ của trường hợp nghiên cứu
 
@@ -220,7 +253,7 @@ Bảng 2.11: So sánh hai quy trình có nguồn
 
 Quy trình 663 phân bổ các bước tiếp nhận, thẩm định, ký và phát hành lần lượt 02, 03, 02 và 01 giờ. Tổng thời gian nội bộ không được dùng để thay quy tắc hạn trong ngày. Một hồ sơ đến gần cuối buổi phải được ưu tiên theo hạn pháp lý; không coi mỗi bước luôn được chờ đủ thời lượng mới chuyển. Nếu cấu hình luồng không thể đáp ứng hạn, đơn vị nghiệp vụ phải điều chỉnh việc tổ chức xử lý, thay vì nới hạn bằng phần mềm.
 
-Phần nơi tiếp nhận của quy trình còn liệt kê địa chỉ cổng địa phương, cổng quốc gia và hệ thống một cửa ngành Tư pháp. Khi đối chiếu với định hướng một cổng giao dịch và Công văn 1747, đây là điểm cần xác nhận tuyến đang sử dụng; không nên hướng dẫn người dân đăng nhập đồng thời ba cổng. Sự khác nhau giữa văn bản quy trình, giao diện lịch sử và tuyến vận hành cho thấy nghiên cứu phải lưu thời điểm, phạm vi và kết quả đối chiếu, không chỉ gom tài liệu thành danh sách.
+Phần nơi tiếp nhận của quy trình 663 còn liệt kê địa chỉ cổng địa phương, Cổng quốc gia và hệ thống một cửa ngành Tư pháp. Thông báo ngày 29/06/2025 nói giao diện giao dịch địa phương dừng hoạt động từ 30/06/2025 và các dịch vụ trực tuyến của Thành phố được tích hợp trên Cổng quốc gia; Công văn 1747 và các quyết định cấu hình năm 2026 tiếp tục phân định hệ thống xử lý theo từng thủ tục. Vì vậy, danh sách kênh trong quy trình 663 không được hiểu là chỉ dẫn để người dân đăng nhập đồng thời ba cổng. Tuyến giao dịch công khai và tuyến cán bộ xử lý là hai việc khác nhau; mỗi thủ tục cần được kiểm tra theo bản ghi hiện hành và địa bàn cụ thể. [1], [19], [23], [35]
 
 ## 2.9. Kết quả công bố và giới hạn đánh giá hiệu quả
 
@@ -234,7 +267,7 @@ Kế hoạch 86/KH-UBND sử dụng tổng số 2.149 thủ tục tại ngày 12
 
 Tên đối tượng nghiên cứu là Hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội. Hệ thống hỗ trợ quản lý hồ sơ yêu cầu giải quyết thủ tục: từ tiếp nhận, chuyển xử lý, theo dõi trách nhiệm và thời hạn đến ký, trả kết quả, đồng bộ và báo cáo. Đây là một hệ thống quản lý hành chính cụ thể trong hoạt động của Thành phố. Toàn bộ chính quyền Hà Nội còn có các hệ thống quản lý văn bản, tài chính, nhân sự, đất đai và dữ liệu chuyên ngành; những hệ thống đó được xét ở điểm kết nối liên quan, không bị gộp thành cùng một phần mềm. [15], [18], [19], [30]
 
-Địa chỉ công khai mang tên hệ thống của Thành phố: https://dichvucong.hanoi.gov.vn/ . Bản tải ngày 02/10/2026 có tiêu đề Hệ thống thông tin giải quyết thủ tục hành chính. Phần hiển thị phụ thuộc việc thực thi nội dung trên trình duyệt, nên bản tải này chỉ được dùng để nhận diện địa chỉ và tên trang; không dùng làm bằng chứng các chức năng bên trong đều hoạt động. [31]
+Địa chỉ công khai mang tên hệ thống của Thành phố: https://dichvucong.hanoi.gov.vn/ . Bản tải có tiêu đề Hệ thống thông tin giải quyết thủ tục hành chính. Phần hiển thị phụ thuộc việc thực thi nội dung trên trình duyệt, nên bản tải này chỉ được dùng để nhận diện địa chỉ và tên trang; không dùng làm bằng chứng các chức năng bên trong đều hoạt động. [31]
 
 Địa chỉ giao dịch của tổ chức, cá nhân: https://dichvucong.gov.vn/ . Thông báo của Hà Nội quy định từ ngày 01/07/2025 thực hiện dịch vụ công trực tuyến trên Cổng Dịch vụ công quốc gia. Người dân tra cứu thủ tục, chọn địa phương và cơ quan theo phiên bản công bố; địa chỉ hệ thống Thành phố không được trình bày như một cổng nộp trực tuyến độc lập hiện hành. Khả năng tải trang bằng công cụ nghiên cứu có thể bị giới hạn xác minh truy cập, không phải kết luận dịch vụ ngừng hoạt động. [1]
 

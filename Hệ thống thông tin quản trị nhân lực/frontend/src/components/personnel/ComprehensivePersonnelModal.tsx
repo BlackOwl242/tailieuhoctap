@@ -29,6 +29,8 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
   const profileMode = isEnterpriseSector(orgConfig) ? 'ENTERPRISE' : 'STATE';
   const [activeTab, setActiveTab] = useState<'p1' | 'p2' | 'p3' | 'history'>('p1');
   const [subTab, setSubTab] = useState<'work' | 'edu' | 'salary' | 'family' | 'reward' | 'appraisal' | 'appointment'>('work');
+  const [editingSalaryAllowanceId, setEditingSalaryAllowanceId] = useState<string | null>(null);
+  const [salaryAllowanceDraft, setSalaryAllowanceDraft] = useState({ overGradeRate: '', positionAllowance: '', otherAllowance: '' });
 
   // Form State
   const [form, setForm] = useState<any>({
@@ -41,7 +43,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
     orgUnitId: '',
     jobTitle: '',
     employmentStatus: 'ACTIVE',
-    baseSalary: 15000000,
+    baseSalary: 0,
     hireDate: new Date().toISOString().slice(0, 10),
 
     // TRANG 1: Định danh, Nơi sinh, Tuyển dụng, Ngạch bậc
@@ -72,9 +74,9 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
     mainDuty: '',
     govPosition: '',
 
-    rankCode: '01.003',
-    salaryStep: 1,
-    salaryCoefficient: 2.34,
+    rankCode: '',
+    salaryStep: '',
+    salaryCoefficient: '',
     salaryStepDate: '',
     overGradePercent: 0,
     positionAllowance: 0,
@@ -164,7 +166,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
         orgUnitId: d.user?.orgUnitId || '',
         jobTitle: d.user?.jobTitle || '',
         employmentStatus: d.user?.employmentStatus || 'ACTIVE',
-        baseSalary: d.user?.baseSalary || 15000000,
+        baseSalary: d.user?.baseSalary ?? 0,
         hireDate: d.user?.hireDate ? d.user.hireDate.slice(0, 10) : '',
         aliasName: d.aliasName || '',
         gender: d.gender || 'Nam',
@@ -181,9 +183,12 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
         familyOrigin: d.familyOrigin || 'Cán bộ',
         govPosition: d.govPosition || '',
         mainDuty: d.mainDuty || '',
-        rankCode: d.rankCode || '01.003',
-        salaryStep: d.salaryStep || 1,
-        salaryCoefficient: d.salaryCoefficient || 2.34,
+        rankCode: d.rankCode || '',
+        salaryStep: d.salaryStep ?? '',
+        salaryCoefficient: d.salaryCoefficient ?? '',
+        salaryStepDate: d.salaryStepDate ? d.salaryStepDate.slice(0, 10) : '',
+        positionAllowance: d.positionAllowance ?? 0,
+        otherAllowance: d.otherAllowance ?? 0,
         overGradePercent: d.overGradePercent || 0,
         generalEducation: d.generalEducation || '12/12',
         highestDegree: d.highestDegree || 'Đại học',
@@ -242,6 +247,27 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
   // Mutation lưu hồ sơ chính
   const saveProfile = useMutation({
     mutationFn: async () => {
+      const original = profileQ.data;
+      const salaryValue = (value: unknown) => value == null || value === '' ? '' : String(value).slice(0, 10);
+      const stateSalaryFields = ['rankCode', 'salaryStep', 'salaryCoefficient', 'salaryStepDate'] as const;
+      const hasStateSalaryInput = stateSalaryFields.some((key) => form[key] !== '' && form[key] != null);
+      const stateSalaryChanged = !userId || !original || stateSalaryFields.some((key) => salaryValue(form[key]) !== salaryValue(original[key]));
+      const persistStateSalary = profileMode === 'STATE' && hasStateSalaryInput;
+      if (persistStateSalary && stateSalaryChanged && (original?.salaryHistories?.length ?? 0) > 0) {
+        throw new Error('Hồ sơ đã có lịch sử lương. Hãy thêm quyết định mới ở tab Quá trình lương để giữ đúng ngày hiệu lực.');
+      }
+      if (persistStateSalary && stateSalaryChanged) {
+        const rank = ranksQ.data?.find((item: any) => item.code === form.rankCode);
+        const step = Number(form.salaryStep);
+        const coefficient = Number(form.salaryCoefficient);
+        if (!rank || !Number.isInteger(step) || step < 1 || step > rank.totalSteps || !Number.isFinite(coefficient) || coefficient <= 0 || !form.salaryStepDate) {
+          throw new Error('Hồ sơ lương khu vực công cần có ngạch, bậc, hệ số và ngày bắt đầu hưởng theo quyết định.');
+        }
+        const configuredCoefficient = Number(rank.coefficients?.[step - 1]);
+        if (!Number.isFinite(configuredCoefficient) || Math.abs(configuredCoefficient - coefficient) > 0.000001) {
+          throw new Error(`Hệ số bậc ${step} của ngạch ${rank.code} là ${configuredCoefficient}; hãy đối chiếu danh mục ngạch hoặc nhập quyết định lương lịch sử.`);
+        }
+      }
       let targetId = userId;
       // 1. Nếu chưa có userId, tạo mới User trước
       if (!targetId) {
@@ -254,7 +280,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
           jobTitle: form.jobTitle || undefined,
           orgUnitId: form.orgUnitId || undefined,
           employmentStatus: form.employmentStatus,
-          baseSalary: Number(form.baseSalary) || undefined,
+          baseSalary: Number(form.baseSalary) > 0 ? Number(form.baseSalary) : undefined,
           hireDate: form.hireDate ? new Date(form.hireDate).toISOString() : undefined,
           roleCodes: ['USER'],
         });
@@ -284,9 +310,12 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
         officialDate: form.officialDate ? new Date(form.officialDate).toISOString() : undefined,
         govPosition: form.govPosition,
         mainDuty: form.mainDuty,
-        rankCode: form.rankCode,
-        salaryStep: Number(form.salaryStep) || 1,
-        salaryCoefficient: Number(form.salaryCoefficient) || 2.34,
+        ...(persistStateSalary && form.rankCode && Number(form.salaryStep) > 0 && Number(form.salaryCoefficient) > 0 && form.salaryStepDate ? {
+          rankCode: form.rankCode,
+          salaryStep: Number(form.salaryStep),
+          salaryCoefficient: Number(form.salaryCoefficient),
+          salaryStepDate: new Date(form.salaryStepDate).toISOString(),
+        } : {}),
         overGradePercent: Number(form.overGradePercent) || 0,
         positionAllowance: Number(form.positionAllowance) || 0,
         otherAllowance: Number(form.otherAllowance) || 0,
@@ -356,12 +385,20 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
           graduationYear: Number(subForm.graduationYear) || 2020,
         });
       } else if (subTab === 'salary') {
+        const overGradeRate = Number(subForm.overGradeRate ?? form.overGradePercent ?? 0);
+        if (!Number.isInteger(Number(subForm.step)) || Number(subForm.step) < 1 || !Number.isFinite(Number(subForm.coefficient)) || Number(subForm.coefficient) <= 0 || !subForm.fromDate
+          || !Number.isFinite(overGradeRate) || overGradeRate < 0 || overGradeRate > 100) {
+          throw new Error('Cần nhập bậc, hệ số và ngày hiệu lực đúng theo quyết định lương.');
+        }
         return api.post(`/personnel-profiles/${activeId}/salary-histories`, {
-          rankCode: form.rankCode,
-          step: Number(subForm.step) || 1,
-          coefficient: Number(subForm.coefficient) || 2.34,
-          fromDate: new Date(subForm.fromDate || new Date()).toISOString(),
-          decisionNo: subForm.decisionNo || 'QĐ-NL/2026',
+          rankCode: subForm.rankCode || form.rankCode || undefined,
+          step: Number(subForm.step),
+          coefficient: Number(subForm.coefficient),
+          overGradeRate,
+          positionAllowance: Number(subForm.positionAllowance ?? form.positionAllowance ?? 0),
+          otherAllowance: Number(subForm.otherAllowance ?? form.otherAllowance ?? 0),
+          fromDate: new Date(subForm.fromDate).toISOString(),
+          decisionNo: subForm.decisionNo?.trim() || undefined,
         });
       } else if (subTab === 'family') {
         return api.post(`/personnel-profiles/${activeId}/family-relations`, {
@@ -412,6 +449,26 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
       queryClient.invalidateQueries({ queryKey: ['personnel-profile-detail', userId] });
     } catch (err) {
       toast('Lỗi khi xóa: ' + errorMessage(err), 'error');
+    }
+  };
+
+  const saveSalaryAllowances = async (id: string) => {
+    const activeId = userId || profileQ.data?.userId;
+    if (!activeId || salaryAllowanceDraft.overGradeRate === '' || salaryAllowanceDraft.positionAllowance === '' || salaryAllowanceDraft.otherAllowance === '') {
+      toast('Nhập đủ tỷ lệ vượt khung và hai hệ số phụ cấp; nhập 0 nếu không có khoản đó.', 'error');
+      return;
+    }
+    try {
+      await api.patch(`/personnel-profiles/${activeId}/salary-histories/${id}/allowances`, {
+        overGradeRate: Number(salaryAllowanceDraft.overGradeRate),
+        positionAllowance: Number(salaryAllowanceDraft.positionAllowance),
+        otherAllowance: Number(salaryAllowanceDraft.otherAllowance),
+      });
+      toast('Đã cập nhật hệ số phụ cấp cho quyết định lương.', 'success');
+      setEditingSalaryAllowanceId(null);
+      queryClient.invalidateQueries({ queryKey: ['personnel-profile-detail', userId] });
+    } catch (err) {
+      toast('Lỗi cập nhật phụ cấp: ' + errorMessage(err), 'error');
     }
   };
 
@@ -518,7 +575,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                     <User className="w-4 h-4 text-primary" /> Khối 1: Định danh cá nhân & Tài khoản làm việc
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Họ và tên khai sinh *</label>
                     <Input
@@ -794,12 +851,14 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                 </div>
 
                 {profileMode === 'STATE' ? (
+                  <>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
                     <div className="space-y-1 md:col-span-2">
                       <label className="font-semibold text-foreground">Ngạch công chức / viên chức</label>
                       <Select
                         value={form.rankCode}
                         onChange={(e) => handleRankChange(e.target.value)}
+                        disabled={(profileQ.data?.salaryHistories?.length ?? 0) > 0}
                         className="text-xs font-semibold"
                       >
                         {ranksQ.data?.map((r: any) => (
@@ -807,6 +866,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                             {r.code} - {r.name} ({r.totalSteps} bậc)
                           </option>
                         ))}
+                        {!form.rankCode && <option value="">Chọn ngạch theo quyết định</option>}
                       </Select>
                     </div>
                     <div className="space-y-1">
@@ -814,9 +874,10 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                       <Select
                         value={String(form.salaryStep)}
                         onChange={(e) => handleStepChange(Number(e.target.value))}
+                        disabled={(profileQ.data?.salaryHistories?.length ?? 0) > 0}
                         className="text-xs font-semibold"
                       >
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((s) => (
+                        {Array.from({ length: ranksQ.data?.find((r: any) => r.code === form.rankCode)?.totalSteps ?? 0 }, (_, i) => i + 1).map((s) => (
                           <option key={s} value={s}>
                             Bậc {s}
                           </option>
@@ -830,10 +891,17 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                         step="0.01"
                         value={form.salaryCoefficient}
                         onChange={(e) => setForm({ ...form, salaryCoefficient: Number(e.target.value) })}
+                        readOnly={(profileQ.data?.salaryHistories?.length ?? 0) > 0}
                         className="font-bold text-primary"
                       />
                     </div>
+                    <div className="space-y-1">
+                      <label className="font-semibold text-foreground">Ngày bắt đầu hưởng theo quyết định *</label>
+                      <Input type="date" value={form.salaryStepDate} onChange={(e) => setForm({ ...form, salaryStepDate: e.target.value })} disabled={(profileQ.data?.salaryHistories?.length ?? 0) > 0} />
+                    </div>
                   </div>
+                  {(profileQ.data?.salaryHistories?.length ?? 0) > 0 && <p className="text-xs text-muted-foreground">Đã có lịch sử quyết định lương; thay đổi ngạch/bậc tại tab Quá trình → Lương để giữ nguyên dữ liệu các kỳ trước.</p>}
+                  </>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                     <div className="space-y-1">
@@ -882,6 +950,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                       value={form.overGradePercent}
                       onChange={(e) => setForm({ ...form, overGradePercent: Number(e.target.value) })}
                       placeholder="0"
+                      disabled={profileMode === 'STATE' && (profileQ.data?.salaryHistories?.length ?? 0) > 0}
                     />
                   </div>
                   <div className="space-y-1">
@@ -892,6 +961,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                       value={form.positionAllowance}
                       onChange={(e) => setForm({ ...form, positionAllowance: Number(e.target.value) })}
                       placeholder="0.0"
+                      disabled={profileMode === 'STATE' && (profileQ.data?.salaryHistories?.length ?? 0) > 0}
                     />
                   </div>
                   <div className="space-y-1">
@@ -903,13 +973,15 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="font-semibold text-foreground">Phụ cấp khác / Trách nhiệm</label>
+                    <label className="font-semibold text-foreground">Hệ số phụ cấp khác theo quyết định</label>
                     <Input
                       type="number"
                       value={form.otherAllowance}
                       onChange={(e) => setForm({ ...form, otherAllowance: Number(e.target.value) })}
                       placeholder="0"
+                      disabled={profileMode === 'STATE' && (profileQ.data?.salaryHistories?.length ?? 0) > 0}
                     />
+                    <p className="text-muted-foreground">Nhập hệ số ghi trong quyết định; để 0 nếu không có căn cứ hưởng.</p>
                   </div>
                 </div>
               </div>
@@ -1356,6 +1428,20 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                             <div className="text-muted-foreground mt-0.5">
                               Ngày hưởng: {formatDate(s.fromDate)} • Số QĐ: {s.decisionNo || 'Chưa cập nhật'}
                             </div>
+                            {editingSalaryAllowanceId === s.id ? (
+                              <div className="mt-2 flex flex-wrap items-end gap-2">
+                                <label className="space-y-1"><span>Vượt khung (%)</span><Input className="h-8 w-24" type="number" min="0" max="100" step="0.01" value={salaryAllowanceDraft.overGradeRate} onChange={(e) => setSalaryAllowanceDraft({ ...salaryAllowanceDraft, overGradeRate: e.target.value })} /></label>
+                                <label className="space-y-1"><span>Hệ số chức vụ</span><Input className="h-8 w-28" type="number" min="0" step="0.01" value={salaryAllowanceDraft.positionAllowance} onChange={(e) => setSalaryAllowanceDraft({ ...salaryAllowanceDraft, positionAllowance: e.target.value })} /></label>
+                                <label className="space-y-1"><span>Hệ số phụ cấp khác</span><Input className="h-8 w-28" type="number" min="0" step="0.01" value={salaryAllowanceDraft.otherAllowance} onChange={(e) => setSalaryAllowanceDraft({ ...salaryAllowanceDraft, otherAllowance: e.target.value })} /></label>
+                                <Button variant="outline" size="sm" onClick={() => saveSalaryAllowances(s.id)}>Lưu</Button>
+                                <Button variant="ghost" size="sm" onClick={() => setEditingSalaryAllowanceId(null)}>Hủy</Button>
+                              </div>
+                            ) : (
+                              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
+                                <span>PC chức vụ: hệ số {s.positionAllowance ?? 'chưa lưu'}</span><span>PC khác: hệ số {s.otherAllowance ?? 'chưa lưu'}</span><span>Vượt khung: {s.overGradeRate ?? 0}%</span>
+                                <Button variant="ghost" size="sm" onClick={() => { setEditingSalaryAllowanceId(s.id); setSalaryAllowanceDraft({ overGradeRate: s.overGradeRate == null ? '' : String(s.overGradeRate), positionAllowance: s.positionAllowance == null ? '' : String(s.positionAllowance), otherAllowance: s.otherAllowance == null ? '' : String(s.otherAllowance) }); }}>Cập nhật phụ cấp theo quyết định</Button>
+                              </div>
+                            )}
                           </div>
                           <Button variant="ghost" size="sm" onClick={() => deleteSubRecord('salary-histories', s.id)} className="text-destructive hover:bg-destructive/10">
                             <Trash2 className="w-4 h-4" />
@@ -1550,23 +1636,60 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
 
             {subTab === 'salary' && (
               <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="font-semibold">Ngạch theo quyết định</label>
+                  <Select
+                    value={subForm.rankCode || form.rankCode || ''}
+                    onChange={(e) => setSubForm({ ...subForm, rankCode: e.target.value, step: '', coefficient: '' })}
+                    className="text-xs"
+                  >
+                    <option value="">Chọn ngạch</option>
+                    {ranksQ.data?.map((rank: any) => <option key={rank.code} value={rank.code}>{rank.code} · {rank.name}</option>)}
+                  </Select>
+                </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
                     <label className="font-semibold">Bậc lương</label>
-                    <Input type="number" value={subForm.step || 2} onChange={(e) => setSubForm({ ...subForm, step: e.target.value })} />
+                    <Select
+                      value={subForm.step || ''}
+                      onChange={(e) => {
+                        const step = Number(e.target.value);
+                        const rank = ranksQ.data?.find((item: any) => item.code === (subForm.rankCode || form.rankCode));
+                        setSubForm({ ...subForm, step: e.target.value, coefficient: rank?.coefficients?.[step - 1] ?? '' });
+                      }}
+                      className="text-xs"
+                    >
+                      <option value="">Chọn bậc</option>
+                      {Array.from({ length: ranksQ.data?.find((rank: any) => rank.code === (subForm.rankCode || form.rankCode))?.totalSteps ?? 0 }, (_, i) => i + 1).map((step) => <option key={step} value={step}>Bậc {step}</option>)}
+                    </Select>
                   </div>
                   <div className="space-y-1">
-                    <label className="font-semibold">Hệ số lương</label>
-                    <Input type="number" step="0.01" value={subForm.coefficient || 2.67} onChange={(e) => setSubForm({ ...subForm, coefficient: e.target.value })} />
+                    <label className="font-semibold">Hệ số theo danh mục ngạch</label>
+                    <Input type="number" step="0.01" value={subForm.coefficient || ''} readOnly />
                   </div>
                 </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <label className="font-semibold">Hệ số phụ cấp chức vụ</label>
+                    <Input type="number" step="0.01" min="0" value={subForm.positionAllowance ?? form.positionAllowance ?? 0} onChange={(e) => setSubForm({ ...subForm, positionAllowance: e.target.value })} />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-semibold">Hệ số phụ cấp khác</label>
+                    <Input type="number" step="0.01" min="0" value={subForm.otherAllowance ?? form.otherAllowance ?? 0} onChange={(e) => setSubForm({ ...subForm, otherAllowance: e.target.value })} />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="font-semibold">Thâm niên vượt khung (%)</label>
+                  <Input type="number" min="0" max="100" step="0.01" value={subForm.overGradeRate ?? form.overGradePercent ?? 0} onChange={(e) => setSubForm({ ...subForm, overGradeRate: e.target.value })} />
+                </div>
+                <p className="text-muted-foreground">Ghi hệ số theo quyết định để kỳ lương cũ không lấy nhầm mức phụ cấp mới. Không có căn cứ hưởng thì để 0.</p>
                 <div className="space-y-1">
                   <label className="font-semibold">Ngày bắt đầu hưởng</label>
                   <Input type="date" value={subForm.fromDate || ''} onChange={(e) => setSubForm({ ...subForm, fromDate: e.target.value })} />
                 </div>
                 <div className="space-y-1">
                   <label className="font-semibold">Số quyết định nâng bậc</label>
-                  <Input value={subForm.decisionNo || ''} onChange={(e) => setSubForm({ ...subForm, decisionNo: e.target.value })} placeholder="QĐ-NL/2026" />
+                  <Input value={subForm.decisionNo || ''} onChange={(e) => setSubForm({ ...subForm, decisionNo: e.target.value })} placeholder="Số quyết định theo hồ sơ (nếu có)" />
                 </div>
               </div>
             )}

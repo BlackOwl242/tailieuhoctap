@@ -29,7 +29,7 @@ def replace_p(p,t):
  for child in list(p):
   if child.tag!=qn('w:pPr'):p.remove(child)
  r=OxmlElement('w:r');tx=OxmlElement('w:t');tx.text=t;r.append(tx);p.append(r)
-repl={10:'Nghiên cứu hệ thống thông tin giải quyết',11:'thủ tục hành chính thành phố Hà Nội',35:'Nghiên cứu hệ thống thông tin giải quyết',36:'thủ tục hành chính thành phố Hà Nội',14:'Học phần : Hệ thống thông tin quản lý hành chính',39:'Học phần : Hệ thống thông tin quản lý hành chính',12:'',37:'',15:'GVHD      : Hoàng Minh Ngọc',40:'GVHD      : Hoàng Minh Ngọc',41:'Sinh viên : Lê Quóc Huy   2305HTTB011',42:'',43:'',44:'',45:'',46:''}
+repl={10:'Nghiên cứu hệ thống thông tin giải quyết',11:'thủ tục hành chính thành phố Hà Nội',35:'Nghiên cứu hệ thống thông tin giải quyết',36:'thủ tục hành chính thành phố Hà Nội',14:'Học phần : Hệ thống thông tin quản lý hành chính',39:'Học phần : Hệ thống thông tin quản lý hành chính',12:'',37:'',15:'',40:'',41:'',42:'',43:'',44:'',45:'',46:''}
 for i,t in repl.items():
  p=body[i];rpr=deepcopy(p.find(qn('w:r')).find(qn('w:rPr'))) if p.find(qn('w:r')) is not None and p.find(qn('w:r')).find(qn('w:rPr')) is not None else None
  replace_p(p,t)
@@ -93,7 +93,7 @@ def table(rows,widths=None):
     for r in p.runs:r.bold=ri==0
  return t
 heading('LỜI CẢM ƠN')
-para('Em trân trọng cảm ơn giảng viên Hoàng Minh Ngọc đã hướng dẫn học phần Hệ thống thông tin quản lý hành chính. Những kiến thức của học phần giúp em tiếp cận việc phân tích hệ thống gắn với tổ chức công vụ, xem xét quy trình, dữ liệu, trách nhiệm và điều kiện vận hành.')
+para('Em trân trọng cảm ơn giảng viên hướng dẫn học phần Hệ thống thông tin quản lý hành chính. Những kiến thức của học phần giúp em tiếp cận việc phân tích hệ thống gắn với tổ chức công vụ, xem xét quy trình, dữ liệu, trách nhiệm và điều kiện vận hành.')
 para('Em trân trọng ghi nhận các tài liệu được cơ quan nhà nước công khai, đặc biệt là thông tin vận hành của Hà Nội, quy định chức năng của hệ thống giải quyết thủ tục hành chính và các quy trình điện tử chuyên ngành. Các tài liệu này tạo căn cứ để lựa chọn đối tượng thực tế, đối chiếu những thay đổi theo thời gian và xây dựng phương án thiết kế.')
 para('Em mong nhận được ý kiến của giảng viên để tiếp tục hoàn thiện lập luận, kiểm chứng các đề xuất và bổ sung khảo sát với đơn vị sử dụng khi có điều kiện.')
 heading('LỜI CAM ĐOAN')
@@ -145,7 +145,7 @@ for file in sorted((ROOT/'02_Noi_dung').glob('*.md')):
   full.append('')
 d.core_properties.title='Nghiên cứu hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội'
 d.core_properties.subject='Phân tích, thiết kế, triển khai, vận hành, kiểm thử và quản trị'
-d.core_properties.author='Lê Quóc Huy'
+d.core_properties.author=''
 d.core_properties.keywords='Hà Nội, một cửa, hộ tịch, thiết kế hệ thống'
 settings=d.settings.element
 e=settings.find(qn('w:updateFields'))

@@ -1,8 +1,6 @@
 # Hồ sơ nghiên cứu hệ thống thông tin giải quyết thủ tục hành chính Hà Nội
 
-Giảng viên hướng dẫn: Hoàng Minh Ngọc. Sinh viên: Lê Quóc Huy, 2305HTTB011.
-
-Bản chính là [Báo cáo phân tích và thiết kế hướng đối tượng](04_Bao_cao/Phan_tich_thiet_ke_huong_doi_tuong_Ha_Noi.docx). Báo cáo có 235 trang, 158 hình và 97 bảng, trong đó có một bảng viết tắt. Trích dẫn dùng số trong ngoặc vuông; Use case mang mã UC01 đến UC36.
+Bản chính là [Báo cáo phân tích và thiết kế hướng đối tượng](04_Bao_cao/Phan_tich_thiet_ke_huong_doi_tuong_Ha_Noi.docx). Bản hiện hành có 184 trang, 136 hình, 97 bảng có số hiệu và một bảng từ viết tắt. Trích dẫn dùng số trong ngoặc vuông; Use case mang mã UC01 đến UC36.
 
 ## Nội dung bộ hồ sơ
 
@@ -14,7 +12,9 @@ Bản chính là [Báo cáo phân tích và thiết kế hướng đối tượn
 - `06_Cong_cu`: công cụ phục vụ chỉnh sửa và kiểm tra tài liệu.
 - `07_Huong_dan`: 36 hướng dẫn chức năng, thư viện 2.075 thủ tục theo danh mục ngày 14/04/2026 và hướng dẫn riêng cho hai thủ tục đã phân tích sâu.
 
-Số 2.075 là số dòng thủ tục trong danh mục tại ngày công bố. Thư viện này chưa xác minh đầy đủ thành phần, khoản thu, thời hạn và hiệu lực hiện hành của từng thủ tục. Mô hình kỹ thuật là thiết kế đề xuất dựa trên nguồn công khai; chưa khảo sát mã nguồn hoặc hệ thống cán bộ. Các kịch bản kiểm thử phần mềm chưa thực hiện. Phạm vi bàn giao gồm báo cáo và bản thiết kế.
+Số 2.075 là số dòng thủ tục trong danh mục tại văn bản công bố. Thư viện này chưa xác minh đầy đủ thành phần, khoản thu, thời hạn và hiệu lực hiện hành của từng thủ tục. Cổng Dịch vụ công quốc gia đã được đối chiếu ở một tuyến cụ thể: mã 2.000908, Hà Nội → Phường Tây Hồ → UBND phường Tây Hồ. Tuyến đó không được áp dụng mặc định cho địa bàn khác. Phần mềm React/Python hiện thực luồng tác nghiệp cục bộ, quản lý tài khoản cán bộ và lưu trạng thái hồ sơ trong cơ sở dữ liệu. Chưa khảo sát mã nguồn hoặc giao diện sau đăng nhập của hệ thống cán bộ Hà Nội. Báo cáo có hai bộ kiểm thử thiết kế riêng: 180 ca hướng đối tượng và 101 ca tổng hợp; chưa bộ nào được chạy đầy đủ trên phần mềm. Năm bài kiểm tra HTTP hồi quy trên dữ liệu tạm đã đạt, gồm luồng tiếp nhận đến phê duyệt, quản trị hai người và thay đổi tài khoản có thu hồi phiên. Ứng dụng chưa kết nối cổng định danh, hồ sơ Hà Nội, ký số, thanh toán hoặc đồng bộ kết quả; cần tài khoản được cấp, hợp đồng tích hợp và môi trường kết nối để đưa vào vận hành chính thức.
+
+Trong lượt rà soát gần nhất, năm bài kiểm tra HTTP hồi quy đã đạt trên cơ sở dữ liệu tạm. Các bài bao phủ quyền và phạm vi hồ sơ, cấp tài khoản qua hai quản trị viên, đổi mật khẩu lần đầu, quyền ký Mẫu 06, cùng đề nghị đổi vai trò/cơ quan/thời hạn hoặc tạm ngưng/khôi phục tài khoản, duyệt độc lập và thu hồi phiên cũ. Kiểm tra này không thay thế đầy đủ 101 ca thiết kế hay kiểm thử trên hệ thống nhà nước. Tài khoản quản trị phần mềm không thể đọc hoặc xuất hồ sơ công dân. Thay đổi tài khoản quản trị cần một người duyệt thứ ba.
 
 ## Dọn thư mục ngày 03/10/2026
 
@@ -23,8 +23,8 @@ Số 2.075 là số dòng thủ tục trong danh mục tại ngày công bố. T
 
 ## Bố trí sơ đồ trên trang A4
 
-Báo cáo giữ nguyên bốn chương và có phần mở đầu riêng về lý do chọn đề tài, đối tượng, mục tiêu, phạm vi, phương pháp và cấu trúc báo cáo. Đã bỏ 36 hình màn hình thiết kế đề xuất; các ảnh khảo sát giao diện thực tế, đặc tả Use case, biểu đồ nghiệp vụ và bảng dữ liệu được giữ lại.
+Báo cáo có bảy chương và phần mở đầu riêng về lý do chọn đề tài, đối tượng, mục tiêu, phạm vi, phương pháp và cấu trúc. Đã bỏ 36 màn hình thiết kế đề xuất; sau các sơ đồ phân tích và thiết kế, mục 4.6 đưa vào ảnh chụp các giao diện hiện có của ứng dụng nghiên cứu để phân biệt rõ giao diện đã xây dựng với giao diện tham khảo từ cổng công khai.
 
-Trong mục 3.2, Hình 3.13 đến Hình 3.29 trình bày mô hình 35 lớp và đủ 62 quan hệ trong 17 phần nối tiếp. Hình 3.30 đến Hình 3.46 trình bày mô hình 35 bảng cùng 62 liên kết khóa ngoại trong 17 phần tương ứng. Lớp có ba ngăn và bội số liên kết; ERD dùng thực thể, khóa chính, khóa ngoại, hình thoi quan hệ và bội số. Đối tượng tham chiếu được chỉ dẫn tới phần định nghĩa đầy đủ dưới mỗi hình. Các biểu đồ chi tiết và từ điển dữ liệu được giữ nguyên.
+Chương 3 trình bày biểu đồ Use Case cùng biểu đồ trình tự và hoạt động cho 36 Use case. Chương 4 trình bày kiến trúc, mô hình lớp và ERD; từ điển dữ liệu hiện có 37 thực thể cùng 74 khóa ngoại/quan hệ. Các sơ đồ được chia nhóm để giữ trên khổ A4, còn định nghĩa chi tiết nằm trong bảng và từ điển dữ liệu.
 
 Danh mục bảng và hình căn cùng lề trái, số trang bên phải và có dấu chấm dẫn. Ảnh kết xuất và bản sao phục vụ kiểm tra được lưu trong thư mục tạm ngoài kho tài liệu.

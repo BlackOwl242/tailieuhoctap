@@ -1,6 +1,6 @@
 # IV. THIẾT KẾ HỆ THỐNG VÀ PHƯƠNG ÁN HOÀN THIỆN
 
-Thiết kế gồm lõi dùng chung được đặc tả qua thủ tục hộ tịch và các thành phần mở rộng để xử lý danh mục, tuyến tác nghiệp, liên thông, phối hợp, thông báo, phản ánh và nộp lưu. Mô hình là phương án nghiên cứu xây dựng từ nghiệp vụ có nguồn; không phải sơ đồ kỹ thuật nội bộ của Hà Nội. Toàn bộ 35 bảng trong từ điển dữ liệu thuộc cùng phương án, trong đó thông tin chuyên biệt của sự kiện hộ tịch chỉ áp dụng cho hồ sơ tương ứng.
+Thiết kế gồm lõi dùng chung được đặc tả qua thủ tục hộ tịch và các thành phần mở rộng để xử lý danh mục, tuyến tác nghiệp, liên thông, phối hợp, thông báo, phản ánh và nộp lưu. Mô hình là phương án nghiên cứu xây dựng từ nghiệp vụ có nguồn; không phải sơ đồ kỹ thuật nội bộ của Hà Nội. Toàn bộ 37 bảng trong từ điển dữ liệu thuộc cùng phương án, trong đó thông tin chuyên biệt của sự kiện hộ tịch chỉ áp dụng cho hồ sơ tương ứng.
 
 ## 4.1. Nguyên tắc và lựa chọn kiến trúc
 
@@ -52,17 +52,17 @@ Bảng 4.3: Trạng thái nghiệp vụ đề xuất
 | Trạng thái | Ý nghĩa | Chuyển tiếp hợp lệ |
 | --- | --- | --- |
 | NHAP | Người yêu cầu đang chuẩn bị | CHO_TIEP_NHAN |
-| CHO_TIEP_NHAN | Yêu cầu đã gửi | CHO_BO_SUNG, DA_TIEP_NHAN, TU_CHOI |
-| CHO_BO_SUNG | Chờ nội dung theo yêu cầu có căn cứ | Trở về giai đoạn yêu cầu bổ sung |
-| DA_TIEP_NHAN | Đã cấp mã và hẹn trả | DANG_THU_LY, DUNG |
-| DANG_THU_LY | Đã phân công và xử lý chuyên môn | CHO_BO_SUNG, TRINH_DUYET, KHONG_GIAI_QUYET, DUNG |
-| TRINH_DUYET | Dự thảo đang chờ quyết định | DANG_THU_LY, DA_PHE_DUYET |
-| DA_PHE_DUYET | Có kết quả ký duyệt được kiểm tra | DA_PHAT_HANH |
+| CHO_TIEP_NHAN | Yêu cầu đã gửi, chưa được xác nhận tiếp nhận hợp lệ | CHO_BO_SUNG, DA_TIEP_NHAN, TU_CHOI |
+| CHO_BO_SUNG | Chờ nội dung theo yêu cầu có căn cứ | Trở về giai đoạn yêu cầu bổ sung; yêu cầu dừng chỉ mở nếu hồ sơ đã được tiếp nhận hợp lệ và vẫn trong khoảng thời gian luật định |
+| DA_TIEP_NHAN | Đã cấp mã và hẹn trả | DANG_THU_LY; DUNG sau khi yêu cầu hợp lệ được xử lý và Mẫu 06 được ký/phát hành |
+| DANG_THU_LY | Đã phân công và xử lý chuyên môn | CHO_BO_SUNG, TRINH_DUYET, KHONG_GIAI_QUYET; DUNG chỉ khi chưa có kết luận, quyết định hoặc văn bản thông báo kết quả |
+| TRINH_DUYET | Dự thảo đang chờ quyết định | DANG_THU_LY, DA_PHE_DUYET; DUNG chỉ khi chưa ban hành quyết định/văn bản kết quả và Mẫu 06 đã ký/phát hành |
+| DA_PHE_DUYET | Dự thảo đã được duyệt, chưa phát hành | DA_PHAT_HANH; DUNG chỉ khi quyết định/văn bản kết quả chưa được ban hành và Mẫu 06 đã ký/phát hành |
 | DA_PHAT_HANH | Kết quả chính thức đã phát hành | HOAN_THANH |
 | HOAN_THANH | Đã xác nhận giao kết quả | Chỉ sửa bằng quy trình điều chỉnh có liên kết |
 | TU_CHOI | Không tiếp nhận có lý do | Kết thúc yêu cầu này |
-| KHONG_GIAI_QUYET | Kết luận chuyên môn không đủ điều kiện | Phát hành thông báo theo thẩm quyền |
-| DUNG | Dừng theo quyết định có căn cứ | Kết thúc, xử lý nghĩa vụ còn lại |
+| KHONG_GIAI_QUYET | Kết luận chuyên môn không đủ điều kiện | Kết thúc nhánh này; không mở lại để dừng theo yêu cầu |
+| DUNG | Mẫu 06 đã được người ký có thẩm quyền ký và phát hành theo yêu cầu hợp lệ | Kết thúc; lưu Mẫu 05, lần kiểm tra, Mẫu 06, bằng chứng gửi/giao; trả giấy và hoàn phí/lệ phí theo dõi riêng |
 
 Bảng 4.4: Các chiều trạng thái độc lập
 
@@ -93,6 +93,10 @@ Bảng 4.5: Các bất biến nghiệp vụ cần bảo vệ
 | BV06 | Chuyển bước và nhật ký phải cùng thành công | Giao dịch dữ liệu chung |
 | BV07 | Không xác nhận giao chỉ vì gửi thông báo thành công | Kiểm tra bằng chứng giao nhận |
 | BV08 | Chỉnh hạn không xóa hạn ban đầu | Lưu sự kiện điều chỉnh và căn cứ |
+| BV09 | Hướng dẫn bổ sung đầu vào phải liệt kê đầy đủ trong một lần | Trường hợp lần hai ở kiểm tra đầu vào bị chặn; yêu cầu có danh sách mục và căn cứ |
+| BV10 | Chỉ dừng khi chưa có kết quả hoặc văn bản thông báo kết quả | Vai trò tiếp nhận kiểm tra trước; sau khi kết quả/thông báo đã có thì giữ nguyên, không đảo trạng thái |
+
+Tại bước kiểm tra đầu vào, phiếu bổ sung phải mang danh sách từng thiếu sót và được gửi trọn vẹn trong một lần; phần mềm nghiên cứu chặn thao tác lặp tại cùng hồ sơ. Yêu cầu làm rõ ở giai đoạn chuyên môn là nhánh khác và phải được thủ tục chuyên ngành cho phép, có căn cứ, lịch sử và hạn. Với yêu cầu dừng, Bộ phận Một cửa kiểm tra hồ sơ đã được tiếp nhận hợp lệ, đúng chủ thể, đúng kênh và chưa có quyết định/văn bản thông báo kết quả. Ứng dụng giữ nguyên trạng thái hồ sơ khi chờ ký; chỉ người được cấp riêng quyền ký theo văn bản phân công mới ghi nhận phát hành Mẫu 06 và chuyển `DUNG`. Nhánh đã kết luận `KHONG_GIAI_QUYET` không được mở lại để dừng. Giao diện có bản xem/in dự thảo Mẫu 06; cán bộ tải lên bản đã ký và ghi bằng chứng gửi. Ứng dụng cục bộ không ký số thay cơ quan, không xác thực mật mã chữ ký, và chưa gửi sự kiện tới Cổng quốc gia. [37], [39]
 
 ## 4.3. Thiết kế cơ sở dữ liệu
 
@@ -195,49 +199,19 @@ Thay đổi nghiệp vụ và thông điệp chờ gửi được lưu trong cù
 
 Sau số lần thử lại đã cấu hình, thông điệp chuyển sang danh sách cần xử lý. Cán bộ kỹ thuật chỉ được thay cấu hình gửi hoặc kích hoạt gửi lại; không sửa nội dung hồ sơ đã phê duyệt để làm cho thông điệp qua được. Nếu lỗi do dữ liệu nghiệp vụ, hồ sơ được trả về quy trình sửa có thẩm quyền. Mọi lần thử đều ghi mã tương quan nhưng không ghi bí mật xác thực.
 
-Hình 4.4: Trình tự phát hành và đồng bộ kết quả
+Hình 4.6: Trình tự phát hành và đồng bộ kết quả
 
 ![Trình tự đồng bộ](../03_Thiet_ke/So_do/09_dong_bo.png)
 
-## 4.5. Thiết kế giao diện tác nghiệp
-
-### 4.5.1. Danh sách và chi tiết hồ sơ
-
-Màn hình danh sách giúp cán bộ biết việc cần làm và thời hạn, không chỉ hiển thị tổng số hồ sơ. Bộ lọc gồm cơ quan, người phụ trách, trạng thái, loại hạn và khoảng tiếp nhận. Các dòng luôn có mã hồ sơ, thủ tục, thời điểm nhận, hạn trả và người chịu trách nhiệm. Tìm kiếm theo tên cá nhân được giới hạn quyền và ghi nhận khi sử dụng.
-
-Màn hình chi tiết chia thông tin chủ thể, thành phần, xử lý, tài chính, kết quả và lịch sử thành các vùng rõ. Nút hành động được hiển thị theo quyền, nhưng việc ẩn nút không thay cho kiểm tra ở máy chủ. Trước tiếp nhận, từ chối, dừng hoặc phát hành, hệ thống nêu hậu quả và yêu cầu xác nhận dữ liệu liên quan. Lý do nghiệp vụ được lưu thành trường dữ liệu có cấu trúc, không chỉ nằm trong thông báo.
-
-Bảng 4.10: Đặc tả màn hình tác nghiệp
-
-| Màn hình | Nội dung | Điều kiện sử dụng |
-| --- | --- | --- |
-| DS01 Danh sách xử lý | Bộ lọc, mã, hạn, chủ thể đã che và việc cần làm | Cán bộ trong phạm vi cơ quan |
-| CT01 Chi tiết | Thông tin chủ thể, thành phần, lịch sử và hành động | Kiểm tra quyền từng hồ sơ |
-| TN01 Tiếp nhận | Kết luận kiểm tra, phiên bản và giấy hẹn | Yêu cầu chờ tiếp nhận |
-| TD01 Thẩm định | Kết quả tra cứu, ý kiến và dự thảo | Người được phân công |
-| KY01 Phê duyệt | Bản chốt, người ký và trạng thái chữ ký | Đúng thẩm quyền ký |
-| TK01 Trả kết quả | Bản phát hành, người nhận, kênh và chứng cứ | Kết quả đã phát hành |
-| QT01 Quản trị | Phiên bản cấu hình, quyền và phê duyệt | Phân tách người sửa và duyệt |
-
-Hình 4.5: Bản thiết kế màn hình danh sách và chi tiết hồ sơ
-
-![Giao diện tác nghiệp](../03_Thiet_ke/So_do/10_giao_dien.png)
-
-### 4.5.2. Tiếp cận và phòng ngừa sai sót
-
-Thiết kế lựa chọn mức AA của WCAG 2.2 làm mục tiêu kiểm tra khả năng tiếp cận; đây là tiêu chí đề xuất, không kết luận hệ thống hiện tại đã đạt. Thông báo trạng thái phải có chữ, biểu tượng và khả năng đọc bằng công cụ hỗ trợ, không chỉ dùng màu đỏ hoặc xanh. Thứ tự chuyển bằng bàn phím theo luồng công việc. Trường sai có giải thích và vẫn giữ dữ liệu người dùng đã nhập. [11]
-
-Tệp được tải lên có thông tin loại và giới hạn dung lượng trước thao tác. Khi mất phiên trong lúc kê khai, bản nháp được bảo vệ theo chính sách và có hướng tiếp tục; không hiển thị dữ liệu cá nhân cho người đăng nhập sau trên máy dùng chung. Việc tải tài liệu xuống phải có mục đích phù hợp và đường dẫn ngắn hạn, không dùng địa chỉ công khai cố định.
-
 ## 4.6. Thiết kế an toàn và phân quyền
 
-Bảng 4.11: Mối đe dọa và kiểm soát thiết kế
+Bảng 4.10: Mối đe dọa và kiểm soát thiết kế
 
 | Mối đe dọa | Điểm kiểm soát | Bằng chứng kiểm tra |
 | --- | --- | --- |
 | Dò mã để xem hồ sơ khác | Kiểm tra quan hệ đối tượng phía máy chủ | Ca thử đổi định danh và quyền |
 | Chèn dữ liệu độc hại | Tham số hóa truy vấn; làm sạch đầu ra | Ca thử nhập nội dung đặc biệt |
-| Tệp gây hại | Kiểm tra loại thực, quét và kho cách ly | Tệp thử an toàn được chặn đúng |
+| Tệp tải lên không an toàn | Kiểm tra dấu định dạng, phần mở rộng và giới hạn dung lượng; quét mã độc và kho cách ly cần được tích hợp trước vận hành | Ứng dụng hiện kiểm tra định dạng và giới hạn; chưa có dịch vụ quét mã độc |
 | Giả thông báo thanh toán | Xác thực nguồn và nội dung thông điệp | Chữ ký sai bị từ chối |
 | Chiếm phiên cán bộ | Xác thực phù hợp, thời hạn và thu hồi | Phiên hết hiệu lực không dùng tiếp |
 | Thay bản đã ký | Băm, phiên bản bất biến và kiểm tra chữ ký | Bản thay đổi không phát hành được |
@@ -252,7 +226,9 @@ Kiểm tra an toàn sử dụng các nhóm yêu cầu của OWASP ASVS làm danh
 
 Danh mục tuyến liên kết phiên bản thủ tục với hệ thống xử lý, ngày hiệu lực, căn cứ và người phê duyệt. Khi tiếp nhận, hệ thống lấy tuyến tại mốc áp dụng, không lấy một địa chỉ được viết cố định trong màn hình. Phiên bản tương lai có thể được chuẩn bị nhưng chưa dùng cho hồ sơ trước ngày hiệu lực. Một thay đổi tuyến phải kiểm tra giao nhau của khoảng thời gian trong cùng giao dịch và khóa cấu hình đang sửa, để hai quản trị viên không cùng tạo hai tuyến có hiệu lực.
 
-Bảng 4.12: Thành phần dữ liệu mở rộng của thiết kế
+Tra cứu tuyến cần thêm địa bàn và cơ quan cụ thể vào khóa phân giải. Cổng quốc gia công khai bộ lọc tỉnh/thành phố cùng phường/xã hoặc Sở và chỉ hiển thị cơ quan đã áp dụng dịch vụ trực tuyến. Tổ hợp thủ tục 2.000908 tại Hà Nội → Phường Tây Hồ được hiển thị cho UBND phường Tây Hồ; đây chỉ là kết quả của một thủ tục và địa bàn. Vì vậy, mỗi tuyến lưu mã cơ quan, phạm vi địa bàn, loại cơ quan, phiên bản thủ tục, mốc hiệu lực và căn cứ. Khi chưa có dữ liệu tuyến được công bố hoặc xác nhận, hệ thống phải yêu cầu tra cứu chính thức thay vì chọn một cơ quan mặc định. [35]
+
+Bảng 4.11: Thành phần dữ liệu mở rộng của thiết kế
 
 | Thành phần | Mục đích | Ràng buộc cần bảo vệ |
 | --- | --- | --- |
@@ -266,7 +242,7 @@ Bảng 4.12: Thành phần dữ liệu mở rộng của thiết kế
 | ho_so_nop_luu | Chứng cứ giao hồ sơ vào lưu trữ | Mã gói, danh mục toàn vẹn và biên nhận |
 | phan_anh_kien_nghi | Theo dõi phản ánh, đánh giá | Phân loại và trả lời không thay quyết định hồ sơ |
 
-Hình 4.8: Quan hệ bổ sung cho tham chiếu liên thông và nộp lưu
+Hình 4.7: Quan hệ bổ sung cho tham chiếu liên thông và nộp lưu
 
 ![Quan hệ mở rộng](../03_Thiet_ke/So_do/21_quan_he_lien_thong.png)
 
@@ -284,7 +260,7 @@ Khi tuyến bộ là nơi xử lý, hệ thống Thành phố giữ trạng thá
 
 ### 4.7.3. Giao tiếp bổ sung và phạm vi đặc tả
 
-Bảng 4.13: Giao tiếp bổ sung của bộ thiết kế
+Bảng 4.12: Giao tiếp bổ sung của bộ thiết kế
 
 | Thao tác | Dữ liệu chính | Điều kiện kiểm soát |
 | --- | --- | --- |
@@ -304,7 +280,7 @@ Tệp giao tiếp gốc có 10 thao tác; tệp mở rộng bổ sung 7 thao tá
 
 Kho cá nhân, kho tài liệu tác nghiệp, bản sao lưu và hệ thống lưu trữ có mục đích khác nhau. Kho cá nhân giúp người có quyền nhận và dùng lại giấy tờ; kho tác nghiệp giữ thành phần phục vụ xử lý; bản sao lưu giúp phục hồi; hệ thống lưu trữ quản lý giá trị, bảo quản và khai thác lâu dài. Sao lưu thành công không chứng minh hồ sơ đã được nộp lưu, còn giao kết quả vào kho cá nhân không cho phép xóa hồ sơ tác nghiệp ngay lập tức. [26], [27]
 
-Hình 4.9: Vòng đời lập gói và nộp lưu hồ sơ điện tử
+Hình 4.8: Vòng đời lập gói và nộp lưu hồ sơ điện tử
 
 ![Nộp lưu hồ sơ](../03_Thiet_ke/So_do/20_nop_luu.png)
 
@@ -312,7 +288,7 @@ Gói nộp lưu gồm tài liệu đầu vào, tài liệu hình thành trong x�
 
 ### 4.8.2. Phân loại và quyết định bảo quản
 
-Bảng 4.14: Kiểm soát vòng đời dữ liệu theo mục đích
+Bảng 4.13: Kiểm soát vòng đời dữ liệu theo mục đích
 
 | Nhóm dữ liệu | Kiểm soát sử dụng | Quyết định kết thúc vòng đời |
 | --- | --- | --- |
@@ -335,9 +311,9 @@ Quyền hỗ trợ của nhà cung cấp chỉ được cấp khi có nhiệm v�
 
 ### 4.9.1. Dữ liệu quản lý nhánh và nguồn hướng dẫn
 
-Sáu thực thể bổ sung đưa mô hình lên 35 bảng. Chúng làm rõ trách nhiệm của điểm tiếp nhận, mẫu báo cáo, nguồn trợ giúp, kho tài liệu, quyền khai thác kho và nhiệm vụ điều hành. Các bảng này được trình bày trong từ điển mục 4.3, cùng khóa, kiểu dữ liệu và điều kiện rỗng. Dữ liệu mã điểm trên hồ sơ được đối chiếu danh mục điểm tại thời điểm tiếp nhận; một mã hết phục vụ vẫn có giá trị giải thích lịch sử.
+Tám thực thể bổ sung đưa mô hình từ 29 lên 37 bảng. Sáu thực thể đầu làm rõ điểm tiếp nhận, mẫu báo cáo, nguồn trợ giúp, kho tài liệu, quyền khai thác kho và nhiệm vụ điều hành; hai thực thể còn lại tách yêu cầu dừng giải quyết và sự kiện ký theo Mẫu 06 để giữ riêng căn cứ, người thực hiện và dấu vết giao dịch. Các bảng được trình bày trong từ điển mục 4.3 cùng khóa, kiểu dữ liệu và điều kiện rỗng. Dữ liệu mã điểm trên hồ sơ được đối chiếu danh mục điểm tại thời điểm tiếp nhận; một mã hết phục vụ vẫn có giá trị giải thích lịch sử.
 
-Bảng 4.15: Liên kết các nhánh với thành phần dữ liệu
+Bảng 4.14: Liên kết các nhánh với thành phần dữ liệu
 
 | Nhánh | Thành phần dữ liệu | Quyết định thiết kế |
 | --- | --- | --- |
@@ -354,7 +330,7 @@ Mẫu báo cáo lưu định nghĩa có cấu trúc, không cho người dùng n
 
 ### 4.9.2. Cấu hình quy trình có thể kiểm tra
 
-Bảng 4.16: Thành phần cấu hình quy trình đề xuất
+Bảng 4.15: Thành phần cấu hình quy trình đề xuất
 
 | Thành phần | Nội dung phải có | Điều kiện kiểm tra |
 | --- | --- | --- |
@@ -374,3 +350,92 @@ Danh mục 17 thao tác giao tiếp kèm theo tập trung ở luồng hồ sơ v
 
 Khi phát triển một nhánh, hồ sơ thiết kế chi tiết phải chốt quy tắc trường, thông báo lỗi, quyền từng thao tác, cách lưu bằng chứng và hợp đồng của bên kết nối. Bộ ca CF01 đến CF31 cùng các chuỗi ở mục 3.10 dùng để kiểm tra sự thống nhất giữa thiết kế chức năng và dữ liệu. Nghiên cứu không lấy việc có tệp đặc tả giao tiếp làm bằng chứng một kết nối đang vận hành.
 
+
+## 4.10. Giao diện ứng dụng nghiên cứu
+
+### 4.10.1. Danh sách và chi tiết hồ sơ
+
+Màn hình danh sách giúp cán bộ biết việc cần làm và thời hạn, không chỉ hiển thị tổng số hồ sơ. Bộ lọc gồm cơ quan, người phụ trách, trạng thái, loại hạn và khoảng tiếp nhận. Các dòng luôn có mã hồ sơ, thủ tục, thời điểm nhận, hạn trả và người chịu trách nhiệm. Tìm kiếm theo tên cá nhân được giới hạn quyền và ghi nhận khi sử dụng.
+
+Màn hình chi tiết chia thông tin chủ thể, thành phần, xử lý, tài chính, kết quả và lịch sử thành các vùng rõ. Nút hành động được hiển thị theo quyền, nhưng việc ẩn nút không thay cho kiểm tra ở máy chủ. Trước tiếp nhận, từ chối, dừng hoặc phát hành, hệ thống nêu hậu quả và yêu cầu xác nhận dữ liệu liên quan. Lý do nghiệp vụ được lưu thành trường dữ liệu có cấu trúc, không chỉ nằm trong thông báo.
+
+Bảng 4.16: Đặc tả màn hình tác nghiệp
+
+| Màn hình | Nội dung | Điều kiện sử dụng |
+| --- | --- | --- |
+| DS01 Danh sách xử lý | Bộ lọc, mã, hạn, chủ thể đã che và việc cần làm | Cán bộ trong phạm vi cơ quan |
+| CT01 Chi tiết | Thông tin chủ thể, thành phần, lịch sử và hành động | Kiểm tra quyền từng hồ sơ |
+| TN01 Tiếp nhận | Kết luận kiểm tra, phiên bản và giấy hẹn | Yêu cầu chờ tiếp nhận |
+| TD01 Thẩm định | Kết quả tra cứu, ý kiến và dự thảo | Người được phân công |
+| KY01 Phê duyệt | Bản chốt, người ký và trạng thái chữ ký | Đúng thẩm quyền ký |
+| TK01 Trả kết quả | Bản phát hành, người nhận, kênh và chứng cứ | Kết quả đã phát hành |
+| QT01 Quản trị | Phiên bản cấu hình, quyền và phê duyệt | Phân tách người sửa và duyệt |
+
+
+### 4.10.2. Tiếp cận và phòng ngừa sai sót
+
+Thiết kế lựa chọn mức AA của WCAG 2.2 làm mục tiêu kiểm tra khả năng tiếp cận; đây là tiêu chí đề xuất, không kết luận hệ thống hiện tại đã đạt. Thông báo trạng thái phải có chữ, biểu tượng và khả năng đọc bằng công cụ hỗ trợ, không chỉ dùng màu đỏ hoặc xanh. Thứ tự chuyển bằng bàn phím theo luồng công việc. Trường sai có giải thích và vẫn giữ dữ liệu người dùng đã nhập. [11]
+
+Tệp được tải lên có thông tin loại và giới hạn dung lượng trước thao tác. Khi mất phiên trong lúc kê khai, bản nháp được bảo vệ theo chính sách và có hướng tiếp tục; không hiển thị dữ liệu cá nhân cho người đăng nhập sau trên máy dùng chung. Việc tải tài liệu xuống phải có mục đích phù hợp và đường dẫn ngắn hạn, không dùng địa chỉ công khai cố định.
+
+### 4.10.3. Phân hệ cán bộ trong ứng dụng nghiên cứu
+
+Phần mềm chia bàn cán bộ thành các nhóm công việc để người dùng đi từ tổng quan đến hồ sơ, quản trị và giám sát theo quyền được cấp. Cách phân nhóm bám theo hành trình phục vụ được Trung tâm Phục vụ hành chính công Hà Nội công bố: hướng dẫn, tiếp nhận, xử lý, trả kết quả và đánh giá; đồng thời dành vùng giám sát, kiểm tra chất lượng theo trách nhiệm được công bố của Trung tâm [44], [45]. Đây là thiết kế của ứng dụng nghiên cứu, không phải mô tả giao diện nội bộ hoặc phân quyền chính xác của nền tảng Hà Nội.
+
+Bảng 4.17: Phân hệ cán bộ và mức hiện thực trong phần mềm nghiên cứu
+
+| Phân hệ | Công việc và tương tác đang có | Quyền và dữ liệu | Giới hạn cần công bố |
+| --- | --- | --- | --- |
+| Tổng quan điều hành | Đếm hồ sơ trong phạm vi tài khoản; phân bố theo giai đoạn; ưu tiên hồ sơ quá hạn, sắp hạn, chưa phân công; xem hoạt động gần đây và mở hồ sơ liên quan | Chỉ dùng hồ sơ máy chủ trả về cho phiên cán bộ | Chỉ số phản ánh dữ liệu cục bộ; không phải báo cáo điều hành của Hà Nội |
+| Hộp xử lý | Lọc theo trạng thái, từ khóa, hạn, phân công; sắp xếp theo hạn, thời điểm cập nhật hoặc tiếp nhận; mở chi tiết; xuất CSV theo phạm vi máy chủ | Các thao tác trên hồ sơ được máy chủ kiểm tra vai trò, trạng thái, phạm vi và phiên bản | Danh sách hiện có không thay thế tất cả hàng đợi nghiệp vụ, SLA và bộ lọc của hệ thống thật |
+| Chi tiết và xử lý hồ sơ | Xem chủ thể, thủ tục, hạn, thành phần, lịch sử; tiếp nhận, phân công, yêu cầu bổ sung, lập dự thảo, trình duyệt, phê duyệt, trả bước; xử lý riêng hồ sơ yêu cầu dừng theo Mẫu 05/06 | Máy chủ kiểm tra quyền và chuyển trạng thái; tài khoản quản trị không tự thao tác nghiệp vụ | Không ký số, không phát hành kết quả thông thường, không tự ghi thu hoặc xác nhận giao kết quả |
+| Số hóa hồ sơ giấy | Bản chạy hiện tại chỉ nhận tệp thuộc định dạng cho phép; chưa có màn hình kiểm đếm trang, đối chiếu bản gốc, bóc tách OCR/nhập tay, lập dữ liệu đặc tả, cấp mã kết quả số hóa hoặc ký bản sao | Chưa hiện thực; đây là yêu cầu cần bổ sung theo Thông tư 14/2026/TT-BTP | Không được coi tệp tải lên là hồ sơ đã số hóa, đã kiểm tra toàn vẹn, đã ký hoặc đã lưu trữ chính thức |
+| Giám sát quy trình | Chọn kỳ; tổng hợp trạng thái, hồ sơ mở/quá hạn, tải theo cơ quan và người phụ trách, hồ sơ tồn lâu, phản hồi và hàng chờ cục bộ | Tổng hợp trên tập hồ sơ cán bộ được xem | Không phải số liệu chính thức, không suy rộng ra toàn Thành phố; phản hồi và hàng chờ có thể trống |
+| Danh mục thủ tục | Tìm theo mã/tên/lĩnh vực/cơ quan; xem cấp và dấu vết nguồn; phân biệt bản ghi đã đối chiếu, đối chiếu một phần hoặc chỉ tham chiếu | Tra cứu chỉ đọc | Danh mục cục bộ không bảo đảm toàn bộ tuyến, thành phần, lệ phí hay thời hạn đang có hiệu lực cho mọi địa bàn |
+| Nhật ký hồ sơ | Tìm sự kiện theo mã, nội dung, người thực hiện; lọc sự kiện công khai/nội bộ; mở hồ sơ tương ứng | Tập sự kiện được giới hạn theo hồ sơ mà phiên đăng nhập được phép xem | Nhật ký cục bộ không phải nhật ký hệ thống chính thức của Thành phố |
+| Kết nối dịch vụ | Hiển thị biên tích hợp với Cổng quốc gia, ký số, thanh toán/hoàn phí, thông báo và giao kết quả; xem bản ghi hàng chờ và số lần thử trong ứng dụng | Không mở thao tác gửi, thu, ký hoặc đối soát khi chưa có hợp đồng và thông tin xác thực | Nhãn “đang hoạt động” chỉ nói máy chủ ứng dụng cục bộ đang chạy; không biểu thị các hệ thống ngoài đã kết nối |
+| Quản trị tài khoản cán bộ | Lập đề nghị cấp; đề nghị tạm ngưng/khôi phục hoặc đổi vai trò, cơ quan và thời hạn; duyệt/từ chối độc lập; thu hồi quyền ký Mẫu 06; lưu lịch sử trước/sau và thu hồi phiên khi đổi quyền | Máy chủ kiểm tra vai trò quản trị, tách người lập/người duyệt/chủ tài khoản, chặn nhiều đề nghị chờ trên một tài khoản và giữ quyền quản trị viên cuối cùng; tài khoản quản trị không mở, tải hoặc xuất hồ sơ công dân | Tài khoản nội bộ chưa đồng bộ danh tính, đơn vị hoặc quyền từ kho công vụ Hà Nội; thay đổi tài khoản quản trị cần quản trị viên thứ ba |
+| Quản lý tin tức cổng thông tin | Tìm và lọc tin; tạo bản nháp; sửa nội dung; chọn chuyên mục và ảnh trong thư viện; gắn nguồn; đánh dấu nổi bật; xuất bản, lưu trữ và khôi phục về bản nháp | Chỉ quản trị viên hệ thống được đọc và thay đổi CMS; máy chủ xác minh miền nguồn `.gov.vn`, tệp ảnh nội bộ, trường bắt buộc và phiên bản; mỗi thay đổi có nhật ký người thao tác | Tin lưu trong cơ sở dữ liệu ứng dụng; chỉ bản đã xuất bản hiện ở cổng công dân; chưa có đồng bộ hoặc lấy tin tự động từ Trung tâm |
+
+Hộp xử lý và trang giám sát dùng dữ liệu có phạm vi được kiểm soát ở máy chủ. Các bộ lọc hiển thị không được xem là ranh giới bảo mật: API mới là nơi xác minh quyền. Chỉ số quá hạn được tính theo ngày và hạn đang lưu trên hồ sơ; thay đổi lịch làm việc hoặc ngoại lệ thủ tục cần được cán bộ kiểm tra trong chi tiết. Xuất CSV chỉ chứa trường được phép xuất cho phiên hiện tại.
+
+Phạm vi hiện thực chưa bao phủ toàn bộ 36 Use case mục tiêu. Ứng dụng có quản lý tài khoản cán bộ, CMS tin tức cho quản trị viên, xem và chuyển một số trạng thái hồ sơ, nhật ký, danh mục tham chiếu, phản hồi và hàng chờ nội bộ. CMS hỗ trợ nháp, xuất bản, lưu trữ và nhật ký trên dữ liệu cục bộ, nhưng không tự lấy tin hay đồng bộ với trang Trung tâm. Chưa có số hóa hồ sơ theo quy trình tại Thông tư 14; cũng chưa kết nối chữ ký số, thanh toán/hoàn phí, phát hành và giao kết quả thông thường, liên thông đang vận hành, đồng bộ danh tính, lưu trữ chính thức hoặc cấu hình quy trình của cơ quan. Chưa có tài khoản do Hà Nội cấp để kiểm tra. Do đó, 36 Use case là phạm vi thiết kế, không phải 36 chức năng đã hoàn thành.
+
+Hình 4.9: Tổng quan bàn xử lý cán bộ trong phần mềm nghiên cứu
+
+![Tổng quan cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/04_tong_quan_can_bo.jpg)
+
+Hình 4.10: Hộp xử lý với bộ lọc trạng thái, hạn và phân công
+
+![Hộp xử lý cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/05_hop_xu_ly.jpg)
+
+Hình 4.11: Giám sát hồ sơ, thời hạn và tải xử lý trong phạm vi tài khoản
+
+![Giám sát quy trình](../03_Thiet_ke/Anh_giao_dien_he_thong/08_giam_sat_quy_trinh.jpg)
+
+Hình 4.12: Tra cứu danh mục thủ tục và trạng thái xác minh nguồn
+
+![Danh mục thủ tục](../03_Thiet_ke/Anh_giao_dien_he_thong/09_danh_muc_thu_tuc.jpg)
+
+Hình 4.13: Nhật ký sự kiện hồ sơ theo quyền tài khoản
+
+![Nhật ký hồ sơ](../03_Thiet_ke/Anh_giao_dien_he_thong/10_nhat_ky_ho_so.jpg)
+
+Hình 4.14: Trạng thái các phụ thuộc tích hợp và hàng chờ cục bộ
+
+![Kết nối dịch vụ](../03_Thiet_ke/Anh_giao_dien_he_thong/11_ket_noi_dich_vu.jpg)
+
+Hình 4.15: Trang chủ hiển thị bài viết đã xuất bản từ cơ sở dữ liệu ứng dụng
+
+![Cổng công dân và tin đã xuất bản](../03_Thiet_ke/Anh_giao_dien_he_thong/12_cong_dan_tin_tuc.jpg)
+
+Hình 4.16: Danh sách tin và trạng thái biên tập trong tài khoản quản trị viên
+
+![Quản lý tin tức](../03_Thiet_ke/Anh_giao_dien_he_thong/13_quan_ly_tin_tuc.jpg)
+
+Hình 4.17: Biểu mẫu tạo nội dung, chọn chuyên mục, ảnh và nguồn tin
+
+![Soạn tin tức](../03_Thiet_ke/Anh_giao_dien_he_thong/14_soan_tin_tuc.jpg)
+
+
+Các ảnh minh họa trong mục này được chụp từ ứng dụng nghiên cứu hiện có. Dữ liệu hồ sơ và tài khoản trong ảnh là dữ liệu minh họa; không phải dữ liệu thật của người dân hoặc tài khoản công vụ Hà Nội.

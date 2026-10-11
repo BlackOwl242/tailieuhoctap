@@ -31,7 +31,7 @@ def check(file):
   parts=[n for n in z.namelist() if n.startswith(('word/theme/','word/footer','word/header','word/numbering','word/styles','word/fontTable'))]
   for n in parts:ck('Bảo toàn '+n,z.read(n)==f.read(n))
  text='\n'.join(p.text for p in d.paragraphs)+'\n'+'\n'.join(c.text for t in d.tables for row in t.rows for c in row.cells)
- ck('Tên sinh viên đúng', 'Lê Quóc Huy' in text and '2305HTTB011' in text)
+ ck('Tên sinh viên đúng', 'Lê Quốc Huy' in text and '2305HTTB011' in text)
  ck('Giảng viên đúng','Hoàng Minh Ngọc' in text)
  ck('Không có dấu gạch kép','--' not in text)
  ck('Không có thuật ngữ tiếng Anh thêm trong ngoặc',not re.search(r'\((?:workflow|use case|class|sequence|activity|deployment|component|business|API|UML)[^)]*\)',text,re.I))

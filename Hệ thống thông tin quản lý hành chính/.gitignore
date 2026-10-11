@@ -1,0 +1,11 @@
+/data/
+__pycache__/
+
+# Temporary report-render preview images
+**/render*/page-*.png
+**/tmp/**/page-*.png
+**/render*/contact_*.png
+**/render*/*-pages.jpg
+
+# Generated QA artifacts, browser profiles, and temporary downloads
+tmp/
