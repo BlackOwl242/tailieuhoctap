@@ -33,6 +33,46 @@ export class CreateCycleDto {
   @IsString()
   description?: string;
 
+  @ApiPropertyOptional({ enum: ['CUSTOM', 'MONTHLY', 'QUARTERLY', 'ANNUAL'] })
+  @IsOptional()
+  @IsIn(['CUSTOM', 'MONTHLY', 'QUARTERLY', 'ANNUAL'])
+  periodType?: string;
+
+  @ApiPropertyOptional({ enum: ['MONTHLY', 'QUARTERLY'], description: 'Kỳ tháng hoặc quý được dùng để tổng hợp điểm năm công vụ' })
+  @IsOptional()
+  @IsIn(['MONTHLY', 'QUARTERLY'])
+  annualSourceFrequency?: string;
+
+  @ApiPropertyOptional({ minimum: 0, maximum: 100, description: 'Tỷ trọng tiêu chí số lượng trong phần kết quả nhiệm vụ; phải cộng với hai tỷ trọng còn lại thành 100%' })
+  @IsOptional() @IsNumber()
+  quantityCriteriaWeight?: number;
+
+  @ApiPropertyOptional({ minimum: 0, maximum: 100 })
+  @IsOptional() @IsNumber()
+  qualityCriteriaWeight?: number;
+
+  @ApiPropertyOptional({ minimum: 0, maximum: 100 })
+  @IsOptional() @IsNumber()
+  progressCriteriaWeight?: number;
+
+}
+
+export class ScoreGoalDto {
+  @ApiPropertyOptional({ minimum: 0, maximum: 100 })
+  @IsOptional() @IsNumber()
+  managerScore?: number;
+
+  @ApiPropertyOptional({ minimum: 0, maximum: 100, description: 'Tỷ lệ hoàn thành số lượng công việc đã quy đổi' })
+  @IsOptional() @IsNumber()
+  quantityScore?: number;
+
+  @ApiPropertyOptional({ minimum: 0, maximum: 100, description: 'Tỷ lệ sản phẩm/công việc đạt yêu cầu chất lượng' })
+  @IsOptional() @IsNumber()
+  qualityScore?: number;
+
+  @ApiPropertyOptional({ minimum: 0, maximum: 100, description: 'Tỷ lệ sản phẩm/công việc bảo đảm tiến độ' })
+  @IsOptional() @IsNumber()
+  progressScore?: number;
 }
 
 export class CreateGoalItemDto {
@@ -159,17 +199,93 @@ export class HrmsPerformanceService {
       await this.prisma.hrmsAppraisalGoal.update({ where: { id: goal.id }, data: { finalScore, status: 'SUBMITTED' } });
     }
   }
+
+  private publicPeriodKey(cycle: { periodType: string; startDate: Date }) {
+    const date = new Date(cycle.startDate);
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1;
+    return cycle.periodType === 'MONTHLY'
+      ? `${year}-${String(month).padStart(2, '0')}`
+      : `${year}-Q${Math.floor((month - 1) / 3) + 1}`;
+  }
+
+  private async getPublicAnnualSourceCycles(cycle: { id: string; year: number; publicPersonnelType: string | null; annualSourceFrequency: string | null }) {
+    const frequency = cycle.annualSourceFrequency;
+    if (!frequency || !['MONTHLY', 'QUARTERLY'].includes(frequency)) return [];
+    return this.prisma.hrmsAppraisalCycle.findMany({
+      where: {
+        id: { not: cycle.id }, organizationSector: 'state', publicPersonnelType: cycle.publicPersonnelType,
+        year: cycle.year, periodType: frequency,
+      },
+      orderBy: { startDate: 'asc' },
+    });
+  }
+
+  private async getPublicAnnualUserIds(cycle: { id: string; year: number; publicPersonnelType: string | null; annualSourceFrequency: string | null }) {
+    const sourceCycles = await this.getPublicAnnualSourceCycles(cycle);
+    const rows = await this.prisma.hrmsAppraisalGoal.findMany({
+      where: { cycleId: { in: sourceCycles.map(item => item.id) } }, select: { userId: true },
+    });
+    return [...new Set(rows.map(row => row.userId))];
+  }
+
+  private incompleteAnnualSummary(expectedPeriods: number, foundPeriods: number) {
+    return {
+      complete: false, weight: { general: 0, result: 0 }, score: null, classification: null,
+      scoreClassification: null, finalDecision: false, missingTaskEvidence: false, missingPublicDimensions: false,
+      periodsRequired: expectedPeriods, periodsCompleted: foundPeriods,
+    };
+  }
+
   async summary(cycleId: string, userId: string) {
     const cycle = await this.prisma.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id: cycleId } });
     const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId, userId }, include: { evidences: { select: { id: true } } } });
     if (cycle.organizationSector === 'state') {
+      if (cycle.periodType === 'ANNUAL') {
+        const expectedPeriods = cycle.annualSourceFrequency === 'QUARTERLY' ? 4 : 12;
+        if (goals.length) return this.incompleteAnnualSummary(expectedPeriods, 0);
+        const sourceCycles = await this.getPublicAnnualSourceCycles(cycle);
+        const keyed = new Map(sourceCycles.map(item => [this.publicPeriodKey(item), item]));
+        const expectedKeys = cycle.annualSourceFrequency === 'QUARTERLY'
+          ? Array.from({ length: 4 }, (_, index) => `${cycle.year}-Q${index + 1}`)
+          : Array.from({ length: 12 }, (_, index) => `${cycle.year}-${String(index + 1).padStart(2, '0')}`);
+        if (sourceCycles.length !== expectedPeriods || keyed.size !== expectedPeriods || expectedKeys.some(key => !keyed.has(key))) {
+          return this.incompleteAnnualSummary(expectedPeriods, keyed.size);
+        }
+        const periodSummaries: Array<{ score: number; generalScore: number; taskScore: number }> = [];
+        for (const key of expectedKeys) {
+          const sourceCycle = keyed.get(key)!;
+          if (sourceCycle.status !== 'COMPLETED') return this.incompleteAnnualSummary(expectedPeriods, periodSummaries.length);
+          const periodSummary = await this.summary(sourceCycle.id, userId);
+          if (!periodSummary.complete || periodSummary.score === null || !('generalScore' in periodSummary) || periodSummary.generalScore == null || !('taskScore' in periodSummary) || periodSummary.taskScore == null) {
+            return this.incompleteAnnualSummary(expectedPeriods, periodSummaries.length);
+          }
+          periodSummaries.push({ score: periodSummary.score, generalScore: periodSummary.generalScore, taskScore: periodSummary.taskScore });
+        }
+        const average = (key: 'score' | 'generalScore' | 'taskScore') => periodSummaries.reduce((sum, row) => sum + row[key], 0) / periodSummaries.length;
+        const score = Math.round(average('score') * 100) / 100;
+        const generalScore = Math.round(average('generalScore') * 100) / 100;
+        const taskScore = Math.round(average('taskScore') * 100) / 100;
+        const scoreClassification: import('@prisma/client').AppraisalClassification = score >= 90 ? 'EXCELLENT' : score >= 70 ? 'GOOD' : score >= 50 ? 'SATISFACTORY' : 'UNSATISFACTORY';
+        const decision = await this.prisma.hrmsPublicAppraisalDecision.findUnique({ where: { cycleId_userId: { cycleId, userId } } });
+        return {
+          complete: true, weight: { general: 100, result: 100 }, score,
+          classification: decision?.finalClassification ?? scoreClassification,
+          scoreClassification, finalDecision: Boolean(decision), generalScore, taskScore,
+          missingTaskEvidence: false, framework: cycle.publicPersonnelType === 'PUBLIC_EMPLOYEE' ? 'ND233_2026' : 'ND335_2025',
+          periodsRequired: expectedPeriods, periodsCompleted: periodSummaries.length,
+        };
+      }
       const general = goals.filter(goal => goal.criteriaGroup === 'GENERAL');
       const results = goals.filter(goal => goal.criteriaGroup === 'RESULT');
       const generalWeight = general.reduce((sum, goal) => sum + goal.weightage, 0);
       const resultWeight = results.reduce((sum, goal) => sum + goal.weightage, 0);
       const missingTaskEvidence = goals.some(goal => goal.criteriaGroup === 'RESULT' && goal.evidences.length === 0);
-      if (Math.abs(generalWeight - 100) > .001 || Math.abs(resultWeight - 100) > .001 || !goals.length || goals.some(goal => goal.finalScore === null) || missingTaskEvidence) {
-        return { complete: false, weight: { general: generalWeight, result: resultWeight }, score: null, classification: null, scoreClassification: null, finalDecision: false, missingTaskEvidence };
+      const missingPublicDimensions = cycle.periodType !== 'CUSTOM' && results.some(goal =>
+        goal.quantityScore === null || goal.qualityScore === null || goal.progressScore === null,
+      );
+      if (Math.abs(generalWeight - 100) > .001 || Math.abs(resultWeight - 100) > .001 || !goals.length || goals.some(goal => goal.finalScore === null) || missingTaskEvidence || missingPublicDimensions) {
+        return { complete: false, weight: { general: generalWeight, result: resultWeight }, score: null, classification: null, scoreClassification: null, finalDecision: false, missingTaskEvidence, missingPublicDimensions };
       }
       const generalScore = general.reduce((sum, goal) => sum + goal.finalScore! * goal.weightage / 100, 0);
       const taskScore = results.reduce((sum, goal) => sum + goal.finalScore! * goal.weightage / 100, 0);
@@ -201,21 +317,69 @@ export class HrmsPerformanceService {
     const profile = profileRow?.value && typeof profileRow.value === 'object' ? profileRow.value as Record<string, unknown> : {};
     const organizationSector = profile.orgSector === 'state' ? 'state' : 'enterprise';
     const publicPersonnelType = organizationSector === 'state' && profile.publicPersonnelType === 'PUBLIC_EMPLOYEE' ? 'PUBLIC_EMPLOYEE' : organizationSector === 'state' ? 'CIVIL_SERVANT' : null;
+    const periodType = organizationSector === 'state' ? dto.periodType : 'CUSTOM';
+    const startDate = new Date(dto.startDate);
+    const endDate = new Date(dto.endDate);
+    if (organizationSector === 'state') {
+      if (!periodType || !['MONTHLY', 'QUARTERLY', 'ANNUAL'].includes(periodType)) {
+        throw new BadRequestException('Kỳ công vụ phải chọn theo dõi tháng, quý hoặc tổng hợp năm');
+      }
+      if (startDate.getUTCFullYear() !== dto.year || endDate.getUTCFullYear() !== dto.year) {
+        throw new BadRequestException('Ngày bắt đầu và kết thúc phải thuộc năm đánh giá đã chọn');
+      }
+      const lastDay = (year: number, monthIndex: number) => new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+      if (periodType === 'MONTHLY' && (startDate.getUTCDate() !== 1 || startDate.getUTCMonth() !== endDate.getUTCMonth() || endDate.getUTCDate() !== lastDay(dto.year, startDate.getUTCMonth()))) {
+        throw new BadRequestException('Kỳ tháng phải bắt đầu ngày 1 và kết thúc vào ngày cuối cùng của cùng tháng');
+      }
+      if (periodType === 'QUARTERLY') {
+        const quarterStartMonth = Math.floor(startDate.getUTCMonth() / 3) * 3;
+        if (startDate.getUTCDate() !== 1 || startDate.getUTCMonth() !== quarterStartMonth || endDate.getUTCMonth() !== quarterStartMonth + 2 || endDate.getUTCDate() !== lastDay(dto.year, quarterStartMonth + 2)) {
+          throw new BadRequestException('Kỳ quý phải bao trọn một quý dương lịch');
+        }
+      }
+      if (periodType === 'ANNUAL' && (startDate.getUTCMonth() !== 0 || startDate.getUTCDate() !== 1 || endDate.getUTCMonth() !== 11 || endDate.getUTCDate() !== 31)) {
+        throw new BadRequestException('Kỳ tổng hợp năm phải từ ngày 1/1 đến ngày 31/12');
+      }
+      if (periodType === 'ANNUAL' && !['MONTHLY', 'QUARTERLY'].includes(dto.annualSourceFrequency ?? '')) {
+        throw new BadRequestException('Chọn dữ liệu tháng hoặc quý làm căn cứ tổng hợp năm');
+      }
+      const defaultDimensionWeight = 100 / 3;
+      const quantityCriteriaWeight = publicPersonnelType === 'PUBLIC_EMPLOYEE' ? dto.quantityCriteriaWeight ?? defaultDimensionWeight : defaultDimensionWeight;
+      const qualityCriteriaWeight = publicPersonnelType === 'PUBLIC_EMPLOYEE' ? dto.qualityCriteriaWeight ?? defaultDimensionWeight : defaultDimensionWeight;
+      const progressCriteriaWeight = publicPersonnelType === 'PUBLIC_EMPLOYEE' ? dto.progressCriteriaWeight ?? defaultDimensionWeight : defaultDimensionWeight;
+      if ([quantityCriteriaWeight, qualityCriteriaWeight, progressCriteriaWeight].some(value => !Number.isFinite(value) || value < 0 || value > 100)
+        || Math.abs(quantityCriteriaWeight + qualityCriteriaWeight + progressCriteriaWeight - 100) > 0.001) {
+        throw new BadRequestException('Trọng số số lượng, chất lượng và tiến độ phải hợp lệ và cộng đủ 100%');
+      }
+      const existingPublicCycles = await this.prisma.hrmsAppraisalCycle.findMany({
+        where: { organizationSector: 'state', publicPersonnelType, year: dto.year, periodType },
+        select: { id: true, startDate: true, periodType: true },
+      });
+      const duplicatePeriod = periodType === 'ANNUAL'
+        ? existingPublicCycles.length > 0
+        : existingPublicCycles.some(existing => this.publicPeriodKey(existing) === this.publicPeriodKey({ periodType, startDate }));
+      if (duplicatePeriod) throw new ConflictException('Kỳ đánh giá này đã được tạo cho năm và nhóm nhân sự đã chọn');
+    }
     const res = await this.prisma.hrmsAppraisalCycle.create({
       data: {
         name: dto.name,
         year: dto.year,
-        startDate: new Date(dto.startDate),
-        endDate: new Date(dto.endDate),
+        startDate,
+        endDate,
         description: dto.description,
         organizationSector,
         publicPersonnelType,
+        periodType: periodType ?? 'CUSTOM',
+        annualSourceFrequency: periodType === 'ANNUAL' ? dto.annualSourceFrequency : null,
         selfWeight: 0,
         peerWeight: 0,
         managerWeight: 100,
         subordinateWeight: 0,
         generalCriteriaWeight: 30,
         taskCriteriaWeight: 70,
+        quantityCriteriaWeight: organizationSector === 'state' ? (publicPersonnelType === 'PUBLIC_EMPLOYEE' ? dto.quantityCriteriaWeight ?? 100 / 3 : 100 / 3) : 100 / 3,
+        qualityCriteriaWeight: organizationSector === 'state' ? (publicPersonnelType === 'PUBLIC_EMPLOYEE' ? dto.qualityCriteriaWeight ?? 100 / 3 : 100 / 3) : 100 / 3,
+        progressCriteriaWeight: organizationSector === 'state' ? (publicPersonnelType === 'PUBLIC_EMPLOYEE' ? dto.progressCriteriaWeight ?? 100 / 3 : 100 / 3) : 100 / 3,
       },
     });
 
@@ -234,10 +398,13 @@ export class HrmsPerformanceService {
     if (cycle.status === 'COMPLETED') throw new ConflictException('Kỳ đã khóa');
     if (dto.status && !['ACTIVE', 'COMPLETED'].includes(dto.status)) throw new BadRequestException('Trạng thái kỳ không hợp lệ');
     if (dto.status === 'COMPLETED') {
-      const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId: id } });
-      if (!goals.length) throw new ConflictException('Kỳ chưa có mục tiêu');
-      for (const userId of [...new Set(goals.map(goal => goal.userId))]) if (!(await this.summary(id, userId)).complete) throw new ConflictException('Chưa đủ điểm theo mô hình của kỳ hoặc trọng số mục tiêu chưa đạt yêu cầu');
-      if (cycle.organizationSector === 'state') await this.assertPublicQuotaReady(id, [...new Set(goals.map(goal => goal.userId))]);
+      const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId: id }, select: { userId: true } });
+      const userIds = cycle.organizationSector === 'state' && cycle.periodType === 'ANNUAL'
+        ? await this.getPublicAnnualUserIds(cycle)
+        : [...new Set(goals.map(goal => goal.userId))];
+      if (!userIds.length) throw new ConflictException(cycle.periodType === 'ANNUAL' ? 'Chưa có nhân sự trong các kỳ tháng/quý làm căn cứ tổng hợp năm' : 'Kỳ chưa có mục tiêu');
+      for (const userId of userIds) if (!(await this.summary(id, userId)).complete) throw new ConflictException('Chưa đủ điểm, minh chứng hoặc kỳ tháng/quý chưa khóa đủ để tổng hợp');
+      if (cycle.organizationSector === 'state' && cycle.periodType === 'ANNUAL') await this.assertPublicQuotaReady(id, userIds);
     }
     const res = await this.prisma.hrmsAppraisalCycle.update({
       where: { id },
@@ -289,7 +456,9 @@ export class HrmsPerformanceService {
   async listPublicDecisions(cycleId: string) {
     const cycle = await this.prisma.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id: cycleId } });
     if (cycle.organizationSector !== 'state') throw new BadRequestException('Hiệu chuẩn hạn ngạch chỉ áp dụng cho chu kỳ khu vực công');
-    const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId }, select: { userId: true, employeeName: true } });
+    if (!['ANNUAL', 'CUSTOM'].includes(cycle.periodType)) throw new BadRequestException('Chỉ tổng hợp năm hoặc kỳ công vụ cũ mới có bước chốt xếp loại');
+    const sourceCycles = cycle.periodType === 'ANNUAL' ? await this.getPublicAnnualSourceCycles(cycle) : [cycle];
+    const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId: { in: sourceCycles.map(item => item.id) } }, select: { userId: true, employeeName: true } });
     const names = new Map<string, string>();
     for (const goal of goals) names.set(goal.userId, goal.employeeName);
     const users = await this.prisma.user.findMany({ where: { id: { in: [...names.keys()] } }, select: { id: true, fullName: true, jobTitle: true, orgUnitId: true, orgUnit: { select: { name: true } } } });
@@ -307,6 +476,9 @@ export class HrmsPerformanceService {
         scoreClassification: 'scoreClassification' in summary ? summary.scoreClassification ?? summary.classification : summary.classification,
         complete: summary.complete,
         missingTaskEvidence: 'missingTaskEvidence' in summary ? Boolean(summary.missingTaskEvidence) : false,
+        missingPublicDimensions: 'missingPublicDimensions' in summary ? Boolean(summary.missingPublicDimensions) : false,
+        periodsRequired: 'periodsRequired' in summary ? summary.periodsRequired : undefined,
+        periodsCompleted: 'periodsCompleted' in summary ? summary.periodsCompleted : undefined,
         comparableGroup: decision?.comparableGroup ?? this.publicComparableGroup(user.orgUnitId, user.jobTitle),
         finalClassification: decision?.finalClassification ?? ('scoreClassification' in summary ? summary.scoreClassification ?? summary.classification : summary.classification),
         excellentCriteriaConfirmed: decision?.excellentCriteriaConfirmed ?? false,
@@ -321,6 +493,7 @@ export class HrmsPerformanceService {
   async savePublicDecision(actor: AuthUser, dto: PublicAppraisalDecisionDto) {
     const cycle = await this.assertActive(dto.cycleId);
     if (cycle.organizationSector !== 'state') throw new BadRequestException('Chỉ kỳ khu vực công có bước hiệu chuẩn xếp loại');
+    if (!['ANNUAL', 'CUSTOM'].includes(cycle.periodType)) throw new BadRequestException('Kết luận xếp loại chỉ được lưu ở kỳ tổng hợp năm');
     const summary = await this.summary(dto.cycleId, dto.userId);
     const scoreClassification = 'scoreClassification' in summary ? summary.scoreClassification : summary.classification;
     if (!summary.complete || !scoreClassification) throw new ConflictException('Cần hoàn tất điểm và trọng số trước khi hiệu chuẩn xếp loại');
@@ -420,6 +593,7 @@ export class HrmsPerformanceService {
   async createGoal(actor: AuthUser, dto: CreateGoalDto) {
     if (Boolean(dto.userId) === Boolean(dto.orgUnitId)) throw new BadRequestException('Chọn đúng một phạm vi giao: cá nhân hoặc đơn vị tổ chức');
     const cycle = await this.assertActive(dto.cycleId);
+    if (cycle.organizationSector === 'state' && cycle.periodType === 'ANNUAL') throw new BadRequestException('Kỳ tổng hợp năm nhận kết quả từ kỳ tháng/quý; hãy giao mục tiêu ở kỳ theo dõi định kỳ');
     const goalItems = dto.goals?.length
       ? dto.goals.map(item => ({
         kraTitle: item.kraTitle.trim(),
@@ -567,16 +741,38 @@ export class HrmsPerformanceService {
     };
   }
 
-  async scoreGoal(actor: AuthUser, id: string, managerScore?: number) {
+  async scoreGoal(actor: AuthUser, id: string, dto: ScoreGoalDto) {
     const goal = await this.prisma.hrmsAppraisalGoal.findUniqueOrThrow({ where: { id } });
     const cycle = await this.assertActive(goal.cycleId);
-    if (managerScore === undefined || !Number.isFinite(managerScore) || managerScore < 0 || managerScore > 100) throw new BadRequestException('Điểm KPI phải trong 0–100');
     await this.access.assertReviewer(actor, goal.userId);
+    const usesPublicTaskDimensions = cycle.organizationSector === 'state' && goal.criteriaGroup === 'RESULT' && cycle.periodType !== 'CUSTOM';
+    let scoreData: { managerScore: number; quantityScore: number | null; qualityScore: number | null; progressScore: number | null };
+    if (usesPublicTaskDimensions) {
+      const dimensions = [dto.quantityScore, dto.qualityScore, dto.progressScore];
+      if (dimensions.some(value => value === undefined || !Number.isFinite(value) || value < 0 || value > 100)) {
+        throw new BadRequestException('Nhập đủ tỷ lệ số lượng, chất lượng và tiến độ trong khoảng 0–100');
+      }
+      const [quantityScore, qualityScore, progressScore] = dimensions as [number, number, number];
+      scoreData = {
+        managerScore: Math.round((quantityScore * cycle.quantityCriteriaWeight / 100
+          + qualityScore * cycle.qualityCriteriaWeight / 100
+          + progressScore * cycle.progressCriteriaWeight / 100) * 100) / 100,
+        quantityScore, qualityScore, progressScore,
+      };
+    } else {
+      const managerScore = dto.managerScore;
+      if (managerScore === undefined || !Number.isFinite(managerScore) || managerScore < 0 || managerScore > 100) throw new BadRequestException('Điểm KPI phải trong 0–100');
+      scoreData = { managerScore, quantityScore: null, qualityScore: null, progressScore: null };
+    }
     if (cycle.organizationSector === 'enterprise') {
       const evidenceCount = await this.prisma.hrmsKraEvidence.count({ where: { goalId: id } });
       if (evidenceCount === 0) throw new ConflictException('Cần ghi kết quả thực tế và ít nhất một minh chứng trước khi chấm KPI');
     }
-    await this.prisma.hrmsAppraisalGoal.update({ where: { id }, data: { managerScore } });
+    if (cycle.organizationSector === 'state' && goal.criteriaGroup === 'RESULT') {
+      const evidenceCount = await this.prisma.hrmsKraEvidence.count({ where: { goalId: id } });
+      if (evidenceCount === 0) throw new ConflictException('Cần ghi kết quả và căn cứ đối chiếu nhiệm vụ trước khi chấm');
+    }
+    await this.prisma.hrmsAppraisalGoal.update({ where: { id }, data: scoreData });
     await this.recompute(goal.cycleId, goal.userId);
     await this.audit.log({ actorId: actor.id, action: 'APPRAISAL_SCORED', entityType: 'HrmsAppraisalGoal', entityId: id });
     return this.prisma.hrmsAppraisalGoal.findUniqueOrThrow({ where: { id } });
@@ -592,7 +788,8 @@ export class HrmsPerformanceService {
       decisionNo?: string;
     },
   ) {
-    const cycle = await this.prisma.hrmsAppraisalCycle.findFirst({ where: { year: dto.year, status: 'COMPLETED', organizationSector: 'state' }, orderBy: { endDate: 'desc' } });
+    const cycle = await this.prisma.hrmsAppraisalCycle.findFirst({ where: { year: dto.year, status: 'COMPLETED', organizationSector: 'state', periodType: 'ANNUAL' }, orderBy: { endDate: 'desc' } })
+      ?? await this.prisma.hrmsAppraisalCycle.findFirst({ where: { year: dto.year, status: 'COMPLETED', organizationSector: 'state', periodType: 'CUSTOM' }, orderBy: { endDate: 'desc' } });
     if (!cycle) throw new ConflictException('Chỉ kỳ đánh giá khu vực nhà nước đã khóa mới đồng bộ vào hồ sơ xếp loại; KPI doanh nghiệp không đồng bộ sang hồ sơ công vụ hoặc P3');
     const summary = await this.summary(cycle.id, dto.userId);
     if (!summary.complete || !summary.classification || !('finalDecision' in summary) || !summary.finalDecision) throw new ConflictException('Chưa đủ điểm hoặc chưa lưu kết luận hiệu chuẩn của cấp có thẩm quyền');
@@ -673,8 +870,8 @@ export class HrmsPerformanceController {
   scoreGoal(
     @CurrentUser() actor: AuthUser,
     @Param('id') id: string,
-    @Body('managerScore') managerScore?: number) {
-    return this.service.scoreGoal(actor, id, managerScore);
+    @Body() dto: ScoreGoalDto) {
+    return this.service.scoreGoal(actor, id, dto);
   }
 
   @Delete('goals/:id')

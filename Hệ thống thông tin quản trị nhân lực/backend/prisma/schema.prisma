@@ -1885,12 +1885,17 @@ model HrmsAppraisalCycle {
   description           String?
   organizationSector    String                        @default("enterprise") // enterprise | state; snapshot when cycle is created
   publicPersonnelType   String? // CIVIL_SERVANT | PUBLIC_EMPLOYEE
+  periodType            String                        @default("CUSTOM") // CUSTOM for enterprise/legacy; MONTHLY, QUARTERLY, ANNUAL for public appraisal
+  annualSourceFrequency String? // MONTHLY | QUARTERLY when an annual public appraisal rolls up periodic results
   selfWeight            Float                         @default(0) // Trường lịch sử; KPI hiện hành do quản lý chấm
   peerWeight            Float                         @default(0) // Trường lịch sử; KPI hiện hành do quản lý chấm
   managerWeight         Float                         @default(100)
   subordinateWeight     Float                         @default(0) // Trường lịch sử; KPI hiện hành do quản lý chấm
   generalCriteriaWeight Float                         @default(30) // public-sector general criteria
   taskCriteriaWeight    Float                         @default(70) // public-sector assigned work results
+  quantityCriteriaWeight Float                      @default(33.3333333333) // default public-service task ratio
+  qualityCriteriaWeight  Float                      @default(33.3333333333)
+  progressCriteriaWeight Float                      @default(33.3333333334)
   createdAt             DateTime                      @default(now())
   goals                 HrmsAppraisalGoal[]
   reviews               HrmsAppraisalReview[]          // Bản ghi lịch sử; không tham gia tính điểm hiện hành
@@ -1918,6 +1923,9 @@ model HrmsAppraisalGoal {
   assignmentOrgUnitCode String?
   selfScore     Float? // Dữ liệu lịch sử; điểm KPI hiện hành lấy từ managerScore
   managerScore  Float? // Quản lý chấm
+  quantityScore Float? // Khu vực công: tỷ lệ hoàn thành số lượng sản phẩm/công việc đã quy đổi
+  qualityScore  Float? // Khu vực công: tỷ lệ sản phẩm/công việc đạt yêu cầu chất lượng
+  progressScore Float? // Khu vực công: tỷ lệ sản phẩm/công việc bảo đảm tiến độ
   finalScore    Float?
   status        String   @default("DRAFT") // DRAFT, SUBMITTED, APPROVED
   createdAt     DateTime @default(now())

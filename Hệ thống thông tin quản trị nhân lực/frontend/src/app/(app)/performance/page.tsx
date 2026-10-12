@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth-store';
 import { api, errorMessage } from '@/lib/api';
-import { formatDate } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
@@ -35,8 +35,13 @@ interface AppraisalCycle {
   description?: string;
   organizationSector?: 'enterprise' | 'state';
   publicPersonnelType?: 'CIVIL_SERVANT' | 'PUBLIC_EMPLOYEE' | null;
+  periodType?: 'CUSTOM' | 'MONTHLY' | 'QUARTERLY' | 'ANNUAL';
+  annualSourceFrequency?: 'MONTHLY' | 'QUARTERLY' | null;
   generalCriteriaWeight?: number;
   taskCriteriaWeight?: number;
+  quantityCriteriaWeight?: number;
+  qualityCriteriaWeight?: number;
+  progressCriteriaWeight?: number;
   _count?: { goals: number };
 }
 
@@ -56,20 +61,114 @@ interface AppraisalGoal {
   assignmentOrgUnitCode?: string | null;
   assignmentOrgUnit?: { id: string; name: string; code: string } | null;
   managerScore?: number;
+  quantityScore?: number | null;
+  qualityScore?: number | null;
+  progressScore?: number | null;
   finalScore?: number;
   status: string;
   cycle?: AppraisalCycle;
-  evidences?: { id: string; description: string; metricValue?: string | null; evidenceUrl?: string | null; createdAt: string }[];
+  evidences?: { id: string; description: string; metricValue?: string | null; evidenceUrl?: string | null; createdAt: string; submittedBy?: string }[];
 }
 
 type GoalEvaluationStatus = 'WAITING_EVIDENCE' | 'WAITING_SCORE' | 'SCORED';
 type GoalEvaluationFilter = GoalEvaluationStatus | 'ALL';
 
+type AppraisalPeriodType = 'CUSTOM' | 'MONTHLY' | 'QUARTERLY' | 'ANNUAL';
+interface AppraisalCycleForm {
+  name: string;
+  year: number;
+  startDate: string;
+  endDate: string;
+  description: string;
+  periodType: AppraisalPeriodType;
+  month: number;
+  quarter: number;
+  annualSourceFrequency: 'MONTHLY' | 'QUARTERLY';
+  quantityCriteriaWeight: number;
+  qualityCriteriaWeight: number;
+  progressCriteriaWeight: number;
+}
+
+function periodBounds(year: number, periodType: AppraisalPeriodType, month: number, quarter: number) {
+  if (periodType === 'MONTHLY') {
+    const monthIndex = Math.max(0, Math.min(11, month - 1));
+    const lastDay = new Date(year, monthIndex + 1, 0).getDate();
+    return { startDate: `${year}-${String(monthIndex + 1).padStart(2, '0')}-01`, endDate: `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}` };
+  }
+  if (periodType === 'QUARTERLY') {
+    const startMonth = (Math.max(1, Math.min(4, quarter)) - 1) * 3;
+    const endMonth = startMonth + 2;
+    const lastDay = new Date(year, endMonth + 1, 0).getDate();
+    return { startDate: `${year}-${String(startMonth + 1).padStart(2, '0')}-01`, endDate: `${year}-${String(endMonth + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}` };
+  }
+  if (periodType === 'ANNUAL') return { startDate: `${year}-01-01`, endDate: `${year}-12-31` };
+  return null;
+}
+
+const formatAppraisalScore = (value: number) => new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(value);
+
+function goalWeightedContribution(goal: AppraisalGoal) {
+  if (goal.finalScore == null) return null;
+  const withinGroup = goal.finalScore * goal.weightage / 100;
+  if (goal.cycle?.organizationSector === 'state') {
+    const categoryWeight = goal.criteriaGroup === 'GENERAL'
+      ? goal.cycle.generalCriteriaWeight ?? 30
+      : goal.cycle.taskCriteriaWeight ?? 70;
+    return {
+      points: withinGroup * categoryWeight / 100,
+      formula: `${formatAppraisalScore(goal.finalScore)} × ${formatAppraisalScore(goal.weightage)}% × ${formatAppraisalScore(categoryWeight)}%`,
+      groupName: goal.criteriaGroup === 'GENERAL' ? 'tiêu chí chung' : 'kết quả nhiệm vụ',
+    };
+  }
+  return {
+    points: withinGroup,
+    formula: `${formatAppraisalScore(goal.finalScore)} × ${formatAppraisalScore(goal.weightage)}%`,
+    groupName: '',
+  };
+}
+
+function goalContributionRule(goal: AppraisalGoal) {
+  if (goal.cycle?.organizationSector !== 'state') return 'Điểm KPI × trọng số mục tiêu';
+  const categoryWeight = goal.criteriaGroup === 'GENERAL'
+    ? goal.cycle.generalCriteriaWeight ?? 30
+    : goal.cycle.taskCriteriaWeight ?? 70;
+  return `Điểm KPI × trọng số trong nhóm × ${formatAppraisalScore(categoryWeight)}%`;
+}
+
+function goalContributionGroupLabel(goal: AppraisalGoal) {
+  if (goal.cycle?.organizationSector !== 'state') return '';
+  const categoryWeight = goal.criteriaGroup === 'GENERAL'
+    ? goal.cycle.generalCriteriaWeight ?? 30
+    : goal.cycle.taskCriteriaWeight ?? 70;
+  return `${goal.criteriaGroup === 'GENERAL' ? 'Tiêu chí chung' : 'Kết quả nhiệm vụ'} · tối đa ${formatAppraisalScore(categoryWeight)} điểm`;
+}
+
+function goalGroupWeightTotal(goals: AppraisalGoal[], goal: AppraisalGoal) {
+  return goals.filter(item => item.userId === goal.userId && item.cycleId === goal.cycleId && item.criteriaGroup === goal.criteriaGroup)
+    .reduce((sum, item) => sum + item.weightage, 0);
+}
+
 const goalEvaluationStatus = (goal: AppraisalGoal): GoalEvaluationStatus => {
+  if (goal.cycle?.organizationSector === 'state' && goal.criteriaGroup === 'RESULT' && goal.cycle.periodType !== 'CUSTOM'
+    && (goal.quantityScore == null || goal.qualityScore == null || goal.progressScore == null)) {
+    return (goal.evidences?.length ?? 0) > 0 ? 'WAITING_SCORE' : 'WAITING_EVIDENCE';
+  }
   if (goal.finalScore != null || goal.managerScore != null) return 'SCORED';
   if (goal.cycle?.organizationSector === 'state' && goal.criteriaGroup === 'GENERAL') return 'WAITING_SCORE';
   return (goal.evidences?.length ?? 0) > 0 ? 'WAITING_SCORE' : 'WAITING_EVIDENCE';
 };
+
+function safeEvidenceHref(value?: string | null) {
+  const href = value?.trim();
+  if (!href) return null;
+  if (href.startsWith('/') && !href.startsWith('//')) return href;
+  try {
+    const parsed = new URL(href);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? href : null;
+  } catch {
+    return null;
+  }
+}
 
 const GOAL_EVALUATION_STATUS_LABEL: Record<GoalEvaluationStatus, string> = {
   WAITING_EVIDENCE: 'Chờ cập nhật kết quả',
@@ -105,6 +204,9 @@ interface PublicDecisionRow {
   scoreClassification: 'EXCELLENT' | 'GOOD' | 'SATISFACTORY' | 'UNSATISFACTORY' | null;
   complete: boolean;
   missingTaskEvidence?: boolean;
+  missingPublicDimensions?: boolean;
+  periodsRequired?: number;
+  periodsCompleted?: number;
   comparableGroup: string;
   finalClassification: 'EXCELLENT' | 'GOOD' | 'SATISFACTORY' | 'UNSATISFACTORY' | null;
   excellentCriteriaConfirmed: boolean;
@@ -325,6 +427,7 @@ export default function PerformanceKpiPage() {
 
   const [selectedCycleFilter, setSelectedCycleFilter] = useState<string>('ALL');
   const [selectedUnitFilter, setSelectedUnitFilter] = useState<string>('ALL');
+  const [selectedEmployeeFilter, setSelectedEmployeeFilter] = useState<string>('ALL');
   const [selectedEvaluationFilter, setSelectedEvaluationFilter] = useState<GoalEvaluationFilter>('ALL');
 
   // Modals
@@ -332,6 +435,7 @@ export default function PerformanceKpiPage() {
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
   const [evidenceGoal, setEvidenceGoal] = useState<AppraisalGoal | null>(null);
+  const [evidenceViewGoal, setEvidenceViewGoal] = useState<AppraisalGoal | null>(null);
   const [evidenceForm, setEvidenceForm] = useState({ description: '', metricValue: '', evidenceUrl: '' });
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
   const [calibrationCycleId, setCalibrationCycleId] = useState('');
@@ -347,12 +451,26 @@ export default function PerformanceKpiPage() {
   const [selectedGoal, setSelectedGoal] = useState<AppraisalGoal | null>(null);
 
   // Form Cycle
-  const [cycleForm, setCycleForm] = useState({
-    name: 'Chu kỳ đánh giá KPI 2026',
-    year: 2026,
-    startDate: '2026-01-01',
-    endDate: '2026-12-31',
-    description: 'Chu kỳ đánh giá theo chế độ tổ chức đã cấu hình.',
+  const [cycleForm, setCycleForm] = useState<AppraisalCycleForm>(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const periodType: AppraisalPeriodType = isEnterprise ? 'CUSTOM' : 'MONTHLY';
+    const bounds = periodBounds(year, periodType, month, Math.ceil(month / 3));
+    return {
+      name: isEnterprise ? `Chu kỳ đánh giá KPI ${year}` : `Đánh giá công vụ tháng ${String(month).padStart(2, '0')}/${year}`,
+      year,
+      startDate: bounds?.startDate ?? `${year}-01-01`,
+      endDate: bounds?.endDate ?? `${year}-12-31`,
+      description: 'Theo dõi kết quả công việc và căn cứ đánh giá theo quy chế của cơ quan.',
+      periodType,
+      month,
+      quarter: Math.ceil(month / 3),
+      annualSourceFrequency: 'MONTHLY' as 'MONTHLY' | 'QUARTERLY',
+      quantityCriteriaWeight: 33.33,
+      qualityCriteriaWeight: 33.33,
+      progressCriteriaWeight: 33.34,
+    };
   });
 
   // Form Goal
@@ -370,6 +488,7 @@ export default function PerformanceKpiPage() {
 
   // Form Score
   const [managerScore, setManagerScore] = useState<number | null>(null);
+  const [publicTaskScores, setPublicTaskScores] = useState<{ quantityScore: number | null; qualityScore: number | null; progressScore: number | null }>({ quantityScore: null, qualityScore: null, progressScore: null });
 
   // Form Sync Appraisal
   const [syncForm, setSyncForm] = useState({
@@ -385,7 +504,8 @@ export default function PerformanceKpiPage() {
     queryFn: async () => (await api.get('/hrms/performance/cycles')).data,
   });
   const stateCycles = cycles.filter(cycle => cycle.organizationSector === 'state');
-  const effectiveCalibrationCycleId = calibrationCycleId || stateCycles[0]?.id || '';
+  const calibrationCycles = stateCycles.filter(cycle => cycle.periodType === 'ANNUAL' || cycle.periodType === 'CUSTOM');
+  const effectiveCalibrationCycleId = calibrationCycleId || calibrationCycles.find(cycle => cycle.periodType === 'ANNUAL')?.id || calibrationCycles[0]?.id || '';
 
   const { data: goals = [], isLoading: isLoadingGoals } = useQuery<AppraisalGoal[]>({
     queryKey: ['hrms-performance-goals'],
@@ -455,6 +575,11 @@ export default function PerformanceKpiPage() {
         startDate: new Date(payload.startDate).toISOString(),
         endDate: new Date(payload.endDate).toISOString(),
         description: payload.description,
+        periodType: isEnterprise ? 'CUSTOM' : payload.periodType,
+        annualSourceFrequency: isEnterprise || payload.periodType !== 'ANNUAL' ? undefined : payload.annualSourceFrequency,
+        quantityCriteriaWeight: !isEnterprise && publicEmployee ? Number(payload.quantityCriteriaWeight) : undefined,
+        qualityCriteriaWeight: !isEnterprise && publicEmployee ? Number(payload.qualityCriteriaWeight) : undefined,
+        progressCriteriaWeight: !isEnterprise && publicEmployee ? Number(payload.progressCriteriaWeight) : undefined,
       })).data;
     },
     onSuccess: () => {
@@ -539,7 +664,13 @@ export default function PerformanceKpiPage() {
   const scoreGoalMutation = useMutation({
     mutationFn: async () => {
       if (!selectedGoal) return;
-      if (managerScore === null) throw new Error('Nhập điểm KPI sau khi đối chiếu kết quả và minh chứng');
+      const publicTaskGoal = selectedGoal.cycle?.organizationSector === 'state' && selectedGoal.criteriaGroup === 'RESULT' && selectedGoal.cycle.periodType !== 'CUSTOM';
+      if (publicTaskGoal) {
+        const { quantityScore, qualityScore, progressScore } = publicTaskScores;
+        if (quantityScore === null || qualityScore === null || progressScore === null) throw new Error('Nhập đủ điểm số lượng, chất lượng và tiến độ');
+        return (await api.patch(`/hrms/performance/goals/${selectedGoal.id}/score`, { quantityScore, qualityScore, progressScore })).data;
+      }
+      if (managerScore === null) throw new Error('Nhập điểm sau khi đối chiếu kết quả và căn cứ');
       return (await api.patch(`/hrms/performance/goals/${selectedGoal.id}/score`, { managerScore })).data;
     },
     onSuccess: () => {
@@ -598,7 +729,7 @@ export default function PerformanceKpiPage() {
   }
 
   const activeCycle = cycles.find((c) => c.status === 'ACTIVE') || cycles[0];
-  const goalSetupCycles = cycles.filter((cycle) => cycle.status === 'ACTIVE' && cycle.organizationSector === (isEnterprise ? 'enterprise' : 'state'));
+  const goalSetupCycles = cycles.filter((cycle) => cycle.status === 'ACTIVE' && cycle.organizationSector === (isEnterprise ? 'enterprise' : 'state') && (isEnterprise || cycle.periodType !== 'ANNUAL'));
   const goalWeightTotal = (goal: AppraisalGoal) => goals
     .filter((item) => item.userId === goal.userId && item.cycleId === goal.cycleId)
     .reduce((sum, item) => sum + item.weightage, 0);
@@ -617,7 +748,7 @@ export default function PerformanceKpiPage() {
   const openGoalSetup = () => {
     if (!goalSetupCycles.length) {
       toast('Chưa có chu kỳ đang mở cho chế độ tổ chức hiện tại. Hãy khởi tạo chu kỳ trước khi giao mục tiêu.', 'error');
-      if (canManageCycles) setIsCycleModalOpen(true);
+      if (canManageCycles) openCycleModal();
       return;
     }
     setGoalForm((form) => ({ ...form, cycleId: goalSetupCycles[0].id }));
@@ -687,13 +818,72 @@ export default function PerformanceKpiPage() {
       const goalUnitId = goal.assignmentOrgUnitId ?? employees.find(employee => employee.id === goal.userId)?.orgUnitId;
       return isInOrgUnitSubtree(orgUnits, goalUnitId, selectedUnitFilter);
     });
-  const visibleGoals = selectedEvaluationFilter === 'ALL'
+  const employeeFilterOptions = Array.from(new Map(unitFilteredGoals.map(goal => {
+    const employee = employees.find(item => item.id === goal.userId);
+    return [goal.userId, {
+      id: goal.userId,
+      name: goal.employeeName,
+      code: employee?.employeeCode,
+      orgUnitName: employee?.orgUnit?.name,
+    }] as const;
+  })).values()).sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+  const employeeFilteredGoals = selectedEmployeeFilter === 'ALL'
     ? unitFilteredGoals
-    : unitFilteredGoals.filter(goal => goalEvaluationStatus(goal) === selectedEvaluationFilter);
-  const evaluationStatusCounts = unitFilteredGoals.reduce<Record<GoalEvaluationStatus, number>>((counts, goal) => {
+    : unitFilteredGoals.filter(goal => goal.userId === selectedEmployeeFilter);
+  const visibleGoals = selectedEvaluationFilter === 'ALL'
+    ? employeeFilteredGoals
+    : employeeFilteredGoals.filter(goal => goalEvaluationStatus(goal) === selectedEvaluationFilter);
+  const evaluationStatusCounts = employeeFilteredGoals.reduce<Record<GoalEvaluationStatus, number>>((counts, goal) => {
     counts[goalEvaluationStatus(goal)] += 1;
     return counts;
   }, { WAITING_EVIDENCE: 0, WAITING_SCORE: 0, SCORED: 0 });
+  const updateCycleForm = (patch: Partial<typeof cycleForm>) => {
+    setCycleForm(previous => {
+      const next = { ...previous, ...patch };
+      if (!isEnterprise) {
+        const bounds = periodBounds(next.year, next.periodType, next.month, next.quarter);
+        if (bounds) Object.assign(next, bounds);
+      }
+      return next;
+    });
+  };
+  const openCycleModal = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const periodType: AppraisalPeriodType = isEnterprise ? 'CUSTOM' : 'MONTHLY';
+    const bounds = periodBounds(year, periodType, month, Math.ceil(month / 3));
+    setCycleForm(previous => ({
+      ...previous,
+      name: isEnterprise ? `Chu kỳ đánh giá KPI ${year}` : `Đánh giá công vụ tháng ${String(month).padStart(2, '0')}/${year}`,
+      year,
+      startDate: bounds?.startDate ?? `${year}-01-01`,
+      endDate: bounds?.endDate ?? `${year}-12-31`,
+      periodType,
+      month,
+      quarter: Math.ceil(month / 3),
+      annualSourceFrequency: 'MONTHLY',
+      quantityCriteriaWeight: 33.33,
+      qualityCriteriaWeight: 33.33,
+      progressCriteriaWeight: 33.34,
+    }));
+    setIsCycleModalOpen(true);
+  };
+  const selectedGoalUsesPublicDimensions = Boolean(selectedGoal?.cycle?.organizationSector === 'state'
+    && selectedGoal.criteriaGroup === 'RESULT' && selectedGoal.cycle.periodType !== 'CUSTOM');
+  const selectedGoalRequiresEvidence = Boolean(selectedGoal && (selectedGoal.cycle?.organizationSector === 'enterprise'
+    || (selectedGoal.cycle?.organizationSector === 'state' && selectedGoal.criteriaGroup === 'RESULT')));
+  const selectedGoalPublicAverage = selectedGoalUsesPublicDimensions
+    && publicTaskScores.quantityScore !== null && publicTaskScores.qualityScore !== null && publicTaskScores.progressScore !== null
+    ? publicTaskScores.quantityScore * (selectedGoal?.cycle?.quantityCriteriaWeight ?? 100 / 3) / 100
+      + publicTaskScores.qualityScore * (selectedGoal?.cycle?.qualityCriteriaWeight ?? 100 / 3) / 100
+      + publicTaskScores.progressScore * (selectedGoal?.cycle?.progressCriteriaWeight ?? 100 / 3) / 100
+    : null;
+  const selectedGoalCanSaveScore = selectedGoalUsesPublicDimensions
+    ? publicTaskScores.quantityScore !== null && publicTaskScores.qualityScore !== null && publicTaskScores.progressScore !== null
+    : managerScore !== null;
+  const cycleDimensionWeightTotal = cycleForm.quantityCriteriaWeight + cycleForm.qualityCriteriaWeight + cycleForm.progressCriteriaWeight;
+  const cycleDimensionWeightsValid = isEnterprise || !publicEmployee || cycleForm.periodType === 'ANNUAL' || Math.abs(cycleDimensionWeightTotal - 100) < 0.001;
 
   return (
     <div className="space-y-6 pb-12">
@@ -714,7 +904,7 @@ export default function PerformanceKpiPage() {
             {canManageCycles && <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsCycleModalOpen(true)}
+              onClick={openCycleModal}
               className="h-9 w-full text-xs sm:h-8 sm:w-auto"
             >
               <Calendar className="h-3.5 w-3.5 mr-1.5" />
@@ -747,12 +937,6 @@ export default function PerformanceKpiPage() {
           icon={Target}
         />
       </div>
-
-      {isEnterprise && <div className="rounded-lg border border-border bg-card px-4 py-3 text-sm leading-6">
-        <p className="font-semibold text-foreground">Quy trình đánh giá theo kết quả KPI</p>
-        <p className="text-muted-foreground">Quản lý và nhân viên thống nhất chỉ tiêu, cách đo, thời hạn và trọng số. Trong kỳ, nhân viên cập nhật kết quả cùng minh chứng; cuối kỳ, quản lý đối chiếu và chấm từng KPI trên thang 0–100. Điểm chu kỳ là tổng điểm KPI nhân với trọng số mục tiêu, tổng trọng số phải đủ 100%.</p>
-        {incompleteEvaluationCount > 0 && <p className="mt-1 text-foreground">Hiện có {incompleteEvaluationCount} hồ sơ nhân sự chưa đủ trọng số, điểm hoặc minh chứng; chưa thể hoàn tất kỳ.</p>}
-      </div>}
 
       {/* Navigation Tabs (Đồng bộ chuẩn hệ thống) */}
       <div className="flex flex-wrap items-center justify-between border-b border-border gap-4">
@@ -819,7 +1003,10 @@ export default function PerformanceKpiPage() {
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
           <Select
             value={selectedCycleFilter}
-            onChange={(e) => setSelectedCycleFilter(e.target.value)}
+            onChange={(e) => {
+              setSelectedCycleFilter(e.target.value);
+              setSelectedEmployeeFilter('ALL');
+            }}
             className="w-[180px] text-xs font-medium"
           >
             <option value="ALL">Tất cả chu kỳ</option>
@@ -829,7 +1016,10 @@ export default function PerformanceKpiPage() {
           </Select>
           {activeTab === 'goals' && <Select
             value={selectedUnitFilter}
-            onChange={(e) => setSelectedUnitFilter(e.target.value)}
+            onChange={(e) => {
+              setSelectedUnitFilter(e.target.value);
+              setSelectedEmployeeFilter('ALL');
+            }}
             searchable
             searchPlaceholder="Tìm phòng ban, khối..."
             className="w-[220px] text-xs font-medium"
@@ -838,12 +1028,25 @@ export default function PerformanceKpiPage() {
             {orgUnits.map(unit => <option key={unit.id} value={unit.id}>{unit.code} · {unit.name}</option>)}
           </Select>}
           {activeTab === 'goals' && <Select
+            value={selectedEmployeeFilter}
+            onChange={(e) => setSelectedEmployeeFilter(e.target.value)}
+            searchable
+            searchPlaceholder="Tìm nhân viên..."
+            className="w-[240px] text-xs font-medium"
+            aria-label="Lọc mục tiêu theo nhân viên"
+          >
+            <option value="ALL">Tất cả nhân viên ({employeeFilterOptions.length})</option>
+            {employeeFilterOptions.map(employee => <option key={employee.id} value={employee.id}>
+              {employee.name}{employee.code ? ` · ${employee.code}` : ''}{employee.orgUnitName ? ` · ${employee.orgUnitName}` : ''}
+            </option>)}
+          </Select>}
+          {activeTab === 'goals' && <Select
             value={selectedEvaluationFilter}
             onChange={(e) => setSelectedEvaluationFilter(e.target.value as GoalEvaluationFilter)}
             className="w-[200px] text-xs font-medium"
             aria-label="Lọc mục tiêu theo trạng thái đánh giá"
           >
-            <option value="ALL">Mọi trạng thái ({unitFilteredGoals.length})</option>
+            <option value="ALL">Mọi trạng thái ({employeeFilteredGoals.length})</option>
             <option value="WAITING_EVIDENCE">Chờ cập nhật kết quả ({evaluationStatusCounts.WAITING_EVIDENCE})</option>
             <option value="WAITING_SCORE">Chờ quản lý chấm ({evaluationStatusCounts.WAITING_SCORE})</option>
             <option value="SCORED">Đã chấm ({evaluationStatusCounts.SCORED})</option>
@@ -857,11 +1060,11 @@ export default function PerformanceKpiPage() {
           {visibleGoals.length === 0 ? (
             <div className="text-center py-12 border border-dashed rounded-lg bg-card space-y-3">
               <Target className="w-10 h-10 text-muted-foreground/40 mx-auto" />
-              <div className="text-sm font-bold text-foreground">{unitFilteredGoals.length === 0
+              <div className="text-sm font-bold text-foreground">{employeeFilteredGoals.length === 0
                 ? (goals.length === 0 ? 'Chưa có mục tiêu KRA/KPI nào trong chu kỳ này' : 'Đơn vị này chưa có mục tiêu trong chu kỳ đang chọn')
                 : `Không có mục tiêu ở trạng thái “${GOAL_EVALUATION_STATUS_LABEL[selectedEvaluationFilter as GoalEvaluationStatus]}”`}</div>
               <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                {unitFilteredGoals.length > 0
+                {employeeFilteredGoals.length > 0
                   ? 'Thử chọn trạng thái khác hoặc mở lại bộ lọc chu kỳ và phòng ban.'
                   : canManageGoals
                   ? 'Quản lý thiết lập mục tiêu theo định hướng của đơn vị và thống nhất chỉ tiêu với nhân viên trước khi giao.'
@@ -872,7 +1075,7 @@ export default function PerformanceKpiPage() {
               </Button>}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               {visibleGoals.map((g) => (
                 <div key={g.id} className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-3 relative group">
                   <div className="flex items-start justify-between gap-2">
@@ -884,7 +1087,9 @@ export default function PerformanceKpiPage() {
                         <User className="w-4 h-4" />
                         {g.employeeName}
                       </p>
-                      {g.assignmentScope === 'ORG_UNIT' && <p className="mt-1 text-xs text-muted-foreground">Giao theo {g.assignmentOrgUnitName ?? g.assignmentOrgUnit?.name} ({g.assignmentOrgUnitCode ?? g.assignmentOrgUnit?.code}) · đánh giá riêng theo từng nhân sự</p>}
+                      {g.assignmentScope === 'ORG_UNIT'
+                        ? <p className="mt-1 text-xs text-muted-foreground">Giao theo {g.assignmentOrgUnitName ?? g.assignmentOrgUnit?.name} ({g.assignmentOrgUnitCode ?? g.assignmentOrgUnit?.code}); mỗi nhân viên có bản mục tiêu và điểm riêng.</p>
+                        : <p className="mt-1 text-xs text-muted-foreground">KPI cá nhân · trọng số tính trong tổng điểm riêng của nhân viên.</p>}
                     </div>
                     <div className="flex items-center gap-1.5">
                       {(() => {
@@ -899,7 +1104,7 @@ export default function PerformanceKpiPage() {
                         </span>;
                       })()}
                       <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border border-border bg-muted/40 text-foreground">
-                        Trọng số: {g.weightage}%
+                        Trọng số {g.cycle?.organizationSector === 'state' ? 'trong nhóm' : 'trong điểm cá nhân'}: {g.weightage}%
                       </span>
                       {canAdministerGoals && <button
                         type="button"
@@ -925,21 +1130,36 @@ export default function PerformanceKpiPage() {
                   </div>
 
                   {isEnterprise && <p className="text-xs text-muted-foreground">Tổng trọng số mục tiêu của nhân sự trong kỳ: <b className="text-foreground">{goalWeightTotal(g)}% / 100%</b>{goalWeightTotal(g) < 100 ? ` · Còn ${100 - goalWeightTotal(g)}% chưa phân bổ` : goalWeightTotal(g) > 100 ? ' · Vượt 100%, cần điều chỉnh' : ''}</p>}
+                  {g.cycle?.organizationSector === 'state' && <p className="text-xs text-muted-foreground">Tổng trọng số nhóm {g.criteriaGroup === 'GENERAL' ? 'tiêu chí chung' : 'kết quả nhiệm vụ'}: <b className="text-foreground">{formatAppraisalScore(goalGroupWeightTotal(goals, g))}% / 100%</b></p>}
 
-                  {g.evidences?.length ? <div className="space-y-1 border-t pt-2 text-xs">
-                    <p className="font-medium text-foreground">Kết quả / minh chứng đã ghi ({g.evidences.length})</p>
-                    {g.evidences.map((evidence) => <div key={evidence.id} className="text-muted-foreground">
-                      <span>{evidence.metricValue ? `${evidence.metricValue} · ` : ''}{evidence.description}</span>
-                      {evidence.evidenceUrl && <a href={evidence.evidenceUrl} target="_blank" rel="noreferrer" className="ml-2 text-primary underline">Mở tài liệu</a>}
-                    </div>)}
-                  </div> : <p className="border-t pt-2 text-xs text-muted-foreground">Chưa có kết quả thực tế hoặc minh chứng. Quản lý chỉ có thể chấm sau khi nhân viên cập nhật căn cứ.</p>}
+                  {g.evidences?.length ? <div className="border-t pt-2 text-xs text-muted-foreground">
+                    Đã ghi {g.evidences.length} kết quả / minh chứng. Bấm “Xem” để đọc nội dung và mở tài liệu đính kèm.
+                  </div> : g.cycle?.organizationSector === 'state' && g.criteriaGroup === 'GENERAL' ? <p className="border-t pt-2 text-xs text-muted-foreground">Tiêu chí chung được quản lý chấm theo quy chế cơ quan; không bắt buộc tệp minh chứng cho từng tiêu chí.</p> : <p className="border-t pt-2 text-xs text-muted-foreground">Chưa có kết quả thực tế hoặc minh chứng. Quản lý chỉ có thể chấm sau khi nhân viên cập nhật căn cứ.</p>}
 
-                  <div className="pt-3 border-t flex items-center justify-between text-sm">
-                    <div className="space-x-2">
-                      <span>Điểm KPI: <b className="font-bold text-foreground">{g.finalScore != null ? `${g.finalScore}/100` : 'Chưa chấm'}</b></span>
+                  <div className="rounded-md border border-border bg-muted/20 px-3 py-2.5">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                      <span className="text-xs font-medium text-muted-foreground">{g.cycle?.organizationSector === 'state' ? 'Phần điểm mục tiêu trong tổng kỳ của nhân viên' : 'Phần điểm trong tổng 100 điểm cá nhân'}</span>
+                      {goalContributionGroupLabel(g) && <span className="text-xs text-muted-foreground">{goalContributionGroupLabel(g)}</span>}
                     </div>
-                    <div className="flex items-center gap-3">
+                    {goalWeightedContribution(g)
+                      ? <p className="mt-1 text-sm font-semibold text-foreground">{goalWeightedContribution(g)!.formula} = {formatAppraisalScore(goalWeightedContribution(g)!.points)} / 100 điểm</p>
+                      : <p className="mt-1 text-xs text-muted-foreground">Chưa tính vì chưa có điểm chấm · {goalContributionRule(g)}</p>}
+                  </div>
+
+                  <div className="pt-3 border-t flex flex-col gap-3 text-sm lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-center justify-between gap-2 lg:justify-start">
+                      <span>{g.cycle?.organizationSector === 'state' ? (g.criteriaGroup === 'GENERAL' ? 'Điểm tiêu chí chung' : 'Điểm nhiệm vụ') : 'Điểm KPI'}: <b className="font-bold text-foreground">{g.finalScore != null ? `${g.finalScore}/100` : 'Chưa chấm'}</b></span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 lg:justify-end">
+                      {(g.evidences?.length ?? 0) > 0 && <button
+                        type="button"
+                        onClick={() => setEvidenceViewGoal(g)}
+                        className="inline-flex items-center gap-1 font-medium text-muted-foreground hover:text-foreground"
+                      >
+                        Xem minh chứng
+                      </button>}
                       {(g.userId === currentUser?.id || canManageGoals) && <button
+                        type="button"
                         onClick={() => {
                           setEvidenceGoal(g);
                           setEvidenceForm({ description: '', metricValue: '', evidenceUrl: '' });
@@ -947,9 +1167,11 @@ export default function PerformanceKpiPage() {
                         className="font-medium text-muted-foreground hover:text-foreground"
                       >Ghi kết quả / minh chứng</button>}
                       {canScoreGoals && g.userId !== currentUser?.id && <button
+                        type="button"
                         onClick={() => {
                           setSelectedGoal(g);
                           setManagerScore(g.managerScore ?? null);
+                          setPublicTaskScores({ quantityScore: g.quantityScore ?? null, qualityScore: g.qualityScore ?? null, progressScore: g.progressScore ?? null });
                           setIsScoreModalOpen(true);
                         }}
                         className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
@@ -1097,7 +1319,8 @@ export default function PerformanceKpiPage() {
       {/* TAB 4: BẢNG QUY ƯỚC & THANG ĐIỂM ĐÁNH GIÁ (RUBRICS) */}
       {activeTab === 'rubrics' && (
         <div className="space-y-6">
-          <div className="rounded-xl border border-border bg-card p-5 shadow-xs">
+          {isEnterprise && incompleteEvaluationCount > 0 && <p className="border-l-2 border-border pl-3 text-sm leading-5 text-muted-foreground">Chưa thể hoàn tất kỳ: {incompleteEvaluationCount} hồ sơ nhân sự còn thiếu trọng số, điểm hoặc minh chứng.</p>}
+          <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-5">
             <div className="flex items-center gap-3">
               <span className="p-2 rounded-lg bg-muted text-foreground border border-border">
                 <BookOpen className="w-5 h-5" />
@@ -1111,9 +1334,8 @@ export default function PerformanceKpiPage() {
                 </p>
               </div>
             </div>
-          </div>
 
-          <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="space-y-4 border-t border-border/70 pt-5">
             <div className="border-b border-border/70 pb-3">
               <h4 className="font-bold text-foreground text-base">1. Ngưỡng điểm đang được hệ thống tính</h4>
               <p className="mt-1 text-xs text-muted-foreground">{isEnterprise ? 'Ngưỡng xếp loại nội bộ của HRMS; doanh nghiệp cần ban hành quy chế riêng. Không áp dụng hạn ngạch công vụ.' : `Ngưỡng điểm tham chiếu theo ${publicEmployee ? 'Nghị định 233/2026/NĐ-CP (viên chức)' : 'Nghị định 335/2025/NĐ-CP (công chức)'}. Kết luận vẫn cần điều kiện và thẩm quyền theo quy định.`}</p>
@@ -1132,21 +1354,40 @@ export default function PerformanceKpiPage() {
             <p className="text-sm text-muted-foreground">{isEnterprise ? 'Không áp dụng hạn ngạch công vụ. Thưởng, điều chỉnh lương hoặc PIP cần quy chế và phê duyệt riêng của doanh nghiệp.' : 'Trong khu vực công, tỷ lệ xuất sắc được kiểm tra theo cùng đơn vị và nhóm nhiệm vụ theo quy định áp dụng; tỷ lệ này không áp dụng cho doanh nghiệp tư nhân.'}</p>
           </div>
 
-          <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4">
+          <div className="space-y-4 border-t border-border/70 pt-5">
             <div className="border-b border-border/70 pb-3">
-              <h4 className="font-bold text-foreground text-base">2. Công thức theo chế độ và vai trò</h4>
-              <p className="mt-1 text-xs text-muted-foreground">{isEnterprise ? 'Điểm quản lý chấm cho từng KPI được nhân với trọng số mục tiêu; tổng trọng số trong kỳ bằng 100%.' : 'Điểm từng nhóm tiêu chí được nhân với tỷ lệ 30/70 của kỳ công vụ.'}</p>
+              <h4 className="font-bold text-foreground text-base">2. Cách giao mục tiêu và công thức tính điểm</h4>
+              <p className="mt-1 text-xs text-muted-foreground">{isEnterprise ? 'Có hai phạm vi giao KPI; cả hai đều được tính vào điểm riêng của từng nhân viên.' : 'Hai phạm vi giao mục tiêu giống nhau; cách tính điểm khu vực công được tách theo nhóm tiêu chí và kết quả nhiệm vụ.'}</p>
             </div>
-            {isEnterprise ? <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-              <div className="p-4 rounded-lg border border-border bg-card"><b>Điểm từng KPI</b><p className="mt-2 text-sm text-muted-foreground">Quản lý chấm trên thang 0–100 sau khi đối chiếu kết quả thực tế và minh chứng với chỉ tiêu đã thống nhất.</p></div>
-              <div className="p-4 rounded-lg border border-border bg-card"><b>Điểm chu kỳ</b><p className="mt-2 text-sm text-muted-foreground">Tổng điểm từng KPI nhân với trọng số tương ứng. Tổng trọng số mục tiêu của mỗi người phải bằng 100%.</p></div>
-            </div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-              <div className="p-4 rounded-lg border border-border bg-card"><b>Tiêu chí chung · 30 điểm</b><p className="mt-2 text-sm text-muted-foreground">Tổng trọng số nội bộ nhóm bằng 100%; điểm nhóm được quy đổi vào tỷ lệ 30%.</p></div>
-              <div className="p-4 rounded-lg border border-border bg-card"><b>Kết quả nhiệm vụ · 70 điểm</b><p className="mt-2 text-sm text-muted-foreground">Tổng trọng số nội bộ nhóm bằng 100%; điểm nhóm được quy đổi vào tỷ lệ 70%.</p></div>
-            </div>}
-            <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2 text-sm">
-              {isEnterprise ? <><p><b>Điểm chu kỳ</b> = tổng (điểm KPI × trọng số KPI); tổng trọng số bằng 100%.</p><p><b>Điểm KPI</b> do quản lý chấm sau khi xem kết quả và minh chứng.</p><p className="text-muted-foreground">Kết quả KPI không tự tạo thưởng hoặc thay đổi lương; các quyết định này cần quy trình phê duyệt riêng.</p></> : <><p><b>Điểm kỳ</b> = điểm tiêu chí chung × 30% + điểm kết quả nhiệm vụ × 70%.</p><p><b>Xếp loại cuối</b> cần ghi nhận kết luận có thẩm quyền; chỉ đóng kỳ sau khi lưu quyết định cho từng người và qua kiểm tra tỷ lệ khu vực công.</p><p className="text-muted-foreground">Ngưỡng điểm không thay thế các điều kiện định tính, hồ sơ và quy trình phê duyệt theo chế độ công chức/viên chức.</p></>}
-            </div>
+            {isEnterprise ? <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div className="p-4 rounded-lg border border-border bg-card"><b>KPI cá nhân</b><p className="mt-2 text-sm text-muted-foreground">Giao đích danh cho một nhân viên. Điểm và trọng số được tính trong kỳ đánh giá của người đó.</p></div>
+                <div className="p-4 rounded-lg border border-border bg-card"><b>KPI giao theo phòng ban, khối hoặc đơn vị</b><p className="mt-2 text-sm text-muted-foreground">Hệ thống tạo một bản mục tiêu cho từng nhân viên đang làm việc trong đơn vị. Mỗi người cập nhật minh chứng và được chấm riêng; hiện chưa có điểm tổng hợp riêng cho phòng ban.</p></div>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2 text-sm">
+                <p><b>Điểm kỳ của một nhân viên</b> = Σ (điểm KPI × trọng số KPI / 100).</p>
+                <p className="text-muted-foreground">Điểm từng KPI từ 0–100. Tổng trọng số của toàn bộ KPI cá nhân và KPI giao theo đơn vị trong hồ sơ một người phải bằng 100%.</p>
+                <p><b>Ví dụ</b>: KPI cá nhân 90 × 40%, hai KPI giao theo phòng ban lần lượt 80 × 35% và 100 × 25% → 36 + 28 + 25 = <b>89/100 điểm</b> cho nhân viên đó.</p>
+                <p className="text-muted-foreground">Kết quả KPI không tự tạo thưởng hoặc thay đổi lương; các quyết định này cần quy trình phê duyệt riêng.</p>
+              </div>
+            </> : <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div className="p-4 rounded-lg border border-border bg-card"><b>Giao cho cá nhân</b><p className="mt-2 text-sm text-muted-foreground">Mục tiêu gắn với một người; người đó được chấm theo trọng số trong nhóm tiêu chí tương ứng.</p></div>
+                <div className="p-4 rounded-lg border border-border bg-card"><b>Giao theo phòng ban hoặc đơn vị</b><p className="mt-2 text-sm text-muted-foreground">Mỗi nhân viên trong đơn vị nhận một bản mục tiêu và được đánh giá riêng. Điểm đơn vị chưa được cộng gộp thành một kết quả phòng ban.</p></div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div className="p-4 rounded-lg border border-border bg-card"><b>Tiêu chí chung · tỷ trọng mặc định 30%</b><p className="mt-2 text-sm text-muted-foreground">Điểm nhóm = tổng (điểm tiêu chí × trọng số trong nhóm / 100). Tổng trọng số tiêu chí trong nhóm bằng 100%.</p></div>
+                <div className="p-4 rounded-lg border border-border bg-card"><b>Kết quả nhiệm vụ · tỷ trọng mặc định 70%</b><p className="mt-2 text-sm text-muted-foreground">Điểm nhiệm vụ = số lượng × tỷ trọng số lượng + chất lượng × tỷ trọng chất lượng + tiến độ × tỷ trọng tiến độ. Các tỷ trọng chiều được lưu theo kỳ.</p></div>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2 text-sm">
+                <p><b>Điểm kỳ</b> = điểm tiêu chí chung × tỷ trọng nhóm chung + điểm kết quả nhiệm vụ × tỷ trọng nhóm nhiệm vụ (mặc định 30% và 70%).</p>
+                <p><b>Ví dụ</b>: điểm chung 85, điểm nhiệm vụ 90 → 85 × 30% + 90 × 70% = <b>88,5/100 điểm</b>.</p>
+                <p><b>Đóng góp một nhiệm vụ</b>: điểm nhiệm vụ × trọng số trong nhóm × tỷ trọng nhóm nhiệm vụ. Ví dụ: 90 × 25% × 70% = 15,75 điểm.</p>
+                <p><b>Điểm năm</b> là trung bình cộng điểm các kỳ tháng hoặc quý đã hoàn tất. Quyết định xếp loại và tỷ lệ xuất sắc chỉ được ghi ở kỳ năm.</p>
+                <p className="text-muted-foreground">Điểm là căn cứ theo dõi. Người có thẩm quyền còn phải xét điều kiện, hồ sơ, căn cứ của vị trí và quy chế áp dụng trước khi kết luận.</p>
+              </div>
+            </>}
+          </div>
           </div>
 
           <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-3">
@@ -1209,10 +1450,10 @@ export default function PerformanceKpiPage() {
               <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">Mỗi người cần quyết định cuối cùng của cấp có thẩm quyền. Tỷ lệ xuất sắc được kiểm tra trong cùng đơn vị và nhóm nhiệm vụ tương đồng; mức 25% chỉ mở khi ghi số quyết định ngoại lệ. Kết luận này tách biệt hoàn toàn với KPI doanh nghiệp.</p>
             </div>
             <Select value={effectiveCalibrationCycleId} onChange={event => setCalibrationCycleId(event.target.value)} className="min-w-[260px]">
-              {stateCycles.map(cycle => <option key={cycle.id} value={cycle.id}>{cycle.name} ({cycle.year})</option>)}
+              {calibrationCycles.map(cycle => <option key={cycle.id} value={cycle.id}>{cycle.name} ({cycle.year})</option>)}
             </Select>
           </div>
-          {!stateCycles.length ? <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">Chưa có chu kỳ khu vực công. Hãy chọn chế độ tổ chức tại Cấu hình tổ chức và tạo kỳ đánh giá mới.</div>
+          {!calibrationCycles.length ? <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">Chưa có kỳ tổng hợp năm. Hãy tạo đủ kỳ theo dõi tháng hoặc quý, sau đó tạo kỳ tổng hợp năm.</div>
             : isLoadingPublicDecisions ? <LoadingState text="Đang tải danh sách cần hiệu chuẩn..." />
             : <div className="grid gap-3 xl:grid-cols-2">
               {publicDecisions.map(row => {
@@ -1229,7 +1470,7 @@ export default function PerformanceKpiPage() {
                 return <article key={row.userId} className="space-y-3 rounded-lg border border-border bg-card p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div><h4 className="font-semibold">{row.employeeName}</h4><p className="text-xs text-muted-foreground">{row.jobTitle || 'Chưa có chức danh'} · {row.orgUnitName || 'Chưa gán đơn vị'}</p></div>
-                    <Badge variant={row.complete ? 'default' : 'outline'}>{row.complete ? `${row.score ?? 0} điểm · ${PUBLIC_CLASSIFICATIONS.find(item => item.value === row.scoreClassification)?.label ?? row.scoreClassification}` : row.missingTaskEvidence ? 'Thiếu minh chứng nhiệm vụ' : 'Chưa đủ điểm hoặc trọng số'}</Badge>
+                    <Badge variant={row.complete ? 'default' : 'outline'}>{row.complete ? `${row.score ?? 0} điểm · ${PUBLIC_CLASSIFICATIONS.find(item => item.value === row.scoreClassification)?.label ?? row.scoreClassification}` : row.periodsRequired ? `Thiếu kỳ theo dõi (${row.periodsCompleted ?? 0}/${row.periodsRequired})` : row.missingPublicDimensions ? 'Thiếu điểm số lượng, chất lượng hoặc tiến độ' : row.missingTaskEvidence ? 'Thiếu minh chứng nhiệm vụ' : 'Chưa đủ điểm hoặc trọng số'}</Badge>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="space-y-1 text-xs"><span className="font-medium">Nhóm nhiệm vụ tương đồng</span><Input value={draft.comparableGroup} onChange={event => updatePublicDecisionDraft(row, { comparableGroup: event.target.value })} placeholder="Ví dụ: Chuyên viên thẩm định hồ sơ" /></label>
@@ -1264,7 +1505,7 @@ export default function PerformanceKpiPage() {
                 <Medal className="w-4 h-4 mr-1.5 text-amber-500" />
                 Đồng Bộ Kết Quả Vào Hồ Sơ Cán Bộ (QT ĐGCB)
               </Button>}
-              {canManageCycles && <Button size="sm" onClick={() => setIsCycleModalOpen(true)}>
+              {canManageCycles && <Button size="sm" onClick={openCycleModal}>
                 <Plus className="w-4 h-4 mr-1.5" />
                 Tạo chu kỳ mới
               </Button>}
@@ -1277,6 +1518,9 @@ export default function PerformanceKpiPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-bold text-foreground text-base">{c.name}</h3>
+                    {c.organizationSector === 'state' && <p className="mt-1 text-xs font-semibold text-foreground">{c.periodType === 'ANNUAL'
+                      ? `Tổng hợp năm từ ${c.annualSourceFrequency === 'QUARTERLY' ? '4 kỳ quý' : '12 kỳ tháng'}`
+                      : c.periodType === 'QUARTERLY' ? 'Theo dõi theo quý' : c.periodType === 'MONTHLY' ? 'Theo dõi theo tháng' : 'Kỳ công vụ đã tạo trước đây'}</p>}
                     <div className="text-sm text-muted-foreground mt-1 font-medium">
                       Năm đánh giá: <b className="text-foreground">{c.year}</b> • Từ {new Date(c.startDate).toLocaleDateString('vi-VN')} đến {new Date(c.endDate).toLocaleDateString('vi-VN')}
                     </div>
@@ -1292,8 +1536,9 @@ export default function PerformanceKpiPage() {
                 )}
 
                 <div className="grid grid-cols-2 gap-2 bg-muted/20 p-3 rounded-lg text-sm">
-                  <div>Mục tiêu KRA: <b className="text-primary font-bold">{c._count?.goals ?? 0}</b></div>
+                  <div>{c.organizationSector === 'state' && c.periodType === 'ANNUAL' ? 'Nguồn dữ liệu' : 'Mục tiêu KRA'}: <b className="text-primary font-bold">{c.organizationSector === 'state' && c.periodType === 'ANNUAL' ? `${c.annualSourceFrequency === 'QUARTERLY' ? '4 quý' : '12 tháng'}` : c._count?.goals ?? 0}</b></div>
                   <div>{c.organizationSector === 'state' ? 'Khung đánh giá' : 'Tổng trọng số mục tiêu'}: <b className="text-foreground font-bold">{c.organizationSector === 'state' ? `${c.generalCriteriaWeight ?? 30} điểm chung + ${c.taskCriteriaWeight ?? 70} điểm nhiệm vụ` : `${goals.filter(goal => goal.cycleId === c.id).reduce((sum, goal) => sum + goal.weightage, 0)}%`}</b></div>
+                  {c.organizationSector === 'state' && c.publicPersonnelType === 'PUBLIC_EMPLOYEE' && c.periodType !== 'ANNUAL' && <div className="col-span-2 text-xs text-muted-foreground">Kết quả nhiệm vụ: số lượng {formatAppraisalScore(c.quantityCriteriaWeight ?? 100 / 3)}% · chất lượng {formatAppraisalScore(c.qualityCriteriaWeight ?? 100 / 3)}% · tiến độ {formatAppraisalScore(c.progressCriteriaWeight ?? 100 / 3)}%</div>}
                 </div>
 
                 <div className="pt-3 border-t flex items-center justify-between text-sm">
@@ -1355,43 +1600,75 @@ export default function PerformanceKpiPage() {
                   <label className="font-medium text-foreground block mb-1">Tên kỳ đánh giá:</label>
                   <Input
                     value={cycleForm.name}
-                    onChange={(e) => setCycleForm({ ...cycleForm, name: e.target.value })}
+                    onChange={(e) => updateCycleForm({ name: e.target.value })}
                     placeholder={isEnterprise ? 'VD: Chu kỳ đánh giá KPI 2026' : 'VD: Chu kỳ đánh giá công chức 2026'}
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <div>
                     <label className="font-medium text-foreground block mb-1">Năm:</label>
-                    <Input
-                      type="number"
-                      value={cycleForm.year}
-                      onChange={(e) => setCycleForm({ ...cycleForm, year: Number(e.target.value) })}
-                    />
+                    <Input type="number" value={cycleForm.year} onChange={(e) => updateCycleForm({ year: Number(e.target.value) })} />
                   </div>
-                  <div>
+                  {!isEnterprise && <div>
+                    <label className="font-medium text-foreground block mb-1">Loại kỳ công vụ:</label>
+                    <Select value={cycleForm.periodType} onChange={e => updateCycleForm({ periodType: e.target.value as AppraisalPeriodType })}>
+                      <option value="MONTHLY">Theo dõi tháng</option>
+                      <option value="QUARTERLY">Theo dõi quý</option>
+                      <option value="ANNUAL">Tổng hợp xếp loại năm</option>
+                    </Select>
+                  </div>}
+                  {!isEnterprise && cycleForm.periodType === 'MONTHLY' && <div>
+                    <label className="font-medium text-foreground block mb-1">Tháng:</label>
+                    <Select value={cycleForm.month} onChange={e => updateCycleForm({ month: Number(e.target.value) })}>
+                      {Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>Tháng {index + 1}</option>)}
+                    </Select>
+                  </div>}
+                  {!isEnterprise && cycleForm.periodType === 'QUARTERLY' && <div>
+                    <label className="font-medium text-foreground block mb-1">Quý:</label>
+                    <Select value={cycleForm.quarter} onChange={e => updateCycleForm({ quarter: Number(e.target.value) })}>
+                      {[1, 2, 3, 4].map(quarter => <option key={quarter} value={quarter}>Quý {quarter}</option>)}
+                    </Select>
+                  </div>}
+                  {!isEnterprise && cycleForm.periodType === 'ANNUAL' && <div>
+                    <label className="font-medium text-foreground block mb-1">Lấy kết quả từ:</label>
+                    <Select value={cycleForm.annualSourceFrequency} onChange={e => updateCycleForm({ annualSourceFrequency: e.target.value as 'MONTHLY' | 'QUARTERLY' })}>
+                      <option value="MONTHLY">12 kỳ tháng đã khóa</option>
+                      <option value="QUARTERLY">4 kỳ quý đã khóa</option>
+                    </Select>
+                  </div>}
+                  {isEnterprise && <div>
                     <label className="font-medium text-foreground block mb-1">Từ ngày:</label>
-                    <Input
-                      type="date"
-                      value={cycleForm.startDate}
-                      onChange={(e) => setCycleForm({ ...cycleForm, startDate: e.target.value })}
-                    />
-                  </div>
-                  <div>
+                    <Input type="date" value={cycleForm.startDate} onChange={e => updateCycleForm({ startDate: e.target.value })} />
+                  </div>}
+                  {isEnterprise && <div>
                     <label className="font-medium text-foreground block mb-1">Đến ngày:</label>
-                    <Input
-                      type="date"
-                      value={cycleForm.endDate}
-                      onChange={(e) => setCycleForm({ ...cycleForm, endDate: e.target.value })}
-                    />
-                  </div>
+                    <Input type="date" value={cycleForm.endDate} onChange={e => updateCycleForm({ endDate: e.target.value })} />
+                  </div>}
                 </div>
+                {!isEnterprise && <div className="grid grid-cols-2 gap-2 rounded-md border border-border bg-muted/20 p-3">
+                  <p><span className="text-muted-foreground">Từ ngày:</span> <b>{new Date(`${cycleForm.startDate}T00:00:00`).toLocaleDateString('vi-VN')}</b></p>
+                  <p><span className="text-muted-foreground">Đến ngày:</span> <b>{new Date(`${cycleForm.endDate}T00:00:00`).toLocaleDateString('vi-VN')}</b></p>
+                </div>}
+
+                {!isEnterprise && publicEmployee && cycleForm.periodType !== 'ANNUAL' && <div className="space-y-2 rounded-md border border-border p-3">
+                  <p className="font-medium">Tỷ trọng trong nhóm kết quả nhiệm vụ</p>
+                  <p className="text-muted-foreground">Điều chỉnh theo quy chế đánh giá do người đứng đầu đơn vị ban hành. Tổng ba tỷ trọng phải bằng 100%.</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <label className="space-y-1"><span>Số lượng (%)</span><Input type="number" min="0" max="100" step="0.01" value={cycleForm.quantityCriteriaWeight} onChange={e => updateCycleForm({ quantityCriteriaWeight: Number(e.target.value) })} /></label>
+                    <label className="space-y-1"><span>Chất lượng (%)</span><Input type="number" min="0" max="100" step="0.01" value={cycleForm.qualityCriteriaWeight} onChange={e => updateCycleForm({ qualityCriteriaWeight: Number(e.target.value) })} /></label>
+                    <label className="space-y-1"><span>Tiến độ (%)</span><Input type="number" min="0" max="100" step="0.01" value={cycleForm.progressCriteriaWeight} onChange={e => updateCycleForm({ progressCriteriaWeight: Number(e.target.value) })} /></label>
+                  </div>
+                  <p className={`text-xs ${Math.abs(cycleForm.quantityCriteriaWeight + cycleForm.qualityCriteriaWeight + cycleForm.progressCriteriaWeight - 100) < 0.001 ? 'text-muted-foreground' : 'text-destructive'}`}>
+                    Tổng tỷ trọng: {formatAppraisalScore(cycleForm.quantityCriteriaWeight + cycleForm.qualityCriteriaWeight + cycleForm.progressCriteriaWeight)}% / 100%
+                  </p>
+                </div>}
 
                 <div>
                   <label className="font-medium text-foreground block mb-1">Mô tả hướng dẫn:</label>
                   <textarea
                     value={cycleForm.description}
-                    onChange={(e) => setCycleForm({ ...cycleForm, description: e.target.value })}
+                    onChange={(e) => updateCycleForm({ description: e.target.value })}
                     rows={3}
                     className="w-full rounded-lg border border-border bg-card p-2 text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-primary"
                     placeholder="Tiêu chí đánh giá, đối tượng tham gia..."
@@ -1400,17 +1677,19 @@ export default function PerformanceKpiPage() {
                 <div className="rounded-lg border border-border bg-muted/30 p-3">
                   {isEnterprise ? <>
                     <p className="font-medium">Kết quả đánh giá theo KPI</p>
-                    <p className="mt-1 text-muted-foreground">Điểm quản lý chấm là điểm cuối của từng KPI. Điểm chu kỳ tính theo trọng số mục tiêu, tổng cộng bằng 100%.</p>
+                    <p className="mt-1 text-muted-foreground">Mỗi KPI đóng góp điểm = điểm KPI × trọng số. Ví dụ: 90 × 25% = 22,5 điểm; cộng các KPI để tính điểm chu kỳ khi tổng trọng số là 100%.</p>
                   </> : <>
-                    <p className="font-medium">Khung đánh giá khu vực nhà nước</p>
-                    <p className="mt-1 text-muted-foreground">Tiêu chí chung 30 điểm; kết quả nhiệm vụ 70 điểm. Ngưỡng tham chiếu 90 / 70 / 50; mỗi nhóm tiêu chí phân bổ đủ 100% trọng số.</p>
+                    <p className="font-medium">Khung đánh giá {cycleForm.periodType === 'ANNUAL' ? 'tổng hợp năm' : 'định kỳ'}</p>
+                    {cycleForm.periodType === 'ANNUAL'
+                      ? <p className="mt-1 text-muted-foreground">Kỳ năm không nhận mục tiêu riêng. Hệ thống lấy trung bình điểm từ đủ {cycleForm.annualSourceFrequency === 'QUARTERLY' ? '4 quý' : '12 tháng'} đã khóa; sau đó mới mở bước ghi kết luận xếp loại của cấp có thẩm quyền.</p>
+                      : <p className="mt-1 text-muted-foreground">Điểm chung tối đa 30; kết quả nhiệm vụ tối đa 70. Mỗi nhóm có trọng số riêng đủ 100%. Điểm năm được tổng hợp từ các kỳ tháng hoặc quý đã khóa. {publicEmployee ? 'Tỷ trọng số lượng, chất lượng và tiến độ lấy theo quy chế đơn vị.' : 'Điểm nhiệm vụ tính trung bình tỷ lệ số lượng, chất lượng và tiến độ theo Nghị định 335/2025.'}</p>}
                   </>}
                 </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t">
                 <Button variant="outline" size="sm" onClick={() => setIsCycleModalOpen(false)}>Hủy</Button>
-                <Button size="sm" onClick={() => createCycleMutation.mutate(cycleForm)} disabled={createCycleMutation.isPending}>
+                <Button size="sm" onClick={() => createCycleMutation.mutate(cycleForm)} disabled={createCycleMutation.isPending || !cycleDimensionWeightsValid}>
                   {createCycleMutation.isPending ? 'Đang tạo...' : 'Khởi Tạo Chu Kỳ'}
                 </Button>
               </div>
@@ -1464,7 +1743,7 @@ export default function PerformanceKpiPage() {
                       onChange={(e) => setGoalForm({ ...goalForm, cycleId: e.target.value })}
                       className="w-full text-xs"
                     >
-                      {cycles.map((c) => (
+                      {goalSetupCycles.map((c) => (
                         <option key={c.id} value={c.id}>{c.name} ({c.year})</option>
                       ))}
                     </Select>
@@ -1613,26 +1892,147 @@ export default function PerformanceKpiPage() {
                   <div className="text-xs text-primary font-bold mt-1">Trọng số: {selectedGoal.weightage}%</div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <label className="font-medium text-foreground block mb-1">Điểm KPI do quản lý chấm (thang 0–100):</label>
-                    <Input type="number" min="0" max="100" value={managerScore ?? ''} onChange={(e) => setManagerScore(e.target.value === '' ? null : Number(e.target.value))} />
+                {selectedGoalUsesPublicDimensions ? <div className="space-y-3">
+                  <p className="text-muted-foreground">Chấm theo tỷ lệ hoàn thành từng nhiệm vụ đã giao và căn cứ kèm theo.</p>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <label className="space-y-1"><span className="font-medium">Số lượng (%)</span><Input type="number" min="0" max="100" value={publicTaskScores.quantityScore ?? ''} onChange={e => setPublicTaskScores(current => ({ ...current, quantityScore: e.target.value === '' ? null : Number(e.target.value) }))} /></label>
+                    <label className="space-y-1"><span className="font-medium">Chất lượng (%)</span><Input type="number" min="0" max="100" value={publicTaskScores.qualityScore ?? ''} onChange={e => setPublicTaskScores(current => ({ ...current, qualityScore: e.target.value === '' ? null : Number(e.target.value) }))} /></label>
+                    <label className="space-y-1"><span className="font-medium">Tiến độ (%)</span><Input type="number" min="0" max="100" value={publicTaskScores.progressScore ?? ''} onChange={e => setPublicTaskScores(current => ({ ...current, progressScore: e.target.value === '' ? null : Number(e.target.value) }))} /></label>
                   </div>
-                </div>
+                </div> : <div>
+                  <label className="font-medium text-foreground block mb-1">Điểm KPI do quản lý chấm (thang 0–100):</label>
+                  <Input type="number" min="0" max="100" value={managerScore ?? ''} onChange={(e) => setManagerScore(e.target.value === '' ? null : Number(e.target.value))} />
+                </div>}
 
                 <div className="rounded-lg border border-border/80 bg-muted/20 p-3 space-y-2 text-xs">
                   <p className="font-semibold text-foreground">Cách tính:</p>
-                  <p className="text-muted-foreground">Điểm KPI là điểm quản lý chấm sau khi đối chiếu kết quả thực tế và minh chứng với mục tiêu. Điểm chu kỳ bằng tổng điểm KPI nhân trọng số từng mục tiêu; tổng trọng số phải đủ 100%.</p>
+                  {selectedGoalUsesPublicDimensions && <>
+                    <p className="text-muted-foreground">Điểm nhiệm vụ = số lượng × {formatAppraisalScore(selectedGoal.cycle?.quantityCriteriaWeight ?? 100 / 3)}% + chất lượng × {formatAppraisalScore(selectedGoal.cycle?.qualityCriteriaWeight ?? 100 / 3)}% + tiến độ × {formatAppraisalScore(selectedGoal.cycle?.progressCriteriaWeight ?? 100 / 3)}%.</p>
+                    {selectedGoalPublicAverage !== null && <p className="font-medium text-foreground">Điểm mục tiêu hiện tại: {formatAppraisalScore(publicTaskScores.quantityScore!)} × {formatAppraisalScore(selectedGoal.cycle?.quantityCriteriaWeight ?? 100 / 3)}% + {formatAppraisalScore(publicTaskScores.qualityScore!)} × {formatAppraisalScore(selectedGoal.cycle?.qualityCriteriaWeight ?? 100 / 3)}% + {formatAppraisalScore(publicTaskScores.progressScore!)} × {formatAppraisalScore(selectedGoal.cycle?.progressCriteriaWeight ?? 100 / 3)}% = {formatAppraisalScore(selectedGoalPublicAverage)}/100.</p>}
+                    <p className="text-muted-foreground">Điểm này được nhân tiếp với trọng số trong nhóm kết quả nhiệm vụ và tỷ trọng 70% của toàn kỳ.</p>
+                  </>}
+                  {!selectedGoalUsesPublicDimensions && <p className="text-muted-foreground">Phần điểm mục tiêu tính vào tổng kỳ = điểm quản lý chấm × trọng số. {selectedGoal.cycle?.organizationSector === 'state' ? 'Điểm tiêu chí chung được tính trong nhóm 30 điểm; kết quả nhiệm vụ thuộc nhóm 70 điểm.' : 'Tổng trọng số mục tiêu của nhân sự phải đủ 100%.'}</p>}
+                  {selectedGoal.finalScore != null && <p className="font-medium text-foreground">Điểm mục tiêu đã lưu: {selectedGoal.finalScore}/100; phần điểm trong kỳ là {goalWeightedContribution(selectedGoal) ? `${goalWeightedContribution(selectedGoal)!.formula} = ${formatAppraisalScore(goalWeightedContribution(selectedGoal)!.points)} / 100 điểm` : 'chưa tính'}.</p>}
                   <p className="text-muted-foreground">{selectedGoal.finalScore != null ? `Điểm đã lưu: ${selectedGoal.finalScore}/100.` : 'Điểm chưa được chấm.'} Kết quả không tự tạo thưởng hoặc thay đổi lương; quyết định đãi ngộ cần được phê duyệt riêng.</p>
-                  {(selectedGoal.evidences?.length ?? 0) === 0 && <p className="font-medium text-destructive">Chưa có kết quả và minh chứng. Hãy yêu cầu nhân viên cập nhật trước khi lưu điểm.</p>}
+                  {selectedGoalRequiresEvidence && (selectedGoal.evidences?.length ?? 0) === 0 && <p className="font-medium text-destructive">Chưa có kết quả và căn cứ đối chiếu. Hãy yêu cầu nhân viên cập nhật trước khi lưu điểm.</p>}
                 </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t">
                 <Button variant="outline" size="sm" onClick={() => setIsScoreModalOpen(false)}>Hủy</Button>
-                <Button size="sm" onClick={() => scoreGoalMutation.mutate()} disabled={scoreGoalMutation.isPending || managerScore === null || (selectedGoal.evidences?.length ?? 0) === 0}>
+                <Button size="sm" onClick={() => scoreGoalMutation.mutate()} disabled={scoreGoalMutation.isPending || !selectedGoalCanSaveScore || (selectedGoalRequiresEvidence && (selectedGoal.evidences?.length ?? 0) === 0)}>
                   {scoreGoalMutation.isPending ? 'Đang lưu...' : 'Lưu điểm KPI'}
                 </Button>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
+
+      {evidenceGoal && (
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <button type="button" aria-label="Đóng biểu mẫu minh chứng" className="fixed inset-0 bg-black/60" onClick={() => setEvidenceGoal(null)} />
+            <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl border border-border bg-card p-5 text-foreground shadow-2xl">
+              <div className="flex items-start justify-between gap-4 border-b border-border pb-3">
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-base">Ghi kết quả / minh chứng</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{evidenceGoal.kraTitle}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{evidenceGoal.employeeName} · {evidenceGoal.cycle?.name ?? 'Kỳ đánh giá'}</p>
+                </div>
+                <button type="button" aria-label="Đóng" onClick={() => setEvidenceGoal(null)} className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 space-y-4 overflow-y-auto py-4 text-sm">
+                {(evidenceGoal.evidences?.length ?? 0) > 0 && <div className="rounded-lg border border-border bg-muted/20 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-medium">Đã có {evidenceGoal.evidences?.length} kết quả / minh chứng</p>
+                    <button type="button" className="text-primary underline underline-offset-2" onClick={() => {
+                      setEvidenceViewGoal(evidenceGoal);
+                      setEvidenceGoal(null);
+                    }}>Xem nội dung đã ghi</button>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">Có thể ghi bổ sung kết quả mới; nội dung đã gửi sẽ được giữ trong lịch sử.</p>
+                </div>}
+
+                <label className="block space-y-1.5">
+                  <span className="font-medium">Kết quả thực tế / số liệu đạt được</span>
+                  <Input maxLength={300} value={evidenceForm.metricValue} onChange={(event) => setEvidenceForm({ ...evidenceForm, metricValue: event.target.value })} placeholder="Ví dụ: 9/10 bài viết đúng hạn (90%)" />
+                </label>
+                <label className="block space-y-1.5">
+                  <span className="font-medium">Mô tả kết quả và căn cứ đối chiếu <span className="text-destructive">*</span></span>
+                  <textarea
+                    value={evidenceForm.description}
+                    onChange={(event) => setEvidenceForm({ ...evidenceForm, description: event.target.value })}
+                    rows={4}
+                    maxLength={2000}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-hidden focus:ring-2 focus:ring-ring"
+                    placeholder="Nêu kết quả, thời gian thực hiện và nguồn số liệu hoặc tài liệu để quản lý kiểm tra."
+                  />
+                  <span className="text-xs text-muted-foreground">Tối thiểu 3 ký tự. Hãy ghi đủ căn cứ để quản lý có thể đối chiếu.</span>
+                </label>
+                <label className="block space-y-1.5">
+                  <span className="font-medium">Đường dẫn tài liệu đính kèm <span className="font-normal text-muted-foreground">(nếu có)</span></span>
+                  <Input maxLength={1000} value={evidenceForm.evidenceUrl} onChange={(event) => setEvidenceForm({ ...evidenceForm, evidenceUrl: event.target.value })} placeholder="https://... hoặc /đường-dẫn-tài-liệu-nội-bộ" />
+                </label>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
+                <p className="text-xs text-muted-foreground">Kết quả được lưu cùng mục tiêu KPI để người đánh giá xem trước khi chấm.</p>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setEvidenceGoal(null)}>Hủy</Button>
+                  <Button size="sm" onClick={() => addEvidenceMutation.mutate()} disabled={addEvidenceMutation.isPending || evidenceForm.description.trim().length < 3}>
+                    {addEvidenceMutation.isPending ? 'Đang lưu...' : 'Lưu kết quả / minh chứng'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
+
+      {evidenceViewGoal && (
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <button type="button" aria-label="Đóng danh sách minh chứng" className="fixed inset-0 bg-black/60" onClick={() => setEvidenceViewGoal(null)} />
+            <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl border border-border bg-card p-5 text-foreground shadow-2xl">
+              <div className="flex items-start justify-between gap-4 border-b border-border pb-3">
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-base">Kết quả và minh chứng</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{evidenceViewGoal.kraTitle}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{evidenceViewGoal.employeeName} · {evidenceViewGoal.cycle?.name ?? 'Kỳ đánh giá'} · {evidenceViewGoal.evidences?.length ?? 0} mục</p>
+                </div>
+                <button type="button" aria-label="Đóng" onClick={() => setEvidenceViewGoal(null)} className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="flex-1 space-y-3 overflow-y-auto py-4">
+                {(evidenceViewGoal.evidences ?? []).length === 0 ? <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Mục tiêu này chưa có kết quả hoặc minh chứng.</div> :
+                  [...(evidenceViewGoal.evidences ?? [])].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).map((evidence, index) => {
+                    const href = safeEvidenceHref(evidence.evidenceUrl);
+                    return <article key={evidence.id} className="space-y-2 rounded-lg border border-border p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h4 className="font-medium">Kết quả / minh chứng {index + 1}</h4>
+                        <time className="text-xs text-muted-foreground">{formatDateTime(evidence.createdAt)}</time>
+                      </div>
+                      {evidence.metricValue && <div className="rounded-md bg-muted/30 px-3 py-2 text-sm"><span className="text-muted-foreground">Kết quả thực tế: </span><strong>{evidence.metricValue}</strong></div>}
+                      <p className="whitespace-pre-wrap text-sm leading-6">{evidence.description}</p>
+                      {evidence.evidenceUrl && (href
+                        ? <a href={href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-2"><ExternalLink className="h-4 w-4" /> Mở tài liệu đính kèm</a>
+                        : <p className="break-all text-xs text-muted-foreground">Đường dẫn tài liệu đã lưu nhưng không thể mở an toàn: {evidence.evidenceUrl}</p>)}
+                    </article>;
+                  })}
+              </div>
+              <div className="flex justify-end gap-2 border-t border-border pt-3">
+                {(evidenceViewGoal.userId === currentUser?.id || canManageGoals) && <Button variant="outline" size="sm" onClick={() => {
+                  const goal = evidenceViewGoal;
+                  setEvidenceViewGoal(null);
+                  setEvidenceGoal(goal);
+                  setEvidenceForm({ description: '', metricValue: '', evidenceUrl: '' });
+                }}>Ghi bổ sung</Button>}
+                <Button size="sm" onClick={() => setEvidenceViewGoal(null)}>Đóng</Button>
               </div>
             </div>
           </div>

@@ -18,7 +18,7 @@ export default function PerformanceGuidePage() {
   const steps = isEnterprise ? [
     {
       number: '1', title: 'Tạo chu kỳ đánh giá', owner: 'HR / Quản trị nhân sự', icon: Calendar,
-      text: 'HR chọn năm, ngày bắt đầu và ngày kết thúc tại mục Chu kỳ đánh giá. Chu kỳ chụp lại chế độ doanh nghiệp hoặc khu vực công đang cấu hình; chỉ tạo một kỳ khi phạm vi thời gian và cách đánh giá đã rõ.',
+      text: 'HR chọn năm, thời gian bắt đầu và kết thúc. Kỳ ghi nhận chế độ doanh nghiệp hoặc khu vực công đang cấu hình để các mục tiêu và phép tính dùng đúng khung đã chọn.',
       href: '/performance?tab=cycles', action: 'Mở chu kỳ',
     },
     {
@@ -38,34 +38,34 @@ export default function PerformanceGuidePage() {
     },
     {
       number: '5', title: 'Đối chiếu và chấm từng KPI', owner: 'Quản lý trực tiếp', icon: UserRoundCheck,
-      text: 'Quản lý xem chỉ số, kết quả và minh chứng; trao đổi với nhân viên về chênh lệch hoặc yếu tố ngoài khả năng kiểm soát. Hệ thống chỉ cho lưu điểm 0–100 khi KPI đã có minh chứng. Điểm kỳ bằng tổng điểm từng KPI nhân với trọng số.',
+      text: 'Quản lý xem chỉ số, kết quả và minh chứng; trao đổi với nhân viên về chênh lệch hoặc yếu tố ngoài khả năng kiểm soát. Hệ thống chỉ cho lưu điểm 0–100 khi KPI đã có minh chứng. Mỗi KPI đóng góp điểm bằng điểm KPI nhân trọng số rồi chia 100; ví dụ 90 × 25% = 22,5 điểm. Cộng các KPI để ra điểm chu kỳ.',
       href: '/performance?tab=goals', action: 'Rà soát kết quả',
     },
     {
       number: '6', title: 'Rà soát và đóng chu kỳ', owner: 'HR / Người có quyền quản lý chu kỳ', icon: CheckCircle2,
-      text: 'HR rà soát danh sách nhân sự, tổng trọng số 100% cho từng người, điểm và minh chứng. Hệ thống chặn đóng kỳ nếu còn mục tiêu thiếu trọng số, điểm hoặc minh chứng. Sau khi đóng, kết quả được giữ làm lịch sử; thưởng, tăng lương hoặc quyết định nhân sự vẫn cần quy chế và phê duyệt riêng.',
+      text: 'HR rà soát từng người: tổng trọng số phải đủ 100%, mỗi KPI có điểm và minh chứng. Hệ thống chặn đóng kỳ nếu còn thiếu một trong các điều kiện này. Kết quả được lưu làm lịch sử; thưởng, tăng lương hoặc quyết định nhân sự cần quy chế và phê duyệt riêng.',
       href: '/performance?tab=cycles', action: 'Kiểm tra chu kỳ',
     },
   ] : [
     {
-      number: '1', title: 'Tạo kỳ theo đúng loại đơn vị', owner: 'HR / Quản trị nhân sự', icon: Target,
-      text: `Chọn loại nhân sự công chức hoặc viên chức trong cấu hình tổ chức trước khi tạo kỳ. Kỳ đánh giá lưu ảnh chụp chế độ và căn cứ áp dụng (${publicRule}); thay đổi cấu hình chỉ ảnh hưởng các kỳ mới.`,
+      number: '1', title: 'Tạo kỳ theo dõi và kỳ tổng hợp năm', owner: 'HR / Quản trị nhân sự', icon: Target,
+      text: `Chọn công chức hoặc viên chức trong cấu hình tổ chức. Tạo kỳ tháng hoặc quý để ghi nhận điểm; cuối năm tạo kỳ tổng hợp từ đủ 12 tháng hoặc 4 quý đã khóa. Mỗi kỳ lưu căn cứ áp dụng (${publicRule}).`,
       href: '/performance?tab=cycles', action: 'Xem chu kỳ đánh giá',
     },
     {
-      number: '2', title: 'Giao tiêu chí và nhiệm vụ', owner: 'Thủ trưởng đơn vị / Quản lý trực tiếp', icon: FileSearch,
-      text: 'Khung hiện tại chia 30 điểm cho tiêu chí chung và 70 điểm cho kết quả thực hiện nhiệm vụ; từng nhóm có tổng trọng số riêng bằng 100%. Nhập kết quả, căn cứ và nhận xét theo nhiệm vụ được giao.',
+      number: '2', title: 'Giao tiêu chí chung và nhiệm vụ', owner: 'Thủ trưởng đơn vị / Quản lý trực tiếp', icon: FileSearch,
+      text: 'Mục tiêu có thể giao cho một người hoặc giao theo phòng ban/đơn vị; mục tiêu giao theo đơn vị được đánh giá riêng cho từng nhân viên. Nhóm tiêu chí chung và nhóm nhiệm vụ có trọng số riêng đủ 100%; tỷ trọng hai nhóm mặc định là 30/70. Mỗi nhiệm vụ ghi sản phẩm, chỉ số đo, thời hạn và căn cứ đối chiếu.',
       href: '/performance?tab=goals', action: 'Mở tiêu chí đánh giá',
     },
     {
-      number: '3', title: 'Chấm và rà soát theo thẩm quyền', owner: 'Quản lý, HR và người có thẩm quyền', icon: UserRoundCheck,
-      text: 'Người có thẩm quyền xem điểm, điều kiện xếp loại, nhóm nhiệm vụ tương đồng và căn cứ kết luận. Hệ thống lưu quyết định, lý do và bước hiệu chuẩn; không tự nâng mức xếp loại vượt ngưỡng điểm.',
+      number: '3', title: 'Chấm kết quả định kỳ', owner: 'Quản lý trực tiếp / Nhân viên', icon: UserRoundCheck,
+      text: `Với từng nhiệm vụ, ghi điểm số lượng, chất lượng và tiến độ. Công chức dùng tỷ trọng đều; với viên chức, nhập tỷ trọng theo quy chế của đơn vị. Ví dụ điểm nhiệm vụ 90, trọng số trong nhóm 25% và nhóm nhiệm vụ chiếm 70% thì mục tiêu đóng góp 90 × 25% × 70% = 15,75 điểm.`,
       href: '/performance?tab=cycles', action: 'Xem trạng thái chu kỳ',
     },
     {
-      number: '4', title: 'Lưu kết luận và đóng kỳ', owner: 'Cơ quan có thẩm quyền / HR', icon: Scale,
-      text: 'Tỷ lệ xếp loại xuất sắc và ngoại lệ chỉ được kiểm tra trong phạm vi khu vực công theo nhóm đơn vị, nhóm nhiệm vụ và quy định áp dụng. Đây không phải hạn ngạch KPI doanh nghiệp. Biểu mẫu pháp quy, chữ ký số và toàn bộ quy trình phê duyệt cơ quan cần được cấu hình, kiểm chứng riêng.',
-      href: '/performance?tab=cycles', action: 'Kiểm tra trạng thái kỳ',
+      number: '4', title: 'Tổng hợp năm và chốt xếp loại', owner: 'Cơ quan có thẩm quyền / HR', icon: Scale,
+      text: 'Điểm năm là trung bình cộng điểm các kỳ tháng hoặc quý đã khóa. Cấp có thẩm quyền xem điểm, điều kiện xếp loại, nhóm nhiệm vụ tương đồng và căn cứ kết luận. Tỷ lệ xuất sắc cùng ngoại lệ được kiểm tra trong phạm vi khu vực công; kết quả không tự nâng xếp loại vượt ngưỡng điểm.',
+      href: '/performance?tab=calibration', action: 'Mở tổng hợp công vụ',
     },
   ];
 
@@ -78,6 +78,7 @@ export default function PerformanceGuidePage() {
           : `Hướng dẫn đánh giá công chức hoặc viên chức theo chế độ tổ chức đã chọn; căn cứ hiện hành: ${publicRule}.`}
         breadcrumbs={[{ label: 'Phát triển' }, { label: 'Cách đánh giá nhân sự' }]}
         actions={<Link href="/performance"><Button><ClipboardCheck className="h-4 w-4" />Đi đến đánh giá KPI</Button></Link>}
+        className="border-b-0"
       />
 
       <Card className="border-primary/25 bg-primary/5 p-5 sm:p-6">
@@ -85,25 +86,45 @@ export default function PerformanceGuidePage() {
         {isEnterprise ? (
           <div className="mt-3 grid gap-4 md:grid-cols-2">
             <div><p className="font-medium">Kết quả KPI</p><p className="mt-1 text-sm leading-6 text-muted-foreground">Đo tiến độ, chất lượng, sản lượng, mức phục vụ hoặc độ chính xác theo vị trí. Chỉ tiêu phải nằm trong phạm vi người được đánh giá có thể tác động và có nguồn dữ liệu để đối chiếu.</p></div>
-            <div><p className="font-medium">Cách tổng hợp điểm</p><p className="mt-1 text-sm leading-6 text-muted-foreground">Quản lý chấm từng KPI trên thang 0–100 dựa vào kết quả và minh chứng. Điểm chu kỳ là tổng điểm KPI nhân với trọng số của từng mục tiêu; tổng trọng số phải bằng 100%.</p></div>
+            <div><p className="font-medium">Phạm vi giao</p><p className="mt-1 text-sm leading-6 text-muted-foreground">Có KPI giao riêng cho cá nhân và KPI giao theo phòng ban/khối/đơn vị. Mục tiêu giao theo đơn vị được chấm riêng cho từng nhân viên nhận mục tiêu.</p></div>
           </div>
         ) : (
           <div className="mt-3 grid gap-4 md:grid-cols-2">
-            <div><p className="font-medium">Điểm đánh giá</p><p className="mt-1 text-sm leading-6 text-muted-foreground">Kỳ công vụ hiện dùng 30 điểm tiêu chí chung và 70 điểm kết quả nhiệm vụ. Mức xếp loại phải căn cứ ngưỡng điểm, điều kiện pháp lý, nhận xét và kết luận của cấp có thẩm quyền.</p></div>
+            <div><p className="font-medium">Khung điểm</p><p className="mt-1 text-sm leading-6 text-muted-foreground">Một kỳ tối đa 100 điểm, gồm nhóm tiêu chí chung và nhóm kết quả nhiệm vụ. Tỷ trọng mặc định là 30% và 70%; trọng số đang dùng được lưu trong từng kỳ.</p></div>
             <div><p className="font-medium">Hiệu chuẩn thuộc khu vực công</p><p className="mt-1 text-sm leading-6 text-muted-foreground">Hệ thống ghi kết luận cuối, nhóm nhiệm vụ, căn cứ và kiểm tra tỷ lệ xuất sắc trong phạm vi khu vực công. Không áp dụng tỷ lệ này cho doanh nghiệp; mẫu pháp quy và ký duyệt chính thức vẫn cần tích hợp, xác nhận theo từng cơ quan.</p></div>
           </div>
         )}
       </Card>
 
-      {isEnterprise && <Card className="space-y-3 p-5 sm:p-6">
-        <h2 className="font-semibold">Kết quả được tính từ đâu?</h2>
-        <p className="text-sm leading-6 text-muted-foreground">Người quản lý thiết lập mục tiêu, chỉ số đo và trọng số; nhân viên cập nhật kết quả cùng minh chứng trong kỳ. Cuối kỳ, quản lý đối chiếu dữ liệu đã ghi nhận và chấm từng KPI. Hệ thống hiện lưu kết quả và minh chứng do người dùng nhập, chưa tự lấy số liệu từ doanh số, ticket, SLA hay các hệ thống nghiệp vụ khác.</p>
-        <div className="rounded-lg bg-background p-4 text-sm leading-6">
-          <p><b>Điểm KPI</b> = điểm do quản lý chấm sau khi đối chiếu kết quả và minh chứng.</p>
-          <p><b>Điểm chu kỳ</b> = tổng điểm mục tiêu × trọng số mục tiêu; trọng số mục tiêu của nhân viên phải cộng đủ 100%.</p>
-        </div>
-        <p className="text-sm leading-6 text-muted-foreground">Vì vậy, để đánh giá sát thực tế, đầu kỳ hai bên nên thống nhất mức gốc, mục tiêu, đơn vị đo, nguồn kiểm chứng, thời hạn và cách xử lý yếu tố ngoài khả năng kiểm soát. Trong kỳ cập nhật kết quả cùng minh chứng; cuối kỳ dùng chứng cứ đó để chấm. KPI không tự quyết định tăng lương hoặc thưởng; P3 vẫn cần chính sách và quy trình phê duyệt riêng.</p>
-      </Card>}
+      <Card className="space-y-4 p-5 sm:p-6">
+        <h2 className="font-semibold">{isEnterprise ? 'Cách tính điểm KPI trong một kỳ' : 'Cách tính điểm đánh giá công vụ'}</h2>
+        {isEnterprise ? <>
+          <p className="text-sm leading-6 text-muted-foreground">Quản lý chấm từng KPI từ 0 đến 100 sau khi đối chiếu kết quả thực tế và minh chứng. Hệ thống tính riêng điểm cho từng nhân viên, kể cả với mục tiêu được giao theo phòng ban.</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="rounded-lg border border-border p-4"><h3 className="font-medium">KPI cá nhân</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">Giao đích danh cho một nhân viên; điểm và trọng số thuộc kỳ đánh giá của người đó.</p></div>
+            <div className="rounded-lg border border-border p-4"><h3 className="font-medium">KPI phòng ban/đơn vị</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">Hệ thống tạo một bản mục tiêu cho mỗi nhân viên đủ điều kiện trong đơn vị. Mỗi người có kết quả và minh chứng riêng; hiện chưa có điểm tổng hợp riêng cho phòng ban.</p></div>
+          </div>
+          <div className="rounded-lg bg-background p-4 text-sm leading-6">
+            <p><b>Điểm đóng góp của một KPI</b> = điểm KPI × trọng số KPI / 100.</p>
+            <p><b>Điểm chu kỳ của nhân viên</b> = tổng điểm đóng góp của các KPI.</p>
+            <p className="text-muted-foreground">Tổng trọng số các KPI cá nhân và KPI được giao theo đơn vị của một nhân viên phải bằng 100%.</p>
+            <p className="mt-2"><b>Ví dụ:</b> KPI cá nhân đạt 90 điểm, trọng số 40%; hai KPI phòng ban lần lượt đạt 80 điểm với trọng số 35% và 100 điểm với trọng số 25%.</p>
+            <p>Điểm chu kỳ = 90 × 40 / 100 + 80 × 35 / 100 + 100 × 25 / 100 = 36 + 28 + 25 = <b>89/100 điểm</b>.</p>
+          </div>
+          <p className="text-sm leading-6 text-muted-foreground">Đầu kỳ, quản lý và nhân viên thống nhất mục tiêu, đơn vị đo, nguồn kiểm chứng và thời hạn. Trong kỳ, nhân viên cập nhật kết quả cùng minh chứng; cuối kỳ, quản lý dùng các căn cứ đó để chấm. Kết quả KPI không tự thay đổi lương hoặc thưởng; quyết định đãi ngộ cần quy chế và phê duyệt riêng.</p>
+        </> : <>
+          <p className="text-sm leading-6 text-muted-foreground">Mỗi tiêu chí hoặc nhiệm vụ được chấm trên thang 0–100. Trọng số các tiêu chí phải đủ 100% trong từng nhóm. Tỷ trọng hai nhóm lấy theo cấu hình của kỳ, mặc định là 30% tiêu chí chung và 70% kết quả nhiệm vụ.</p>
+          <div className="rounded-lg bg-background p-4 text-sm leading-6">
+            <p><b>Điểm một nhiệm vụ</b> = điểm số lượng × tỷ trọng số lượng + điểm chất lượng × tỷ trọng chất lượng + điểm tiến độ × tỷ trọng tiến độ.</p>
+            <p><b>Điểm nhóm</b> = tổng (điểm tiêu chí × trọng số tiêu chí trong nhóm / 100).</p>
+            <p><b>Điểm kỳ</b> = điểm nhóm tiêu chí chung × tỷ trọng nhóm chung + điểm nhóm nhiệm vụ × tỷ trọng nhóm nhiệm vụ.</p>
+            <p className="mt-2"><b>Ví dụ:</b> nhiệm vụ có điểm số lượng 90, chất lượng 80, tiến độ 100; tỷ trọng lần lượt 40%, 35%, 25%.</p>
+            <p>Điểm nhiệm vụ = 90 × 40% + 80 × 35% + 100 × 25% = <b>89/100</b>.</p>
+            <p>Nếu điểm nhóm chung là 85 và điểm nhóm nhiệm vụ là 89, điểm kỳ = 85 × 30% + 89 × 70% = <b>87,8/100 điểm</b>.</p>
+          </div>
+          <p className="text-sm leading-6 text-muted-foreground">Với công chức, tỷ trọng số lượng, chất lượng và tiến độ được chia đều; với viên chức, dùng tỷ trọng đã cấu hình theo quy chế của đơn vị. Điểm năm là trung bình cộng điểm các kỳ tháng hoặc quý đã khóa; cấp có thẩm quyền xem điều kiện và hồ sơ trước khi kết luận xếp loại.</p>
+        </>}
+      </Card>
 
       <section className="grid gap-4 lg:grid-cols-2" aria-label="Các bước đánh giá nhân sự">
         {steps.map(({ number, title, owner, icon: Icon, text, href, action }) => (
@@ -139,7 +160,7 @@ export default function PerformanceGuidePage() {
         {isEnterprise ? (
           <p className="text-sm leading-6 text-muted-foreground">Mỗi nhân viên trong kỳ phải có tổng trọng số KPI bằng 100%. Từng KPI phải có kết quả chấm của quản lý và ít nhất một minh chứng. Nếu một người còn thiếu bất kỳ điều kiện nào, hệ thống không cho chuyển kỳ sang trạng thái hoàn tất. Đơn vị có thể xem hồ sơ còn thiếu bằng cách lọc theo phòng ban hoặc khối trong tab Mục tiêu.</p>
         ) : (
-          <p className="text-sm leading-6 text-muted-foreground">Mỗi người cần đủ 100% trọng số trong nhóm tiêu chí chung và nhóm kết quả nhiệm vụ; phần kết quả nhiệm vụ phải có minh chứng. Người có thẩm quyền phải lưu kết luận cho từng người. Hệ thống kiểm tra điều kiện và tỷ lệ xếp loại trước khi đóng kỳ công vụ.</p>
+          <p className="text-sm leading-6 text-muted-foreground">Kỳ tháng hoặc quý cần đủ 100% trọng số ở từng nhóm, điểm chấm cho mọi tiêu chí và căn cứ cho mọi nhiệm vụ. Kỳ năm cần đủ 12 kỳ tháng hoặc 4 kỳ quý đã khóa; sau đó người có thẩm quyền lưu kết luận cho từng người. Kiểm tra tỷ lệ xếp loại chỉ diễn ra ở bước tổng hợp năm.</p>
         )}
       </Card>
 
