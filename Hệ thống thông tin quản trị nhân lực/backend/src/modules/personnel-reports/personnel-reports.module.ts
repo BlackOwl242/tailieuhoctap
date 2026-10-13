@@ -1,6 +1,6 @@
 import { HrAccessService } from '../../common/services/hr-access.service';
 import {
-  Controller, Get, Injectable, Module, NotFoundException, Param,
+  Controller, Get, Injectable, Module, NotFoundException, Param, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../../common/prisma.service';
@@ -10,6 +10,17 @@ import type { AuthUser } from '../../common/types/auth-user';
 @Injectable()
 export class PersonnelReportsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private async scopedUnitIds(orgUnitId?: string): Promise<string[] | undefined> {
+    if (!orgUnitId) return undefined;
+    const unit = await this.prisma.orgUnit.findUnique({ where: { id: orgUnitId } });
+    if (!unit) throw new NotFoundException('Không tìm thấy đơn vị được chọn');
+    const descendants = await this.prisma.orgUnit.findMany({
+      where: { path: { startsWith: `${unit.path}${unit.id}/` } },
+      select: { id: true },
+    });
+    return [unit.id, ...descendants.map((child) => child.id)];
+  }
 
   /**
    * Xuất dữ liệu Sơ yếu lý lịch chuẩn 4 trang (111 trường thông tin).
@@ -143,9 +154,11 @@ export class PersonnelReportsService {
    * BÁO CÁO THỐNG KÊ BIỂU 01: CƠ CẤU ĐỘ TUỔI THEO NGẠCH BẬC LƯƠNG
    * - Ma trận các ngạch lương x 6 nhóm tuổi: [<30, 30-39, 40-49, 50-54, 55-59, >=60].
    */
-  async getAgeByRankReport() {
+  async getAgeByRankReport(orgUnitId?: string) {
+    const unitIds = await this.scopedUnitIds(orgUnitId);
     const ranks = await this.prisma.personnelRank.findMany({ orderBy: [{ groupCode: 'asc' }, { code: 'asc' }] });
     const profiles = await this.prisma.personnelComprehensiveProfile.findMany({
+      where: unitIds ? { user: { orgUnitId: { in: unitIds } } } : undefined,
       include: {
         user: { select: { birthDate: true } },
         rank: true,
@@ -199,15 +212,17 @@ export class PersonnelReportsService {
     return {
       reportTitle: 'BÁO CÁO THỐNG KÊ CƠ CẤU ĐỘ TUỔI THEO NGẠCH LƯƠNG (BIỂU 01)',
       generatedAt: new Date().toISOString(),
-      rows: Object.values(rankMap).filter((r) => r.total > 0 || ranks.length <= 15),
+      rows: Object.values(rankMap).filter((r) => r.total > 0 || (!orgUnitId && ranks.length <= 15)),
     };
   }
 
   /**
    * BÁO CÁO THỐNG KÊ BIỂU 02: TRÌNH ĐỘ NGOẠI NGỮ & TIN HỌC THEO CHỨC DANH / NGẠCH
    */
-  async getLanguageReport() {
+  async getLanguageReport(orgUnitId?: string) {
+    const unitIds = await this.scopedUnitIds(orgUnitId);
     const profiles = await this.prisma.personnelComprehensiveProfile.findMany({
+      where: unitIds ? { user: { orgUnitId: { in: unitIds } } } : undefined,
       include: {
         user: { select: { fullName: true, employeeCode: true, jobTitle: true, orgUnit: true } },
         rank: true,
@@ -247,9 +262,14 @@ export class PersonnelReportsService {
   /**
    * BÁO CÁO THỐNG KÊ BIỂU 03: TRÌNH ĐỘ CHUYÊN MÔN & LÝ LUẬN CHÍNH TRỊ THEO ĐƠN VỊ
    */
-  async getEducationByUnitReport() {
-    const orgUnits = await this.prisma.orgUnit.findMany({ orderBy: { code: 'asc' } });
+  async getEducationByUnitReport(orgUnitId?: string) {
+    const unitIds = await this.scopedUnitIds(orgUnitId);
+    const orgUnits = await this.prisma.orgUnit.findMany({
+      where: unitIds ? { id: { in: unitIds } } : undefined,
+      orderBy: { code: 'asc' },
+    });
     const profiles = await this.prisma.personnelComprehensiveProfile.findMany({
+      where: unitIds ? { user: { orgUnitId: { in: unitIds } } } : undefined,
       include: {
         user: { select: { orgUnitId: true, fullName: true, employeeCode: true } },
       },
@@ -321,26 +341,26 @@ export class PersonnelReportsController {
 
   @Get('bieu-01-age-rank')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  getAgeByRank() {
-    return this.service.getAgeByRankReport();
+  getAgeByRank(@Query('orgUnitId') orgUnitId?: string) {
+    return this.service.getAgeByRankReport(orgUnitId);
   }
 
   @Get('bieu-02-languages')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  getLanguages() {
-    return this.service.getLanguageReport();
+  getLanguages(@Query('orgUnitId') orgUnitId?: string) {
+    return this.service.getLanguageReport(orgUnitId);
   }
 
   @Get('bieu-03-education-unit')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  getEducationByUnit() {
-    return this.service.getEducationByUnitReport();
+  getEducationByUnit(@Query('orgUnitId') orgUnitId?: string) {
+    return this.service.getEducationByUnitReport(orgUnitId);
   }
 
   @Get('bieu-03-education-org')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  getEducationByOrg() {
-    return this.service.getEducationByUnitReport();
+  getEducationByOrg(@Query('orgUnitId') orgUnitId?: string) {
+    return this.service.getEducationByUnitReport(orgUnitId);
   }
 }
 

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import { Badge, Button, Card, Input } from '@/components/ui/primitives';
+import { Badge, Button, Card, Input, Select } from '@/components/ui/primitives';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock, PrintExportDropdown } from '@/components/ui/print';
@@ -19,6 +19,14 @@ import { StateCivilServantProfile } from '@/components/personnel/StateCivilServa
 import { EnterprisePersonnelProfile } from '@/components/personnel/EnterprisePersonnelProfile';
 import { SearchableEmployeeSelect } from '@/components/personnel/SearchableEmployeeSelect';
 
+type ReportOrgUnit = {
+  id: string;
+  name: string;
+  code: string;
+  parentId: string | null;
+  path: string;
+};
+
 export default function PersonnelReportsPage() {
   const searchParams = useSearchParams();
   const initialUserId = searchParams.get('userId');
@@ -27,6 +35,25 @@ export default function PersonnelReportsPage() {
   const [activeReport, setActiveReport] = useState<'2c' | 'bieu01' | 'bieu02' | 'bieu03'>('2c');
   const [selectedUserId, setSelectedUserId] = useState<string>(initialUserId || '');
   const [cvMode, setCvMode] = useState<'enterprise' | 'state'>(isEnterpriseSector(orgConfig) ? 'enterprise' : 'state');
+  const [selectedBlockId, setSelectedBlockId] = useState('');
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState('');
+
+  const qOrgUnits = useQuery({
+    queryKey: ['org-units'],
+    queryFn: async () => (await api.get<ReportOrgUnit[]>('/org-units')).data,
+  });
+  const orgUnits = qOrgUnits.data || [];
+  const blocks = orgUnits.filter((unit) => /^khối\b/i.test(unit.name));
+  const selectedBlock = orgUnits.find((unit) => unit.id === selectedBlockId);
+  const departments = orgUnits.filter((unit) =>
+    unit.id !== selectedBlockId &&
+    !/^khối\b/i.test(unit.name) &&
+    (selectedBlock
+      ? unit.path.startsWith(`${selectedBlock.path}${selectedBlock.id}/`)
+      : Boolean(unit.parentId) || /^ban\b/i.test(unit.name))
+  );
+  const scopeId = selectedDepartmentId || selectedBlockId;
+  const scopeName = orgUnits.find((unit) => unit.id === scopeId)?.name || 'Toàn tổ chức';
 
   useEffect(() => {
     setCvMode(isEnterpriseSector(orgConfig) ? 'enterprise' : 'state');
@@ -65,22 +92,22 @@ export default function PersonnelReportsPage() {
 
   // Query Biểu 01: Tuổi x Ngạch
   const qBieu01 = useQuery({
-    queryKey: ['report-bieu-01'],
-    queryFn: async () => (await api.get('/personnel-reports/bieu-01-age-rank')).data,
+    queryKey: ['report-bieu-01', scopeId],
+    queryFn: async () => (await api.get('/personnel-reports/bieu-01-age-rank', { params: scopeId ? { orgUnitId: scopeId } : {} })).data,
     enabled: activeReport === 'bieu01',
   });
 
   // Query Biểu 02: Ngoại ngữ
   const qBieu02 = useQuery({
-    queryKey: ['report-bieu-02'],
-    queryFn: async () => (await api.get('/personnel-reports/bieu-02-languages')).data,
+    queryKey: ['report-bieu-02', scopeId],
+    queryFn: async () => (await api.get('/personnel-reports/bieu-02-languages', { params: scopeId ? { orgUnitId: scopeId } : {} })).data,
     enabled: activeReport === 'bieu02',
   });
 
   // Query Biểu 03: Trình độ x Đơn vị
   const qBieu03 = useQuery({
-    queryKey: ['report-bieu-03'],
-    queryFn: async () => (await api.get('/personnel-reports/bieu-03-education-unit')).data,
+    queryKey: ['report-bieu-03', scopeId],
+    queryFn: async () => (await api.get('/personnel-reports/bieu-03-education-unit', { params: scopeId ? { orgUnitId: scopeId } : {} })).data,
     enabled: activeReport === 'bieu03',
   });
 
@@ -118,6 +145,37 @@ export default function PersonnelReportsPage() {
           );
         })}
       </div>
+
+      {activeReport !== '2c' && (
+        <div className="no-print flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4">
+          <div className="w-full sm:w-64">
+            <label htmlFor="report-block" className="mb-1 block text-xs font-medium text-foreground">Khối</label>
+            <Select
+              id="report-block"
+              value={selectedBlockId}
+              onChange={(event) => {
+                setSelectedBlockId(event.target.value);
+                setSelectedDepartmentId('');
+              }}
+            >
+              <option value="">Tất cả khối</option>
+              {blocks.map((unit) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}
+            </Select>
+          </div>
+          <div className="w-full sm:w-72">
+            <label htmlFor="report-department" className="mb-1 block text-xs font-medium text-foreground">Phòng ban / đơn vị</label>
+            <Select
+              id="report-department"
+              value={selectedDepartmentId}
+              onChange={(event) => setSelectedDepartmentId(event.target.value)}
+            >
+              <option value="">Tất cả phòng ban</option>
+              {departments.map((unit) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}
+            </Select>
+          </div>
+          <span className="pb-2 text-xs text-muted-foreground">Phạm vi: {scopeName}, gồm cả đơn vị trực thuộc</span>
+        </div>
+      )}
 
       {/* BÁO CÁO 1: SƠ YẾU LÝ LỊCH KÉP (NHÀ NƯỚC 2C-BNV / 2008 & DOANH NGHIỆP TƯ NHÂN) */}
       {activeReport === '2c' && (
@@ -191,7 +249,7 @@ export default function PersonnelReportsPage() {
         <div className="print-area font-times space-y-4">
           <PrintFrame
             title="THỐNG KÊ CƠ CẤU ĐỘ TUỔI THEO NGẠCH BẬC LƯƠNG"
-            subtitle={`Báo cáo quản trị nội bộ 01 — không phải biểu mẫu pháp quy — Xuất ngày ${formatDate(new Date().toISOString())}`}
+            subtitle={`Báo cáo quản trị nội bộ 01 — không phải biểu mẫu pháp quy — Phạm vi: ${scopeName} — Xuất ngày ${formatDate(new Date().toISOString())}`}
           />
           <Card className="p-5 bg-card border border-border shadow-xs overflow-x-auto">
             <table className="w-full border-collapse border border-black text-[11pt]">
@@ -258,7 +316,7 @@ export default function PersonnelReportsPage() {
         <div className="print-area font-times space-y-4">
           <PrintFrame
             title="THỐNG KÊ TRÌNH ĐỘ NGOẠI NGỮ & TIN HỌC"
-            subtitle={`Báo cáo quản trị nội bộ 02 — không phải biểu mẫu pháp quy — Tổng số ${qBieu02.data?.totalPersonnel || 0} nhân sự`}
+            subtitle={`Báo cáo quản trị nội bộ 02 — không phải biểu mẫu pháp quy — Phạm vi: ${scopeName} — Tổng số ${qBieu02.data?.totalPersonnel || 0} nhân sự`}
           />
           <Card className="p-5 bg-card border border-border shadow-xs overflow-x-auto">
             <table className="w-full border-collapse border border-black text-[11pt]">
@@ -301,7 +359,7 @@ export default function PersonnelReportsPage() {
         <div className="print-area font-times space-y-4">
           <PrintFrame
             title="THỐNG KÊ TRÌNH ĐỘ CHUYÊN MÔN & LÝ LUẬN CHÍNH TRỊ THEO ĐƠN VỊ"
-            subtitle={`Báo cáo quản trị nội bộ 03 — không phải biểu mẫu pháp quy — Xuất ngày ${formatDate(new Date().toISOString())}`}
+            subtitle={`Báo cáo quản trị nội bộ 03 — không phải biểu mẫu pháp quy — Phạm vi: ${scopeName} — Xuất ngày ${formatDate(new Date().toISOString())}`}
           />
           <Card className="p-5 bg-card border border-border shadow-xs overflow-x-auto">
             <table className="w-full border-collapse border border-black text-[11pt]">

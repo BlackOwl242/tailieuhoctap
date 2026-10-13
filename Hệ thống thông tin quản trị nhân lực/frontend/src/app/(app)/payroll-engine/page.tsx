@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Calculator, Plus, Trash2, Edit3, Eye, Printer, FileText, Download,
   BookOpen, ShieldCheck, Percent, Clock, Award, Info, CheckCircle2, ChevronRight,
-  Layers, Sliders, FileSpreadsheet, Sparkles, ArrowRight, ExternalLink, Save, Upload, Paperclip
+  Layers, Sliders, FileSpreadsheet, Sparkles, ArrowRight, ExternalLink, Save, Upload, Paperclip, RefreshCw
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth-store';
 import { api, errorMessage, openProtectedFile } from '@/lib/api';
@@ -87,11 +87,13 @@ interface PayrollSlip {
   bankAccount?: string;
   bankName?: string;
   employeeName: string;
-  employeeCode?: string;
-  department?: string;
-  jobTitle?: string;
+  employeeCode?: string | null;
+  department?: string | null;
+  jobTitle?: string | null;
   workingDays?: number;
   actualWorkDays?: number;
+  missingAttendanceDays?: number;
+  calculationError?: string;
   baseSalary: number;
   grossPay: number;
   totalDeduction: number;
@@ -122,6 +124,43 @@ interface PayrollSlip {
   };
   status: string;
 }
+
+interface PayrollPreviewSlip {
+  id: string;
+  userId: string;
+  employeeName: string;
+  employeeCode: string | null;
+  department?: string | null;
+  jobTitle?: string | null;
+  workingDays: number;
+  scheduledDaysToDate: number;
+  actualWorkDays: number;
+  missingAttendanceDays: number;
+  baseSalary: number;
+  grossPay: number;
+  totalDeduction: number;
+  netPay: number;
+  calculationError?: string;
+  breakdown?: PayrollSlip['breakdown'];
+}
+
+interface PayrollPreview {
+  mode: 'PROVISIONAL';
+  asOfDate: string;
+  generatedAt: string;
+  periodFrom: string;
+  periodTo: string;
+  attendanceStatus: string;
+  totalEmployees: number;
+  totalGrossPay: number;
+  totalDeduction: number;
+  totalNetPay: number;
+  pendingAttendanceDays: number;
+  unpricedEmployees: number;
+  slips: PayrollPreviewSlip[];
+}
+
+const PROVISIONAL_RUN_ID = '__PROVISIONAL_PAYROLL__';
 
 interface SlipAttendanceEvidence {
   id: string; workDate: string; kind: 'ATTENDANCE_CORRECTION' | 'LEAVE' | 'OVERTIME' | 'OTHER';
@@ -262,6 +301,12 @@ export default function PayrollEnginePage() {
     queryFn: async () => (await api.get('/hrms/payroll/runs')).data,
   });
 
+  const payrollPreviewQuery = useQuery<PayrollPreview>({
+    queryKey: ['hrms-payroll-preview-to-date'],
+    queryFn: async () => (await api.get('/hrms/payroll/preview-to-date', { timeout: 120_000 })).data,
+    enabled: activeTab === 'runs',
+  });
+
   const slipAttendanceQuery = useQuery<SlipAttendanceDetail>({
     queryKey: ['hrms-slip-attendance', selectedSlip?.id],
     enabled: isPayslipModalOpen && payslipViewMode === 'attendance' && !!selectedSlip,
@@ -347,12 +392,20 @@ export default function PayrollEnginePage() {
     policyNumberField(label, Number((value * 100).toFixed(4)), (next) => onChange(next / 100), '%', '0.01');
 
   const currentRun = useMemo(() => {
-    if (!runs || runs.length === 0) return null;
+    if (selectedRunId === PROVISIONAL_RUN_ID || !runs || runs.length === 0) return null;
     if (selectedRunId) {
       return runs.find((r) => r.id === selectedRunId) || runs[0];
     }
     return runs[0];
   }, [runs, selectedRunId]);
+  const isPreviewSelected = selectedRunId === PROVISIONAL_RUN_ID || (!isLoadingRuns && runs.length === 0);
+  const tableSlips: PayrollSlip[] = isPreviewSelected
+    ? (payrollPreviewQuery.data?.slips ?? []).map((slip) => ({
+      ...slip,
+      workingDays: slip.scheduledDaysToDate,
+      status: 'PROVISIONAL',
+    }))
+    : currentRun?.slips ?? [];
 
   // Mutations
   const createRunMutation = useMutation({
@@ -567,6 +620,7 @@ export default function PayrollEnginePage() {
         <div>
           <span className="font-medium text-xs text-foreground">{s.employeeName}</span>
           <p className="text-xs text-muted-foreground">{s.jobTitle || 'Chuyên viên'}</p>
+          {s.calculationError && <p className="mt-1 max-w-[22rem] text-[10px] text-amber-700">{s.calculationError}</p>}
           {s.breakdown?.calculation?.minimumWageReview?.status === 'REVIEW' && <p className="text-[10px] text-amber-600">Cần rà soát mức lương tối thiểu</p>}
           {s.breakdown?.calculation?.salaryBandReview?.bands.some((band) => band.status === 'BELOW_RANGE' || band.status === 'ABOVE_RANGE' || band.status === 'BASIS_MISMATCH') && <p className="text-[10px] text-amber-700">Lương hợp đồng cần đối chiếu khung vị trí đã duyệt</p>}
         </div>
@@ -586,14 +640,16 @@ export default function PayrollEnginePage() {
         const actual = s.actualWorkDays ?? 22;
         const standard = s.workingDays ?? 22;
         const isFull = actual >= standard;
+        if (s.calculationError) return <span className="text-xs text-amber-700" title={s.calculationError}>Cần đối soát</span>;
         return (
           <div className="text-xs">
             <span className={`font-mono font-medium ${isFull ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
               {actual}/{standard} công
             </span>
+            {s.missingAttendanceDays ? <span className="block text-[10px] text-muted-foreground">Chờ ghi nhận: {s.missingAttendanceDays} ngày</span> : null}
             {!isFull && (
               <span className="block text-[10px] text-rose-500 font-mono">
-                Thiếu {standard - actual} ngày
+                {s.status === 'PROVISIONAL' ? `Còn ${Math.max(0, standard - actual - (s.missingAttendanceDays ?? 0))} ngày chưa hưởng` : `Thiếu ${standard - actual} ngày`}
               </span>
             )}
           </div>
@@ -606,7 +662,7 @@ export default function PayrollEnginePage() {
       sortable: true,
       render: (s: PayrollSlip) => (
         <span className="text-xs font-mono text-foreground">
-          {s.baseSalary.toLocaleString('vi-VN')} đ
+          {s.calculationError ? '—' : `${s.baseSalary.toLocaleString('vi-VN')} đ`}
         </span>
       ),
     },
@@ -616,6 +672,7 @@ export default function PayrollEnginePage() {
       sortable: true,
       render: (s: PayrollSlip) => {
         const amount = s.breakdown?.calculation?.attendanceWageReduction;
+        if (s.calculationError) return <span className="text-xs text-muted-foreground">—</span>;
         return <span className={`text-xs font-mono ${amount ? 'text-rose-700' : 'text-muted-foreground'}`}>
           {amount === undefined ? '—' : `${amount > 0 ? '−' : ''}${amount.toLocaleString('vi-VN')} đ`}
         </span>;
@@ -627,7 +684,7 @@ export default function PayrollEnginePage() {
       sortable: true,
       render: (s: PayrollSlip) => (
         <span className="text-xs font-mono text-foreground">
-          {s.grossPay.toLocaleString('vi-VN')} đ
+          {s.calculationError ? '—' : `${s.grossPay.toLocaleString('vi-VN')} đ`}
         </span>
       ),
     },
@@ -637,7 +694,7 @@ export default function PayrollEnginePage() {
       sortable: true,
       render: (s: PayrollSlip) => (
         <span className="text-xs font-mono text-muted-foreground">
-          -{s.totalDeduction.toLocaleString('vi-VN')} đ
+          {s.calculationError ? '—' : `-${s.totalDeduction.toLocaleString('vi-VN')} đ`}
         </span>
       ),
     },
@@ -647,7 +704,7 @@ export default function PayrollEnginePage() {
       sortable: true,
       render: (s: PayrollSlip) => (
         <span className="text-xs font-mono font-semibold text-foreground">
-          {s.netPay.toLocaleString('vi-VN')} đ
+          {s.calculationError ? '—' : `${s.netPay.toLocaleString('vi-VN')} đ`}
         </span>
       ),
     },
@@ -656,8 +713,8 @@ export default function PayrollEnginePage() {
       header: 'Trạng thái',
       render: (s: PayrollSlip) => (
         <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          {s.status}
+          <span className={`h-1.5 w-1.5 rounded-full ${s.calculationError ? 'bg-amber-500' : s.status === 'PROVISIONAL' ? 'bg-sky-500' : 'bg-emerald-500'}`} />
+          {s.calculationError ? 'Cần đối soát' : s.status === 'PROVISIONAL' ? 'Tạm tính' : s.status}
         </span>
       ),
     },
@@ -668,6 +725,8 @@ export default function PayrollEnginePage() {
         <Button
           variant="ghost"
           size="sm"
+          disabled={Boolean(s.calculationError)}
+          title={s.calculationError || undefined}
           onClick={() => {
             setSelectedSlip(s);
             setPayslipViewMode('summary');
@@ -677,13 +736,11 @@ export default function PayrollEnginePage() {
           }}
           className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-foreground"
         >
-          Xem phiếu
+          {s.calculationError ? 'Chưa tính được' : s.status === 'PROVISIONAL' ? 'Xem phiếu tạm tính' : 'Xem phiếu'}
         </Button>
       ),
     },
   ];
-
-
 
   const exportBankCsv = (run: PayrollRun) => {
     if (!['LOCKED', 'PAID'].includes(run.status)) { toast('Chỉ xuất kỳ đã khóa', 'error'); return; }
@@ -799,58 +856,52 @@ export default function PayrollEnginePage() {
       {/* ================= TAB 1: CHU KỲ BẢNG LƯƠNG & DANH SÁCH PHIẾU LƯƠNG ================= */}
       {activeTab === 'runs' && (
         <div className="space-y-4">
-          {runs.length === 0 ? (
-            <EmptyState
-              title="Chưa có đợt lương nào"
-              description="Bấm 'Tính bảng lương' để bắt đầu tạo bảng lương chu kỳ mới."
-            />
-          ) : (
-            <>
-              {/* Minimalist Run Selector & Summary Toolbar */}
-              <div className="grid min-w-0 grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 text-xs 2xl:grid-cols-[minmax(0,1fr)_auto] 2xl:items-center">
-                <div className="grid min-w-0 grid-cols-1 gap-3 2xl:grid-cols-[minmax(15rem,0.9fr)_minmax(0,1.7fr)] 2xl:items-center">
-                  <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
-                    <span className="whitespace-nowrap text-muted-foreground">Kỳ lương:</span>
-                    <Select
-                      value={currentRun?.id || ''}
-                      onChange={(e) => setSelectedRunId(e.target.value)}
-                      className="min-w-0 w-full text-xs font-medium md:max-w-[340px]"
-                    >
-                      {runs.map((r) => (
-                        <option key={r.id} value={r.id}>
-                          {r.periodName} ({r.totalEmployees} nhân viên)
-                        </option>
-                      ))}
-                    </Select>
+          <section className="space-y-3 rounded-lg border border-border bg-card p-3 sm:p-4" aria-busy={isPreviewSelected && payrollPreviewQuery.isFetching}>
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+              <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 2xl:grid-cols-[minmax(16rem,0.8fr)_minmax(0,1.7fr)] 2xl:items-center">
+                <label className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-2 text-xs">
+                  <span className="whitespace-nowrap text-muted-foreground">Kỳ lương:</span>
+                  <Select
+                    value={selectedRunId || currentRun?.id || PROVISIONAL_RUN_ID}
+                    onChange={(e) => setSelectedRunId(e.target.value)}
+                    className="min-w-0 w-full text-xs font-medium md:max-w-[380px]"
+                  >
+                    <option value={PROVISIONAL_RUN_ID}>
+                      {payrollPreviewQuery.data ? `Tạm tính đến ${new Date(`${payrollPreviewQuery.data.asOfDate}T00:00:00`).toLocaleDateString('vi-VN')}` : 'Lương tạm tính đến hôm nay'}
+                    </option>
+                    {runs.map((r) => (
+                      <option key={r.id} value={r.id}>{r.periodName} ({r.totalEmployees} nhân viên)</option>
+                    ))}
+                  </Select>
+                </label>
+
+                {isPreviewSelected && payrollPreviewQuery.data ? (
+                  <div className="grid min-w-0 grid-cols-2 gap-2 text-xs text-muted-foreground xl:grid-cols-4">
+                    <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Tính được / tổng nhân sự</span><b className="block text-foreground">{payrollPreviewQuery.data.totalEmployees - payrollPreviewQuery.data.unpricedEmployees} / {payrollPreviewQuery.data.totalEmployees}</b>{payrollPreviewQuery.data.unpricedEmployees > 0 && <span className="block text-amber-700">Cần đối soát: {payrollPreviewQuery.data.unpricedEmployees}</span>}</div>
+                    <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Thu nhập gộp đã tính</span><b className="block whitespace-nowrap font-mono text-foreground">{payrollPreviewQuery.data.totalGrossPay.toLocaleString('vi-VN')} đ</b></div>
+                    <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Khấu trừ tạm tính</span><b className="block whitespace-nowrap font-mono text-foreground">{payrollPreviewQuery.data.totalDeduction.toLocaleString('vi-VN')} đ</b></div>
+                    <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Thực lĩnh tạm tính</span><b className="block whitespace-nowrap font-mono text-foreground">{payrollPreviewQuery.data.totalNetPay.toLocaleString('vi-VN')} đ</b></div>
                   </div>
+                ) : currentRun ? (
+                  <div className="grid min-w-0 grid-cols-2 gap-2 text-xs text-muted-foreground xl:grid-cols-3">
+                    <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Nhân sự</span><b className="block text-foreground">{currentRun.totalEmployees}</b></div>
+                    <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Khấu trừ</span><b className="block whitespace-nowrap font-mono text-foreground">{currentRun.totalDeduction.toLocaleString('vi-VN')} đ</b></div>
+                    <div className="col-span-2 min-w-0 rounded-md bg-muted/30 px-2 py-1.5 xl:col-span-1"><span className="block">Tổng thực lĩnh</span><b className="block whitespace-nowrap font-mono text-foreground">{currentRun.totalNetPay.toLocaleString('vi-VN')} đ</b></div>
+                  </div>
+                ) : null}
+              </div>
 
-                  {currentRun && (
-                    <div className="grid min-w-0 grid-cols-2 gap-2 text-muted-foreground xl:grid-cols-3">
-                      <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5">
-                        <span className="block">Nhân sự</span>
-                        <b className="block whitespace-nowrap text-foreground">{currentRun.totalEmployees}</b>
-                      </div>
-                      <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5">
-                        <span className="block">Khấu trừ</span>
-                        <b className="block whitespace-nowrap text-foreground">{currentRun.totalDeduction.toLocaleString('vi-VN')} đ</b>
-                      </div>
-                      <div className="col-span-2 min-w-0 rounded-md bg-muted/30 px-2 py-1.5 xl:col-span-1">
-                        <span className="block">Tổng thực lĩnh</span>
-                        <b className="block whitespace-nowrap font-mono text-foreground">{currentRun.totalNetPay.toLocaleString('vi-VN')} đ</b>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {currentRun && (
-                  <div className="flex min-w-0 flex-col gap-2 xl:items-end">
-                    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 xl:justify-end">
-                      <span className="font-medium">{currentRun.status}</span>
-                      {currentRun.paymentReference && (
-                        <span className="max-w-full truncate text-xs text-muted-foreground" title={`Chứng từ kỳ cũ: ${currentRun.paymentReference}`}>{currentRun.status === 'CANCELLED' ? 'Chứng từ kỳ cũ: ' : 'Chứng từ: '}{currentRun.paymentReference}</span>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+              {isPreviewSelected ? (
+                <Button variant="outline" size="sm" disabled={payrollPreviewQuery.isFetching} onClick={() => { void payrollPreviewQuery.refetch(); }}>
+                  <RefreshCw className={`h-3.5 w-3.5 ${payrollPreviewQuery.isFetching ? 'animate-spin' : ''}`} /> Cập nhật
+                </Button>
+              ) : currentRun ? (
+                <div className="flex min-w-0 flex-col gap-2 xl:items-end">
+                  <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 xl:justify-end">
+                    <span className="text-xs font-medium">{currentRun.status}</span>
+                    {currentRun.paymentReference && <span className="max-w-full truncate text-xs text-muted-foreground" title={`Chứng từ kỳ cũ: ${currentRun.paymentReference}`}>{currentRun.status === 'CANCELLED' ? 'Chứng từ kỳ cũ: ' : 'Chứng từ: '}{currentRun.paymentReference}</span>}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 xl:justify-end">
                     {[
                       { status: 'PROCESSED', action: 'review', label: 'Đối soát', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT'] },
                       { status: 'REVIEWED', action: 'approve', label: 'Phê duyệt', roles: ['ADMIN', 'BOD'] },
@@ -859,77 +910,61 @@ export default function PayrollEnginePage() {
                     ].filter(step => step.status === currentRun.status && user?.roles?.some(role => step.roles.includes(role))).map(step => <Button key={step.action} size="sm" disabled={transitionMutation.isPending} onClick={() => {
                       if (step.action === 'pay') {
                         const paymentMethod = window.prompt('Chọn hình thức: BANK_TRANSFER, CASH hoặc OTHER', 'BANK_TRANSFER');
-                        if (!paymentMethod || !['BANK_TRANSFER', 'CASH', 'OTHER'].includes(paymentMethod.trim().toUpperCase())) {
-                          toast('Hình thức thanh toán không hợp lệ', 'error');
-                          return;
-                        }
+                        if (!paymentMethod || !['BANK_TRANSFER', 'CASH', 'OTHER'].includes(paymentMethod.trim().toUpperCase())) { toast('Hình thức thanh toán không hợp lệ', 'error'); return; }
                         const paymentReference = window.prompt('Nhập mã giao dịch chuyển khoản hoặc số chứng từ chi:');
                         if (!paymentReference?.trim()) return;
                         transitionMutation.mutate({ id: currentRun.id, action: step.action, payment: { paymentMethod: paymentMethod.trim().toUpperCase(), paymentReference: paymentReference.trim() } });
                       } else transitionMutation.mutate({ id: currentRun.id, action: step.action });
                     }}>{step.label}</Button>)}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => exportBankCsv(currentRun)}
-                      className="h-7 text-xs px-2.5 text-muted-foreground hover:text-foreground"
-                    >
-                      <Download className="h-3 w-3 mr-1" />
-                      Xuất CSV ngân hàng
-                    </Button>
-                    {canDeletePayrollRun && ['DRAFT', 'PROCESSED'].includes(currentRun.status) && <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={deleteRunMutation.isPending}
-                      onClick={() => {
-                        if (confirm(`Bạn có chắc muốn xóa đợt lương "${currentRun.periodName}"?`)) {
-                          deleteRunMutation.mutate(currentRun.id);
-                        }
-                      }}
-                      className="h-7 text-xs px-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/20"
-                    >
-                      Xóa đợt này
-                    </Button>}
-                    {canDeletePayrollRun && !['DRAFT', 'PROCESSED', 'CANCELLED'].includes(currentRun.status) && <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={cancelRunMutation.isPending}
-                      onClick={() => {
-                        const confirmed = confirm(`Kỳ lương đang ở trạng thái ${currentRun.status}. Hủy để lập lại sẽ đánh dấu kỳ cũ là CANCELLED và giữ nguyên phiếu lương/chứng từ trong lịch sử. Thao tác này không đảo ngược khoản tiền đã chuyển. Bạn có muốn tiếp tục?`);
-                        if (confirmed) cancelRunMutation.mutate(currentRun.id);
-                      }}
-                      className="h-7 text-xs px-2.5"
-                    >
-                      Hủy kỳ để lập lại
-                    </Button>}
-                    </div>
+                    <Button variant="outline" size="sm" onClick={() => exportBankCsv(currentRun)} className="h-7 px-2.5 text-xs text-muted-foreground hover:text-foreground"><Download className="mr-1 h-3 w-3" />Xuất CSV ngân hàng</Button>
+                    {canDeletePayrollRun && ['DRAFT', 'PROCESSED'].includes(currentRun.status) && <Button variant="ghost" size="sm" disabled={deleteRunMutation.isPending} onClick={() => { if (confirm(`Bạn có chắc muốn xóa đợt lương "${currentRun.periodName}"?`)) deleteRunMutation.mutate(currentRun.id); }} className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50 hover:text-rose-700">Xóa đợt này</Button>}
+                    {canDeletePayrollRun && !['DRAFT', 'PROCESSED', 'CANCELLED'].includes(currentRun.status) && <Button variant="outline" size="sm" disabled={cancelRunMutation.isPending} onClick={() => { const confirmed = confirm(`Kỳ lương đang ở trạng thái ${currentRun.status}. Hủy để lập lại sẽ đánh dấu kỳ cũ là CANCELLED và giữ nguyên phiếu lương/chứng từ trong lịch sử. Thao tác này không đảo ngược khoản tiền đã chuyển. Bạn có muốn tiếp tục?`); if (confirmed) cancelRunMutation.mutate(currentRun.id); }} className="h-7 px-2.5 text-xs">Hủy kỳ để lập lại</Button>}
                   </div>
-                )}
-              </div>
-
-              {/* Slips DataTable (Single search box, clean rows) */}
-              {currentRun && (
-                <div className="space-y-2">
-                  <DataTable
-                    columns={slipColumns}
-                    rows={currentRun.slips || []}
-                    rowKey={(s: PayrollSlip) => s.id}
-                    pageSize={10}
-                    searchFields={(s: PayrollSlip) => [s.employeeName, s.employeeCode || '', s.department || '']}
-                    filters={[
-                      {
-                        key: 'department',
-                        label: 'Phòng ban',
-                        value: (slip) => slip.department || 'UNASSIGNED',
-                        options: Array.from(new Set((currentRun.slips ?? []).map((slip) => slip.department || 'UNASSIGNED')))
-                          .sort((a, b) => a.localeCompare(b, 'vi'))
-                          .map((department) => ({ value: department, label: department === 'UNASSIGNED' ? 'Chưa xếp đơn vị' : department })),
-                      },
-                    ]}
-                  />
                 </div>
-              )}
-            </>
+              ) : null}
+            </div>
+
+            {isPreviewSelected && payrollPreviewQuery.data && (
+              <p className="text-xs leading-5 text-muted-foreground">
+                Tạm tính đến {new Date(`${payrollPreviewQuery.data.asOfDate}T00:00:00`).toLocaleDateString('vi-VN')}; công tháng {payrollPreviewQuery.data.attendanceStatus === 'FINALIZED' ? 'đã chốt' : 'đang mở'}.
+                {payrollPreviewQuery.data.pendingAttendanceDays > 0 && ` Còn ${payrollPreviewQuery.data.pendingAttendanceDays} ngày công chưa ghi nhận.`}
+                {payrollPreviewQuery.data.unpricedEmployees > 0 && ` Tổng tiền chỉ gồm ${payrollPreviewQuery.data.totalEmployees - payrollPreviewQuery.data.unpricedEmployees} người tính được; ${payrollPreviewQuery.data.unpricedEmployees} người chưa tính được và cần đối soát.`}
+                {' '}Số liệu thay đổi khi công hoặc khoản lương được cập nhật; làm mới lúc {new Date(payrollPreviewQuery.data.generatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}.
+              </p>
+            )}
+          </section>
+
+          {isPreviewSelected && payrollPreviewQuery.isLoading ? (
+            <LoadingState text="Đang tính lương tạm thời theo dữ liệu hiện có…" />
+          ) : isPreviewSelected && payrollPreviewQuery.isError ? (
+            <div className="flex flex-col gap-2 rounded-md border border-border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-foreground">{errorMessage(payrollPreviewQuery.error)}</p>
+              <Button variant="outline" size="sm" onClick={() => { void payrollPreviewQuery.refetch(); }}>Thử lại</Button>
+            </div>
+          ) : isPreviewSelected && tableSlips.length === 0 ? (
+            <EmptyState title="Chưa có nhân sự đủ căn cứ tính" description="Kiểm tra hồ sơ lương, hợp đồng và cấu trúc lương đang có hiệu lực." />
+          ) : currentRun || (isPreviewSelected && payrollPreviewQuery.data) ? (
+            <DataTable
+              columns={slipColumns}
+              rows={tableSlips}
+              rowKey={(slip) => slip.id}
+              pageSize={10}
+              searchFields={(slip) => [slip.employeeName, slip.employeeCode || '', slip.department || '', slip.jobTitle || '', slip.calculationError || '']}
+              filters={[
+                {
+                  key: 'department',
+                  label: 'Phòng ban',
+                  value: (slip) => slip.department || 'UNASSIGNED',
+                  options: Array.from(new Set(tableSlips.map((slip) => slip.department || 'UNASSIGNED')))
+                    .sort((a, b) => a.localeCompare(b, 'vi'))
+                    .map((department) => ({ value: department, label: department === 'UNASSIGNED' ? 'Chưa xếp đơn vị' : department })),
+                },
+              ]}
+            />
+          ) : isLoadingRuns ? (
+            <LoadingState text="Đang tải các kỳ lương…" />
+          ) : (
+            <EmptyState title="Chưa có kỳ lương nào" description="Bạn đang xem chế độ tạm tính. Chọn ‘Tính bảng lương’ để tạo kỳ lương chính thức." />
           )}
         </div>
       )}
@@ -1600,7 +1635,7 @@ export default function PayrollEnginePage() {
       <Modal
         open={isPayslipModalOpen}
         onOpenChange={(open) => setIsPayslipModalOpen(open)}
-        title="Chi Tiết Phiếu Lương Cán Bộ Nhân Viên"
+        title={selectedSlip?.status === 'PROVISIONAL' ? 'Phiếu lương tạm tính' : 'Chi Tiết Phiếu Lương Cán Bộ Nhân Viên'}
         size="2xl"
       >
         {selectedSlip && (
@@ -1617,7 +1652,7 @@ export default function PayrollEnginePage() {
                       : 'bg-muted/50 text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Phiếu Lương Chuẩn
+                  {selectedSlip.status === 'PROVISIONAL' ? 'Phiếu tạm tính' : 'Phiếu Lương Chuẩn'}
                 </button>
                 <button
                   type="button"
@@ -1630,7 +1665,7 @@ export default function PayrollEnginePage() {
                 >
                   Giải Trình Công Thức Chi Tiết
                 </button>
-                <button
+                {selectedSlip.status !== 'PROVISIONAL' && <button
                   type="button"
                   onClick={() => setPayslipViewMode('attendance')}
                   className={`px-3 py-1.5 rounded-md font-medium text-xs transition-colors ${
@@ -1640,12 +1675,13 @@ export default function PayrollEnginePage() {
                   }`}
                 >
                   Chấm công & hồ sơ
-                </button>
+                </button>}
               </div>
               <span className="text-2xs text-muted-foreground font-mono">
-                Mã phiếu: {selectedSlip.id.slice(0, 8).toUpperCase()}
+                {selectedSlip.status === 'PROVISIONAL' ? 'Bản xem trước' : `Mã phiếu: ${selectedSlip.id.slice(0, 8).toUpperCase()}`}
               </span>
             </div>
+            {selectedSlip.status === 'PROVISIONAL' && <p className="rounded-md border border-border bg-muted/30 px-3 py-2 text-xs leading-5 text-muted-foreground">Số liệu tạm tính theo ngày công và căn cứ lương hiện có đến hôm nay. Đây chưa phải phiếu lương chính thức hoặc chứng từ thanh toán.</p>}
 
             {/* TAB: GIẢI TRÌNH CÔNG THỨC CHI TIẾT */}
             {payslipViewMode === 'formula' ? (
@@ -1848,9 +1884,9 @@ export default function PayrollEnginePage() {
                 `}</style>
                 <header className="text-center pb-3">
                   <p className="font-bold uppercase tracking-wide">{orgConfig.orgName || 'Tên doanh nghiệp / đơn vị'}</p>
-                  <h2 className="mt-1 text-lg font-bold uppercase">PHIẾU LƯƠNG NHÂN VIÊN</h2>
-                  <p className="mt-1">{currentRun?.periodName || 'Kỳ lương hiện hành'}</p>
-                  <p className="mt-1 text-xs">Mã phiếu: <b className="font-mono">{selectedSlip.id.slice(0, 8).toUpperCase()}</b> · Ngày lập: {new Date().toLocaleDateString('vi-VN')}</p>
+                  <h2 className="mt-1 text-lg font-bold uppercase">{selectedSlip.status === 'PROVISIONAL' ? 'PHIẾU LƯƠNG TẠM TÍNH' : 'PHIẾU LƯƠNG NHÂN VIÊN'}</h2>
+                  <p className="mt-1">{selectedSlip.status === 'PROVISIONAL' && payrollPreviewQuery.data ? `Tạm tính đến ${new Date(`${payrollPreviewQuery.data.asOfDate}T00:00:00`).toLocaleDateString('vi-VN')}` : currentRun?.periodName || 'Kỳ lương hiện hành'}</p>
+                  <p className="mt-1 text-xs">{selectedSlip.status === 'PROVISIONAL' ? 'Bản xem trước · Chưa phải chứng từ thanh toán' : <>Mã phiếu: <b className="font-mono">{selectedSlip.id.slice(0, 8).toUpperCase()}</b></>} · Ngày lập: {new Date().toLocaleDateString('vi-VN')}</p>
                 </header>
 
                 <section className="payslip-section">
@@ -1922,7 +1958,7 @@ export default function PayrollEnginePage() {
         <ModalFooterActions
           onCancel={() => payslipViewMode === 'attendance' ? setPayslipViewMode('summary') : setIsPayslipModalOpen(false)}
           cancelLabel={payslipViewMode === 'attendance' ? 'Quay lại phiếu lương' : 'Đóng'}
-          confirmLabel={payslipViewMode === 'attendance' ? 'Đóng' : 'In phiếu lương'}
+          confirmLabel={payslipViewMode === 'attendance' ? 'Đóng' : selectedSlip?.status === 'PROVISIONAL' ? 'In bản tạm tính' : 'In phiếu lương'}
           onConfirm={() => payslipViewMode === 'attendance' ? setIsPayslipModalOpen(false) : printDocumentElement('print-payslip-doc')}
         />
       </Modal>

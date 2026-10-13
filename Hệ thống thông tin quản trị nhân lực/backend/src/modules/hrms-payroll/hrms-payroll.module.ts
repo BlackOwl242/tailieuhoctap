@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { calculateOvertimePay, calculatePayroll, currentPayrollPolicies, evaluateFormula, monthlyHourlyRate, payrollPolicyFor, VN_PAYROLL_POLICIES, type PayrollPolicy } from '../../common/payroll-calculator';
-import { businessDates, dateKey, DAY_MS, DEFAULT_WORK_DAYS, isScheduledWorkday, isUnderThreeMonths } from '../../common/hr-time';
+import { businessDates, dateKey, DAY_MS, DEFAULT_WORK_DAYS, isScheduledWorkday, isUnderThreeMonths, workDate } from '../../common/hr-time';
 import { RuntimeSettingsService } from '../../common/services/runtime-settings.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
@@ -447,6 +447,25 @@ export class HrmsPayrollService {
   }
 
   async createPayrollRun(actorId: string, dto: CreatePayrollRunDto, legacyPeriodId?: string) {
+    return this.calculatePayrollRun(actorId, dto, legacyPeriodId);
+  }
+
+  async previewPayrollToDate() {
+    const asOf = workDate();
+    const from = new Date(Date.UTC(asOf.getUTCFullYear(), asOf.getUTCMonth(), 1));
+    const to = new Date(Date.UTC(asOf.getUTCFullYear(), asOf.getUTCMonth() + 1, 0));
+    const periodName = `Tạm tính lương đến ${asOf.toLocaleDateString('vi-VN', { timeZone: 'UTC' })}`;
+    return this.calculatePayrollRun('PAYROLL_PREVIEW', {
+      periodName,
+      fromDate: from.toISOString(),
+      toDate: to.toISOString(),
+      notes: 'Bản tạm tính chỉ đọc dữ liệu hiện có, không tạo kỳ lương hoặc phiếu lương.',
+    }, undefined, asOf);
+  }
+
+  private async calculatePayrollRun(actorId: string, dto: CreatePayrollRunDto, legacyPeriodId?: string, previewAsOf?: Date) {
+    const isPreview = Boolean(previewAsOf);
+    const asOf = previewAsOf ? dateKey(previewAsOf) : null;
     const from = dateKey(dto.fromDate), to = dateKey(dto.toDate);
     if (from.getUTCDate() !== 1 || from.getUTCFullYear() !== to.getUTCFullYear() || from.getUTCMonth() !== to.getUTCMonth()
       || to.getUTCDate() !== new Date(Date.UTC(to.getUTCFullYear(), to.getUTCMonth() + 1, 0)).getUTCDate()) throw new BadRequestException('Kỳ lương phải bao phủ đúng một tháng');
@@ -461,15 +480,33 @@ export class HrmsPayrollService {
     const insuranceCap = Number(await this.settings.get(`INSURANCE_CAP_BHXH_${year}_${month}`, policy.bhxhCap));
     const result = await this.prisma.$transaction(async tx => {
       const attendancePeriod = await tx.attendancePeriod.findUnique({ where: { month_year: { month, year } } });
-      if (!attendancePeriod || attendancePeriod.status !== 'FINALIZED') throw new ConflictException('Phải chốt công tháng trước khi tính lương');
+      if (!isPreview && (!attendancePeriod || attendancePeriod.status !== 'FINALIZED')) throw new ConflictException('Phải chốt công tháng trước khi tính lương');
       const orgProfileSetting = await tx.setting.findUnique({ where: { key: 'ORG_PROFILE' } });
       const orgProfile = (orgProfileSetting?.value ?? {}) as { orgSector?: string };
       const isStateOrganization = orgProfile.orgSector === 'state';
-      const overlap = await tx.hrmsPayrollRun.findFirst({ where: { fromDate: { lte: to }, toDate: { gte: from }, status: { not: 'CANCELLED' } } });
-      if (overlap) throw new ConflictException('Đã có kỳ lương cho khoảng thời gian này; không tạo trùng');
-      const rows = attendancePeriod.snapshot as unknown as { userId: string; workDate: string; status: string; workedMinutes: number; nightWorkedMinutes?: number; scheduledMinutes?: number; paidLeave?: boolean; leaveType?: string | null; lateMinutes?: number; earlyMinutes?: number }[];
+      if (!isPreview) {
+        const overlap = await tx.hrmsPayrollRun.findFirst({ where: { fromDate: { lte: to }, toDate: { gte: from }, status: { not: 'CANCELLED' } } });
+        if (overlap) throw new ConflictException('Đã có kỳ lương cho khoảng thời gian này; không tạo trùng');
+      }
+      type PayrollAttendanceRow = { userId: string; workDate: string; status: string; workedMinutes: number; nightWorkedMinutes?: number; scheduledMinutes?: number; paidLeave?: boolean; leaveType?: string | null; lateMinutes?: number; earlyMinutes?: number };
+      const rows: PayrollAttendanceRow[] = isPreview
+        ? (await tx.attendanceDay.findMany({ where: { workDate: { gte: from, lte: asOf ?? to } } })).map(row => ({
+          userId: row.userId, workDate: dateKey(row.workDate).toISOString().slice(0, 10), status: row.status,
+          workedMinutes: row.workedMinutes, nightWorkedMinutes: row.nightWorkedMinutes, scheduledMinutes: row.scheduledMinutes,
+          paidLeave: row.paidLeave, leaveType: row.leaveType, lateMinutes: row.lateMinutes, earlyMinutes: row.earlyMinutes,
+        }))
+        : attendancePeriod!.snapshot as unknown as PayrollAttendanceRow[];
       const users = await tx.user.findMany({
-        where: { deletedAt: null, id: { in: [...new Set(rows.map(r => r.userId))] } },
+        where: isPreview ? {
+          deletedAt: null,
+          AND: [
+            { OR: [{ hireDate: null }, { hireDate: { lte: asOf ?? to } }] },
+            { OR: [
+              { status: 'ACTIVE', employmentStatus: { in: ['ACTIVE', 'PROBATION'] } },
+              { actionsOnMe: { some: { type: 'RESIGNATION', status: 'APPROVED', effectiveAt: { gte: from, lte: asOf ?? to } } } },
+            ] },
+          ],
+        } : { deletedAt: null, id: { in: [...new Set(rows.map(r => r.userId))] } },
         select: {
           id: true, fullName: true, employeeCode: true, jobTitle: true, orgUnitId: true, salaryBandId: true,
           baseSalary: true, hireDate: true, taxDependentCount: true, taxResidency: true, minimumWageRegion: true,
@@ -494,9 +531,11 @@ export class HrmsPayrollService {
       const approvedBands = await tx.hrmsSalaryBand.findMany({
         where: { status: 'ACTIVE', approvedAt: { not: null }, effectiveFrom: { lte: to }, OR: [{ effectiveTo: null }, { effectiveTo: { gte: from } }] },
       });
-      const run = await tx.hrmsPayrollRun.create({ data: { periodName: dto.periodName, fromDate: from, toDate: to, attendancePeriodId: attendancePeriod.id, policySnapshot: { ...policy, holidays, defaultOfficeDayCount: defaultDates.length, calendarDays: Math.round((to.getTime() - from.getTime()) / DAY_MS) + 1 }, legacyPeriodId, notes: dto.notes, status: 'PROCESSED', processedBy: actorId, processedAt: new Date() } });
+      const run = isPreview ? null : await tx.hrmsPayrollRun.create({ data: { periodName: dto.periodName, fromDate: from, toDate: to, attendancePeriodId: attendancePeriod!.id, policySnapshot: { ...policy, holidays, defaultOfficeDayCount: defaultDates.length, calendarDays: Math.round((to.getTime() - from.getTime()) / DAY_MS) + 1 }, legacyPeriodId, notes: dto.notes, status: 'PROCESSED', processedBy: actorId, processedAt: new Date() } });
       let totalGrossPay = 0, totalDeduction = 0, totalNetPay = 0;
+      const previewSlips: Array<Record<string, unknown>> = [];
       for (const user of users) {
+        try {
         const employeeRows = rows.filter(row => row.userId === user.id).sort((a, b) => a.workDate.localeCompare(b.workDate));
         const attendanceByDate = new Map(employeeRows.map(row => [row.workDate.slice(0, 10), row]));
         const scheduleAssignments = await tx.hrmsShiftAssignment.findMany({
@@ -525,9 +564,17 @@ export class HrmsPayrollService {
         const contracts = await tx.contract.findMany({ where: { userId: user.id, startDate: { lte: to } }, orderBy: { startDate: 'desc' } });
         const actions = await tx.personnelAction.findMany({ where: { subjectId: user.id, status: 'APPROVED', effectiveAt: { lte: to } }, orderBy: { effectiveAt: 'asc' } });
         const transfers = await tx.personnelAction.findMany({ where: { subjectId: user.id, type: 'TRANSFER', status: 'APPROVED', effectiveAt: { not: null } }, orderBy: { effectiveAt: 'asc' } });
-        const resignation = actions.find(a => a.type === 'RESIGNATION');
-        const eligible = dates.filter(day => (!user.hireDate || dateKey(user.hireDate) <= day) && (!resignation?.effectiveAt || day <= dateKey(resignation.effectiveAt)));
+        const resignation = actions.find(a => a.type === 'RESIGNATION'
+          && (!asOf || !a.effectiveAt || dateKey(a.effectiveAt) <= asOf));
+        const resignationDate = resignation?.effectiveAt ? dateKey(resignation.effectiveAt) : to;
+        const rateCutoff = asOf && asOf < resignationDate ? asOf : resignationDate;
+        const eligible = dates.filter(day => (!asOf || day <= asOf)
+          && (!user.hireDate || dateKey(user.hireDate) <= day)
+          && (!resignation?.effectiveAt || day <= dateKey(resignation.effectiveAt)));
         const eligibleKeys = new Set(eligible.map(day => day.toISOString().slice(0, 10)));
+        const missingAttendanceDays = asOf
+          ? eligible.filter(day => day < asOf && !attendanceByDate.has(day.toISOString().slice(0, 10))).length
+          : 0;
         let baseTotal = 0, overtimeBaseTotal = 0, insuranceBaseTotal = 0, expectedBase = 0, earnedBase = 0, expectedComponents = 0, earnedComponents = 0, paidDays = 0, attendanceDays = 0, unpaidFullDays = 0, standardHours = 0;
         let lateMinutesTotal = 0, earlyMinutesTotal = 0, workedMinutesTotal = 0, shortMinutesTotal = 0;
         let lateDays = 0, earlyLeaveDays = 0, absenceDays = 0, paidLeaveDays = 0, unpaidLeaveDays = 0, socialInsuranceLeaveDays = 0, missingPairDays = 0;
@@ -542,9 +589,10 @@ export class HrmsPayrollService {
         let daysWithoutApprovedBand = 0;
         const componentTotals = new Map<string, { code: string; name: string; type: 'EARNING' | 'DEDUCTION'; amount: number; taxable: boolean; periodAmount: true; basisReference: string | null }>();
         for (const day of dates) {
-          const assignment = assignments.find(a => dateKey(a.fromDate) <= day);
-          const transferBefore = transfers.filter((action) => dateKey(action.effectiveAt!) <= day).at(-1);
-          const transferAfter = transfers.find((action) => dateKey(action.effectiveAt!) > day);
+          const rateDay = day > rateCutoff ? rateCutoff : day;
+          const assignment = assignments.find(a => dateKey(a.fromDate) <= rateDay);
+          const transferBefore = transfers.filter((action) => dateKey(action.effectiveAt!) <= rateDay).at(-1);
+          const transferAfter = transfers.find((action) => dateKey(action.effectiveAt!) > rateDay);
           const beforePayload = transferBefore?.payload as { newJobTitle?: string; newOrgUnitId?: string } | undefined;
           const afterPayload = transferAfter?.payload as { oldJobTitle?: string; oldOrgUnitId?: string } | undefined;
           const effectiveJobTitle = transferBefore
@@ -558,16 +606,16 @@ export class HrmsPayrollService {
           const unitMatches = positionStructures.filter((structure) => !structure.jobTitle && Boolean(structure.orgUnitId) && structure.orgUnitId === effectiveOrgUnitId);
           const selectedPositionMatches = titleAndUnitMatches.length ? titleAndUnitMatches : titleMatches.length ? titleMatches : unitMatches;
           if (selectedPositionMatches.length > 1) throw new ConflictException(`Có nhiều cấu trúc lương áp dụng cho ${user.fullName} (${effectiveJobTitle || 'chưa có chức danh'} / ${effectiveOrgUnitId || 'chưa có đơn vị'}). Hãy xử lý cấu hình trùng trước khi tính kỳ.`);
-          const contract = contracts.find(c => dateKey(c.startDate) <= day
-            && (c.endDate ? dateKey(c.endDate) >= day : c.status === 'ACTIVE'));
+          const contract = contracts.find(c => dateKey(c.startDate) <= rateDay
+            && (c.endDate ? dateKey(c.endDate) >= rateDay : c.status === 'ACTIVE'));
           let publicPay: { monthlyTotal: number; detail: Record<string, number | string | null> } | null = null;
           if (isStateOrganization) {
             const profile = user.comprehensiveProfile;
-            const effectiveHistories = (profile?.salaryHistories ?? []).filter(history => dateKey(history.fromDate) <= day && (!history.toDate || dateKey(history.toDate) >= day));
+            const effectiveHistories = (profile?.salaryHistories ?? []).filter(history => dateKey(history.fromDate) <= rateDay && (!history.toDate || dateKey(history.toDate) >= rateDay));
             if (effectiveHistories.length > 1) throw new ConflictException(`Có nhiều quyết định ngạch/bậc cùng hiệu lực cho ${user.fullName} ngày ${day.toISOString().slice(0, 10)}.`);
             const salaryHistory = effectiveHistories[0];
             const hasSalaryHistoryInPeriod = (profile?.salaryHistories ?? []).length > 0;
-            const profileRateEffective = !hasSalaryHistoryInPeriod && Boolean(profile?.salaryStepDate) && dateKey(profile!.salaryStepDate!) <= day;
+            const profileRateEffective = !hasSalaryHistoryInPeriod && Boolean(profile?.salaryStepDate) && dateKey(profile!.salaryStepDate!) <= rateDay;
             const step = salaryHistory ? salaryHistory.step : profileRateEffective ? profile?.salaryStep ?? null : null;
             const rankCode = salaryHistory ? salaryHistory.rankCode : profileRateEffective ? profile?.rankCode ?? null : null;
             const effectiveRank = salaryHistory?.rank ?? profile?.rank;
@@ -635,7 +683,7 @@ export class HrmsPayrollService {
           const monthlyEquivalentBase = compensationBasis === 'DAILY' ? dailyBase * dates.length
             : compensationBasis === 'HOURLY' ? dailyBase * totalScheduledHours
               : dailyBase;
-          const dayBandMatches = approvedBands.filter((band) => dateKey(band.effectiveFrom) <= day && (!band.effectiveTo || dateKey(band.effectiveTo) >= day) && band.jobTitles.includes(effectiveJobTitle ?? ''));
+          const dayBandMatches = approvedBands.filter((band) => dateKey(band.effectiveFrom) <= rateDay && (!band.effectiveTo || dateKey(band.effectiveTo) >= rateDay) && band.jobTitles.includes(effectiveJobTitle ?? ''));
           const salaryBand = dayBandMatches.find((band) => band.id === user.salaryBandId) ?? (dayBandMatches.length === 1 ? dayBandMatches[0] : null);
           const salaryBandStructure = salaryBand
             ? positionStructures.find((structure) => structure.salaryBandId === salaryBand.id) ?? null
@@ -737,7 +785,7 @@ export class HrmsPayrollService {
         const overtimeBase = overtimeBaseTotal / dates.length;
         const insuranceSalary = insuranceBaseTotal / dates.length;
         const items = [...componentTotals.values()];
-        const overtimeRequests = await tx.overtimeRequest.findMany({ where: { userId: user.id, workDate: { gte: from, lte: to } }, orderBy: { workDate: 'asc' } });
+        const overtimeRequests = await tx.overtimeRequest.findMany({ where: { userId: user.id, workDate: { gte: from, lte: asOf ?? to } }, orderBy: { workDate: 'asc' } });
         const hourly = monthlyHourlyRate(overtimeBase, standardHours);
         const approvedOvertime = overtimeRequests.filter((ot) => ot.status === 'APPROVED');
         const overtimeDetails = approvedOvertime.map((ot) => {
@@ -749,12 +797,12 @@ export class HrmsPayrollService {
           return { workDate, hours: ot.hours, nightHours, category, hourlyRate, pay: calculateOvertimePay(ot.hours, nightHours, hourlyRate, category, policy) };
         });
         const otPay = overtimeDetails.reduce((sum, ot) => sum + ot.pay, 0);
-        const bonus = actions.filter(a => a.type === 'AWARD' && a.effectiveAt && a.effectiveAt >= from).reduce((sum, a) => sum + Number((a.payload as { amount?: number }).amount ?? 0), 0);
-        const loans = await tx.hrmsEmployeeLoan.findMany({ where: { userId: user.id, status: 'DISBURSED', disbursedAt: { lte: to }, payrollDeductionAuthorizedAt: { not: null } }, orderBy: { createdAt: 'asc' } });
+        const bonus = actions.filter(a => a.type === 'AWARD' && a.effectiveAt && a.effectiveAt >= from && a.effectiveAt <= (asOf ?? to)).reduce((sum, a) => sum + Number((a.payload as { amount?: number }).amount ?? 0), 0);
+        const loans = await tx.hrmsEmployeeLoan.findMany({ where: { userId: user.id, status: 'DISBURSED', disbursedAt: { lte: asOf ?? to }, payrollDeductionAuthorizedAt: { not: null } }, orderBy: { createdAt: 'asc' } });
         const overtimeTaxable = overtimeDetails.reduce((sum, ot) => sum + ot.hours * ot.hourlyRate, 0);
         const nightWorkBase = employeeRows.reduce((sum, row) => sum + Number(row.nightWorkedMinutes ?? 0) / 60 * (overtimeHourlyRateByDate.get(row.workDate.slice(0, 10)) ?? hourly), 0);
         const nightWorkPremium = nightWorkBase * policy.overtimeRates.nightAdditional;
-        const firstMonthSick = user.hireDate && dateKey(user.hireDate) >= from && await tx.leaveRequest.count({where:{userId:user.id,type:'SICK',status:'APPROVED',startDate:{lte:to},endDate:{gte:from}}}) > 0;
+        const firstMonthSick = user.hireDate && dateKey(user.hireDate) >= from && await tx.leaveRequest.count({where:{userId:user.id,type:'SICK',status:'APPROVED',startDate:{lte:asOf ?? to},endDate:{gte:from}}}) > 0;
         // A finalized resignation can leave fewer than 14 paid workdays in the month.
         // Count scheduled workdays after the effective termination date as days with no
         // salary so insurance is not withheld for a full month against a one-day payslip.
@@ -808,6 +856,7 @@ export class HrmsPayrollService {
             attendance: {
               standardDays: dates.length,
               paidDays: Number(paidDays.toFixed(2)),
+              missingAttendanceDays,
               actualWorkDays: Number(attendanceDays.toFixed(2)),
               workedHours: Number((workedMinutesTotal / 60).toFixed(2)),
               scheduledHours: totalScheduledHours,
@@ -835,12 +884,49 @@ export class HrmsPayrollService {
             approvedOvertime: overtimeDetails,
           },
         };
-        await tx.hrmsPayrollSlip.create({ data: { payrollRunId: run.id, userId: user.id, employeeName: user.fullName, bankAccount: user.bankAccount, bankName: user.bankName, employeeCode: user.employeeCode, department: user.orgUnit?.name, jobTitle: user.jobTitle, workingDays: dates.length, actualWorkDays: paidDays, baseSalary: base, grossPay: calculated.grossPay, totalDeduction: calculated.totalDeduction, netPay: calculated.netPay, breakdown, status: 'DRAFT' } });
-        for (const deduction of calculated.loanDeductions) await tx.payrollLoanDeduction.create({ data: { payrollRunId: run.id, userId: user.id, ...deduction } });
+        if (isPreview) {
+          previewSlips.push({
+            id: user.id, userId: user.id, employeeName: user.fullName, employeeCode: user.employeeCode,
+            department: user.orgUnit?.name, jobTitle: user.jobTitle, workingDays: dates.length,
+            scheduledDaysToDate: eligible.length, actualWorkDays: paidDays, missingAttendanceDays, baseSalary: base,
+            grossPay: calculated.grossPay, totalDeduction: calculated.totalDeduction, netPay: calculated.netPay, breakdown,
+          });
+        } else {
+          await tx.hrmsPayrollSlip.create({ data: { payrollRunId: run!.id, userId: user.id, employeeName: user.fullName, bankAccount: user.bankAccount, bankName: user.bankName, employeeCode: user.employeeCode, department: user.orgUnit?.name, jobTitle: user.jobTitle, workingDays: dates.length, actualWorkDays: paidDays, baseSalary: base, grossPay: calculated.grossPay, totalDeduction: calculated.totalDeduction, netPay: calculated.netPay, breakdown, status: 'DRAFT' } });
+          for (const deduction of calculated.loanDeductions) await tx.payrollLoanDeduction.create({ data: { payrollRunId: run!.id, userId: user.id, ...deduction } });
+        }
         totalGrossPay += calculated.grossPay; totalDeduction += calculated.totalDeduction; totalNetPay += calculated.netPay;
+        } catch (error) {
+          if (!isPreview) throw error;
+          previewSlips.push({
+            id: user.id, userId: user.id, employeeName: user.fullName, employeeCode: user.employeeCode,
+            department: user.orgUnit?.name, jobTitle: user.jobTitle, workingDays: 0, scheduledDaysToDate: 0,
+            actualWorkDays: 0, missingAttendanceDays: 0, baseSalary: 0, grossPay: 0,
+            totalDeduction: 0, netPay: 0,
+            calculationError: error instanceof Error ? error.message : 'Chưa đủ căn cứ lương để tính.',
+          });
+        }
       }
-      await tx.auditLog.create({ data: { actorId, action: 'PAYROLL_CALCULATED', entityType: 'HrmsPayrollRun', entityId: run.id, afterData: { attendancePeriodId: attendancePeriod.id, attendanceVersion: attendancePeriod.version, employees: users.length } } });
-      return tx.hrmsPayrollRun.update({ where: { id: run.id }, data: { totalEmployees: users.length, totalGrossPay, totalDeduction, totalNetPay }, include: { slips: true } });
+      if (isPreview) {
+        const unpricedEmployees = previewSlips.filter(slip => Boolean(slip.calculationError)).length;
+        return {
+          mode: 'PROVISIONAL',
+          asOfDate: asOf!.toISOString().slice(0, 10),
+          generatedAt: new Date().toISOString(),
+          periodFrom: from.toISOString().slice(0, 10),
+          periodTo: to.toISOString().slice(0, 10),
+          attendanceStatus: attendancePeriod?.status ?? 'OPEN',
+          totalEmployees: users.length,
+          totalGrossPay,
+          totalDeduction,
+          totalNetPay,
+          pendingAttendanceDays: previewSlips.reduce((sum, slip) => sum + Number(slip.missingAttendanceDays ?? 0), 0),
+          unpricedEmployees,
+          slips: previewSlips,
+        };
+      }
+      await tx.auditLog.create({ data: { actorId, action: 'PAYROLL_CALCULATED', entityType: 'HrmsPayrollRun', entityId: run!.id, afterData: { attendancePeriodId: attendancePeriod!.id, attendanceVersion: attendancePeriod!.version, employees: users.length } } });
+      return tx.hrmsPayrollRun.update({ where: { id: run!.id }, data: { totalEmployees: users.length, totalGrossPay, totalDeduction, totalNetPay }, include: { slips: true } });
     }, { isolationLevel: 'Serializable', timeout: 120_000 });
     return result;
   }
@@ -1054,6 +1140,11 @@ export class HrmsPayrollController {
   @Post('runs')
   createRun(@Body() dto: CreatePayrollRunDto, @CurrentUser() actor: AuthUser) {
     return this.service.createPayrollRun(actor.id, dto);
+  }
+
+  @Get('preview-to-date')
+  previewToDate() {
+    return this.service.previewPayrollToDate();
   }
 
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT')
