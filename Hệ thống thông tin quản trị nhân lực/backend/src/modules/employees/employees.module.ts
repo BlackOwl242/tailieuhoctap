@@ -87,7 +87,9 @@ const EMPLOYEE_SELECT_PUBLIC = {
 } as const;
 
 /** Nhân viên thường hay HR/quản trị? Dùng để chặn dữ liệu lương nhạy cảm. */
-const isPrivilegedHr = (u: AuthUser) => u.roles.includes('ADMIN') || u.roles.includes('KM_MANAGER');
+const isPrivilegedHr = (u: AuthUser) => u.roles.includes('ADMIN') || u.roles.includes('KM_MANAGER') || u.roles.includes('HR_CB');
+const canReadContractsAcrossOrganization = (u: AuthUser) =>
+  u.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD'].includes(role));
 
 @Injectable()
 export class EmployeesService {
@@ -119,7 +121,7 @@ export class EmployeesService {
 
   /**
    * Danh sách hồ sơ nhân sự (cho data table — client tự lọc/sắp xếp/phân trang).
-   * RBAC: chỉ ADMIN/KM_MANAGER nhận trường baseSalary; nhân viên thường
+   * RBAC: chỉ ADMIN/KM_MANAGER/HR_CB nhận trường baseSalary; nhân viên thường
    * nhận bản rút gọn không có lương.
    */
   async list(viewer: AuthUser) {
@@ -148,6 +150,9 @@ export class EmployeesService {
   async detail(id: string, viewer: AuthUser) {
     const privileged = isPrivilegedHr(viewer);
     const canSeePersonalDetails = privileged || viewer.id === id;
+    const canReadContracts = canReadContractsAcrossOrganization(viewer)
+      || viewer.id === id
+      || viewer.roles.includes('LINE_MANAGER');
     const user = await this.prisma.user.findFirst({
       where: { id, deletedAt: null },
       select: {
@@ -156,7 +161,7 @@ export class EmployeesService {
         ...(privileged || viewer.id === id ? { baseSalary: true } : {}),
         ...(viewer.id === id && !privileged ? { birthDate: true, phone: true, address: true } : {}),
         bio: true, expertise: true,
-        ...(privileged || viewer.id === id ? { contracts: { orderBy: { startDate: 'desc' as const } } } : {}),
+        ...(canReadContracts ? { contracts: { orderBy: { startDate: 'desc' as const } } } : {}),
         ...(canSeePersonalDetails ? { comprehensiveProfile: { select: { currentAddress: true, permanentAddress: true, verificationStatus: true, verifiedAt: true, dataSource: true } } } : {}),
         certificates: { orderBy: { createdAt: 'desc' } },
         leaveBalances: { orderBy: { year: 'desc' }, take: 1 },
@@ -413,19 +418,19 @@ export class EmployeesController {
     return this.service.compensationBasis(id, effectiveDate);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Patch(':id/profile')
   updateProfile(@Param('id') id: string, @Body() dto: UpdateProfileDto, @CurrentUser() user: AuthUser) {
     return this.service.updateProfile(id, dto, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Post(':id/contracts')
   createContract(@Param('id') id: string, @Body() dto: CreateContractDto, @CurrentUser() user: AuthUser) {
     return this.service.createContract(id, dto, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Patch(':id/contracts/:contractId')
   updateContract(
     @Param('id') id: string, @Param('contractId') contractId: string,
@@ -434,13 +439,13 @@ export class EmployeesController {
     return this.service.updateContract(id, contractId, dto, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Post(':id/certificates')
   createCertificate(@Param('id') id: string, @Body() dto: CreateCertificateDto, @CurrentUser() user: AuthUser) {
     return this.service.createCertificate(id, dto, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Delete(':id/certificates/:certId')
   deleteCertificate(
     @Param('id') id: string, @Param('certId') certId: string, @CurrentUser() user: AuthUser,

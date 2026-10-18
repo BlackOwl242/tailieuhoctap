@@ -12,6 +12,7 @@ import { ArticlesModule } from '../articles/articles.module';
 import { ArticlesService } from '../articles/articles.service';
 
 const HR_ROLES = ['ADMIN', 'KM_MANAGER', 'HR_CB'];
+const CONTRACT_READ_ROLES = ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD'];
 const FILE_ROLES = ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'LINE_MANAGER', 'BOD', 'AUDITOR', 'USER'];
 const MIME: Record<string, string> = {
   '.pdf': 'application/pdf', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp',
@@ -42,8 +43,18 @@ export class FilesService {
       allowed = publicDocument.status === 'PUBLISHED' || isHr;
     }
     if (!allowed) {
-      const contract = await this.prisma.contract.findFirst({ where: { fileUrl: url }, select: { fileName: true, userId: true } });
-      if (contract) { originalName = contract.fileName; allowed = isHr || contract.userId === actor.id; }
+      const contract = await this.prisma.contract.findFirst({
+        where: { fileUrl: url },
+        select: { fileName: true, userId: true, user: { select: { orgUnitId: true } } },
+      });
+      if (contract) {
+        originalName = contract.fileName;
+        allowed = CONTRACT_READ_ROLES.some(role => roles.has(role)) || contract.userId === actor.id;
+        if (!allowed && roles.has('LINE_MANAGER')) {
+          const manager = await this.prisma.user.findUnique({ where: { id: actor.id }, select: { orgUnitId: true } });
+          allowed = Boolean(manager?.orgUnitId && manager.orgUnitId === contract.user.orgUnitId);
+        }
+      }
     }
     if (!allowed) {
       const certificate = await this.prisma.certificate.findFirst({ where: { fileUrl: url }, select: { userId: true, name: true } });

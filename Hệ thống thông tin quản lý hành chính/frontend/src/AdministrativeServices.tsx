@@ -3,17 +3,63 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 type Request = <T>(path: string, body?: unknown) => Promise<T>
 type Person = { role: string; agencyScope?: string }
 type Procedure = { code: string; name: string }
-type DeskRecord = { code: string; agency: string; status: string; citizen_name?: string; sender_name?: string; phone?: string; title?: string; content?: string; reply?: string; appointment_date?: string; time_slot?: string; counter_note?: string }
-const statusNames: Record<string, string> = { BOOKED: 'Chờ xác nhận', CONFIRMED: 'Đã xác nhận', CHECKED_IN: 'Đã đến quầy', COMPLETED: 'Đã phục vụ', CANCELLED: 'Đã hủy', RECEIVED: 'Chờ trả lời', REPLIED: 'Đã trả lời', DA_XAC_NHAN: 'Đã xác nhận', DA_TRA_LOI: 'Đã trả lời' }
-const nextStatuses: Record<string, string[]> = { BOOKED: ['CONFIRMED', 'CANCELLED'], CONFIRMED: ['CHECKED_IN', 'CANCELLED'], CHECKED_IN: ['COMPLETED'], DA_XAC_NHAN: ['CHECKED_IN', 'CANCELLED'], DA_DAT: ['CONFIRMED', 'CANCELLED'], CHO_XAC_NHAN: ['CONFIRMED', 'CANCELLED'] }
+type DeskRecord = {
+  code: string
+  agency: string
+  status: string
+  citizen_name?: string
+  sender_name?: string
+  phone?: string
+  email?: string
+  procedure_code?: string
+  procedure_name?: string
+  queue_number?: string | number
+  note?: string
+  topic?: string
+  title?: string
+  content?: string
+  reply?: string
+  replied_by?: string
+  replied_at?: string
+  appointment_date?: string
+  time_slot?: string
+  counter_note?: string
+  created_at?: string
+}
+const statusNames: Record<string, string> = {
+  BOOKED: 'Chờ xác nhận',
+  DA_DAT: 'Đã đặt lịch',
+  CHO_XAC_NHAN: 'Chờ xác nhận',
+  CONFIRMED: 'Đã xác nhận',
+  DA_XAC_NHAN: 'Đã xác nhận',
+  CHECKED_IN: 'Đã đến quầy',
+  COMPLETED: 'Đã phục vụ',
+  CANCELLED: 'Đã hủy',
+  DA_HUY: 'Đã hủy',
+  HUY: 'Đã hủy',
+  RECEIVED: 'Chờ trả lời',
+  MOI_TIEP_NHAN: 'Mới tiếp nhận',
+  DANG_XU_LY: 'Đang xử lý',
+  REPLIED: 'Đã trả lời',
+  DA_TRA_LOI: 'Đã trả lời',
+  CLOSED: 'Đã đóng',
+}
+const nextStatuses: Record<string, string[]> = {
+  BOOKED: ['CONFIRMED', 'CANCELLED'],
+  DA_DAT: ['CONFIRMED', 'CANCELLED'],
+  CHO_XAC_NHAN: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['CHECKED_IN', 'CANCELLED'],
+  DA_XAC_NHAN: ['CHECKED_IN', 'CANCELLED'],
+  CHECKED_IN: ['COMPLETED'],
+}
 
-function DeskRecordRow({ record, appointment, request, onChanged }: { record: DeskRecord; appointment: boolean; request: Request; onChanged: () => Promise<void> }) {
+function DeskRecordRow({ record, appointment, canEdit, request, onChanged }: { record: DeskRecord; appointment: boolean; canEdit: boolean; request: Request; onChanged: () => Promise<void> }) {
   const [note, setNote] = useState('')
   const [status, setStatus] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const options = nextStatuses[record.status] || []
-  const closed = appointment ? !options.length : ['REPLIED', 'DA_TRA_LOI', 'CLOSED'].includes(record.status)
+  const closed = !canEdit || (appointment ? !options.length : ['REPLIED', 'DA_TRA_LOI', 'CLOSED'].includes(record.status))
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError('')
     try {
@@ -23,8 +69,17 @@ function DeskRecordRow({ record, appointment, request, onChanged }: { record: De
     finally { setBusy(false) }
   }
   return <article className="sandbox-payment-row">
-    <header><div><b>{record.code} · {record.citizen_name || record.sender_name}</b><span>{record.agency} · {record.phone}</span></div><strong>{statusNames[record.status] || record.status}</strong></header>
-    {appointment ? <p>{record.appointment_date} · {record.time_slot} · {record.counter_note}</p> : <><h3>{record.title}</h3><p>{record.content}</p>{record.reply && <p><b>Nội dung trả lời:</b> {record.reply}</p>}</>}
+    <header><div><b>{record.code} · {record.citizen_name || record.sender_name || 'Công dân'}</b><span>{record.agency}{record.phone ? ` · ${record.phone}` : ''}{record.email ? ` · ${record.email}` : ''}</span></div><strong>{statusNames[record.status] || record.status}</strong></header>
+    {appointment ? <>
+      <p><b>Lịch hẹn:</b> {record.appointment_date} · {record.time_slot}{record.queue_number ? ` · Số thứ tự: ${record.queue_number}` : ''}</p>
+      {(record.procedure_code || record.procedure_name) && <p><b>Thủ tục:</b> {[record.procedure_code, record.procedure_name].filter(Boolean).join(' · ')}</p>}
+      {record.note && <p><b>Nội dung công dân đăng ký:</b> {record.note}</p>}
+      {record.counter_note && <p><b>Ghi chú quầy một cửa:</b> {record.counter_note}</p>}
+    </> : <>
+      <h3>{record.title}{record.topic ? ` (${record.topic})` : ''}</h3>
+      <p>{record.content}</p>
+      {record.reply && <p><b>Nội dung trả lời:</b> {record.reply}{record.replied_by ? ` — ${record.replied_by}` : ''}{record.replied_at ? ` (${record.replied_at})` : ''}</p>}
+    </>}
     {!closed && <form className="sandbox-payment-action form-grid account-form" onSubmit={save}>
       {appointment && <label>Trạng thái tiếp theo<select required value={status} onChange={event => setStatus(event.target.value)}><option value="">Chọn thao tác</option>{options.map(value => <option key={value} value={value}>{statusNames[value]}</option>)}</select></label>}
       <label>{appointment ? 'Ghi chú xử lý' : 'Nội dung trả lời'}<textarea required minLength={8} maxLength={2000} rows={3} value={note} onChange={event => setNote(event.target.value)} /></label>
@@ -34,41 +89,45 @@ function DeskRecordRow({ record, appointment, request, onChanged }: { record: De
   </article>
 }
 
-export function AdministrativeServiceDesk({ user, procedures, request }: { user: Person; procedures: Procedure[]; request: Request }) {
+export function AdministrativeServiceDesk({ user, procedures, request, onCaseCreated }: { user: Person; procedures: Procedure[]; request: Request; onCaseCreated?: (caseRecord: any) => Promise<void> | void }) {
   const [appointments, setAppointments] = useState<DeskRecord[]>([])
   const [feedback, setFeedback] = useState<DeskRecord[]>([])
+  const [summary, setSummary] = useState<{ appointments?: Record<string, number>; feedback?: Record<string, number> } | null>(null)
+  const [createdCase, setCreatedCase] = useState<any | null>(null)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
   const [submissionKey, setSubmissionKey] = useState(() => crypto.randomUUID())
-  const eligible = ['intake', 'leader'].includes(user.role)
+  const eligible = ['intake', 'leader', 'admin'].includes(user.role)
+  const canEdit = ['intake', 'leader'].includes(user.role)
   const load = useCallback(async () => {
     if (!eligible) return
-    const result = await request<{ appointments: DeskRecord[]; feedback: DeskRecord[] }>('/api/service-desk')
-    setAppointments(result.appointments); setFeedback(result.feedback)
+    const result = await request<{ appointments: DeskRecord[]; feedback: DeskRecord[]; summary?: { appointments?: Record<string, number>; feedback?: Record<string, number> } }>('/api/service-desk')
+    setAppointments(result.appointments || []); setFeedback(result.feedback || []); setSummary(result.summary || null)
   }, [eligible, request])
   useEffect(() => {
     if (!eligible) return
     let active = true
-    void request<{ appointments: DeskRecord[]; feedback: DeskRecord[] }>('/api/service-desk').then(result => {
-      if (active) { setAppointments(result.appointments); setFeedback(result.feedback) }
+    void request<{ appointments: DeskRecord[]; feedback: DeskRecord[]; summary?: { appointments?: Record<string, number>; feedback?: Record<string, number> } }>('/api/service-desk').then(result => {
+      if (active) { setAppointments(result.appointments || []); setFeedback(result.feedback || []); setSummary(result.summary || null) }
     }).catch(cause => { if (active) setError(cause instanceof Error ? cause.message : 'Không tải được lịch hẹn.') })
     return () => { active = false }
   }, [eligible, request])
   async function create(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const form = event.currentTarget
-    const values = Object.fromEntries(new FormData(form)); setBusy(true); setError(''); setNotice('')
+    const values = Object.fromEntries(new FormData(form)); setBusy(true); setError(''); setNotice(''); setCreatedCase(null)
     try {
-      const result = await request<{ case: { code: string } }>('/api/cases/counter', { ...values, submissionKey, identityVerified: values.identityVerified === 'on' })
-      setNotice(`Đã tiếp nhận hồ sơ ${result.case.code}. Mở lại bàn cán bộ để xem hồ sơ, cấp khóa tra cứu và thực hiện số hóa.`)
+      const result = await request<{ case: any }>('/api/cases/counter', { ...values, submissionKey, identityVerified: values.identityVerified === 'on' })
+      setCreatedCase(result.case)
+      setNotice(`Đã tiếp nhận hồ sơ ${result.case.code} tại quầy Một cửa. Bạn có thể mở trực tiếp hồ sơ để in Phiếu tiếp nhận (Mẫu 01), cấp khóa tra cứu và thực hiện số hóa.`)
       setSubmissionKey(crypto.randomUUID()); form.reset()
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Chưa tiếp nhận được hồ sơ.') }
     finally { setBusy(false) }
   }
   if (!eligible) return null
   return <>
-    {user.role === 'intake' && <section className="panel"><details><summary><b>Tiếp nhận hồ sơ trực tiếp tại quầy</b></summary>
-      <p>Ghi nhận giấy tờ đã đối chiếu với người nộp. Tệp quét được bổ sung trong chi tiết hồ sơ sau khi tiếp nhận.</p>
+    {user.role === 'intake' && <section className="panel"><details open><summary><b>Tiếp nhận hồ sơ trực tiếp tại quầy Một cửa</b></summary>
+      <p>Ghi nhận giấy tờ bản chính/bản sao đã đối chiếu với người nộp. Tệp quét số hóa được bổ sung trong chi tiết hồ sơ sau khi tiếp nhận.</p>
       <form className="sandbox-signer-form form-grid account-form" onSubmit={create}>
         <label>Thủ tục<select name="procedureCode" required><option value="">Chọn thủ tục</option>{procedures.map(p => <option key={p.code} value={p.code}>{p.code} · {p.name}</option>)}</select></label>
         <label>Cơ quan tiếp nhận<input name="receivingAgency" required maxLength={180} defaultValue={user.agencyScope === 'Toàn thành phố' ? '' : user.agencyScope} readOnly={!!user.agencyScope && user.agencyScope !== 'Toàn thành phố'} /></label>
@@ -85,15 +144,21 @@ export function AdministrativeServiceDesk({ user, procedures, request }: { user:
       </form>
     </details></section>}
     {error && <p className="form-error" role="alert">{error}</p>}
-    {notice && <p className="citizen-success" role="status">{notice} <a href="/staff">Mở bàn cán bộ</a></p>}
-    <section className="panel"><h2>Lịch hẹn tại cơ quan</h2><button className="text-button" onClick={() => { setError(''); void load().catch(cause => setError(String(cause))) }}>Tải lại danh sách</button>
-      <div className="sandbox-payment-list">{appointments.map(record => <DeskRecordRow key={record.code} record={record} appointment request={request} onChanged={load} />)}</div>
-      {!appointments.length && <p>Chưa có lịch hẹn trong phạm vi được cấp.</p>}
-    </section>
-    <section className="panel"><h2>Phản ánh, kiến nghị gửi đến cơ quan</h2>
-      <div className="sandbox-payment-list">{feedback.map(record => <DeskRecordRow key={record.code} record={record} appointment={false} request={request} onChanged={load} />)}</div>
-      {!feedback.length && <p>Chưa có phản ánh trong phạm vi được cấp.</p>}
-    </section>
+    {notice && <p className="citizen-success" role="status">{notice} {createdCase && onCaseCreated && <button type="button" className="button secondary" style={{ marginLeft: 8 }} onClick={() => void onCaseCreated(createdCase)}>Mở hồ sơ {createdCase.code}</button>}</p>}
+    {summary && user.role === 'admin' && <section className="panel"><h2>Tổng hợp Lịch hẹn & Phản ánh kiến nghị toàn thành phố</h2>
+      <p><b>Lịch hẹn:</b> {Object.entries(summary.appointments || {}).map(([st, cnt]) => `${statusNames[st] || st}: ${cnt}`).join(' · ') || 'Chưa có dữ liệu'}</p>
+      <p><b>Phản ánh, kiến nghị:</b> {Object.entries(summary.feedback || {}).map(([st, cnt]) => `${statusNames[st] || st}: ${cnt}`).join(' · ') || 'Chưa có dữ liệu'}</p>
+    </section>}
+    {canEdit && <>
+      <section className="panel"><h2>Lịch hẹn tại cơ quan ({appointments.length})</h2><button className="text-button" onClick={() => { setError(''); void load().catch(cause => setError(String(cause))) }}>Tải lại danh sách</button>
+        <div className="sandbox-payment-list">{appointments.map(record => <DeskRecordRow key={record.code} record={record} appointment canEdit={canEdit} request={request} onChanged={load} />)}</div>
+        {!appointments.length && <p>Chưa có lịch hẹn trong phạm vi được cấp.</p>}
+      </section>
+      <section className="panel"><h2>Phản ánh, kiến nghị gửi đến cơ quan ({feedback.length})</h2>
+        <div className="sandbox-payment-list">{feedback.map(record => <DeskRecordRow key={record.code} record={record} appointment={false} canEdit={canEdit} request={request} onChanged={load} />)}</div>
+        {!feedback.length && <p>Chưa có phản ánh trong phạm vi được cấp.</p>}
+      </section>
+    </>}
   </>
 }
 
@@ -116,8 +181,9 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
       if (kind === 'lookup') {
         const result = await request<{ record: DeskRecord }>('/api/public/service-lookup', values); setRecord(result.record)
       } else {
-        const result = await request<{ code: string; message: string }>(`/api/public/${kind}`, values)
-        setNotice(`${result.message} Mã theo dõi: ${result.code}. Giữ mã này cùng số điện thoại đã khai để tra cứu.`); form.reset()
+        const result = await request<{ code: string; queueNumber?: string | number; message: string }>(`/api/public/${kind}`, values)
+        const queueInfo = result.queueNumber ? ` Số thứ tự quầy: ${result.queueNumber}.` : ''
+        setNotice(`${result.message} Mã theo dõi: ${result.code}.${queueInfo} Giữ mã này cùng số điện thoại đã khai để tra cứu.`); form.reset()
       }
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Chưa gửi được thông tin.') }
     finally { setBusy(false) }
@@ -125,7 +191,7 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
   return <section className="portal-section"><details onToggle={event => setOpen(event.currentTarget.open)}><summary><b>Đặt lịch hẹn, gửi phản ánh và tra cứu kết quả</b></summary>
     {open && <div className="panel"><div className="form-actions">{[['appointments', 'Đặt lịch hẹn'], ['pakn', 'Gửi phản ánh'], ['lookup', 'Tra cứu']].map(([value, label]) => <button type="button" className={`button ${kind === value ? 'primary' : 'secondary'}`} key={value} onClick={() => { setKind(value); setNotice(''); setError(''); setRecord(null) }}>{label}</button>)}</div>
       <form className="citizen-action-form" key={kind} onSubmit={submit}>
-        {kind === 'lookup' ? <label className="citizen-field">Mã lịch hẹn / phản ánh<input name="code" required maxLength={40} /></label> : <>
+        {kind === 'lookup' ? <label className="citizen-field">Mã lịch hẹn / phản ánh (LH-... hoặc PAKN-...)<input name="code" required maxLength={40} placeholder="Ví dụ: LH-2026-0001 hoặc PAKN-2026-0001" /></label> : <>
           <label className="citizen-field">Họ và tên<input name="name" required minLength={2} maxLength={150} /></label>
           <label className="citizen-field">Cơ quan<select name="agency" required><option value="">Chọn cơ quan</option>{agencies.map(a => <option key={a}>{a}</option>)}</select></label>
         </>}
@@ -140,7 +206,17 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
         <button className="button primary" disabled={busy}>{busy ? 'Đang xử lý…' : kind === 'lookup' ? 'Tra cứu' : 'Gửi thông tin'}</button>
       </form>
       {error && <p className="form-error" role="alert">{error}</p>}{notice && <p className="citizen-success" role="status">{notice}</p>}
-      {record && <article className="citizen-case-section"><h3>{record.code} · {statusNames[record.status] || record.status}</h3><p>{record.agency}</p><p>{record.appointment_date} {record.time_slot}</p><p>{record.title}</p><p>{record.reply || record.counter_note || 'Chưa có nội dung trả lời mới.'}</p></article>}
+      {record && <article className="citizen-case-section">
+        <h3>{record.code} · {statusNames[record.status] || record.status}</h3>
+        <p><b>Cơ quan:</b> {record.agency}</p>
+        {(record.citizen_name || record.sender_name) && <p><b>Người gửi / Đặt lịch:</b> {record.citizen_name || record.sender_name}</p>}
+        {record.appointment_date && <p><b>Thời gian hẹn:</b> {record.appointment_date} · {record.time_slot}{record.queue_number ? ` (Số thứ tự: ${record.queue_number})` : ''}</p>}
+        {(record.procedure_code || record.procedure_name) && <p><b>Thủ tục:</b> {[record.procedure_code, record.procedure_name].filter(Boolean).join(' · ')}</p>}
+        {record.note && <p><b>Nội dung đăng ký:</b> {record.note}</p>}
+        {record.title && <p><b>Tiêu đề:</b> {record.title}{record.topic ? ` (${record.topic})` : ''}</p>}
+        {record.content && <p><b>Nội dung phản ánh:</b> {record.content}</p>}
+        <p><b>Kết quả xử lý / Ghi chú:</b> {record.reply || record.counter_note || 'Chưa có nội dung trả lời mới.'}{record.replied_by ? ` — ${record.replied_by}` : ''}{record.replied_at ? ` (${record.replied_at})` : ''}</p>
+      </article>}
     </div>}
   </details></section>
 }

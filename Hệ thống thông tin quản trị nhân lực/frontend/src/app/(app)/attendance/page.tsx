@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { LogIn, LogOut, Camera } from 'lucide-react';
+import { LogIn, LogOut, Camera, RefreshCw } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { cn, formatDateTime, DAY_STATUS_LABEL } from '@/lib/utils';
+import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/components/ui/primitives';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
@@ -16,6 +17,8 @@ import type { AttendanceDayRow, AttendanceEventRow } from '@/lib/types';
 export default function AttendancePage() {
   const qc = useQueryClient();
   const toast = useToast();
+  const user = useAuthStore((s) => s.user);
+  const canAutoSync = Boolean(user?.roles?.some((r) => ['ADMIN', 'KM_MANAGER', 'HR_CB'].includes(r)));
 
   const q = useQuery({
     queryKey: ['attendance-me'],
@@ -33,6 +36,19 @@ export default function AttendancePage() {
     onError: (e) => toast(errorMessage(e), 'error'),
   });
 
+  const autoSync = useMutation({
+    mutationFn: async () => api.post('/attendance/auto-sync', {}),
+    onSuccess: (res) => {
+      const d = res.data as { syncedUsers?: number; syncedDays?: number; targetDate?: string };
+      toast(
+        `Đã đồng bộ điểm danh tự động cho toàn bộ nhân sự đến ngày ${d.targetDate ?? 'hôm nay'} (${d.syncedDays ?? 0} bản ghi cập nhật)`,
+        'success',
+      );
+      qc.invalidateQueries({ queryKey: ['attendance-me'] });
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
   const todayEvents = q.data?.todayEvents ?? [];
   const nextPunch = todayEvents.length % 2 === 0 ? 'IN' : 'OUT';
 
@@ -40,10 +56,21 @@ export default function AttendancePage() {
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
         title="Bảng chấm công"
-        description="Chấm công vào/ra ca trên web hoặc bằng khuôn mặt qua camera thường."
+        description="Chấm công vào/ra ca trên web, nhận diện khuôn mặt qua camera và tự động đồng bộ công cho toàn bộ nhân sự."
         breadcrumbs={[{ label: 'Chấm công' }, { label: 'Bảng chấm công' }]}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {canAutoSync && (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={autoSync.isPending}
+                onClick={() => autoSync.mutate()}
+              >
+                <RefreshCw className={cn('h-4 w-4', autoSync.isPending && 'animate-spin')} />
+                Đồng bộ công tự động toàn công ty
+              </Button>
+            )}
             <Link href="/check-in"><Button variant="outline" size="sm"><Camera className="h-4 w-4" /> Điểm danh khuôn mặt</Button></Link>
             <PrintExportDropdown
               printLabel="In bảng công"
@@ -81,6 +108,9 @@ export default function AttendancePage() {
               Đã có {todayEvents.length} lần chấm · Lần cuối {formatDateTime(todayEvents[todayEvents.length - 1].occurredAt)}
             </p>
           ) : null}
+          <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+            Hệ thống đã bật chế độ tự động ghi nhận đủ ngày công theo ca làm việc cho toàn bộ nhân viên đến ngày hiện tại.
+          </p>
         </CardContent>
       </Card>
 

@@ -15,9 +15,11 @@ import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { ErrorState } from '@/components/common/states';
 
 interface OvertimeRow {
-  id: string; workDate: string; hours: number; nightHours?: number; dayCategory?: string; reason: string;
+  id: string;
+  userId?: string;
+  workDate: string; hours: number; nightHours?: number; dayCategory?: string; reason: string;
   status: keyof typeof REQUEST_STATUS_LABEL; decisionNote: string | null;
-  user?: { fullName: string; employeeCode: string | null; orgUnit?: { name: string } | null };
+  user?: { id?: string; fullName: string; employeeCode: string | null; orgUnit?: { name: string } | null };
   approver?: { fullName: string } | null;
 }
 
@@ -25,8 +27,10 @@ interface OvertimeRow {
 export default function OvertimePage() {
   const qc = useQueryClient();
   const toast = useToast();
-  const roles = useAuthStore((s) => s.user?.roles ?? []);
-  const isHr = roles.includes('ADMIN') || roles.includes('KM_MANAGER');
+  const user = useAuthStore((s) => s.user);
+  const roles = user?.roles ?? [];
+  const canReview = roles.some((r) => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD'].includes(r));
+  const isHr = canReview;
   const [tab, setTab] = useState<'mine' | 'all'>('mine');
   const [open, setOpen] = useState(false);
   const [detail, setDetail] = useState<OvertimeRow | null>(null);
@@ -39,7 +43,7 @@ export default function OvertimePage() {
   const allQ = useQuery({
     queryKey: ['overtime-all'],
     queryFn: async () => (await api.get<OvertimeRow[]>('/overtime')).data,
-    enabled: isHr && tab === 'all',
+    enabled: canReview && tab === 'all',
   });
 
   const invalidate = () => {
@@ -124,15 +128,18 @@ export default function OvertimePage() {
           options: Object.entries(REQUEST_STATUS_LABEL).map(([value, label]) => ({ value, label })),
         }]}
         emptyTitle="Chưa có đăng ký làm thêm giờ"
-        actions={(r): RowActionItem[] => [
-          // "Xem chi tiết" LUÔN có mặt — kebab không bao giờ trống (Mục 8)
-          { label: 'Xem chi tiết đăng ký', icon: Eye, onSelect: () => setDetail(r) },
-          ...(tab === 'all' && isHr && r.status === 'PENDING' ? [
-            'separator' as const,
-            { label: 'Duyệt giờ làm thêm', icon: Check, onSelect: () => decide.mutate({ id: r.id, approve: true }) },
-            { label: 'Từ chối', icon: X, danger: true, onSelect: () => decide.mutate({ id: r.id, approve: false }) },
-          ] : []),
-        ]}
+        actions={(r): RowActionItem[] => {
+          const isOwnRequest = Boolean(user?.id && (r.userId === user.id || r.user?.id === user.id));
+          return [
+            // "Xem chi tiết" LUÔN có mặt — kebab không bao giờ trống (Mục 8)
+            { label: 'Xem chi tiết đăng ký', icon: Eye, onSelect: () => setDetail(r) },
+            ...(tab === 'all' && canReview && r.status === 'PENDING' && !isOwnRequest ? [
+              'separator' as const,
+              { label: 'Duyệt giờ làm thêm', icon: Check, onSelect: () => decide.mutate({ id: r.id, approve: true }) },
+              { label: 'Từ chối', icon: X, danger: true, onSelect: () => decide.mutate({ id: r.id, approve: false }) },
+            ] : []),
+          ];
+        }}
       />
 
       {/* Modal chi tiết đăng ký — đầy đủ lý do, giờ, kết quả duyệt */}

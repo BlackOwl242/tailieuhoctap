@@ -310,7 +310,12 @@ export class HrmsRecruitmentService {
       if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== 'MONTHLY' || band.effectiveFrom > joiningDate || (band.effectiveTo && band.effectiveTo < joiningDate)) throw new ConflictException('Khung lương tháng của vị trí không còn hiệu lực vào ngày nhận việc');
       if (dto.offeredSalary < band.minSalary || dto.offeredSalary > band.maxSalary) throw new ConflictException(`Mức đề nghị phải nằm trong khung ${band.minSalary.toLocaleString('vi-VN')}–${band.maxSalary.toLocaleString('vi-VN')} đồng/tháng`);
       const request = app.jobOpening.requisitionId ? await tx.jobRequisition.findUnique({ where: { id: app.jobOpening.requisitionId } }) : null;
-      if (!request || request.status !== 'APPROVED' || dto.offeredSalary * app.jobOpening.vacancies > request.budgetMonthly) throw new ConflictException('Offer vượt ngân sách/chỉ tiêu chưa duyệt');
+      const existingOffers = await tx.hrmsJobOffer.findMany({
+        where: { applicant: { jobOpeningId: app.jobOpeningId }, status: { in: ['SENT', 'ACCEPTED'] } },
+        select: { offeredSalary: true },
+      });
+      const committedBudget = existingOffers.reduce((sum, item) => sum + item.offeredSalary, 0);
+      if (!request || request.status !== 'APPROVED' || committedBudget + dto.offeredSalary > request.budgetMonthly) throw new ConflictException('Offer vượt ngân sách/chỉ tiêu chưa duyệt');
       if (await tx.hrmsJobOffer.count({ where: { applicantId: app.id, status: { in: ['SENT','ACCEPTED'] } } })) throw new ConflictException('Đã có offer đang hiệu lực');
       const offer = await tx.hrmsJobOffer.create({ data: { ...dto, joiningDate, status: 'SENT' } });
       await tx.hrmsJobApplicant.update({ where: { id: app.id }, data: { stage: 'OFFER_SENT' } });
@@ -342,7 +347,7 @@ export class HrmsRecruitmentService {
       if (hired >= app.jobOpening.vacancies) throw new ConflictException('Đã đủ chỉ tiêu tuyển');
       const req = app.jobOpening.requisitionId ? await tx.jobRequisition.findUniqueOrThrow({ where: { id: app.jobOpening.requisitionId } }) : null;
       if (!req || req.status !== 'APPROVED') throw new ConflictException('Chỉ tiêu không còn hiệu lực');
-      const user = await tx.user.create({ data: { email: app.email, passwordHash, mustChangePassword: false, fullName: app.candidateName, phone: app.phone, employeeCode: `NV-${randomUUID().slice(0,8).toUpperCase()}`, jobTitle: offer.designation, salaryBandId: app.jobOpening.salaryBandId, baseSalary: offer.offeredSalary, hireDate: dateKey(offer.joiningDate), employmentStatus: 'PROBATION', status: 'DISABLED', orgUnitId: req.orgUnitId, roles: { create: { roleCode: 'USER' } } }, select: { id: true, email: true, fullName: true, employeeCode: true, employmentStatus: true, status: true } });
+      const user = await tx.user.create({ data: { email: app.email, passwordHash, mustChangePassword: true, fullName: app.candidateName, phone: app.phone, employeeCode: `NV-${randomUUID().slice(0,8).toUpperCase()}`, jobTitle: offer.designation, salaryBandId: app.jobOpening.salaryBandId, baseSalary: offer.offeredSalary, hireDate: dateKey(offer.joiningDate), employmentStatus: 'PROBATION', status: 'ACTIVE', orgUnitId: req.orgUnitId, roles: { create: { roleCode: 'USER' } } }, select: { id: true, email: true, fullName: true, employeeCode: true, employmentStatus: true, status: true } });
       await tx.personnelComprehensiveProfile.create({ data: { userId: user.id, recruitDate: dateKey(offer.joiningDate), recruitOrg: app.jobOpening.department } });
       await tx.contract.create({ data: { userId: user.id, contractNo: `TV-${user.employeeCode}`, type: 'PROBATION', startDate: dateKey(offer.joiningDate), endDate: new Date(dateKey(offer.joiningDate).getTime() + (app.jobOpening.probationDays - 1) * 86400000), baseSalary: offer.offeredSalary, compensationBasis: 'MONTHLY', insuranceSalary: offer.offeredSalary, createdById: actorId } });
       await tx.hrmsJobApplicant.update({ where: { id: applicantId, stage: 'OFFER_SENT' }, data: { stage: 'HIRED' } });
@@ -359,7 +364,7 @@ export class HrmsRecruitmentService {
 @ApiTags('HRMS - Recruitment & ATS')
 @ApiBearerAuth()
 @Controller('hrms/recruitment')
-@Roles('ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'BOD')
+@Roles('ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'HR_CB', 'BOD')
 export class HrmsRecruitmentController {
   constructor(private readonly service: HrmsRecruitmentService) {}
 
@@ -368,7 +373,7 @@ export class HrmsRecruitmentController {
     return this.service.listOpenings();
   }
 
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER','HR_CB')
   @Post('openings')
   createOpening(@Body() dto: CreateJobOpeningDto, @CurrentUser() actor: AuthUser) {
     return this.service.createOpening(actor.id, dto);
@@ -379,35 +384,35 @@ export class HrmsRecruitmentController {
     return this.service.listApplicants(jobOpeningId, stage);
   }
 
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER','HR_CB')
   @Post('applicants')
   createApplicant(@Body() dto: CreateApplicantDto, @CurrentUser() actor: AuthUser) {
     return this.service.createApplicant(actor.id, dto);
   }
 
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER','HR_CB')
   @Patch('applicants/:id/stage')
   updateStage(@Param('id') id: string, @Body('stage') stage: ApplicantStage, @CurrentUser() actor: AuthUser) {
     return this.service.updateApplicantStage(actor.id, id, stage);
   }
 
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER','HR_CB')
   @Post('interviews')
   addInterview(@Body() dto: CreateInterviewRoundDto, @CurrentUser() actor: AuthUser) {
     return this.service.addInterviewRound(actor.id, dto);
   }
 
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER','HR_CB')
   @Post('offers')
   createOffer(@Body() dto: CreateJobOfferDto, @CurrentUser() actor: AuthUser) {
     return this.service.createOffer(actor.id, dto);
   }
 
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER','HR_CB')
   @Patch('offers/:id/respond')
   respondOffer(@Param('id') id: string, @Body() body: { accepted: boolean; evidenceUrl: string }, @CurrentUser() actor: AuthUser) { return this.service.respondOffer(actor.id, id, body.accepted === true, body.evidenceUrl); }
 
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER','HR_CB')
   @Post('applicants/:id/convert-to-employee')
   convertToEmployee(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
     return this.service.convertToEmployee(actor.id, id);

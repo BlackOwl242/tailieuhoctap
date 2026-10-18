@@ -106,13 +106,21 @@ export class AttendanceController {
   }
 
   // ------------------------------------------------------------ admin routes
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Get('days')
   companyDays(@Query('date') date?: string, @Query('q') q?: string, @Query('page') page?: number, @Query('limit') limit?: number) {
     return this.service.companyDays(date, q, page, limit);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
+  @Post('auto-sync')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Đồng bộ & bù điểm danh tự động cho toàn bộ nhân sự đến ngày hiện tại' })
+  autoSync(@CurrentUser() user: AuthUser, @Req() req: AuthedRequest) {
+    return this.service.autoSyncNow(user, req.requestId);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Post('days/:userId/:date/correction')
   correct(
     @Param('userId') userId: string,
@@ -124,7 +132,7 @@ export class AttendanceController {
     return this.service.correctDay(userId, date, dto, user, req.requestId);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Get('devices')
   devices() {
     return this.service.listDevices();
@@ -143,7 +151,7 @@ export class AttendanceController {
   }
 
   /** Import CSV — nhận text/csv thô trong body. */
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Post('import/csv')
   async importCsv(@Req() req: Request & { rawBody?: Buffer }, @CurrentUser() user: AuthUser, @Res() res: Response) {
     const chunks: Buffer[] = [];
@@ -155,7 +163,7 @@ export class AttendanceController {
     void res.status(HttpStatus.OK).json(result);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Post('simulator/run')
   simulate(@Body() dto: SimulatorDto, @CurrentUser() user: AuthUser, @Req() req: AuthedRequest) {
     return this.service.runSimulator(Math.min(60, Math.max(1, dto.days ?? 14)), user, req.requestId);

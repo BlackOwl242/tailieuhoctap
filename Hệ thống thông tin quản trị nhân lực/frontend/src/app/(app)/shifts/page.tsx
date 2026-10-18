@@ -429,12 +429,20 @@ export default function ShiftsPage() {
           <span className="text-base font-semibold text-foreground">{rosterData?.assignments.length ?? 0}</span>
         </div>
         <div>
-          <span className="text-muted-foreground block text-xs">Dung sai đi trễ</span>
-          <span className="text-base font-semibold text-foreground">15 phút</span>
+          <span className="text-muted-foreground block text-xs">Dung sai đi trễ TB</span>
+          <span className="text-base font-semibold text-foreground">
+            {shiftTypes.length > 0
+              ? `${Math.round(shiftTypes.reduce((acc, s) => acc + (s.lateToleranceMinutes ?? 0), 0) / shiftTypes.length)} phút`
+              : '0 phút'}
+          </span>
         </div>
         <div>
-          <span className="text-muted-foreground block text-xs">Tỷ lệ đúng giờ</span>
-          <span className="text-base font-semibold text-foreground">96.4%</span>
+          <span className="text-muted-foreground block text-xs">Tự động chấm công</span>
+          <span className="text-base font-semibold text-foreground">
+            {shiftTypes.length > 0
+              ? `${Math.round((shiftTypes.filter((s) => s.enableAutoAttendance !== false).length / shiftTypes.length) * 100)}%`
+              : '0%'}
+          </span>
         </div>
       </div>
 
@@ -717,24 +725,6 @@ export default function ShiftsPage() {
               />
             </div>
           </div>
-          <fieldset>
-            <legend className="font-semibold text-foreground">Ngày làm việc theo tuần *</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {WEEK_DAYS.map(day => (
-                <label key={day.value} className="flex items-center gap-1.5 rounded-md border border-border px-2 py-1.5">
-                  <input
-                    type="checkbox"
-                    checked={selectedWorkDays.includes(day.value)}
-                    onChange={event => setSelectedWorkDays(current => event.target.checked
-                      ? [...current, day.value]
-                      : current.filter(value => value !== day.value))}
-                  />
-                  {day.label}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="font-semibold text-foreground">Dung sai đi trễ (phút)</label>
@@ -900,6 +890,28 @@ export default function ShiftsPage() {
               />
             </div>
           </div>
+
+          <fieldset>
+            <legend className="font-semibold text-foreground">Ngày làm việc theo tuần *</legend>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {WEEK_DAYS.map((day) => (
+                <label key={day.value} className="flex items-center gap-1.5 rounded-md border border-border px-2 py-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={selectedWorkDays.includes(day.value)}
+                    onChange={(event) =>
+                      setSelectedWorkDays((current) =>
+                        event.target.checked
+                          ? [...current, day.value]
+                          : current.filter((value) => value !== day.value),
+                      )
+                    }
+                  />
+                  {day.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
         </div>
 
         <ModalFooterActions

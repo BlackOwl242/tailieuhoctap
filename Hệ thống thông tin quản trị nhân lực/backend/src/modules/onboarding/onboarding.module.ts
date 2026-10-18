@@ -100,7 +100,7 @@ export class OnboardingService {
       userIds: [dto.userId],
       type: 'ONBOARDING_ASSIGNED',
       title: `Bạn có lộ trình hội nhập mới: ${path.title}`,
-      linkPath: '/onboarding',
+      linkPath: '/ess',
     });
     await this.audit.log({ actorId: actor.id, action: 'ONBOARDING_ASSIGNED', entityType: 'OnboardingAssignment', entityId: assignment.id, requestId });
     return assignment;
@@ -160,10 +160,10 @@ export class OnboardingService {
   }
 
   // --------------------------------------------------------------- handover
-  /** Danh sách checklist chuyển giao: KM/ADMIN thấy tất cả, người thường thấy của mình. */
+  /** Danh sách checklist chuyển giao: KM/ADMIN/HR_CB thấy tất cả, người thường thấy của mình. */
   async listHandovers(user: AuthUser) {
     const roles = await this.globalRoles(user.id);
-    const privileged = roles.includes('ADMIN') || roles.includes('KM_MANAGER');
+    const privileged = roles.includes('ADMIN') || roles.includes('KM_MANAGER') || roles.includes('HR_CB');
     const rows = await this.prisma.handoverChecklist.findMany({
       where: privileged ? {} : { OR: [{ ownerUserId: user.id }, { items: { some: { responsibleRole: { in: roles } } } }] },
       include: {
@@ -180,26 +180,32 @@ export class OnboardingService {
   }
 
   /**
-   * Tạo checklist chuyển giao khi nghỉ việc — mirror UC17 của tài liệu gốc:
-   * sinh sẵn các mục bắt buộc (tri thức đã văn bản hóa, xóa mẫu khuôn mặt…).
+   * Tạo checklist chuyển giao khi nghỉ việc — chuẩn hóa 5 mục bàn giao liên phòng ban
+   * đồng nhất với personnel-actions.module.ts.
    */
   async createHandover(dto: CreateHandoverDto, actor: AuthUser, requestId?: string) {
     const owner = await this.prisma.user.findFirst({ where: { id: dto.ownerUserId, deletedAt: null } });
     if (!owner) throw new NotFoundException('Không tìm thấy nhân viên');
 
-    const defaultTitles = [
-      'Bàn giao công việc cho người kế nhiệm',
-      'Văn bản hóa tri thức quan trọng thành bài viết trong KMS',
-      'Xóa mẫu khuôn mặt & thu hồi quyền truy cập hệ thống',
-      'Chuyển giao bookmark / runbook cá nhân',
+    const defaultItems: Array<{ title: string; responsibleRole: 'LINE_MANAGER' | 'HR_CB' | 'ADMIN' | 'ACCOUNTANT' | 'KM_MANAGER' }> = [
+      { title: 'Bàn giao công việc chuyên môn cho người kế nhiệm', responsibleRole: 'LINE_MANAGER' },
+      { title: 'Thu hồi tài sản vật lý (Máy tính, Thẻ từ, Chìa khóa tủ)', responsibleRole: 'HR_CB' },
+      { title: 'Xóa mẫu sinh trắc học khuôn mặt & thu hồi tài khoản hệ thống', responsibleRole: 'ADMIN' },
+      { title: 'Chốt công nợ tạm ứng và khoản vay nội bộ', responsibleRole: 'ACCOUNTANT' },
+      { title: 'Đóng gói tri thức và tài liệu đang phụ trách trên KMS', responsibleRole: 'KM_MANAGER' },
     ];
-    const titles = dto.itemTitles?.length ? dto.itemTitles : defaultTitles;
+    const itemsToCreate = dto.itemTitles?.length
+      ? dto.itemTitles.map((title, idx) => ({
+          title,
+          responsibleRole: defaultItems[idx % defaultItems.length].responsibleRole,
+        }))
+      : defaultItems;
 
     const checklist = await this.prisma.handoverChecklist.create({
       data: {
         ownerUserId: dto.ownerUserId,
         leavingDate: new Date(dto.leavingDate),
-        items: { create: titles.map((title) => ({ title })) },
+        items: { create: itemsToCreate },
       },
       include: { items: true },
     });
@@ -226,7 +232,7 @@ export class OnboardingService {
     // Ràng buộc UC17: Nếu là mục Thu hồi tài sản, kiểm tra xem nhân viên còn tài sản chưa trả không
     if (done && checklist?.ownerUserId && (item.title.toLowerCase().includes('tài sản') || item.title.toLowerCase().includes('máy tính'))) {
       const activeAsset = await this.prisma.hrmsAssetAllocation.findFirst({
-        where: { assignedUserId: checklist.ownerUserId, status: 'ALLOCATED' },
+        where: { assignedUserId: checklist.ownerUserId, status: { in: ['ALLOCATED', 'PENDING_ACK'] } },
       });
       if (activeAsset) {
         throw new BusinessException(
@@ -254,8 +260,8 @@ export class OnboardingService {
       throw new BusinessException(ErrorCodes.HANDOVER_NOT_CLOSABLE, `Còn ${pending} mục chưa hoàn thành`, HttpStatus.CONFLICT);
     }
     const checklist = await this.prisma.handoverChecklist.findUniqueOrThrow({ where: { id } });
-    const debts = await this.prisma.hrmsEmployeeLoan.count({ where: { userId: checklist.ownerUserId, status: 'APPROVED', remainingAmount: { gt: 0 } } });
-    const assets = await this.prisma.hrmsAssetAllocation.count({ where: { assignedUserId: checklist.ownerUserId, status: 'ALLOCATED' } });
+    const debts = await this.prisma.hrmsEmployeeLoan.count({ where: { userId: checklist.ownerUserId, status: { in: ['APPROVED', 'DISBURSED'] }, remainingAmount: { gt: 0 } } });
+    const assets = await this.prisma.hrmsAssetAllocation.count({ where: { assignedUserId: checklist.ownerUserId, status: { in: ['ALLOCATED', 'PENDING_ACK'] } } });
     if (debts || assets) throw new BusinessException(ErrorCodes.HANDOVER_NOT_CLOSABLE, 'Cần thu hồi tài sản và tất toán khoản vay trước khi đóng bàn giao', HttpStatus.CONFLICT);
     await this.prisma.handoverChecklist.update({ where: { id }, data: { status: 'CLOSED', closedAt: new Date() } });
     await this.audit.log({ actorId: actor.id, action: 'HANDOVER_CLOSED', entityType: 'HandoverChecklist', entityId: id, requestId });
@@ -287,7 +293,7 @@ export class OnboardingController {
     return this.service.listPaths();
   }
 
-  @Roles('KM_MANAGER', 'ADMIN')
+  @Roles('KM_MANAGER', 'ADMIN', 'HR_CB', 'LINE_MANAGER')
   @Post('paths')
   createPath(@Body() dto: CreatePathDto, @CurrentUser() user: AuthUser) {
     return this.service.createPath(dto, user);
@@ -298,7 +304,7 @@ export class OnboardingController {
     return this.service.myAssignments(user.id);
   }
 
-  @Roles('KM_MANAGER', 'ADMIN')
+  @Roles('KM_MANAGER', 'ADMIN', 'HR_CB', 'LINE_MANAGER')
   @Post('paths/:id/assign')
   assign(@Param('id') id: string, @Body() dto: AssignPathDto, @CurrentUser() user: AuthUser) {
     return this.service.assign(id, dto, user);
@@ -325,7 +331,7 @@ export class HandoverController {
     return this.service.listHandovers(user);
   }
 
-  @Roles('KM_MANAGER', 'ADMIN')
+  @Roles('KM_MANAGER', 'ADMIN', 'HR_CB')
   @Post()
   create(@Body() dto: CreateHandoverDto, @CurrentUser() user: AuthUser) {
     return this.service.createHandover(dto, user);
@@ -341,7 +347,7 @@ export class HandoverController {
     return this.service.setItemDone(id, itemId, dto, user);
   }
 
-  @Roles('KM_MANAGER', 'ADMIN')
+  @Roles('KM_MANAGER', 'ADMIN', 'HR_CB')
   @Post(':id/close')
   close(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.service.closeHandover(id, user);

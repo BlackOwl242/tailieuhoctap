@@ -1,5 +1,19 @@
 {
-  "holidays": [],
+  "holidays": [
+    "2026-01-01",
+    "2026-02-16",
+    "2026-02-17",
+    "2026-02-18",
+    "2026-02-19",
+    "2026-02-20",
+    "2026-04-26",
+    "2026-04-27",
+    "2026-04-30",
+    "2026-05-01",
+    "2026-09-01",
+    "2026-09-02"
+  ],
   "working_weekends": [],
-  "note": "Danh sách ngày nghỉ lễ và ngày làm bù cần được đơn vị vận hành xác nhận, cập nhật theo năm."
+  "note": "Danh sách ngày nghỉ lễ năm 2026 (Tết Dương lịch, Tết Nguyên đán Bính Ngọ, Giỗ Tổ Hùng Vương, 30/4 - 01/5, Quốc khánh 02/9) phục vụ tính ngày làm việc và hạn giải quyết."
 }
+

@@ -16,6 +16,7 @@ import { DataTable, type DataColumn, type RowActionItem } from '@/components/ui/
 import { Modal } from '@/components/ui/modal';
 import { PrintFrame, PrintSignatureBlock, PrintExportDropdown } from '@/components/ui/print';
 import { exportRowsToExcel } from '@/lib/export';
+import { useAuthStore } from '@/lib/auth-store';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -34,6 +35,13 @@ interface UnitTableRow {
 
 export default function OrgChartPage() {
   const router = useRouter();
+  const roles = useAuthStore((s) => s.user?.roles ?? []);
+  const canViewEmployees = roles.some((r) =>
+    ['ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR'].includes(r)
+  );
+  const canManageOrgUnits = roles.some((r) =>
+    ['ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD'].includes(r)
+  );
   const [activeTab, setActiveTab] = useState<'tree' | 'table'>('tree');
   const [selectedNode, setSelectedNode] = useState<OrgNode | null>(null);
 
@@ -48,6 +56,8 @@ export default function OrgChartPage() {
   const { data: rawEmployees } = useQuery<any>({
     queryKey: ['employees-list'],
     queryFn: async () => (await api.get('/employees?limit=200')).data,
+    enabled: canViewEmployees,
+    retry: false,
   });
 
   const employeeList: {
@@ -77,7 +87,7 @@ export default function OrgChartPage() {
       let headTitle = node.headTitle;
       let headName = node.headName;
       const manager = unitEmps.find((e) => {
-        const title = e.jobTitle.toLowerCase();
+        const title = (e.jobTitle || '').toLowerCase();
         return title.includes('tổng giám đốc') || title.includes('giám đốc') || title.includes('trưởng') || title.includes('lead');
       });
       headTitle = headTitle || manager?.jobTitle || 'Chưa xác định';
@@ -94,7 +104,7 @@ export default function OrgChartPage() {
         code: node.code,
         headTitle,
         headName,
-        headcount: node.memberCount ?? unitEmps.length,
+        headcount: node.memberCount ?? node.headcount ?? unitEmps.length,
         children,
       };
     };
@@ -255,13 +265,15 @@ export default function OrgChartPage() {
                 exportRowsToExcel('co-cau-to-chuc', headers, rowsData);
               }}
             />
-            <Link
-              href="/admin/org-units"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-2xs"
-            >
-              <Building2 className="h-3.5 w-3.5" />
-              Quản lý Đơn vị
-            </Link>
+            {canManageOrgUnits && (
+              <Link
+                href="/admin/org-units"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-2xs"
+              >
+                <Building2 className="h-3.5 w-3.5" />
+                Quản lý Đơn vị
+              </Link>
+            )}
           </div>
         }
       />
@@ -367,15 +379,35 @@ export default function OrgChartPage() {
             emptyTitle="Chưa có dữ liệu cơ cấu tổ chức"
             actions={(r): RowActionItem[] => [
               {
-                label: 'Xem nhân sự thuộc đơn vị',
+                label: 'Xem chi tiết đơn vị',
                 icon: Eye,
-                onSelect: () => router.push(`/employees?search=${r.name}`),
+                onSelect: () => {
+                  if (canViewEmployees) {
+                    router.push(`/employees?search=${r.name}`);
+                  } else {
+                    const findNode = (nodes: OrgNode[]): OrgNode | null => {
+                      for (const n of nodes) {
+                        if (n.id === r.id) return n;
+                        if (n.children) {
+                          const found = findNode(n.children);
+                          if (found) return found;
+                        }
+                      }
+                      return null;
+                    };
+                    setSelectedNode(findNode(enrichedTree));
+                  }
+                },
               },
-              {
-                label: 'Cấu hình đơn vị',
-                icon: Building2,
-                onSelect: () => router.push('/admin/org-units'),
-              },
+              ...(canManageOrgUnits
+                ? [
+                    {
+                      label: 'Cấu hình đơn vị',
+                      icon: Building2,
+                      onSelect: () => router.push('/admin/org-units'),
+                    },
+                  ]
+                : []),
             ]}
           />
 

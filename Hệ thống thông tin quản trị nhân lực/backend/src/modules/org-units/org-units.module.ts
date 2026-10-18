@@ -38,6 +38,8 @@ interface TreeNode {
   sortOrder: number;
   memberCount: number;
   totalMembers: number;
+  headName?: string;
+  headTitle?: string;
   level: number;
   levelLabel: string;
   children: TreeNode[];
@@ -54,10 +56,21 @@ export class OrgUnitsService {
   async tree(): Promise<TreeNode[]> {
     const units = await this.prisma.orgUnit.findMany({
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      include: { _count: { select: { users: { where: { deletedAt: null } } } } },
+      include: {
+        _count: { select: { users: { where: { deletedAt: null } } } },
+        users: {
+          where: { deletedAt: null },
+          select: { fullName: true, jobTitle: true },
+          orderBy: [{ employeeCode: 'asc' }, { fullName: 'asc' }],
+        },
+      },
     });
     const byId = new Map<string, TreeNode>();
     for (const u of units) {
+      const head =
+        u.users.find((m) =>
+          /chủ tịch|tổng giám đốc|giám đốc|trưởng|quản lý/i.test(m.jobTitle ?? ''),
+        ) ?? u.users[0];
       byId.set(u.id, {
         id: u.id,
         name: u.name,
@@ -68,6 +81,8 @@ export class OrgUnitsService {
         // Giữ trường cũ để tương thích các client, nhưng nó cùng nghĩa với
         // memberCount; số của đơn vị cha không cộng dồn nhân sự của đơn vị con.
         totalMembers: u._count.users,
+        headName: head?.fullName,
+        headTitle: head?.jobTitle ?? undefined,
         level: 1,
         levelLabel: 'Cấp 1: Doanh nghiệp',
         children: [],
@@ -190,7 +205,7 @@ export class OrgUnitsService {
 }
 
 // ---------------------------------------------------------------------------
-// Controller — xem cây: mọi người; ghi: chỉ ADMIN (KC03)
+// Controller — xem cây: mọi người; ghi: ADMIN / KM_MANAGER / HR_CB / BOD
 // ---------------------------------------------------------------------------
 
 @ApiTags('org-units')
@@ -211,19 +226,19 @@ export class OrgUnitsController {
     return this.service.tree();
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD')
   @Post()
   create(@Body() dto: CreateOrgUnitDto, @CurrentUser() user: AuthUser) {
     return this.service.create(dto, user);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD')
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateOrgUnitDto, @CurrentUser() user: AuthUser) {
     return this.service.update(id, dto, user);
   }
 
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD')
   @Delete(':id')
   remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.service.remove(id, user);

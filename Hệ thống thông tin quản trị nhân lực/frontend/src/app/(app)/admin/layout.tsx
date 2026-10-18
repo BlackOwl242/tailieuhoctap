@@ -25,7 +25,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     retry: false,
   });
 
-  const isAdmin = !!meQuery.data?.roles?.includes('ADMIN');
+  const isAdmin = !!meQuery.data?.roles?.some((r) =>
+    ['ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD', 'AUDITOR'].includes(r)
+  );
 
   useEffect(() => {
     if (meQuery.isSuccess && !isAdmin) router.replace('/dashboard');

@@ -72,7 +72,8 @@ const ASSET_CATEGORY_LABEL: Record<string, string> = {
 export default function AssetsPage() {
   const queryClient = useQueryClient();
   const toast = useToast();
-  const roles = useAuthStore((s) => s.user?.roles ?? []);
+  const user = useAuthStore((s) => s.user);
+  const roles = user?.roles ?? [];
   const canManage = roles.some((role) => ['ADMIN', 'KM_MANAGER', 'HR_CB'].includes(role));
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -123,7 +124,9 @@ export default function AssetsPage() {
       setAssetCode('');
       setSerialNumber('');
       setNotes('');
+      toast('Đã khai báo tài sản mới thành công', 'success');
     },
+    onError: (e) => toast(errorMessage(e), 'error'),
   });
 
   const allocateMutation = useMutation({
@@ -135,7 +138,9 @@ export default function AssetsPage() {
       setIsAllocateModalOpen(false);
       setAssigneeId('');
       setAssigneeName('');
+      toast('Đã lập biên bản bàn giao tài sản', 'success');
     },
+    onError: (e) => toast(errorMessage(e), 'error'),
   });
 
   const returnMutation = useMutation({
@@ -144,15 +149,21 @@ export default function AssetsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hrms-assets'] });
+      toast('Đã thu hồi tài sản về kho', 'success');
     },
+    onError: (e) => toast(errorMessage(e), 'error'),
   });
 
   const acknowledgeMutation = useMutation({
-    mutationFn: async () => api.post(`/hrms/assets/${receiptAsset!.id}/acknowledge`, { accepted: true, condition: receiptCondition }),
-    onSuccess: () => {
+    mutationFn: async (accepted: boolean) =>
+      api.post(`/hrms/assets/${receiptAsset!.id}/acknowledge`, { accepted, condition: receiptCondition }),
+    onSuccess: (_data, accepted) => {
       queryClient.invalidateQueries({ queryKey: ['hrms-assets'] });
       setReceiptAsset(null);
-      toast('Đã lưu xác nhận nhận tài sản điện tử', 'success');
+      toast(
+        accepted ? 'Đã lưu xác nhận nhận tài sản điện tử' : 'Đã từ chối tiếp nhận và hoàn trả về kho',
+        'success',
+      );
     },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
@@ -183,6 +194,9 @@ export default function AssetsPage() {
   const allocatedCount = assetList.filter((a) => a.status === 'ALLOCATED').length;
   const availableCount = assetList.filter((a) => a.status === 'AVAILABLE').length;
   const pendingAckCount = assetList.filter((a) => a.status === 'PENDING_ACK').length;
+  const ackRate = allocatedCount + pendingAckCount > 0
+    ? Math.round((allocatedCount / (allocatedCount + pendingAckCount)) * 100)
+    : 100;
 
   return (
     <div className="space-y-6 pb-12">
@@ -237,8 +251,8 @@ export default function AssetsPage() {
         />
         <NumberCard
           title="Tuân Thủ Bàn Giao"
-          value="100%"
-          subtitle="Đầy đủ biên bản bàn giao & thu hồi"
+          value={`${ackRate}%`}
+          subtitle={`${pendingAckCount} chờ xác nhận · Đầy đủ biên bản`}
           icon={ShieldCheck}
           trend={{ value: 'Đồng bộ hồ sơ', isPositive: true }}
         />
@@ -341,7 +355,7 @@ export default function AssetsPage() {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      {!canManage && asset.status === 'PENDING_ACK' ? (
+                      {asset.status === 'PENDING_ACK' && (!canManage || asset.assignedUserId === user?.id) ? (
                         <button onClick={() => { setReceiptAsset(asset); setReceiptCondition(asset.condition || 'GOOD'); }} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/10 text-primary font-semibold hover:bg-primary/20 transition-colors text-xs">
                           <Check className="h-3 w-3" /> Xác nhận đã nhận
                         </button>
@@ -563,13 +577,17 @@ export default function AssetsPage() {
       )}
       <Modal open={!!receiptAsset} onOpenChange={(open) => !open && setReceiptAsset(null)} title="Xác nhận nhận tài sản" description={receiptAsset ? `${receiptAsset.assetCode} · ${receiptAsset.name}` : undefined}>
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">Xác nhận điện tử này ghi nhận tài khoản của bạn đã tiếp nhận tài sản. Hãy kiểm tra tình trạng trước khi xác nhận.</p>
+          <p className="text-sm text-muted-foreground">Xác nhận điện tử này ghi nhận tài khoản của bạn đã tiếp nhận tài sản. Hãy kiểm tra tình trạng trước khi xác nhận hoặc từ chối nếu có sai lệch.</p>
           <div className="space-y-1.5"><label className="text-sm font-medium">Tình trạng khi nhận</label>
             <Select value={receiptCondition} onChange={(e) => setReceiptCondition(e.target.value)}>
               <option value="NEW">Mới</option><option value="EXCELLENT">Rất tốt</option><option value="GOOD">Tốt</option><option value="DAMAGED">Có hư hỏng</option>
             </Select>
           </div>
-          <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setReceiptAsset(null)}>Hủy</Button><Button onClick={() => acknowledgeMutation.mutate()} disabled={acknowledgeMutation.isPending}>Tôi xác nhận đã nhận</Button></div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setReceiptAsset(null)}>Hủy</Button>
+            <Button variant="destructive" onClick={() => acknowledgeMutation.mutate(false)} disabled={acknowledgeMutation.isPending}>Từ chối / Báo sai lệch</Button>
+            <Button onClick={() => acknowledgeMutation.mutate(true)} disabled={acknowledgeMutation.isPending}>Tôi xác nhận đã nhận</Button>
+          </div>
         </div>
       </Modal>
     </div>

@@ -48,7 +48,7 @@ export class DocumentsService {
   list(category?: string, processArea?: string, actor?: AuthUser, q?: string) {
     return this.prisma.hrDocument.findMany({
       where: {
-        ...(actor?.roles.some(role => ['ADMIN','KM_MANAGER'].includes(role)) ? { status: { not: 'ARCHIVED' } } : { status: 'PUBLISHED' }),
+        ...(actor?.roles.some(role => ['ADMIN','KM_MANAGER','HR_CB'].includes(role)) ? { status: { not: 'ARCHIVED' } } : { status: 'PUBLISHED' }),
         ...(q ? { OR: [{ title: { contains: q, mode: 'insensitive' as const } }, { contentMd: { contains: q, mode: 'insensitive' as const } }, { description: { contains: q, mode: 'insensitive' as const } }, { tags: { has: q } }] } : {}),
         ...(category ? { category: category as never } : {}),
         ...(processArea ? { processArea } : {}),
@@ -64,7 +64,7 @@ export class DocumentsService {
       include: { uploader: { select: { fullName: true } } },
     });
     if (!doc) throw new NotFoundException('Không tìm thấy tài liệu');
-    if (doc.status !== 'PUBLISHED' && !actor?.roles.some(role => ['ADMIN','KM_MANAGER'].includes(role))) throw new ForbiddenException('Tài liệu chưa được công bố');
+    if (doc.status !== 'PUBLISHED' && !actor?.roles.some(role => ['ADMIN','KM_MANAGER','HR_CB'].includes(role))) throw new ForbiddenException('Tài liệu chưa được công bố');
     return doc;
   }
 
@@ -181,23 +181,23 @@ export class DocumentsController {
     return this.service.get(id, actor);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Get(':id/history') history(@Param('id') id: string) { return this.service.history(id); }
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Post(':id/publish') publish(@Param('id') id: string, @CurrentUser() actor: AuthUser) { return this.service.publish(id, actor); }
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Post()
   create(@Body() dto: CreateDocumentDto, @CurrentUser() user: AuthUser) {
     return this.service.create(dto, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Put(':id')
   update(@Param('id') id: string, @Body() dto: CreateDocumentDto, @CurrentUser() user: AuthUser) {
     return this.service.update(id, dto, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Delete(':id')
   remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.service.remove(id, user);

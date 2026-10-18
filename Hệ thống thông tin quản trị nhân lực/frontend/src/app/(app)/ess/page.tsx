@@ -15,10 +15,12 @@ import { NumberCard } from '@/components/common/number-card';
 import { LoadingState } from '@/components/common/states';
 import { Badge, Button, Input, Textarea } from '@/components/ui/primitives';
 import { Portal } from '@/components/ui/portal';
+import { useToast } from '@/components/ui/toaster';
 import Link from 'next/link';
 
 export default function EssPage() {
   const queryClient = useQueryClient();
+  const toast = useToast();
   const { user } = useAuthStore();
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
@@ -45,9 +47,15 @@ export default function EssPage() {
     queryFn: async () => (await api.get('/hrms/loans/my')).data,
   });
 
-  const { data: myLeaveBalance } = useQuery<{ entitled: number; used: number; remaining: number }>({
+  const { data: myLeaveBalance } = useQuery<{ entitled?: number; carriedOver?: number; used?: number; remaining?: number }>({
     queryKey: ['my-leave-balance'],
     queryFn: async () => (await api.get('/hrms/leave/my-balance')).data,
+  });
+
+  const { data: myPayslips } = useQuery<{ id: string; month?: number; year?: number; payrollRun?: { month: number; year: number } }[]>({
+    queryKey: ['my-payslips-ess'],
+    queryFn: async () => (await api.get('/hrms/payroll/my-slips')).data,
+    retry: false,
   });
 
   const { data: attendanceSummary } = useQuery<{
@@ -66,21 +74,23 @@ export default function EssPage() {
   }, [attendanceSummary]);
   const checkInMutation = useMutation({
     mutationFn: async () => (await api.post('/attendance/check-in', { method: 'WEB' })).data,
-    onError: (error) => alert(errorMessage(error)),
+    onError: (error) => toast(errorMessage(error), 'error'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ess-attendance'] });
       setIsCheckedIn(true);
       setCheckInTime(new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }));
+      toast('Đã điểm danh vào ca thành công', 'success');
     },
   });
 
   const checkOutMutation = useMutation({
     mutationFn: async () => (await api.post('/attendance/check-in', { method: 'WEB' })).data,
-    onError: (error) => alert(errorMessage(error)),
+    onError: (error) => toast(errorMessage(error), 'error'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ess-attendance'] });
       setIsCheckedIn(false);
       setCheckInTime(null);
+      toast('Đã điểm danh ra ca thành công', 'success');
     },
   });
 
@@ -98,7 +108,9 @@ export default function EssPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-regularizations'] });
       setIsRegularizeModalOpen(false);
+      toast('Đã gửi đơn giải trình bổ sung công', 'success');
     },
+    onError: (error) => toast(errorMessage(error), 'error'),
   });
 
   const handleCheckIn = () => {
@@ -177,7 +189,7 @@ export default function EssPage() {
               <p className="text-xs text-muted-foreground">Tuân thủ Điều 113, 114 Bộ luật Lao động 2019</p>
             </div>
             <Badge variant="outline" className="text-xs font-normal">
-              12 ngày cơ bản + 1 ngày thâm niên
+              {`${myLeaveBalance?.entitled ?? 12} ngày tiêu chuẩn${myLeaveBalance?.carriedOver ? ` + ${myLeaveBalance.carriedOver} ngày tồn` : ''}`}
             </Badge>
           </div>
 
@@ -197,7 +209,14 @@ export default function EssPage() {
           </div>
 
           <div className="flex items-center justify-between pt-1 text-xs border-t border-border/40">
-            <span className="text-muted-foreground">Phiếu lương gần nhất: <b>Tháng {String(new Date().getMonth() === 0 ? 12 : new Date().getMonth()).padStart(2, '0')}/{new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear()}</b></span>
+            <span className="text-muted-foreground">
+              Phiếu lương gần nhất:{' '}
+              <b>
+                {myPayslips && myPayslips.length > 0
+                  ? `Tháng ${String(myPayslips[0].payrollRun?.month ?? myPayslips[0].month ?? 1).padStart(2, '0')}/${myPayslips[0].payrollRun?.year ?? myPayslips[0].year ?? new Date().getFullYear()}`
+                  : 'Chưa có phiếu lương'}
+              </b>
+            </span>
             <Link href="/my-payslips" className="font-semibold text-primary hover:underline flex items-center gap-1">
               Xem Chi Tiết Phiếu Lương <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -319,8 +338,20 @@ export default function EssPage() {
                   <p className="text-xs text-muted-foreground line-clamp-1">{reg.reason}</p>
                 </div>
                 <Badge variant="outline" className="text-xs font-normal gap-1.5">
-                  <span className={`h-1.5 w-1.5 rounded-full ${reg.status === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                  {reg.status === 'APPROVED' ? 'Đã duyệt bù công' : 'Chờ duyệt'}
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      reg.status === 'APPROVED'
+                        ? 'bg-emerald-500'
+                        : reg.status === 'REJECTED'
+                        ? 'bg-rose-500'
+                        : 'bg-amber-500'
+                    }`}
+                  />
+                  {reg.status === 'APPROVED'
+                    ? 'Đã duyệt bù công'
+                    : reg.status === 'REJECTED'
+                    ? 'Đã từ chối'
+                    : 'Chờ duyệt'}
                 </Badge>
               </div>
             )) : (

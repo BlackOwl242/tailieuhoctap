@@ -383,19 +383,20 @@ export class PersonnelProfilesService {
     if (dto.idCardIssueDate) data.idCardIssueDate = new Date(dto.idCardIssueDate);
 
     await this.prisma.$transaction(async tx => {
-      await tx.user.update({where:{id:userId},data:{...(dto.currentAddress !== undefined ? {address:dto.currentAddress}:{}),...(dto.govPosition !== undefined ? {jobTitle:dto.govPosition}:{})}});
-    if (!profile) {
-      profile = await tx.personnelComprehensiveProfile.create({
-        data: { userId, ...data },
-      });
-    } else {
-      profile = await tx.personnelComprehensiveProfile.update({
-        where: { id: profile.id },
-        data,
-      });
-    }
-
-    }, {isolationLevel:'Serializable'});
+      if (dto.currentAddress !== undefined) {
+        await tx.user.update({ where: { id: userId }, data: { address: dto.currentAddress } });
+      }
+      if (!profile) {
+        profile = await tx.personnelComprehensiveProfile.create({
+          data: { userId, ...data },
+        });
+      } else {
+        profile = await tx.personnelComprehensiveProfile.update({
+          where: { id: profile.id },
+          data,
+        });
+      }
+    }, { isolationLevel: 'Serializable' });
 
     await this.audit.log({
       actorId: actor.id,
@@ -457,6 +458,8 @@ export class PersonnelProfilesService {
         requiresApproval: false,
         fields: [
           { key: 'phone', label: 'Số điện thoại cá nhân' },
+          { key: 'workPhone', label: 'Điện thoại cơ quan' },
+          { key: 'homePhone', label: 'Điện thoại nhà riêng' },
           { key: 'currentAddress', label: 'Nơi ở hiện nay / Tạm trú' },
           { key: 'avatarUrl', label: 'Ảnh đại diện' },
           { key: 'bio', label: 'Giới thiệu bản thân' },
@@ -485,12 +488,27 @@ export class PersonnelProfilesService {
           { key: 'ethnicity', label: 'Dân tộc' },
           { key: 'religion', label: 'Tôn giáo' },
           { key: 'familyOrigin', label: 'Thành phần gia đình' },
+          { key: 'maritalStatus', label: 'Tình trạng hôn nhân' },
           { key: 'generalEducation', label: 'Giáo dục phổ thông' },
           { key: 'highestDegree', label: 'Học vị / Bằng cấp cao nhất' },
+          { key: 'majorCode', label: 'Mã ngành đào tạo' },
           { key: 'majorName', label: 'Chuyên ngành đào tạo' },
+          { key: 'academicTitle', label: 'Học hàm' },
+          { key: 'academicTitleDate', label: 'Ngày phong học hàm' },
+          { key: 'politicalTheory', label: 'Lý luận chính trị' },
+          { key: 'stateManagement', label: 'Quản lý nhà nước' },
           { key: 'foreignLanguage', label: 'Ngoại ngữ' },
           { key: 'informaticsLevel', label: 'Tin học' },
+          { key: 'ethnicLanguage', label: 'Tiếng dân tộc thiểu số' },
+          { key: 'healthStatus', label: 'Tình trạng sức khỏe' },
+          { key: 'heightCm', label: 'Chiều cao (cm)' },
+          { key: 'weightKg', label: 'Cân nặng (kg)' },
+          { key: 'bloodType', label: 'Nhóm máu' },
           { key: 'socialInsuranceNo', label: 'Mã số BHXH' },
+          { key: 'socialInsuranceDate', label: 'Ngày tham gia BHXH' },
+          { key: 'bankAccount', label: 'Số tài khoản ngân hàng' },
+          { key: 'bankName', label: 'Ngân hàng nhận lương' },
+          { key: 'taxDependentCount', label: 'Số người phụ thuộc giảm trừ gia cảnh' },
         ],
       },
       tier3: {
@@ -616,9 +634,13 @@ export class PersonnelProfilesService {
     }, { isolationLevel: 'Serializable' });
   }
 
-  async deleteSalaryHistory(id: string) {
+  async deleteSalaryHistory(userId: string, id: string, actorId?: string) {
     await this.assertPublicSalaryMode();
-    return this.prisma.personnelSalaryHistory.delete({ where: { id } });
+    const record = await this.prisma.personnelSalaryHistory.findFirst({ where: { id, profile: { userId } } });
+    if (!record) throw new NotFoundException('Không tìm thấy quyết định lương của nhân sự này');
+    const deleted = await this.prisma.personnelSalaryHistory.delete({ where: { id } });
+    await this.audit.log({ actorId, action: 'DELETE_SALARY_HISTORY', entityType: 'PersonnelSalaryHistory', entityId: id, before: { userId } });
+    return deleted;
   }
 
   async updateSalaryHistoryAllowances(userId: string, id: string, dto: UpdateSalaryHistoryAllowancesDto) {
@@ -666,8 +688,12 @@ export class PersonnelProfilesService {
     });
   }
 
-  async deleteAppointment(id: string) {
-    return this.prisma.personnelAppointment.delete({ where: { id } });
+  async deleteAppointment(userId: string, id: string, actorId?: string) {
+    const record = await this.prisma.personnelAppointment.findFirst({ where: { id, profile: { userId } } });
+    if (!record) throw new NotFoundException('Không tìm thấy quá trình bổ nhiệm của nhân sự này');
+    const deleted = await this.prisma.personnelAppointment.delete({ where: { id } });
+    await this.audit.log({ actorId, action: 'DELETE_APPOINTMENT', entityType: 'PersonnelAppointment', entityId: id, before: { userId } });
+    return deleted;
   }
 
   async addEducation(userId: string, dto: CreateEducationDto) {
@@ -688,8 +714,12 @@ export class PersonnelProfilesService {
     });
   }
 
-  async deleteEducation(id: string) {
-    return this.prisma.personnelEducation.delete({ where: { id } });
+  async deleteEducation(userId: string, id: string, actorId?: string) {
+    const record = await this.prisma.personnelEducation.findFirst({ where: { id, profile: { userId } } });
+    if (!record) throw new NotFoundException('Không tìm thấy quá trình đào tạo của nhân sự này');
+    const deleted = await this.prisma.personnelEducation.delete({ where: { id } });
+    await this.audit.log({ actorId, action: 'DELETE_EDUCATION', entityType: 'PersonnelEducation', entityId: id, before: { userId } });
+    return deleted;
   }
 
   async addWorkHistory(userId: string, dto: CreateWorkHistoryDto) {
@@ -708,8 +738,12 @@ export class PersonnelProfilesService {
     });
   }
 
-  async deleteWorkHistory(id: string) {
-    return this.prisma.personnelWorkHistory.delete({ where: { id } });
+  async deleteWorkHistory(userId: string, id: string, actorId?: string) {
+    const record = await this.prisma.personnelWorkHistory.findFirst({ where: { id, profile: { userId } } });
+    if (!record) throw new NotFoundException('Không tìm thấy quá trình công tác của nhân sự này');
+    const deleted = await this.prisma.personnelWorkHistory.delete({ where: { id } });
+    await this.audit.log({ actorId, action: 'DELETE_WORK_HISTORY', entityType: 'PersonnelWorkHistory', entityId: id, before: { userId } });
+    return deleted;
   }
 
   async addRewardDiscipline(userId: string, dto: CreateRewardDisciplineDto) {
@@ -728,8 +762,12 @@ export class PersonnelProfilesService {
     });
   }
 
-  async deleteRewardDiscipline(id: string) {
-    return this.prisma.personnelRewardDiscipline.delete({ where: { id } });
+  async deleteRewardDiscipline(userId: string, id: string, actorId?: string) {
+    const record = await this.prisma.personnelRewardDiscipline.findFirst({ where: { id, profile: { userId } } });
+    if (!record) throw new NotFoundException('Không tìm thấy bản ghi khen thưởng/kỷ luật của nhân sự này');
+    const deleted = await this.prisma.personnelRewardDiscipline.delete({ where: { id } });
+    await this.audit.log({ actorId, action: 'DELETE_REWARD_DISCIPLINE', entityType: 'PersonnelRewardDiscipline', entityId: id, before: { userId } });
+    return deleted;
   }
 
   async addFamilyRelation(userId: string, dto: CreateFamilyRelationDto) {
@@ -747,8 +785,12 @@ export class PersonnelProfilesService {
     });
   }
 
-  async deleteFamilyRelation(id: string) {
-    return this.prisma.personnelFamilyRelation.delete({ where: { id } });
+  async deleteFamilyRelation(userId: string, id: string, actorId?: string) {
+    const record = await this.prisma.personnelFamilyRelation.findFirst({ where: { id, profile: { userId } } });
+    if (!record) throw new NotFoundException('Không tìm thấy quan hệ gia đình của nhân sự này');
+    const deleted = await this.prisma.personnelFamilyRelation.delete({ where: { id } });
+    await this.audit.log({ actorId, action: 'DELETE_FAMILY_RELATION', entityType: 'PersonnelFamilyRelation', entityId: id, before: { userId } });
+    return deleted;
   }
 
   async addAppraisal(userId: string, dto: CreateAppraisalDto) {
@@ -765,8 +807,12 @@ export class PersonnelProfilesService {
     });
   }
 
-  async deleteAppraisal(id: string) {
-    return this.prisma.personnelAppraisal.delete({ where: { id } });
+  async deleteAppraisal(userId: string, id: string, actorId?: string) {
+    const record = await this.prisma.personnelAppraisal.findFirst({ where: { id, profile: { userId } } });
+    if (!record) throw new NotFoundException('Không tìm thấy nhận xét đánh giá của nhân sự này');
+    const deleted = await this.prisma.personnelAppraisal.delete({ where: { id } });
+    await this.audit.log({ actorId, action: 'DELETE_APPRAISAL', entityType: 'PersonnelAppraisal', entityId: id, before: { userId } });
+    return deleted;
   }
 
   async addSocialActivity(userId: string, dto: CreateSocialActivityDto) {
@@ -783,8 +829,12 @@ export class PersonnelProfilesService {
     });
   }
 
-  async deleteSocialActivity(id: string) {
-    return this.prisma.personnelSocialActivity.delete({ where: { id } });
+  async deleteSocialActivity(userId: string, id: string, actorId?: string) {
+    const record = await this.prisma.personnelSocialActivity.findFirst({ where: { id, profile: { userId } } });
+    if (!record) throw new NotFoundException('Không tìm thấy hoạt động chính trị - xã hội của nhân sự này');
+    const deleted = await this.prisma.personnelSocialActivity.delete({ where: { id } });
+    await this.audit.log({ actorId, action: 'DELETE_SOCIAL_ACTIVITY', entityType: 'PersonnelSocialActivity', entityId: id, before: { userId } });
+    return deleted;
   }
 }
 
@@ -853,8 +903,8 @@ export class PersonnelProfilesController {
 
   @Delete(':userId/salary-histories/:id')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  deleteSalaryHistory(@Param('id') id: string) {
-    return this.service.deleteSalaryHistory(id);
+  deleteSalaryHistory(@Param('userId') userId: string, @Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.deleteSalaryHistory(userId, id, actor.id);
   }
 
   @Post(':userId/appointments')
@@ -865,8 +915,8 @@ export class PersonnelProfilesController {
 
   @Delete(':userId/appointments/:id')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  deleteAppointment(@Param('id') id: string) {
-    return this.service.deleteAppointment(id);
+  deleteAppointment(@Param('userId') userId: string, @Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.deleteAppointment(userId, id, actor.id);
   }
 
   @Post(':userId/educations')
@@ -877,8 +927,8 @@ export class PersonnelProfilesController {
 
   @Delete(':userId/educations/:id')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  deleteEducation(@Param('id') id: string) {
-    return this.service.deleteEducation(id);
+  deleteEducation(@Param('userId') userId: string, @Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.deleteEducation(userId, id, actor.id);
   }
 
   @Post(':userId/work-histories')
@@ -889,8 +939,8 @@ export class PersonnelProfilesController {
 
   @Delete(':userId/work-histories/:id')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  deleteWorkHistory(@Param('id') id: string) {
-    return this.service.deleteWorkHistory(id);
+  deleteWorkHistory(@Param('userId') userId: string, @Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.deleteWorkHistory(userId, id, actor.id);
   }
 
   @Post(':userId/rewards-disciplines')
@@ -901,8 +951,8 @@ export class PersonnelProfilesController {
 
   @Delete(':userId/rewards-disciplines/:id')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  deleteRewardDiscipline(@Param('id') id: string) {
-    return this.service.deleteRewardDiscipline(id);
+  deleteRewardDiscipline(@Param('userId') userId: string, @Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.deleteRewardDiscipline(userId, id, actor.id);
   }
 
   @Post(':userId/family-relations')
@@ -913,8 +963,8 @@ export class PersonnelProfilesController {
 
   @Delete(':userId/family-relations/:id')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  deleteFamilyRelation(@Param('id') id: string) {
-    return this.service.deleteFamilyRelation(id);
+  deleteFamilyRelation(@Param('userId') userId: string, @Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.deleteFamilyRelation(userId, id, actor.id);
   }
 
   @Post(':userId/appraisals')
@@ -925,8 +975,8 @@ export class PersonnelProfilesController {
 
   @Delete(':userId/appraisals/:id')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  deleteAppraisal(@Param('id') id: string) {
-    return this.service.deleteAppraisal(id);
+  deleteAppraisal(@Param('userId') userId: string, @Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.deleteAppraisal(userId, id, actor.id);
   }
 
   @Post(':userId/social-activities')
@@ -937,8 +987,8 @@ export class PersonnelProfilesController {
 
   @Delete(':userId/social-activities/:id')
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
-  deleteSocialActivity(@Param('id') id: string) {
-    return this.service.deleteSocialActivity(id);
+  deleteSocialActivity(@Param('userId') userId: string, @Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.deleteSocialActivity(userId, id, actor.id);
   }
 }
 

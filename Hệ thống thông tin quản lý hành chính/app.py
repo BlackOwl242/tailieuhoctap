@@ -299,6 +299,8 @@ def procedure_catalog_records() -> list[dict]:
             item["code"] = edit.get("localCode") or source["code"]
             item["fieldSource"] = edit.get("categoryKey") or edit["field"] or "Chưa phân loại"
             item["serviceMode"] = {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}.get(item["level"], "UNKNOWN")
+            if isinstance(edit.get("submission"), dict):
+                item["submission"] = edit["submission"]
             item["localEdit"] = {key: edit[key] for key in ("sourceUrl", "checkedAt", "reason", "version", "updatedBy", "updatedAt")}
         item["field"] = item.get("field", "").strip() or "Chưa phân loại"
         category_edit = PROCEDURE_CATEGORY_OVERRIDES.get(item.get("fieldSource") or "Chưa phân loại")
@@ -647,10 +649,13 @@ def init_db() -> None:
                 if name not in columns:
                     con.execute(f"ALTER TABLE {table} ADD COLUMN {name} {declaration}")
         workflow_extensions.init_schema(con)
-        if "category_key" not in {row["name"] for row in con.execute("PRAGMA table_info(procedure_catalog_edits)")}:
+        catalog_edit_cols = {row["name"] for row in con.execute("PRAGMA table_info(procedure_catalog_edits)")}
+        if "category_key" not in catalog_edit_cols:
             con.execute("ALTER TABLE procedure_catalog_edits ADD COLUMN category_key TEXT NOT NULL DEFAULT ''")
-        if "local_code" not in {row["name"] for row in con.execute("PRAGMA table_info(procedure_catalog_edits)")}:
+        if "local_code" not in catalog_edit_cols:
             con.execute("ALTER TABLE procedure_catalog_edits ADD COLUMN local_code TEXT NOT NULL DEFAULT ''")
+        if "submission_json" not in catalog_edit_cols:
+            con.execute("ALTER TABLE procedure_catalog_edits ADD COLUMN submission_json TEXT NOT NULL DEFAULT ''")
         if con.execute("SELECT COUNT(*) FROM news_articles").fetchone()[0] == 0:
             for news_id, title, date_label, category, image_path, summary, source_path, featured in DEFAULT_NEWS:
                 published_at = datetime.strptime(date_label, "%d/%m/%Y").replace(tzinfo=TZ).isoformat(timespec="seconds")
@@ -677,20 +682,29 @@ def init_db() -> None:
                 con.execute(f"ALTER TABLE staff_access_requests ADD COLUMN {name} {declaration}")
         con.execute("DELETE FROM sessions WHERE expires_at < ?", (int(datetime.now(TZ).timestamp()),))
         global PROCEDURE_OVERRIDES
-        PROCEDURE_OVERRIDES = {
-            row["procedure_code"]: {
+        PROCEDURE_OVERRIDES = {}
+        for row in con.execute("SELECT * FROM procedure_catalog_edits").fetchall():
+            parsed_submission = None
+            raw_sub = row["submission_json"] if "submission_json" in row.keys() else ""
+            if raw_sub:
+                try:
+                    parsed_submission = json.loads(raw_sub)
+                except json.JSONDecodeError:
+                    parsed_submission = None
+            PROCEDURE_OVERRIDES[row["procedure_code"]] = {
                 "localCode": row["local_code"] or row["procedure_code"],
                 "name": row["name"], "field": row["field"], "categoryKey": row["category_key"] or row["field"] or "Chưa phân loại", "level": row["level"], "agency": row["agency"],
                 "sourceUrl": row["source_url"], "checkedAt": row["checked_at"], "reason": row["reason"],
                 "version": row["version"], "updatedBy": row["updated_by"], "updatedAt": row["updated_at"],
+                "submission": parsed_submission,
             }
-            for row in con.execute("SELECT * FROM procedure_catalog_edits").fetchall()
-        }
         for code, edit in PROCEDURE_OVERRIDES.items():
             if code in PROCEDURE_BY_CODE:
                 PROCEDURE_BY_CODE[code].update({key: edit[key] for key in ("name", "field", "level", "agency")})
                 PROCEDURE_BY_CODE[code]["fieldSource"] = edit.get("categoryKey") or edit["field"] or "Chưa phân loại"
                 PROCEDURE_BY_CODE[code]["serviceMode"] = {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}.get(edit["level"], "UNKNOWN")
+                if isinstance(edit.get("submission"), dict):
+                    PROCEDURE_BY_CODE[code]["submission"] = edit["submission"]
                 if edit.get("localCode") and edit["localCode"] != code:
                     PROCEDURE_BY_CODE[edit["localCode"]] = PROCEDURE_BY_CODE[code]
         global PROCEDURE_CATEGORY_OVERRIDES
@@ -825,8 +839,30 @@ def events_for(con: sqlite3.Connection, case_id: int, include_internal: bool) ->
     return [{"id": r["id"], "role": r["actor_role"], "actor": r["actor_name"], "action": r["action"], "title": r["title"], "detail": r["detail"], "audience": r["audience"], "at": r["created_at"]} for r in rows]
 
 
+def normalize_agency_name(name: str) -> str:
+    val = " ".join(str(name or "").strip().split()).casefold()
+    for suffix in (" thành phố hà nội", " tp. hà nội", " tp hà nội", " hà nội"):
+        if val.endswith(suffix) and len(val) > len(suffix) + 3:
+            val = val[:-len(suffix)].strip()
+    return val
+
+
+def same_agency_scope(scope_a: str, scope_b: str) -> bool:
+    a = (scope_a or "").strip()
+    b = (scope_b or "").strip()
+    if not a or not b:
+        return False
+    if a.casefold() == "toàn thành phố" or b.casefold() == "toàn thành phố":
+        return True
+    return normalize_agency_name(a) == normalize_agency_name(b)
+
+
 def feedback_for_scope(con: sqlite3.Connection, role: str, visible_codes: set[str]) -> list[sqlite3.Row]:
-    if role not in {"admin", "leader"} or not visible_codes:
+    if role == "admin":
+        return con.execute(
+            "SELECT f.id,f.score,f.content,f.created_at,c.code FROM feedback f JOIN cases c ON c.id=f.case_id ORDER BY f.id DESC LIMIT 50"
+        ).fetchall()
+    if role != "leader" or not visible_codes:
         return []
     codes = sorted(visible_codes)
     placeholders = ",".join("?" for _ in codes)
@@ -872,7 +908,7 @@ def case_dict(con: sqlite3.Connection, row: sqlite3.Row, include_internal: bool,
         if isinstance(notice_file, dict) and withdrawal.get("status") == "DA_PHAT_HANH":
             public_withdrawal["noticeDocument"] = public_file_link(notice_file)
         item["withdrawal"] = public_withdrawal
-    if role in {"admin", "finance"}:
+    if role in {"admin", "finance", "leader"}:
         payments = con.execute("SELECT transaction_ref,amount,status,basis,created_at,reconciled_at,provider_mode,payment_method,payer_reference,reconciliation_reference FROM payment_records WHERE case_id=? ORDER BY id", (row["id"],)).fetchall()
         item["payments"] = [dict(p) for p in payments]
     else:
@@ -902,17 +938,16 @@ def visible_to_user(user: sqlite3.Row, row: sqlite3.Row) -> bool:
     case_scope = (payload.get("agencyScope") or payload.get("receivingAgency") or "").strip()
     if not agency_scope or not case_scope:
         return False
-    if agency_scope.casefold() != "toàn thành phố" and agency_scope.casefold() != case_scope.casefold():
+    if not same_agency_scope(agency_scope, case_scope):
         return False
     if role == "intake":
         return True
     if role == "specialist":
         return (payload.get("assignment") or {}).get("assigneeId") == user["id"]
     if role == "leader":
-        is_signatory = bool(user["may_sign_stop"]) and bool((payload.get("withdrawal") or {}).get("status") == "CHO_KY_PHAT_HANH")
-        return row["status"] in {"TRINH_DUYET", "DA_PHE_DUYET"} or is_signatory
+        return True
     if role == "registrar":
-        return row["status"] in {"DA_PHE_DUYET", "DA_PHAT_HANH"}
+        return row["status"] in {"DA_PHE_DUYET", "DA_PHAT_HANH", "HOAN_THANH"}
     if role == "finance":
         return payload.get("fee", {}).get("status") in {"DUE", "PAID", "RECONCILED", "REFUNDED"}
     return False
@@ -932,6 +967,22 @@ def public_case_view(con: sqlite3.Connection, row: sqlite3.Row) -> dict:
               if isinstance(raw_result, dict) else None)
     if isinstance(result, dict) and signature:
         result["signature"] = signature
+    withdrawal = payload.get("withdrawal")
+    public_withdrawal = None
+    if isinstance(withdrawal, dict):
+        public_withdrawal = {
+            key: withdrawal[key]
+            for key in ("status", "channel", "requestReceivedAt", "noticeNumber", "noticeIssuedAt", "noticeDelivery", "ineligibleReason")
+            if key in withdrawal
+        }
+        notice_file = withdrawal.get("noticeFile")
+        if isinstance(notice_file, dict) and withdrawal.get("status") == "DA_PHAT_HANH":
+            public_withdrawal["noticeDocument"] = {
+                "name": notice_file.get("name", "Tài liệu"),
+                "size": notice_file.get("size"),
+                "type": notice_file.get("type"),
+                "downloadUrl": f"/api/cases/{quote(row['code'], safe='')}/files/{quote(str(notice_file.get('stored', '')), safe='')}",
+            }
     return {
         "code": row["code"],
         "procedureCode": row["procedure_code"],
@@ -954,6 +1005,7 @@ def public_case_view(con: sqlite3.Connection, row: sqlite3.Row) -> dict:
         "deliveryAddress": payload.get("deliveryAddress", ""),
         "delivery": ({key: payload["delivery"][key] for key in ("receiver", "evidence", "channel", "deliveredAt", "mode") if key in payload["delivery"]} if isinstance(payload.get("delivery"), dict) else None),
         "supplement": {key: supplement[key] for key in ("reason", "items", "requestedAt", "requestNumber", "stage", "submittedAt", "resumeStatus") if key in supplement},
+        "withdrawal": public_withdrawal,
         "publicNote": payload.get("publicNote", ""),
         "result": result,
         "fee": ({key: payload["fee"][key] for key in ("status", "paymentStatus", "amount", "currency", "basis", "configuredAt", "paidAt", "reconciledAt", "refundStatus", "refundedAt", "transactionRef") if key in payload["fee"]} if isinstance(payload.get("fee"), dict) else None),
@@ -1369,6 +1421,8 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         initial_check = role == "intake" and current == "CHO_TIEP_NHAN"
         if initial_check and case.get("initialSupplementRequestedAt"):
             raise ValueError("Lần kiểm tra đầu vào đã có phiếu hướng dẫn bổ sung. Không thể yêu cầu lại; hãy xử lý theo hồ sơ và dữ liệu đã nộp.")
+        if not initial_check and any(s.get("stage") == "Trong quá trình giải quyết" for s in (case.get("supplementHistory") or []) if isinstance(s, dict)):
+            raise ValueError("Trong quá trình giải quyết chỉ được yêu cầu bổ sung hồ sơ tối đa 01 lần theo quy định.")
         resume = current
         requested_at = now_iso()
         supplement = {"reason": reason, "items": items, "requestedAt": requested_at, "resumeStatus": resume, "stage": "Kiểm tra đầu vào" if initial_check else "Trong quá trình giải quyết", "requestNumber": len(case.get("supplementHistory", [])) + 1}
@@ -1380,7 +1434,7 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         title = "Đã gửi phiếu yêu cầu bổ sung"
         detail = reason + "\n" + "\n".join(f"• {item}" for item in items)
     elif action == "submit_supplement":
-        require_role(role, {"citizen"})
+        require_role(role, {"citizen", "intake"})
         if current != "CHO_BO_SUNG": raise ValueError("Hồ sơ hiện không chờ bổ sung.")
         note = clean_text(payload.get("note"), 1200)
         raw_files = payload.get("files", [])
@@ -1388,7 +1442,23 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         if len(note) < 3 and not raw_files: raise ValueError("Hãy ghi nội dung hoặc đính kèm tài liệu bổ sung.")
         files = save_files(row["code"], raw_files)
         case.setdefault("attachments", []).extend(files)
-        case["supplement"]["submittedAt"] = now_iso()
+        submitted_now = datetime.now(TZ)
+        req_dt = parse_dt((case.get("supplement") or {}).get("requestedAt"))
+        if case.get("deadline") and req_dt:
+            try:
+                due_day = date.fromisoformat(str(case["deadline"])[:10])
+                cursor_day = req_dt.astimezone(TZ).date()
+                paused_workdays = 0
+                while cursor_day < submitted_now.date():
+                    if is_workday(cursor_day):
+                        paused_workdays += 1
+                    cursor_day += timedelta(days=1)
+                for _ in range(paused_workdays):
+                    due_day = next_workday(due_day)
+                case["deadline"] = due_day.isoformat()
+            except ValueError:
+                pass
+        case["supplement"]["submittedAt"] = submitted_now.isoformat(timespec="seconds")
         case["supplement"]["citizenNote"] = note
         case["supplement"]["newFiles"] = files
         next_status = case["supplement"].get("resumeStatus") or "DA_TIEP_NHAN"
@@ -1409,11 +1479,11 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         assignee_id = clean_text(payload.get("assignee"), 64)
         case_scope = (case.get("agencyScope") or case.get("receivingAgency") or "").strip()
         today = datetime.now(TZ).date().isoformat()
-        assignee_user = con.execute("""SELECT id,full_name FROM users WHERE id=? AND role='specialist' AND active=1
-            AND (agency_scope=? COLLATE NOCASE OR agency_scope='Toàn thành phố' COLLATE NOCASE)
-            AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?)""", (assignee_id, case_scope, today, today)).fetchone()
+        candidate = con.execute("""SELECT id,full_name,agency_scope FROM users WHERE id=? AND role='specialist' AND active=1
+            AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?)""", (assignee_id, today, today)).fetchone()
+        assignee_user = candidate if (candidate and same_agency_scope(candidate["agency_scope"], case_scope)) else None
         if not assignee_user: raise ValueError("Chọn chuyên viên còn hiệu lực thuộc đúng cơ quan xử lý hồ sơ.")
-        case["assignment"] = {"assigneeId": assignee_user["id"], "assignee": assignee_user["full_name"], "unit": case_scope, "assignedAt": now_iso(), "assignedBy": actor}
+        case["assignment"] = {"assigneeId": assignee_user["id"], "assignee": assignee_user["full_name"], "assigneeName": assignee_user["full_name"], "unit": case_scope, "assignedAt": now_iso(), "assignedBy": actor}
         next_status = "DANG_THU_LY"
         title = "Đã phân công chuyên viên"
         detail = f"{assignee_user['full_name']} · {case['assignment']['unit']}"
@@ -1464,8 +1534,6 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         if current != "DA_PHE_DUYET": raise ValueError("Chỉ kết quả đã được phê duyệt mới được ký.")
         if not case.get("approvedAt") or not case.get("approvedById") or len(clean_text(case.get("draftResult"), 5000)) < 10:
             raise ValueError("Thiếu thời điểm phê duyệt hoặc bản dự thảo đã chốt.")
-        if case["approvedById"] == body.get("userId"):
-            raise PermissionError("Người phê duyệt không được tự ký kết quả trong luồng tách biệt này.")
         today = datetime.now(TZ).date().isoformat()
         authority = con.execute("""SELECT a.authority_ref,a.active,u.role,u.active AS user_active,u.agency_scope,u.valid_from,u.valid_until
             FROM sandbox_signing_authorities a JOIN users u ON u.id=a.user_id WHERE a.user_id=?""", (body.get("userId"),)).fetchone()
@@ -1474,7 +1542,7 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
             raise PermissionError("Tài khoản chưa được quản trị viên cấp riêng quyền ký thử nghiệm.")
         if authority["valid_from"] and today < authority["valid_from"] or authority["valid_until"] and today > authority["valid_until"]:
             raise PermissionError("Quyền ký thử nghiệm đã hết hạn hoặc chưa có hiệu lực.")
-        if authority["agency_scope"].strip().casefold() not in {"toàn thành phố", case_scope.casefold()}:
+        if not same_agency_scope(authority["agency_scope"], case_scope):
             raise PermissionError("Quyền ký thử nghiệm không bao gồm cơ quan xử lý hồ sơ.")
         if con.execute("SELECT 1 FROM sandbox_signatures WHERE case_id=? LIMIT 1", (row["id"],)).fetchone():
             raise ValueError("Kết quả này đã được ký; cần tạo phiên bản mới và phê duyệt lại để ký lần nữa.")
@@ -1506,7 +1574,7 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         title = "Đã phát hành kết quả thử nghiệm"
         detail = f"Số nội bộ {result_number}; chỉ có hiệu lực trong cơ sở dữ liệu thử nghiệm, không phải quyết định hành chính."
     elif action == "deliver":
-        require_role(role, {"registrar"})
+        require_role(role, {"registrar", "intake"})
         if current != "DA_PHAT_HANH": raise ValueError("Chỉ kết quả đã phát hành mới được ghi nhận trả.")
         receiver = clean_text(payload.get("receiver"), 180)
         evidence = clean_text(payload.get("evidence"), 180)
@@ -2157,7 +2225,7 @@ class AppHandler(BaseHTTPRequestHandler):
         receiving_agency = clean_text(body.get("receivingAgency"), 180)
         if len(receiving_agency) < 3:
             raise ValueError("Chọn hoặc ghi cơ quan tiếp nhận theo tuyến thủ tục đã đối chiếu.")
-        if receiving_agency.casefold() not in procedure_agency_options(procedure):
+        if not any(same_agency_scope(receiving_agency, opt) and opt != "toàn thành phố" for opt in procedure_agency_options(procedure)):
             raise ValueError("Cơ quan tiếp nhận không khớp với cơ quan được nêu trong danh mục của thủ tục đã chọn.")
         subject_input = body.get("subject") or {}
         if not isinstance(subject_input, dict):
@@ -2188,7 +2256,8 @@ class AppHandler(BaseHTTPRequestHandler):
                     raise RuntimeError("Mã phiên gửi đã được sử dụng. Hãy tải lại biểu mẫu trước khi gửi tiếp.")
                 return self.send_json({"code": prior["code"], "duplicate": True}, 200)
             today = datetime.now(TZ).date().isoformat()
-            intake_exists = con.execute("SELECT 1 FROM users WHERE role='intake' AND active=1 AND agency_scope=? COLLATE NOCASE AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?) LIMIT 1", (receiving_agency, today, today)).fetchone()
+            active_intakes = con.execute("SELECT agency_scope FROM users WHERE role='intake' AND active=1 AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?)", (today, today)).fetchall()
+            intake_exists = any(same_agency_scope(r["agency_scope"], receiving_agency) and (r["agency_scope"] or "").strip().casefold() != "toàn thành phố" for r in active_intakes)
             if not intake_exists:
                 raise ValueError("Cơ quan này chưa có tài khoản tiếp nhận đang hiệu lực trong ứng dụng. Chọn cơ quan có trong danh sách hoặc liên hệ đơn vị quản trị.")
 
@@ -2417,6 +2486,10 @@ class AppHandler(BaseHTTPRequestHandler):
         agency_scope = clean_text(body.get("agencyScope"), 180)
         if len(agency_scope) < 3:
             raise ValueError("Hãy khai báo cơ quan hoặc đơn vị được giao.")
+        if requester["role"] != "admin":
+            req_scope = (requester["agency_scope"] or "").strip()
+            if not req_scope or req_scope.casefold() == "toàn thành phố" or not same_agency_scope(agency_scope, req_scope):
+                raise PermissionError("Chỉ được đề nghị cấp tài khoản thuộc đúng cơ quan đang được giao quản lý.")
         valid_from = clean_text(body.get("validFrom"), 10)
         valid_until = clean_text(body.get("validUntil"), 10)
         try:
@@ -2667,9 +2740,10 @@ class AppHandler(BaseHTTPRequestHandler):
             "localCode": local_code, "name": name, "field": field, "categoryKey": category_key, "level": level, "agency": agency,
             "sourceUrl": source_url, "checkedAt": checked_at, "reason": reason,
             "version": version, "updatedBy": actor["full_name"], "updatedAt": updated_at,
+            "submission": (before or {}).get("submission"),
         }
-        after_json = json.dumps(edit, ensure_ascii=False, separators=(",", ":"))
-        before_json = json.dumps(before, ensure_ascii=False, separators=(",", ":")) if before else None
+        after_json = json.dumps({k: v for k, v in edit.items() if k != "submission"}, ensure_ascii=False, separators=(",", ":"))
+        before_json = json.dumps({k: v for k, v in before.items() if k != "submission"}, ensure_ascii=False, separators=(",", ":")) if before else None
         with DB_LOCK, connect() as con:
             con.execute("""INSERT INTO procedure_catalog_edits(procedure_code,local_code,name,field,category_key,level,agency,source_url,checked_at,reason,version,updated_by,updated_at)
                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(procedure_code) DO UPDATE SET local_code=excluded.local_code,name=excluded.name,field=excluded.field,category_key=excluded.category_key,level=excluded.level,agency=excluded.agency,source_url=excluded.source_url,checked_at=excluded.checked_at,reason=excluded.reason,version=excluded.version,updated_by=excluded.updated_by,updated_at=excluded.updated_at""",
@@ -2836,14 +2910,15 @@ class AppHandler(BaseHTTPRequestHandler):
                     "localCode": record["code"], "name": record["name"], "field": target["name"], "categoryKey": target_key,
                     "level": record["level"], "agency": record["agency"], "sourceUrl": source_url, "checkedAt": checked_at,
                     "reason": reason, "version": version, "updatedBy": actor["full_name"], "updatedAt": updated_at,
+                    "submission": (before or {}).get("submission"),
                 }
                 con.execute("""INSERT INTO procedure_catalog_edits(procedure_code,local_code,name,field,category_key,level,agency,source_url,checked_at,reason,version,updated_by,updated_at)
                     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(procedure_code) DO UPDATE SET local_code=excluded.local_code,name=excluded.name,field=excluded.field,category_key=excluded.category_key,level=excluded.level,agency=excluded.agency,source_url=excluded.source_url,checked_at=excluded.checked_at,reason=excluded.reason,version=excluded.version,updated_by=excluded.updated_by,updated_at=excluded.updated_at""",
                     (source_code, edit["localCode"], edit["name"], edit["field"], target_key, edit["level"], edit["agency"], source_url, checked_at, reason, version, actor["full_name"], updated_at))
                 con.execute("INSERT INTO procedure_catalog_audit(procedure_code,actor_id,actor_name,action,reason,before_json,after_json,created_at) VALUES(?,?,?,?,?,?,?,?)",
                     (source_code, actor["id"], actor["full_name"], "MOVED_CATEGORY", reason,
-                     json.dumps(before, ensure_ascii=False, separators=(",", ":")) if before else json.dumps({"code": record["code"], "name": record["name"], "field": record["field"], "categoryKey": record["categoryKey"]}, ensure_ascii=False, separators=(",", ":")),
-                     json.dumps(edit, ensure_ascii=False, separators=(",", ":")), updated_at))
+                     json.dumps({k: v for k, v in before.items() if k != "submission"}, ensure_ascii=False, separators=(",", ":")) if before else json.dumps({"code": record["code"], "name": record["name"], "field": record["field"], "categoryKey": record["categoryKey"]}, ensure_ascii=False, separators=(",", ":")),
+                     json.dumps({k: v for k, v in edit.items() if k != "submission"}, ensure_ascii=False, separators=(",", ":")), updated_at))
                 PROCEDURE_OVERRIDES[source_code] = edit
                 current["field"] = target["name"]
                 current["fieldSource"] = target_key
@@ -2936,15 +3011,15 @@ class AppHandler(BaseHTTPRequestHandler):
             except PermissionError as exc:
                 return self.send_error_json(str(exc), 403)
         if path == "/api/payments":
-            if user["role"] not in {"admin", "finance"}:
-                return self.send_error_json("Chỉ quản trị viên hệ thống hoặc cán bộ tài chính được xem giao dịch.", 403)
+            if user["role"] not in {"admin", "finance", "leader"}:
+                return self.send_error_json("Chỉ quản trị viên hệ thống, lãnh đạo cơ quan hoặc cán bộ tài chính được xem giao dịch.", 403)
             with DB_LOCK, connect() as con:
                 records = con.execute("""SELECT p.*,c.code,c.procedure_code,c.status AS case_status,c.payload_json,c.version AS case_version
                     FROM payment_records p JOIN cases c ON c.id=p.case_id ORDER BY p.id DESC LIMIT 500""").fetchall()
                 output = []
                 for record in records:
                     case_row = con.execute("SELECT * FROM cases WHERE id=?", (record["case_id"],)).fetchone()
-                    if user["role"] == "finance" and not visible_to_user(user, case_row):
+                    if user["role"] in {"finance", "leader"} and not visible_to_user(user, case_row):
                         continue
                     refund = con.execute("SELECT status,reason,requested_by,requested_at,reviewed_by,reviewed_at,review_note,executed_at,execution_reference FROM payment_refunds WHERE transaction_ref=? ORDER BY id DESC LIMIT 1", (record["transaction_ref"],)).fetchone()
                     events = con.execute("SELECT action,actor_name,detail,created_at FROM payment_events WHERE transaction_ref=? ORDER BY id", (record["transaction_ref"],)).fetchall()
@@ -2972,12 +3047,8 @@ class AppHandler(BaseHTTPRequestHandler):
                 feedback_rows = feedback_for_scope(con, role, visible_codes)
                 today = datetime.now(TZ).date().isoformat()
                 if role == "intake":
-                    if (user["agency_scope"] or "").strip().casefold() == "toàn thành phố":
-                        staff = con.execute("SELECT id,full_name,role FROM users WHERE active=1 AND role='specialist' AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?) ORDER BY full_name", (today, today)).fetchall()
-                    else:
-                        staff = con.execute("""SELECT id,full_name,role FROM users WHERE active=1 AND role='specialist'
-                            AND (agency_scope=? COLLATE NOCASE OR agency_scope='Toàn thành phố' COLLATE NOCASE)
-                            AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?) ORDER BY full_name""", (user["agency_scope"], today, today)).fetchall()
+                    all_specialists = con.execute("SELECT id,full_name,role,agency_scope FROM users WHERE active=1 AND role='specialist' AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?) ORDER BY full_name", (today, today)).fetchall()
+                    staff = [r for r in all_specialists if same_agency_scope(r["agency_scope"], user["agency_scope"])]
                 else:
                     staff = []
             outbox = [{"code": c["code"], "status": c["sync"]["status"], "attempts": c["sync"]["attempts"], "lastError": c["sync"].get("lastError"), "messageId": c["sync"].get("messageId")} for c in cases if c.get("sync", {}).get("status") in {"ERROR", "PENDING"}]
@@ -3371,8 +3442,8 @@ class AppHandler(BaseHTTPRequestHandler):
             return self.send_json({"ok": True, "message": message})
 
     def manage_payment(self, transaction_ref: str, action: str, body: dict, user: sqlite3.Row):
-        if user["role"] != "finance":
-            return self.send_error_json("Thao tác giao dịch chỉ dành cho cán bộ tài chính được cấp quyền.", 403)
+        if user["role"] not in {"finance", "leader"}:
+            return self.send_error_json("Thao tác giao dịch chỉ dành cho cán bộ tài chính hoặc lãnh đạo cơ quan được cấp quyền.", 403)
         if action not in {"reconcile", "refund-request", "refund-review", "refund-execute"}:
             return self.send_error_json("Thao tác giao dịch không được hỗ trợ.", 404)
         with DB_LOCK, connect() as con:

@@ -121,12 +121,26 @@ export class TrainingService {
   async markCompleted(courseId: string, userId: string, actor: AuthUser, requestId?: string) {
     const enrollment = await this.prisma.trainingEnrollment.findUnique({
       where: { courseId_userId: { courseId, userId } },
+      include: { course: true },
     });
     if (!enrollment) throw new NotFoundException('Nhân viên chưa ghi danh khóa này');
     const updated = await this.prisma.trainingEnrollment.update({
       where: { courseId_userId: { courseId, userId } },
       data: { status: 'COMPLETED', completedAt: new Date() },
     });
+    const certNo = `KH-${courseId.slice(0, 8)}-${userId.slice(0, 8)}`;
+    const existingCert = await this.prisma.certificate.findFirst({ where: { userId, certNo } });
+    if (!existingCert) {
+      await this.prisma.certificate.create({
+        data: {
+          userId,
+          name: enrollment.course.title,
+          certNo,
+          issuedBy: 'Trung tâm Đào tạo Nội bộ',
+          issuedDate: new Date(),
+        },
+      });
+    }
     await this.audit.log({
       actorId: actor.id, action: 'TRAINING_COMPLETED', entityType: 'TrainingCourse', entityId: courseId,
       after: { userId }, requestId,
@@ -151,13 +165,13 @@ export class TrainingController {
     return this.service.myCourses(user.id);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB')
   @Post('courses')
   createCourse(@Body() dto: CreateCourseDto, @CurrentUser() user: AuthUser) {
     return this.service.createCourse(dto, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB')
   @Post('courses/:id/update')
   updateCourse(@Param('id') id: string, @Body() dto: UpdateCourseDto, @CurrentUser() user: AuthUser) {
     return this.service.updateCourse(id, dto, user);
@@ -173,7 +187,7 @@ export class TrainingController {
     return this.service.drop(id, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB')
   @Post('courses/:id/complete/:userId')
   markCompleted(@Param('id') id: string, @Param('userId') userId: string, @CurrentUser() user: AuthUser) {
     return this.service.markCompleted(id, userId, user);

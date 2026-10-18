@@ -16,11 +16,13 @@ import { ErrorState } from '@/components/common/states';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface LeaveRow {
-  id: string; type: keyof typeof LEAVE_TYPE_LABEL;
+  id: string;
+  userId?: string;
+  type: keyof typeof LEAVE_TYPE_LABEL;
   startDate: string; endDate: string; days: number; reason: string;
   status: keyof typeof REQUEST_STATUS_LABEL;
   decisionNote: string | null;
-  user?: { fullName: string; employeeCode: string | null; orgUnit?: { name: string } | null };
+  user?: { id?: string; fullName: string; employeeCode: string | null; orgUnit?: { name: string } | null };
   approver?: { fullName: string } | null;
 }
 interface Balance { year: number; entitled: number; used: number; pendingDays: number; remaining: number }
@@ -29,8 +31,10 @@ interface Balance { year: number; entitled: number; used: number; pendingDays: n
 export default function LeavePage() {
   const qc = useQueryClient();
   const toast = useToast();
-  const roles = useAuthStore((s) => s.user?.roles ?? []);
-  const isHr = roles.includes('ADMIN') || roles.includes('KM_MANAGER');
+  const user = useAuthStore((s) => s.user);
+  const roles = user?.roles ?? [];
+  const canReview = roles.some((r) => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD'].includes(r));
+  const isHr = canReview;
   const [tab, setTab] = useState<'mine' | 'all'>('mine');
   const [createOpen, setCreateOpen] = useState(false);
   const [detail, setDetail] = useState<LeaveRow | null>(null);
@@ -47,7 +51,7 @@ export default function LeavePage() {
   const allQ = useQuery({
     queryKey: ['leave-all'],
     queryFn: async () => (await api.get<LeaveRow[]>('/leave')).data,
-    enabled: isHr && tab === 'all',
+    enabled: canReview && tab === 'all',
   });
 
   const invalidate = () => {
@@ -174,17 +178,20 @@ export default function LeavePage() {
           ]}
           emptyTitle="Chưa có đơn nghỉ phép nào"
           emptyHint="Bấm “Tạo đơn nghỉ phép” để gửi đơn đầu tiên."
-          actions={(r): RowActionItem[] => [
-            { label: 'Xem chi tiết đơn', icon: Eye, onSelect: () => setDetail(r) },
-            ...(tab === 'all' && isHr && r.status === 'PENDING' ? [
-              'separator' as const,
-              { label: 'Duyệt đơn (trừ quỹ ngay)', icon: Check, onSelect: () => decide.mutate({ id: r.id, approve: true }) },
-              { label: 'Từ chối đơn', icon: X, danger: true, onSelect: () => decide.mutate({ id: r.id, approve: false }) },
-            ] : tab === 'mine' && r.status === 'PENDING' ? [
-              'separator' as const,
-              { label: 'Hủy đơn', icon: Ban, danger: true, onSelect: () => cancel.mutate(r.id) },
-            ] : []),
-          ]}
+          actions={(r): RowActionItem[] => {
+            const isOwnRequest = Boolean(user?.id && (r.userId === user.id || r.user?.id === user.id));
+            return [
+              { label: 'Xem chi tiết đơn', icon: Eye, onSelect: () => setDetail(r) },
+              ...(tab === 'all' && canReview && r.status === 'PENDING' && !isOwnRequest ? [
+                'separator' as const,
+                { label: 'Duyệt đơn (trừ quỹ ngay)', icon: Check, onSelect: () => decide.mutate({ id: r.id, approve: true }) },
+                { label: 'Từ chối đơn', icon: X, danger: true, onSelect: () => decide.mutate({ id: r.id, approve: false }) },
+              ] : (tab === 'mine' || isOwnRequest) && r.status === 'PENDING' ? [
+                'separator' as const,
+                { label: 'Hủy đơn', icon: Ban, danger: true, onSelect: () => cancel.mutate(r.id) },
+              ] : []),
+            ];
+          }}
         />
         <PrintSignatureBlock leftTitle="Người làm đơn" middleTitle="Trưởng bộ phận" rightTitle="Trưởng phòng HC-NS" />
       </div>

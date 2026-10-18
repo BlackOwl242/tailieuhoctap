@@ -3,6 +3,7 @@ import { Controller, Get, Injectable, Module } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../../common/prisma.service';
 import { SpaceAccessService } from '../../common/services/space-access.service';
+import { AttendanceLedgerService } from '../../common/services/attendance-ledger.service';
 import { CurrentUser } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 
@@ -15,9 +16,11 @@ export class DashboardService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly access: SpaceAccessService,
+    private readonly ledger: AttendanceLedgerService,
   ) {}
 
   async stats(user: AuthUser) {
+    await this.ledger.ensureAutoAttendanceUpToDate();
     const roles = await this.access.globalRoles(user.id);
     const privileged = this.access.isPrivileged(roles);
 

@@ -28,7 +28,7 @@ interface EmployeeDetail {
   id: string; employeeCode: string | null; fullName: string; email: string;
   jobTitle: string | null; orgUnit?: { name: string } | null;
   hireDate: string | null; employmentStatus: keyof typeof EMPLOYMENT_STATUS_LABEL;
-  /** baseSalary + contracts chỉ có trong phản hồi khi viewer là ADMIN/KM_MANAGER (RBAC). */
+  /** baseSalary và contracts được giới hạn theo quyền hồ sơ hoặc quyền xem hợp đồng. */
   baseSalary?: number | null; birthDate: string | null; phone: string | null; address: string | null;
   bio: string | null; expertise: string[];
   contracts?: ContractRow[]; certificates: CertificateRow[];
@@ -46,7 +46,7 @@ export default function EmployeeDetailPage() {
   const toast = useToast();
   const viewer = useAuthStore((s) => s.user);
   const roles = viewer?.roles ?? [];
-  const isHr = roles.includes('ADMIN') || roles.includes('KM_MANAGER');
+  const isHr = roles.some((r) => ['ADMIN', 'KM_MANAGER', 'HR_CB'].includes(r));
 
   const q = useQuery({
     queryKey: ['employee', id],
@@ -142,7 +142,9 @@ export default function EmployeeDetailPage() {
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   const activeContract = (emp.contracts ?? []).find((contract) => contract.status === 'ACTIVE'
     && contract.startDate.slice(0, 10) <= today && (!contract.endDate || contract.endDate.slice(0, 10) >= today));
-  const canViewContracts = isHr || emp.id === viewer?.id;
+  // API chỉ gửi mảng contracts sau khi đã xác thực quyền (tự xem, vai trò được cấp,
+  // hoặc quản lý cùng đơn vị); dùng chính phản hồi này để hiển thị cả cho LINE_MANAGER.
+  const canViewContracts = Array.isArray(emp.contracts);
   const balance = emp.leaveBalances[0];
   const missingProfileFields = [
     !emp.phone ? 'số điện thoại' : null,

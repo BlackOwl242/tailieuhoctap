@@ -86,11 +86,28 @@ export default function TrainingGrievancePage() {
   const [isProgramDetailOpen, setIsProgramDetailOpen] = useState(false);
   const [isPrintCertOpen, setIsPrintCertOpen] = useState(false);
 
+  const currentUser = useAuthStore((s) => s.user);
   const [isCreateGrievanceOpen, setIsCreateGrievanceOpen] = useState(false);
   const [resolvingGrievance, setResolvingGrievance] = useState<Grievance | null>(null);
   const [resolutionText, setResolutionText] = useState('');
+  const [dismissingGrievance, setDismissingGrievance] = useState<Grievance | null>(null);
+  const [dismissReason, setDismissReason] = useState('');
   const [isPrintGrievanceOpen, setIsPrintGrievanceOpen] = useState(false);
   const [selectedGrievance, setSelectedGrievance] = useState<Grievance | null>(null);
+
+  // Verification & Course Feedback Modals
+  const [verifyingEnrollment, setVerifyingEnrollment] = useState<{
+    programId: string;
+    programName: string;
+    userId: string;
+    employeeName: string;
+  } | null>(null);
+  const [verifyScore, setVerifyScore] = useState<number>(85);
+  const [verifyEvidenceUrl, setVerifyEvidenceUrl] = useState('');
+
+  const [feedbackProgram, setFeedbackProgram] = useState<TrainingProgram | null>(null);
+  const [feedbackRating, setFeedbackRating] = useState<number>(5);
+  const [feedbackComments, setFeedbackComments] = useState('');
 
   // Form Training
   const [progName, setProgName] = useState('');
@@ -183,8 +200,8 @@ export default function TrainingGrievancePage() {
     mutationFn: async (payload: { userId: string; subject: string; category: string; description: string }) => {
       const activeUser = employees.find((e) => e.id === payload.userId) || employees[0];
       return (await api.post('/hrms/training/grievances', {
-        userId: activeUser?.id || 'emp-default',
-        employeeName: activeUser?.fullName || 'Cán bộ Nhân viên',
+        userId: activeUser?.id || currentUser?.id || 'emp-default',
+        employeeName: activeUser?.fullName || currentUser?.fullName || 'Cán bộ Nhân viên',
         subject: payload.subject,
         category: payload.category,
         description: payload.description,
@@ -209,7 +226,7 @@ export default function TrainingGrievancePage() {
       setResolutionText('');
       toast('Đã ghi nhận kết quả giải quyết khiếu nại!', 'success');
     },
-    onError: () => toast('Lỗi khi giải quyết khiếu nại', 'error'),
+    onError: (err) => toast(errorMessage(err), 'error'),
   });
 
   const updateGrievanceStatusMutation = useMutation({
@@ -220,9 +237,11 @@ export default function TrainingGrievancePage() {
       queryClient.invalidateQueries({ queryKey: ['hrms-grievances'] });
       setResolvingGrievance(null);
       setResolutionText('');
+      setDismissingGrievance(null);
+      setDismissReason('');
       toast('Cập nhật trạng thái xử lý khiếu nại thành công', 'success');
     },
-    onError: () => toast('Lỗi khi cập nhật trạng thái khiếu nại', 'error'),
+    onError: (err) => toast(errorMessage(err), 'error'),
   });
 
   const deleteGrievanceMutation = useMutation({
@@ -234,6 +253,54 @@ export default function TrainingGrievancePage() {
       toast('Đã xóa khiếu nại thành công', 'success');
     },
     onError: () => toast('Không thể xóa khiếu nại', 'error'),
+  });
+
+  const verifyEnrollmentMutation = useMutation({
+    mutationFn: async ({
+      programId,
+      userId,
+      score,
+      evidenceUrl,
+    }: {
+      programId: string;
+      userId: string;
+      score: number;
+      evidenceUrl: string;
+    }) => {
+      return (
+        await api.patch(`/hrms/training/programs/${programId}/enrollments/${userId}`, {
+          score,
+          evidenceUrl,
+        })
+      ).data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hrms-training-programs'] });
+      setVerifyingEnrollment(null);
+      setVerifyEvidenceUrl('');
+      toast('Đã xác nhận hoàn thành đào tạo và cấp chứng nhận', 'success');
+    },
+    onError: (error) => toast(errorMessage(error), 'error'),
+  });
+
+  const submitFeedbackMutation = useMutation({
+    mutationFn: async (payload: {
+      programId: string;
+      userId: string;
+      employeeName: string;
+      rating: number;
+      comments?: string;
+    }) => {
+      return (await api.post('/hrms/training/feedback', payload)).data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hrms-training-programs'] });
+      setFeedbackProgram(null);
+      setFeedbackComments('');
+      setFeedbackRating(5);
+      toast('Đã gửi đánh giá khóa đào tạo thành công!', 'success');
+    },
+    onError: (error) => toast(errorMessage(error), 'error'),
   });
 
   const resetProgramForm = () => {
@@ -291,6 +358,7 @@ export default function TrainingGrievancePage() {
   }, [grievances, searchTerm, grievanceStatusFilter]);
 
   const canVerifyTraining = useAuthStore(s=>s.user?.roles.some(r=>['ADMIN','KM_MANAGER','HR_TRAINER'].includes(r)) ?? false);
+  const canHandleGrievance = useAuthStore(s=>s.user?.roles.some(r=>['ADMIN','KM_MANAGER','HR_CB','LINE_MANAGER','BOD'].includes(r)) ?? false);
   const enrollMutation = useMutation({ mutationFn: async (id: string) => (await api.post(`/hrms/training/programs/${id}/enroll`)).data, onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['hrms-training-programs'] }); toast('Đã ghi danh', 'success'); }, onError: error => toast(errorMessage(error), 'error') });
 
   if (isLoadingPrograms || isLoadingGrievances) {
@@ -365,6 +433,18 @@ export default function TrainingGrievancePage() {
       header: '',
       render: (p: TrainingProgram) => (
         <div className="flex items-center justify-end gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setFeedbackProgram(p);
+              setFeedbackRating(5);
+              setFeedbackComments('');
+            }}
+            className="h-7 px-2 text-xs font-normal text-primary hover:text-primary"
+          >
+            Đánh giá
+          </Button>
           <Button
             variant="ghost"
             size="sm"
@@ -466,46 +546,63 @@ export default function TrainingGrievancePage() {
     {
       key: 'actions',
       header: '',
-      render: (g: Grievance) => (
-        <div className="flex items-center justify-end gap-1">
-          {g.status !== 'RESOLVED' && (
+      render: (g: Grievance) => {
+        const isOwnGrievance = Boolean(currentUser?.id && g.userId === currentUser.id);
+        const isPending = g.status === 'OPEN' || g.status === 'INVESTIGATING';
+        return (
+          <div className="flex items-center justify-end gap-1">
+            {canHandleGrievance && !isOwnGrievance && isPending && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setResolvingGrievance(g);
+                    setResolutionText(g.resolution || '');
+                  }}
+                  className="text-xs px-2 h-7"
+                >
+                  Giải quyết
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setDismissingGrievance(g);
+                    setDismissReason('');
+                  }}
+                  className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-destructive"
+                >
+                  Bác bỏ
+                </Button>
+              </>
+            )}
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={() => {
-                setResolvingGrievance(g);
-                setResolutionText(g.resolution || '');
+                setSelectedGrievance(g);
+                setIsPrintGrievanceOpen(true);
               }}
-              className="text-xs px-2 h-7"
+              className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-foreground"
             >
-              Giải quyết
+              In
             </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setSelectedGrievance(g);
-              setIsPrintGrievanceOpen(true);
-            }}
-            className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-foreground"
-          >
-            In
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              if (confirm(`Bạn có chắc chắn muốn xóa kiến nghị này?`)) {
-                deleteGrievanceMutation.mutate(g.id);
-              }
-            }}
-            className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-rose-600"
-          >
-            Xóa
-          </Button>
-        </div>
-      ),
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                if (confirm(`Bạn có chắc chắn muốn xóa kiến nghị này?`)) {
+                  deleteGrievanceMutation.mutate(g.id);
+                }
+              }}
+              className="h-7 px-2 text-xs font-normal text-muted-foreground hover:text-rose-600"
+            >
+              Xóa
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -543,7 +640,68 @@ export default function TrainingGrievancePage() {
         }
       />
 
-      {activeTab === 'training' && <div className="grid gap-3 md:grid-cols-2">{programs.map(program => <div key={program.id} className="rounded border bg-card p-3 text-sm"><b>{program.name}</b><p>{program.participantCount ?? 0}/{program.maxParticipants} học viên</p><Button size="sm" disabled={enrollMutation.isPending || program.status === 'COMPLETED'} onClick={() => enrollMutation.mutate(program.id)}>Ghi danh</Button>{program.enrollments?.map(enrollment => <div key={enrollment.id} className="flex items-center justify-between mt-2"><span>{enrollment.employeeName??'Học viên'} · {enrollment.status}{enrollment.score != null ? ` · ${enrollment.score}/100` : ''}</span>{canVerifyTraining && ['ENROLLED', 'ATTENDED'].includes(enrollment.status) && <Button size="sm" onClick={async () => { const score = prompt('Điểm kết quả 0–100'); const evidenceUrl = prompt('Đường dẫn minh chứng hoàn thành'); if (score === null || !evidenceUrl) return; try { await api.patch(`/hrms/training/programs/${program.id}/enrollments/${enrollment.userId}`, { score: Number(score), evidenceUrl }); queryClient.invalidateQueries({ queryKey: ['hrms-training-programs'] }); } catch (error) { toast(errorMessage(error), 'error'); } }}>Xác nhận kết quả</Button>}</div>)}</div>)}</div>}
+      {activeTab === 'training' && (
+        <div className="grid gap-3 md:grid-cols-2">
+          {programs.map((program) => (
+            <div key={program.id} className="rounded border bg-card p-3 text-sm space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <b>{program.name}</b>
+                  <p className="text-xs text-muted-foreground">
+                    {program.participantCount ?? 0}/{program.maxParticipants} học viên
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    size="sm"
+                    disabled={enrollMutation.isPending || program.status === 'COMPLETED'}
+                    onClick={() => enrollMutation.mutate(program.id)}
+                  >
+                    Ghi danh
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setFeedbackProgram(program);
+                      setFeedbackRating(5);
+                      setFeedbackComments('');
+                    }}
+                  >
+                    Đánh giá
+                  </Button>
+                </div>
+              </div>
+              {program.enrollments?.map((enrollment) => (
+                <div key={enrollment.id} className="flex items-center justify-between mt-2 text-xs">
+                  <span>
+                    {enrollment.employeeName ?? 'Học viên'} · {enrollment.status}
+                    {enrollment.score != null ? ` · ${enrollment.score}/100` : ''}
+                  </span>
+                  {canVerifyTraining && ['ENROLLED', 'ATTENDED'].includes(enrollment.status) && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setVerifyingEnrollment({
+                          programId: program.id,
+                          programName: program.name,
+                          userId: enrollment.userId,
+                          employeeName: enrollment.employeeName ?? 'Học viên',
+                        });
+                        setVerifyScore(85);
+                        setVerifyEvidenceUrl('');
+                      }}
+                    >
+                      Xác nhận kết quả
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Standard KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -743,9 +901,21 @@ export default function TrainingGrievancePage() {
 
                     <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
                       <span className="text-muted-foreground text-xs">
-                        Khảo sát: <b className="text-foreground">{p._count?.feedbacks ?? 0}</b>
+                        Khảo sát: <b className="text-foreground">{p.feedbacks?.length ?? p._count?.feedbacks ?? 0}</b>
                       </span>
                       <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setFeedbackProgram(p);
+                            setFeedbackRating(5);
+                            setFeedbackComments('');
+                          }}
+                          className="h-7 px-2 text-xs font-normal text-primary hover:text-primary"
+                        >
+                          Đánh giá
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -807,6 +977,7 @@ export default function TrainingGrievancePage() {
               {filteredGrievances.map((g) => {
                 const cat = CATEGORY_MAP[g.category] || { label: g.category };
                 const isPending = g.status === 'OPEN' || g.status === 'INVESTIGATING';
+                const isOwnGrievance = Boolean(currentUser?.id && g.userId === currentUser.id);
                 const dotColor =
                   g.status === 'RESOLVED' ? 'bg-primary' :
                   g.status === 'INVESTIGATING' ? 'bg-muted-foreground' :
@@ -860,7 +1031,7 @@ export default function TrainingGrievancePage() {
                     {/* Grievance Action Bar */}
                     <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        {g.status === 'OPEN' && (
+                        {canHandleGrievance && !isOwnGrievance && g.status === 'OPEN' && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -870,7 +1041,7 @@ export default function TrainingGrievancePage() {
                             Chuyển xử lý
                           </Button>
                         )}
-                        {isPending && (
+                        {canHandleGrievance && !isOwnGrievance && isPending && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -883,17 +1054,15 @@ export default function TrainingGrievancePage() {
                             Giải quyết
                           </Button>
                         )}
-                        {isPending && (
+                        {canHandleGrievance && !isOwnGrievance && isPending && (
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => {
-                              const reason = prompt('Nhập lý do bác bỏ khiếu nại (theo quy chế công ty):');
-                              if (reason) {
-                                updateGrievanceStatusMutation.mutate({ id: g.id, status: 'DISMISSED', resolution: reason });
-                              }
+                              setDismissingGrievance(g);
+                              setDismissReason('');
                             }}
-                            className="text-xs px-2 h-7 text-muted-foreground hover:text-foreground"
+                            className="text-xs px-2 h-7 text-muted-foreground hover:text-destructive"
                           >
                             Bác bỏ
                           </Button>
@@ -1129,15 +1298,30 @@ export default function TrainingGrievancePage() {
                 <span className="font-bold text-foreground uppercase text-xs">
                   Danh sách ghi danh ({selectedProgram.participantCount ?? selectedProgram.enrollments?.length ?? 0} / {selectedProgram.maxParticipants})
                 </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsPrintCertOpen(true)}
-                  className="gap-1.5 text-xs h-7"
-                >
-                  <Printer className="h-3 w-3" />
-                  In Danh Sách & Chứng Chỉ
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setFeedbackProgram(selectedProgram);
+                      setFeedbackRating(5);
+                      setFeedbackComments('');
+                    }}
+                    className="gap-1.5 text-xs h-7"
+                  >
+                    <Star className="h-3 w-3" />
+                    Gửi Đánh Giá
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsPrintCertOpen(true)}
+                    className="gap-1.5 text-xs h-7"
+                  >
+                    <Printer className="h-3 w-3" />
+                    In Danh Sách & Chứng Chỉ
+                  </Button>
+                </div>
               </div>
 
               <div className="border border-border rounded-lg overflow-hidden">
@@ -1148,7 +1332,7 @@ export default function TrainingGrievancePage() {
                       <th className="p-2.5">Mã ghi danh</th>
                       <th className="p-2.5 text-center">Trạng thái</th>
                       <th className="p-2.5 text-center">Kết quả</th>
-                      <th className="p-2.5 text-center">Chứng chỉ</th>
+                      <th className="p-2.5 text-center">Chứng chỉ / Thao tác</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -1159,7 +1343,29 @@ export default function TrainingGrievancePage() {
                         <td className="p-2.5 text-center text-muted-foreground">{enrollment.status}</td>
                         <td className="p-2.5 text-center">{enrollment.score == null ? 'Chưa ghi nhận' : `${enrollment.score}/100`}</td>
                         <td className="p-2.5 text-center">
-                          {enrollment.certificateId || 'Chưa ghi nhận'}
+                          {enrollment.certificateId ? (
+                            enrollment.certificateId
+                          ) : canVerifyTraining && ['ENROLLED', 'ATTENDED'].includes(enrollment.status) ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-6 px-2 text-xs"
+                              onClick={() => {
+                                setVerifyingEnrollment({
+                                  programId: selectedProgram.id,
+                                  programName: selectedProgram.name,
+                                  userId: enrollment.userId,
+                                  employeeName: enrollment.employeeName || enrollment.userId,
+                                });
+                                setVerifyScore(85);
+                                setVerifyEvidenceUrl('');
+                              }}
+                            >
+                              Xác nhận kết quả
+                            </Button>
+                          ) : (
+                            'Chưa ghi nhận'
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -1167,6 +1373,30 @@ export default function TrainingGrievancePage() {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* Course Feedbacks Preview */}
+            <div className="space-y-2 border-t border-border pt-3">
+              <span className="font-bold text-foreground uppercase text-xs block">
+                Phản hồi & Đánh giá khóa học ({selectedProgram.feedbacks?.length ?? 0})
+              </span>
+              {(selectedProgram.feedbacks ?? []).length > 0 ? (
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {(selectedProgram.feedbacks ?? []).map((fb) => (
+                    <div key={fb.id} className="p-2.5 rounded-md bg-muted/20 border border-border flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-semibold text-foreground">{fb.employeeName}</p>
+                        {fb.comments && <p className="text-muted-foreground mt-0.5">{fb.comments}</p>}
+                      </div>
+                      <Badge variant="outline" className="text-xs shrink-0">
+                        {fb.rating} / 5 ★
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground italic">Chưa có đánh giá nào cho khóa học này.</p>
+              )}
             </div>
           </div>
         )}
@@ -1181,6 +1411,184 @@ export default function TrainingGrievancePage() {
               openEditProgramModal(selectedProgram);
             }
           }}
+        />
+      </Modal>
+
+      {/* ================= MODAL: XÁC NHẬN KẾT QUẢ ĐÀO TẠO ================= */}
+      <Modal
+        open={!!verifyingEnrollment}
+        onOpenChange={(open) => {
+          if (!open) setVerifyingEnrollment(null);
+        }}
+        title="Xác Nhận Hoàn Thành Đào Tạo & Cấp Chứng Nhận"
+        size="md"
+      >
+        {verifyingEnrollment && (
+          <div className="space-y-4 text-xs">
+            <div className="p-3 rounded-lg bg-muted/40 border border-border space-y-1">
+              <p className="font-bold text-foreground">Khóa học: {verifyingEnrollment.programName}</p>
+              <p className="text-muted-foreground">Học viên: <b>{verifyingEnrollment.employeeName}</b></p>
+            </div>
+
+            <div>
+              <label className="font-semibold text-foreground">Điểm kết quả đánh giá (0 – 100) *</label>
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                value={verifyScore}
+                onChange={(e) => setVerifyScore(Number(e.target.value))}
+                className="mt-1 h-9 text-xs font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="font-semibold text-foreground">Đường dẫn minh chứng hoàn thành / bài kiểm tra *</label>
+              <Input
+                placeholder="VD: https://lms.company.vn/certificates/2026-001.pdf"
+                value={verifyEvidenceUrl}
+                onChange={(e) => setVerifyEvidenceUrl(e.target.value)}
+                className="mt-1 h-9 text-xs"
+              />
+            </div>
+          </div>
+        )}
+
+        <ModalFooterActions
+          onCancel={() => setVerifyingEnrollment(null)}
+          confirmLabel="Lưu Kết Quả"
+          onConfirm={() => {
+            if (!verifyingEnrollment) return;
+            if (verifyScore < 0 || verifyScore > 100 || !verifyEvidenceUrl.trim()) {
+              toast('Vui lòng nhập điểm hợp lệ (0–100) và đường dẫn minh chứng hoàn thành', 'error');
+              return;
+            }
+            verifyEnrollmentMutation.mutate({
+              programId: verifyingEnrollment.programId,
+              userId: verifyingEnrollment.userId,
+              score: verifyScore,
+              evidenceUrl: verifyEvidenceUrl.trim(),
+            });
+          }}
+          disabled={verifyEnrollmentMutation.isPending}
+        />
+      </Modal>
+
+      {/* ================= MODAL: ĐÁNH GIÁ KHÓA ĐÀO TẠO ================= */}
+      <Modal
+        open={!!feedbackProgram}
+        onOpenChange={(open) => {
+          if (!open) setFeedbackProgram(null);
+        }}
+        title="Gửi Khảo Sát & Đánh Giá Khóa Đào Tạo"
+        size="md"
+      >
+        {feedbackProgram && (
+          <div className="space-y-4 text-xs">
+            <div className="p-3 rounded-lg bg-muted/40 border border-border space-y-1">
+              <p className="font-bold text-foreground">{feedbackProgram.name}</p>
+              <p className="text-muted-foreground">Giảng viên: {feedbackProgram.trainerName}</p>
+            </div>
+
+            <div>
+              <label className="font-semibold text-foreground block mb-1.5">Mức độ hài lòng (1 – 5 sao) *</label>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setFeedbackRating(star)}
+                    className={`px-3 py-1.5 rounded-md border text-xs font-semibold flex items-center gap-1 transition-colors ${
+                      feedbackRating >= star
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border bg-card text-muted-foreground'
+                    }`}
+                  >
+                    <Star className="h-3.5 w-3.5 fill-current" />
+                    {star}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="font-semibold text-foreground">Nhận xét & Đóng góp ý kiến</label>
+              <Textarea
+                rows={4}
+                placeholder="Chia sẻ cảm nhận về chất lượng nội dung, phương pháp giảng dạy và tính ứng dụng thực tế..."
+                value={feedbackComments}
+                onChange={(e) => setFeedbackComments(e.target.value)}
+                className="mt-1 text-xs"
+              />
+            </div>
+          </div>
+        )}
+
+        <ModalFooterActions
+          onCancel={() => setFeedbackProgram(null)}
+          confirmLabel="Gửi Đánh Giá"
+          onConfirm={() => {
+            if (!feedbackProgram) return;
+            submitFeedbackMutation.mutate({
+              programId: feedbackProgram.id,
+              userId: currentUser?.id || employees[0]?.id || 'emp-default',
+              employeeName: currentUser?.fullName || employees[0]?.fullName || 'Học viên',
+              rating: feedbackRating,
+              comments: feedbackComments.trim() || undefined,
+            });
+          }}
+          disabled={submitFeedbackMutation.isPending}
+        />
+      </Modal>
+
+      {/* ================= MODAL: BÁC BỎ KIẾN NGHỊ ================= */}
+      <Modal
+        open={!!dismissingGrievance}
+        onOpenChange={(open) => {
+          if (!open) setDismissingGrievance(null);
+        }}
+        title="Bác Bỏ Kiến Nghị / Khiếu Nại"
+        size="md"
+      >
+        {dismissingGrievance && (
+          <div className="space-y-4 text-xs">
+            <div className="p-3 rounded-lg bg-muted/40 border border-border space-y-1">
+              <span className="font-bold text-foreground">Người gửi: {dismissingGrievance.employeeName}</span>
+              <p className="text-muted-foreground font-medium">Chủ đề: {dismissingGrievance.subject}</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="font-bold text-foreground">
+                Lý do bác bỏ khiếu nại (theo quy chế công ty) *
+              </label>
+              <Textarea
+                rows={4}
+                placeholder="Nhập căn cứ và lý do bác bỏ kiến nghị..."
+                value={dismissReason}
+                onChange={(e) => setDismissReason(e.target.value)}
+                className="mt-1 text-xs"
+              />
+            </div>
+          </div>
+        )}
+
+        <ModalFooterActions
+          onCancel={() => setDismissingGrievance(null)}
+          confirmLabel="Xác Nhận Bác Bỏ"
+          onConfirm={() => {
+            if (!dismissReason.trim()) {
+              toast('Vui lòng nhập lý do bác bỏ khiếu nại', 'error');
+              return;
+            }
+            if (dismissingGrievance) {
+              updateGrievanceStatusMutation.mutate({
+                id: dismissingGrievance.id,
+                status: 'DISMISSED',
+                resolution: dismissReason.trim(),
+              });
+            }
+          }}
+          disabled={updateGrievanceStatusMutation.isPending}
         />
       </Modal>
 

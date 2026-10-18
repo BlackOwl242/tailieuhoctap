@@ -78,7 +78,8 @@ export default function EmployeesPage() {
   const qc = useQueryClient();
   const toast = useToast();
   const viewerRoles = useAuthStore((s) => s.user?.roles ?? []);
-  const canEditTaxProfile = viewerRoles.some((role) => ['ADMIN', 'KM_MANAGER'].includes(role));
+  const isHr = viewerRoles.some((role) => ['ADMIN', 'KM_MANAGER', 'HR_CB'].includes(role));
+  const canEditTaxProfile = isHr;
 
   const qPendingApprovals = useQuery({
     queryKey: ['profile-change-requests-count'],

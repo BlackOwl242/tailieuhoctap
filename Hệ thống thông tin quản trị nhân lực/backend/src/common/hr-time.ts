@@ -20,19 +20,18 @@ export function clockMinutes(clock: string): number {
 export function atClock(day: Date, clock: string): Date {
   return new Date(dateKey(day).getTime() - VN_OFFSET + clockMinutes(clock) * 60_000);
 }
-export function businessDates(from: Date, to: Date, holidays: string[] = []): Date[] {
-  const days: Date[] = [];
-  for (let time = dateKey(from).getTime(); time <= dateKey(to).getTime(); time += DAY_MS) {
-    const d = new Date(time);
-    if (![0, 6].includes(d.getUTCDay()) && !holidays.includes(d.toISOString().slice(0, 10))) days.push(d);
-  }
-  return days;
-}
-
 export const DEFAULT_WORK_DAYS = [1, 2, 3, 4, 5];
 /** Day-of-week uses JavaScript numbering: Sunday=0 ... Saturday=6. */
 export function isScheduledWorkday(day: Date, workDays: number[] = DEFAULT_WORK_DAYS): boolean {
   return workDays.includes(dateKey(day).getUTCDay());
+}
+export function businessDates(from: Date, to: Date, holidays: string[] = [], workDays: number[] = DEFAULT_WORK_DAYS): Date[] {
+  const days: Date[] = [];
+  for (let time = dateKey(from).getTime(); time <= dateKey(to).getTime(); time += DAY_MS) {
+    const d = new Date(time);
+    if (isScheduledWorkday(d, workDays) && !holidays.includes(d.toISOString().slice(0, 10))) days.push(d);
+  }
+  return days;
 }
 
 export function isUnderThreeMonths(startValue: Date, endValue: Date): boolean {

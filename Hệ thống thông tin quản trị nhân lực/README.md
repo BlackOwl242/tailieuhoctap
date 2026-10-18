@@ -1,7 +1,7 @@
 # HRMIS — Hệ thống Thông tin Quản trị Nhân lực · Saigon Technology
 
 Hệ thống thông tin quản trị nhân lực tích hợp xây dựng theo tài liệu thiết kế tại [`doc/PTTK_OOP_HR.md`](doc/PTTK_OOP_HR.md)
-và bộ biểu đồ thiết kế UML 47 Use Case tại [`doc/PTTK_OOP_HR_DIAGRAMS.md`](doc/PTTK_OOP_HR_DIAGRAMS.md).
+và bộ biểu đồ thiết kế UML 48 Use Case tại [`doc/PTTK_OOP_HR_DIAGRAMS.md`](doc/PTTK_OOP_HR_DIAGRAMS.md).
 
 > **Clone-and-run:** `git clone` → `docker compose up -d` → mở **http://localhost:8080** → đăng nhập bằng tài khoản demo. Không cần tạo file hay sửa cấu hình gì thêm.
 
@@ -23,21 +23,21 @@ build và khởi động cùng stack `kms` trong thư mục này, đợi giao di
 trình duyệt. Nếu Docker Desktop chưa chạy, hãy mở ứng dụng đó và chạy lại file. Để dừng
 hệ thống, chạy `docker compose down` trong thư mục dự án; dữ liệu vẫn được giữ.
 
-Mở **http://localhost:8080** và đăng nhập:
+Mở **http://localhost:8080** và đăng nhập (trong script `seed.cjs`, mật khẩu khởi tạo mặc định được đồng bộ là `123` cho toàn bộ 11 tài khoản demo để thuận tiện kiểm thử nhanh; cột bên phải ghi kèm mật khẩu phân vai tham chiếu):
 
-| Vai trò                       | Họ tên & Chức danh / Đơn vị | Email                    | Mật khẩu      |
-| ----------------------------- | --------------------------- | ------------------------ | ------------- |
-| Quản trị CNTT — `ADMIN` | Nguyễn Hoàng Nam, Phòng CNTT | `admin@demo.local` | `Admin@123` |
-| Ban điều hành — `BOD` | Trần Minh Hoàng, Tổng Giám đốc | `ceo@saigontechnology.vn` | `Admin@123` |
-| Cổ đông / HĐQT — `SHAREHOLDER` + `BOD` | Phạm Tiến Thành, Chủ tịch HĐQT | `chairman@saigontechnology.vn` | `Admin@123` |
-| Quản lý nhân sự — `KM_MANAGER` | Dương Khánh Chi, Trưởng ban Nhân sự | `km.manager@demo.local` | `Manager@123` |
-| Quản lý trực tiếp — `LINE_MANAGER` | Lê Minh Tuấn, Trưởng nhóm Java | `pm.java@demo.local` | `Pm@123456` |
-| Chuyên viên C&B — `HR_CB` | Trần Thu Trang | `cb.demo@demo.local` | `Cb@123456` |
-| Kế toán — `ACCOUNTANT` | Nguyễn Thị Hồng | `accountant.demo@demo.local` | `Acc@123456` |
-| Tuyển dụng — `HR_RECRUITER` | Phạm Ngọc Mai | `recruiter.demo@demo.local` | `Recruit@123` |
-| Đào tạo — `HR_TRAINER` | Lê Hoàng Anh | `trainer.demo@demo.local` | `Trainer@123` |
-| Kiểm toán / Pháp chế — `AUDITOR` | Vũ Minh Đức | `auditor.demo@demo.local` | `Audit@123` |
-| Nhân viên — `USER` | Đỗ Gia Hân, Lập trình viên Java | `dev.fresher@demo.local` | `Fresher@123` |
+| Vai trò                       | Họ tên & Chức danh / Đơn vị | Email                    | Mật khẩu seed (`seed.cjs`) | Mật khẩu phân vai tham chiếu |
+| ----------------------------- | --------------------------- | ------------------------ | -------------------------- | ---------------------------- |
+| Quản trị CNTT — `ADMIN` | Nguyễn Hoàng Nam, Phòng CNTT | `admin@demo.local` | `123` | `Admin@123` |
+| Ban điều hành — `BOD` | Trần Minh Hoàng, Tổng Giám đốc | `ceo@saigontechnology.vn` | `123` | `Admin@123` |
+| Cổ đông / HĐQT — `SHAREHOLDER` + `BOD` | Phạm Tiến Thành, Chủ tịch HĐQT | `chairman@saigontechnology.vn` | `123` | `Admin@123` |
+| Quản lý nhân sự — `KM_MANAGER` | Dương Khánh Chi, Trưởng ban Nhân sự | `km.manager@demo.local` | `123` | `Manager@123` |
+| Quản lý trực tiếp — `LINE_MANAGER` | Lê Minh Tuấn, Trưởng nhóm Java | `pm.java@demo.local` | `123` | `Pm@123456` |
+| Chuyên viên C&B — `HR_CB` | Trần Thu Trang | `cb.demo@demo.local` | `123` | `Cb@123456` |
+| Kế toán — `ACCOUNTANT` | Nguyễn Thị Hồng | `accountant.demo@demo.local` | `123` | `Acc@123456` |
+| Tuyển dụng — `HR_RECRUITER` | Phạm Ngọc Mai | `recruiter.demo@demo.local` | `123` | `Recruit@123` |
+| Đào tạo — `HR_TRAINER` | Lê Hoàng Anh | `trainer.demo@demo.local` | `123` | `Trainer@123` |
+| Kiểm toán / Pháp chế — `AUDITOR` | Vũ Minh Đức | `auditor.demo@demo.local` | `123` | `Audit@123` |
+| Nhân viên — `USER` | Đỗ Gia Hân, Lập trình viên Java | `dev.fresher@demo.local` | `123` | `Fresher@123` |
 
 Tài khoản trình diễn thể hiện vai trò và đơn vị đại diện; quan hệ quản lý trực tiếp
 giữa các hồ sơ chỉ được mô phỏng theo cây tổ chức vì mô hình người dùng hiện chưa lưu
@@ -73,7 +73,7 @@ Trình duyệt ──► web (Next.js 14 standalone, cổng 8080 duy nhất)
                  ▼
                api (NestJS 10 + Prisma 5, Node 20-alpine)
                  ▼
-               db (PostgreSQL 16-alpine, 95 model trong schema Prisma hiện tại, FTS pg_trgm)
+               db (PostgreSQL 16-alpine, 102 model và 42 enum trong schema Prisma hiện tại, FTS pg_trgm)
 ```
 
 - **Backend:** NestJS phân tầng Controller → Service → Prisma; JWT access 15' + refresh xoay vòng;
@@ -83,7 +83,7 @@ Trình duyệt ──► web (Next.js 14 standalone, cổng 8080 duy nhất)
   mobile-first (sidebar desktop / bottom-nav mobile); token z-index cố định
   (content < sticky < dropdown < overlay < modal < toast); xử lý đầy đủ trạng thái loading/rỗng/lỗi.
 - **Chấm công đa nguồn:** QR kiosk xoay 30s (token HMAC + jti one-time), khuôn mặt trên trình duyệt
-  (vector mã hóa AES-256-GCM), webhook HMAC + CSV import cho máy chấm công, bộ mô phỏng tích hợp. Nhận diện khuôn mặt hiện chỉ là demo; không có cảm biến IR/3D liveness hoặc kết nối SDK máy chấm công thật.
+  (thu phóng 64×64 điểm ảnh, trích xuất 128 chiều Spatial HOG + 128 chiều LBP Texture = vector 256 chiều, mã hóa AES-256-GCM), webhook HMAC + CSV import cho máy chấm công, bộ mô phỏng tích hợp và cơ chế tự động đồng bộ chấm công liên tục (Auto-Attendance Backfill) cho các ngày làm việc trong kỳ mở. Nhận diện khuôn mặt hiện chạy trên trình duyệt cho mục đích demo học phần; không có cảm biến IR/3D liveness hoặc kết nối SDK máy chấm công thật.
 
 Chi tiết đầy đủ: [`doc/PTTK_OOP_HR.md`](doc/PTTK_OOP_HR.md) và [`plans/ke-hoach-cai-thien-hrms.md`](plans/ke-hoach-cai-thien-hrms.md).
 
@@ -108,7 +108,7 @@ Toàn bộ biến nằm trong [`.env.example`](.env.example). Compose có sẵn 
 
 ```bash
 cd backend
-npm test                 # unit test và hồi quy; bộ kiểm tra cô lập hiện tại gồm 38 trường hợp (chi tiết tại báo cáo trạng thái)
+npm test                 # unit test và hồi quy; bộ kiểm tra cô lập hiện tại gồm 68 bài kiểm thử (chi tiết tại báo cáo trạng thái)
 RUN_E2E=1 DATABASE_URL=... npm run test:e2e   # e2e cần DB đang chạy
 node scripts/smoke.mjs   # smoke 25 bước qua web proxy (stack phải đang chạy)
 ```
@@ -132,10 +132,10 @@ CI (GitHub Actions): `.github/workflows/ci.yml` — backend test/build với Pos
 ## 6. Giả định đã đưa ra (do tài liệu chưa chi tiết hóa)
 
 1. **Editor Markdown** (textarea + preview) thay cho TipTap — phương án dự phòng đã ghi trong mục rủi ro của kế hoạch; tính năng không đổi.
-2. **Nhận diện khuôn mặt** bản demo dùng vector mô tả ảnh 16×16 (grayscale block-mean) thay vì model AI đầy đủ — đủ để trình diễn cơ chế đồng thuận/mã hóa/so khớp; MediaPipe/model thật là hướng phát triển. Nhãn “chế độ demo” hiển thị thẳng trong UI.
+2. **Nhận diện khuôn mặt & Tự động đồng bộ công (Auto-Attendance Backfill):** Bản demo thu phóng khung hình gương mặt về lưới **64×64 điểm ảnh**, trích xuất **128 chiều Spatial HOG + 128 chiều LBP Texture = vector đặc trưng 256 chiều** (chuẩn hóa L2 và mã hóa **AES-256-GCM**) để đối sánh Cosine Similarity thay vì model AI sâu nặng; đồng thời tích hợp cơ chế **Tự động đồng bộ chấm công liên tục (Auto-Attendance Backfill)** tự động điền đủ công cho các ngày làm việc từ đầu tháng đến ngày hiện tại khi kỳ chấm công đang `OPEN` để phục vụ kiểm thử và trình diễn học phần.
 3. **Máy chấm công thật** chưa nối SDK độc quyền (ZKTeco…) — thay bằng webhook HMAC + CSV + simulator; adapter mở rộng đã chừa sẵn.
 4. **Tệp đính kèm** phục vụ qua `/uploads` tĩnh với tên ngẫu nhiên uuid (không xác thực download) — chấp nhận cho demo nội bộ.
-5. Mật khẩu demo để nguyên trong seed phục vụ trình diễn; bắt buộc đổi trước khi dùng thật.
+5. Mật khẩu demo trong `seed.cjs` được đặt mặc định là `123` để thuận tiện trình diễn học phần; bắt buộc đổi trước khi dùng thật.
 
 
 

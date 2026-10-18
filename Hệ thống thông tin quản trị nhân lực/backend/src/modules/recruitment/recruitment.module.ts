@@ -150,6 +150,25 @@ export class RecruitmentService {
       if (!req) throw new NotFoundException('Không tìm thấy phiếu tuyển dụng liên quan');
     }
     const candidate = await this.prisma.candidate.create({ data: dto });
+    if (dto.requisitionId && dto.email) {
+      const opening = await this.prisma.hrmsJobOpening.findUnique({ where: { requisitionId: dto.requisitionId } });
+      if (opening) {
+        const existingApp = await this.prisma.hrmsJobApplicant.findFirst({
+          where: { jobOpeningId: opening.id, email: dto.email },
+        });
+        if (!existingApp) {
+          await this.prisma.hrmsJobApplicant.create({
+            data: {
+              jobOpeningId: opening.id,
+              candidateName: dto.fullName,
+              email: dto.email,
+              phone: dto.phone ?? '0900000000',
+              stage: 'APPLIED',
+            },
+          });
+        }
+      }
+    }
     await this.audit.log({
       actorId: actor.id, action: 'CANDIDATE_CREATED', entityType: 'Candidate', entityId: candidate.id,
       after: { fullName: dto.fullName }, requestId,
@@ -189,7 +208,7 @@ export class RecruitmentService {
 @ApiTags('recruitment')
 @ApiBearerAuth()
 @Controller('recruitment')
-@Roles('ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER')
+@Roles('ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'HR_CB', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER')
 export class RecruitmentController {
   constructor(private readonly service: RecruitmentService) {}
 
@@ -218,28 +237,26 @@ export class RecruitmentController {
     return this.service.decideRequisition(id, false, user, dto.note);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'HR_CB')
   @Post('requisitions/:id/close')
   closeRequisition(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.service.closeRequisition(id, user);
   }
 
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'HR_CB', 'BOD')
   @Get('candidates')
   candidates() {
     return this.service.candidates();
   }
 
   /** Mục 5 — siết quyền: chỉ HR/quản lý mới được thêm ứng viên và chuyển stage. */
-  @Roles('ADMIN', 'KM_MANAGER')
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'HR_CB')
   @Post('candidates')
   createCandidate(@Body() dto: CreateCandidateDto, @CurrentUser() user: AuthUser) {
     return this.service.createCandidate(dto, user);
   }
 
-  @Roles('ADMIN', 'KM_MANAGER')
-  @Roles('ADMIN','KM_MANAGER','HR_RECRUITER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'HR_CB')
   @Patch('candidates/:id')
   updateCandidate(@Param('id') id: string, @Body() dto: UpdateCandidateDto, @CurrentUser() user: AuthUser) {
     return this.service.updateCandidate(id, dto, user);

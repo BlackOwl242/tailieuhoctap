@@ -370,11 +370,6 @@ export class ProfileChangeRequestsService {
       if (!TIER_2_VERIFIED_FIELDS.has(key)) throw new BadRequestException('Yêu cầu có trường ngoài danh sách mức 2');
       if (['bankAccount', 'bankName', 'taxDependentCount'].includes(key)) userUpdates[key] = val;
       if (key === 'fullName') userUpdates.fullName = val;
-      if (key === 'phone') userUpdates.phone = val;
-      if (key === 'currentAddress') {
-        userUpdates.address = val;
-        profileUpdates.currentAddress = val;
-      }
       if (key === 'birthDate') {
         userUpdates.birthDate = val ? new Date(val) : null;
       }
@@ -382,12 +377,10 @@ export class ProfileChangeRequestsService {
       // Map trường PersonnelComprehensiveProfile
       const profileDateKeys = [
         'idCardIssueDate', 'socialInsuranceDate', 'academicTitleDate',
-        'unionJoinDate', 'partyJoinDate', 'partyOfficialDate',
-        'enlistmentDate', 'dischargeDate', 'recruitDate', 'currentOrgDate', 'officialDate',
       ];
       if (profileDateKeys.includes(key)) {
         profileUpdates[key] = val ? new Date(val) : null;
-      } else if (!['phone', 'currentAddress', 'fullName', 'birthDate', 'bankAccount', 'bankName', 'taxDependentCount'].includes(key)) {
+      } else if (!['fullName', 'birthDate', 'bankAccount', 'bankName', 'taxDependentCount'].includes(key)) {
         profileUpdates[key] = val;
       }
     }
@@ -467,6 +460,9 @@ export class ProfileChangeRequestsService {
     if (!request) throw new NotFoundException('Không tìm thấy yêu cầu điều chỉnh thông tin');
     if (request.status !== 'PENDING') {
       throw new BadRequestException(`Yêu cầu đã ở trạng thái ${request.status}, không thể từ chối`);
+    }
+    if (request.userId === reviewer.id) {
+      throw new ForbiddenException('Không được tự từ chối yêu cầu của chính mình; vui lòng dùng tính năng Hủy đề xuất');
     }
 
     await this.prisma.$transaction(async (tx) => {

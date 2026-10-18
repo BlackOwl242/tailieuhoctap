@@ -148,8 +148,10 @@ function amountInVietnameseWords(value: number): string {
 export default function ExpenseClaimsPage() {
   const queryClient = useQueryClient();
   const toast = useToast();
-  const roles = useAuthStore((s) => s.user?.roles ?? []);
+  const user = useAuthStore((s) => s.user);
+  const roles = user?.roles ?? [];
   const canSettleTravel = roles.some((role) => ['ADMIN', 'ACCOUNTANT'].includes(role));
+  const canViewAllEmployees = roles.some((role) => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER'].includes(role));
 
   const [activeTab, setActiveTab] = useState<'claims' | 'travel' | 'advances'>('claims');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
@@ -226,7 +228,25 @@ export default function ExpenseClaimsPage() {
         return [];
       }
     },
+    enabled: canViewAllEmployees,
+    retry: false,
   });
+
+  const resolveEmployeeSelection = (selectedValue: string) => {
+    const trimmed = selectedValue.trim();
+    const matched = employees.find((e) => e.id === trimmed || e.fullName === trimmed);
+    if (matched) {
+      return { userId: matched.id, employeeName: matched.fullName };
+    }
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed);
+    if (isUuid) {
+      return { userId: trimmed, employeeName: user?.fullName || 'Nhân sự công ty' };
+    }
+    return {
+      userId: user?.id || '',
+      employeeName: trimmed || user?.fullName || 'Nhân sự công ty',
+    };
+  };
 
   // Calculate sum of claim items
   const calculatedClaimTotal = useMemo(() => {
@@ -235,10 +255,15 @@ export default function ExpenseClaimsPage() {
 
   // Mutations: Claims
   const createClaimMutation = useMutation({
-    mutationFn: async (payload: { employeeName: string; title: string; category: string; totalAmount: number; items: ExpenseItemDetail[] }) => {
+    mutationFn: async (payload: { selectedEmployee: string; title: string; category: string; totalAmount: number; items: ExpenseItemDetail[] }) => {
+      const { userId, employeeName } = resolveEmployeeSelection(payload.selectedEmployee);
       return (await api.post('/hrms/expenses/claims', {
-        userId: payload.employeeName,
-        ...payload,
+        userId,
+        employeeName,
+        title: payload.title,
+        category: payload.category,
+        totalAmount: payload.totalAmount,
+        items: payload.items,
       })).data;
     },
     onSuccess: () => {
@@ -279,14 +304,20 @@ export default function ExpenseClaimsPage() {
   // Mutations: Travel
   const createTravelMutation = useMutation({
     mutationFn: async (payload: {
-      employeeName: string; purpose: string; fromLocation: string; toLocation: string;
+      selectedEmployee: string; purpose: string; fromLocation: string; toLocation: string;
       departureDate: string; returnDate: string; estimatedBudget: number; notes?: string;
     }) => {
+      const { userId, employeeName } = resolveEmployeeSelection(payload.selectedEmployee);
       return (await api.post('/hrms/expenses/travel-requests', {
-        userId: payload.employeeName,
-        ...payload,
+        userId,
+        employeeName,
+        purpose: payload.purpose,
+        fromLocation: payload.fromLocation,
+        toLocation: payload.toLocation,
         departureDate: new Date(payload.departureDate).toISOString(),
         returnDate: new Date(payload.returnDate).toISOString(),
+        estimatedBudget: payload.estimatedBudget,
+        notes: payload.notes,
       })).data;
     },
     onSuccess: () => {
@@ -347,10 +378,13 @@ export default function ExpenseClaimsPage() {
 
   // Mutations: Advances
   const createAdvanceMutation = useMutation({
-    mutationFn: async (payload: { employeeName: string; purpose: string; amount: number }) => {
+    mutationFn: async (payload: { selectedEmployee: string; purpose: string; amount: number }) => {
+      const { userId, employeeName } = resolveEmployeeSelection(payload.selectedEmployee);
       return (await api.post('/hrms/expenses/advances', {
-        userId: payload.employeeName,
-        ...payload,
+        userId,
+        employeeName,
+        purpose: payload.purpose,
+        amount: payload.amount,
       })).data;
     },
     onSuccess: () => {
@@ -1410,21 +1444,16 @@ export default function ExpenseClaimsPage() {
                 onChange={(e) => setClaimEmployee(e.target.value)}
                 className="mt-1 w-full text-xs"
               >
-                <option value="">Chọn nhân viên</option>
+                <option value="">Chọn nhân viên (mặc định: {user?.fullName || 'Bản thân'})</option>
                 {employees.length > 0 ? (
                   employees.map((emp) => (
                     <option key={emp.id} value={emp.id}>
                       {emp.fullName} {emp.jobTitle ? `(${emp.jobTitle})` : ''}
                     </option>
                   ))
-                ) : (
-                  <>
-                    <option value="Nguyễn Văn An">Nguyễn Văn An</option>
-                    <option value="Võ Tấn Phát">Võ Tấn Phát</option>
-                    <option value="Trần Thị Mai">Trần Thị Mai</option>
-                    <option value="Lê Hoàng Long">Lê Hoàng Long</option>
-                  </>
-                )}
+                ) : user ? (
+                  <option value={user.id}>{user.fullName}</option>
+                ) : null}
               </Select>
             </div>
 
@@ -1544,7 +1573,7 @@ export default function ExpenseClaimsPage() {
               return;
             }
             createClaimMutation.mutate({
-              employeeName: claimEmployee,
+              selectedEmployee: claimEmployee,
               title: claimTitle,
               category: claimCategory,
               totalAmount: calculatedClaimTotal,
@@ -1572,20 +1601,16 @@ export default function ExpenseClaimsPage() {
               onChange={(e) => setTravelEmployee(e.target.value)}
               className="mt-1 w-full text-xs"
             >
-              <option value="">Chọn nhân viên</option>
+              <option value="">Chọn nhân viên (mặc định: {user?.fullName || 'Bản thân'})</option>
                 {employees.length > 0 ? (
                 employees.map((emp) => (
                   <option key={emp.id} value={emp.id}>
                     {emp.fullName} {emp.jobTitle ? `(${emp.jobTitle})` : ''}
                   </option>
                 ))
-              ) : (
-                <>
-                  <option value="Nguyễn Văn An">Nguyễn Văn An</option>
-                  <option value="Võ Tấn Phát">Võ Tấn Phát</option>
-                  <option value="Trần Thị Mai">Trần Thị Mai</option>
-                </>
-              )}
+              ) : user ? (
+                <option value={user.id}>{user.fullName}</option>
+              ) : null}
             </Select>
           </div>
 
@@ -1668,7 +1693,7 @@ export default function ExpenseClaimsPage() {
               return;
             }
             createTravelMutation.mutate({
-              employeeName: travelEmployee,
+              selectedEmployee: travelEmployee,
               purpose: travelPurpose,
               fromLocation: fromLoc,
               toLocation: toLoc,
@@ -1699,20 +1724,16 @@ export default function ExpenseClaimsPage() {
               onChange={(e) => setAdvEmployee(e.target.value)}
               className="mt-1 w-full text-xs"
             >
-              <option value="">Chọn nhân viên</option>
+              <option value="">Chọn nhân viên (mặc định: {user?.fullName || 'Bản thân'})</option>
                 {employees.length > 0 ? (
                 employees.map((emp) => (
                   <option key={emp.id} value={emp.id}>
                     {emp.fullName} {emp.jobTitle ? `(${emp.jobTitle})` : ''}
                   </option>
                 ))
-              ) : (
-                <>
-                  <option value="Nguyễn Văn An">Nguyễn Văn An</option>
-                  <option value="Võ Tấn Phát">Võ Tấn Phát</option>
-                  <option value="Trần Thị Mai">Trần Thị Mai</option>
-                </>
-              )}
+              ) : user ? (
+                <option value={user.id}>{user.fullName}</option>
+              ) : null}
             </Select>
           </div>
 
@@ -1748,7 +1769,7 @@ export default function ExpenseClaimsPage() {
               return;
             }
             createAdvanceMutation.mutate({
-              employeeName: advEmployee,
+              selectedEmployee: advEmployee,
               purpose: advPurpose,
               amount: advAmount,
             });

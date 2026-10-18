@@ -158,6 +158,7 @@ const DOMAINS: NavDomain[] = [
         items: [
           { href: '/leave', label: 'Nghỉ phép' },
           { href: '/overtime', label: 'Làm thêm giờ' },
+          { href: '/hr-workflows', label: 'Giải trình & Quy trình HR', roles: ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD'] },
         ],
       },
     ],
@@ -262,7 +263,7 @@ const DOMAINS: NavDomain[] = [
     label: 'Quản trị',
     shortLabel: 'Quản trị',
     icon: Settings,
-    roles: ['ADMIN'],
+    roles: ['ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD', 'AUDITOR'],
     folders: [
       {
         id: 'admin-users',

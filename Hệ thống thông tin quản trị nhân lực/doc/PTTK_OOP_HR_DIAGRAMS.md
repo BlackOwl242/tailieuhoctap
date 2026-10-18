@@ -1,13 +1,13 @@
-> Tổng cộng **148 biểu đồ PlantUML**.
+> Tổng cộng **150 biểu đồ PlantUML**.
 
 
-# BỘ BIỂU ĐỒ UML ĐẦY ĐỦ 47 USE CASE - HRMIS SAIGON TECHNOLOGY
+# BỘ BIỂU ĐỒ UML ĐẦY ĐỦ 48 USE CASE - HRMIS SAIGON TECHNOLOGY
 
-> Tài liệu kèm theo `doc/PTTK_OOP_HR.md`, sinh thống nhất cho **47 use case chia 10 nhóm**.
+> Tài liệu kèm theo `doc/PTTK_OOP_HR.md`, sinh thống nhất cho **48 use case chia 10 nhóm**.
 > **Mọi biểu đồ đều khai báo `skinparam linetype ortho` nên các đường nối được kẻ THẲNG VUÔNG GÓC.**
 > Cách dùng: sao chép từng khối ```plantuml``` dán vào plantuml.com (hoặc plugin IDE) để xuất ảnh PNG/SVG chèn vào báo cáo.
 
-**Cấu trúc:** A. Use case (tổng quát + 10 nhóm) | B. Trình tự (47 UC) | C. Hoạt động (47 UC) | D. Trạng thái (theo đối tượng) | E. Luồng dữ liệu đầu-cuối | F. Gói (tổng quan + theo nhóm) | G. Lớp (theo nhóm, gán rõ use case)
+**Cấu trúc:** A. Use case (tổng quát + 10 nhóm) | B. Trình tự (48 UC) | C. Hoạt động (48 UC) | D. Trạng thái (theo đối tượng) | E. Luồng dữ liệu đầu-cuối | F. Gói (tổng quan + theo nhóm) | G. Lớp (theo nhóm, gán rõ use case)
 
 
 ## A. BIỂU ĐỒ USE CASE
@@ -49,7 +49,7 @@ NV --|> NVIT
 ```
 _Hình 2.1. Biểu đồ cây phân cấp Tác nhân (Actor Generalization) — "Nhân viên" làm tác nhân chung, tỏa nhánh ra 10 tác nhân chuyên biệt hóa._
 
-### A.0. Tổng quan hệ thống (47 use case, 10 nhóm)
+### A.0. Tổng quan hệ thống (48 use case, 10 nhóm)
 
 ```plantuml
 @startuml
@@ -67,11 +67,11 @@ actor "Trưởng dự án" as TDA
 actor "Nhân viên" as NV
 actor "Chuyên viên Đào tạo\n& Hiệu suất" as CVDT
 
-rectangle "HỆ THỐNG QUẢN TRỊ NHÂN LỰC (47 USE CASE)" {
+rectangle "HỆ THỐNG QUẢN TRỊ NHÂN LỰC (48 USE CASE)" {
   usecase "I. Chuẩn cán bộ & Báo cáo\n(UC40-UC43)" as GI
   usecase "B. Tuyển dụng & Ứng viên\n(UC04-UC08)" as GB
   usecase "A. Quản trị hệ thống & Tổ chức\n(UC01-UC03)" as GA
-  usecase "J. Quản trị tri thức & Điều hành\n(UC44-UC47)" as GJ
+  usecase "J. Quản trị tri thức & Điều hành\n(UC44-UC48)" as GJ
   usecase "C. Hồ sơ nhân sự & Hội nhập\n(UC09-UC14)" as GC
   usecase "G. Biến động nhân sự & Thôi việc\n(UC32-UC36)" as GG
   usecase "E. Chấm công & Phân ca\n(UC18-UC25)" as GE
@@ -132,7 +132,7 @@ GG <-- CVTL
 GF <-- NVHC
 @enduml
 ```
-_Hình 2.2. Biểu đồ Use case tổng quan Hệ thống Quản trị nhân lực — 10 nhóm, 47 use case, tác nhân phân bố đều hai bên, đường nối thẳng vuông góc có mũi tên._
+_Hình 2.2. Biểu đồ Use case tổng quan Hệ thống Quản trị nhân lực — 10 nhóm, 48 use case, tác nhân phân bố đều hai bên, đường nối thẳng vuông góc có mũi tên._
 
 
 ### A.A. Nhóm A - Quản trị hệ thống & Tổ chức
@@ -394,14 +394,16 @@ rectangle "Nhóm J - Quản trị Tri thức & Điều hành hệ thống" {
   (UC45 Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia) as UC45
   (UC46 Bảng điều khiển phân tích & Thống kê nhân sự (Dashboard)) as UC46
   (UC47 Nhật ký kiểm toán hệ thống & Cấu hình tham số) as UC47
+  (UC48 Giám sát trạng thái thiết bị & Sức khỏe hệ thống) as UC48
 }
 A0 -- UC44
 A1 -- UC45
 A2 -- UC46
 A0 -- UC47
+A2 -- UC48
 @enduml
 ```
-_Hình D.11. Nhóm J - Quản trị Tri thức & Điều hành hệ thống (UC44, UC45, UC46, UC47)._
+_Hình D.11. Nhóm J - Quản trị Tri thức & Điều hành hệ thống (UC44, UC45, UC46, UC47, UC48)._
 
 ## B. BIỂU ĐỒ TRÌNH TỰ THEO TỪNG USE CASE
 
@@ -477,19 +479,20 @@ actor "Trưởng dự án" as PM
 actor "Chuyên viên tuyển dụng" as HR
 actor "Kế toán" as KT
 actor "Giám đốc" as GD
-boundary "Trang ATS" as B
+boundary "Trang /recruitment-ats" as B
 control "RecruitmentService" as C
-entity "JobRequisition" as E
-PM -> B : lập phiếu (vị trí, số lượng, lý do)
-B -> C : submit()
-C -> E : lưu trạng thái PENDING_REVIEW
-C -> HR : thông báo thẩm định
-HR -> C : đối chiếu định biên + yêu cầu xác nhận quỹ
-C -> KT : gửi yêu cầu song song
-KT -> C : xác nhận khả năng chi
-C -> GD : chuyển PENDING_APPROVAL
-GD -> C : approve() từ xa
-C -> E : cập nhật APPROVED, kích hoạt vị trí tuyển
+entity "JobRequisition / HrmsJobOpening" as E
+PM -> B : lập phiếu (vị trí, số lượng, lý do, lương dự kiến)
+B -> C : createRequisition() / submit()
+C -> E : lưu trạng thái DRAFT -> PENDING_REVIEW
+C -> HR : thông báo thẩm định định biên
+HR -> C : thẩm định định biên + yêu cầu xác nhận quỹ lương
+C -> KT : gửi yêu cầu thẩm định ngân sách
+KT -> C : xác nhận khả năng chi trả quỹ lương
+C -> E : cập nhật trạng thái REVIEWED (sau thẩm định kép HR + Kế toán)
+C -> GD : trình phê duyệt chỉ tiêu (REVIEWED)
+GD -> C : approve() / reject()
+C -> E : cập nhật APPROVED (kích hoạt HrmsJobOpening OPEN) hoặc REJECTED / CLOSED
 @enduml
 ```
 _Hình D.15. Trình tự UC04 - Lập phiếu đề xuất tuyển dụng nhân sự._
@@ -502,18 +505,21 @@ skinparam linetype ortho
 skinparam shadowing false
 actor "Chuyên viên tuyển dụng" as HR
 actor "Kế toán" as KT
-boundary "Trang ATS" as B
+boundary "Trang /recruitment-ats" as B
 control "RecruitmentService" as C
 entity "JobRequisition" as E
-HR -> B : mở phiếu chờ thẩm định
-B -> C : review()
-C -> E : đối chiếu định biên - nội quy
-alt có người nội bộ phù hợp
-  C --> HR : gợi ý luân chuyển, dừng luồng
-else cần ngân sách
-  C -> KT : yêu cầu xác nhận quỹ
-  KT -> C : xác nhận khả năng chi
-  C -> E : chuyển PENDING_APPROVAL
+HR -> B : mở phiếu chờ thẩm định (PENDING_REVIEW)
+B -> C : reviewHr(id, note)
+C -> E : đối chiếu định biên phòng ban & tiêu chuẩn chức danh
+alt vượt định biên hoặc không đạt yêu cầu
+  C -> E : cập nhật REJECTED kèm lý do
+  C --> HR : thông báo từ chối phiếu đề xuất
+else đạt định biên, kiểm tra ngân sách
+  C -> KT : yêu cầu thẩm định quỹ lương dự kiến
+  KT -> B : xác nhận ngân sách (reviewFinance)
+  B -> C : reviewFinance(id, note)
+  C -> E : hoàn tất thẩm định kép -> chuyển trạng thái REVIEWED
+  C -> E : ghi AuditLog & chuyển trình Giám đốc
 end
 @enduml
 ```
@@ -526,16 +532,18 @@ _Hình D.16. Trình tự UC05 - Thẩm định chỉ tiêu & Kiểm soát địn
 skinparam linetype ortho
 skinparam shadowing false
 actor "Giám đốc" as GD
-boundary "Trang ATS" as B
+boundary "Trang /recruitment-ats" as B
 control "RecruitmentService" as C
-entity "JobRequisition" as E
-GD -> B : xem tờ trình điện tử
-alt ký duyệt
-  GD -> C : approve(kèm ý kiến)
-  C -> E : APPROVED + kích hoạt kế hoạch tuyển
-else điều chỉnh / từ chối
-  GD -> C : reject(kèm ý kiến)
-  C -> E : REJECTED, phản hồi Trưởng dự án
+entity "JobRequisition / HrmsJobOpening" as E
+GD -> B : xem tờ trình đã qua thẩm định kép (REVIEWED)
+alt phê duyệt chỉ tiêu
+  GD -> C : approve(id, comment)
+  C -> E : cập nhật JobRequisition = APPROVED
+  C -> E : mở vị trí tuyển dụng HrmsJobOpening (OPEN)
+  C -> E : khi tuyển đủ chỉ tiêu -> chuyển CLOSED
+else từ chối phê duyệt
+  GD -> C : reject(id, reason)
+  C -> E : cập nhật JobRequisition = REJECTED, phản hồi Trưởng dự án
 end
 C -> E : ghi AuditLog
 @enduml
@@ -548,19 +556,24 @@ _Hình D.17. Trình tự UC06 - Phê duyệt chỉ tiêu tuyển dụng._
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-actor "Chuyên viên tuyển dụng" as A
+actor "Chuyên viên tuyển dụng" as HR
+actor "Trưởng dự án" as PM
 boundary "Trang /recruitment-ats" as B
 control "RecruitmentService" as C
-entity "Candidate" as E
-A -> B : mở trang quản lý
-B -> C : truy vấn danh sách
-C -> E : SELECT phân trang
-alt Thêm / Sửa / Xóa
-A -> B : nhập dữ liệu
-B -> C : validate DTO + lưu
-C -> E : ghi + AuditLog
+entity "HrmsJobApplicant / HrmsInterview" as E
+HR -> B : tiếp nhận CV ứng viên vào vị trí đang mở (HrmsJobOpening)
+B -> C : createApplicant()
+C -> E : khởi tạo HrmsJobApplicant ở bước APPLIED
+HR -> B : sơ loại hồ sơ & kéo-thả trên bảng Kanban
+B -> C : moveStage(SCREENING -> INTERVIEW_ROUND_1 -> INTERVIEW_ROUND_2)
+C -> E : lập lịch phỏng vấn (HrmsInterview) & lưu nhận xét của PM
+alt đạt phỏng vấn
+  C -> E : chuyển bước OFFER_SENT -> nhận việc chuyển HIRED
+else không đạt ở bất kỳ vòng nào
+  C -> E : cập nhật trạng thái REJECTED + lưu lịch sử đánh giá
 end
-B --> A : làm mới danh sách
+C -> E : ghi AuditLog
+B --> HR : cập nhật bảng Kanban ATS theo thời gian thực
 @enduml
 ```
 _Hình D.18. Trình tự UC07 - Quản lý hồ sơ ứng viên & Tuyển dụng ATS Kanban._
@@ -573,17 +586,24 @@ skinparam linetype ortho
 skinparam shadowing false
 actor "Chuyên viên tuyển dụng" as HR
 actor "Ứng viên" as UV
-boundary "Trang ATS" as B
+boundary "Trang /recruitment-ats" as B
 control "RecruitmentService" as C
-entity "HrmsJobOffer" as E
-HR -> B : soạn thư mời (chức danh, lương, ngày nhận việc)
+entity "HrmsJobOffer / HrmsJobApplicant" as E
+HR -> B : lập thư mời nhận việc (chức danh, lương, ngày nhận việc)
 B -> C : createOffer()
-C -> E : đối chiếu thang bảng lương
-alt vượt khung
-  C -> C : trình Giám đốc duyệt riêng
+C -> E : lưu HrmsJobOffer (DRAFT) & đối chiếu khung lương HrmsSalaryBand
+HR -> B : phát hành thư mời cho ứng viên
+B -> C : sendOffer()
+C -> E : cập nhật HrmsJobOffer = SENT, HrmsJobApplicant = OFFER_SENT
+alt ứng viên đồng ý nhận việc
+  UV -> C : phản hồi chấp thuận
+  C -> E : HrmsJobOffer = ACCEPTED, HrmsJobApplicant = HIRED
+  C -> E : khởi tạo hồ sơ nhân viên (PROBATION) & chuyển sang hội nhập
+else ứng viên từ chối hoặc hủy thư mời
+  UV -> C : từ chối / hủy
+  C -> E : HrmsJobOffer = REJECTED | CANCELLED, HrmsJobApplicant = REJECTED
 end
-UV -> C : chấp nhận thư mời
-C -> E : OFFER_ACCEPTED, chuyển sang hội nhập
+C -> E : ghi AuditLog
 @enduml
 ```
 _Hình D.19. Trình tự UC08 - Gửi thư mời nhận việc & Thỏa thuận mức lương._
@@ -663,17 +683,27 @@ _Hình D.22. Trình tự UC11 - Quản lý văn bằng, chứng chỉ chuyên m�
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-actor "Nhân viên" as A
+actor "Nhân viên" as NV
+actor "Chuyên viên hồ sơ" as HR
 boundary "Trang /employees/:id" as B
 control "EmployeesService" as C
-entity "PhieuMuonTra (thiết kế)" as E
-A -> B : nhập đề xuất
-B -> C : submit()
-C -> E : lưu PENDING + thông báo duyệt
-alt duyệt
-C -> E : APPROVED + phát sinh hiệu lực
-else từ chối
-C -> E : REJECTED kèm lý do
+entity "PhysicalRecordLoan" as E
+NV -> B : gửi phiếu đăng ký mượn bản gốc (lý do, ngày hẹn trả)
+B -> C : requestLoan()
+C -> E : lưu PhysicalRecordLoan trạng thái REQUESTED
+alt phê duyệt cho mượn
+  HR -> C : approveLoan()
+  C -> E : chuyển trạng thái APPROVED
+  HR -> C : confirmHandover() (bàn giao bản gốc vật lý)
+  C -> E : chuyển trạng thái BORROWED
+  NV -> B : gửi yêu cầu hoàn trả bản gốc
+  B -> C : requestReturn()
+  C -> E : chuyển trạng thái RETURN_REQUESTED
+  HR -> C : confirmReturn() (kiểm tra tình trạng & nhập kho tủ hồ sơ)
+  C -> E : chuyển trạng thái RETURNED
+else từ chối cho mượn
+  HR -> C : rejectLoan(reason)
+  C -> E : chuyển trạng thái REJECTED kèm lý do
 end
 C -> E : ghi AuditLog
 @enduml
@@ -710,21 +740,22 @@ skinparam linetype ortho
 skinparam shadowing false
 actor "Nhân viên mới" as NV
 actor "Chuyên viên hồ sơ" as HR
-boundary "Trang /onboarding, /handover" as B
+boundary "Trang /onboarding" as B
 control "OnboardingService" as C
-entity "OnboardingPath / HandoverChecklist" as E
-HR -> C : gán lộ trình đọc theo vị trí
-NV -> B : tick tiến độ từng bài bắt buộc
-alt thôi việc được duyệt
-  HR -> C : kích hoạt checklist bàn giao 5 mục
-  BP -> C : các bên xác nhận từng mục
-  alt đủ 5/5
-    C -> E : đóng checklist, hồ sơ chuyển lưu trữ
-  else thiếu
-    C --> HR : nhắc mục còn thiếu
-  end
-else đang làm việc
-  C -> E : cập nhật tiến độ hội nhập
+entity "OnboardingPath / OnboardingAssignment / OnboardingItemProgress" as E
+HR -> B : thiết lập khuôn mẫu lộ trình theo vị trí/phòng ban
+B -> C : assignPath(userId, pathId)
+C -> E : tạo OnboardingAssignment & danh sách hạng mục hội nhập
+loop từng hạng mục tài liệu quy chế / nhiệm vụ bắt buộc
+  NV -> B : đọc tài liệu SOP / hoàn thành hạng mục & đánh dấu xác nhận
+  B -> C : completeItem(assignmentId, itemId)
+  C -> E : cập nhật OnboardingItemProgress (completedAt)
+end
+alt hoàn tất 100% hạng mục bắt buộc
+  C -> E : đánh dấu hoàn thành lộ trình hội nhập (completedAt)
+  C -> E : ghi AuditLog
+else còn hạng mục quá hạn chưa hoàn thành
+  C --> HR : hiển thị cảnh báo tiến độ hội nhập chậm
 end
 @enduml
 ```
@@ -1078,22 +1109,28 @@ _Hình D.39. Trình tự UC28 - Phê duyệt, khóa và ghi nhận chi trả k�
 skinparam linetype ortho
 skinparam shadowing false
 actor "Nhân viên" as NV
-actor "Chuyên viên nhân sự" as HR
+actor "Chuyên viên C&B" as HR
 actor "Kế toán" as FIN
 boundary "Trang /loans" as B
 control "HrmsLoansService" as C
-entity "HrmsEmployeeLoan" as E
-NV -> B : tạo đơn vay (kỳ hạn trả và đồng ý khấu trừ lương)
-C -> E : tính EMI hàng tháng
-alt đã ghi nhận chấp thuận khấu trừ
-  C -> E : chuyển CHỜ THẨM ĐỊNH
-  HR -> C : phê duyệt khoản vay
-  C -> E : APPROVED (chưa giải ngân, chưa khấu trừ)
-  FIN -> C : ghi nhận tiền mặt/chuyển khoản + mã chứng từ
-  C -> E : DISBURSED, ghi thời điểm và tham chiếu
-  C -> E : bảng lương chỉ lấy khoản đã giải ngân và còn dư nợ
-else thiếu ủy quyền hoặc hồ sơ chưa đạt
-  C --> NV : chặn kèm thông báo
+entity "HrmsEmployeeLoan / PayrollLoanDeduction" as E
+NV -> B : tạo đơn vay (số tiền, kỳ hạn trả, đồng ý khấu trừ lương)
+B -> C : createLoan()
+C -> E : tính EMI hàng tháng & kiểm tra chấp thuận khấu trừ
+alt đã ghi nhận chấp thuận khấu trừ hợp lệ
+  C -> E : lưu trạng thái PENDING
+  HR -> C : approveLoan() / rejectLoan()
+  alt phê duyệt khoản vay
+    C -> E : chuyển trạng thái APPROVED (chưa giải ngân, chưa khấu trừ)
+    FIN -> C : disburseLoan(method, referenceCode)
+    C -> E : chuyển trạng thái DISBURSED, lưu thời điểm & mã chứng từ
+    C -> E : kỳ lương sau tự động trích nợ (PayrollLoanDeduction) đến khi dư nợ = 0 -> PAID (hoặc COMPLETED)
+    note over C,E : Khi thôi việc (UC36), hệ thống chặn đóng bàn giao nếu còn khoản vay APPROVED hoặc DISBURSED có dư nợ > 0
+  else từ chối khoản vay
+    C -> E : chuyển trạng thái REJECTED
+  end
+else thiếu ủy quyền khấu trừ
+  C --> NV : chặn tạo đơn kèm thông báo
 end
 @enduml
 ```
@@ -1106,16 +1143,24 @@ _Hình D.40. Trình tự UC29 - Quản lý tạm ứng & Khoản vay phúc lợi
 skinparam linetype ortho
 skinparam shadowing false
 actor "Nhân viên" as NV
-actor "Chuyên viên nhân sự" as HR
+actor "Trưởng dự án / C&B" as HR
+actor "Kế toán" as FIN
 boundary "Trang /expense-claims" as B
 control "HrmsExpensesService" as C
-entity "HrmsTravelRequest / HrmsExpenseClaim" as E
-NV -> B : đề xuất chuyến công tác
-HR -> C : duyệt lịch trình
-C -> E : tạm ứng kinh phí
-NV -> B : lập bảng kê chi phí + chứng từ
-HR -> C : duyệt quyết toán
-C -> E : chuyển số liệu xuống kỳ lương / kế toán
+entity "HrmsTravelRequest / HrmsExpenseClaim / HrmsClaimApprovalStep" as E
+NV -> B : tạo đề xuất công tác & bảng kê chi phí kèm chứng từ
+B -> C : createClaim() / submitClaim()
+C -> E : chuyển trạng thái DRAFT -> SUBMITTED, khởi tạo HrmsClaimApprovalStep
+alt phê duyệt đề nghị thanh toán
+  HR -> C : approveClaim()
+  C -> E : cập nhật HrmsExpenseClaim = APPROVED
+  FIN -> C : payClaim() / ghi nhận ExpenseSettlement
+  C -> E : cập nhật HrmsExpenseClaim = PAID, đồng bộ kỳ lương / kế toán
+else từ chối đề nghị thanh toán
+  HR -> C : rejectClaim(reason)
+  C -> E : cập nhật HrmsExpenseClaim = REJECTED kèm lý do
+end
+C -> E : ghi AuditLog
 @enduml
 ```
 _Hình D.41. Trình tự UC30 - Quản lý đề xuất công tác & Quyết toán chi phí (T&E)._
@@ -1127,14 +1172,22 @@ _Hình D.41. Trình tự UC30 - Quản lý đề xuất công tác & Quyết to�
 skinparam linetype ortho
 skinparam shadowing false
 actor "Nhân viên hành chính" as HC
+actor "Nhân viên" as NV
 boundary "Trang /assets" as B
 control "HrmsAssetsService" as C
-entity "HrmsAssetAllocation" as E
-HC -> B : đăng ký tài sản mới
-HC -> B : cấp phát cho nhân viên
-C -> E : lập biên bản bàn giao, trạng thái ALLOCATED
-HC -> B : thu hồi khi chuyển / thôi việc
-C -> E : trả về IN_STOCK (hoặc DECOMMISSIONED)
+entity "HrmsAsset / HrmsAssetAllocation / AssetCustodyEvent" as E
+HC -> B : đăng ký tài sản mới vào kho
+B -> C : createAsset()
+C -> E : lưu HrmsAsset trạng thái AVAILABLE
+HC -> B : lập phiếu cấp phát tài sản cho nhân viên
+B -> C : allocateAsset()
+C -> E : chuyển trạng thái PENDING_ACK (chờ nhân viên xác nhận bàn giao)
+NV -> B : xác nhận đã nhận bàn giao tài sản
+B -> C : acknowledgeAsset()
+C -> E : chuyển trạng thái ALLOCATED + ghi AssetCustodyEvent
+HC -> B : thu hồi khi điều chuyển / thôi việc hoặc chuyển bảo trì / thanh lý
+B -> C : returnAsset() / updateStatus()
+C -> E : chuyển về AVAILABLE (hoặc MAINTENANCE | DISPOSED)
 @enduml
 ```
 _Hình D.42. Trình tự UC31 - Quản lý cấp phát & Thu hồi tài sản làm việc._
@@ -1239,20 +1292,21 @@ skinparam linetype ortho
 skinparam shadowing false
 actor "Nhân viên" as NV
 actor "Các bộ phận xác nhận" as BP
-actor "Quản trị viên" as AD
-boundary "Trang /personnel" as B
-control "PersonnelActionsService" as C
-entity "HandoverChecklist" as E
-NV -> B : nộp đơn thôi việc
-AD -> C : duyệt đơn
-C -> E : tự sinh checklist 5 mục xác nhận
-BP -> C : lần lượt xác nhận (1/5 -> 5/5)
-alt đủ 5/5
-  C -> E : bật phát hành quyết định chấm dứt hợp đồng
-  C -> E : hồ sơ chuyển Lưu trữ - đã nghỉ
-else thiếu
-  C --> BP : nhắc mục còn thiếu
+actor "Quản trị viên / HR" as AD
+boundary "Trang /personnel, /handover" as B
+control "PersonnelActionsService / HandoverService" as C
+entity "PersonnelAction / HandoverChecklist / User" as E
+NV -> B : nộp đơn thôi việc (PersonnelAction = TERMINATION)
+AD -> C : approve() đơn thôi việc
+C -> E : tự sinh HandoverChecklist (OPEN) gồm các hạng mục liên bộ phận
+BP -> C : lần lượt xác nhận bàn giao công việc, tài sản, tài khoản IT, công nợ
+alt đủ 100% hạng mục & không còn tài sản ALLOCATED hay khoản vay APPROVED/DISBURSED còn dư nợ
+  C -> E : đóng HandoverChecklist = CLOSED, phát hành quyết định chấm dứt HĐLĐ
+  C -> E : cập nhật User.employmentStatus = RESIGNED (hoặc RETIRED), User.status = DISABLED
+else còn mục thiếu hoặc còn công nợ khoản vay / tài sản chưa trả
+  C --> BP : chặn đóng hồ sơ & thông báo hạng mục / công nợ còn tồn đọng
 end
+C -> E : ghi AuditLog
 @enduml
 ```
 _Hình D.47. Trình tự UC36 - Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận._
@@ -1293,16 +1347,29 @@ _Hình D.48. Trình tự UC37 - Quản lý mục tiêu và đánh giá KPI._
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-actor "Chuyên viên nhân sự" as HR
+actor "Chuyên viên đào tạo" as HR
 actor "Nhân viên" as NV
 boundary "Trang /training-grievance" as B
 control "HrmsTrainingService" as C
-entity "HrmsTrainingProgram / HrmsGrievance" as E
-HR -> B : lập chương trình đào tạo
-NV -> C : ghi danh (chặn khi hết chỗ)
-NV -> C : hoàn thành + khảo sát hài lòng
-NV -> B : gửi khiếu nại / kiến nghị
-HR -> C : xử lý đến RESOLVED
+entity "HrmsTrainingProgram / HrmsTrainingEnrollment / Certificate" as E
+HR -> B : thiết lập chương trình đào tạo (sĩ số tối đa, giảng viên, thời gian)
+B -> C : createProgram()
+C -> E : lưu HrmsTrainingProgram (PLANNED / OPEN)
+NV -> B : đăng ký tham gia khóa học
+B -> C : enroll(programId, userId)
+alt còn chỉ tiêu sĩ số & chưa ghi danh trùng
+  C -> E : tạo HrmsTrainingEnrollment (ENROLLED)
+  NV -> B : hoàn thành khóa học & gửi khảo sát đánh giá (HrmsTrainingFeedback)
+  HR -> B : chấm điểm kết quả đào tạo (completeEnrollment)
+  B -> C : completeEnrollment(enrollmentId, score)
+  C -> E : cập nhật COMPLETED + lưu điểm số
+  alt điểm đánh giá score >= 50
+    C -> E : tự động cấp chứng chỉ hoàn thành vào hồ sơ (Certificate)
+  end
+else lớp đã đủ sĩ số tối đa
+  C --> NV : chặn ghi danh & thông báo hết chỗ
+end
+C -> E : ghi AuditLog
 @enduml
 ```
 _Hình D.49. Trình tự UC38 - Quản trị chương trình đào tạo nội bộ._
@@ -1313,16 +1380,26 @@ _Hình D.49. Trình tự UC38 - Quản trị chương trình đào tạo nội b
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-actor "Chuyên viên nhân sự" as HR
 actor "Nhân viên" as NV
+actor "Chuyên viên nhân sự / Thanh tra" as HR
 boundary "Trang /training-grievance" as B
 control "HrmsTrainingService" as C
-entity "HrmsTrainingProgram / HrmsGrievance" as E
-HR -> B : lập chương trình đào tạo
-NV -> C : ghi danh (chặn khi hết chỗ)
-NV -> C : hoàn thành + khảo sát hài lòng
-NV -> B : gửi khiếu nại / kiến nghị
-HR -> C : xử lý đến RESOLVED
+entity "HrmsGrievance" as E
+NV -> B : gửi đơn kiến nghị / khiếu nại bảo mật (tiêu đề, nội dung, mức ẩn danh)
+B -> C : createGrievance()
+C -> E : lưu HrmsGrievance trạng thái OPEN
+HR -> B : tiếp nhận hồ sơ & mở phiên xác minh nội bộ
+B -> C : updateGrievanceStatus(INVESTIGATING)
+C -> E : chuyển trạng thái OPEN -> INVESTIGATING
+HR -> B : cập nhật kết luận giải quyết hoặc bác đơn
+B -> C : resolveGrievance(id, status, resolutionNote)
+alt người xử lý khác người gửi đơn (actor.id !== grievance.userId)
+  C -> E : chuyển trạng thái sang RESOLVED hoặc DISMISSED kèm kết luận
+  C -> E : ghi AuditLog bảo mật
+  B --> NV : thông báo kết quả giải quyết trên cổng cá nhân
+else người xử lý trùng người gửi đơn
+  C --> HR : chặn thao tác (ForbiddenException - không tự giải quyết đơn của chính mình)
+end
 @enduml
 ```
 _Hình D.50. Trình tự UC39 - Tiếp nhận & Giải quyết khiếu nại lao động bảo mật._
@@ -1356,19 +1433,20 @@ _Hình D.51. Trình tự UC40 - Quản lý hồ sơ cán bộ toàn diện theo 
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-actor "Chuyên viên hồ sơ" as A
+actor "Chuyên viên hồ sơ / C&B" as HR
 boundary "Trang /salary-ranks" as B
 control "PersonnelRanksService" as C
-entity "PersonnelRank" as E
-A -> B : mở trang quản lý
-B -> C : truy vấn danh sách
-C -> E : SELECT phân trang
-alt Thêm / Sửa / Xóa
-A -> B : nhập dữ liệu
-B -> C : validate DTO + lưu
-C -> E : ghi + AuditLog
+entity "PersonnelRank / MasterCatalogItem" as E
+HR -> B : mở trang quản trị danh mục ngạch bậc công vụ
+B -> C : listRanks()
+C -> E : truy vấn danh sách ngạch (nhóm A0, A1, A2, B, C), thang bậc & hệ số
+alt Thêm mới / Cập nhật ngạch bậc lương
+  HR -> B : nhập mã ngạch, tên ngạch, mảng hệ số bậc, chu kỳ nâng bậc (36/24 tháng)
+  B -> C : upsertRank(dto)
+  C -> E : kiểm tra tính hợp lệ của dãy hệ số & quy đổi mức lương theo lương cơ sở 2.340.000đ
+  C -> E : lưu PersonnelRank + ghi AuditLog
 end
-B --> A : làm mới danh sách
+B --> HR : hiển thị bảng tra cứu ngạch bậc, hệ số & phụ cấp vượt khung
 @enduml
 ```
 _Hình D.52. Trình tự UC41 - Quản trị danh mục ngạch bậc lương chuẩn NĐ 204._
@@ -1383,12 +1461,15 @@ actor "Chuyên viên hồ sơ" as HR
 actor "Giám đốc" as GD
 boundary "Trang /salary-progression" as B
 control "PersonnelReportsService" as C
-entity "PersonnelSalaryHistory" as E
-HR -> B : bấm quét nâng bậc
-C -> E : đối chiếu ngày hưởng bậc với chu kỳ 36/24 tháng
-C -> E : sinh danh sách đề nghị (bậc trần cộng vượt khung 5% + 1%/năm)
-GD -> C : phê duyệt
-C -> E : cập nhật ngạch/bậc/hệ số + ghi diễn biến lương
+entity "PersonnelComprehensiveProfile / PersonnelSalaryHistory" as E
+HR -> B : kích hoạt rà soát nâng bậc định kỳ hoặc lập đề xuất nâng bậc trước hạn
+B -> C : scanEligibility()
+C -> E : đối chiếu thời gian giữ bậc (đủ 36/24 tháng) & kiểm tra không bị kỷ luật trong kỳ
+C -> E : lập danh sách đủ điều kiện (nếu chạm bậc trần thì tính phụ cấp vượt khung 5% + 1%/năm)
+GD -> B : xem danh sách & phê duyệt quyết định nâng bậc / phụ cấp vượt khung
+B -> C : approveProgression(userId, newStep, effectiveDate)
+C -> E : cập nhật bậc/hệ số mới trên PersonnelComprehensiveProfile
+C -> E : ghi bản ghi mới vào PersonnelSalaryHistory + ghi AuditLog
 @enduml
 ```
 _Hình D.53. Trình tự UC42 - Tự động rà soát & Phê duyệt nâng bậc lương định kỳ._
@@ -1499,6 +1580,32 @@ C -> E : ghi AuditLog thay đổi
 ```
 _Hình D.58. Trình tự UC47 - Nhật ký kiểm toán hệ thống & Cấu hình tham số._
 
+### B.UC48. Giám sát trạng thái thiết bị & Sức khỏe hệ thống
+
+```plantuml
+@startuml
+skinparam linetype ortho
+skinparam shadowing false
+actor "Nhân viên IT" as IT
+boundary "Trang /admin/attendance, /api/health" as B
+control "HealthController / AttendanceDevicesService" as C
+entity "AttendanceDevice / PrismaService" as E
+IT -> B : kiểm tra trạng thái sức khỏe hệ thống (GET /api/health)
+B -> C : checkHealth()
+C -> E : thực thi truy vấn thăm dò PostgreSQL (SELECT 1)
+C --> B : trả trạng thái dịch vụ (ok, timestamp, độ trễ kết nối DB)
+IT -> B : giám sát danh sách thiết bị chấm công & đồng bộ heartbeat
+B -> C : listDevices() / pingDevice(deviceId)
+C -> E : kiểm tra lastSeenAt & trạng thái thiết bị (ACTIVE / INACTIVE)
+alt thiết bị phản hồi hợp lệ
+  C -> E : cập nhật lastSeenAt & trạng thái kết nối trực tuyến
+else mất kết nối hoặc sai chữ ký HMAC
+  C --> IT : hiển thị cảnh báo thiết bị ngoại tuyến & ghi AuditLog
+end
+@enduml
+```
+_Hình D.58b. Trình tự UC48 - Giám sát trạng thái thiết bị & Sức khỏe hệ thống._
+
 ## C. BIỂU ĐỒ HOẠT ĐỘNG THEO TỪNG USE CASE
 
 ### C.UC01. Đăng nhập & Xác thực hệ thống
@@ -1571,15 +1678,16 @@ _Hình D.61. Hoạt động UC03 - Quản trị cơ cấu tổ chức & Cây ph�
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Trưởng dự án lập phiếu đề xuất;
-:Lưu PENDING_REVIEW, báo chuyên viên;
-:Thẩm định định biên + nội quy;
-:Kế toán xác nhận quỹ (song song);
-:Trình Giám đốc;
-if (Ký duyệt?) then (có)
-:APPROVED - kích hoạt vị trí tuyển;
-else (không)
-:REJECTED kèm ý kiến;
+:Trưởng dự án lập phiếu đề xuất tuyển dụng (JobRequisition);
+:Lưu trạng thái DRAFT -> gửi trình PENDING_REVIEW;
+:Chuyên viên Tuyển dụng thẩm định định biên + Kế toán xác nhận quỹ lương;
+:Hoàn tất thẩm định kép -> chuyển trạng thái REVIEWED;
+:Trình Giám đốc phê duyệt;
+if (Giám đốc phê duyệt?) then (có)
+  :Cập nhật APPROVED & mở vị trí HrmsJobOpening (OPEN);
+  :Khi tuyển đủ chỉ tiêu -> chuyển CLOSED;
+else (từ chối)
+  :Cập nhật REJECTED kèm lý do;
 endif
 stop
 @enduml
@@ -1593,30 +1701,21 @@ _Hình D.62. Hoạt động UC04 - Lập phiếu đề xuất tuyển dụng nh�
 skinparam linetype ortho
 skinparam shadowing false
 start
-Tính xong kỳ lương
-:PROCESSED;
-:HR/C&B hoặc Kế toán đối soát;
-if (Người đối soát khác người tính?) then (có)
-  :REVIEWED;
-else (không)
-  :Từ chối thao tác;
-  stop
+:Tiếp nhận phiếu đề xuất tuyển dụng (PENDING_REVIEW);
+:Chuyên viên Tuyển dụng kiểm tra định biên phòng ban & tiêu chuẩn JD;
+if (Đạt định biên & yêu cầu chuyên môn?) then (đạt)
+  :Chuyển Kế toán thẩm định ngân sách quỹ lương dự kiến;
+  if (Đảm bảo nguồn ngân sách chi trả?) then (đạt)
+    :Hoàn tất thẩm định kép (HR + Kế toán);
+    :Cập nhật trạng thái phiếu sang REVIEWED;
+    :Chuyển tờ trình lên Ban Giám đốc phê duyệt;
+  else (vượt ngân sách)
+    :Cập nhật trạng thái REJECTED kèm lý do tài chính;
+  endif
+else (không đạt)
+  :Cập nhật trạng thái REJECTED hoặc yêu cầu điều chỉnh;
 endif
-:Giám đốc phê duyệt;
-if (Khác người tính và người đối soát?) then (có)
-  :APPROVED;
-else (không)
-  :Từ chối thao tác;
-  stop
-endif
-:Giám đốc khóa kỳ;
-:LOCKED - bất biến;
-:Kế toán ghi nhận PAID;
-:Áp dụng khấu trừ vay đủ điều kiện;
-note right
-  Chưa có mã giao dịch hoặc bằng chứng ngân hàng bắt buộc.
-  Chưa có bước trả kỳ về tính lại kèm lý do.
-end note
+:Ghi nhật ký kiểm toán AuditLog;
 stop
 @enduml
 ```
@@ -1629,9 +1728,17 @@ _Hình D.63. Hoạt động UC05 - Thẩm định chỉ tiêu & Kiểm soát đ�
 skinparam linetype ortho
 skinparam shadowing false
 start
-Mở trang
-Truy vấn theo phạm vi quyền
-Hiển thị dữ liệu
+:Giám đốc mở danh sách tờ trình tuyển dụng đã qua thẩm định kép (REVIEWED);
+:Xem chi tiết nhu cầu, định biên và ý kiến thẩm định của HR & Kế toán;
+if (Đồng ý phê duyệt chỉ tiêu?) then (phê duyệt)
+  :Cập nhật JobRequisition = APPROVED;
+  :Tự động kích hoạt vị trí tuyển dụng HrmsJobOpening = OPEN;
+  :Khi tuyển đủ số lượng -> đóng phiếu (CLOSED);
+else (từ chối)
+  :Cập nhật JobRequisition = REJECTED kèm ý kiến chỉ đạo;
+  :Thông báo phản hồi cho Trưởng dự án & bộ phận Tuyển dụng;
+endif
+:Ghi nhật ký kiểm toán AuditLog;
 stop
 @enduml
 ```
@@ -1644,14 +1751,22 @@ _Hình D.64. Hoạt động UC06 - Phê duyệt chỉ tiêu tuyển dụng._
 skinparam linetype ortho
 skinparam shadowing false
 start
-Mở trang quản lý
-Tìm kiếm / lọc dữ liệu
-alt Thêm / Sửa / Xóa
-Nhập dữ liệu trên form
-Hệ thống validate DTO
-Lưu qua service + ghi AuditLog
-Làm mới danh sách
-end alt
+:Tiếp nhận CV ứng viên vào vị trí tuyển dụng đang mở (HrmsJobOpening);
+:Khởi tạo hồ sơ HrmsJobApplicant ở bước APPLIED;
+:Sơ loại hồ sơ chuyển sang bước SCREENING;
+if (Đạt sàng lọc CV?) then (đạt)
+  :Lập lịch phỏng vấn vòng 1 (INTERVIEW_ROUND_1);
+  :Lập lịch phỏng vấn chuyên sâu vòng 2 (INTERVIEW_ROUND_2);
+  if (Đạt phỏng vấn?) then (đạt)
+    :Chuyển sang bước OFFER_SENT (gửi thư mời nhận việc);
+    :Ứng viên nhận việc -> chuyển trạng thái HIRED;
+  else (không đạt)
+    :Chuyển trạng thái REJECTED;
+  endif
+else (loại)
+  :Chuyển trạng thái REJECTED;
+endif
+:Ghi AuditLog & cập nhật bảng Kanban ATS;
 stop
 @enduml
 ```
@@ -1664,14 +1779,18 @@ _Hình D.65. Hoạt động UC07 - Quản lý hồ sơ ứng viên & Tuyển d�
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Soạn thư mời (chức danh, lương, ngày nhận việc);
-if (Lương vượt khung?) then (có)
-:Trình Giám đốc duyệt riêng;
-else (không)
-:Gửi ngay;
+:Soạn thư mời nhận việc HrmsJobOffer (DRAFT: chức danh, lương, ngày nhận việc);
+:Đối chiếu khung lương HrmsSalaryBand;
+:Phát hành thư mời -> HrmsJobOffer = SENT, HrmsJobApplicant = OFFER_SENT;
+if (Ứng viên đồng ý nhận việc?) then (chấp thuận)
+  :Cập nhật HrmsJobOffer = ACCEPTED;
+  :Cập nhật HrmsJobApplicant = HIRED;
+  :Khởi tạo hồ sơ nhân sự mới (PROBATION) & kích hoạt lộ trình hội nhập;
+else (từ chối / hủy)
+  :Cập nhật HrmsJobOffer = REJECTED | CANCELLED;
+  :Cập nhật HrmsJobApplicant = REJECTED;
 endif
-:Ứng viên chấp nhận;
-:Chuyển sang luồng hội nhập;
+:Ghi nhật ký kiểm toán AuditLog;
 stop
 @enduml
 ```
@@ -1744,9 +1863,17 @@ _Hình D.69. Hoạt động UC11 - Quản lý văn bằng, chứng chỉ chuyên
 skinparam linetype ortho
 skinparam shadowing false
 start
-Mở trang
-Truy vấn theo phạm vi quyền
-Hiển thị dữ liệu
+:Nhân viên gửi yêu cầu mượn hồ sơ/chứng chỉ gốc (PhysicalRecordLoan = REQUESTED);
+:Chuyên viên Hồ sơ kiểm tra mục đích mượn & tình trạng lưu kho;
+if (Chấp thuận cho mượn?) then (duyệt)
+  :Cập nhật trạng thái APPROVED;
+  :Bàn giao bản gốc vật lý -> chuyển trạng thái BORROWED;
+  :Nhân viên đề nghị hoàn trả bản gốc -> chuyển trạng thái RETURN_REQUESTED;
+  :Chuyên viên Hồ sơ kiểm tra bản gốc & nhập lại tủ lưu trữ -> chuyển trạng thái RETURNED;
+else (từ chối)
+  :Cập nhật trạng thái REJECTED kèm lý do;
+endif
+:Ghi nhật ký kiểm toán AuditLog;
 stop
 @enduml
 ```
@@ -1778,20 +1905,14 @@ _Hình D.71. Hoạt động UC13 - Đánh giá kết quả thử việc & Ký H�
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Nhân viên mới nhận lộ trình đọc theo vị trí;
+:Chuyên viên Hồ sơ gán lộ trình hội nhập (OnboardingPath / OnboardingAssignment) theo vị trí;
+:Hệ thống khởi tạo danh sách tài liệu SOP & hạng mục hội nhập bắt buộc;
 repeat
-:Hoàn thành từng bài đọc bắt buộc;
-repeat while (Còn bài?) is (có)
-:Hội nhập hoàn tất;
-if (Đơn thôi việc được duyệt?) then (có)
-:Tự sinh checklist bàn giao 5 mục;
-repeat
-:Các bên xác nhận từng mục;
-repeat while (Chưa đủ 5/5?) is (thiếu)
-:Đóng checklist, lưu trữ hồ sơ;
-else (không)
-:Tiếp tục làm việc;
-endif
+  :Nhân viên mới đọc tài liệu quy chế & thực hiện hạng mục hội nhập;
+  :Đánh dấu hoàn thành hạng mục (OnboardingItemProgress);
+repeat while (Còn hạng mục bắt buộc chưa hoàn tất?) is (còn)
+:Ghi nhận hoàn tất 100% lộ trình hội nhập (completedAt);
+:Ghi nhật ký kiểm toán AuditLog;
 stop
 @enduml
 ```
@@ -2112,22 +2233,22 @@ start
 :Nhân viên gửi đơn vay và chấp thuận lịch khấu trừ;
 :Hệ thống lưu consent, phiên bản và ngày giờ; trạng thái PENDING;
 if (Người có thẩm quyền duyệt?) then (duyệt)
-:APPROVED — chưa giải ngân, chưa khấu trừ;
-:Kế toán ghi phương thức chi và mã chứng từ;
-:DISBURSED;
-if (Đã giải ngân + có consent + còn dư nợ?) then (đủ điều kiện)
-:Kỳ lương sau mới xét khoản khấu trừ;
-:Cập nhật số đã thu và dư nợ;
-if (Dư nợ bằng 0?) then (đã tất toán)
-:COMPLETED;
-else (còn dư)
-:Tiếp tục kỳ sau hoặc ghi nhận hoàn trả;
-endif
-else (không đủ điều kiện)
-:Không đưa vào bảng lương;
-endif
+  :APPROVED — chưa giải ngân, chưa khấu trừ;
+  :Kế toán ghi phương thức chi và mã chứng từ;
+  :Chuyển trạng thái DISBURSED;
+  if (Đã giải ngân + có consent + còn dư nợ?) then (đủ điều kiện)
+    :Kỳ lương sau tự động xét khoản khấu trừ (PayrollLoanDeduction);
+    :Cập nhật số đã thu và dư nợ còn lại;
+    if (Dư nợ bằng 0?) then (đã tất toán)
+      :Chuyển trạng thái PAID (hoặc COMPLETED);
+    else (còn dư nợ)
+      :Tiếp tục kỳ sau (chặn đóng bàn giao thôi việc UC36 nếu còn khoản vay APPROVED / DISBURSED có dư nợ > 0);
+    endif
+  else (không đủ điều kiện)
+    :Không đưa vào bảng lương;
+  endif
 else (từ chối)
-:REJECTED;
+  :Chuyển trạng thái REJECTED;
 endif
 stop
 @enduml
@@ -2141,12 +2262,17 @@ _Hình D.87. Hoạt động UC29 - Quản lý tạm ứng & Khoản vay phúc l�
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Đề xuất chuyến công tác;
-:Duyệt lịch trình;
-:Tạm ứng kinh phí;
-:Lập bảng kê chi phí + chứng từ;
-:Duyệt quyết toán;
-:Chuyển số liệu xuống kỳ lương/kế toán;
+:Nhân viên tạo đề xuất công tác & bảng kê chi phí (HrmsExpenseClaim = DRAFT);
+:Đính kèm chứng từ hóa đơn & gửi trình duyệt -> chuyển trạng thái SUBMITTED;
+:Khởi tạo các bước phê duyệt HrmsClaimApprovalStep;
+if (Quản lý / C&B phê duyệt?) then (duyệt)
+  :Cập nhật trạng thái APPROVED;
+  :Kế toán đối soát tạm ứng, ghi nhận quyết toán (ExpenseSettlement);
+  :Chi trả hoàn ứng & cập nhật trạng thái PAID;
+else (từ chối)
+  :Cập nhật trạng thái REJECTED kèm lý do;
+endif
+:Ghi nhật ký kiểm toán AuditLog;
 stop
 @enduml
 ```
@@ -2159,14 +2285,20 @@ _Hình D.88. Hoạt động UC30 - Quản lý đề xuất công tác & Quyết 
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Đăng ký tài sản;
-:Cấp phát kèm biên bản bàn giao;
-:Trạng thái ALLOCATED;
-if (Nhân viên chuyển/thôi việc?) then (có)
-:Thu hồi về kho IN_STOCK;
-else (không)
-:Tiếp tục sử dụng;
+:Đăng ký tài sản mới vào kho (HrmsAsset = AVAILABLE);
+:Lập phiếu cấp phát cho nhân viên -> chuyển trạng thái PENDING_ACK;
+:Nhân viên xác nhận nhận bàn giao trên cổng ESS;
+:Cập nhật trạng thái ALLOCATED & ghi sự kiện AssetCustodyEvent;
+if (Phát sinh thu hồi / bảo trì / thanh lý?) then (thu hồi về kho)
+  :Nhân viên bàn giao lại -> cập nhật trạng thái AVAILABLE;
+elseif (hỏng hóc cần sửa chữa?) then (bảo trì)
+  :Cập nhật trạng thái MAINTENANCE;
+elseif (hết khấu hao / hỏng hoàn toàn?) then (thanh lý)
+  :Cập nhật trạng thái DISPOSED;
+else (đang sử dụng)
+  :Duy trì trạng thái ALLOCATED;
 endif
+:Ghi nhật ký kiểm toán AuditLog;
 stop
 @enduml
 ```
@@ -2239,14 +2371,16 @@ _Hình D.93. Hoạt động UC35 - Xử lý kỷ luật & Vi phạm nội quy la
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Nhân viên nộp đơn thôi việc;
-:Quản trị viên duyệt;
-:Tự sinh checklist 5 mục xác nhận;
+:Nhân viên nộp đơn thôi việc (PersonnelAction = TERMINATION);
+:Quản lý & Ban Giám đốc phê duyệt đơn thôi việc;
+:Hệ thống tự sinh HandoverChecklist (OPEN) gồm các hạng mục liên bộ phận;
 repeat
-:Bộ phận tiếp theo xác nhận;
-repeat while (Chưa đủ 5/5?) is (thiếu)
-:Bật phát hành quyết định chấm dứt hợp đồng;
-:Hồ sơ chuyển Lưu trữ - đã nghỉ;
+  :Từng bộ phận (Dự án, Hành chính, IT, C&B, Kế toán) xác nhận hạng mục bàn giao;
+  :Kiểm tra không còn tài sản ALLOCATED và không còn khoản vay APPROVED/DISBURSED có dư nợ > 0;
+repeat while (Đủ 100% hạng mục & hết công nợ/tài sản?) is (chưa đủ -> chặn đóng)
+:Đóng HandoverChecklist (CLOSED) & phát hành quyết định chấm dứt HĐLĐ;
+:Cập nhật User.employmentStatus = RESIGNED (hoặc RETIRED) và User.status = DISABLED;
+:Ghi nhật ký kiểm toán AuditLog;
 stop
 @enduml
 ```
@@ -2279,14 +2413,21 @@ _Hình D.95. Hoạt động UC37 - Quản lý mục tiêu và đánh giá KPI._
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Lập chương trình đào tạo;
-if (Còn chỗ?) then (có)
-:Nhân viên ghi danh;
-:Hoàn thành + khảo sát;
-else (hết)
-:Chặn ghi danh;
+:Chuyên viên Đào tạo lập chương trình HrmsTrainingProgram (giới hạn sĩ số, thời gian);
+if (Lớp còn chỗ & nhân viên chưa ghi danh trùng?) then (còn chỗ)
+  :Nhân viên đăng ký tham gia -> lưu HrmsTrainingEnrollment (ENROLLED);
+  :Tham gia khóa học & gửi phản hồi khảo sát HrmsTrainingFeedback;
+  :Chuyên viên Đào tạo chấm điểm hoàn thành (completeEnrollment);
+  :Cập nhật trạng thái COMPLETED;
+  if (Điểm đánh giá cuối khóa score >= 50?) then (đạt)
+    :Tự động cấp chứng chỉ hoàn thành vào bảng Certificate;
+  else (chưa đạt ngưỡng cấp chứng chỉ)
+    :Chỉ lưu kết quả tham gia khóa học;
+  endif
+else (hết chỗ / trùng)
+  :Chặn ghi danh & hiển thị thông báo;
 endif
-:Khiếu nại OPEN -> xử lý -> RESOLVED;
+:Ghi nhật ký kiểm toán AuditLog;
 stop
 @enduml
 ```
@@ -2299,14 +2440,20 @@ _Hình D.96. Hoạt động UC38 - Quản trị chương trình đào tạo nộ
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Lập chương trình đào tạo;
-if (Còn chỗ?) then (có)
-:Nhân viên ghi danh;
-:Hoàn thành + khảo sát;
-else (hết)
-:Chặn ghi danh;
+:Nhân viên gửi đơn kiến nghị / khiếu nại bảo mật;
+:Hệ thống khởi tạo HrmsGrievance ở trạng thái OPEN;
+:Chuyên viên Nhân sự / Thanh tra tiếp nhận hồ sơ;
+:Chuyển trạng thái sang INVESTIGATING & tiến hành xác minh nội bộ;
+if (Người xử lý khác người gửi đơn: actor.id !== grievance.userId?) then (hợp lệ)
+  if (Kết quả xác minh có cơ sở?) then (giải quyết)
+    :Cập nhật trạng thái RESOLVED kèm nội dung kết luận xử lý;
+  else (không đủ căn cứ / bác đơn)
+    :Cập nhật trạng thái DISMISSED kèm lý do phản hồi;
+  endif
+  :Ghi nhật ký kiểm toán AuditLog;
+else (trùng người gửi đơn)
+  :Chặn thao tác (không được tự giải quyết đơn khiếu nại của chính mình);
 endif
-:Khiếu nại OPEN -> xử lý -> RESOLVED;
 stop
 @enduml
 ```
@@ -2339,14 +2486,15 @@ _Hình D.98. Hoạt động UC40 - Quản lý hồ sơ cán bộ toàn diện th
 skinparam linetype ortho
 skinparam shadowing false
 start
-Mở trang quản lý
-Tìm kiếm / lọc dữ liệu
-alt Thêm / Sửa / Xóa
-Nhập dữ liệu trên form
-Hệ thống validate DTO
-Lưu qua service + ghi AuditLog
-Làm mới danh sách
-end alt
+:Mở trang quản trị danh mục ngạch bậc công vụ (/salary-ranks);
+:Truy vấn danh sách PersonnelRank (nhóm ngạch A0, A1, A2, B, C) & bảng hệ số bậc;
+if (Thêm mới hoặc cập nhật ngạch lương?) then (có)
+  :Nhập mã ngạch, tên ngạch, mảng hệ số từng bậc, chu kỳ nâng bậc (36/24 tháng);
+  :Kiểm tra tính hợp lệ của dãy hệ số & quy đổi mức lương theo lương cơ sở 2.340.000đ;
+  :Lưu PersonnelRank / MasterCatalogItem & ghi AuditLog;
+else (chỉ tra cứu)
+  :Hiển thị bảng hệ số lương và phụ cấp thâm niên vượt khung;
+endif
 stop
 @enduml
 ```
@@ -2359,17 +2507,22 @@ _Hình D.99. Hoạt động UC41 - Quản trị danh mục ngạch bậc lương
 skinparam linetype ortho
 skinparam shadowing false
 start
-:Quét đối chiếu ngày hưởng bậc;
-if (Đủ 36/24 tháng giữ bậc?) then (có)
-:Sinh danh sách đề nghị nâng bậc;
-if (ADMIN duyệt?) then (có)
-:Cập nhật ngạch/bậc/hệ số;
-:Ghi diễn biến tiền lương;
-else (chưa)
-:Giữ chờ kỳ sau;
-endif
-else (chưa)
-:Không phát sinh;
+:Chuyên viên Hồ sơ kích hoạt quét rà soát thời gian giữ bậc hoặc đề xuất nâng bậc trước hạn;
+:Đối chiếu ngày hưởng bậc hiện tại với chu kỳ 36 tháng (ngạch A/B) hoặc 24 tháng (ngạch C) và điều kiện không bị kỷ luật;
+if (Đủ điều kiện nâng bậc định kỳ hoặc có thành tích nâng bậc trước hạn?) then (đủ điều kiện)
+  if (Đã chạm bậc cuối cùng của ngạch?) then (bậc trần)
+    :Tính phụ cấp thâm niên vượt khung (5% năm đầu + 1% mỗi năm tiếp theo);
+  else (chưa chạm trần)
+    :Đề xuất nâng lên bậc kế tiếp trong ngạch;
+  endif
+  if (Cấp có thẩm quyền phê duyệt?) then (duyệt)
+    :Cập nhật bậc, hệ số và ngày hưởng mới trên PersonnelComprehensiveProfile;
+    :Lưu bản ghi lịch sử vào PersonnelSalaryHistory & ghi AuditLog;
+  else (tạm hoãn / từ chối)
+    :Giữ nguyên bậc hiện tại & lưu lý do;
+  endif
+else (chưa đủ điều kiện)
+  :Báo cáo chưa phát sinh hồ sơ đến hạn nâng bậc;
 endif
 stop
 @enduml
@@ -2463,25 +2616,46 @@ stop
 ```
 _Hình D.105. Hoạt động UC47 - Nhật ký kiểm toán hệ thống & Cấu hình tham số._
 
-## D. BIỂU ĐỒ TRẠNG THÁI THEO ĐỐI TƯỢNG
-
-### D.1. Vòng đời Nhân viên (User.employmentStatus)
+### C.UC48. Giám sát trạng thái thiết bị & Sức khỏe hệ thống
 
 ```plantuml
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-[*] --> PROBATION : ký HĐ thử việc
-PROBATION --> ACTIVE : đánh giá đạt + xếp lương
-PROBATION --> [*] : dừng thử việc
-ACTIVE --> ACTIVE : thăng chức / điều chuyển / thưởng - phạt
-ACTIVE --> RESIGNED : thôi việc (đủ checklist 5 mục)
-ACTIVE --> RETIRED : đủ tuổi
-RESIGNED --> [*] : lưu trữ bất biến
-RETIRED --> [*] : lưu trữ bất biến
+start
+:Nhân viên IT mở trang giám sát thiết bị (/admin/attendance) hoặc gọi /api/health;
+:Thực thi kiểm tra kết nối cơ sở dữ liệu PostgreSQL (SELECT 1);
+:Kiểm tra danh sách máy chấm công (AttendanceDevice) & thời điểm đồng bộ gần nhất (lastSeenAt);
+if (Thiết bị phản hồi đúng hạn & chữ ký HMAC hợp lệ?) then (trực tuyến)
+  :Hiển thị trạng thái ACTIVE / Trực tuyến;
+else (quá hạn heartbeat / lỗi kết nối)
+  :Đánh dấu cảnh báo thiết bị ngoại tuyến (OFFLINE / INACTIVE);
+  :Ghi nhận sự kiện vào nhật ký hệ thống;
+endif
+stop
 @enduml
 ```
-_Hình D.106. Trạng thái - Vòng đời Nhân viên (User.employmentStatus)._
+_Hình D.105b. Hoạt động UC48 - Giám sát trạng thái thiết bị & Sức khỏe hệ thống._
+
+## D. BIỂU ĐỒ TRẠNG THÁI THEO ĐỐI TƯỢNG
+
+### D.1. Vòng đời Nhân viên (User.employmentStatus & User.status)
+
+```plantuml
+@startuml
+skinparam linetype ortho
+skinparam shadowing false
+[*] --> PROBATION : tiếp nhận thử việc (User.status = ACTIVE)
+PROBATION --> ACTIVE : đánh giá đạt + ký HĐ chính thức
+PROBATION --> RESIGNED : chấm dứt thử việc (User.status = DISABLED)
+ACTIVE --> ACTIVE : thăng chức / điều chuyển / khen thưởng / kỷ luật
+ACTIVE --> RESIGNED : thôi việc hoàn tất bàn giao 5 mục (User.status = DISABLED)
+ACTIVE --> RETIRED : nghỉ hưu theo chế độ (User.status = DISABLED)
+RESIGNED --> [*] : lưu trữ hồ sơ bất biến
+RETIRED --> [*] : lưu trữ hồ sơ bất biến
+@enduml
+```
+_Hình D.106. Trạng thái - Vòng đời Nhân viên (User.employmentStatus & User.status)._
 
 ### D.2. Phiếu tuyển dụng (JobRequisition)
 
@@ -2489,12 +2663,15 @@ _Hình D.106. Trạng thái - Vòng đời Nhân viên (User.employmentStatus)._
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-[*] --> DRAFT
-DRAFT --> PENDING_REVIEW : trình
-PENDING_REVIEW --> APPROVED : Giám đốc ký
-PENDING_REVIEW --> REJECTED : từ chối
-APPROVED --> CLOSED : hết chỉ tiêu
+[*] --> DRAFT : tạo bản nháp
+DRAFT --> PENDING_REVIEW : gửi trình thẩm định
+PENDING_REVIEW --> REVIEWED : hoàn tất thẩm định kép (HR + Kế toán)
+PENDING_REVIEW --> REJECTED : từ chối ở bước thẩm định
+REVIEWED --> APPROVED : Giám đốc phê duyệt (mở HrmsJobOpening)
+REVIEWED --> REJECTED : Giám đốc từ chối
+APPROVED --> CLOSED : tuyển đủ chỉ tiêu / đóng đợt tuyển
 REJECTED --> [*]
+CLOSED --> [*]
 @enduml
 ```
 _Hình D.107. Trạng thái - Phiếu tuyển dụng (JobRequisition)._
@@ -2552,29 +2729,34 @@ skinparam shadowing false
 [*] --> PENDING : tạo đề nghị + đồng ý khấu trừ theo lịch
 PENDING --> APPROVED : người có thẩm quyền duyệt
 PENDING --> REJECTED : từ chối
-APPROVED --> DISBURSED : kế toán ghi nhận phương thức và mã tham chiếu
-DISBURSED --> DISBURSED : khấu trừ/hoàn trả, còn dư nợ
-DISBURSED --> COMPLETED : dư nợ bằng 0
-COMPLETED --> [*]
+APPROVED --> DISBURSED : kế toán giải ngân (ghi phương thức & mã chứng từ)
+DISBURSED --> DISBURSED : khấu trừ/hoàn trả từng kỳ, còn dư nợ > 0
+DISBURSED --> PAID : tất toán dư nợ bằng 0 (hoặc COMPLETED)
+REJECTED --> [*]
+PAID --> [*]
 @enduml
 ```
 _Hình D.111. Trạng thái - Khoản vay phúc lợi (HrmsEmployeeLoan)._
 
-### D.7. Tài sản (HrmsAssetAllocation)
+### D.7. Tài sản (HrmsAsset / HrmsAssetAllocation)
 
 ```plantuml
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-[*] --> IN_STOCK : nhập kho
-IN_STOCK --> ALLOCATED : cấp phát + biên bản
-ALLOCATED --> IN_STOCK : thu hồi
-ALLOCATED --> MAINTENANCE : bảo trì
-IN_STOCK --> DECOMMISSIONED : thanh lý
-DECOMMISSIONED --> [*]
+[*] --> AVAILABLE : nhập kho sẵn sàng
+AVAILABLE --> PENDING_ACK : lập phiếu cấp phát (chờ nhân viên xác nhận)
+PENDING_ACK --> ALLOCATED : nhân viên xác nhận nhận bàn giao
+PENDING_ACK --> AVAILABLE : hủy phiếu cấp phát
+ALLOCATED --> AVAILABLE : thu hồi về kho
+ALLOCATED --> MAINTENANCE : chuyển bảo trì / sửa chữa
+MAINTENANCE --> AVAILABLE : hoàn tất bảo trì
+AVAILABLE --> DISPOSED : thanh lý tài sản
+ALLOCATED --> DISPOSED : thanh lý / báo mất
+DISPOSED --> [*]
 @enduml
 ```
-_Hình D.112. Trạng thái - Tài sản (HrmsAssetAllocation)._
+_Hình D.112. Trạng thái - Tài sản (HrmsAsset / HrmsAssetAllocation)._
 
 ### D.8. Công tác phí (HrmsExpenseClaim)
 
@@ -2582,11 +2764,13 @@ _Hình D.112. Trạng thái - Tài sản (HrmsAssetAllocation)._
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-[*] --> DRAFT : đề xuất chuyến
-DRAFT --> SUBMITTED : trình duyệt
-SUBMITTED --> ADVANCED : tạm ứng
-ADVANCED --> SETTLED : quyết toán chứng từ
-SETTLED --> [*]
+[*] --> DRAFT : tạo bảng kê nháp
+DRAFT --> SUBMITTED : gửi trình duyệt (khởi tạo HrmsClaimApprovalStep)
+SUBMITTED --> APPROVED : phê duyệt chi phí
+SUBMITTED --> REJECTED : từ chối thanh toán
+APPROVED --> PAID : kế toán quyết toán & chi trả (ExpenseSettlement)
+REJECTED --> [*]
+PAID --> [*]
 @enduml
 ```
 _Hình D.113. Trạng thái - Công tác phí (HrmsExpenseClaim)._
@@ -2627,10 +2811,12 @@ _Hình D.115. Trạng thái - Bài viết tri thức (Article)._
 @startuml
 skinparam linetype ortho
 skinparam shadowing false
-[*] --> OPEN : nhân viên gửi
-OPEN --> IN_PROGRESS : HR tiếp nhận
-IN_PROGRESS --> RESOLVED : giải quyết
+[*] --> OPEN : nhân viên gửi đơn bảo mật
+OPEN --> INVESTIGATING : HR / Thanh tra tiếp nhận xác minh
+INVESTIGATING --> RESOLVED : ban hành kết luận giải quyết (actor.id !== userId)
+INVESTIGATING --> DISMISSED : bác đơn kèm lý do (actor.id !== userId)
 RESOLVED --> [*]
+DISMISSED --> [*]
 @enduml
 ```
 _Hình D.116. Trạng thái - Khiếu nại (HrmsGrievance)._
@@ -3175,10 +3361,15 @@ package "Nhóm J - Quản trị Tri thức & Điều hành hệ thống" {
     [Control: UC47Service]
     [Entity: UC47Entity]
   }
+  package "UC48 - Giám sát trạng thái thiết bị & Sức khỏe hệ thống" {
+    [Boundary: UC48]
+    [Control: UC48Service]
+    [Entity: UC48Entity]
+  }
 }
 @enduml
 ```
-_Hình D.115. Gói Nhóm J - Quản trị Tri thức & Điều hành hệ thống, mỗi use case một gói con Boundary-Control-Entity._
+_Hình D.115. Gói Nhóm J - Quản trị Tri thức & Điều hành hệ thống (UC44-UC48), mỗi use case một gói con Boundary-Control-Entity._
 
 ## G. BIỂU ĐỒ LỚP THEO NHÓM (GÁN RÕ USE CASE)
 
@@ -3579,18 +3770,21 @@ package "Boundary (Next.js)" {
   class "<<Boundary>> Page_UC45" as B_UC45
   class "<<Boundary>> Page_UC46" as B_UC46
   class "<<Boundary>> Page_UC47" as B_UC47
+  class "<<Boundary>> Page_UC48" as B_UC48
 }
 package "Control (NestJS Service)" {
   class "<<Control>> Service_UC44" as C_UC44
   class "<<Control>> Service_UC45" as C_UC45
   class "<<Control>> Service_UC46" as C_UC46
   class "<<Control>> Service_UC47" as C_UC47
+  class "<<Control>> Service_UC48" as C_UC48
 }
 package "Entity (Prisma Model)" {
   class "<<Entity>> Model_UC44" as E_UC44
   class "<<Entity>> Model_UC45" as E_UC45
   class "<<Entity>> Model_UC46" as E_UC46
   class "<<Entity>> Model_UC47" as E_UC47
+  class "<<Entity>> Model_UC48" as E_UC48
 }
 B_UC44 ..> C_UC44
 C_UC44 ..> E_UC44
@@ -3600,10 +3794,12 @@ B_UC46 ..> C_UC46
 C_UC46 ..> E_UC46
 B_UC47 ..> C_UC47
 C_UC47 ..> E_UC47
+B_UC48 ..> C_UC48
+C_UC48 ..> E_UC48
 note bottom of C_UC44
-  Phục vụ use case: UC44=Quản lý không gian tri thức số & Tài liệu quy trình SOP; UC45=Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia; UC46=Bảng điều khiển phân tích & Thống kê nhân sự (Dashboard); UC47=Nhật ký kiểm toán hệ thống & Cấu hình tham số
+  Phục vụ use case: UC44=Quản lý không gian tri thức số & Tài liệu quy trình SOP; UC45=Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia; UC46=Bảng điều khiển phân tích & Thống kê nhân sự (Dashboard); UC47=Nhật ký kiểm toán hệ thống & Cấu hình tham số; UC48=Giám sát trạng thái thiết bị & Sức khỏe hệ thống
 end note
 @enduml
 ```
-_Hình D.125. Lớp Nhóm J - Quản trị Tri thức & Điều hành hệ thống - gán use case: UC44, UC45, UC46, UC47._
+_Hình D.125. Lớp Nhóm J - Quản trị Tri thức & Điều hành hệ thống - gán use case: UC44, UC45, UC46, UC47, UC48._
 

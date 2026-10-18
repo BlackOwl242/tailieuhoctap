@@ -52,7 +52,8 @@ export function CitizenApplicationForm({ initialProcedureCode, onSubmitted, requ
   const schema = procedure?.submission
   const observed = procedure?.routing?.observedAuthorities || []
   const matchingAgencies = [...new Set(observed.length ? observed.map(a => a.authority) : procedure?.agency ? [procedure.agency] : [])]
-  const hasIntake = agencies.some(a => a.toLocaleLowerCase('vi') === agency.toLocaleLowerCase('vi'))
+  const normalizeAgency = (value: string) => value.toLocaleLowerCase('vi').replace(/\s+(thành phố\s+)?hà nội$/i, '').trim()
+  const hasIntake = Boolean(agency) && agencies.some(a => normalizeAgency(a) === normalizeAgency(agency))
   const fields = schema?.fields.filter(f => visibleFormItem(f, applicantType, values)) || []
   const components = schema?.documents.filter(f => visibleFormItem(f, applicantType, values)) || []
   const files = components.flatMap(c => (documents[c.id] || []).map(file => ({ file, componentId: c.id })))
@@ -93,7 +94,11 @@ export function CitizenApplicationForm({ initialProcedureCode, onSubmitted, requ
     setKeys(requestKeys); setBusy(true); setError('')
     try {
       const declaration = Object.fromEntries(fields.map(f => [f.id, values[f.id] || '']))
-      const summary = selectedCode === '1.004237' ? `${values.dataRequested}. Mục đích: ${values.purpose}` : `Đề nghị cấp ${values.copies} bản sao ${values.documentName} cho ${values.originalOwner}.`
+      const summary = selectedCode === '1.004237'
+        ? `${values.dataRequested || ''}. Mục đích: ${values.purpose || ''}`
+        : selectedCode === '2.000908'
+          ? `Đề nghị cấp ${values.copies || 1} bản sao ${values.documentName || ''} cho ${values.originalOwner || contact.name}.`
+          : fields.map(f => values[f.id] ? `${f.label}: ${values[f.id]}` : '').filter(Boolean).slice(0, 4).join('; ') || `Nộp hồ sơ ${procedure?.name || selectedCode}`
       onSubmitted(await request<Receipt>('/api/cases', { ...requestKeys, procedureCode: selectedCode, schemaVersion: schema!.version, applicantType, applicant: contact, receivingAgency: agency, declaration, requestSummary: summary.slice(0, 3000), deliveryMethod: delivery, deliveryAddress, confirmed: true, files: await Promise.all(files.map(f => encode(f.file, f.componentId))) }))
     } catch (e) { setError(e instanceof Error ? e.message : 'Không gửi được hồ sơ. Thông tin đang nhập vẫn được giữ để thử lại.') } finally { setBusy(false) }
   }

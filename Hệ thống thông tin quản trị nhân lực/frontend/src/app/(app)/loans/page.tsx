@@ -121,7 +121,10 @@ export default function LoansPage() {
   const toast = useToast();
   const { user } = useAuthStore();
   const roles = user?.roles ?? [];
-  const canDisburse = roles.some((role) => ['ADMIN', 'ACCOUNTANT'].includes(role));
+  const canReview = roles.some((role) => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD'].includes(role));
+  const canDisburse = roles.some((role) => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD'].includes(role));
+  const canRepay = roles.some((role) => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT'].includes(role));
+  const canViewAllEmployees = roles.some((role) => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER'].includes(role));
   const [printConfig] = useOrgConfig();
 
   // Navigation View Mode & Filter
@@ -169,6 +172,8 @@ export default function LoansPage() {
   const { data: employeeList } = useQuery<EmployeeOption[]>({
     queryKey: ['employees-for-loans'],
     queryFn: async () => (await api.get('/employees')).data,
+    enabled: canViewAllEmployees,
+    retry: false,
   });
 
   // Mutations
@@ -214,8 +219,16 @@ export default function LoansPage() {
   });
 
   const disburseMutation = useMutation({
-    mutationFn: async ({ id, method, reference }: { id: string; method: 'CASH' | 'BANK'; reference: string }) =>
-      (await api.patch(`/hrms/loans/${id}/disburse`, { method, reference })).data as LoanItem,
+    mutationFn: async ({ id, method, reference }: { id: string; method: 'CASH' | 'BANK'; reference: string }) => {
+      try {
+        return (await api.patch(`/hrms/loans/${id}/disburse`, { method, reference })).data as LoanItem;
+      } catch (err: any) {
+        if (err?.response?.status === 404 || err?.response?.status === 405) {
+          return (await api.post(`/hrms/loans/${id}/disburse`, { method, reference })).data as LoanItem;
+        }
+        throw err;
+      }
+    },
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: ['hrms-loans'] });
       setSelectedDetailLoan(updated);
@@ -589,11 +602,12 @@ export default function LoansPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center rounded-md bg-muted/40 p-1 border border-border">
+              <div className="flex flex-wrap items-center rounded-md bg-muted/40 p-1 border border-border">
                 {[
                   { id: 'ALL', label: `Tất cả (${(loans ?? []).length})` },
                   { id: 'PENDING', label: `Chờ duyệt (${pendingLoans.length})` },
-                  { id: 'APPROVED', label: `Đang thu hồi (${activeLoans.length})` },
+                  { id: 'APPROVED', label: `Đã duyệt - Chờ giải ngân (${approvedLoans.length})` },
+                  { id: 'DISBURSED', label: `Đã giải ngân - Đang thu hồi (${activeLoans.length})` },
                   { id: 'COMPLETED', label: `Đã hoàn tất (${completedLoans.length})` },
                 ].map((item) => (
                   <button
@@ -620,6 +634,7 @@ export default function LoansPage() {
                 const repaidRatio = totalTarget > 0
                   ? Math.max(0, Math.min(100, Math.round(((loan.totalRepaid || (loan.principalAmount - loan.remainingAmount)) / totalTarget) * 100)))
                   : 0;
+                const isOwnLoan = Boolean(user?.id && loan.userId === user.id);
 
                 return (
                   <div
@@ -646,8 +661,10 @@ export default function LoansPage() {
                         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium border border-border bg-muted/40 text-foreground shrink-0">
                           <span
                             className={`h-1.5 w-1.5 rounded-full ${
-                              loan.status === 'APPROVED' || loan.status === 'DISBURSED'
+                              loan.status === 'DISBURSED'
                                 ? 'bg-primary'
+                                : loan.status === 'APPROVED'
+                                ? 'bg-amber-500'
                                 : loan.status === 'PENDING'
                                 ? 'bg-muted-foreground'
                                 : loan.status === 'COMPLETED'
@@ -656,7 +673,9 @@ export default function LoansPage() {
                             }`}
                           />
                           {loan.status === 'APPROVED'
-                            ? 'Đang thu hồi'
+                            ? 'Đã duyệt - Chờ giải ngân'
+                            : loan.status === 'DISBURSED'
+                            ? 'Đã giải ngân - Đang thu hồi'
                             : loan.status === 'PENDING'
                             ? 'Chờ duyệt'
                             : loan.status === 'COMPLETED'
@@ -726,51 +745,75 @@ export default function LoansPage() {
 
                       <div className="flex items-center gap-1.5">
                         {loan.status === 'PENDING' ? (
-                          <>
+                          canReview && !isOwnLoan ? (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() => decideMutation.mutate({ id: loan.id, status: 'APPROVED' })}
+                                disabled={decideMutation.isPending}
+                                className="h-8 text-xs font-medium gap-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                              >
+                                <Check className="h-3.5 w-3.5" />
+                                <span>Duyệt</span>
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => decideMutation.mutate({ id: loan.id, status: 'REJECTED' })}
+                                disabled={decideMutation.isPending}
+                                className="h-8 text-xs text-muted-foreground hover:text-destructive hover:border-destructive/30"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </Button>
+                            </>
+                          ) : (
+                            <span className="text-[11px] text-muted-foreground">Đang chờ phê duyệt</span>
+                          )
+                        ) : loan.status === 'APPROVED' ? (
+                          canDisburse && !isOwnLoan ? (
                             <Button
                               size="sm"
-                              onClick={() => decideMutation.mutate({ id: loan.id, status: 'APPROVED' })}
-                              disabled={decideMutation.isPending}
+                              onClick={() => {
+                                setSelectedDetailLoan(loan);
+                                setIsDisbursementModalOpen(true);
+                              }}
                               className="h-8 text-xs font-medium gap-1 bg-primary text-primary-foreground hover:bg-primary/90"
                             >
-                              <Check className="h-3.5 w-3.5" />
-                              <span>Duyệt</span>
+                              <Wallet className="h-3.5 w-3.5" />
+                              <span>Giải ngân</span>
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => decideMutation.mutate({ id: loan.id, status: 'REJECTED' })}
-                              disabled={decideMutation.isPending}
-                              className="h-8 text-xs text-muted-foreground hover:text-destructive hover:border-destructive/30"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </Button>
-                          </>
-                        ) : loan.status === 'APPROVED' || loan.status === 'DISBURSED' ? (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openRepayDialog(loan, 'emi')}
-                              className="h-8 text-xs gap-1 font-medium"
-                              title="Thu hồi 1 kỳ lương"
-                            >
-                              <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
-                              <span>Trích 1 kỳ</span>
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => openRepayDialog(loan, 'full')}
-                              className="h-8 text-xs gap-1 font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border"
-                              title="Tất toán toàn bộ nợ"
-                            >
-                              <span>Tất toán</span>
-                            </Button>
-                          </>
+                          ) : (
+                            <span className="text-[11px] text-muted-foreground">Chờ kế toán giải ngân</span>
+                          )
+                        ) : loan.status === 'DISBURSED' ? (
+                          canRepay ? (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openRepayDialog(loan, 'emi')}
+                                className="h-8 text-xs gap-1 font-medium"
+                                title="Thu hồi 1 kỳ lương"
+                              >
+                                <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
+                                <span>Trích 1 kỳ</span>
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => openRepayDialog(loan, 'full')}
+                                className="h-8 text-xs gap-1 font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border"
+                                title="Tất toán toàn bộ nợ"
+                              >
+                                <span>Tất toán</span>
+                              </Button>
+                            </>
+                          ) : (
+                            <span className="text-[11px] text-muted-foreground">Đang trích lương</span>
+                          )
                         ) : (
                           <span className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
                             <BadgeCheck className="h-3.5 w-3.5 text-primary" />
-                            <span>Đã hoàn tất</span>
+                            <span>{loan.status === 'COMPLETED' ? 'Đã hoàn tất' : 'Đã từ chối'}</span>
                           </span>
                         )}
                       </div>
@@ -865,8 +908,10 @@ export default function LoansPage() {
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border border-border bg-muted/40 text-foreground">
                               <span
                                 className={`h-1.5 w-1.5 rounded-full ${
-                                  loan.status === 'APPROVED' || loan.status === 'DISBURSED'
+                                  loan.status === 'DISBURSED'
                                     ? 'bg-primary'
+                                    : loan.status === 'APPROVED'
+                                    ? 'bg-amber-500'
                                     : loan.status === 'PENDING'
                                     ? 'bg-muted-foreground'
                                     : loan.status === 'COMPLETED'
@@ -875,7 +920,9 @@ export default function LoansPage() {
                                 }`}
                               />
                               {loan.status === 'APPROVED'
-                                ? 'Đang thu hồi'
+                                ? 'Đã duyệt - Chờ giải ngân'
+                                : loan.status === 'DISBURSED'
+                                ? 'Đã giải ngân - Đang thu hồi'
                                 : loan.status === 'PENDING'
                                 ? 'Chờ duyệt'
                                 : loan.status === 'COMPLETED'
@@ -908,7 +955,7 @@ export default function LoansPage() {
                                 <Printer className="h-3 w-3" />
                               </Button>
 
-                              {loan.status === 'PENDING' && (
+                              {loan.status === 'PENDING' && canReview && (!user?.id || loan.userId !== user.id) && (
                                 <>
                                   <Button
                                     size="sm"
@@ -929,7 +976,21 @@ export default function LoansPage() {
                                 </>
                               )}
 
-                              {(loan.status === 'APPROVED' || loan.status === 'DISBURSED') && (
+                              {loan.status === 'APPROVED' && canDisburse && (!user?.id || loan.userId !== user.id) && (
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedDetailLoan(loan);
+                                    setIsDisbursementModalOpen(true);
+                                  }}
+                                  className="h-7 text-xs px-2.5 gap-1 font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+                                >
+                                  <Wallet className="h-3 w-3" />
+                                  <span>Giải ngân</span>
+                                </Button>
+                              )}
+
+                              {loan.status === 'DISBURSED' && canRepay && (
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -968,7 +1029,7 @@ export default function LoansPage() {
             },
             {
               id: 'APPROVED',
-              title: '2. Đang Trích Lương',
+              title: '2. Đã Duyệt & Đang Thu Hồi',
               color: 'border-border bg-card',
               badge: 'bg-primary',
               items: (loans ?? []).filter((l) => l.status === 'APPROVED' || l.status === 'DISBURSED'),
@@ -1025,13 +1086,13 @@ export default function LoansPage() {
                     </p>
 
                     <div className="flex items-center justify-between text-[11px] pt-1 text-muted-foreground border-t border-border/50">
-                      <span>{loan.termMonths} tháng</span>
+                      <span>{loan.status === 'APPROVED' ? 'Đã duyệt - Chờ giải ngân' : `${loan.termMonths} tháng`}</span>
                       <span className="font-medium text-foreground">
                         {loan.monthlyEmi.toLocaleString('vi-VN')} đ/tháng
                       </span>
                     </div>
 
-                    {column.id === 'PENDING' && (
+                    {column.id === 'PENDING' && canReview && (!user?.id || loan.userId !== user.id) && (
                       <div className="pt-2 flex items-center gap-1.5">
                         <Button
                           size="sm"
@@ -1053,6 +1114,21 @@ export default function LoansPage() {
                           className="h-7 text-[11px] text-muted-foreground hover:text-destructive"
                         >
                           Từ chối
+                        </Button>
+                      </div>
+                    )}
+                    {loan.status === 'APPROVED' && canDisburse && (!user?.id || loan.userId !== user.id) && (
+                      <div className="pt-2">
+                        <Button
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDetailLoan(loan);
+                            setIsDisbursementModalOpen(true);
+                          }}
+                          className="w-full h-7 text-[11px] font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+                        >
+                          Giải ngân
                         </Button>
                       </div>
                     )}
@@ -1419,7 +1495,28 @@ export default function LoansPage() {
             </Button>
 
             <div className="flex items-center gap-2">
-              {selectedDetailLoan?.status === 'APPROVED' && canDisburse && (
+              {selectedDetailLoan?.status === 'PENDING' && canReview && selectedDetailLoan.userId !== user?.id && (
+                <>
+                  <Button
+                    size="sm"
+                    onClick={() => decideMutation.mutate({ id: selectedDetailLoan.id, status: 'APPROVED' })}
+                    disabled={decideMutation.isPending}
+                    className="text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Duyệt khoản vay
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => decideMutation.mutate({ id: selectedDetailLoan.id, status: 'REJECTED' })}
+                    disabled={decideMutation.isPending}
+                    className="text-xs text-destructive"
+                  >
+                    Từ chối
+                  </Button>
+                </>
+              )}
+              {selectedDetailLoan?.status === 'APPROVED' && canDisburse && selectedDetailLoan.userId !== user?.id && (
                 <Button
                   size="sm"
                   onClick={() => setIsDisbursementModalOpen(true)}
@@ -1428,7 +1525,7 @@ export default function LoansPage() {
                   Ghi nhận giải ngân
                 </Button>
               )}
-              {selectedDetailLoan?.status === 'DISBURSED' && (
+              {selectedDetailLoan?.status === 'DISBURSED' && canRepay && (
                 <>
                   <Button
                     size="sm"

@@ -274,31 +274,31 @@ export class PersonnelRanksController {
   constructor(private readonly service: PersonnelRanksService) {}
 
   @Get()
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'USER', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD', 'AUDITOR')
   list(@Query() query: { groupCode?: string; field?: string; q?: string }) {
     return this.service.listRanks(query);
   }
 
   @Get('progression/scan')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD')
   scanProgression(@Query('targetDate') targetDate?: string) {
     return this.service.scanSalaryProgression(targetDate);
   }
 
   @Post('progression/apply')
-  @Roles('ADMIN', 'KM_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD')
   applyProgression(@Body() dto: ApplyProgressionDto, @CurrentUser() actor: AuthUser) {
     return this.service.applyProgression(dto, actor);
   }
 
   @Get(':code')
-  @Roles('ADMIN', 'KM_MANAGER', 'USER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'USER', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD', 'AUDITOR')
   getOne(@Param('code') code: string) {
     return this.service.getRank(code);
   }
 
   @Post()
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   upsert(@Body() dto: UpsertRankDto, @CurrentUser() actor: AuthUser) {
     return this.service.upsertRank(dto, actor);
   }

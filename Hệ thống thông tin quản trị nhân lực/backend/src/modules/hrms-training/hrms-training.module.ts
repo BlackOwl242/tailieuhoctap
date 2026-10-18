@@ -67,18 +67,80 @@ export class CreateGrievanceDto {
   description: string;
 }
 
+export class SubmitTrainingFeedbackDto {
+  @ApiProperty()
+  @IsString()
+  programId: string;
+
+  @ApiProperty({ example: 5 })
+  @IsNumber()
+  rating: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  comments?: string;
+}
+
 @Injectable()
 export class HrmsTrainingService {
   constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
 
   async listPrograms(userId?: string) {
-    const programs = await this.prisma.hrmsTrainingProgram.findMany({ include: { _count: { select: { feedbacks: true } } }, orderBy: { startDate: 'desc' } });
+    const programs = await this.prisma.hrmsTrainingProgram.findMany({
+      include: {
+        _count: { select: { feedbacks: true } },
+        feedbacks: { orderBy: { createdAt: 'desc' } },
+      },
+      orderBy: { startDate: 'desc' },
+    });
     return Promise.all(programs.map(async program => {
       const enrollments = await this.prisma.hrmsTrainingEnrollment.findMany({ where: { programId: program.id, ...(userId ? { userId } : {}) }, orderBy: { enrolledAt: 'asc' } });
       const users = await this.prisma.user.findMany({ where: { id: { in: enrollments.map(e=>e.userId) } }, select: { id: true, fullName: true } });
       return { ...program, enrollments: enrollments.map(e=>({...e, employeeName:users.find(u=>u.id===e.userId)?.fullName})), participantCount: await this.prisma.hrmsTrainingEnrollment.count({ where: { programId: program.id, status: { not: 'CANCELLED' } } }) };
     }));
   }
+
+  async submitFeedback(actor: AuthUser, dto: SubmitTrainingFeedbackDto) {
+    const rating = Math.round(Number(dto.rating));
+    if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+      throw new BadRequestException('Điểm đánh giá khóa học phải từ 1 đến 5 sao');
+    }
+    const program = await this.prisma.hrmsTrainingProgram.findUnique({ where: { id: dto.programId } });
+    if (!program) throw new NotFoundException('Không tìm thấy khóa đào tạo');
+    const enrollment = await this.prisma.hrmsTrainingEnrollment.findUnique({
+      where: { programId_userId: { programId: dto.programId, userId: actor.id } },
+    });
+    if (!enrollment || enrollment.status === 'CANCELLED') {
+      throw new ForbiddenException('Chỉ học viên đã ghi danh khóa học mới được gửi đánh giá');
+    }
+    const existing = await this.prisma.hrmsTrainingFeedback.findFirst({
+      where: { programId: dto.programId, userId: actor.id },
+    });
+    const feedback = existing
+      ? await this.prisma.hrmsTrainingFeedback.update({
+          where: { id: existing.id },
+          data: { rating, comments: dto.comments?.trim() || null },
+        })
+      : await this.prisma.hrmsTrainingFeedback.create({
+          data: {
+            programId: dto.programId,
+            userId: actor.id,
+            employeeName: actor.fullName ?? actor.email,
+            rating,
+            comments: dto.comments?.trim() || null,
+          },
+        });
+    await this.audit.log({
+      actorId: actor.id,
+      action: 'SUBMIT_TRAINING_FEEDBACK',
+      targetType: 'HrmsTrainingFeedback',
+      targetId: feedback.id,
+      description: `Đánh giá khóa học ${program.name}: ${rating}/5 sao`,
+    });
+    return feedback;
+  }
+
   async enroll(programId: string, userId: string) {
     return this.prisma.$transaction(async tx => {
       const program = await tx.hrmsTrainingProgram.findUniqueOrThrow({ where: { id: programId } });
@@ -212,6 +274,9 @@ export class HrmsTrainingService {
   async updateGrievanceStatus(actorId: string, id: string, status: GrievanceStatus, resolution?: string) {
     const gr = await this.prisma.hrmsGrievance.findUnique({ where: { id } });
     if (!gr) throw new NotFoundException('Không tìm thấy kiến nghị');
+    if (gr.userId === actorId) {
+      throw new ForbiddenException('Không được tự xử lý hoặc giải quyết kiến nghị của chính mình');
+    }
 
     const updateData: Record<string, unknown> = { status };
     if (resolution !== undefined) updateData.resolution = resolution;
@@ -256,6 +321,9 @@ export class HrmsTrainingService {
   async resolveGrievance(actorId: string, id: string, resolution: string) {
     const gr = await this.prisma.hrmsGrievance.findUnique({ where: { id } });
     if (!gr) throw new NotFoundException('Không tìm thấy khiếu nại');
+    if (gr.userId === actorId) {
+      throw new ForbiddenException('Không được tự giải quyết khiếu nại của chính mình');
+    }
 
     const res = await this.prisma.hrmsGrievance.update({
       where: { id },
@@ -282,19 +350,25 @@ export class HrmsTrainingService {
 @ApiTags('HRMS - Training & Grievances')
 @ApiBearerAuth()
 @Controller('hrms/training')
-@Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER')
+@Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD')
 export class HrmsTrainingController {
   constructor(private readonly service: HrmsTrainingService) {}
 
   @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')
   @Get('programs')
   listPrograms(@CurrentUser() actor: AuthUser) {
-    return this.service.listPrograms(actor.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER'].includes(role)) ? undefined : actor.id);
+    return this.service.listPrograms(actor.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(role)) ? undefined : actor.id);
   }
 
   @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'HR_TRAINER', 'ACCOUNTANT', 'BOD', 'HR_RECRUITER')
   @Post('programs/:id/enroll')
   enroll(@Param('id') id: string, @CurrentUser() actor: AuthUser) { return this.service.enroll(id, actor.id); }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'HR_TRAINER', 'ACCOUNTANT', 'BOD', 'HR_RECRUITER', 'AUDITOR')
+  @Post('feedback')
+  submitFeedback(@Body() dto: SubmitTrainingFeedbackDto, @CurrentUser() actor: AuthUser) {
+    return this.service.submitFeedback(actor, dto);
+  }
 
   @Patch('programs/:id/enrollments/:userId')
   complete(@Param('id') id: string, @Param('userId') userId: string, @Body() dto: { score: number; evidenceUrl: string }, @CurrentUser() actor: AuthUser) { return this.service.completeEnrollment(actor.id, id, userId, dto); }
@@ -317,7 +391,7 @@ export class HrmsTrainingController {
   @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')
   @Get('grievances')
   listGrievances(@CurrentUser() actor: AuthUser, @Query('userId') userId?: string, @Query('status') status?: GrievanceStatus) {
-    return this.service.listGrievances(actor.roles.some(r => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER'].includes(r)) ? userId : actor.id, status);
+    return this.service.listGrievances(actor.roles.some(r => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(r)) ? userId : actor.id, status);
   }
 
   @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')

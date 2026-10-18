@@ -128,11 +128,10 @@ export class HrmsShiftsService {
       const closed = await tx.attendancePeriod.findFirst({ where: { status: 'FINALIZED', closedAt: { not: null } }, orderBy: [{ year: 'desc' }, { month: 'desc' }] });
       if (!end && closed && start < new Date(Date.UTC(closed.year, closed.month, 1))) throw new ConflictException('Ca không có ngày kết thúc không được bao phủ kỳ đã chốt');
       const overlaps = await tx.hrmsShiftAssignment.findMany({ where: { userId: dto.userId, status: 'ACTIVE', ...(end ? { startDate: { lte: end } } : {}), OR: [{ endDate: null }, { endDate: { gte: start } }] } });
-      if (overlaps.length && (!end || start.getTime() !== end.getTime())) throw new ConflictException('Khoảng phân ca trùng lịch đã có');
       for (const existing of overlaps) {
         await tx.hrmsShiftAssignment.update({ where: { id: existing.id }, data: { status: 'CANCELLED' } });
         if (dateKey(existing.startDate) < start) await tx.hrmsShiftAssignment.create({ data: { userId: existing.userId, shiftTypeId: existing.shiftTypeId, startDate: dateKey(existing.startDate), endDate: new Date(start.getTime() - DAY_MS), workDays: existing.workDays, assignedBy: actorId } });
-        if (!existing.endDate || dateKey(existing.endDate) > start) await tx.hrmsShiftAssignment.create({ data: { userId: existing.userId, shiftTypeId: existing.shiftTypeId, startDate: new Date(start.getTime() + DAY_MS), endDate: existing.endDate ? dateKey(existing.endDate) : null, workDays: existing.workDays, assignedBy: actorId } });
+        if (end && (!existing.endDate || dateKey(existing.endDate) > end)) await tx.hrmsShiftAssignment.create({ data: { userId: existing.userId, shiftTypeId: existing.shiftTypeId, startDate: new Date(end.getTime() + DAY_MS), endDate: existing.endDate ? dateKey(existing.endDate) : null, workDays: existing.workDays, assignedBy: actorId } });
       }
       return tx.hrmsShiftAssignment.create({ data: { userId: dto.userId, shiftTypeId: dto.shiftTypeId, startDate: start, endDate: end, workDays, assignedBy: actorId }, include: { shiftType: true } });
     }, { isolationLevel: 'Serializable' });

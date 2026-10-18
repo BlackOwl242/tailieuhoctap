@@ -41,9 +41,20 @@ def init_schema(con):
     """)
 
 
+def _normalize_agency(name: str) -> str:
+    val = " ".join(str(name or "").strip().split()).casefold()
+    for suffix in (" thành phố hà nội", " tp. hà nội", " tp hà nội", " hà nội"):
+        if val.endswith(suffix) and len(val) > len(suffix) + 3:
+            val = val[:-len(suffix)].strip()
+    return val
+
+
 def _agency_allowed(user, agency):
-    scope = user['agency_scope'].strip().casefold()
-    return bool(scope and (scope == 'toàn thành phố' or scope == agency.strip().casefold()))
+    scope = (user['agency_scope'] or '').strip()
+    target = (agency or '').strip()
+    if not scope or not target:
+        return False
+    return scope.casefold() == 'toàn thành phố' or _normalize_agency(scope) == _normalize_agency(target)
 
 
 def get_records(service, handler, user):
@@ -55,11 +66,11 @@ def get_records(service, handler, user):
             return handler.send_json({'appointments': [], 'feedback': [], 'summary': {
                 'appointments': con.execute('SELECT count(*) FROM public_appointments').fetchone()[0],
                 'feedback': con.execute('SELECT count(*) FROM public_pakn').fetchone()[0]}})
-        scope = user['agency_scope'].strip()
-        clause, args = ('', ()) if scope.casefold() == 'toàn thành phố' else (' WHERE agency=? COLLATE NOCASE', (scope,))
-        appointments = con.execute('SELECT * FROM public_appointments' + clause + ' ORDER BY appointment_date DESC,queue_number LIMIT 500', args).fetchall()
-        feedback = con.execute('SELECT * FROM public_pakn' + clause + ' ORDER BY created_at DESC LIMIT 500', args).fetchall()
-        return handler.send_json({'appointments': [dict(r) for r in appointments], 'feedback': [dict(r) for r in feedback]})
+        all_appointments = con.execute('SELECT * FROM public_appointments ORDER BY appointment_date DESC,queue_number LIMIT 500').fetchall()
+        all_feedback = con.execute('SELECT * FROM public_pakn ORDER BY created_at DESC LIMIT 500').fetchall()
+        appointments = [dict(r) for r in all_appointments if _agency_allowed(user, r['agency'])]
+        feedback = [dict(r) for r in all_feedback if _agency_allowed(user, r['agency'])]
+        return handler.send_json({'appointments': appointments, 'feedback': feedback})
 
 
 def create_public(service, handler, kind, body):
@@ -72,7 +83,11 @@ def create_public(service, handler, kind, body):
     now = service.now_iso()
     with service.DB_LOCK, service.connect() as con:
         today = datetime.now(service.TZ).date()
-        if not con.execute("SELECT 1 FROM users WHERE role='intake' AND active=1 AND agency_scope=? COLLATE NOCASE AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?)", (agency, today.isoformat(), today.isoformat())).fetchone():
+        active_intakes = con.execute(
+            "SELECT agency_scope FROM users WHERE role='intake' AND active=1 AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?)",
+            (today.isoformat(), today.isoformat()),
+        ).fetchall()
+        if not any(_normalize_agency(r['agency_scope']) == _normalize_agency(agency) for r in active_intakes if r['agency_scope']):
             raise ValueError('Chọn cơ quan có bộ phận tiếp nhận đang hoạt động trong hệ thống.')
         if kind == 'appointments':
             procedure = service.PROCEDURE_BY_CODE.get(service.clean_text(body.get('procedureCode'), 40))
@@ -84,10 +99,17 @@ def create_public(service, handler, kind, body):
             slot = service.clean_text(body.get('timeSlot'), 30)
             if slot not in {'08:00-09:00', '09:00-10:00', '10:00-11:00', '14:00-15:00', '15:00-16:00'}:
                 raise ValueError('Chọn khung giờ làm việc trong danh sách.')
-            booked = con.execute("SELECT count(*) FROM public_appointments WHERE agency=? COLLATE NOCASE AND appointment_date=? AND time_slot=? AND status NOT IN ('CANCELLED','DA_HUY','HUY')", (agency, day.isoformat(), slot)).fetchone()[0]
+            existing_rows = con.execute('SELECT agency,queue_number,time_slot,status FROM public_appointments WHERE appointment_date=?', (day.isoformat(),)).fetchall()
+            same_agency_rows = [r for r in existing_rows if _normalize_agency(r['agency']) == _normalize_agency(agency)]
+            booked = sum(1 for r in same_agency_rows if r['time_slot'] == slot and r['status'] not in ('CANCELLED', 'DA_HUY', 'HUY'))
             if booked >= 10:
                 raise ValueError('Khung giờ này đã đủ lịch; hãy chọn khung giờ khác.')
-            queue = con.execute('SELECT coalesce(max(queue_number),0)+1 FROM public_appointments WHERE agency=? COLLATE NOCASE AND appointment_date=?', (agency, day.isoformat())).fetchone()[0]
+            max_q = 0
+            for r in same_agency_rows:
+                nums = re.findall(r'\d+', str(r['queue_number'] or ''))
+                if nums:
+                    max_q = max(max_q, int(nums[-1]))
+            queue = max_q + 1
             code = 'LH-' + secrets.token_hex(6).upper()
             con.execute('INSERT INTO public_appointments(code,citizen_name,phone,agency,procedure_code,procedure_name,appointment_date,time_slot,queue_number,note,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
                         (code, name, phone, agency, procedure['code'], procedure['name'], day.isoformat(), slot, queue, service.clean_text(body.get('note'), 1000), 'BOOKED', now))
@@ -113,9 +135,9 @@ def lookup_public(service, handler, body):
         raise ValueError('Nhập số điện thoại liên hệ đã khai khi gửi thông tin.')
     with service.connect() as con:
         if code.startswith('LH-'):
-            row = con.execute('SELECT code,phone,agency,procedure_name,appointment_date,time_slot,queue_number,status,counter_note FROM public_appointments WHERE code=?', (code,)).fetchone()
-        elif code.startswith('PA-'):
-            row = con.execute('SELECT code,phone,agency,title,content,status,reply,replied_at FROM public_pakn WHERE code=?', (code,)).fetchone()
+            row = con.execute('SELECT code,citizen_name,phone,agency,procedure_code,procedure_name,appointment_date,time_slot,queue_number,note,status,counter_note,created_at FROM public_appointments WHERE code=?', (code,)).fetchone()
+        elif code.startswith(('PA-', 'PAKN-')):
+            row = con.execute('SELECT code,sender_name,phone,agency,topic,title,content,status,reply,replied_by,replied_at,created_at FROM public_pakn WHERE code=?', (code,)).fetchone()
         else:
             row = None
         if not row or not secrets.compare_digest(row['phone'], phone):
@@ -129,7 +151,12 @@ def update_record(service, handler, user, body):
     if user['role'] not in {'intake', 'leader'}:
         raise PermissionError('Chỉ cán bộ tiếp nhận hoặc lãnh đạo cùng cơ quan được xử lý nội dung này.')
     code = service.clean_text(body.get('code'), 40).upper()
-    table = 'public_appointments' if code.startswith('LH-') else 'public_pakn'
+    if code.startswith('LH-'):
+        table = 'public_appointments'
+    elif code.startswith(('PA-', 'PAKN-')):
+        table = 'public_pakn'
+    else:
+        raise ValueError('Mã lịch hẹn hoặc phản ánh không hợp lệ.')
     with service.DB_LOCK, service.connect() as con:
         row = con.execute(f'SELECT * FROM {table} WHERE code=?', (code,)).fetchone()
         if not row or not _agency_allowed(user, row['agency']):

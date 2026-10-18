@@ -118,6 +118,24 @@ export class UpdateAdvanceStatusDto {
 export class HrmsExpensesService {
   constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
 
+  private async resolveRecipient(actorId: string, userId?: string, employeeName?: string) {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (userId && uuidRegex.test(userId)) {
+      const byId = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
+      if (byId) return byId;
+    }
+    const nameCandidate = (employeeName || userId || '').trim();
+    if (nameCandidate && !uuidRegex.test(nameCandidate)) {
+      const byName = await this.prisma.user.findFirst({
+        where: { fullName: { equals: nameCandidate, mode: 'insensitive' }, deletedAt: null },
+      });
+      if (byName) return byName;
+    }
+    const byActor = await this.prisma.user.findFirst({ where: { id: actorId, deletedAt: null } });
+    if (byActor) return byActor;
+    throw new BadRequestException('Cần chọn nhân viên hiện có');
+  }
+
   async listTravelRequests(userId?: string, status?: ClaimStatus) {
     const where: Record<string, unknown> = {};
     if (userId) where.userId = userId;
@@ -131,12 +149,11 @@ export class HrmsExpensesService {
   }
 
   async createTravelRequest(actorId: string, dto: CreateTravelRequestDto) {
-    const recipient = await this.prisma.user.findFirst({where:{id:dto.userId,deletedAt:null}});
-    if (!recipient) throw new BadRequestException('Cần chọn nhân viên hiện có');
+    const recipient = await this.resolveRecipient(actorId, dto.userId, dto.employeeName);
     if (new Date(dto.returnDate) < new Date(dto.departureDate) || (dto.estimatedBudget ?? 0) < 0) throw new BadRequestException('Thời gian/ngân sách công tác không hợp lệ');
     const res = await this.prisma.hrmsTravelRequest.create({
       data: {
-        userId: dto.userId,
+        userId: recipient.id,
         employeeName: recipient.fullName,
         purpose: dto.purpose,
         fromLocation: dto.fromLocation,
@@ -173,18 +190,17 @@ export class HrmsExpensesService {
   }
 
   async createClaim(actorId: string, dto: CreateExpenseClaimDto) {
-    const recipient = await this.prisma.user.findFirst({where:{id:dto.userId,deletedAt:null}});
-    if (!recipient) throw new BadRequestException('Cần chọn nhân viên hiện có');
+    const recipient = await this.resolveRecipient(actorId, dto.userId, dto.employeeName);
     if (!dto.items?.length || dto.items.some(item => !Number.isFinite(item.amount) || item.amount < 0) || Math.abs(dto.items.reduce((sum, item) => sum + item.amount, 0) - dto.totalAmount) > 0.01) throw new BadRequestException('Tổng bảng kê phải bằng tổng chi tiết hợp lệ');
     if (dto.travelRequestId) {
       const travel = await this.prisma.hrmsTravelRequest.findUniqueOrThrow({ where: { id: dto.travelRequestId } });
-      if (travel.userId !== dto.userId || travel.status !== 'APPROVED') throw new ConflictException('Bảng kê phải thuộc chuyến công tác đã được duyệt của cùng nhân viên');
+      if (travel.userId !== recipient.id || travel.status !== 'APPROVED') throw new ConflictException('Bảng kê phải thuộc chuyến công tác đã được duyệt của cùng nhân viên');
       if (travel.settlementClosedAt) throw new ConflictException('Đối soát tạm ứng chuyến đi đã khóa');
     }
 
     const res = await this.prisma.hrmsExpenseClaim.create({
       data: {
-        userId: dto.userId,
+        userId: recipient.id,
         employeeName: recipient.fullName,
         travelRequestId: dto.travelRequestId,
         title: dto.title,
@@ -214,7 +230,7 @@ export class HrmsExpensesService {
     if (!graph[current]?.includes(status)) throw new ConflictException('Không được đảo ngược/bỏ qua bước phê duyệt');
     if (actorId === userId) throw new ForbiddenException('Không được tự duyệt hoặc chi trả đề xuất của mình');
     const roles = await this.prisma.userRole.findMany({ where: { userId: actorId }, select: { roleCode: true } });
-    const allowed = status === 'PAID' ? ['ADMIN', 'ACCOUNTANT'] : ['ADMIN', 'KM_MANAGER', 'BOD'];
+    const allowed = status === 'PAID' ? ['ADMIN', 'ACCOUNTANT'] : ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD'];
     if (!roles.some(role => allowed.includes(role.roleCode))) throw new ForbiddenException('Không có quyền duyệt/chi trả bước này');
   }
 
@@ -264,7 +280,7 @@ export class HrmsExpensesService {
     const roles = await this.prisma.userRole.findMany({ where: { userId: actorId }, select: { roleCode: true } });
     if (!roles.some(role => ['ADMIN', 'ACCOUNTANT'].includes(role.roleCode))) throw new ForbiddenException('Chỉ kế toán mới được ghi nhận đã thu hồi tạm ứng');
     return this.prisma.$transaction(async tx => {
-      const travel = await tx.hrmsTravelRequest.findUnique({ where: { id: travelRequestId } });
+      const travel = await this.prisma.hrmsTravelRequest.findUnique({ where: { id: travelRequestId } });
       if (!travel) throw new NotFoundException('Không tìm thấy chuyến công tác');
       if (!travel.settlementClosedAt || travel.refundStatus === 'NONE') throw new ConflictException('Chuyến đi chưa có khoản tạm ứng dư cần thu hồi');
       const outstanding = travel.advanceRefundDue - travel.advanceRefundPaid;
@@ -291,13 +307,12 @@ export class HrmsExpensesService {
   }
 
   async createAdvance(actorId: string, dto: CreateAdvanceDto) {
-    const recipient = await this.prisma.user.findFirst({where:{id:dto.userId,deletedAt:null}});
-    if (!recipient) throw new BadRequestException('Cần chọn nhân viên hiện có');
+    const recipient = await this.resolveRecipient(actorId, dto.userId, dto.employeeName);
     if (!Number.isFinite(dto.amount) || dto.amount <= 0) throw new BadRequestException('Tiền tạm ứng phải dương');
-    if (dto.travelRequestId) { const travel=await this.prisma.hrmsTravelRequest.findUniqueOrThrow({where:{id:dto.travelRequestId}}); if(travel.userId!==dto.userId || travel.status!=='APPROVED') throw new ConflictException('Tạm ứng phải thuộc chuyến đã duyệt của cùng nhân viên'); if(travel.settlementClosedAt) throw new ConflictException('Đối soát tạm ứng chuyến đi đã khóa'); }
+    if (dto.travelRequestId) { const travel=await this.prisma.hrmsTravelRequest.findUniqueOrThrow({where:{id:dto.travelRequestId}}); if(travel.userId!==recipient.id || travel.status!=='APPROVED') throw new ConflictException('Tạm ứng phải thuộc chuyến đã duyệt của cùng nhân viên'); if(travel.settlementClosedAt) throw new ConflictException('Đối soát tạm ứng chuyến đi đã khóa'); }
     const res = await this.prisma.hrmsEmployeeAdvance.create({
       data: {
-        userId: dto.userId,
+        userId: recipient.id,
         employeeName: recipient.fullName,
         travelRequestId: dto.travelRequestId,
         amount: dto.amount,
@@ -423,7 +438,7 @@ export class HrmsExpensesService {
 @ApiTags('HRMS - Expenses & Travel Claims')
 @ApiBearerAuth()
 @Controller('hrms/expenses')
-@Roles('ADMIN', 'KM_MANAGER', 'ACCOUNTANT', 'BOD')
+@Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')
 export class HrmsExpensesController {
   constructor(private readonly service: HrmsExpensesService) {}
 
@@ -437,16 +452,19 @@ export class HrmsExpensesController {
     return this.service.createTravelRequest(actor.id, dto);
   }
 
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD')
   @Patch('travel-requests/:id/status')
   updateTravelRequestStatus(@Param('id') id: string, @Body('status') status: ClaimStatus, @CurrentUser() actor: AuthUser) {
     return this.service.updateTravelRequestStatus(actor.id, id, status);
   }
 
+  @Roles('ADMIN', 'ACCOUNTANT')
   @Post('travel-requests/:id/close-settlement')
   closeSettlement(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
     return this.service.closeTravelSettlement(actor.id, id);
   }
 
+  @Roles('ADMIN', 'ACCOUNTANT')
   @Post('travel-requests/:id/record-refund')
   recordRefund(@Param('id') id: string, @Body() body: { amount: number; note?: string }, @CurrentUser() actor: AuthUser) {
     return this.service.recordAdvanceRefund(actor.id, id, Number(body.amount), body.note);
@@ -467,6 +485,7 @@ export class HrmsExpensesController {
     return this.service.createClaim(actor.id, dto);
   }
 
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD')
   @Patch('claims/:id/status')
   updateClaimStatus(@Param('id') id: string, @Body('status') status: ClaimStatus, @CurrentUser() actor: AuthUser) {
     return this.service.updateClaimStatus(actor.id, id, status);
@@ -487,6 +506,7 @@ export class HrmsExpensesController {
     return this.service.createAdvance(actor.id, dto);
   }
 
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD')
   @Patch('advances/:id/status')
   updateAdvanceStatus(@Param('id') id: string, @Body() dto: UpdateAdvanceStatusDto, @CurrentUser() actor: AuthUser) {
     return this.service.updateAdvanceStatus(actor.id, id, dto.status, dto.paymentMethod);

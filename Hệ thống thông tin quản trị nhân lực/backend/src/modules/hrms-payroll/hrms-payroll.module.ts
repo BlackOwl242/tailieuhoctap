@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { calculateOvertimePay, calculatePayroll, currentPayrollPolicies, evaluateFormula, monthlyHourlyRate, payrollPolicyFor, VN_PAYROLL_POLICIES, type PayrollPolicy } from '../../common/payroll-calculator';
 import { businessDates, dateKey, DAY_MS, DEFAULT_WORK_DAYS, isScheduledWorkday, isUnderThreeMonths, workDate } from '../../common/hr-time';
+import { AttendanceLedgerService } from '../../common/services/attendance-ledger.service';
 import { RuntimeSettingsService } from '../../common/services/runtime-settings.service';
 import { endsEmployment } from '../../common/personnel-action-rules';
 import { CurrentUser, Roles } from '../../common/decorators';
@@ -154,7 +155,12 @@ class AddAttendanceEvidenceDto {
 
 @Injectable()
 export class HrmsPayrollService {
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly settings: RuntimeSettingsService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+    private readonly settings: RuntimeSettingsService,
+    private readonly ledger: AttendanceLedgerService,
+  ) {}
 
   async listComponents() {
     return this.prisma.hrmsSalaryComponent.findMany({ orderBy: { type: 'asc' } });
@@ -499,10 +505,12 @@ export class HrmsPayrollService {
   }
 
   async createPayrollRun(actorId: string, dto: CreatePayrollRunDto, legacyPeriodId?: string) {
+    await this.ledger.ensureAutoAttendanceUpToDate().catch(() => undefined);
     return this.calculatePayrollRun(actorId, dto, legacyPeriodId);
   }
 
   async previewPayrollToDate() {
+    await this.ledger.ensureAutoAttendanceUpToDate().catch(() => undefined);
     const asOf = workDate();
     const from = new Date(Date.UTC(asOf.getUTCFullYear(), asOf.getUTCMonth(), 1));
     const to = new Date(Date.UTC(asOf.getUTCFullYear(), asOf.getUTCMonth() + 1, 0));
@@ -1025,6 +1033,15 @@ export class HrmsPayrollService {
       const changed = await tx.hrmsPayrollRun.updateMany({ where: { id, status: expected[next] }, data: { status: next, ...(next === 'REVIEWED' ? { reviewedBy: actorId, reviewedAt: new Date() } : {}), ...(next === 'LOCKED' ? { lockedBy: actorId, lockedAt: new Date() } : {}), ...(next === 'PAID' ? { paidBy: actorId, paidAt: new Date(), paymentMethod: payment!.paymentMethod, paymentReference: payment!.paymentReference.trim() } : {}) } });
       if (changed.count !== 1) throw new ConflictException('Kỳ lương vừa được xử lý bởi người khác');
       if (next === 'APPROVED' || next === 'PAID') await tx.hrmsPayrollSlip.updateMany({ where: { payrollRunId: id }, data: { status: next } });
+      if (run.legacyPeriodId) {
+        const legacyStatus = next === 'REVIEWED' || next === 'APPROVED' ? 'REVIEWED' : next === 'LOCKED' || next === 'PAID' ? 'LOCKED' : undefined;
+        if (legacyStatus) {
+          await tx.payrollPeriod.updateMany({
+            where: { id: run.legacyPeriodId },
+            data: { status: legacyStatus, ...(legacyStatus === 'LOCKED' ? { lockedAt: new Date() } : {}) },
+          });
+        }
+      }
       await tx.auditLog.create({ data: { actorId, action: `PAYROLL_${next}`, entityType: 'HrmsPayrollRun', entityId: id } });
       return tx.hrmsPayrollRun.findUniqueOrThrow({ where: { id }, include: { slips: true } });
     }, { isolationLevel: 'Serializable' });

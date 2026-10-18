@@ -1,10 +1,10 @@
 # Tài khoản cục bộ được phân quyền
 
-> Bản ghi lịch sử ngày 11/10/2026. Bộ dữ liệu sau phục hồi có 79 tài khoản; xem [danh sách hiện tại](TAI_KHOAN_SAU_KHOI_PHUC_20261018.md). Thông tin mật khẩu trong bản lịch sử chưa được đối chiếu lại, không khẳng định còn sử dụng được.
+> Bản ghi khởi tạo ngày 11/10/2026, đã đồng bộ lại ngày 18/10/2026. Bộ dữ liệu hiện có 79 tài khoản; xem [danh sách đầy đủ 79 tài khoản](TAI_KHOAN_SAU_KHOI_PHUC_20261018.md). **Mật khẩu mặc định hiện tại của toàn bộ tài khoản trong hệ thống là `123`** (không bắt buộc đổi mật khẩu lần đầu).
 
 **Cơ sở dữ liệu:** `data/hanoi-services.sqlite3`
-**Ngày tạo/kiểm tra:** 11/10/2026
-**Trạng thái:** 11 tài khoản cục bộ đang hoạt động; 9 đề nghị cấp quyền nghiệp vụ đã được quản trị viên thứ hai phê duyệt. Đây không phải tài khoản do cơ quan Hà Nội cấp.
+**Ngày tạo/kiểm tra:** 11/10/2026 (cập nhật mật khẩu mặc định `123` ngày 18/10/2026)
+**Trạng thái:** 79 tài khoản cục bộ đang hoạt động (dưới đây là 11 tài khoản cốt lõi). Đây không phải tài khoản do cơ quan Hà Nội cấp.
 
 Các địa chỉ `example.test` là định danh dành riêng cho môi trường thử nghiệm, không phải hộp thư thật. Email chưa được xác minh. Tài khoản không có quyền ký Mẫu 06 vì chưa có căn cứ phân công thẩm quyền ký. Thời hạn các quyền nghiệp vụ: **11/10/2026–11/10/2027**.
 
@@ -15,12 +15,12 @@ Các địa chỉ `example.test` là định danh dành riêng cho môi trườn
 | Quản trị viên cục bộ 01 | `admin01@example.test` | Toàn thành phố trong ứng dụng | Đang hoạt động |
 | Quản trị viên cục bộ 02 | `admin02@example.test` | Toàn thành phố trong ứng dụng | Đang hoạt động |
 
-Mật khẩu hiện tại của hai tài khoản quản trị đã được đặt ngẫu nhiên. Có thể giữ nguyên khi dùng trong môi trường cục bộ:
+Mật khẩu mặc định hiện tại của hai tài khoản quản trị:
 
 | Email | Mật khẩu hiện tại |
 |---|---|
-| `admin01@example.test` | `NuAhGUjZhlgOY6qWqLppjrCmHs` |
-| `admin02@example.test` | `oFjj5dzWEWJU7HUn4PhoqN2aSG` |
+| `admin01@example.test` | `123` |
+| `admin02@example.test` | `123` |
 
 ## Cán bộ nghiệp vụ
 
@@ -36,19 +36,19 @@ Mật khẩu hiện tại của hai tài khoản quản trị đã được đ�
 | Lãnh đạo xem xét — UBND phường Tây Hồ | `leader.tayho@example.test` | `leader` | UBND phường Tây Hồ | Quản trị viên 02 |
 | Cán bộ trả kết quả — UBND phường Tây Hồ | `registrar.tayho@example.test` | `registrar` | UBND phường Tây Hồ | Quản trị viên 02 |
 
-Mật khẩu dưới đây là mật khẩu khởi tạo. Mỗi cán bộ dùng mật khẩu trong bảng trực tiếp khi đăng nhập; ứng dụng không yêu cầu đổi mật khẩu lần đầu tại `/staff`.
+Mật khẩu mặc định hiện tại là `123`. Mỗi cán bộ dùng mật khẩu này trực tiếp khi đăng nhập; ứng dụng không yêu cầu đổi mật khẩu lần đầu tại `/staff`.
 
-| Email | Mật khẩu khởi tạo |
+| Email | Mật khẩu mặc định |
 |---|---|
-| `intake.sotnmt@example.test` | `4UsZJ1lQFLMomtAva5Atgsg4pQ` |
-| `specialist.sotnmt@example.test` | `qgYS4XzLYjwvSzYvnMWt6ZP1Nx` |
-| `leader.sotnmt@example.test` | `8HbDTeaPXehsqAgCY85vCbzod0` |
-| `registrar.sotnmt@example.test` | `LgcGOU6zNOUzSJY29o09YdDaXn` |
-| `finance.sotnmt@example.test` | `BhmnjnezorD022olnTpTk0NVBC` |
-| `intake.tayho@example.test` | `Abtnt5qKx6FfIKFih7FcopvRRB` |
-| `specialist.tayho@example.test` | `kO32N8GGV1mxORGxSuaMIsR4cj` |
-| `leader.tayho@example.test` | `AbKcQ96eisrzubgSAZw7fqaDiR` |
-| `registrar.tayho@example.test` | `KYTDdgDfV862n3QUUa54FoB2Gq` |
+| `intake.sotnmt@example.test` | `123` |
+| `specialist.sotnmt@example.test` | `123` |
+| `leader.sotnmt@example.test` | `123` |
+| `registrar.sotnmt@example.test` | `123` |
+| `finance.sotnmt@example.test` | `123` |
+| `intake.tayho@example.test` | `123` |
+| `specialist.tayho@example.test` | `123` |
+| `leader.tayho@example.test` | `123` |
+| `registrar.tayho@example.test` | `123` |
 
 ## Sử dụng và phạm vi
 

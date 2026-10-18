@@ -55,11 +55,12 @@ export class DecideRegularizationDto {
 export class HrmsRegularizationService {
   constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly ledger: AttendanceLedgerService, private readonly access: HrAccessService) {}
 
-  async list(status?: string, userId?: string) {
+  async list(status?: string, userId?: string, actor?: AuthUser) {
+    const scope = actor ? await this.access.reviewScope(actor) : {};
     return this.prisma.hrmsAttendanceRegularization.findMany({
       where: {
         ...(status ? { status } : {}),
-        ...(userId ? { userId } : {}),
+        ...(userId ? { userId } : scope),
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -117,7 +118,7 @@ export class HrmsRegularizationService {
 @ApiTags('HRMS - Attendance Regularization')
 @ApiBearerAuth()
 @Controller('hrms/attendance-regularizations')
-@Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
+@Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD')
 export class HrmsRegularizationController {
   constructor(private readonly service: HrmsRegularizationService) {}
 
@@ -127,9 +128,10 @@ export class HrmsRegularizationController {
     return this.service.list(undefined, user?.id);
   }
 
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD')
   @Get()
-  list(@Query('status') status?: string, @Query('userId') userId?: string) {
-    return this.service.list(status, userId);
+  list(@Query('status') status?: string, @Query('userId') userId?: string, @CurrentUser() actor?: AuthUser) {
+    return this.service.list(status, userId, actor);
   }
 
   @Roles('ADMIN', 'KM_MANAGER', 'USER', 'LINE_MANAGER', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER', 'HR_TRAINER', 'BOD', 'AUDITOR')
@@ -138,7 +140,7 @@ export class HrmsRegularizationController {
     return this.service.submit(actor.id, { ...dto, userId: actor.id, employeeName: actor.fullName ?? actor.email });
   }
 
-  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD')
   @Patch(':id/decide')
   decide(@Param('id') id: string, @Body() dto: DecideRegularizationDto, @CurrentUser() actor: AuthUser) {
     return this.service.decide(actor, id, dto);

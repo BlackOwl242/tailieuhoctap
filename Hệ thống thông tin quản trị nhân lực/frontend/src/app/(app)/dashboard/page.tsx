@@ -20,39 +20,86 @@ export default function FrappeHrmsDeskDashboard() {
   const { user } = useAuthStore();
   const userRoles = user?.roles ?? [];
   const isManagerOrAdmin = userRoles.some((r) =>
-    ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'ACCOUNTANT', 'HR_TRAINER', 'AUDITOR'].includes(r)
+    ['ADMIN', 'KM_MANAGER', 'BOD', 'SHAREHOLDER', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'ACCOUNTANT', 'HR_TRAINER', 'AUDITOR'].includes(r)
   );
   const isAdmin = userRoles.includes('ADMIN');
+  const canViewShifts = userRoles.some((r) =>
+    ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD'].includes(r)
+  );
+  const canViewPayroll = userRoles.some((r) =>
+    ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD', 'SHAREHOLDER'].includes(r)
+  );
+  const canViewRecruitment = userRoles.some((r) =>
+    ['ADMIN', 'KM_MANAGER', 'HR_RECRUITER', 'BOD', 'LINE_MANAGER'].includes(r)
+  );
 
   // Queries cho Quản lý / Quản trị viên
   const { data: stats, isLoading: statsLoading, isError: statsError, error: statsErr, refetch: refetchStats } = useQuery<DashboardStats>({
     queryKey: ['dashboard'],
     queryFn: async () => (await api.get<DashboardStats>('/dashboard/stats')).data,
     enabled: isManagerOrAdmin,
+    retry: false,
   });
 
   const { data: shiftTypes } = useQuery({
     queryKey: ['hrms-shift-types'],
     queryFn: async () => (await api.get('/hrms/shifts/types')).data,
-    enabled: isManagerOrAdmin,
+    enabled: canViewShifts,
+    retry: false,
   });
 
   const { data: payrollRuns } = useQuery({
     queryKey: ['hrms-payroll-runs'],
     queryFn: async () => (await api.get('/hrms/payroll/runs')).data,
-    enabled: isManagerOrAdmin,
+    enabled: canViewPayroll,
+    retry: false,
   });
 
   const { data: applicants } = useQuery({
     queryKey: ['hrms-job-applicants'],
     queryFn: async () => (await api.get('/hrms/recruitment/applicants')).data,
-    enabled: isManagerOrAdmin,
+    enabled: canViewRecruitment,
+    retry: false,
   });
 
   // Queries cá nhân cho Nhân viên (USER)
-  const { data: myLeaveBalance, isLoading: leaveLoading } = useQuery<{ total: number; used: number; remaining: number }>({
+  const { data: myLeaveBalance } = useQuery<{
+    entitled?: number;
+    carriedOver?: number;
+    total?: number;
+    used?: number;
+    pendingDays?: number;
+    remaining?: number;
+  }>({
     queryKey: ['my-leave-balance'],
     queryFn: async () => (await api.get('/hrms/leave/my-balance')).data,
+    enabled: !isManagerOrAdmin,
+  });
+
+  const { data: myAttendance } = useQuery<{
+    days?: Array<{
+      id: string;
+      workDate: string;
+      status: string;
+      firstCheckIn?: string | null;
+      lastCheckOut?: string | null;
+      workingMinutes?: number | null;
+    }>;
+    todayEvents?: Array<{
+      id: string;
+      type: 'CHECK_IN' | 'CHECK_OUT';
+      occurredAt: string;
+      note?: string | null;
+    }>;
+  }>({
+    queryKey: ['my-attendance-dashboard'],
+    queryFn: async () => {
+      try {
+        return (await api.get('/attendance/my')).data;
+      } catch {
+        return (await api.get('/attendance/me')).data;
+      }
+    },
     enabled: !isManagerOrAdmin,
   });
 
@@ -79,6 +126,36 @@ export default function FrappeHrmsDeskDashboard() {
   const pendingLeavesCount = (myLeaves ?? []).filter((l) => l.status === 'PENDING').length;
   const pendingRegsCount = (myRegularizations ?? []).filter((r) => r.status === 'PENDING').length;
   const myPendingTotal = pendingLeavesCount + pendingRegsCount;
+
+  const leaveEntitled = (myLeaveBalance?.entitled ?? myLeaveBalance?.total ?? 12) + (myLeaveBalance?.carriedOver ?? 0);
+  const leaveUsed = myLeaveBalance?.used ?? 0;
+  const leaveRemaining = myLeaveBalance?.remaining ?? Math.max(0, leaveEntitled - leaveUsed);
+
+  const now = new Date();
+  const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const todayPrefix = `${currentMonthPrefix}-${String(now.getDate()).padStart(2, '0')}`;
+  const attendanceDays = Array.isArray(myAttendance?.days) ? myAttendance.days : Array.isArray(myAttendance) ? myAttendance : [];
+  const currentMonthWorkDays = attendanceDays.filter(
+    (d) => d.workDate?.startsWith(currentMonthPrefix) && ['PRESENT', 'LATE', 'EARLY_LEAVE', 'HALF_DAY', 'ON_LEAVE'].includes(d.status)
+  );
+  const actualWorkCount = currentMonthWorkDays.reduce((acc, d) => acc + (d.status === 'HALF_DAY' ? 0.5 : 1), 0);
+  const standardWorkDays = 22;
+  const attendanceRatePct = Math.min(100, Math.round((actualWorkCount / standardWorkDays) * 1000) / 10);
+
+  const todayRecord = attendanceDays.find((d) => d.workDate?.startsWith(todayPrefix));
+  const todayCheckInEvent = (myAttendance?.todayEvents ?? []).find((e) => e.type === 'CHECK_IN');
+  const checkInTimestamp = todayCheckInEvent?.occurredAt || todayRecord?.firstCheckIn;
+  const checkInTimeText = checkInTimestamp
+    ? new Date(checkInTimestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    : null;
+  const todayStatusText = checkInTimeText
+    ? todayRecord?.status === 'LATE'
+      ? 'Đi muộn'
+      : 'Đã vào ca'
+    : 'Chưa điểm danh';
+  const todaySubtitleText = checkInTimeText
+    ? `Vào ca: ${checkInTimeText}${todayCheckInEvent?.note ? ` · ${todayCheckInEvent.note}` : ' · Đã ghi nhận'}`
+    : 'Chưa ghi nhận lượt vào ca hôm nay';
 
   // --------------------------------------------------------------------------
   // BẢNG ĐIỀU KHIỂN CHO CÁN BỘ QUẢN TRỊ & NHÂN SỰ (ADMIN / KM_MANAGER)
@@ -445,24 +522,24 @@ export default function FrappeHrmsDeskDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         <NumberCard
           title="Chuyên cần tháng này"
-          value="21.5 công"
-          subtitle="21.5 / 22 ngày công chuẩn"
+          value={`${actualWorkCount} công`}
+          subtitle={`${actualWorkCount} / ${standardWorkDays} ngày công chuẩn`}
           icon={ShieldCheck}
-          trend={{ value: '97.7%', isPositive: true, label: 'chuyên cần' }}
+          trend={{ value: `${attendanceRatePct}%`, isPositive: attendanceRatePct >= 80, label: 'chuyên cần' }}
         />
         <NumberCard
           title="Phép năm còn lại"
-          value={myLeaveBalance ? `${myLeaveBalance.remaining} ngày` : '10 ngày'}
-          subtitle={`Đã dùng ${myLeaveBalance?.used ?? 2} ngày · Điều 113 BLLĐ`}
+          value={`${leaveRemaining} ngày`}
+          subtitle={`Đã dùng ${leaveUsed} ngày · Điều 113 BLLĐ`}
           icon={CalendarDays}
-          trend={{ value: `${myLeaveBalance?.remaining ?? 10}/${myLeaveBalance?.total ?? 12}`, isPositive: true, label: 'ngày khả dụng' }}
+          trend={{ value: `${leaveRemaining}/${leaveEntitled}`, isPositive: leaveRemaining > 0, label: 'ngày khả dụng' }}
         />
         <NumberCard
           title="Điểm danh hôm nay"
-          value="Đúng giờ"
-          subtitle="Vào ca: 08:25 · Sảnh văn phòng"
+          value={todayStatusText}
+          subtitle={todaySubtitleText}
           icon={Clock4}
-          trend={{ value: 'Đã điểm danh', isPositive: true }}
+          trend={{ value: checkInTimeText ? 'Đã điểm danh' : 'Chưa điểm danh', isPositive: Boolean(checkInTimeText) }}
         />
         <NumberCard
           title="Đơn từ của tôi"
