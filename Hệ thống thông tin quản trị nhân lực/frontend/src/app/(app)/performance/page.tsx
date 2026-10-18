@@ -19,7 +19,7 @@ import { formatDateTime } from '@/lib/utils';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Button, Badge, Input, Select } from '@/components/ui/primitives';
+import { Button, Badge, Input, Select, Textarea } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toaster';
 import { printDocumentElement } from '@/components/ui/print';
 import { Portal } from '@/components/ui/portal';
@@ -55,6 +55,11 @@ interface AppraisalGoal {
   weightage: number;
   criteriaGroup?: 'GENERAL' | 'RESULT';
   targetMetric: string;
+  measurementMode?: string;
+  targetValue?: number | null;
+  actualValue?: number | null;
+  measurementUnit?: string | null;
+  scoreRationale?: string | null;
   assignmentScope?: 'INDIVIDUAL' | 'ORG_UNIT';
   assignmentOrgUnitId?: string | null;
   assignmentOrgUnitName?: string | null;
@@ -484,10 +489,13 @@ export default function PerformanceKpiPage() {
     weightage: 25,
     criteriaGroup: 'RESULT' as 'GENERAL' | 'RESULT',
     description: '',
+    measurementMode: 'MANUAL', targetValue: '', measurementUnit: '',
   });
 
   // Form Score
   const [managerScore, setManagerScore] = useState<number | null>(null);
+  const [actualKpiValue, setActualKpiValue] = useState('');
+  const [scoreRationale, setScoreRationale] = useState('');
   const [publicTaskScores, setPublicTaskScores] = useState<{ quantityScore: number | null; qualityScore: number | null; progressScore: number | null }>({ quantityScore: null, qualityScore: null, progressScore: null });
 
   // Form Sync Appraisal
@@ -637,6 +645,9 @@ export default function PerformanceKpiPage() {
         weightage: Number(goalForm.weightage) || 20,
         criteriaGroup: goalForm.criteriaGroup,
         description: goalForm.description,
+        measurementMode: isEnterprise ? goalForm.measurementMode : 'MANUAL',
+        targetValue: isEnterprise && goalForm.measurementMode !== 'MANUAL' ? Number(goalForm.targetValue) : undefined,
+        measurementUnit: goalForm.measurementUnit || undefined,
       })).data;
     },
     onSuccess: (result: { createdCount: number; assignmentScope: 'INDIVIDUAL' | 'ORG_UNIT'; assignmentOrgUnit?: { name: string } | null }) => {
@@ -656,6 +667,7 @@ export default function PerformanceKpiPage() {
         weightage: 25,
         criteriaGroup: 'RESULT',
         description: '',
+        measurementMode: 'MANUAL', targetValue: '', measurementUnit: '',
       });
     },
     onError: (err) => toast('Lỗi: ' + errorMessage(err), 'error'),
@@ -670,8 +682,10 @@ export default function PerformanceKpiPage() {
         if (quantityScore === null || qualityScore === null || progressScore === null) throw new Error('Nhập đủ điểm số lượng, chất lượng và tiến độ');
         return (await api.patch(`/hrms/performance/goals/${selectedGoal.id}/score`, { quantityScore, qualityScore, progressScore })).data;
       }
-      if (managerScore === null) throw new Error('Nhập điểm sau khi đối chiếu kết quả và căn cứ');
-      return (await api.patch(`/hrms/performance/goals/${selectedGoal.id}/score`, { managerScore })).data;
+      const quantitative = selectedGoal.cycle?.organizationSector === 'enterprise' && selectedGoal.measurementMode && selectedGoal.measurementMode !== 'MANUAL';
+      if (!quantitative && managerScore === null) throw new Error('Nhập điểm sau khi đối chiếu kết quả và căn cứ');
+      if (quantitative && actualKpiValue === '') throw new Error('Nhập kết quả thực tế để tính điểm');
+      return (await api.patch(`/hrms/performance/goals/${selectedGoal.id}/score`, { managerScore: quantitative ? undefined : managerScore, actualValue: quantitative ? Number(actualKpiValue) : undefined, scoreRationale })).data;
     },
     onSuccess: () => {
       toast('Đã cập nhật điểm đánh giá KRA!', 'success');
@@ -881,7 +895,7 @@ export default function PerformanceKpiPage() {
     : null;
   const selectedGoalCanSaveScore = selectedGoalUsesPublicDimensions
     ? publicTaskScores.quantityScore !== null && publicTaskScores.qualityScore !== null && publicTaskScores.progressScore !== null
-    : managerScore !== null;
+    : selectedGoal?.measurementMode && selectedGoal.measurementMode !== 'MANUAL' ? actualKpiValue !== '' && scoreRationale.trim().length >= 10 : managerScore !== null && (selectedGoal?.cycle?.organizationSector !== 'enterprise' || scoreRationale.trim().length >= 10);
   const cycleDimensionWeightTotal = cycleForm.quantityCriteriaWeight + cycleForm.qualityCriteriaWeight + cycleForm.progressCriteriaWeight;
   const cycleDimensionWeightsValid = isEnterprise || !publicEmployee || cycleForm.periodType === 'ANNUAL' || Math.abs(cycleDimensionWeightTotal - 100) < 0.001;
 
@@ -1078,7 +1092,7 @@ export default function PerformanceKpiPage() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               {visibleGoals.map((g) => (
                 <div key={g.id} className="rounded-lg border border-border bg-card p-5 shadow-xs space-y-3 relative group">
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-col items-start gap-2">
                     <div>
                       <h3 className="font-bold text-foreground text-base flex items-center gap-2">
                         {g.kraTitle}
@@ -1091,7 +1105,7 @@ export default function PerformanceKpiPage() {
                         ? <p className="mt-1 text-xs text-muted-foreground">Giao theo {g.assignmentOrgUnitName ?? g.assignmentOrgUnit?.name} ({g.assignmentOrgUnitCode ?? g.assignmentOrgUnit?.code}); mỗi nhân viên có bản mục tiêu và điểm riêng.</p>
                         : <p className="mt-1 text-xs text-muted-foreground">KPI cá nhân · trọng số tính trong tổng điểm riêng của nhân viên.</p>}
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
                       {(() => {
                         const evaluationStatus = goalEvaluationStatus(g);
                         const statusClass = evaluationStatus === 'SCORED'
@@ -1104,7 +1118,7 @@ export default function PerformanceKpiPage() {
                         </span>;
                       })()}
                       <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border border-border bg-muted/40 text-foreground">
-                        Trọng số {g.cycle?.organizationSector === 'state' ? 'trong nhóm' : 'trong điểm cá nhân'}: {g.weightage}%
+                        {g.cycle?.organizationSector === 'state' ? 'Trọng số nhóm' : 'Trọng số'}: {g.weightage}%
                       </span>
                       {canAdministerGoals && <button
                         type="button"
@@ -1171,6 +1185,8 @@ export default function PerformanceKpiPage() {
                         onClick={() => {
                           setSelectedGoal(g);
                           setManagerScore(g.managerScore ?? null);
+                          setActualKpiValue(g.actualValue == null ? '' : String(g.actualValue));
+                          setScoreRationale(g.scoreRationale || '');
                           setPublicTaskScores({ quantityScore: g.quantityScore ?? null, qualityScore: g.qualityScore ?? null, progressScore: g.progressScore ?? null });
                           setIsScoreModalOpen(true);
                         }}
@@ -1785,6 +1801,11 @@ export default function PerformanceKpiPage() {
                   </div> : null;
                 })()}
 
+                {isEnterprise && <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <label className="space-y-1 sm:col-span-2"><span className="font-medium">Cách đo KPI</span><Select value={goalForm.measurementMode} onChange={e => setGoalForm({ ...goalForm, measurementMode: e.target.value, targetValue: e.target.value === 'BINARY' ? '1' : '' })}><option value="MANUAL">Quản lý chấm theo rubric đã thống nhất</option><option value="HIGHER_BETTER">Càng cao càng tốt — thực tế / mục tiêu</option><option value="LOWER_BETTER">Càng thấp càng tốt — mục tiêu / thực tế</option><option value="BINARY">Đạt / không đạt</option></Select></label>
+                  {goalForm.measurementMode !== 'MANUAL' && <><label className="space-y-1"><span className="font-medium">Giá trị mục tiêu</span><Input type="number" step="any" min={0} value={goalForm.targetValue} disabled={goalForm.measurementMode === 'BINARY'} onChange={e => setGoalForm({ ...goalForm, targetValue: e.target.value })} /></label><label className="space-y-1"><span className="font-medium">Đơn vị đo</span><Input value={goalForm.measurementUnit} onChange={e => setGoalForm({ ...goalForm, measurementUnit: e.target.value })} placeholder="%, hồ sơ, ngày, đồng..." /></label></>}
+                </div>}
+
                 {goalForm.assignmentScope === 'INDIVIDUAL' ? <div>
                   <label className="font-medium text-foreground block mb-1">Nhân viên nhận mục tiêu:</label>
                   <Select
@@ -1900,9 +1921,9 @@ export default function PerformanceKpiPage() {
                     <label className="space-y-1"><span className="font-medium">Tiến độ (%)</span><Input type="number" min="0" max="100" value={publicTaskScores.progressScore ?? ''} onChange={e => setPublicTaskScores(current => ({ ...current, progressScore: e.target.value === '' ? null : Number(e.target.value) }))} /></label>
                   </div>
                 </div> : <div>
-                  <label className="font-medium text-foreground block mb-1">Điểm KPI do quản lý chấm (thang 0–100):</label>
-                  <Input type="number" min="0" max="100" value={managerScore ?? ''} onChange={(e) => setManagerScore(e.target.value === '' ? null : Number(e.target.value))} />
+                  {selectedGoal.measurementMode && selectedGoal.measurementMode !== 'MANUAL' ? <><label className="font-medium text-foreground block mb-1">Kết quả thực tế ({selectedGoal.measurementUnit || 'giá trị'}), mục tiêu {selectedGoal.targetValue}:</label><Input type="number" step="any" min={0} value={actualKpiValue} onChange={e => setActualKpiValue(e.target.value)} /><p className="mt-1 text-muted-foreground">{selectedGoal.measurementMode === 'HIGHER_BETTER' ? 'Điểm = thực tế / mục tiêu × 100' : selectedGoal.measurementMode === 'LOWER_BETTER' ? 'Điểm = mục tiêu / thực tế × 100; kết quả 0 được xử lý riêng' : 'Kết quả 1 = đạt 100 điểm; 0 = chưa đạt'}. Điểm tối đa 100 theo quy ước của doanh nghiệp.</p></> : <><label className="font-medium text-foreground block mb-1">Điểm KPI do quản lý chấm (thang 0–100):</label><Input type="number" min="0" max="100" value={managerScore ?? ''} onChange={(e) => setManagerScore(e.target.value === '' ? null : Number(e.target.value))} /></>}
                 </div>}
+                {selectedGoal.cycle?.organizationSector === 'enterprise' && <label className="block space-y-1"><span className="font-medium">Giải trình đối chiếu mục tiêu, kết quả và minh chứng</span><Textarea minLength={10} value={scoreRationale} onChange={e => setScoreRationale(e.target.value)} placeholder="Nêu dữ liệu thực tế và rubric/cách tính đã thống nhất" /></label>}
 
                 <div className="rounded-lg border border-border/80 bg-muted/20 p-3 space-y-2 text-xs">
                   <p className="font-semibold text-foreground">Cách tính:</p>

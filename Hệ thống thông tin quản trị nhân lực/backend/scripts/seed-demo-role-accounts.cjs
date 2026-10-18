@@ -1,11 +1,12 @@
 /**
- * Tạo/cập nhật bộ tài khoản demo theo vai trò RBAC để trình diễn giao diện theo cấp.
- * Chạy sau seed.cjs; không xóa dữ liệu nghiệp vụ và không đổi mật khẩu tài khoản đã có.
+ * Tạo/cập nhật bộ tài khoản theo vai trò RBAC để truy cập nhanh từng nhóm chức năng.
+ * Chạy sau seed.cjs; không xóa dữ liệu nghiệp vụ. Các tài khoản trong danh sách dùng mật khẩu 123.
  */
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
+const INITIAL_PASSWORD = '123';
 
 const roles = [
   ['ADMIN', 'Quản trị viên Hệ thống CNTT', 'Quản trị kỹ thuật, tài khoản, cấu hình và nhật ký hệ thống.'],
@@ -61,17 +62,17 @@ async function main() {
   const javaTeam = await ensureUnit('SQ-BE-SGN', 'Nhóm Backend Microservices', center, 1);
 
   const accounts = [
-    { email: 'admin@demo.local', password: 'Admin@123', name: 'Nguyễn Hoàng Nam', title: 'Quản trị viên Hệ thống CNTT', unit: itUnit, employeeCode: 'NV0001', roles: ['ADMIN'] },
-    { email: 'ceo@saigontechnology.vn', password: 'Admin@123', name: 'Trần Minh Hoàng', title: 'Tổng Giám đốc', unit: bodUnit, employeeCode: 'NVDEMO-CEO', roles: ['BOD'] },
-    { email: 'chairman@saigontechnology.vn', password: 'Admin@123', name: 'Phạm Tiến Thành', title: 'Chủ tịch Hội đồng Quản trị', unit: dhcdUnit, employeeCode: 'NVDEMO-CHAIR', roles: ['SHAREHOLDER', 'BOD'] },
-    { email: 'km.manager@demo.local', password: 'Manager@123', name: 'Dương Khánh Chi', title: 'Trưởng ban Quản trị Nhân sự', unit: hrOpsUnit, employeeCode: 'NV0002', roles: ['KM_MANAGER'] },
-    { email: 'pm.java@demo.local', password: 'Pm@123456', name: 'Lê Minh Tuấn', title: 'Trưởng nhóm Java', unit: javaTeam, employeeCode: 'NV0003', roles: ['LINE_MANAGER'] },
-    { email: 'dev.fresher@demo.local', password: 'Fresher@123', name: 'Đỗ Gia Hân', title: 'Lập trình viên Java', unit: javaTeam, employeeCode: 'NV0004', roles: ['USER'] },
-    { email: 'cb.demo@demo.local', password: 'Cb@123456', name: 'Trần Thu Trang', title: 'Chuyên viên C&B', unit: cbUnit, employeeCode: 'NVDEMO-CB', roles: ['HR_CB'] },
-    { email: 'accountant.demo@demo.local', password: 'Acc@123456', name: 'Nguyễn Thị Hồng', title: 'Kế toán thanh toán', unit: financeUnit, employeeCode: 'NVDEMO-ACC', roles: ['ACCOUNTANT'] },
-    { email: 'recruiter.demo@demo.local', password: 'Recruit@123', name: 'Phạm Ngọc Mai', title: 'Chuyên viên Tuyển dụng', unit: recruitUnit, employeeCode: 'NVDEMO-TA', roles: ['HR_RECRUITER'] },
-    { email: 'trainer.demo@demo.local', password: 'Trainer@123', name: 'Lê Hoàng Anh', title: 'Chuyên viên Đào tạo và Phát triển', unit: trainerUnit, employeeCode: 'NVDEMO-LD', roles: ['HR_TRAINER'] },
-    { email: 'auditor.demo@demo.local', password: 'Audit@123', name: 'Vũ Minh Đức', title: 'Kiểm toán viên nội bộ', unit: legalUnit, employeeCode: 'NVDEMO-AUD', roles: ['AUDITOR'] },
+    { email: 'admin@demo.local', password: INITIAL_PASSWORD, name: 'Nguyễn Hoàng Nam', title: 'Quản trị viên Hệ thống CNTT', unit: itUnit, employeeCode: 'NV0001', roles: ['ADMIN'] },
+    { email: 'ceo@saigontechnology.vn', password: INITIAL_PASSWORD, name: 'Trần Minh Hoàng', title: 'Tổng Giám đốc', unit: bodUnit, employeeCode: 'NVDEMO-CEO', roles: ['BOD'] },
+    { email: 'chairman@saigontechnology.vn', password: INITIAL_PASSWORD, name: 'Phạm Tiến Thành', title: 'Chủ tịch Hội đồng Quản trị', unit: dhcdUnit, employeeCode: 'NVDEMO-CHAIR', roles: ['SHAREHOLDER', 'BOD'] },
+    { email: 'km.manager@demo.local', password: INITIAL_PASSWORD, name: 'Dương Khánh Chi', title: 'Trưởng ban Quản trị Nhân sự', unit: hrOpsUnit, employeeCode: 'NV0002', roles: ['KM_MANAGER'] },
+    { email: 'pm.java@demo.local', password: INITIAL_PASSWORD, name: 'Lê Minh Tuấn', title: 'Trưởng nhóm Java', unit: javaTeam, employeeCode: 'NV0003', roles: ['LINE_MANAGER'] },
+    { email: 'dev.fresher@demo.local', password: INITIAL_PASSWORD, name: 'Đỗ Gia Hân', title: 'Lập trình viên Java', unit: javaTeam, employeeCode: 'NV0004', roles: ['USER'] },
+    { email: 'cb.demo@demo.local', password: INITIAL_PASSWORD, name: 'Trần Thu Trang', title: 'Chuyên viên C&B', unit: cbUnit, employeeCode: 'NVDEMO-CB', roles: ['HR_CB'] },
+    { email: 'accountant.demo@demo.local', password: INITIAL_PASSWORD, name: 'Nguyễn Thị Hồng', title: 'Kế toán thanh toán', unit: financeUnit, employeeCode: 'NVDEMO-ACC', roles: ['ACCOUNTANT'] },
+    { email: 'recruiter.demo@demo.local', password: INITIAL_PASSWORD, name: 'Phạm Ngọc Mai', title: 'Chuyên viên Tuyển dụng', unit: recruitUnit, employeeCode: 'NVDEMO-TA', roles: ['HR_RECRUITER'] },
+    { email: 'trainer.demo@demo.local', password: INITIAL_PASSWORD, name: 'Lê Hoàng Anh', title: 'Chuyên viên Đào tạo và Phát triển', unit: trainerUnit, employeeCode: 'NVDEMO-LD', roles: ['HR_TRAINER'] },
+    { email: 'auditor.demo@demo.local', password: INITIAL_PASSWORD, name: 'Vũ Minh Đức', title: 'Kiểm toán viên nội bộ', unit: legalUnit, employeeCode: 'NVDEMO-AUD', roles: ['AUDITOR'] },
   ];
 
   for (const account of accounts) {
@@ -86,6 +87,7 @@ async function main() {
         orgUnitId: profile.unit.id,
         employeeCode: profile.employeeCode,
         passwordHash: await bcrypt.hash(password, 12),
+        mustChangePassword: false,
         status: 'ACTIVE',
         employmentStatus: 'ACTIVE',
         hireDate: new Date('2021-01-04'),

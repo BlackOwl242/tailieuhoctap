@@ -30,6 +30,7 @@ model User {
   id                  String     @id @default(uuid())
   email               String     @unique
   passwordHash        String
+  mustChangePassword  Boolean    @default(false)
   fullName            String
   orgUnitId           String?
   jobTitle            String?
@@ -771,6 +772,7 @@ enum ContractType {
 }
 
 enum ContractStatus {
+  DRAFT
   ACTIVE
   EXPIRED
   TERMINATED
@@ -1218,6 +1220,10 @@ model PersonnelComprehensiveProfile {
   id     String @id @default(uuid())
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verificationStatus String @default("UNVERIFIED") // VERIFIED after a recorded review
+  verifiedAt         DateTime?
+  verifiedById       String?
+  dataSource         String @default("MANUAL") // MANUAL | ACADEMIC_SIMULATION
 
   // 1. Thông tin cá nhân & Lý lịch
   aliasName        String? // Tên gọi khác
@@ -1916,6 +1922,11 @@ model HrmsAppraisalGoal {
   description   String   @db.Text
   weightage     Float    @default(20) // Trọng số %
   targetMetric  String // KPI mục tiêu: "Hoàn thành 100% sprint đúng hạn"
+  measurementMode String @default("MANUAL") // MANUAL | HIGHER_BETTER | LOWER_BETTER | BINARY
+  targetValue     Float?
+  actualValue     Float?
+  measurementUnit String?
+  scoreRationale  String?
   criteriaGroup String   @default("RESULT") // RESULT for enterprise KPIs; GENERAL or RESULT in public-sector assessment
   assignmentScope String @default("INDIVIDUAL") // INDIVIDUAL or ORG_UNIT; org-unit assignments are copied to each eligible employee
   assignmentOrgUnitId String?

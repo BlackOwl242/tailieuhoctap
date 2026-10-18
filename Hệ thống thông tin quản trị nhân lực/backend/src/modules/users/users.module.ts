@@ -2,7 +2,7 @@ import {
   Body, ConflictException, Controller, Delete, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsDateString, IsEmail, IsEnum, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsEmail, IsEnum, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../common/prisma.service';
@@ -24,7 +24,7 @@ class ListUsersQueryDto {
 
 class CreateUserDto {
   @ApiProperty() @IsEmail({}, { message: 'Email không hợp lệ' }) email!: string;
-  @ApiProperty({ minLength: 8 }) @IsString() @MinLength(8, { message: 'Mật khẩu tối thiểu 8 ký tự' }) password!: string;
+  @ApiProperty({ minLength: 3 }) @IsString() @MinLength(3, { message: 'Mật khẩu tối thiểu 3 ký tự' }) password!: string;
   @ApiProperty() @IsString() @MaxLength(120) fullName!: string;
   @ApiPropertyOptional() @IsOptional() @IsString() jobTitle?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
@@ -45,8 +45,9 @@ class UpdateUserDto {
   @ApiPropertyOptional() @IsOptional() @IsString() jobTitle?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() bio?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() @MinLength(8) password?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() @MinLength(3) password?: string;
   @ApiPropertyOptional() @IsOptional() @IsEnum(UserStatus) status?: UserStatus;
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() mustChangePassword?: boolean;
   @ApiPropertyOptional({ type: [String], isArray: true })
   @IsOptional()
   @IsArray()
@@ -108,6 +109,7 @@ export class UsersService {
       data: {
         email: dto.email.toLowerCase(),
         passwordHash,
+        mustChangePassword: false,
         fullName: dto.fullName,
         jobTitle: dto.jobTitle,
         orgUnitId: dto.orgUnitId,
@@ -142,7 +144,11 @@ export class UsersService {
     if (dto.orgUnitId !== undefined) data.orgUnitId = dto.orgUnitId;
     if (dto.expertise !== undefined) data.expertise = dto.expertise;
     if (dto.status !== undefined) data.status = dto.status;
-    if (dto.password) data.passwordHash = await bcrypt.hash(dto.password, 12);
+    if (dto.mustChangePassword !== undefined) data.mustChangePassword = dto.mustChangePassword;
+    if (dto.password) {
+      data.passwordHash = await bcrypt.hash(dto.password, 12);
+      data.mustChangePassword = false;
+    }
 
     const user = await this.prisma.$transaction(async (tx) => {
       if (dto.roleCodes) {
@@ -153,7 +159,7 @@ export class UsersService {
     });
 
     // Khóa/vô hiệu hóa tài khoản → thu hồi toàn bộ phiên đăng nhập đang chạy
-    if (dto.status && dto.status !== 'ACTIVE') {
+    if ((dto.status && dto.status !== 'ACTIVE') || dto.password || dto.mustChangePassword === true) {
       await this.prisma.refreshToken.updateMany({ where: { userId: id, revokedAt: null }, data: { revokedAt: new Date() } });
     }
 

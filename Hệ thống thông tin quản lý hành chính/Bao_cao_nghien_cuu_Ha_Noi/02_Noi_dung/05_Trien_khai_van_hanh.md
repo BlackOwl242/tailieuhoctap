@@ -128,6 +128,24 @@ Bảng 5.8: Phân loại sự cố và mục tiêu phản hồi đề xuất
 
 Các thời gian trên là mục tiêu đề xuất cho tổ chức vận hành, cần được thống nhất nguồn lực. Thời gian phản hồi là thời gian nhận trách nhiệm và thông báo bước xử lý, không bảo đảm đã sửa xong. Báo cáo sự cố ghi riêng thời điểm phát hiện, xác nhận, khôi phục và xử lý nguyên nhân để không dùng một chỉ số che phần gián đoạn còn lại.
 
+### 5.3.3. Thao tác khoản thu và chữ ký trong bản cài đặt cục bộ
+
+Bản hiện tại có thể chạy các nhánh nghiệp vụ thanh toán và ký ở chế độ `LOCAL_SANDBOX`; đây là luồng lưu dữ liệu và kiểm tra điều kiện trong ứng dụng, không phải kết nối với ngân hàng, nhà cung cấp chứng thư số hay Cổng Dịch vụ công quốc gia.
+
+| Bước | Người thao tác | Điều kiện và kết quả được lưu |
+| --- | --- | --- |
+| Ghi khoản thu | Cán bộ tiếp nhận | Hồ sơ đã tiếp nhận/đang thụ lý; ghi số nguyên dương và căn cứ. Sau khi có giao dịch thì không sửa khoản thu tại thao tác này |
+| Tạo giao dịch | Người nộp bằng mã và khóa tra cứu | Chỉ với khoản thu `DUE`; tạo mã duy nhất trạng thái `PENDING`. Không cần tài khoản người dân |
+| Xác nhận sandbox | Người nộp | Chuyển giao dịch sang `PAID` và thêm sự kiện; đây là xác nhận giả lập trong ứng dụng, không chứng minh đã trừ tiền |
+| Đối soát nội bộ | Cán bộ tài chính trong đúng phạm vi | Chỉ giao dịch `PAID` được chuyển thành `RECONCILED`; hồ sơ và giao dịch được cập nhật cùng phiên bản dữ liệu |
+| Đề nghị và duyệt hoàn | Hai tài khoản tài chính khác nhau | Chỉ lập đề nghị với giao dịch đã đối soát và hồ sơ thuộc nhánh kết thúc cho phép. Người lập không tự duyệt; duyệt sandbox chuyển sổ nội bộ sang `REFUNDED`, không chuyển tiền |
+| Cấp quyền ký | Quản trị viên hệ thống | Ghi căn cứ và lý do; chỉ lãnh đạo đang hiệu lực được cấp. Có thể thu hồi và lưu nhật ký riêng |
+| Ký và phát hành | Lãnh đạo được cấp quyền; sau đó là văn thư | Người phê duyệt không tự ký. Ứng dụng ký Ed25519 trên nội dung kết quả đã duyệt, xác minh chữ ký trước khi phát hành sandbox; văn thư ghi số kết quả nội bộ rồi người nhận, kênh và chứng cứ giao |
+
+Máy chủ từ chối thao tác khi sai vai trò, cơ quan, trạng thái, phiên bản hoặc điều kiện chữ ký. Nhật ký giao dịch hiển thị người thực hiện, thời điểm và nội dung từng bước. Chữ ký hiện gắn với dữ liệu kết quả chuẩn hóa, chưa ký lên tệp PDF và không phải chứng thư số công vụ. Số phát hành và chứng cứ giao chỉ tồn tại trong ứng dụng; không được dùng làm văn bản hành chính, biên lai hoặc bằng chứng giao dịch chính thức.
+
+Trước khi thay luồng sandbox bằng dịch vụ thật cần có quy trình và thẩm quyền được cơ quan xác nhận, hợp đồng/API, danh tính kỹ thuật và chứng thư phù hợp, môi trường kiểm thử, quy tắc chống lặp, xử lý phản hồi trễ, đối soát với dữ liệu nguồn, quản lý hoàn tiền và nghiệm thu. Không bật tích hợp chỉ bằng cách thay nhãn trạng thái trên giao diện.
+
 ## 5.4. Sao lưu, phục hồi và duy trì dịch vụ
 
 ### 5.4.1. Phạm vi và chiến lược sao lưu

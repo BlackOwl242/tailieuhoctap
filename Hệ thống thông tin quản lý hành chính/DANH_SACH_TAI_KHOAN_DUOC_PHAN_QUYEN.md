@@ -1,5 +1,7 @@
 # Tài khoản cục bộ được phân quyền
 
+> Bản ghi lịch sử ngày 11/10/2026. Bộ dữ liệu sau phục hồi có 79 tài khoản; xem [danh sách hiện tại](TAI_KHOAN_SAU_KHOI_PHUC_20261018.md). Thông tin mật khẩu trong bản lịch sử chưa được đối chiếu lại, không khẳng định còn sử dụng được.
+
 **Cơ sở dữ liệu:** `data/hanoi-services.sqlite3`
 **Ngày tạo/kiểm tra:** 11/10/2026
 **Trạng thái:** 11 tài khoản cục bộ đang hoạt động; 9 đề nghị cấp quyền nghiệp vụ đã được quản trị viên thứ hai phê duyệt. Đây không phải tài khoản do cơ quan Hà Nội cấp.

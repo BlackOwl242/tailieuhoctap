@@ -60,6 +60,10 @@ export default function PersonnelReportsPage() {
   }, [orgConfig]);
 
   useEffect(() => {
+    if (cvMode === 'enterprise' && activeReport === 'bieu01') setActiveReport('2c');
+  }, [cvMode, activeReport]);
+
+  useEffect(() => {
     if (initialUserId) {
       setSelectedUserId(initialUserId);
       setActiveReport('2c');
@@ -126,7 +130,7 @@ export default function PersonnelReportsPage() {
           { id: 'bieu01', label: '2. Nội bộ 01: Độ tuổi × Ngạch bậc', icon: Award },
           { id: 'bieu02', label: '3. Nội bộ 02: Ngoại ngữ & Tin học', icon: Globe },
           { id: 'bieu03', label: '4. Nội bộ 03: Trình độ CM & LLCT × Đơn vị', icon: Building },
-        ].map((tab) => {
+        ].filter((tab) => cvMode === 'state' || tab.id !== 'bieu01').map((tab) => {
           const Icon = tab.icon;
           const active = activeReport === tab.id;
           return (
@@ -326,14 +330,14 @@ export default function PersonnelReportsPage() {
                   <th className="border border-border p-2 text-left w-24">Mã NV</th>
                   <th className="border border-border p-2 text-left">Họ và tên</th>
                   <th className="border border-border p-2 text-left">Đơn vị / Phòng ban</th>
-                  <th className="border border-border p-2 text-left">Ngạch lương</th>
+                  {cvMode === 'state' && <th className="border border-border p-2 text-left">Ngạch lương</th>}
                   <th className="border border-border p-2 text-left">Trình độ Ngoại ngữ</th>
                   <th className="border border-border p-2 text-left">Trình độ Tin học</th>
                 </tr>
               </thead>
               <tbody>
                 {qBieu02.isLoading ? (
-                  <tr><td colSpan={7} className="text-center py-6 text-muted-foreground">Đang tổng hợp số liệu...</td></tr>
+                  <tr><td colSpan={cvMode === 'state' ? 7 : 6} className="text-center py-6 text-muted-foreground">Đang tổng hợp số liệu...</td></tr>
                 ) : (
                   qBieu02.data?.items?.map((item: any, idx: number) => (
                     <tr key={idx} className="hover:bg-muted/30">
@@ -341,7 +345,7 @@ export default function PersonnelReportsPage() {
                       <td className="border border-border p-2 font-bold">{item.employeeCode || 'Chưa cập nhật'}</td>
                       <td className="border border-black p-2 font-bold">{item.fullName}</td>
                       <td className="border border-black p-2">{item.orgUnitName || 'Chưa cập nhật'}</td>
-                      <td className="border border-black p-2">{item.rankName || 'Theo HĐLĐ'}</td>
+                      {cvMode === 'state' && <td className="border border-black p-2">{item.rankName || 'Chưa cập nhật ngạch'}</td>}
                       <td className="border border-black p-2 font-medium">{item.foreignLanguage}</td>
                       <td className="border border-black p-2 font-medium">{item.informaticsLevel}</td>
                     </tr>

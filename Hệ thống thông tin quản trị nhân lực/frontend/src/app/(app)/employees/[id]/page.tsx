@@ -32,6 +32,7 @@ interface EmployeeDetail {
   baseSalary?: number | null; birthDate: string | null; phone: string | null; address: string | null;
   bio: string | null; expertise: string[];
   contracts?: ContractRow[]; certificates: CertificateRow[];
+  comprehensiveProfile?: { verificationStatus?: string; verifiedAt?: string | null; dataSource?: string } | null;
   leaveBalances: { year: number; entitled: number; used: number }[];
 }
 
@@ -43,7 +44,8 @@ export default function EmployeeDetailPage() {
   const id = params.id;
   const qc = useQueryClient();
   const toast = useToast();
-  const roles = useAuthStore((s) => s.user?.roles ?? []);
+  const viewer = useAuthStore((s) => s.user);
+  const roles = viewer?.roles ?? [];
   const isHr = roles.includes('ADMIN') || roles.includes('KM_MANAGER');
 
   const q = useQuery({
@@ -54,10 +56,12 @@ export default function EmployeeDetailPage() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [contractOpen, setContractOpen] = useState(false);
   const [certOpen, setCertOpen] = useState(false);
+  const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
   const [profileForm, setProfileForm] = useState<Record<string, string>>({});
   const [contractForm, setContractForm] = useState({ contractNo: '', type: 'FIXED_TERM', startDate: '', endDate: '', baseSalary: '', compensationBasis: 'MONTHLY', note: '' });
   const [certForm, setCertForm] = useState({ name: '', certNo: '', issuedBy: '', issuedDate: '', expiryDate: '', storageSpot: '' });
   const [contractFile, setContractFile] = useState<{ name: string; mimeType: string; sizeBytes: number; dataBase64: string } | null>(null);
+  const [replacementContractFile, setReplacementContractFile] = useState<{ name: string; mimeType: string; sizeBytes: number; dataBase64: string } | null>(null);
   const [certFile, setCertFile] = useState<{ name: string; mimeType: string; sizeBytes: number; dataBase64: string } | null>(null);
 
   /** Đọc tập tin thành base64 để đính kèm bản mềm hợp đồng/văn bằng. */
@@ -81,6 +85,7 @@ export default function EmployeeDetailPage() {
       if (profileForm.employmentStatus) body.employmentStatus = profileForm.employmentStatus;
       if (profileForm.phone) body.phone = profileForm.phone;
       if (profileForm.address) body.address = profileForm.address;
+      if (profileForm.birthDate) body.birthDate = profileForm.birthDate;
       if (profileForm.jobTitle) body.jobTitle = profileForm.jobTitle;
       return api.patch(`/employees/${id}/profile`, body);
     },
@@ -100,6 +105,13 @@ export default function EmployeeDetailPage() {
       file: contractFile ?? undefined,
     }),
     onSuccess: () => { toast('Đã tạo hợp đồng', 'success'); setContractOpen(false); setContractFile(null); invalidate(); },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const uploadContractCopy = useMutation({
+    mutationFn: async ({ contractId, file }: { contractId: string; file: { name: string; mimeType: string; sizeBytes: number; dataBase64: string } }) =>
+      api.patch(`/employees/${id}/contracts/${contractId}`, { file }),
+    onSuccess: () => { toast('Đã lưu bản mềm hợp đồng', 'success'); setReplacementContractFile(null); invalidate(); },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
 
@@ -126,7 +138,18 @@ export default function EmployeeDetailPage() {
   if (q.isLoading) return <Skeleton className="h-96" />;
   if (q.isError || !q.data) return <ErrorState message={errorMessage(q.error)} onRetry={() => q.refetch()} />;
   const emp = q.data;
+  const selectedContract = emp.contracts?.find((contract) => contract.id === selectedContractId) ?? null;
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  const activeContract = (emp.contracts ?? []).find((contract) => contract.status === 'ACTIVE'
+    && contract.startDate.slice(0, 10) <= today && (!contract.endDate || contract.endDate.slice(0, 10) >= today));
+  const canViewContracts = isHr || emp.id === viewer?.id;
   const balance = emp.leaveBalances[0];
+  const missingProfileFields = [
+    !emp.phone ? 'số điện thoại' : null,
+    !emp.birthDate ? 'ngày sinh' : null,
+    !emp.address ? 'địa chỉ liên hệ' : null,
+  ].filter((field): field is string => Boolean(field));
+  const hasNoActiveContract = canViewContracts && !activeContract;
 
   return (
     <>
@@ -156,13 +179,13 @@ export default function EmployeeDetailPage() {
             <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
               {([
                 ['Email', emp.email],
-                ['Điện thoại', emp.phone ?? 'Chưa cập nhật'],
+                ['Điện thoại', emp.phone?.trim() || 'Chưa cập nhật'],
                 ['Ngày sinh', emp.birthDate ? formatDate(emp.birthDate) : 'Chưa cập nhật'],
-                ['Địa chỉ', emp.address ?? 'Chưa cập nhật'],
+                ['Xác minh hồ sơ', emp.comprehensiveProfile?.verificationStatus === 'VERIFIED' ? `Đã xác minh${emp.comprehensiveProfile.verifiedAt ? ` · ${formatDate(emp.comprehensiveProfile.verifiedAt)}` : ''}` : 'Chưa xác minh'],
+                ['Địa chỉ', emp.address?.trim() || 'Chưa cập nhật'],
                 ['Ngày vào làm', emp.hireDate ? formatDate(emp.hireDate) : 'Chưa cập nhật'],
                 ['Trạng thái', EMPLOYMENT_STATUS_LABEL[emp.employmentStatus] ?? emp.employmentStatus],
-                // RBAC: lương cơ bản chỉ hiển thị cho HR/Quản trị viên
-                ...(isHr ? [['Lương cơ bản', vnd(emp.baseSalary)] as [string, string]] : []),
+                ...(canViewContracts ? [['Lương theo hợp đồng', activeContract ? `${vnd(activeContract.baseSalary)} / ${activeContract.compensationBasis === 'HOURLY' ? 'giờ' : activeContract.compensationBasis === 'DAILY' ? 'ngày' : 'tháng'}` : isHr && emp.baseSalary != null ? `${vnd(emp.baseSalary)} · Mức trong hồ sơ, chưa có hợp đồng hiệu lực` : 'Chưa có hợp đồng hiệu lực'] as [string, string]] : []),
                 ['Phép năm còn lại', balance ? `${balance.entitled - balance.used}/${balance.entitled} ngày (${balance.year})` : 'Chưa cập nhật'],
               ] as [string, string][]).map(([k, v]) => (
                 <div key={k as string}>
@@ -174,17 +197,37 @@ export default function EmployeeDetailPage() {
           </CardContent>
         </Card>
 
+        {isHr && (missingProfileFields.length > 0 || hasNoActiveContract) ? (
+          <Card>
+            <CardHeader><CardTitle>Thông tin cần đối chiếu và bổ sung</CardTitle></CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              {missingProfileFields.length > 0 ? (
+                <p className="text-muted-foreground">Chưa có {missingProfileFields.join(', ')} trong hồ sơ hiện hành. Hãy lấy thông tin từ nhân viên hoặc hồ sơ gốc trước khi lưu.</p>
+              ) : null}
+              {hasNoActiveContract ? (
+                <p className="text-muted-foreground">Chưa có hợp đồng hiệu lực để xác nhận mức lương. Không dùng mức lương trong hồ sơ thay cho điều khoản hợp đồng.</p>
+              ) : null}
+              <div className="flex flex-wrap gap-2">
+                {missingProfileFields.length > 0 ? <Button size="sm" variant="outline" onClick={() => { setProfileForm({}); setProfileOpen(true); }}>Cập nhật thông tin cá nhân</Button> : null}
+                {hasNoActiveContract ? <Button size="sm" variant="outline" onClick={() => setContractOpen(true)}>Bổ sung hợp đồng đã đối chiếu</Button> : null}
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
         {/* Hợp đồng lao động */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><FileText className="h-4 w-4" /> Hợp đồng lao động</CardTitle>
           </CardHeader>
           <CardContent>
-            {!isHr ? (
-              // RBAC: nhân viên thường không được xem hợp đồng (chứa lương)
-              <p className="text-sm text-muted-foreground">Hợp đồng lao động chỉ hiển thị cho HR / Quản trị viên.</p>
+            {!canViewContracts ? (
+              <p className="text-sm text-muted-foreground">Hợp đồng và mức lương chỉ hiển thị cho chính nhân viên đó hoặc HR có thẩm quyền.</p>
             ) : (emp.contracts?.length ?? 0) === 0 ? (
-              <p className="text-sm text-muted-foreground">Chưa có hợp đồng nào.</p>
+              <div className="space-y-2 rounded-md border border-dashed p-3 text-sm">
+                <p className="font-medium">Chưa có hợp đồng được lưu cho nhân viên này.</p>
+                <p className="text-muted-foreground">Mức lương trong hồ sơ chỉ để tham khảo, chưa đủ căn cứ tính lương theo hợp đồng. Chỉ thêm hợp đồng khi đã đối chiếu số hợp đồng, loại hợp đồng, ngày hiệu lực, mức lương và bản đã ký hoặc quyết định có thẩm quyền.</p>
+              </div>
             ) : (
               <div className="overflow-x-auto rounded-lg border">
                 <table className="w-full min-w-[560px] text-sm">
@@ -192,7 +235,7 @@ export default function EmployeeDetailPage() {
                     <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                       <th className="px-3 py-2">Số HĐ</th><th className="px-3 py-2">Loại</th>
                       <th className="px-3 py-2">Hiệu lực</th><th className="px-3 py-2">Lương CB</th>
-                      <th className="px-3 py-2">Trạng thái</th><th className="px-3 py-2">Bản mềm</th>
+                      <th className="px-3 py-2">Trạng thái</th><th className="px-3 py-2">Hợp đồng</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -213,9 +256,10 @@ export default function EmployeeDetailPage() {
                           </span>
                         </td>
                         <td className="px-3 py-2">
-                          {c.fileUrl ? (
-                            <button type="button" onClick={() => void openProtectedFile(c.fileUrl!)} className="text-xs text-primary hover:underline">Tải bản mềm</button>
-                          ) : 'Chưa cập nhật'}
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <button type="button" onClick={() => setSelectedContractId(c.id)} className="text-xs font-medium text-primary hover:underline">Xem chi tiết</button>
+                            {c.fileUrl ? <button type="button" onClick={() => void openProtectedFile(c.fileUrl!)} className="text-xs text-primary hover:underline">Mở bản mềm</button> : <span className="text-xs text-muted-foreground">Chưa có tệp</span>}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -223,6 +267,9 @@ export default function EmployeeDetailPage() {
                 </table>
               </div>
             )}
+            {emp.contracts?.some((contract) => contract.status === 'DRAFT') ? (
+              <p className="mt-2 text-xs text-muted-foreground">Một số thông tin hợp đồng được ghi nhận từ hồ sơ hiện có và đang chờ HR đối chiếu với bản đã ký. Chỉ hợp đồng đã xác minh mới được dùng làm căn cứ tính lương.</p>
+            ) : null}
             {isHr ? (
               <Button size="sm" variant="outline" className="no-print mt-3" onClick={() => setContractOpen(true)}>
                 <Plus className="h-4 w-4" /> Thêm hợp đồng
@@ -238,7 +285,7 @@ export default function EmployeeDetailPage() {
           </CardHeader>
           <CardContent>
             {emp.certificates.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Chưa có văn bằng chứng chỉ nào.</p>
+              <p className="text-sm text-muted-foreground">Chưa có văn bằng/chứng chỉ được lưu. Bổ sung khi nhân viên cung cấp hồ sơ; đây không phải dữ liệu có thể tự suy ra từ thông tin hiện có.</p>
             ) : (
               <ul className="space-y-2">
                 {emp.certificates.map((c) => (
@@ -273,6 +320,39 @@ export default function EmployeeDetailPage() {
       </div>
 
       {/* ------------------------------- Modals ------------------------------- */}
+      <Modal open={Boolean(selectedContract)} onOpenChange={(open) => { if (!open) { setSelectedContractId(null); setReplacementContractFile(null); } }} title={selectedContract ? `Hợp đồng ${selectedContract.contractNo}` : 'Chi tiết hợp đồng'} size="lg">
+        {selectedContract ? (
+          <div className="space-y-4 text-sm">
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+              <div><dt className="text-xs text-muted-foreground">Người lao động</dt><dd className="font-medium">{emp.fullName} · {emp.employeeCode ?? 'Chưa có mã nhân viên'}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Loại hợp đồng</dt><dd className="font-medium">{CONTRACT_TYPE_LABEL[selectedContract.type] ?? selectedContract.type}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Ngày hiệu lực</dt><dd className="font-medium">{formatDate(selectedContract.startDate)}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Ngày hết hạn</dt><dd className="font-medium">{selectedContract.endDate ? formatDate(selectedContract.endDate) : 'Không xác định thời hạn'}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Lương theo hợp đồng</dt><dd className="font-medium">{vnd(selectedContract.baseSalary)} / {selectedContract.compensationBasis === 'HOURLY' ? 'giờ' : selectedContract.compensationBasis === 'DAILY' ? 'ngày' : 'tháng'}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Trạng thái</dt><dd className="font-medium">{CONTRACT_STATUS_LABEL[selectedContract.status] ?? selectedContract.status}</dd></div>
+              {selectedContract.note ? <div className="sm:col-span-2"><dt className="text-xs text-muted-foreground">Ghi chú hồ sơ</dt><dd className="whitespace-pre-wrap">{selectedContract.note}</dd></div> : null}
+            </dl>
+            {selectedContract.status === 'DRAFT' ? <p className="border-t pt-3 text-xs text-muted-foreground">Hồ sơ này chưa được HR xác nhận hiệu lực. Cần đối chiếu số hợp đồng, điều khoản và bản đã ký trước khi dùng làm căn cứ tính lương.</p> : null}
+            <div className="border-t pt-3">
+              <p className="font-medium">Bản mềm hợp đồng</p>
+              {selectedContract.fileUrl ? (
+                <button type="button" onClick={() => void openProtectedFile(selectedContract.fileUrl!)} className="mt-1 inline-flex items-center gap-1.5 text-primary hover:underline"><FileText className="h-4 w-4" />Mở {selectedContract.fileName || 'tệp hợp đồng'}</button>
+              ) : (
+                <p className="mt-1 text-xs text-muted-foreground">Chưa có bản mềm được lưu cho hồ sơ này.</p>
+              )}
+              {isHr ? (
+                <div className="mt-3 flex flex-wrap items-end gap-3">
+                  <label className="space-y-1 text-xs"><span className="block text-muted-foreground">Tải bản đã ký lên (PDF, DOC, DOCX hoặc ảnh; tối đa 8MB)</span>
+                    <input type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onChange={(e) => void pickFile(e.target.files?.[0] ?? null, setReplacementContractFile)} className="block max-w-full text-xs" />
+                  </label>
+                  {replacementContractFile ? <Button size="sm" disabled={uploadContractCopy.isPending} onClick={() => uploadContractCopy.mutate({ contractId: selectedContract.id, file: replacementContractFile })}>Lưu bản mềm</Button> : null}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+      </Modal>
+
       <Modal open={profileOpen} onOpenChange={setProfileOpen} title="Sửa thông tin liên hệ" size="lg">
         <form
           onSubmit={(e) => { e.preventDefault(); updateProfile.mutate(); }}
@@ -283,6 +363,8 @@ export default function EmployeeDetailPage() {
           <p className="sm:col-span-2 rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">Chức danh, đơn vị, ngày vào làm và tình trạng công tác được cập nhật theo quyết định đã duyệt hoặc quy trình tuyển dụng/thử việc.</p>
           <div className="space-y-1.5"><Label>Điện thoại</Label>
             <Input value={profileForm.phone ?? emp.phone ?? ''} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} /></div>
+          <div className="space-y-1.5"><Label>Ngày sinh</Label>
+            <Input type="date" value={profileForm.birthDate ?? (emp.birthDate ? emp.birthDate.slice(0, 10) : '')} onChange={(e) => setProfileForm({ ...profileForm, birthDate: e.target.value })} /></div>
           <div className="space-y-1.5 sm:col-span-2"><Label>Địa chỉ</Label>
             <Input value={profileForm.address ?? emp.address ?? ''} onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })} /></div>
           <div className="col-span-full flex justify-end gap-2">

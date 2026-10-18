@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { dateKey, DAY_MS, workDate } from '../hr-time';
+import { DISCIPLINE_LABELS, endsEmployment } from '../personnel-action-rules';
 
 /** Approved decisions are applied once, on their effective work date. */
 @Injectable()
@@ -27,11 +28,28 @@ export class PersonnelEffectsService implements OnModuleInit, OnModuleDestroy {
         const payload = action.payload as Record<string, unknown>;
         const user = await tx.user.findUniqueOrThrow({ where: { id: action.subjectId } });
         const actorId = action.decidedById ?? action.requestedById;
-        if (action.type === 'RESIGNATION') {
+        if (endsEmployment(action.type, payload)) {
           await tx.user.update({ where: { id: user.id }, data: { employmentStatus: 'RESIGNED', status: 'DISABLED' } });
           await tx.refreshToken.updateMany({ where: { userId: user.id, revokedAt: null }, data: { revokedAt: new Date() } });
           await tx.faceEmbedding.updateMany({ where: { userId: user.id, active: true }, data: { active: false } });
           await tx.contract.updateMany({ where: { userId: user.id, status: 'ACTIVE' }, data: { status: 'TERMINATED', endDate: action.effectiveAt } });
+        }
+        if (action.type === 'AWARD' || action.type === 'DISCIPLINE') {
+          const profile = await tx.personnelComprehensiveProfile.upsert({ where: { userId: user.id }, create: { userId: user.id }, update: {} });
+          const decisionNo = String(payload.decisionNo || action.id);
+          const existing = await tx.personnelRewardDiscipline.findFirst({ where: { profileId: profile.id, decisionNo, type: action.type === 'AWARD' ? 'REWARD' : 'DISCIPLINE' } });
+          if (!existing) await tx.personnelRewardDiscipline.create({ data: {
+            profileId: profile.id, type: action.type === 'AWARD' ? 'REWARD' : 'DISCIPLINE',
+            title: action.type === 'AWARD' ? String(payload.title || 'Khen thưởng theo quyết định') : DISCIPLINE_LABELS[String(payload.subType)] || 'Kỷ luật theo hồ sơ lịch sử',
+            eventDate: action.effectiveAt, decisionNo, issuingAuthority: actorId, reason: String(payload.reason || ''),
+          } });
+          if (action.type === 'DISCIPLINE' && payload.subType === 'DEMOTION') {
+            const jobTitle = String(payload.newJobTitle).trim();
+            await tx.user.update({ where: { id: user.id }, data: { jobTitle } });
+            await tx.personnelAppointment.updateMany({ where: { profileId: profile.id, isCurrent: true }, data: { isCurrent: false, expirationDate: new Date(action.effectiveAt.getTime() - DAY_MS) } });
+            const unit = user.orgUnitId ? await tx.orgUnit.findUnique({ where: { id: user.orgUnitId } }) : null;
+            await tx.personnelAppointment.create({ data: { profileId: profile.id, orgUnitName: unit?.name || 'Chưa phân đơn vị', positionTitle: jobTitle, effectiveDate: action.effectiveAt, isCurrent: true, decisionNo, signer: actorId } });
+          }
         }
         if (action.type === 'TRANSFER') {
           const orgUnitId = String(payload.newOrgUnitId);
@@ -45,11 +63,13 @@ export class PersonnelEffectsService implements OnModuleInit, OnModuleDestroy {
         if (action.type === 'SALARY_ADJUST') {
           const salary = Number(payload.newSalary);
           if (!Number.isFinite(salary) || salary < 0) throw new Error('Quyết định lương thiếu mức hợp lệ');
-          const prior = await tx.contract.findFirst({ where: { userId: user.id, status: 'ACTIVE', startDate: { lte: action.effectiveAt } }, orderBy: { startDate: 'desc' } });
+          const prior = await tx.contract.findFirst({ where: { userId: user.id, status: 'ACTIVE', startDate: { lte: action.effectiveAt }, OR: [{ endDate: null }, { endDate: { gte: action.effectiveAt } }] }, orderBy: { startDate: 'desc' } });
           await tx.user.update({ where: { id: user.id }, data: { baseSalary: salary, ...(typeof payload.salaryBandId === 'string' ? { salaryBandId: payload.salaryBandId } : {}) } });
           if (prior) {
-            await tx.contract.update({ where: { id: prior.id }, data: { endDate: new Date(action.effectiveAt.getTime() - DAY_MS), status: 'EXPIRED' } });
-            await tx.contract.create({ data: { userId: user.id, contractNo: `PL-${action.id}`, type: 'AMENDMENT', startDate: action.effectiveAt, baseSalary: salary, compensationBasis: prior.compensationBasis, insuranceSalary: Number(payload.insuranceSalary ?? prior.insuranceSalary ?? salary), createdById: actorId, note: `Phụ lục của ${prior.contractNo}` } });
+            const root = prior.type === 'AMENDMENT' ? await tx.contract.findFirst({ where: { userId: user.id, type: { not: 'AMENDMENT' }, status: 'ACTIVE', startDate: { lte: action.effectiveAt }, OR: [{ endDate: null }, { endDate: { gte: action.effectiveAt } }] }, orderBy: { startDate: 'desc' } }) : prior;
+            if (!root) throw new Error('Phụ lục điều chỉnh lương cần hợp đồng gốc còn hiệu lực');
+            if (prior.type === 'AMENDMENT') await tx.contract.update({ where: { id: prior.id }, data: { endDate: new Date(action.effectiveAt.getTime() - DAY_MS), status: 'EXPIRED' } });
+            await tx.contract.create({ data: { userId: user.id, contractNo: `PL-${action.id}`, type: 'AMENDMENT', startDate: action.effectiveAt, endDate: root.endDate, baseSalary: salary, compensationBasis: prior.compensationBasis, insuranceSalary: Number(payload.insuranceSalary ?? prior.insuranceSalary ?? salary), createdById: actorId, note: `Phụ lục của ${root.contractNo}; chỉ sửa điều khoản lương, giữ nguyên thời hạn hợp đồng gốc.` } });
           }
           const assignment = await tx.hrmsSalaryStructureAssignment.findFirst({ where: { userId: user.id, isActive: true }, orderBy: { fromDate: 'desc' } });
           if (assignment) {

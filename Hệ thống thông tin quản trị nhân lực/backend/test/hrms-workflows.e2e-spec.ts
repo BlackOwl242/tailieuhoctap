@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/common/prisma.service';
+import { setupTestApp } from './setup-app';
 
 const RUN = process.env.RUN_E2E === '1';
 (RUN ? describe : describe.skip)('HRMS database-backed workflows (e2e)', () => {
@@ -16,8 +17,7 @@ const RUN = process.env.RUN_E2E === '1';
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = moduleRef.createNestApplication();
-    app.setGlobalPrefix('api/v1');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    setupTestApp(app);
     await app.init();
     prisma = app.get(PrismaService);
 
@@ -30,13 +30,13 @@ const RUN = process.env.RUN_E2E === '1';
       data: {
         email: `${label}-${suffix}@example.test`, passwordHash, fullName: `E2E ${label}`,
         status: 'ACTIVE', employmentStatus: 'ACTIVE', orgUnitId: org.id,
-        hireDate: new Date('2020-01-01T00:00:00.000Z'), roles: { create: { roleCode } },
+        hireDate: new Date(roleCode === 'USER' ? '2020-01-01T00:00:00.000Z' : '2030-01-01T00:00:00.000Z'), roles: { create: { roleCode } },
         ...extra,
       },
     });
     const users = {
       ADMIN: await makeUser('ADMIN', 'admin'),
-      USER: await makeUser('USER', 'employee', { employeeCode: `E2E-${suffix}`, baseSalary: 30_000_000, taxDependentCount: 1, minimumWageRegion: 'I' }),
+      USER: await makeUser('USER', 'employee', { employeeCode: `E2E-${suffix}`, baseSalary: 30_000_000, taxDependentCount: 1, minimumWageRegion: 'I', bankAccount: '990000000001', bankName: 'E2E Bank' }),
       HR_CB: await makeUser('HR_CB', 'manager'),
       HR_RECRUITER: await makeUser('HR_RECRUITER', 'recruiter'),
       HR_RECRUITER_2: await makeUser('HR_RECRUITER', 'recruiter-2'),
@@ -44,6 +44,7 @@ const RUN = process.env.RUN_E2E === '1';
       BOD: await makeUser('BOD', 'bod'),
     };
     employee = { id: users.USER.id, fullName: users.USER.fullName };
+    await prisma.contract.create({ data: { userId: employee.id, contractNo: `E2E-BASE-${suffix}`, type: 'INDEFINITE', startDate: new Date('2020-01-01'), baseSalary: 30_000_000, createdById: users.HR_CB.id } });
     managerId = users.HR_CB.id;
     tokens = {};
     for (const [role, user] of Object.entries(users)) {
@@ -55,7 +56,7 @@ const RUN = process.env.RUN_E2E === '1';
 
   afterAll(async () => { await app?.close(); });
 
-  it('writes and closes attendance, settles payroll, records asset receipt/refund, and tracks development evidence', async () => {
+  it('settles attendance/payroll, assets/expenses, evidence-based KPI and recruitment', async () => {
     const now = new Date();
     const from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
     const month = from.getUTCMonth() + 1;
@@ -110,12 +111,13 @@ const RUN = process.env.RUN_E2E === '1';
     const overtimeComponent = await prisma.hrmsSalaryComponent.create({ data: {
       code: `E2E_OT_BASE_${Date.now()}`, name: 'Phụ cấp chức vụ E2E', type: 'EARNING', defaultAmount: 2_000_000,
       isTaxApplicable: true, isOvertimeApplicable: true,
+      basisType: 'COMPANY_POLICY', basisReference: 'Quy chế lương mô phỏng phục vụ kiểm thử E2E',
     } });
     const structure = await prisma.hrmsSalaryStructure.create({ data: { name: `E2E Salary ${Date.now()}` } });
     await prisma.hrmsSalaryStructureItem.create({ data: { structureId: structure.id, componentId: overtimeComponent.id, amount: 2_000_000 } });
     await prisma.hrmsSalaryStructureAssignment.create({ data: { userId: employee.id, structureId: structure.id, fromDate: from, baseSalary: 30_000_000 } });
     const run = await request(app.getHttpServer()).post('/api/v1/hrms/payroll/runs')
-      .set('Authorization', `Bearer ${tokens.ACCOUNTANT}`)
+      .set('Authorization', `Bearer ${tokens.HR_CB}`)
       .send({ periodName: `E2E ${year}-${String(month).padStart(2, '0')}`, fromDate: from.toISOString(), toDate: end.toISOString() })
       .expect(201);
     expect(run.body.policySnapshot.version).toMatch(/^VN-PAYROLL-/);
@@ -125,8 +127,8 @@ const RUN = process.env.RUN_E2E === '1';
     expect(employeeSlip.breakdown.calculation.minimumWageReview).toMatchObject({ region: 'I', status: 'PASS', monthlyMinimum: 5_310_000, hourlyMinimum: 25_500 });
     const deduction = await prisma.payrollLoanDeduction.findFirst({ where: { payrollRunId: run.body.id, loanId: loan.body.id } });
     expect(deduction?.amount).toBe(loan.body.monthlyEmi);
-    await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.body.id}/review`).set('Authorization', `Bearer ${tokens.ACCOUNTANT}`).send({}).expect(403);
-    await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.body.id}/review`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({}).expect(201);
+    await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.body.id}/review`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({}).expect(403);
+    await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.body.id}/review`).set('Authorization', `Bearer ${tokens.ACCOUNTANT}`).send({}).expect(201);
     await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.body.id}/approve`).set('Authorization', `Bearer ${tokens.BOD}`).send({}).expect(201);
     await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.body.id}/lock`).set('Authorization', `Bearer ${tokens.BOD}`).send({}).expect(201);
     await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.body.id}/pay`).set('Authorization', `Bearer ${tokens.ACCOUNTANT}`).send({}).expect(400);
@@ -171,21 +173,21 @@ const RUN = process.env.RUN_E2E === '1';
     const repaid = await request(app.getHttpServer()).post(`/api/v1/hrms/expenses/travel-requests/${travel.body.id}/record-refund`).set('Authorization', `Bearer ${tokens.ACCOUNTANT}`).send({ amount: 35_000, note: 'E2E tất toán' }).expect(201);
     expect(repaid.body.refundStatus).toBe('REPAID');
 
-    const cycles = await Promise.all([1, 2].map((n) => prisma.hrmsAppraisalCycle.create({ data: {
-      name: `E2E năng lực ${n} ${Date.now()}`, year, startDate: new Date(`${year}-01-01T00:00:00.000Z`), endDate: new Date(`${year}-12-31T00:00:00.000Z`), status: 'ACTIVE',
-    } })));
-    const competency = await Promise.all(cycles.map((cycle, index) => request(app.getHttpServer()).post('/api/v1/hrms/performance/competencies')
-      .set('Authorization', `Bearer ${tokens.USER}`).send({ cycleId: cycle.id, userId: employee.id, competencyCode: 'PROBLEM_SOLVING', currentLevel: index + 2, targetLevel: 4, selfNotes: `Minh chứng công việc kỳ ${index + 1}: đã phân tích nguyên nhân và kiểm tra kết quả xử lý.` }).expect(201)));
-    const reviewedCompetency = await request(app.getHttpServer()).post(`/api/v1/hrms/performance/competencies/${competency[0].body.id}/review`)
-      .set('Authorization', `Bearer ${tokens.HR_CB}`).send({ managerLevel: 2, managerNotes: 'Đã đối chiếu kết quả xử lý sự cố và trao đổi với nhân viên trong kỳ.' }).expect(201);
-    expect(reviewedCompetency.body.currentLevel).toBe(2);
-    expect(reviewedCompetency.body.managerLevel).toBe(2);
-    expect(reviewedCompetency.body.status).toBe('MANAGER_REVIEWED');
-    const plan = await request(app.getHttpServer()).post('/api/v1/hrms/performance/development-plans').set('Authorization', `Bearer ${tokens.USER}`)
-      .send({ cycleId: cycles[1].id, assessmentId: competency[1].body.id, userId: employee.id, competencyCode: 'PROBLEM_SOLVING', objective: 'Tự phân tích nguyên nhân và đề xuất giải pháp có kiểm chứng', successCriteria: 'Quản lý xác nhận giải pháp được thử nghiệm và có kết quả', actions: ['Học phương pháp phân tích nguyên nhân', 'Thực hành với tình huống thực tế'], dueDate: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10) }).expect(201);
-    expect(plan.body.status).toBe('PROPOSED');
-    const timeline = await request(app.getHttpServer()).get(`/api/v1/hrms/performance/competencies?userId=${employee.id}`).set('Authorization', `Bearer ${tokens.USER}`).expect(200);
-    expect(timeline.body.filter((row: { competencyCode: string }) => row.competencyCode === 'PROBLEM_SOLVING')).toHaveLength(2);
+    const cycle = await prisma.hrmsAppraisalCycle.create({ data: { name: `E2E KPI ${Date.now()}`, year, startDate: new Date(`${year}-01-01`), endDate: new Date(`${year}-12-31`), status: 'ACTIVE' } });
+    const assigned = await request(app.getHttpServer()).post('/api/v1/hrms/performance/goals').set('Authorization', `Bearer ${tokens.HR_CB}`)
+      .send({ cycleId: cycle.id, userId: employee.id, kraTitle: 'Tỷ lệ hồ sơ đúng hạn', description: 'Tổng hợp theo sổ công việc đã được nghiệm thu trong kỳ', targetMetric: 'Ít nhất 100 hồ sơ được nghiệm thu', weightage: 100, measurementMode: 'HIGHER_BETTER', targetValue: 100, measurementUnit: 'hồ sơ' }).expect(201);
+    expect(assigned.body.createdCount).toBe(1);
+    const goal = await prisma.hrmsAppraisalGoal.findFirstOrThrow({ where: { cycleId: cycle.id, userId: employee.id } });
+    await request(app.getHttpServer()).patch(`/api/v1/hrms/performance/goals/${goal.id}/score`).set('Authorization', `Bearer ${tokens.HR_CB}`)
+      .send({ actualValue: 80, scoreRationale: 'Đối chiếu 80 hồ sơ nghiệm thu trên mục tiêu 100 hồ sơ.' }).expect(409);
+    await request(app.getHttpServer()).post(`/api/v1/hrms/performance/goals/${goal.id}/evidence`).set('Authorization', `Bearer ${tokens.USER}`)
+      .send({ description: 'Sổ công việc ghi nhận 80 hồ sơ đã được nghiệm thu', metricValue: '80 hồ sơ', evidenceUrl: 'https://example.test/kpi-evidence.pdf' }).expect(201);
+    const scored = await request(app.getHttpServer()).patch(`/api/v1/hrms/performance/goals/${goal.id}/score`).set('Authorization', `Bearer ${tokens.HR_CB}`)
+      .send({ actualValue: 80, managerScore: 100, scoreRationale: 'Đối chiếu 80 hồ sơ nghiệm thu trên mục tiêu 100 hồ sơ.' }).expect(200);
+    expect(scored.body.finalScore).toBe(80);
+    expect(scored.body.actualValue).toBe(80);
+    await request(app.getHttpServer()).post('/api/v1/personnel-actions').set('Authorization', `Bearer ${tokens.HR_CB}`)
+      .send({ type: 'DISCIPLINE', subjectId: employee.id, payload: { reason: 'Kiểm tra chặn khấu trừ kỷ luật', subType: 'REPRIMAND', amount: 100000 } }).expect(409);
     expect(managerId).toBeTruthy();
 
     const effectiveFrom = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);

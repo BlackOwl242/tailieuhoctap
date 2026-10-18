@@ -298,6 +298,59 @@
   .quick-card small { font-size: 11px; }
 }
 
+/* Local sandbox workflows: payment reconciliation and signer administration. */
+.sandbox-payment-workspace,
+.sandbox-signer-workspace { margin-bottom: 18px; }
+.sandbox-payment-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.sandbox-payment-list,
+.sandbox-signer-list { display: grid; gap: 12px; margin-top: 18px; }
+.sandbox-payment-row { min-width: 0; padding: 16px; border: 1px solid #d7dfeb; border-radius: 5px; background: #fff; }
+.sandbox-payment-row > header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.sandbox-payment-row > header > div { display: grid; gap: 4px; min-width: 0; }
+.sandbox-payment-row > header span,
+.sandbox-payment-row > header strong,
+.sandbox-payment-facts span { overflow-wrap: anywhere; }
+.sandbox-payment-row > header span,
+.sandbox-payment-facts,
+.sandbox-payment-row > small,
+.sandbox-signer-list small { color: #52667d; font-size: 13px; }
+.sandbox-payment-row > header strong { color: #173d70; white-space: nowrap; }
+.sandbox-payment-facts { display: flex; flex-wrap: wrap; gap: 7px 18px; margin: 12px 0 7px; }
+.sandbox-payment-row > p { margin: 8px 0; color: #334a64; }
+.sandbox-refund-status { margin: 12px 0; padding: 12px; border-left: 3px solid #a47419; background: #fff8e9; }
+.sandbox-refund-status p { margin: 5px 0; }
+.sandbox-payment-action { margin-top: 13px; }
+.sandbox-payment-action summary { width: fit-content; color: #203f75; font-weight: 650; cursor: pointer; }
+.sandbox-payment-action label { display: grid; gap: 6px; max-width: 720px; margin: 12px 0; }
+.sandbox-payment-events { margin: 13px 0; padding-top: 11px; border-top: 1px solid #e2e8ef; }
+.sandbox-payment-events summary { width: fit-content; color: #203f75; font-weight: 650; cursor: pointer; }
+.sandbox-payment-events ol { display: grid; gap: 12px; margin: 12px 0 0; padding-left: 22px; }
+.sandbox-payment-events li { padding-left: 3px; color: #334a64; }
+.sandbox-payment-events li b,
+.sandbox-payment-events li time { display: block; }
+.sandbox-payment-events li time { margin-top: 2px; color: #687a91; font-size: 12px; }
+.sandbox-payment-events li p { margin: 5px 0 0; overflow-wrap: anywhere; }
+.sandbox-signer-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; align-items: end; margin-top: 16px; }
+.sandbox-signer-form label { display: grid; gap: 6px; min-width: 0; }
+.sandbox-signer-form label:nth-child(3) { grid-column: 1 / -1; }
+.sandbox-signer-form button { justify-self: start; }
+.sandbox-signer-list article { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 14px; align-items: center; padding: 13px 0; border-top: 1px solid #e0e6ef; }
+.sandbox-signer-list article > div { display: grid; gap: 4px; min-width: 0; }
+.sandbox-signer-list article > div span { color: #52667d; overflow-wrap: anywhere; }
+.case-fee-record { margin: 16px 0; padding: 17px; }
+.case-fee-record h3 { margin: 0 0 8px; }
+.case-fee-record p { margin: 6px 0; }
+.citizen-payment-section .case-declaration { margin-bottom: 12px; }
+@media (max-width: 700px) {
+  .sandbox-payment-summary { grid-template-columns: minmax(0, 1fr); }
+  .sandbox-payment-row > header { flex-direction: column; gap: 7px; }
+  .sandbox-signer-form { grid-template-columns: minmax(0, 1fr); }
+  .sandbox-signer-form label:nth-child(3) { grid-column: 1; }
+  .sandbox-signer-form button { width: 100%; justify-content: center; }
+  .sandbox-signer-list article { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .sandbox-signer-list article > .button { width: 100%; justify-content: center; }
+}
+
 .submission-steps { list-style: none; padding: 0; margin: 0 0 24px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-bottom: 1px solid #dfe5eb; }
 .submission-steps li { padding: 14px 8px; display: flex; align-items: center; gap: 8px; color: #637384; border-bottom: 3px solid transparent; font-size: 14px; line-height: 1.5; }
 .submission-steps li > span { display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 28px; border: 1px solid #b7c2ce; border-radius: 50%; }

@@ -1,9 +1,9 @@
 async function main() {
   const accounts = [
-    { email: 'ceo@saigontechnology.vn', pw: 'Admin@123', expectedRole: 'BOD' },
-    { email: 'chairman@saigontechnology.vn', pw: 'Admin@123', expectedRole: 'SHAREHOLDER' },
-    { email: 'admin@demo.local', pw: 'Admin@123', expectedRole: 'ADMIN' },
-    { email: 'km.manager@demo.local', pw: 'Manager@123', expectedRole: 'KM_MANAGER' },
+    { email: 'ceo@saigontechnology.vn', pw: '123', expectedRole: 'BOD' },
+    { email: 'chairman@saigontechnology.vn', pw: '123', expectedRole: 'SHAREHOLDER' },
+    { email: 'admin@demo.local', pw: '123', expectedRole: 'ADMIN' },
+    { email: 'km.manager@demo.local', pw: '123', expectedRole: 'KM_MANAGER' },
   ];
 
   for (const acc of accounts) {

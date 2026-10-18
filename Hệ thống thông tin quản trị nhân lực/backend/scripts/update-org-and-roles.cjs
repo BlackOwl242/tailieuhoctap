@@ -52,7 +52,7 @@ async function main() {
   }
 
   // 3. Tách bạch tài khoản Tổng Giám đốc (CEO) và IT Admin
-  const passwordHash = await bcrypt.hash('Admin@123', 12);
+  const passwordHash = await bcrypt.hash('123', 12);
 
   // 3.1. Tìm hoặc tạo tài khoản Quản trị viên Hệ thống CNTT (System Administrator)
   let itAdmin = await prisma.user.findFirst({
@@ -73,8 +73,10 @@ async function main() {
         jobTitle: 'Tổng Giám đốc (CEO)',
         orgUnitId: bgd.id,
         passwordHash,
+        mustChangePassword: false,
       },
     });
+    await prisma.refreshToken.updateMany({ where: { userId: ceoUser.id, revokedAt: null }, data: { revokedAt: new Date() } });
 
     // Gán vai trò BOD cho Trần Minh Hoàng
     await prisma.userRole.deleteMany({ where: { userId: ceoUser.id } });
@@ -115,8 +117,10 @@ async function main() {
         jobTitle: 'Quản trị viên Hệ thống CNTT (System Admin)',
         orgUnitId: opsIt ? opsIt.id : adminUser.orgUnitId,
         passwordHash,
+        mustChangePassword: false,
       },
     });
+    await prisma.refreshToken.updateMany({ where: { userId: adminUser.id, revokedAt: null }, data: { revokedAt: new Date() } });
     console.log('✓ Đã cập nhật tài khoản IT Admin: admin@demo.local');
   }
 
@@ -156,8 +160,11 @@ async function main() {
         data: {
           jobTitle: 'Chủ tịch Hội đồng Quản trị',
           orgUnitId: dhcd.id,
+          passwordHash,
+          mustChangePassword: false,
         },
       });
+      await prisma.refreshToken.updateMany({ where: { userId: chairman.id, revokedAt: null }, data: { revokedAt: new Date() } });
     }
 
     await prisma.userRole.deleteMany({ where: { userId: chairman.id } });

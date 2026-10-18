@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, ShieldBan, ShieldCheck } from 'lucide-react';
+import { KeyRound, Plus, ShieldBan, ShieldCheck } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
 import { Button, Card, CardContent, Input, Label, Select } from '@/components/ui/primitives';
@@ -13,7 +13,7 @@ import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 
 interface UserRow {
   id: string; email: string; fullName: string; jobTitle: string | null;
-  status: string; roles: string[];
+  status: string; roles: string[]; mustChangePassword?: boolean;
   orgUnit?: { id: string; name: string } | null;
 }
 
@@ -36,7 +36,7 @@ export default function AdminUsersPage() {
   const qc = useQueryClient();
   const toast = useToast();
   const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({ email: '', password: '', fullName: '', roleCode: 'USER', jobTitle: '', orgUnitId: '' });
+  const [form, setForm] = useState({ email: '', password: '123', fullName: '', roleCode: 'USER', jobTitle: '', orgUnitId: '' });
 
   const q = useQuery({
     queryKey: ['admin-users'],
@@ -79,7 +79,7 @@ export default function AdminUsersPage() {
     onSuccess: () => {
       toast('Đã tạo người dùng', 'success');
       setShowCreate(false);
-      setForm({ email: '', password: '', fullName: '', roleCode: 'USER', jobTitle: '', orgUnitId: '' });
+      setForm({ email: '', password: '123', fullName: '', roleCode: 'USER', jobTitle: '', orgUnitId: '' });
       qc.invalidateQueries({ queryKey: ['admin-users'] });
       qc.invalidateQueries({ queryKey: ['employees'] });
     },
@@ -90,6 +90,15 @@ export default function AdminUsersPage() {
     mutationFn: async (vars: { id: string; status: string }) => api.patch(`/users/${vars.id}`, { status: vars.status }),
     onSuccess: () => {
       toast('Đã cập nhật trạng thái', 'success');
+      qc.invalidateQueries({ queryKey: ['admin-users'] });
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const requirePasswordChange = useMutation({
+    mutationFn: async (id: string) => api.patch(`/users/${id}`, { mustChangePassword: true }),
+    onSuccess: () => {
+      toast('Đã yêu cầu đổi mật khẩu ở lần đăng nhập tiếp theo', 'success');
       qc.invalidateQueries({ queryKey: ['admin-users'] });
     },
     onError: (e) => toast(errorMessage(e), 'error'),
@@ -136,6 +145,9 @@ export default function AdminUsersPage() {
         {STATUS_LABEL[u.status] ?? u.status}
       </span>
     ) },
+    { key: 'passwordRotation', header: 'Mật khẩu', render: (u) => u.mustChangePassword
+      ? <span className="text-xs font-medium text-amber-700">Cần đổi khi đăng nhập</span>
+      : <span className="text-xs text-muted-foreground">Không có yêu cầu đổi</span> },
   ];
 
   return (
@@ -166,6 +178,7 @@ export default function AdminUsersPage() {
             filters={[
               { key: 'status', label: 'Trạng thái', value: (u) => u.status, options: Object.entries(STATUS_LABEL).map(([value, label]) => ({ value, label })) },
               { key: 'role', label: 'Vai trò', value: (u) => u.roles[0] ?? '', options: Object.entries(ROLE_LABEL).map(([value, label]) => ({ value, label })) },
+              { key: 'passwordRotation', label: 'Mật khẩu', value: (u) => u.mustChangePassword ? 'required' : 'current', options: [{ value: 'required', label: 'Cần đổi khi đăng nhập' }, { value: 'current', label: 'Không có yêu cầu đổi' }] },
             ]}
             emptyTitle="Không tìm thấy người dùng nào"
             actions={(u): RowActionItem[] => [
@@ -177,6 +190,9 @@ export default function AdminUsersPage() {
                   setRoleModalValue(u.roles[0] ?? 'USER');
                 },
               },
+              !u.mustChangePassword
+                ? { label: 'Yêu cầu đổi mật khẩu', icon: KeyRound, disabled: requirePasswordChange.isPending, onSelect: () => requirePasswordChange.mutate(u.id) }
+                : { label: 'Đã yêu cầu đổi mật khẩu', icon: KeyRound, disabled: true, onSelect: () => undefined },
               u.status === 'ACTIVE'
                 ? { label: 'Vô hiệu hóa tài khoản', icon: ShieldBan, danger: true, disabled: setStatus.isPending, onSelect: () => setStatus.mutate({ id: u.id, status: 'DISABLED' }) }
                 : { label: 'Kích hoạt tài khoản', icon: ShieldCheck, disabled: setStatus.isPending, onSelect: () => setStatus.mutate({ id: u.id, status: 'ACTIVE' }) },
@@ -244,7 +260,8 @@ export default function AdminUsersPage() {
           <div className="space-y-1.5"><Label>Email *</Label>
             <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
           <div className="space-y-1.5"><Label>Mật khẩu khởi tạo *</Label>
-            <Input required type="text" minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="tối thiểu 8 ký tự" /></div>
+            <Input required type="password" autoComplete="new-password" minLength={3} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="123" /></div>
+          <p className="sm:col-span-2 text-xs text-muted-foreground">Mật khẩu khởi tạo mặc định là 123. Quản trị viên có thể đổi riêng sau khi tạo tài khoản.</p>
           <div className="space-y-1.5"><Label>Vai trò</Label>
             <Select value={form.roleCode} onChange={(e) => setForm({ ...form, roleCode: e.target.value })}>
               {rolesList.map((r) => (

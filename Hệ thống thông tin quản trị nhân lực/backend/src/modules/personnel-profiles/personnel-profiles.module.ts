@@ -207,6 +207,14 @@ export class PersonnelProfilesService {
     private readonly audit: AuditService,
   ) {}
 
+  private async assertPublicSalaryMode() {
+    const setting = await this.prisma.setting.findUnique({ where: { key: 'ORG_PROFILE' } });
+    const profile = (setting?.value ?? {}) as { orgSector?: string };
+    if (profile.orgSector !== 'state') {
+      throw new ConflictException('Ngạch, bậc và lịch sử lương theo quyết định chỉ áp dụng khi tổ chức được cấu hình là khu vực công. Doanh nghiệp quản lý mức lương qua hợp đồng lao động.');
+    }
+  }
+
   /** Lấy danh sách hồ sơ toàn diện (hỗ trợ phân trang, tìm kiếm, lọc ngạch/đơn vị). */
   async listProfiles(query: { q?: string; orgUnitId?: string; rankCode?: string; page?: number; limit?: number }) {
     const page = Math.max(1, Number(query.page) || 1);
@@ -326,6 +334,11 @@ export class PersonnelProfilesService {
   /** Cập nhật thông tin hồ sơ toàn diện (111 trường). */
   async updateProfile(userId: string, dto: UpdateComprehensiveProfileDto, actor: AuthUser) {
     let profile = await this.prisma.personnelComprehensiveProfile.findUnique({ where: { userId } });
+
+    const publicSalaryFieldsChanged = dto.rankCode !== undefined || dto.salaryStep !== undefined
+      || dto.salaryCoefficient !== undefined || dto.salaryStepDate !== undefined
+      || dto.overGradePercent !== undefined || dto.positionAllowance !== undefined || dto.otherAllowance !== undefined;
+    if (publicSalaryFieldsChanged) await this.assertPublicSalaryMode();
 
     if ((dto.positionAllowance !== undefined && (!Number.isFinite(dto.positionAllowance) || dto.positionAllowance < 0))
       || (dto.otherAllowance !== undefined && (!Number.isFinite(dto.otherAllowance) || dto.otherAllowance < 0))
@@ -522,6 +535,7 @@ export class PersonnelProfilesService {
   // --- Quản lý 8 Quá trình con ---
 
   async addSalaryHistory(userId: string, dto: CreateSalaryHistoryDto) {
+    await this.assertPublicSalaryMode();
     const profile = await this.getOrCreateProfile(userId);
     const fromDate = new Date(dto.fromDate);
     fromDate.setUTCHours(0, 0, 0, 0);
@@ -603,10 +617,12 @@ export class PersonnelProfilesService {
   }
 
   async deleteSalaryHistory(id: string) {
+    await this.assertPublicSalaryMode();
     return this.prisma.personnelSalaryHistory.delete({ where: { id } });
   }
 
   async updateSalaryHistoryAllowances(userId: string, id: string, dto: UpdateSalaryHistoryAllowancesDto) {
+    await this.assertPublicSalaryMode();
     if (dto.overGradeRate === undefined && dto.positionAllowance === undefined && dto.otherAllowance === undefined) throw new ConflictException('Nhập ít nhất một tỷ lệ/hệ số cần cập nhật.');
     if ((dto.overGradeRate !== undefined && (!Number.isFinite(dto.overGradeRate) || dto.overGradeRate < 0 || dto.overGradeRate > 100))
       || (dto.positionAllowance !== undefined && (!Number.isFinite(dto.positionAllowance) || dto.positionAllowance < 0))

@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, ForbiddenException } from '@nes
 import { calculateOvertimePay, calculatePayroll, currentPayrollPolicies, evaluateFormula, monthlyHourlyRate, payrollPolicyFor, VN_PAYROLL_POLICIES, type PayrollPolicy } from '../../common/payroll-calculator';
 import { businessDates, dateKey, DAY_MS, DEFAULT_WORK_DAYS, isScheduledWorkday, isUnderThreeMonths, workDate } from '../../common/hr-time';
 import { RuntimeSettingsService } from '../../common/services/runtime-settings.service';
+import { endsEmployment } from '../../common/personnel-action-rules';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 import {
@@ -246,6 +247,9 @@ export class HrmsPayrollService {
 
   async listApprovedSalaryBands() {
     const today = dateKey(new Date());
+    const orgSetting = await this.prisma.setting.findUnique({ where: { key: 'ORG_PROFILE' }, select: { value: true } });
+    const orgProfile = (orgSetting?.value ?? {}) as { orgSector?: string };
+    const isStateOrganization = orgProfile.orgSector === 'state';
     const [bands, users] = await Promise.all([
       this.prisma.hrmsSalaryBand.findMany({
         where: { status: 'ACTIVE', approvedAt: { not: null }, effectiveFrom: { lte: today }, OR: [{ effectiveTo: null }, { effectiveTo: { gte: today } }] },
@@ -253,7 +257,13 @@ export class HrmsPayrollService {
       }),
       this.prisma.user.findMany({
         where: { deletedAt: null, status: 'ACTIVE', employmentStatus: { in: ['ACTIVE', 'PROBATION'] } },
-        select: { salaryBandId: true, jobTitle: true, baseSalary: true },
+        select: {
+          salaryBandId: true, jobTitle: true, baseSalary: true,
+          ...(isStateOrganization ? {} : { contracts: {
+            where: { status: 'ACTIVE', startDate: { lte: today }, OR: [{ endDate: null }, { endDate: { gte: today } }] },
+            select: { baseSalary: true, compensationBasis: true }, orderBy: { startDate: 'desc' }, take: 1,
+          } }),
+        },
       }),
     ]);
     const currentBandIds = new Set(bands.map((band) => band.id));
@@ -263,23 +273,42 @@ export class HrmsPayrollService {
         const candidates = bands.filter((candidate) => candidate.jobTitles.includes(user.jobTitle ?? ''));
         return candidates.length === 1 && candidates[0].id === band.id;
       });
-      const comparable = band.compensationBasis === 'MONTHLY' ? matched.filter((user) => Number(user.baseSalary ?? 0) > 0) : [];
+      const comparable = matched.filter((user) => {
+        const contract = 'contracts' in user ? user.contracts?.[0] : null;
+        const basis = isStateOrganization ? 'MONTHLY' : contract?.compensationBasis;
+        const salary = isStateOrganization ? user.baseSalary : contract?.baseSalary;
+        return basis === band.compensationBasis && Number(salary ?? 0) > 0;
+      });
+      const salaryOf = (user: (typeof matched)[number]) => isStateOrganization
+        ? Number(user.baseSalary ?? 0)
+        : Number(('contracts' in user ? user.contracts?.[0]?.baseSalary : 0) ?? 0);
       return {
         id: band.id, code: band.code, name: band.name, levelTitle: band.levelTitle,
         minSalary: band.minSalary, midSalary: band.midSalary, maxSalary: band.maxSalary,
         compensationBasis: band.compensationBasis, effectiveFrom: band.effectiveFrom, effectiveTo: band.effectiveTo,
         jobTitles: band.jobTitles, employeeCount: matched.length,
-        withinRange: comparable.filter((user) => Number(user.baseSalary) >= band.minSalary && Number(user.baseSalary) <= band.maxSalary).length,
-        belowRange: comparable.filter((user) => Number(user.baseSalary) < band.minSalary).length,
-        aboveRange: comparable.filter((user) => Number(user.baseSalary) > band.maxSalary).length,
+        withinRange: comparable.filter((user) => salaryOf(user) >= band.minSalary && salaryOf(user) <= band.maxSalary).length,
+        belowRange: comparable.filter((user) => salaryOf(user) < band.minSalary).length,
+        aboveRange: comparable.filter((user) => salaryOf(user) > band.maxSalary).length,
       };
     });
   }
 
   async listStructureAssignmentTargets() {
+    const today = dateKey(new Date());
+    const orgSetting = await this.prisma.setting.findUnique({ where: { key: 'ORG_PROFILE' }, select: { value: true } });
+    const orgProfile = (orgSetting?.value ?? {}) as { orgSector?: string };
+    const isStateOrganization = orgProfile.orgSector === 'state';
     const users = await this.prisma.user.findMany({
       where: { deletedAt: null, status: 'ACTIVE', employmentStatus: { in: ['ACTIVE', 'PROBATION'] } },
-      select: { id: true, fullName: true, employeeCode: true, jobTitle: true, baseSalary: true, salaryBandId: true, orgUnit: { select: { id: true, name: true } } },
+      select: {
+        id: true, fullName: true, employeeCode: true, jobTitle: true, baseSalary: true, salaryBandId: true,
+        orgUnit: { select: { id: true, name: true } },
+        ...(isStateOrganization ? {} : { contracts: {
+          where: { status: 'ACTIVE', startDate: { lte: today }, OR: [{ endDate: null }, { endDate: { gte: today } }] },
+          select: { baseSalary: true, compensationBasis: true }, orderBy: { startDate: 'desc' }, take: 1,
+        } }),
+      },
       orderBy: [{ employeeCode: 'asc' }, { fullName: 'asc' }],
     });
     if (!users.length) return [];
@@ -290,10 +319,16 @@ export class HrmsPayrollService {
     const byUser = new Map(assignments.map((assignment) => [assignment.userId, assignment]));
     return users.map((user) => {
       const assignment = byUser.get(user.id);
+      const contract = 'contracts' in user ? user.contracts?.[0] : null;
+      const salaryBasis = isStateOrganization ? user.baseSalary : contract?.baseSalary ?? null;
       return {
-        ...user,
+        id: user.id, fullName: user.fullName, employeeCode: user.employeeCode, jobTitle: user.jobTitle,
+        salaryBandId: user.salaryBandId, baseSalary: salaryBasis,
+        compensationBasis: isStateOrganization ? 'MONTHLY' : contract?.compensationBasis ?? null,
+        payrollBasisLabel: isStateOrganization ? 'mức lương khu vực công' : contract ? 'hợp đồng đang hiệu lực' : 'chưa có hợp đồng hiệu lực',
+        orgUnit: user.orgUnit,
         currentStructureName: assignment?.structure.name ?? null,
-        hasPayrollBasis: Number(user.baseSalary ?? 0) > 0,
+        hasPayrollBasis: Number(salaryBasis ?? 0) > 0,
       };
     });
   }
@@ -352,10 +387,27 @@ export class HrmsPayrollService {
     const structure = await this.prisma.hrmsSalaryStructure.findUnique({ where: { id: structureId } });
     if (!structure) throw new NotFoundException('Không tìm thấy cấu trúc lương');
 
-    const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null, status: 'ACTIVE' } });
+    const today = dateKey(new Date());
+    const [orgSetting, user] = await Promise.all([
+      this.prisma.setting.findUnique({ where: { key: 'ORG_PROFILE' }, select: { value: true } }),
+      this.prisma.user.findFirst({
+        where: { id: userId, deletedAt: null, status: 'ACTIVE' },
+        include: { contracts: {
+          where: { status: 'ACTIVE', startDate: { lte: today }, OR: [{ endDate: null }, { endDate: { gte: today } }] },
+          orderBy: { startDate: 'desc' }, take: 1,
+        } },
+      }),
+    ]);
     if (!user) throw new NotFoundException('Không tìm thấy nhân sự đang hoạt động');
-    const baseSalary = Number(user.baseSalary ?? 0);
-    if (!Number.isFinite(baseSalary) || baseSalary <= 0) throw new ConflictException('Nhân sự chưa có mức lương làm căn cứ. Hãy cập nhật từ hợp đồng hoặc quyết định lương trước khi gán cấu trúc.');
+    const orgProfile = (orgSetting?.value ?? {}) as { orgSector?: string };
+    const isStateOrganization = orgProfile.orgSector === 'state';
+    const activeContract = user.contracts[0];
+    const baseSalary = Number(isStateOrganization ? user.baseSalary ?? 0 : activeContract?.baseSalary ?? 0);
+    if (!Number.isFinite(baseSalary) || baseSalary <= 0) {
+      throw new ConflictException(isStateOrganization
+        ? 'Nhân sự chưa có mức lương khu vực công làm căn cứ trước khi gán cấu trúc.'
+        : 'Nhân sự chưa có hợp đồng lao động hiệu lực. Hãy lập hợp đồng trước khi gán cấu trúc lương.');
+    }
     if (requestedBaseSalary !== undefined && requestedBaseSalary !== baseSalary) throw new ConflictException('Mức lương gán không khớp hồ sơ nhân sự. Hệ thống sử dụng mức lương đã có hiệu lực.');
     const res = await this.prisma.$transaction(async tx=>{
       await tx.hrmsSalaryStructureAssignment.updateMany({where:{userId,isActive:true},data:{isActive:false}});
@@ -367,7 +419,7 @@ export class HrmsPayrollService {
       action: 'ASSIGN_SALARY_STRUCTURE',
       targetType: 'HrmsSalaryStructureAssignment',
       targetId: res.id,
-      description: `Gán cấu trúc lương ${structure.name} cho nhân sự ${userId} (Lương cơ bản: ${baseSalary.toLocaleString('vi-VN')} VND)`,
+      description: `Gán cấu trúc lương ${structure.name} cho nhân sự ${userId} (${isStateOrganization ? 'mức căn cứ khu vực công' : `lương theo hợp đồng ${activeContract?.contractNo ?? ''}`}: ${baseSalary.toLocaleString('vi-VN')} VND)`,
     });
     return res;
   }
@@ -488,12 +540,13 @@ export class HrmsPayrollService {
         const overlap = await tx.hrmsPayrollRun.findFirst({ where: { fromDate: { lte: to }, toDate: { gte: from }, status: { not: 'CANCELLED' } } });
         if (overlap) throw new ConflictException('Đã có kỳ lương cho khoảng thời gian này; không tạo trùng');
       }
-      type PayrollAttendanceRow = { userId: string; workDate: string; status: string; workedMinutes: number; nightWorkedMinutes?: number; scheduledMinutes?: number; paidLeave?: boolean; leaveType?: string | null; lateMinutes?: number; earlyMinutes?: number };
+      type PayrollAttendanceRow = { userId: string; workDate: string; status: string; workedMinutes: number; nightWorkedMinutes?: number; scheduledMinutes?: number; paidLeave?: boolean; leaveType?: string | null; lateMinutes?: number; earlyMinutes?: number; firstInAt?: Date | null; lastOutAt?: Date | null; eventCount?: number };
       const rows: PayrollAttendanceRow[] = isPreview
         ? (await tx.attendanceDay.findMany({ where: { workDate: { gte: from, lte: asOf ?? to } } })).map(row => ({
           userId: row.userId, workDate: dateKey(row.workDate).toISOString().slice(0, 10), status: row.status,
           workedMinutes: row.workedMinutes, nightWorkedMinutes: row.nightWorkedMinutes, scheduledMinutes: row.scheduledMinutes,
           paidLeave: row.paidLeave, leaveType: row.leaveType, lateMinutes: row.lateMinutes, earlyMinutes: row.earlyMinutes,
+          firstInAt: row.firstInAt, lastOutAt: row.lastOutAt, eventCount: row.eventCount,
         }))
         : attendancePeriod!.snapshot as unknown as PayrollAttendanceRow[];
       const users = await tx.user.findMany({
@@ -503,7 +556,7 @@ export class HrmsPayrollService {
             { OR: [{ hireDate: null }, { hireDate: { lte: asOf ?? to } }] },
             { OR: [
               { status: 'ACTIVE', employmentStatus: { in: ['ACTIVE', 'PROBATION'] } },
-              { actionsOnMe: { some: { type: 'RESIGNATION', status: 'APPROVED', effectiveAt: { gte: from, lte: asOf ?? to } } } },
+              { actionsOnMe: { some: { OR: [{ type: 'RESIGNATION' }, { type: 'DISCIPLINE', payload: { path: ['subType'], equals: 'DISMISSAL' } }], status: 'APPROVED', effectiveAt: { gte: from, lte: asOf ?? to } } } },
             ] },
           ],
         } : { deletedAt: null, id: { in: [...new Set(rows.map(r => r.userId))] } },
@@ -561,10 +614,10 @@ export class HrmsPayrollService {
         // Keep expired/terminated contracts for historical periods. Selecting only
         // today's ACTIVE contract made old-period recalculations fall back to the
         // employee's current profile salary.
-        const contracts = await tx.contract.findMany({ where: { userId: user.id, startDate: { lte: to } }, orderBy: { startDate: 'desc' } });
+        const contracts = await tx.contract.findMany({ where: { userId: user.id, status: { not: 'DRAFT' }, startDate: { lte: to } }, orderBy: { startDate: 'desc' } });
         const actions = await tx.personnelAction.findMany({ where: { subjectId: user.id, status: 'APPROVED', effectiveAt: { lte: to } }, orderBy: { effectiveAt: 'asc' } });
         const transfers = await tx.personnelAction.findMany({ where: { subjectId: user.id, type: 'TRANSFER', status: 'APPROVED', effectiveAt: { not: null } }, orderBy: { effectiveAt: 'asc' } });
-        const resignation = actions.find(a => a.type === 'RESIGNATION'
+        const resignation = actions.find(a => endsEmployment(a.type, a.payload as Record<string, unknown>)
           && (!asOf || !a.effectiveAt || dateKey(a.effectiveAt) <= asOf));
         const resignationDate = resignation?.effectiveAt ? dateKey(resignation.effectiveAt) : to;
         const rateCutoff = asOf && asOf < resignationDate ? asOf : resignationDate;
@@ -658,8 +711,10 @@ export class HrmsPayrollService {
             };
             publicSectorSalaryByDate.set(day.toISOString().slice(0, 10), publicPay.detail);
           }
-          const assignmentSalary = assignment && (!contract || dateKey(assignment.fromDate) >= dateKey(contract.startDate)) ? assignment.baseSalary : null;
           const hasAnyContractHistory = contracts.length > 0;
+          // A current contract is the authoritative enterprise salary source.
+          // Keep older assignment snapshots only for legacy employees with no contract history.
+          const assignmentSalary = assignment && !hasAnyContractHistory ? assignment.baseSalary : null;
           const hasApplicableSalarySource = Boolean(publicPay) || assignmentSalary !== null || contract !== undefined;
           const profileFallback = !isStateOrganization && !hasAnyContractHistory && assignmentSalary === null ? Number(user.baseSalary ?? 0) : 0;
           const dailyBase = publicPay?.monthlyTotal ?? assignmentSalary ?? contract?.baseSalary ?? profileFallback;
@@ -814,12 +869,11 @@ export class HrmsPayrollService {
         const resident = user.taxResidency !== 'NON_RESIDENT';
         const taxContract = contracts.find(c => c.type !== 'AMENDMENT' && dateKey(c.startDate) <= to
           && (c.endDate ? dateKey(c.endDate) >= from : c.status === 'ACTIVE'));
-        const hasSalaryAmendment = contracts.some(c => c.type === 'AMENDMENT' && dateKey(c.startDate) <= to
-          && (c.endDate ? dateKey(c.endDate) >= from : c.status === 'ACTIVE'));
-        const flatTenPercent = resident && !hasSalaryAmendment && (!taxContract || Boolean(taxContract.type !== 'INDEFINITE' && taxContract.endDate && isUnderThreeMonths(taxContract.startDate, taxContract.endDate)));
+        // A pay amendment does not turn a short fixed-term contract into a long one.
+        const flatTenPercent = resident && (!taxContract || Boolean(taxContract.type !== 'INDEFINITE' && taxContract.endDate && isUnderThreeMonths(taxContract.startDate, taxContract.endDate)));
         let calculated: ReturnType<typeof calculatePayroll>;
         try {
-          calculated = calculatePayroll({ year, earnedBase, overtimeTaxable, nightWorkBase, nightWorkPremium, insuranceRequired: unpaidFullDays + postEmploymentUnpaidDays < 14 || Boolean(firstMonthSick), baseSalary: base, standardDays: dates.length, paidDays, attendanceDays, insuranceSalary, insuranceCap, unemploymentCap, dependents: user.taxDependentCount, taxResidency: resident ? 'RESIDENT' : 'NON_RESIDENT', taxWithholdingMode: flatTenPercent ? 'FLAT_10' : 'PROGRESSIVE', policy, overtime: otPay, bonus, items, loans: loans.map(l => ({ id: l.id, emi: l.monthlyEmi, remaining: l.remainingAmount })), minimumWageAudit: { region, contractualMonthlyWage: overtimeBase, standardHours }, overtimeBasis: { contractualMonthlyWage: overtimeBase, standardHours, hourlyRate: hourly } });
+          calculated = calculatePayroll({ provisional: isPreview, year, earnedBase, overtimeTaxable, nightWorkBase, nightWorkPremium, insuranceRequired: unpaidFullDays + postEmploymentUnpaidDays < 14 || Boolean(firstMonthSick), baseSalary: base, standardDays: dates.length, paidDays, attendanceDays, insuranceSalary, insuranceCap, unemploymentCap, dependents: user.taxDependentCount, taxResidency: resident ? 'RESIDENT' : 'NON_RESIDENT', taxWithholdingMode: flatTenPercent ? 'FLAT_10' : 'PROGRESSIVE', policy, overtime: otPay, bonus, items, loans: loans.map(l => ({ id: l.id, emi: l.monthlyEmi, remaining: l.remainingAmount })), minimumWageAudit: { region, contractualMonthlyWage: overtimeBase, standardHours }, overtimeBasis: { contractualMonthlyWage: overtimeBase, standardHours, hourlyRate: hourly } });
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Dữ liệu lương không hợp lệ';
           throw new ConflictException(`Không thể tính lương cho ${user.fullName} (${user.employeeCode ?? 'chưa có mã'}): ${message}`);
@@ -871,12 +925,27 @@ export class HrmsPayrollService {
               socialInsuranceLeaveDays,
               missingPairDays,
             },
-            attendanceDays: employeeRows.filter((row) => eligibleKeys.has(row.workDate.slice(0, 10))).map((row) => ({
-              workDate: row.workDate.slice(0, 10), status: row.status,
-              scheduledMinutes: row.scheduledMinutes ?? 480, workedMinutes: row.workedMinutes ?? 0,
-              lateMinutes: row.lateMinutes ?? 0, earlyMinutes: row.earlyMinutes ?? 0,
-              leaveType: row.leaveType ?? null, paidLeave: Boolean(row.paidLeave),
-            })),
+            attendanceDays: isPreview
+              ? eligible.map((day) => {
+                const workDate = day.toISOString().slice(0, 10);
+                const row = attendanceByDate.get(workDate);
+                return {
+                  workDate, status: row?.status ?? 'UNRECORDED',
+                  scheduledMinutes: row?.scheduledMinutes ?? scheduledMinutesByDate.get(workDate) ?? 480,
+                  workedMinutes: row?.workedMinutes ?? 0,
+                  lateMinutes: row?.lateMinutes ?? 0, earlyMinutes: row?.earlyMinutes ?? 0,
+                  leaveType: row?.leaveType ?? null, paidLeave: Boolean(row?.paidLeave),
+                  firstInAt: row?.firstInAt ? new Date(row.firstInAt).toISOString() : null,
+                  lastOutAt: row?.lastOutAt ? new Date(row.lastOutAt).toISOString() : null,
+                  eventCount: row?.eventCount ?? 0,
+                };
+              })
+              : employeeRows.filter((row) => eligibleKeys.has(row.workDate.slice(0, 10))).map((row) => ({
+                workDate: row.workDate.slice(0, 10), status: row.status,
+                scheduledMinutes: row.scheduledMinutes ?? 480, workedMinutes: row.workedMinutes ?? 0,
+                lateMinutes: row.lateMinutes ?? 0, earlyMinutes: row.earlyMinutes ?? 0,
+                leaveType: row.leaveType ?? null, paidLeave: Boolean(row.paidLeave),
+              })),
             overtimeRequests: overtimeRequests.map((ot) => ({
               workDate: ot.workDate.toISOString().slice(0, 10), status: ot.status, hours: ot.hours,
               nightHours: ot.nightHours, dayCategory: ot.dayCategory, paid: ot.status === 'APPROVED',
@@ -890,6 +959,7 @@ export class HrmsPayrollService {
             department: user.orgUnit?.name, jobTitle: user.jobTitle, workingDays: dates.length,
             scheduledDaysToDate: eligible.length, actualWorkDays: paidDays, missingAttendanceDays, baseSalary: base,
             grossPay: calculated.grossPay, totalDeduction: calculated.totalDeduction, netPay: calculated.netPay, breakdown,
+            deductionReviewNote: calculated.netPay < 0 ? 'Thu nhập tích lũy chưa đủ bù các khoản bảo hiểm/khấu trừ dự kiến của tháng. Số dư âm chỉ để đối soát, không phải số tiền chi trả.' : undefined,
           });
         } else {
           await tx.hrmsPayrollSlip.create({ data: { payrollRunId: run!.id, userId: user.id, employeeName: user.fullName, bankAccount: user.bankAccount, bankName: user.bankName, employeeCode: user.employeeCode, department: user.orgUnit?.name, jobTitle: user.jobTitle, workingDays: dates.length, actualWorkDays: paidDays, baseSalary: base, grossPay: calculated.grossPay, totalDeduction: calculated.totalDeduction, netPay: calculated.netPay, breakdown, status: 'DRAFT' } });
@@ -922,6 +992,7 @@ export class HrmsPayrollService {
           totalNetPay,
           pendingAttendanceDays: previewSlips.reduce((sum, slip) => sum + Number(slip.missingAttendanceDays ?? 0), 0),
           unpricedEmployees,
+          deductionReviewEmployees: previewSlips.filter(slip => Boolean(slip.deductionReviewNote)).length,
           slips: previewSlips,
         };
       }

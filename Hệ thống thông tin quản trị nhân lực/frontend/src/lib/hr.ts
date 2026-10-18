@@ -49,11 +49,11 @@ export const CANDIDATE_STAGE_LABEL: Record<string, string> = {
 };
 
 export const ACTION_TYPE_LABEL: Record<string, string> = {
-  TRANSFER: 'Thuyên chuyển · Điều động · Luân chuyển',
+  TRANSFER: 'Điều động · Bổ nhiệm · Miễn nhiệm · Bãi nhiệm',
   SALARY_ADJUST: 'Điều chỉnh lương · Nâng ngạch bậc',
   AWARD: 'Khen thưởng · Biểu dương',
-  DISCIPLINE: 'Kỷ luật · Bãi nhiệm · Cách chức',
-  RESIGNATION: 'Thôi việc · Nghỉ hưu · Miễn nhiệm',
+  DISCIPLINE: 'Kỷ luật lao động',
+  RESIGNATION: 'Chấm dứt hợp đồng · Thôi việc',
 };
 
 export const PERF_STATUS_LABEL: Record<string, string> = {
@@ -91,6 +91,7 @@ export const CONTRACT_TYPE_LABEL: Record<string, string> = {
 };
 
 export const CONTRACT_STATUS_LABEL: Record<string, string> = {
+  DRAFT: 'Chờ HR đối chiếu',
   ACTIVE: 'Hiệu lực',
   EXPIRED: 'Hết hạn',
   TERMINATED: 'Chấm dứt',

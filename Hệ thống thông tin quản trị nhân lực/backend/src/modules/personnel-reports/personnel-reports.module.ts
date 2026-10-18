@@ -1,6 +1,6 @@
 import { HrAccessService } from '../../common/services/hr-access.service';
 import {
-  Controller, Get, Injectable, Module, NotFoundException, Param, Query,
+  ConflictException, Controller, Get, Injectable, Module, NotFoundException, Param, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../../common/prisma.service';
@@ -79,7 +79,7 @@ export class PersonnelReportsService {
         sectionTitle: 'I. THÔNG TIN CÁ NHÂN & LÝ LỊCH',
         fullName: profile.user.fullName,
         aliasName: profile.aliasName || 'Không',
-        gender: profile.gender || 'Nam',
+        gender: profile.gender || 'Chưa khai báo',
         birthDate: profile.user.birthDate,
         birthPlace: profile.birthPlace,
         hometown: profile.hometown,
@@ -88,9 +88,9 @@ export class PersonnelReportsService {
         idCardNo: profile.idCardNo,
         idCardIssueDate: profile.idCardIssueDate,
         idCardIssuePlace: profile.idCardIssuePlace,
-        ethnicity: profile.ethnicity || 'Kinh',
-        religion: profile.religion || 'Không',
-        familyOrigin: profile.familyOrigin || 'Viên chức',
+        ethnicity: profile.ethnicity || 'Chưa khai báo',
+        religion: profile.religion || 'Chưa khai báo',
+        familyOrigin: profile.familyOrigin || 'Chưa khai báo',
         priorJob: profile.priorJob,
       },
       page2: {
@@ -155,6 +155,11 @@ export class PersonnelReportsService {
    * - Ma trận các ngạch lương x 6 nhóm tuổi: [<30, 30-39, 40-49, 50-54, 55-59, >=60].
    */
   async getAgeByRankReport(orgUnitId?: string) {
+    const orgSetting = await this.prisma.setting.findUnique({ where: { key: 'ORG_PROFILE' }, select: { value: true } });
+    const orgProfile = (orgSetting?.value ?? {}) as { orgSector?: string };
+    if (orgProfile.orgSector !== 'state') {
+      throw new ConflictException('Báo cáo độ tuổi theo ngạch chỉ áp dụng cho tổ chức được cấu hình là khu vực công.');
+    }
     const unitIds = await this.scopedUnitIds(orgUnitId);
     const ranks = await this.prisma.personnelRank.findMany({ orderBy: [{ groupCode: 'asc' }, { code: 'asc' }] });
     const profiles = await this.prisma.personnelComprehensiveProfile.findMany({

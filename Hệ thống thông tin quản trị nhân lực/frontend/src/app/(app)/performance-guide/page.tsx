@@ -38,7 +38,7 @@ export default function PerformanceGuidePage() {
     },
     {
       number: '5', title: 'Đối chiếu và chấm từng KPI', owner: 'Quản lý trực tiếp', icon: UserRoundCheck,
-      text: 'Quản lý xem chỉ số, kết quả và minh chứng; trao đổi với nhân viên về chênh lệch hoặc yếu tố ngoài khả năng kiểm soát. Hệ thống chỉ cho lưu điểm 0–100 khi KPI đã có minh chứng. Mỗi KPI đóng góp điểm bằng điểm KPI nhân trọng số rồi chia 100; ví dụ 90 × 25% = 22,5 điểm. Cộng các KPI để ra điểm chu kỳ.',
+      text: 'Quản lý đối chiếu mục tiêu, kết quả và minh chứng. KPI định lượng tính theo chiều càng cao/càng thấp càng tốt hoặc đạt/không đạt, giới hạn 100 điểm; KPI định tính dùng rubric đã thống nhất. Phải ghi giải trình khi lưu điểm. Điểm kỳ = tổng (điểm KPI × trọng số / 100); tổng trọng số đủ 100%. Đây là quy ước chấm của doanh nghiệp, không phải công thức ISO bắt buộc.',
       href: '/performance?tab=goals', action: 'Rà soát kết quả',
     },
     {

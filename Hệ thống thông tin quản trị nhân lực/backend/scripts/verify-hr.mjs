@@ -39,12 +39,12 @@ console.log('== Mục 2: Kiosk điểm danh từ trang đăng nhập (không c�
 
 // ---------------------------------------------------------------------------
 console.log('== Đăng nhập hai tài khoản ==');
-const adminLogin = await api('POST', '/auth/login', { body: { email: 'admin@demo.local', password: 'Admin@123' } });
+const adminLogin = await api('POST', '/auth/login', { body: { email: 'admin@demo.local', password: '123' } });
 check('Đăng nhập admin', adminLogin.status === 200 && !!adminLogin.data?.accessToken);
 const admin = adminLogin.data.accessToken;
 const adminRefresh = adminLogin.data.refreshToken;
 
-const fresherLogin = await api('POST', '/auth/login', { body: { email: 'dev.fresher@demo.local', password: 'Fresher@123' } });
+const fresherLogin = await api('POST', '/auth/login', { body: { email: 'dev.fresher@demo.local', password: '123' } });
 check('Đăng nhập nhân viên (fresher)', fresherLogin.status === 200 && !!fresherLogin.data?.accessToken);
 const fresher = fresherLogin.data.accessToken;
 
@@ -70,7 +70,7 @@ let leaveId = null;
   if ((await api('GET', '/leave/balance', { token })).data?.remaining < 3) {
     const emps = await api('GET', '/employees', { token: admin });
     for (const e of (emps.data ?? []).filter((x) => x.email.endsWith('@saigontechnology.vn')).slice(0, 15)) {
-      const lg = await api('POST', '/auth/login', { body: { email: e.email, password: 'Nhanvien@123' } });
+      const lg = await api('POST', '/auth/login', { body: { email: e.email, password: '123' } });
       if (lg.status !== 200) continue;
       if ((await api('GET', '/leave/balance', { token: lg.data.accessToken })).data?.remaining >= 3) {
         token = lg.data.accessToken;
@@ -270,7 +270,7 @@ console.log('== Mục 3: Đăng xuất & đổi tài khoản ==');
   const reused = await api('POST', '/auth/refresh', { body: { refreshToken: adminRefresh } });
   check('Refresh token bị thu hồi sau đăng xuất (không tái sử dụng)', reused.status === 401, `status=${reused.status}`);
 
-  const relogin = await api('POST', '/auth/login', { body: { email: 'km.manager@demo.local', password: 'Manager@123' } });
+  const relogin = await api('POST', '/auth/login', { body: { email: 'km.manager@demo.local', password: '123' } });
   check('Đăng nhập tài khoản KHÁC thành công', relogin.status === 200 && !!relogin.data?.accessToken);
 
   const me2 = await api('GET', '/auth/me', { token: relogin.data.accessToken });

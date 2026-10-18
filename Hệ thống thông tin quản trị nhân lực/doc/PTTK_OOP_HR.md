@@ -418,7 +418,7 @@ Bảng dưới tổng hợp các chứng nhận và giải thưởng được n�
 
 Cơ cấu theo nhóm chức năng và địa điểm làm việc được xây dựng để xác định vai trò và phạm vi dữ liệu trong HRMS. Cây tổ chức hiện có trong hệ thống phục vụ mô tả nghiệp vụ; không nên xem là sơ đồ nội bộ chính thức của Saigon Technology khi chưa được doanh nghiệp xác nhận.
 
-![Hình 1.1. Sơ đồ cơ cấu tổ chức tổng thể Công ty Saigon Technology](images/hinh_1_1_org_chart.png)
+![Hình 1.1. Sơ đồ cơ cấu tổ chức tổng thể Công ty Saigon Technology](images/recovered_from_word/hinh_1_1_org_chart.png)
 
 
 Sơ đồ tổ chức tham chiếu chia các đơn vị thành năm nhóm chức năng để thuận tiện mô tả quy trình:
@@ -430,7 +430,7 @@ Sơ đồ tổ chức tham chiếu chia các đơn vị thành năm nhóm chức
 **B. Khối Quản trị Nguồn nhân lực & Khối Vận hành - Pháp chế (Bộ đôi điều phối & hỗ trợ)**
 Trong mô hình nghiệp vụ, HR phụ trách hồ sơ và chính sách nhân sự; OPS hỗ trợ hạ tầng, tài sản và các vấn đề pháp chế. Đây là cách phân vai phục vụ thiết kế, không thay thế sơ đồ hoặc quy chế nội bộ của doanh nghiệp:
 
-![Hình 1.2. Cơ cấu chi tiết Khối Quản trị Nguồn nhân lực và Khối Vận hành & Pháp chế](images/hinh_1_2_hr_admin.png)
+![Hình 1.2. Cơ cấu chi tiết Khối Quản trị Nguồn nhân lực và Khối Vận hành & Pháp chế](images/recovered_from_word/hinh_1_2_hr_admin.png)
 
 
 - **Khối Quản trị Nguồn nhân lực (HR):**
@@ -446,7 +446,7 @@ Trong mô hình nghiệp vụ, HR phụ trách hồ sơ và chính sách nhân s
 **C. Khối Kỹ thuật & Sản xuất Phần mềm (DELIVERY)**
 Trong mô hình của đề tài, Khối Delivery phụ trách triển khai dự án phần mềm; các nhóm kỹ thuật được bố trí tại TP.HCM và Đà Nẵng theo kịch bản:
 
-![Hình 1.3. Cơ cấu chi tiết Khối Kỹ thuật & Sản xuất Phần mềm](images/hinh_1_3_delivery.png)
+![Hình 1.3. Cơ cấu chi tiết Khối Kỹ thuật & Sản xuất Phần mềm](images/recovered_from_word/hinh_1_3_delivery.png)
 
 
 - *Phòng Quản lý Dự án (PMO):* Thiết lập và giám sát chuẩn mực thực thi dự án Agile/Scrum, kiểm soát Milestone bàn giao cho khách hàng quốc tế, quản trị định biên và điều phối nhân sự kỹ thuật giữa các dự án.
@@ -511,7 +511,7 @@ Các tình huống này là căn cứ xác định phạm vi chức năng của 
 
 Trong mô hình quy trình của đề tài, ba nhóm vai trò phối hợp gồm Ban Giám đốc, HR/OPS và các đơn vị chuyên môn. Trách nhiệm cụ thể được phân theo từng quy trình và quyền được cấu hình trong HRMS:
 
-![Hình 1.4. Mô hình phối hợp giữa các đơn vị trong quản trị nhân lực](images/hinh_1_4_matrix_3links.png)
+![Hình 1.4. Mô hình phối hợp giữa các đơn vị trong quản trị nhân lực](images/recovered_from_word/hinh_1_4_matrix_3links.png)
 
 
 
@@ -832,7 +832,7 @@ Trong phân tích hướng đối tượng, tác nhân là người hoặc hệ 
 | 11 | Cổ đông & Hội đồng Quản trị | Đại hội đồng Cổ đông & Hội đồng Quản trị (ĐHCĐ) | SHAREHOLDER | Quản trị sở hữu và giám sát tối cao: Xem báo cáo thường niên ĐHCĐ, báo cáo tài chính - quỹ lương tổng thể, chiến lược nhân sự, giám sát tuân thủ và kiểm toán độc lập. |
 | 12 | Quản trị viên Hệ thống CNTT | Phòng IT & An ninh Mạng (OPS-IT) - Khối Vận hành & Pháp chế | ADMIN | Quản trị kỹ thuật CNTT (IT SysAdmin): Quản trị hạ tầng máy chủ phần mềm, cấu hình tham số hệ thống, phân quyền vai trò RBAC, tích hợp máy chấm công và giám sát nhật ký kiểm toán (Audit Log) theo ISO 27001. Không can thiệp quyết định kinh doanh / phê duyệt tiền lương của Ban Giám Đốc. |
 
-![Hình 2.1. Biểu đồ cây phân cấp Tác nhân](images/hinh_2_1_actor_tree.png)
+![Hình 2.1. Biểu đồ cây phân cấp Tác nhân](images/recovered_from_word/hinh_2_1_actor_tree.png)
 
 Biểu đồ mô tả cây kế thừa của 11 tác nhân thuộc nhóm nhân viên và nghiệp vụ. SHAREHOLDER là vai trò giám sát được phân quyền độc lập trong hệ thống nên không nằm trong cây này.
 
@@ -1512,49 +1512,49 @@ Dưới đây là các kịch bản nghiệp vụ dự kiến cho 47 use case. �
 
 Biểu đồ Use case tổng quan thể hiện các tương tác giữa các nhóm tác nhân nghiệp vụ và 10 phân hệ chức năng bao quát toàn bộ 47 Use Case trong Hệ thống thông tin Quản trị nhân lực STS HRMIS.
 
-![Hình 2.2. Biểu đồ Use case tổng quan Hệ thống Quản trị nhân lực](images/hinh_2_2_usecase_overview.png)
+![Hình 2.2. Biểu đồ Use case tổng quan Hệ thống Quản trị nhân lực](images/recovered_from_word/hinh_2_2_usecase_overview.png)
 
 Để làm rõ chi tiết quan hệ giữa các Use Case trong từng phân hệ, hệ thống được phân rã thành 10 biểu đồ Use Case nghiệp vụ chuyên biệt, mô hình hóa đầy đủ 47 Use Case từ UC01 đến UC47:
 
 **A. Nhóm A - Quản trị hệ thống & Tổ chức (UC01 - UC03)**
 Biểu đồ mô tả tương tác đăng nhập, phân quyền RBAC và cấu hình cây phòng ban doanh nghiệp.
-![Hình 2.3. Biểu đồ Use case Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03)](images/hinh_2_3_usecase_nhom_a.png)
+![Hình 2.3. Biểu đồ Use case Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03)](images/recovered_from_word/hinh_2_3_usecase_nhom_a.png)
 
 **B. Nhóm B - Tuyển dụng & Ứng viên (UC04 - UC08)**
 Biểu đồ mô tả chu trình tuyển dụng từ đề xuất nhu cầu, kiểm soát định biên, duyệt chỉ tiêu, sàng lọc ứng viên Quy trình tuyển dụng đa giai đoạn đến phát hành thư mời làm việc.
-![Hình 2.4. Biểu đồ Use case Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08)](images/hinh_2_4_usecase_nhom_b.png)
+![Hình 2.4. Biểu đồ Use case Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08)](images/recovered_from_word/hinh_2_4_usecase_nhom_b.png)
 
 **C. Nhóm C - Hồ sơ nhân sự & Hội nhập (UC09 - UC14)**
 Biểu đồ mô tả quản lý hồ sơ nhân viên toàn diện, hợp đồng lao động, bằng cấp chứng chỉ, mượn trả hồ sơ gốc, đánh giá thử việc và lộ trình hội nhập Onboarding.
-![Hình 2.5. Biểu đồ Use case Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14)](images/hinh_2_5_usecase_nhom_c.png)
+![Hình 2.5. Biểu đồ Use case Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14)](images/recovered_from_word/hinh_2_5_usecase_nhom_c.png)
 
 **D. Nhóm D - Cổng tự phục vụ nhân viên (UC15 - UC17)**
 Biểu đồ mô tả cổng tự phục vụ tập trung của nhân viên, cơ chế quản lý thông tin phân cấp 3 mức độ và luồng thẩm định điều chỉnh hồ sơ.
-![Hình 2.6. Biểu đồ Use case Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17)](images/hinh_2_6_usecase_nhom_d.png)
+![Hình 2.6. Biểu đồ Use case Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17)](images/recovered_from_word/hinh_2_6_usecase_nhom_d.png)
 
 **E. Nhóm E - Chấm công & Phân ca (UC18 - UC25)**
 Biểu đồ mô tả các kênh ghi nhận công hiện có và các nghiệp vụ liên quan. Nhân viên có thể điểm danh trên web hoặc dùng mẫu khuôn mặt qua camera trình duyệt; webhook thiết bị chỉ hoạt động khi có thiết bị và cấu hình tương ứng.
-![Hình 2.7. Biểu đồ Use case Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25)](images/hinh_2_7_usecase_nhom_e.png)
+![Hình 2.7. Biểu đồ Use case Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25)](images/recovered_from_word/hinh_2_7_usecase_nhom_e.png)
 
 **F. Nhóm F - Tiền lương & Phúc lợi (UC26 - UC31)**
 Biểu đồ mô tả cấu hình công thức và tính lương, quy trình đối soát, phê duyệt, khóa và ghi nhận chi trả; đồng thời thể hiện quản lý khoản vay phúc lợi, quyết toán công tác phí T&E và cấp phát tài sản.
-![Hình 2.8. Biểu đồ Use case Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31)](images/hinh_2_8_usecase_nhom_f.png)
+![Hình 2.8. Biểu đồ Use case Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31)](images/recovered_from_word/hinh_2_8_usecase_nhom_f.png)
 
 **G. Nhóm G - Biến động nhân sự & Thôi việc (UC32 - UC36)**
 Biểu đồ mô tả quy trình điều chuyển nội bộ, điều chỉnh bậc lương, khen thưởng, kỷ luật lao động và tiếp nhận xử lý thôi việc bàn giao 5 bên.
-![Hình 2.9. Biểu đồ Use case Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36)](images/hinh_2_9_usecase_nhom_g.png)
+![Hình 2.9. Biểu đồ Use case Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36)](images/recovered_from_word/hinh_2_9_usecase_nhom_g.png)
 
 **H. Nhóm H - Đánh giá KPI, Đào tạo và Khiếu nại (UC37 - UC39)**
 Biểu đồ mô tả quy trình quản lý mục tiêu KPI, tổ chức đào tạo nội bộ và tiếp nhận giải quyết khiếu nại lao động bảo mật.
-![Hình 2.10. Biểu đồ Use case Phân hệ Đánh giá KPI, Đào tạo và Khiếu nại (Nhóm H: UC37 - UC39)](images/hinh_2_10_usecase_nhom_h.png)
+![Hình 2.10. Biểu đồ Use case Phân hệ Đánh giá KPI, Đào tạo và Khiếu nại (Nhóm H: UC37 - UC39)](images/recovered_from_word/hinh_2_10_usecase_nhom_h.png)
 
 **I. Nhánh hồ sơ công vụ (UC40 - UC43, chỉ chế độ khu vực công)**
 Sơ đồ yêu cầu của nhánh riêng cho hồ sơ khu vực công. Mẫu 2C, danh mục ngạch bậc, nâng bậc và báo cáo là nội dung tham chiếu; HRMS chưa xác nhận các biểu mẫu pháp quy và quy trình ký duyệt chính thức.
-![Hình 2.11. Biểu đồ Use case hồ sơ công vụ (UC40 - UC43, chỉ chế độ khu vực công)](images/hinh_2_11_usecase_nhom_i.png)
+![Hình 2.11. Biểu đồ Use case hồ sơ công vụ (UC40 - UC43, chỉ chế độ khu vực công)](images/recovered_from_word/hinh_2_11_usecase_nhom_i.png)
 
 **J. Nhóm J - Quản trị tri thức & Điều hành (UC44 - UC47)**
 Biểu đồ mô tả quản trị kho tri thức số và quy trình vận hành chuẩn, tìm kiếm toàn văn FTS & danh bạ chuyên gia, bảng điều khiển phân tích số Dashboard và nhật ký kiểm toán hệ thống.
-![Hình 2.12. Biểu đồ Use case Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47)](images/hinh_2_12_usecase_nhom_j.png)
+![Hình 2.12. Biểu đồ Use case Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47)](images/recovered_from_word/hinh_2_12_usecase_nhom_j.png)
 
 ### 2.1.5. Phân tầng yêu cầu: từ quy trình nghiệp vụ đến use case hệ thống
 
@@ -1752,256 +1752,256 @@ Biểu đồ trình tự mô tả chi tiết chuỗi tương tác theo thứ t�
 **UC01 - Đăng nhập & Xác thực hệ thống**
 
 
-![Hình 2.13. Biểu đồ trình tự Use case Đăng nhập & Xác thực hệ thống (UC01)](images/hinh_seq_uc01.png)
+![Hình 2.13. Biểu đồ trình tự Use case Đăng nhập & Xác thực hệ thống (UC01)](images/recovered_from_word/hinh_seq_uc01.png)
 
 **UC02 - Quản trị người dùng & Phân quyền RBAC**
 
 
-![Hình 2.14. Biểu đồ trình tự Use case Quản trị người dùng & Phân quyền RBAC (UC02)](images/hinh_seq_uc02.png)
+![Hình 2.14. Biểu đồ trình tự Use case Quản trị người dùng & Phân quyền RBAC (UC02)](images/recovered_from_word/hinh_seq_uc02.png)
 
 **UC03 - Quản trị cơ cấu tổ chức & Cây phòng ban**
 
 
-![Hình 2.15. Biểu đồ trình tự Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)](images/hinh_seq_uc03.png)
+![Hình 2.15. Biểu đồ trình tự Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)](images/recovered_from_word/hinh_seq_uc03.png)
 
 Ở ba luồng đầu, nhân viên gửi thông tin đăng nhập qua giao diện; hệ thống xác thực rồi mới cấp quyền và dựng các chức năng phù hợp với vai trò. Khi quản trị viên thay đổi tài khoản hoặc cây đơn vị, API kiểm tra quyền và dữ liệu trước khi lưu, sau đó ghi nhật ký. Nếu đăng nhập sai hoặc thiếu quyền, yêu cầu dừng ngay ở bước kiểm tra.
 
 **UC04 - Lập phiếu đề xuất tuyển dụng nhân sự**
 
 
-![Hình 2.16. Biểu đồ trình tự Use case Lập phiếu đề xuất tuyển dụng nhân sự (UC04)](images/hinh_seq_uc04.png)
+![Hình 2.16. Biểu đồ trình tự Use case Lập phiếu đề xuất tuyển dụng nhân sự (UC04)](images/recovered_from_word/hinh_seq_uc04.png)
 
 **UC05 - Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng**
 
 
-![Hình 2.17. Biểu đồ trình tự Use case Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng (UC05)](images/hinh_seq_uc05.png)
+![Hình 2.17. Biểu đồ trình tự Use case Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng (UC05)](images/recovered_from_word/hinh_seq_uc05.png)
 
 **UC06 - Phê duyệt chỉ tiêu tuyển dụng**
 
 
-![Hình 2.18. Biểu đồ trình tự Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)](images/hinh_seq_uc06.png)
+![Hình 2.18. Biểu đồ trình tự Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)](images/recovered_from_word/hinh_seq_uc06.png)
 
 **UC07 - Quản lý hồ sơ ứng viên & Tuyển dụng Quy trình tuyển dụng đa giai đoạn**
 
 
-![Hình 2.19. Biểu đồ trình tự Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS (UC07)](images/hinh_seq_uc07.png)
+![Hình 2.19. Biểu đồ trình tự Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS (UC07)](images/recovered_from_word/hinh_seq_uc07.png)
 
 **UC08 - Gửi thư mời nhận việc & Thỏa thuận mức lương**
 
 
-![Hình 2.20. Biểu đồ trình tự Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)](images/hinh_seq_uc08.png)
+![Hình 2.20. Biểu đồ trình tự Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)](images/recovered_from_word/hinh_seq_uc08.png)
 
 Ở nhóm tuyển dụng, đề xuất chỉ tiêu đi qua bước thẩm định định biên và phê duyệt trước khi chuyên viên mở tuyển. Hồ sơ ứng viên được cập nhật theo từng vòng; chỉ khi ứng viên được chọn và offer được chấp thuận thì hệ thống mới chuyển sang bước tiếp nhận. Hồ sơ chưa đạt hoặc chưa đủ căn cứ được trả về xử lý, không tự chuyển thành nhân viên.
 
 **UC09 - Quản lý hồ sơ nhân viên toàn diện**
 
 
-![Hình 2.21. Biểu đồ trình tự Use case Quản lý hồ sơ nhân viên toàn diện (UC09)](images/hinh_seq_uc09.png)
+![Hình 2.21. Biểu đồ trình tự Use case Quản lý hồ sơ nhân viên toàn diện (UC09)](images/recovered_from_word/hinh_seq_uc09.png)
 
 **UC10 - Quản lý hợp đồng lao động & Phụ lục hợp đồng**
 
 
-![Hình 2.22. Biểu đồ trình tự Use case Quản lý hợp đồng lao động & Phụ lục hợp đồng (UC10)](images/hinh_seq_uc10.png)
+![Hình 2.22. Biểu đồ trình tự Use case Quản lý hợp đồng lao động & Phụ lục hợp đồng (UC10)](images/recovered_from_word/hinh_seq_uc10.png)
 
 **UC11 - Quản lý văn bằng, chứng chỉ chuyên môn**
 
 
-![Hình 2.23. Biểu đồ trình tự Use case Quản lý văn bằng, chứng chỉ chuyên môn (UC11)](images/hinh_seq_uc11.png)
+![Hình 2.23. Biểu đồ trình tự Use case Quản lý văn bằng, chứng chỉ chuyên môn (UC11)](images/recovered_from_word/hinh_seq_uc11.png)
 
 **UC12 - Mượn - trả hồ sơ, chứng chỉ bản gốc**
 
 
-![Hình 2.24. Biểu đồ trình tự Use case Mượn - trả hồ sơ, chứng chỉ bản gốc (UC12)](images/hinh_seq_uc12.png)
+![Hình 2.24. Biểu đồ trình tự Use case Mượn - trả hồ sơ, chứng chỉ bản gốc (UC12)](images/recovered_from_word/hinh_seq_uc12.png)
 
 **UC13 - Đánh giá kết quả thử việc & Ký HĐLĐ chính thức**
 
 
-![Hình 2.25. Biểu đồ trình tự Use case Đánh giá kết quả thử việc & Ký HĐLĐ chính thức (UC13)](images/hinh_seq_uc13.png)
+![Hình 2.25. Biểu đồ trình tự Use case Đánh giá kết quả thử việc & Ký HĐLĐ chính thức (UC13)](images/recovered_from_word/hinh_seq_uc13.png)
 
 **UC14 - Lộ trình hội nhập nhân viên mới**
 
 
-![Hình 2.26. Biểu đồ trình tự Use case Lộ trình hội nhập nhân viên mới (UC14)](images/hinh_seq_uc14.png)
+![Hình 2.26. Biểu đồ trình tự Use case Lộ trình hội nhập nhân viên mới (UC14)](images/recovered_from_word/hinh_seq_uc14.png)
 
 Nhóm hồ sơ và hội nhập nối dữ liệu ứng viên đã nhận việc với hồ sơ nhân viên, hợp đồng và danh sách việc cần hoàn tất. HR cập nhật hồ sơ theo quyền; nhân viên và quản lý xác nhận đầu việc được giao. Ngày hiệu lực cùng trạng thái từng nhiệm vụ quyết định bước tiếp theo, nên hồ sơ thiếu giấy tờ được giữ lại để bổ sung thay vì đóng quy trình.
 
 **UC15 - Cổng tự phục vụ nhân viên tập trung**
 
 
-![Hình 2.27. Biểu đồ trình tự Use case Cổng tự phục vụ nhân viên tập trung (UC15)](images/hinh_seq_uc15.png)
+![Hình 2.27. Biểu đồ trình tự Use case Cổng tự phục vụ nhân viên tập trung (UC15)](images/recovered_from_word/hinh_seq_uc15.png)
 
 **UC16 - Quản lý thông tin cá nhân phân cấp 3 mức độ**
 
 
-![Hình 2.28. Biểu đồ trình tự Use case Quản lý thông tin cá nhân phân cấp 3 mức độ (UC16)](images/hinh_seq_uc16.png)
+![Hình 2.28. Biểu đồ trình tự Use case Quản lý thông tin cá nhân phân cấp 3 mức độ (UC16)](images/recovered_from_word/hinh_seq_uc16.png)
 
 **UC17 - Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2**
 
 
-![Hình 2.29. Biểu đồ trình tự Use case Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 (UC17)](images/hinh_seq_uc17.png)
+![Hình 2.29. Biểu đồ trình tự Use case Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 (UC17)](images/recovered_from_word/hinh_seq_uc17.png)
 
 Ở cổng tự phục vụ, nhân viên chỉ gửi yêu cầu điều chỉnh thông tin thuộc phạm vi được phép sửa. Hệ thống chuyển đề nghị cho người có thẩm quyền, giữ nguyên dữ liệu hiện hành trong lúc chờ và chỉ cập nhật sau khi được duyệt. Nếu bị từ chối, lý do được trả lại để nhân viên biết cần bổ sung gì.
 
 **UC18 - Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca**
 
 
-![Hình 2.30. Biểu đồ trình tự Use case Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca (UC18)](images/hinh_seq_uc18.png)
+![Hình 2.30. Biểu đồ trình tự Use case Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca (UC18)](images/recovered_from_word/hinh_seq_uc18.png)
 
 **UC19 - Điểm danh bằng khuôn mặt qua camera thường**
 
 Nhân viên đăng ký mẫu sau khi đồng ý xử lý dữ liệu, sau đó dùng camera thường trên trang `/check-in`. Trình duyệt trích vector từ khung hình; máy chủ so vector với mẫu đã lưu. Nếu đạt ngưỡng, hệ thống tạo sự kiện chấm công và tính lại công ngày. Luồng hiện chưa xác minh người thật.
 
-![Hình 2.31. Biểu đồ trình tự Use case Điểm danh bằng khuôn mặt qua camera thường (UC19)](images/hinh_seq_uc19.png)
+![Hình 2.31. Biểu đồ trình tự Use case Điểm danh bằng khuôn mặt qua camera thường (UC19)](images/recovered_from_word/hinh_seq_uc19.png)
 
 **UC20 - Quản trị kết nối thiết bị máy chấm công**
 
 
-![Hình 2.32. Biểu đồ trình tự Use case Quản trị kết nối thiết bị máy chấm công (UC20)](images/hinh_seq_uc20.png)
+![Hình 2.32. Biểu đồ trình tự Use case Quản trị kết nối thiết bị máy chấm công (UC20)](images/recovered_from_word/hinh_seq_uc20.png)
 
 **UC21 - Đăng ký & Xét duyệt nghỉ phép trực tuyến**
 
 
-![Hình 2.33. Biểu đồ trình tự Use case Đăng ký & Xét duyệt nghỉ phép trực tuyến (UC21)](images/hinh_seq_uc21.png)
+![Hình 2.33. Biểu đồ trình tự Use case Đăng ký & Xét duyệt nghỉ phép trực tuyến (UC21)](images/recovered_from_word/hinh_seq_uc21.png)
 
 **UC22 - Đăng ký & Phê duyệt làm thêm giờ (OT)**
 
 
-![Hình 2.34. Biểu đồ trình tự Use case Đăng ký & Phê duyệt làm thêm giờ (OT) (UC22)](images/hinh_seq_uc22.png)
+![Hình 2.34. Biểu đồ trình tự Use case Đăng ký & Phê duyệt làm thêm giờ (OT) (UC22)](images/recovered_from_word/hinh_seq_uc22.png)
 
 **UC23 - Lập lịch và phân ca làm việc**
 
 
-![Hình 2.35. Biểu đồ trình tự Use case Lập lịch và phân ca làm việc (UC23)](images/hinh_seq_uc23.png)
+![Hình 2.35. Biểu đồ trình tự Use case Lập lịch và phân ca làm việc (UC23)](images/recovered_from_word/hinh_seq_uc23.png)
 
 **UC24 - Giải trình bổ sung giờ công & Xử lý lệch công**
 
 
-![Hình 2.36. Biểu đồ trình tự Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)](images/hinh_seq_uc24.png)
+![Hình 2.36. Biểu đồ trình tự Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)](images/recovered_from_word/hinh_seq_uc24.png)
 
 **UC25 - Tổng hợp & Chốt bảng chấm công tháng**
 
 
-![Hình 2.37. Biểu đồ trình tự Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)](images/hinh_seq_uc25.png)
+![Hình 2.37. Biểu đồ trình tự Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)](images/recovered_from_word/hinh_seq_uc25.png)
 
 Các nguồn chấm công được ghi nhận thành sự kiện, sau đó tổng hợp thành công ngày để HR rà soát. Đơn nghỉ, làm thêm và giải trình chỉ ảnh hưởng đến kết quả sau khi được đúng người phê duyệt; lượt vào/ra còn thiếu được đưa vào danh sách cần xử lý. Khi chốt tháng, hệ thống kiểm tra các trường hợp còn treo và khóa dữ liệu đã xác nhận để kỳ lương dùng cùng một số liệu.
 
 **UC26 - Cấu hình công thức và ngạch bậc lương**
 
 
-![Hình 2.38. Biểu đồ trình tự Use case Cấu hình công thức và ngạch bậc lương (UC26)](images/hinh_seq_uc26.png)
+![Hình 2.38. Biểu đồ trình tự Use case Cấu hình công thức và ngạch bậc lương (UC26)](images/recovered_from_word/hinh_seq_uc26.png)
 
 **UC27 - Vận hành chức năng tính lương tự động**
 
 
-![Hình 2.39. Biểu đồ trình tự Use case Vận hành chức năng tính lương tự động (UC27)](images/hinh_seq_uc27.png)
+![Hình 2.39. Biểu đồ trình tự Use case Vận hành chức năng tính lương tự động (UC27)](images/recovered_from_word/hinh_seq_uc27.png)
 
 **UC28 - Phê duyệt, khóa và ghi nhận chi trả kỳ lương**
 
 
-![Hình 2.40. Biểu đồ trình tự Use case Phê duyệt, khóa và ghi nhận chi trả kỳ lương (UC28)](images/hinh_seq_uc28.png)
+![Hình 2.40. Biểu đồ trình tự Use case Phê duyệt, khóa và ghi nhận chi trả kỳ lương (UC28)](images/recovered_from_word/hinh_seq_uc28.png)
 
 **UC29 - Quản lý tạm ứng & Khoản vay phúc lợi nhân viên**
 
 
-![Hình 2.41. Biểu đồ trình tự Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)](images/hinh_seq_uc29.png)
+![Hình 2.41. Biểu đồ trình tự Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)](images/recovered_from_word/hinh_seq_uc29.png)
 
 **UC30 - Quản lý đề xuất công tác & Quyết toán chi phí**
 
 
-![Hình 2.42. Biểu đồ trình tự Use case Quản lý đề xuất công tác & Quyết toán chi phí (UC30)](images/hinh_seq_uc30.png)
+![Hình 2.42. Biểu đồ trình tự Use case Quản lý đề xuất công tác & Quyết toán chi phí (UC30)](images/recovered_from_word/hinh_seq_uc30.png)
 
 **UC31 - Quản lý cấp phát & Thu hồi tài sản làm việc**
 
 
-![Hình 2.43. Biểu đồ trình tự Use case Quản lý cấp phát & Thu hồi tài sản làm việc (UC31)](images/hinh_seq_uc31.png)
+![Hình 2.43. Biểu đồ trình tự Use case Quản lý cấp phát & Thu hồi tài sản làm việc (UC31)](images/recovered_from_word/hinh_seq_uc31.png)
 
 Nhóm tiền lương và phúc lợi liên kết dữ liệu hợp đồng, công đã chốt, cấu trúc lương và các khoản khấu trừ để lập phiếu; HR đối chiếu, người duyệt kiểm tra độc lập, rồi Kế toán ghi nhận chứng từ. Đề nghị vay, công tác phí và tài sản có bước duyệt, cấp phát hoặc thu hồi riêng. Hệ thống lưu trạng thái và chứng từ tham chiếu, không gửi lệnh chuyển tiền cho ngân hàng.
 
 **UC32 - Đề xuất & Phê duyệt điều chuyển công tác nội bộ**
 
 
-![Hình 2.44. Biểu đồ trình tự Use case Đề xuất & Phê duyệt điều chuyển công tác nội bộ (UC32)](images/hinh_seq_uc32.png)
+![Hình 2.44. Biểu đồ trình tự Use case Đề xuất & Phê duyệt điều chuyển công tác nội bộ (UC32)](images/recovered_from_word/hinh_seq_uc32.png)
 
 **UC33 - Đề xuất & Phê duyệt điều chỉnh bậc lương**
 
 
-![Hình 2.45. Biểu đồ trình tự Use case Đề xuất & Phê duyệt điều chỉnh bậc lương (UC33)](images/hinh_seq_uc33.png)
+![Hình 2.45. Biểu đồ trình tự Use case Đề xuất & Phê duyệt điều chỉnh bậc lương (UC33)](images/recovered_from_word/hinh_seq_uc33.png)
 
 **UC34 - Đề xuất & Phê duyệt khen thưởng nhân sự**
 
 
-![Hình 2.46. Biểu đồ trình tự Use case Đề xuất & Phê duyệt khen thưởng nhân sự (UC34)](images/hinh_seq_uc34.png)
+![Hình 2.46. Biểu đồ trình tự Use case Đề xuất & Phê duyệt khen thưởng nhân sự (UC34)](images/recovered_from_word/hinh_seq_uc34.png)
 
 **UC35 - Xử lý kỷ luật & Vi phạm nội quy lao động**
 
 
-![Hình 2.47. Biểu đồ trình tự Use case Xử lý kỷ luật & Vi phạm nội quy lao động (UC35)](images/hinh_seq_uc35.png)
+![Hình 2.47. Biểu đồ trình tự Use case Xử lý kỷ luật & Vi phạm nội quy lao động (UC35)](images/recovered_from_word/hinh_seq_uc35.png)
 
 **UC36 - Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận**
 
 
-![Hình 2.48. Biểu đồ trình tự Use case Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận (UC36)](images/hinh_seq_uc36.png)
+![Hình 2.48. Biểu đồ trình tự Use case Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận (UC36)](images/recovered_from_word/hinh_seq_uc36.png)
 
 Các đề nghị điều chuyển, thay đổi chế độ, khen thưởng hoặc xử lý kỷ luật cần người có thẩm quyền xác nhận trước ngày hiệu lực. Khi nhân viên nghỉ việc, HR khởi tạo danh sách bàn giao để các đơn vị lần lượt xác nhận tài sản, công việc và hồ sơ. Quy trình chỉ đóng khi các đầu việc bắt buộc hoàn tất; lịch sử nhân sự vẫn được lưu để tra cứu.
 
 **UC37 - Quản lý mục tiêu và đánh giá KPI**
 
 
-![Hình 2.49. Biểu đồ trình tự Use case Quản lý mục tiêu và đánh giá KPI (UC37)](images/hinh_seq_uc37.png)
+![Hình 2.49. Biểu đồ trình tự Use case Quản lý mục tiêu và đánh giá KPI (UC37)](images/recovered_from_word/hinh_seq_uc37.png)
 
 **UC38 - Quản trị chương trình đào tạo nội bộ**
 
 
-![Hình 2.50. Biểu đồ trình tự Use case Quản trị chương trình đào tạo nội bộ (UC38)](images/hinh_seq_uc38.png)
+![Hình 2.50. Biểu đồ trình tự Use case Quản trị chương trình đào tạo nội bộ (UC38)](images/recovered_from_word/hinh_seq_uc38.png)
 
 **UC39 - Tiếp nhận & Giải quyết khiếu nại lao động bảo mật**
 
 
-![Hình 2.51. Biểu đồ trình tự Use case Tiếp nhận & Giải quyết khiếu nại lao động bảo mật (UC39)](images/hinh_seq_uc39.png)
+![Hình 2.51. Biểu đồ trình tự Use case Tiếp nhận & Giải quyết khiếu nại lao động bảo mật (UC39)](images/recovered_from_word/hinh_seq_uc39.png)
 
 Với KPI, người phụ trách tạo kỳ và giao chỉ tiêu theo cá nhân hoặc đơn vị; nhân viên nhận thông báo riêng, cập nhật kết quả và gửi minh chứng để quản lý xem xét. Điểm chỉ được ghi sau khi quản lý đối chiếu dữ liệu, còn điểm kỳ tính theo trọng số đã giao. Hồ sơ khiếu nại đi theo luồng riêng, giới hạn người xem và không bị trộn vào kết quả KPI.
 
 **UC40 - hồ sơ công vụ (tham chiếu Mẫu 2C-BNV/2008; mẫu hiện hành cần xác minh)**
 
 
-![Hình 2.52. Biểu đồ trình tự hồ sơ công vụ (UC40, tham chiếu Mẫu 2C-BNV/2008; mẫu hiện hành cần xác minh)](images/hinh_seq_uc40.png)
+![Hình 2.52. Biểu đồ trình tự hồ sơ công vụ (UC40, tham chiếu Mẫu 2C-BNV/2008; mẫu hiện hành cần xác minh)](images/recovered_from_word/hinh_seq_uc40.png)
 
 **UC41 - quản trị ngạch bậc khu vực công (tham chiếu NĐ 204; dữ liệu cần xác minh)**
 
 
-![Hình 2.53. Biểu đồ trình tự quản trị danh mục ngạch bậc khu vực công (UC41; nguồn và hiệu lực cần xác minh)](images/hinh_seq_uc41.png)
+![Hình 2.53. Biểu đồ trình tự quản trị danh mục ngạch bậc khu vực công (UC41; nguồn và hiệu lực cần xác minh)](images/recovered_from_word/hinh_seq_uc41.png)
 
 **UC42 - rà soát điều kiện nâng bậc công vụ (đề xuất; cần xác minh căn cứ)**
 
 
-![Hình 2.54. Biểu đồ trình tự rà soát điều kiện nâng bậc công vụ (UC42, đề xuất; căn cứ cần xác minh)](images/hinh_seq_uc42.png)
+![Hình 2.54. Biểu đồ trình tự rà soát điều kiện nâng bậc công vụ (UC42, đề xuất; căn cứ cần xác minh)](images/recovered_from_word/hinh_seq_uc42.png)
 
 **UC43 - kết xuất hồ sơ công vụ (đề xuất; biểu mẫu pháp quy chưa xác nhận)**
 
 
-![Hình 2.55. Biểu đồ trình tự kết xuất hồ sơ công vụ (UC43, đề xuất; biểu mẫu pháp quy chưa xác nhận)](images/hinh_seq_uc43.png)
+![Hình 2.55. Biểu đồ trình tự kết xuất hồ sơ công vụ (UC43, đề xuất; biểu mẫu pháp quy chưa xác nhận)](images/recovered_from_word/hinh_seq_uc43.png)
 
 Nhánh hồ sơ công vụ dùng biểu mẫu và quy tắc riêng cho đúng đối tượng; dữ liệu được kiểm tra trước khi kết xuất để tránh đưa hồ sơ thiếu hoặc sai thời kỳ vào báo cáo. Kết luận và phát hành cần người có thẩm quyền thực hiện. Biểu mẫu chưa được xác nhận căn cứ hiện hành chỉ phục vụ thiết kế tham khảo, chưa phải hồ sơ sẵn sàng sử dụng.
 
 **UC44 - Quản lý không gian tri thức số & Tài liệu quy trình vận hành chuẩn**
 
 
-![Hình 2.56. Biểu đồ trình tự Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành (UC44)](images/hinh_seq_uc44.png)
+![Hình 2.56. Biểu đồ trình tự Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành (UC44)](images/recovered_from_word/hinh_seq_uc44.png)
 
 **UC45 - Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia**
 
 
-![Hình 2.57. Biểu đồ trình tự Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)](images/hinh_seq_uc45.png)
+![Hình 2.57. Biểu đồ trình tự Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)](images/recovered_from_word/hinh_seq_uc45.png)
 
 **UC46 - Bảng điều khiển phân tích & Thống kê nhân sự**
 
 
-![Hình 2.58. Biểu đồ trình tự Use case Bảng điều khiển phân tích & Thống kê nhân sự (UC46)](images/hinh_seq_uc46.png)
+![Hình 2.58. Biểu đồ trình tự Use case Bảng điều khiển phân tích & Thống kê nhân sự (UC46)](images/recovered_from_word/hinh_seq_uc46.png)
 
 **UC47 - Nhật ký kiểm toán hệ thống & Cấu hình tham số**
 
 
-![Hình 2.59. Biểu đồ trình tự Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)](images/hinh_seq_uc47.png)
+![Hình 2.59. Biểu đồ trình tự Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)](images/recovered_from_word/hinh_seq_uc47.png)
 
 Ở nhóm điều hành, người dùng tra cứu nội dung hoặc báo cáo trong phạm vi được cấp; kết quả thay đổi theo bộ lọc và quyền truy cập. Quản trị viên có thể đổi tham số vận hành, nhưng hệ thống kiểm tra giá trị rồi ghi lại ai đã đổi và thời điểm nào. Nhật ký chỉ dùng để tra cứu, không sửa ngược lịch sử đã phát sinh.
 
@@ -2012,256 +2012,256 @@ Biểu đồ hoạt động thể hiện luồng điều khiển xử lý nghi�
 **UC01 - Đăng nhập & Xác thực hệ thống**
 
 
-![Hình 2.60. Biểu đồ hoạt động Use case Đăng nhập & Xác thực hệ thống (UC01)](images/hinh_act_uc01.png)
+![Hình 2.60. Biểu đồ hoạt động Use case Đăng nhập & Xác thực hệ thống (UC01)](images/recovered_from_word/hinh_act_uc01.png)
 
 **UC02 - Quản trị người dùng & Phân quyền RBAC**
 
 
-![Hình 2.61. Biểu đồ hoạt động Use case Quản trị người dùng & Phân quyền RBAC (UC02)](images/hinh_act_uc02.png)
+![Hình 2.61. Biểu đồ hoạt động Use case Quản trị người dùng & Phân quyền RBAC (UC02)](images/recovered_from_word/hinh_act_uc02.png)
 
 **UC03 - Quản trị cơ cấu tổ chức & Cây phòng ban**
 
 
-![Hình 2.62. Biểu đồ hoạt động Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)](images/hinh_act_uc03.png)
+![Hình 2.62. Biểu đồ hoạt động Use case Quản trị cơ cấu tổ chức & Cây phòng ban (UC03)](images/recovered_from_word/hinh_act_uc03.png)
 
 Luồng dừng nếu xác thực thất bại hoặc tài khoản không đủ quyền; tài khoản bị khóa tạm thời sau số lần sai theo cấu hình. Với thao tác quản trị, dữ liệu không hợp lệ được trả về để sửa, còn thay đổi hợp lệ mới được lưu và ghi nhật ký.
 
 **UC04 - Lập phiếu đề xuất tuyển dụng nhân sự**
 
 
-![Hình 2.63. Biểu đồ hoạt động Use case Lập phiếu đề xuất tuyển dụng nhân sự (UC04)](images/hinh_act_uc04.png)
+![Hình 2.63. Biểu đồ hoạt động Use case Lập phiếu đề xuất tuyển dụng nhân sự (UC04)](images/recovered_from_word/hinh_act_uc04.png)
 
 **UC05 - Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng**
 
 
-![Hình 2.64. Biểu đồ hoạt động Use case Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng (UC05)](images/hinh_act_uc05.png)
+![Hình 2.64. Biểu đồ hoạt động Use case Thẩm định chỉ tiêu & Kiểm soát định biên tuyển dụng (UC05)](images/recovered_from_word/hinh_act_uc05.png)
 
 **UC06 - Phê duyệt chỉ tiêu tuyển dụng**
 
 
-![Hình 2.65. Biểu đồ hoạt động Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)](images/hinh_act_uc06.png)
+![Hình 2.65. Biểu đồ hoạt động Use case Phê duyệt chỉ tiêu tuyển dụng (UC06)](images/recovered_from_word/hinh_act_uc06.png)
 
 **UC07 - Quản lý hồ sơ ứng viên & Tuyển dụng Quy trình tuyển dụng đa giai đoạn**
 
 
-![Hình 2.66. Biểu đồ hoạt động Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS (UC07)](images/hinh_act_uc07.png)
+![Hình 2.66. Biểu đồ hoạt động Use case Quản lý hồ sơ ứng viên & Tuyển dụng ATS (UC07)](images/recovered_from_word/hinh_act_uc07.png)
 
 **UC08 - Gửi thư mời nhận việc & Thỏa thuận mức lương**
 
 
-![Hình 2.67. Biểu đồ hoạt động Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)](images/hinh_act_uc08.png)
+![Hình 2.67. Biểu đồ hoạt động Use case Gửi thư mời nhận việc & Thỏa thuận mức lương (UC08)](images/recovered_from_word/hinh_act_uc08.png)
 
 Điểm rẽ chính là kết quả duyệt chỉ tiêu và quyết định sau phỏng vấn. Nếu chỉ tiêu chưa được duyệt thì quy trình tuyển dụng chưa mở; nếu ứng viên chưa đạt, hồ sơ kết thúc hoặc được xử lý tiếp theo quy định. Chỉ offer được chấp thuận mới tạo cơ sở cho bước tiếp nhận.
 
 **UC09 - Quản lý hồ sơ nhân viên toàn diện**
 
 
-![Hình 2.68. Biểu đồ hoạt động Use case Quản lý hồ sơ nhân viên toàn diện (UC09)](images/hinh_act_uc09.png)
+![Hình 2.68. Biểu đồ hoạt động Use case Quản lý hồ sơ nhân viên toàn diện (UC09)](images/recovered_from_word/hinh_act_uc09.png)
 
 **UC10 - Quản lý hợp đồng lao động & Phụ lục hợp đồng**
 
 
-![Hình 2.69. Biểu đồ hoạt động Use case Quản lý hợp đồng lao động & Phụ lục hợp đồng (UC10)](images/hinh_act_uc10.png)
+![Hình 2.69. Biểu đồ hoạt động Use case Quản lý hợp đồng lao động & Phụ lục hợp đồng (UC10)](images/recovered_from_word/hinh_act_uc10.png)
 
 **UC11 - Quản lý văn bằng, chứng chỉ chuyên môn**
 
 
-![Hình 2.70. Biểu đồ hoạt động Use case Quản lý văn bằng, chứng chỉ chuyên môn (UC11)](images/hinh_act_uc11.png)
+![Hình 2.70. Biểu đồ hoạt động Use case Quản lý văn bằng, chứng chỉ chuyên môn (UC11)](images/recovered_from_word/hinh_act_uc11.png)
 
 **UC12 - Mượn - trả hồ sơ, chứng chỉ bản gốc**
 
 
-![Hình 2.71. Biểu đồ hoạt động Use case Mượn - trả hồ sơ, chứng chỉ bản gốc (UC12)](images/hinh_act_uc12.png)
+![Hình 2.71. Biểu đồ hoạt động Use case Mượn - trả hồ sơ, chứng chỉ bản gốc (UC12)](images/recovered_from_word/hinh_act_uc12.png)
 
 **UC13 - Đánh giá kết quả thử việc & Ký HĐLĐ chính thức**
 
 
-![Hình 2.72. Biểu đồ hoạt động Use case Đánh giá kết quả thử việc & Ký HĐLĐ chính thức (UC13)](images/hinh_act_uc13.png)
+![Hình 2.72. Biểu đồ hoạt động Use case Đánh giá kết quả thử việc & Ký HĐLĐ chính thức (UC13)](images/recovered_from_word/hinh_act_uc13.png)
 
 **UC14 - Lộ trình hội nhập nhân viên mới**
 
 
-![Hình 2.73. Biểu đồ hoạt động Use case Lộ trình hội nhập nhân viên mới (UC14)](images/hinh_act_uc14.png)
+![Hình 2.73. Biểu đồ hoạt động Use case Lộ trình hội nhập nhân viên mới (UC14)](images/recovered_from_word/hinh_act_uc14.png)
 
 Hồ sơ chỉ chuyển sang trạng thái sẵn sàng khi thông tin bắt buộc và các đầu việc hội nhập đã được xác nhận. Nhiệm vụ quá hạn hoặc thiếu tài liệu vẫn nằm trong danh sách theo dõi để người phụ trách xử lý, không bị coi là đã hoàn thành.
 
 **UC15 - Cổng tự phục vụ nhân viên tập trung**
 
 
-![Hình 2.74. Biểu đồ hoạt động Use case Cổng tự phục vụ nhân viên tập trung (UC15)](images/hinh_act_uc15.png)
+![Hình 2.74. Biểu đồ hoạt động Use case Cổng tự phục vụ nhân viên tập trung (UC15)](images/recovered_from_word/hinh_act_uc15.png)
 
 **UC16 - Quản lý thông tin cá nhân phân cấp 3 mức độ**
 
 
-![Hình 2.75. Biểu đồ hoạt động Use case Quản lý thông tin cá nhân phân cấp 3 mức độ (UC16)](images/hinh_act_uc16.png)
+![Hình 2.75. Biểu đồ hoạt động Use case Quản lý thông tin cá nhân phân cấp 3 mức độ (UC16)](images/recovered_from_word/hinh_act_uc16.png)
 
 **UC17 - Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2**
 
 
-![Hình 2.76. Biểu đồ hoạt động Use case Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 (UC17)](images/hinh_act_uc17.png)
+![Hình 2.76. Biểu đồ hoạt động Use case Thẩm định & Phê duyệt đề xuất điều chỉnh hồ sơ Mức 2 (UC17)](images/recovered_from_word/hinh_act_uc17.png)
 
 Đề nghị ESS đi qua bước kiểm tra trường dữ liệu và phạm vi quyền trước khi gửi duyệt. Người duyệt có thể chấp thuận hoặc trả lại kèm lý do; dữ liệu gốc chỉ thay đổi sau quyết định hợp lệ, nhờ đó nhân viên vẫn thấy thông tin cũ trong lúc yêu cầu đang chờ.
 
 **UC18 - Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca**
 
 
-![Hình 2.77. Biểu đồ hoạt động Use case Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca (UC18)](images/hinh_act_uc18.png)
+![Hình 2.77. Biểu đồ hoạt động Use case Ghi nhận sự kiện chấm công & Điểm danh vào/ra ca (UC18)](images/recovered_from_word/hinh_act_uc18.png)
 
 **UC19 - Điểm danh bằng khuôn mặt qua camera thường**
 
 Luồng bắt đầu khi nhân viên đã đồng ý xử lý dữ liệu, có mẫu đăng ký và cấp quyền camera. Hệ thống so khớp vector; nếu đạt ngưỡng thì ghi sự kiện vào/ra, nếu không thì trả thông báo để thử lại. Hệ thống chưa có bước xác minh người thật.
 
-![Hình 2.78. Biểu đồ hoạt động Use case Điểm danh bằng khuôn mặt qua camera thường (UC19)](images/hinh_act_uc19.png)
+![Hình 2.78. Biểu đồ hoạt động Use case Điểm danh bằng khuôn mặt qua camera thường (UC19)](images/recovered_from_word/hinh_act_uc19.png)
 
 **UC20 - Quản trị kết nối thiết bị máy chấm công**
 
 
-![Hình 2.79. Biểu đồ hoạt động Use case Quản trị kết nối thiết bị máy chấm công (UC20)](images/hinh_act_uc20.png)
+![Hình 2.79. Biểu đồ hoạt động Use case Quản trị kết nối thiết bị máy chấm công (UC20)](images/recovered_from_word/hinh_act_uc20.png)
 
 **UC21 - Đăng ký & Xét duyệt nghỉ phép trực tuyến**
 
 
-![Hình 2.80. Biểu đồ hoạt động Use case Đăng ký & Xét duyệt nghỉ phép trực tuyến (UC21)](images/hinh_act_uc21.png)
+![Hình 2.80. Biểu đồ hoạt động Use case Đăng ký & Xét duyệt nghỉ phép trực tuyến (UC21)](images/recovered_from_word/hinh_act_uc21.png)
 
 **UC22 - Đăng ký & Phê duyệt làm thêm giờ (OT)**
 
 
-![Hình 2.81. Biểu đồ hoạt động Use case Đăng ký & Phê duyệt làm thêm giờ (OT) (UC22)](images/hinh_act_uc22.png)
+![Hình 2.81. Biểu đồ hoạt động Use case Đăng ký & Phê duyệt làm thêm giờ (OT) (UC22)](images/recovered_from_word/hinh_act_uc22.png)
 
 **UC23 - Lập lịch và phân ca làm việc**
 
 
-![Hình 2.82. Biểu đồ hoạt động Use case Lập lịch và phân ca làm việc (UC23)](images/hinh_act_uc23.png)
+![Hình 2.82. Biểu đồ hoạt động Use case Lập lịch và phân ca làm việc (UC23)](images/recovered_from_word/hinh_act_uc23.png)
 
 **UC24 - Giải trình bổ sung giờ công & Xử lý lệch công**
 
 
-![Hình 2.83. Biểu đồ hoạt động Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)](images/hinh_act_uc24.png)
+![Hình 2.83. Biểu đồ hoạt động Use case Giải trình bổ sung giờ công & Xử lý lệch công (UC24)](images/recovered_from_word/hinh_act_uc24.png)
 
 **UC25 - Tổng hợp & Chốt bảng chấm công tháng**
 
 
-![Hình 2.84. Biểu đồ hoạt động Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)](images/hinh_act_uc25.png)
+![Hình 2.84. Biểu đồ hoạt động Use case Tổng hợp & Chốt bảng chấm công tháng (UC25)](images/recovered_from_word/hinh_act_uc25.png)
 
 Trước khi chốt công, hệ thống tách ngày đủ công, nghỉ đã duyệt và ngày còn thiếu lượt chấm để HR xử lý đúng nguyên nhân. Nếu vẫn còn ngoại lệ chưa giải quyết, bước chốt bị chặn; sau khi hoàn tất, bảng công được khóa để số liệu dùng tính lương không thay đổi âm thầm.
 
 **UC26 - Cấu hình công thức và ngạch bậc lương**
 
 
-![Hình 2.85. Biểu đồ hoạt động Use case Cấu hình công thức và ngạch bậc lương (UC26)](images/hinh_act_uc26.png)
+![Hình 2.85. Biểu đồ hoạt động Use case Cấu hình công thức và ngạch bậc lương (UC26)](images/recovered_from_word/hinh_act_uc26.png)
 
 **UC27 - Vận hành chức năng tính lương tự động**
 
 
-![Hình 2.86. Biểu đồ hoạt động Use case Vận hành chức năng tính lương tự động (UC27)](images/hinh_act_uc27.png)
+![Hình 2.86. Biểu đồ hoạt động Use case Vận hành chức năng tính lương tự động (UC27)](images/recovered_from_word/hinh_act_uc27.png)
 
 **UC28 - Phê duyệt, khóa và ghi nhận chi trả kỳ lương**
 
 
-![Hình 2.87. Biểu đồ hoạt động Use case Phê duyệt, khóa và ghi nhận chi trả kỳ lương (UC28)](images/hinh_act_uc28.png)
+![Hình 2.87. Biểu đồ hoạt động Use case Phê duyệt, khóa và ghi nhận chi trả kỳ lương (UC28)](images/recovered_from_word/hinh_act_uc28.png)
 
 **UC29 - Quản lý tạm ứng & Khoản vay phúc lợi nhân viên**
 
 
-![Hình 2.88. Biểu đồ hoạt động Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)](images/hinh_act_uc29.png)
+![Hình 2.88. Biểu đồ hoạt động Use case Quản lý tạm ứng & Khoản vay phúc lợi nhân viên (UC29)](images/recovered_from_word/hinh_act_uc29.png)
 
 **UC30 - Quản lý đề xuất công tác & Quyết toán chi phí**
 
 
-![Hình 2.89. Biểu đồ hoạt động Use case Quản lý đề xuất công tác & Quyết toán chi phí (UC30)](images/hinh_act_uc30.png)
+![Hình 2.89. Biểu đồ hoạt động Use case Quản lý đề xuất công tác & Quyết toán chi phí (UC30)](images/recovered_from_word/hinh_act_uc30.png)
 
 **UC31 - Quản lý cấp phát & Thu hồi tài sản làm việc**
 
 
-![Hình 2.90. Biểu đồ hoạt động Use case Quản lý cấp phát & Thu hồi tài sản làm việc (UC31)](images/hinh_act_uc31.png)
+![Hình 2.90. Biểu đồ hoạt động Use case Quản lý cấp phát & Thu hồi tài sản làm việc (UC31)](images/recovered_from_word/hinh_act_uc31.png)
 
 Khi cấp phát tài sản, hệ thống ghi người nhận và biên bản bàn giao rồi chuyển tài sản sang trạng thái đang sử dụng. Nếu nhân viên chuyển đơn vị hoặc nghỉ việc, tài sản phải được thu hồi về kho; nếu chưa phát sinh thay đổi, trạng thái tiếp tục sử dụng được giữ nguyên.
 
 **UC32 - Đề xuất & Phê duyệt điều chuyển công tác nội bộ**
 
 
-![Hình 2.91. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt điều chuyển công tác nội bộ (UC32)](images/hinh_act_uc32.png)
+![Hình 2.91. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt điều chuyển công tác nội bộ (UC32)](images/recovered_from_word/hinh_act_uc32.png)
 
 **UC33 - Đề xuất & Phê duyệt điều chỉnh bậc lương**
 
 
-![Hình 2.92. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt điều chỉnh bậc lương (UC33)](images/hinh_act_uc33.png)
+![Hình 2.92. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt điều chỉnh bậc lương (UC33)](images/recovered_from_word/hinh_act_uc33.png)
 
 **UC34 - Đề xuất & Phê duyệt khen thưởng nhân sự**
 
 
-![Hình 2.93. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt khen thưởng nhân sự (UC34)](images/hinh_act_uc34.png)
+![Hình 2.93. Biểu đồ hoạt động Use case Đề xuất & Phê duyệt khen thưởng nhân sự (UC34)](images/recovered_from_word/hinh_act_uc34.png)
 
 **UC35 - Xử lý kỷ luật & Vi phạm nội quy lao động**
 
 
-![Hình 2.94. Biểu đồ hoạt động Use case Xử lý kỷ luật & Vi phạm nội quy lao động (UC35)](images/hinh_act_uc35.png)
+![Hình 2.94. Biểu đồ hoạt động Use case Xử lý kỷ luật & Vi phạm nội quy lao động (UC35)](images/recovered_from_word/hinh_act_uc35.png)
 
 **UC36 - Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận**
 
 
-![Hình 2.95. Biểu đồ hoạt động Use case Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận (UC36)](images/hinh_act_uc36.png)
+![Hình 2.95. Biểu đồ hoạt động Use case Tiếp nhận, Xử lý thôi việc & Bàn giao đa bộ phận (UC36)](images/recovered_from_word/hinh_act_uc36.png)
 
 Kết quả duyệt quyết định đề nghị có hiệu lực hay phải quay lại bổ sung. Riêng quy trình nghỉ việc chờ các đơn vị xác nhận phần việc của mình; hồ sơ chỉ đóng khi đủ bàn giao bắt buộc, còn mục chưa xong sẽ hiện rõ người chịu trách nhiệm.
 
 **UC37 - Quản lý mục tiêu và đánh giá KPI**
 
 
-![Hình 2.96. Biểu đồ hoạt động Use case Quản lý mục tiêu và đánh giá KPI (UC37)](images/hinh_act_uc37.png)
+![Hình 2.96. Biểu đồ hoạt động Use case Quản lý mục tiêu và đánh giá KPI (UC37)](images/recovered_from_word/hinh_act_uc37.png)
 
 **UC38 - Quản trị chương trình đào tạo nội bộ**
 
 
-![Hình 2.97. Biểu đồ hoạt động Use case Quản trị chương trình đào tạo nội bộ (UC38)](images/hinh_act_uc38.png)
+![Hình 2.97. Biểu đồ hoạt động Use case Quản trị chương trình đào tạo nội bộ (UC38)](images/recovered_from_word/hinh_act_uc38.png)
 
 **UC39 - Tiếp nhận & Giải quyết khiếu nại lao động bảo mật**
 
 
-![Hình 2.98. Biểu đồ hoạt động Use case Tiếp nhận & Giải quyết khiếu nại lao động bảo mật (UC39)](images/hinh_act_uc39.png)
+![Hình 2.98. Biểu đồ hoạt động Use case Tiếp nhận & Giải quyết khiếu nại lao động bảo mật (UC39)](images/recovered_from_word/hinh_act_uc39.png)
 
 Kỳ KPI vẫn ở trạng thái đang thực hiện nếu thiếu trọng số, điểm hoặc minh chứng cần thiết; chỉ đủ điều kiện mới được hoàn tất. Nhánh công vụ kiểm tra tiêu chí và thẩm quyền riêng, còn hồ sơ khiếu nại được xử lý kín theo người được phân công, không làm thay đổi điểm KPI.
 
 **UC40 - hồ sơ công vụ (tham chiếu Mẫu 2C-BNV/2008; mẫu hiện hành cần xác minh)**
 
 
-![Hình 2.99. Biểu đồ hoạt động hồ sơ công vụ (UC40, tham chiếu Mẫu 2C-BNV/2008; mẫu hiện hành cần xác minh)](images/hinh_act_uc40.png)
+![Hình 2.99. Biểu đồ hoạt động hồ sơ công vụ (UC40, tham chiếu Mẫu 2C-BNV/2008; mẫu hiện hành cần xác minh)](images/recovered_from_word/hinh_act_uc40.png)
 
 **UC41 - quản trị ngạch bậc khu vực công (tham chiếu NĐ 204; dữ liệu cần xác minh)**
 
 
-![Hình 2.100. Biểu đồ hoạt động quản trị danh mục ngạch bậc khu vực công (UC41; nguồn và hiệu lực cần xác minh)](images/hinh_act_uc41.png)
+![Hình 2.100. Biểu đồ hoạt động quản trị danh mục ngạch bậc khu vực công (UC41; nguồn và hiệu lực cần xác minh)](images/recovered_from_word/hinh_act_uc41.png)
 
 **UC42 - rà soát điều kiện nâng bậc công vụ (đề xuất; cần xác minh căn cứ)**
 
 
-![Hình 2.101. Biểu đồ hoạt động rà soát điều kiện nâng bậc công vụ (UC42, đề xuất; căn cứ cần xác minh)](images/hinh_act_uc42.png)
+![Hình 2.101. Biểu đồ hoạt động rà soát điều kiện nâng bậc công vụ (UC42, đề xuất; căn cứ cần xác minh)](images/recovered_from_word/hinh_act_uc42.png)
 
 **UC43 - kết xuất hồ sơ công vụ (đề xuất; biểu mẫu pháp quy chưa xác nhận)**
 
 
-![Hình 2.102. Biểu đồ hoạt động kết xuất hồ sơ công vụ (UC43, đề xuất; biểu mẫu pháp quy chưa xác nhận)](images/hinh_act_uc43.png)
+![Hình 2.102. Biểu đồ hoạt động kết xuất hồ sơ công vụ (UC43, đề xuất; biểu mẫu pháp quy chưa xác nhận)](images/recovered_from_word/hinh_act_uc43.png)
 
 Nhánh công vụ cần dừng để bổ sung khi hồ sơ, nhóm nhiệm vụ hoặc căn cứ xếp loại chưa đủ. Người có thẩm quyền mới ghi kết luận cuối; hệ thống kiểm tra điều kiện và lưu kết quả nhưng không tự thay cơ quan quyết định.
 
 **UC44 - Quản lý không gian tri thức số & Tài liệu quy trình vận hành chuẩn**
 
 
-![Hình 2.103. Biểu đồ hoạt động Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành (UC44)](images/hinh_act_uc44.png)
+![Hình 2.103. Biểu đồ hoạt động Use case Quản lý không gian tri thức số & Tài liệu quy trình vận hành (UC44)](images/recovered_from_word/hinh_act_uc44.png)
 
 **UC45 - Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia**
 
 
-![Hình 2.104. Biểu đồ hoạt động Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)](images/hinh_act_uc45.png)
+![Hình 2.104. Biểu đồ hoạt động Use case Tìm kiếm tri thức toàn văn & Danh bạ chuyên gia (UC45)](images/recovered_from_word/hinh_act_uc45.png)
 
 **UC46 - Bảng điều khiển phân tích & Thống kê nhân sự**
 
 
-![Hình 2.105. Biểu đồ hoạt động Use case Bảng điều khiển phân tích & Thống kê nhân sự (UC46)](images/hinh_act_uc46.png)
+![Hình 2.105. Biểu đồ hoạt động Use case Bảng điều khiển phân tích & Thống kê nhân sự (UC46)](images/recovered_from_word/hinh_act_uc46.png)
 
 **UC47 - Nhật ký kiểm toán hệ thống & Cấu hình tham số**
 
 
-![Hình 2.106. Biểu đồ hoạt động Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)](images/hinh_act_uc47.png)
+![Hình 2.106. Biểu đồ hoạt động Use case Nhật ký kiểm toán hệ thống & Cấu hình tham số (UC47)](images/recovered_from_word/hinh_act_uc47.png)
 
 Thao tác tra cứu chỉ trả về bản ghi trong phạm vi quyền; giá trị cấu hình sai định dạng bị từ chối trước khi lưu. Mỗi thay đổi hợp lệ đều để lại dấu vết kiểm toán, giúp người quản trị lần lại nguyên nhân khi cần.
 
@@ -2273,31 +2273,31 @@ Biểu đồ trạng thái mô hình hóa vòng đời và các bước chuyển
 
 Vòng đời đối tượng Nhân viên trải qua các trạng thái: Ứng viên đạt tuyển dụng (ONBOARDING) -> Thử việc (PROBATION) -> Ký hợp đồng chính thức (ACTIVE) -> Nghỉ thai sản/Tạm hoãn (SUSPENDED) -> Đã nghỉ việc (TERMINATED).
 
-![Hình 2.107. Biểu đồ trạng thái vòng đời Nhân viên](images/hinh_2_12_state_employee.png)
+![Hình 2.107. Biểu đồ trạng thái vòng đời Nhân viên](images/recovered_from_word/hinh_2_12_state_employee.png)
 
 **2. Biểu đồ trạng thái Phiếu tuyển dụng**
 
 Vòng đời phiếu tuyển dụng: Bản nháp (DRAFT) -> Chờ thẩm định định biên (PENDING_REVIEW) -> Chờ Giám đốc duyệt (PENDING_APPROVAL) -> Đã phê duyệt mở tuyển (APPROVED) hoặc Bị từ chối (REJECTED) -> Hoàn tất tuyển dụng (CLOSED).
 
-![Hình 2.108. Biểu đồ trạng thái Phiếu tuyển dụng](images/hinh_2_13_state_requisition.png)
+![Hình 2.108. Biểu đồ trạng thái Phiếu tuyển dụng](images/recovered_from_word/hinh_2_13_state_requisition.png)
 
 **3. Biểu đồ trạng thái Đơn nghỉ phép**
 
 Vòng đời đơn nghỉ phép: Khởi tạo (DRAFT) -> Chờ Trưởng dự án duyệt (SUBMITTED) -> Chờ HR xác nhận trừ phép (HR_CONFIRMED) -> Chấp thuận (APPROVED) hoặc Bị bác đơn (REJECTED) -> Đã hủy (CANCELLED).
 
-![Hình 2.109. Biểu đồ trạng thái Đơn nghỉ phép](images/hinh_2_14_state_leave.png)
+![Hình 2.109. Biểu đồ trạng thái Đơn nghỉ phép](images/recovered_from_word/hinh_2_14_state_leave.png)
 
 **4. Biểu đồ trạng thái Phiếu mượn - trả hồ sơ**
 
 Vòng đời phiếu mượn hồ sơ: Yêu cầu mượn (REQUESTED) -> HR xuất kho bàn giao (BORROWED) -> Nhân viên hoàn trả hồ sơ (RETURNED) -> HR kiểm tra niêm phong và đóng phiếu (CLOSED).
 
-![Hình 2.110. Biểu đồ trạng thái Phiếu mượn - trả hồ sơ](images/hinh_2_15_state_doclending.png)
+![Hình 2.110. Biểu đồ trạng thái Phiếu mượn - trả hồ sơ](images/recovered_from_word/hinh_2_15_state_doclending.png)
 
 **5. Biểu đồ trạng thái Phiếu lương**
 
 Vòng đời kỳ lương: `PROCESSED` -> `REVIEWED` -> `APPROVED` -> `LOCKED` -> `PAID`; phiếu lương được tạo cùng kỳ và chỉ hiển thị cho nhân viên sau khi được duyệt. Khi ghi nhận `PAID`, Kế toán phải nhập phương thức cùng mã giao dịch hoặc số chứng từ. Hệ thống lưu thông tin thanh toán nhưng chưa xác minh với ngân hàng và không tự gửi lệnh chuyển tiền. Người có quyền có thể hủy kỳ đã đối soát, khóa hoặc thanh toán để lập lại; kỳ cũ được giữ ở trạng thái `CANCELLED`, thao tác không đảo giao dịch ngân hàng và bị chặn nếu khoản vay của kỳ đã được hạch toán.
 
-![Hình 2.111. Biểu đồ trạng thái Phiếu lương](images/hinh_2_16_state_payslip.png)
+![Hình 2.111. Biểu đồ trạng thái Phiếu lương](images/recovered_from_word/hinh_2_16_state_payslip.png)
 
 ### 2.3.4. Xây dựng biểu đồ cộng tác
 
@@ -2311,7 +2311,7 @@ Trong phân hệ quản trị tiền lương, kịch bản tính lương định
 
 Biểu đồ gói tổng quan thể hiện cấu trúc phân rã các gói chức năng và mối quan hệ phụ thuộc kiến trúc trong toàn bộ hệ thống phần mềm.
 
-![Hình 2.112. Biểu đồ gói tổng quan của hệ thống](images/hinh_2_17_package_diagram.png)
+![Hình 2.112. Biểu đồ gói tổng quan của hệ thống](images/recovered_from_word/hinh_2_17_package_diagram.png)
 
 Biểu đồ lớp phân tích cho 10 phân hệ nghiệp vụ thể hiện cấu trúc thuộc tính, phương thức và sự tương tác giữa ba tầng Boundary, Control và Entity, bao quát đầy đủ 47 Use Case của hệ thống:
 
@@ -2319,73 +2319,73 @@ Biểu đồ lớp phân tích cho 10 phân hệ nghiệp vụ thể hiện cấ
 
 Nhóm chức năng này quản lý tài khoản, vai trò và cơ cấu đơn vị. Người dùng đăng nhập qua giao diện chung; quản trị viên có thể tạo tài khoản, gán vai trò và điều chỉnh cây tổ chức theo quyền được cấp.
 
-![Hình 2.113. Biểu đồ lớp Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03)](images/hinh_2_104_class_nhom_a.png)
+![Hình 2.113. Biểu đồ lớp Phân hệ Quản trị hệ thống và Cơ cấu tổ chức (Nhóm A: UC01 - UC03)](images/recovered_from_word/hinh_2_104_class_nhom_a.png)
 
 **2. Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08):**
 
 Nhóm tuyển dụng lưu vị trí cần tuyển, hồ sơ ứng viên, các vòng phỏng vấn và offer. Chuyên viên có thể cập nhật trạng thái hồ sơ và kết quả đánh giá trên giao diện; các bước phê duyệt định biên, gửi thư và tiếp nhận nhân viên cần theo quy trình đã cấu hình.
 
-![Hình 2.114. Biểu đồ lớp Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08)](images/hinh_2_105_class_nhom_b.png)
+![Hình 2.114. Biểu đồ lớp Phân hệ Tuyển dụng và Quản lý ứng viên (Nhóm B: UC04 - UC08)](images/recovered_from_word/hinh_2_105_class_nhom_b.png)
 
 **3. Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14):**
 
 Hồ sơ nhân sự tập hợp thông tin cá nhân, hợp đồng, bằng cấp và các nhiệm vụ hội nhập được giao. Nhân viên có thể cập nhật một số trường; thay đổi thuộc diện kiểm soát được gửi cho HR xem xét. Hệ thống lưu các mốc hợp đồng và kết quả thử việc đã nhập, còn việc kiểm tra hồ sơ gốc và thực hiện thủ tục bên ngoài do bộ phận phụ trách đảm nhiệm.
 
-![Hình 2.115. Biểu đồ lớp Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14)](images/hinh_2_106_class_nhom_c.png)
+![Hình 2.115. Biểu đồ lớp Phân hệ Hồ sơ nhân sự, Hợp đồng và Hội nhập (Nhóm C: UC09 - UC14)](images/recovered_from_word/hinh_2_106_class_nhom_c.png)
 
 **4. Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17):**
 
 Cổng ESS cho phép nhân viên xem thông tin của mình, gửi đơn nghỉ phép hoặc làm thêm, tra cứu phiếu lương và đề nghị sửa một số dữ liệu hồ sơ. Với trường cần thẩm định, yêu cầu kèm minh chứng được chuyển tới HR; chỉ sau khi được duyệt, thông tin chính thức mới được cập nhật.
 
-![Hình 2.116. Biểu đồ lớp Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17)](images/hinh_2_107_class_nhom_d.png)
+![Hình 2.116. Biểu đồ lớp Phân hệ Cổng tự phục vụ nhân viên và Phân cấp hồ sơ (Nhóm D: UC15 - UC17)](images/recovered_from_word/hinh_2_107_class_nhom_d.png)
 
 **5. Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25):**
 
 Phân hệ ghi nhận giờ công qua web, QR và luồng so khớp khuôn mặt từ camera thường. Với lượt khuôn mặt, trình duyệt gửi vector mô tả ảnh để máy chủ so với mẫu đã đăng ký; hệ thống chưa xác minh người đứng trước camera có phải người thật hay không. Các sự kiện được đối chiếu với ca để tổng hợp công ngày; trường hợp cần kết nối thiết bị ngoài còn phụ thuộc adapter và cấu hình tương ứng. Đơn nghỉ phép được quản lý trong luồng riêng và ảnh hưởng đến công theo trạng thái đã duyệt.
 
-![Hình 2.117. Biểu đồ lớp Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25)](images/hinh_2_108_class_nhom_e.png)
+![Hình 2.117. Biểu đồ lớp Phân hệ Chấm công, Phân ca và Điểm danh đa nguồn (Nhóm E: UC18 - UC25)](images/recovered_from_word/hinh_2_108_class_nhom_e.png)
 
 **6. Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31):**
 
 Động cơ tiền lương tổng hợp công, khoản thu nhập, khấu trừ bảo hiểm và thuế theo dữ liệu cùng cấu hình của kỳ. C&B xem từng phiếu, xử lý sai lệch rồi chuyển bảng qua các bước duyệt và khóa theo trạng thái đang áp dụng. Các khoản vay, tạm ứng và công tác phí có luồng quản lý riêng, chỉ được đưa vào lương khi đủ điều kiện.
 
-![Hình 2.118. Biểu đồ lớp Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31)](images/hinh_2_109_class_nhom_f.png)
+![Hình 2.118. Biểu đồ lớp Phân hệ Tiền lương, Chế độ đãi ngộ và Phúc lợi (Nhóm F: UC26 - UC31)](images/recovered_from_word/hinh_2_109_class_nhom_f.png)
 
 **7. Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36):**
 
 Màn hình biến động nhân sự ghi nhận các đề xuất như điều chuyển, bổ nhiệm, điều chỉnh lương hoặc thôi việc cùng ngày hiệu lực và người phê duyệt. Danh sách bàn giao giúp các bộ phận theo dõi việc thu hồi tài sản, xử lý công nợ và bàn giao công việc; việc hoàn tất ngoài hệ thống vẫn cần được xác nhận bởi người phụ trách.
 
-![Hình 2.119. Biểu đồ lớp Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36)](images/hinh_2_110_class_nhom_g.png)
+![Hình 2.119. Biểu đồ lớp Phân hệ Biến động nhân sự và Thôi việc (Nhóm G: UC32 - UC36)](images/recovered_from_word/hinh_2_110_class_nhom_g.png)
 
 **8. Phân hệ Đánh giá KPI, Đào tạo và Khiếu nại (Nhóm H: UC37 - UC39):**
 
 UC37 quản lý chu kỳ, mục tiêu KPI, kết quả, minh chứng và điểm do quản lý chấm. Đào tạo (UC38) và khiếu nại (UC39) là các quy trình riêng.
 
-![Hình 2.120. Mô hình lớp hiện hành của đánh giá KPI (UC37)](images/hinh_2_111_class_nhom_h.png)
+![Hình 2.120. Mô hình lớp hiện hành của đánh giá KPI (UC37)](images/recovered_from_word/hinh_2_111_class_nhom_h.png)
 
 **9. Nhánh hồ sơ công vụ (UC40 - UC43, chỉ chế độ khu vực công):**
 
 Thiết kế tách hồ sơ công vụ khỏi hồ sơ nhân viên doanh nghiệp và hỗ trợ cấu hình riêng theo loại nhân sự công chức/viên chức. HRMS hiện lưu được cấu hình tổ chức theo chế độ và có khung đánh giá 30/70 cùng bước ghi nhận kết luận, kiểm tra tỷ lệ; các mẫu 2C-BNV, báo cáo 01–03, quyết định nâng bậc và quy trình ký duyệt pháp quy chưa được xác nhận tích hợp đầy đủ. Cơ quan cần cấu hình và kiểm chứng danh mục, nguồn dữ liệu, thời hạn áp dụng, thẩm quyền và biểu mẫu trước khi vận hành chính thức.
 
-![Hình 2.121. Biểu đồ lớp hồ sơ công vụ (UC40 - UC43, chỉ chế độ khu vực công)](images/hinh_2_112_class_nhom_i.png)
+![Hình 2.121. Biểu đồ lớp hồ sơ công vụ (UC40 - UC43, chỉ chế độ khu vực công)](images/recovered_from_word/hinh_2_112_class_nhom_i.png)
 
 **10. Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47):**
 
 Kho tri thức lưu bài viết, tài liệu và phiên bản nội dung để nhân viên tra cứu. Các trang báo cáo tổng hợp số liệu theo dữ liệu hiện có và quyền truy cập; nhật ký kiểm toán ghi lại những nhóm thao tác đã được cấu hình lưu vết, không phải mọi hành động trên hệ thống.
 
-![Hình 2.122. Biểu đồ lớp Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47)](images/hinh_2_113_class_nhom_j.png)
+![Hình 2.122. Biểu đồ lớp Phân hệ Quản trị tri thức và Điều hành hệ thống (Nhóm J: UC44 - UC47)](images/recovered_from_word/hinh_2_113_class_nhom_j.png)
 
 **11. Biểu đồ lớp phân tích tương tác Use case Đăng ký nghỉ phép (UC21):**
 
 Bao gồm lớp giao diện `LeaveRequestForm`, lớp điều khiển `LeaveService` cùng các lớp thực thể `LeaveRequest`, `LeaveBalance`, `Employee`.
 
-![Hình 2.123. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC21)](images/hinh_2_19_class_leave.png)
+![Hình 2.123. Biểu đồ lớp Use case Đăng ký nghỉ phép (UC21)](images/recovered_from_word/hinh_2_19_class_leave.png)
 
 **12. Biểu đồ lớp miền cốt lõi của hệ thống:**
 
 Thể hiện mối quan hệ liên kết, hợp thành và kế thừa giữa các thực thể dữ liệu chính trong hệ thống quản trị nhân lực của doanh nghiệp.
 
-![Hình 2.124. Biểu đồ lớp miền cốt lõi của hệ thống](images/hinh_2_20_class_domain.png)
+![Hình 2.124. Biểu đồ lớp miền cốt lõi của hệ thống](images/recovered_from_word/hinh_2_20_class_domain.png)
 
 **Bảng 2.4. Ma trận phân quyền truy cập chức năng theo vai trò doanh nghiệp (RBAC Matrix)**
 
@@ -2425,11 +2425,11 @@ Cơ sở dữ liệu sử dụng PostgreSQL 16. Theo kết quả kiểm kê mã 
 
 Lược đồ cơ sở dữ liệu quan hệ của hệ thống thể hiện cấu trúc các bảng dữ liệu cốt lõi cùng các mối quan hệ khóa chính, khóa ngoại và chỉ mục ràng buộc toàn vẹn giữa các phân hệ:
 
-![Hình 2.125. Mô hình cơ sở dữ liệu vật lý của hệ thống](images/hinh_2_21_erd_database.png)
+![Hình 2.125. Mô hình cơ sở dữ liệu vật lý của hệ thống](images/recovered_from_word/hinh_2_21_erd_database.png)
 
 Mô hình dữ liệu dưới đây mô tả các bảng dùng cho sự kiện chấm công, mẫu khuôn mặt, thiết bị và công ngày. Các kênh hỗ trợ trong từng môi trường phụ thuộc cấu hình và thiết bị được kết nối:
 
-![Hình 2.126. Mô hình dữ liệu mở rộng cho chấm công đa nguồn](images/hinh_2_24_erd_multisource.png)
+![Hình 2.126. Mô hình dữ liệu mở rộng cho chấm công đa nguồn](images/recovered_from_word/hinh_2_24_erd_multisource.png)
 
 `AttendanceDevice` lưu cấu hình nguồn thiết bị; `FaceEmbedding` lưu các vector mẫu khuôn mặt đã mã hóa; `AttendanceEvent` ghi từng lượt điểm danh với nguồn tương ứng; `AttendanceDay` chứa kết quả tổng hợp theo ngày. Nhân viên có thể gửi giải trình khi thiếu hoặc sai giờ công để người quản lý xem xét trước khi cập nhật.
 
@@ -2557,259 +2557,259 @@ Phiên chụp đang ở chế độ doanh nghiệp. Các màn hình hồ sơ 2C,
 
 Cách thao tác: Nhập email và mật khẩu được cấp, sau đó chọn Đăng nhập. Quyền sử dụng sẽ quyết định những màn hình xuất hiện sau khi vào hệ thống.
 
-![Hình 2.128. Đăng nhập (/login)](ui_screenshots/current/login.jpg)
+![Hình 2.128. Đăng nhập (/login)](images/recovered_from_word/login.jpg)
 
 **Hình 2.128. Đăng nhập (/login)**
 
 Cách thao tác: Mở thẻ tổng hợp hoặc lối tắt để đến phân hệ cần xử lý; kiểm tra danh sách việc chờ theo đúng vai trò.
 
-![Hình 2.129. Tổng quan nhân sự (/dashboard)](ui_screenshots/current/dashboard.jpg)
+![Hình 2.129. Tổng quan nhân sự (/dashboard)](images/recovered_from_word/dashboard.jpg)
 
 **Hình 2.129. Tổng quan nhân sự (/dashboard)**
 
 Cách thao tác: Chọn tác vụ cá nhân như chấm công, nghỉ phép, giải trình, vay phúc lợi hoặc mở phiếu lương của tài khoản đang đăng nhập.
 
-![Hình 2.130. Tự phục vụ nhân viên (/ess)](ui_screenshots/current/ess.jpg)
+![Hình 2.130. Tự phục vụ nhân viên (/ess)](images/recovered_from_word/ess.jpg)
 
 **Hình 2.130. Tự phục vụ nhân viên (/ess)**
 
 Cách thao tác: Lọc theo loại quy trình và trạng thái; mở từng hồ sơ để xem căn cứ, tài liệu kèm theo rồi xử lý theo quyền được giao.
 
-![Hình 2.131. Quy trình chờ xử lý (/hr-workflows)](ui_screenshots/current/workflows.jpg)
+![Hình 2.131. Quy trình chờ xử lý (/hr-workflows)](images/recovered_from_word/workflows.jpg)
 
 **Hình 2.131. Quy trình chờ xử lý (/hr-workflows)**
 
 Cách thao tác: Chọn bài viết hoặc bản thảo; tạo nội dung, lưu chỉnh sửa rồi gửi duyệt trước khi xuất bản.
 
-![Hình 2.132. Tri thức và bài viết (/knowledge)](ui_screenshots/current/knowledge.jpg)
+![Hình 2.132. Tri thức và bài viết (/knowledge)](images/recovered_from_word/knowledge.jpg)
 
 **Hình 2.132. Tri thức và bài viết (/knowledge)**
 
 Cách thao tác: Mở thông báo hoặc chọn Xem hồ sơ để chuyển thẳng đến nghiệp vụ liên quan; kiểm tra trạng thái đã đọc.
 
-![Hình 2.133. Thông báo (/notifications)](ui_screenshots/current/notifications.jpg)
+![Hình 2.133. Thông báo (/notifications)](images/recovered_from_word/notifications.jpg)
 
 **Hình 2.133. Thông báo (/notifications)**
 
 Cách thao tác: Chọn tab thông tin, lịch sử đề xuất hoặc bảo mật; gửi đề nghị thay đổi để người có thẩm quyền xem xét.
 
-![Hình 2.134. Hồ sơ cá nhân (/profile)](ui_screenshots/current/profile.jpg)
+![Hình 2.134. Hồ sơ cá nhân (/profile)](images/recovered_from_word/profile.jpg)
 
 **Hình 2.134. Hồ sơ cá nhân (/profile)**
 
 Cách thao tác: Dùng ô tìm kiếm và bộ lọc; mở tên nhân sự để xem hồ sơ. Nút tiếp nhận nhanh chỉ dành cho người có quyền.
 
-![Hình 2.135. Danh sách nhân sự (/employees)](ui_screenshots/current/employees.jpg)
+![Hình 2.135. Danh sách nhân sự (/employees)](images/recovered_from_word/employees.jpg)
 
 **Hình 2.135. Danh sách nhân sự (/employees)**
 
 Cách thao tác: Ảnh phiên hiện tại cho thấy tab hồ sơ 2C bị ẩn trong chế độ doanh nghiệp. Khi tổ chức dùng chế độ khu vực công, mở tab Hồ sơ công chức/viên chức 2C; chỉ tài khoản được phân quyền mới xem hoặc cập nhật.
 
-![Hình 2.136. Hồ sơ khu vực công; phiên doanh nghiệp không hiển thị tab 2C](ui_screenshots/current/employees-civil-servant.jpg)
+![Hình 2.136. Hồ sơ khu vực công; phiên doanh nghiệp không hiển thị tab 2C](images/recovered_from_word/employees-civil-servant.jpg)
 
 **Hình 2.136. Hồ sơ cán bộ, công chức, viên chức (/employees?tab=civil-servant; chỉ ở chế độ khu vực công)**
 
 Cách thao tác: Mở tab xét duyệt hồ sơ, kiểm tra nội dung thay đổi và chứng từ rồi chấp thuận hoặc trả lại theo thẩm quyền.
 
-![Hình 2.137. Hồ sơ chờ duyệt (/employees?tab=approvals)](ui_screenshots/current/employees-approvals.jpg)
+![Hình 2.137. Hồ sơ chờ duyệt (/employees?tab=approvals)](images/recovered_from_word/employees-approvals.jpg)
 
 **Hình 2.137. Hồ sơ chờ duyệt (/employees?tab=approvals)**
 
 Cách thao tác: Từ danh sách, mở tên một người; rà soát thông tin, hợp đồng, văn bằng và lịch sử. Dùng các nút sửa hoặc thêm hồ sơ khi được phân quyền.
 
-![Hình 2.138. Hồ sơ nhân sự chi tiết (/employees/{id})](ui_screenshots/current/employee-detail.jpg)
+![Hình 2.138. Hồ sơ nhân sự chi tiết (/employees/{id})](images/recovered_from_word/employee-detail.jpg)
 
 **Hình 2.138. Hồ sơ nhân sự chi tiết (/employees/{id})**
 
 Cách thao tác: Chọn dạng cây hoặc bảng; chọn đơn vị để xem cấp trên và danh sách nhân sự trực thuộc.
 
-![Hình 2.139. Sơ đồ tổ chức (/org-chart)](ui_screenshots/current/org-chart.jpg)
+![Hình 2.139. Sơ đồ tổ chức (/org-chart)](images/recovered_from_word/org-chart.jpg)
 
 **Hình 2.139. Sơ đồ tổ chức (/org-chart)**
 
 Cách thao tác: Chọn phạm vi cá nhân hoặc toàn công ty, lọc loại quyết định và trạng thái; mở hồ sơ hoặc tạo quyết định kèm ngày hiệu lực và checklist bàn giao.
 
-![Hình 2.140. Biến động nhân sự (/personnel)](ui_screenshots/current/personnel.jpg)
+![Hình 2.140. Biến động nhân sự (/personnel)](images/recovered_from_word/personnel.jpg)
 
 **Hình 2.140. Biến động nhân sự (/personnel)**
 
 Cách thao tác: Chọn khung theo vị trí, xem dải sàn, tham chiếu và trần; lập bản nháp rồi gửi cấp có thẩm quyền phê duyệt.
 
-![Hình 2.141. Khung lương vị trí (/salary-bands)](ui_screenshots/current/salary-bands.jpg)
+![Hình 2.141. Khung lương vị trí (/salary-bands)](images/recovered_from_word/salary-bands.jpg)
 
 **Hình 2.141. Khung lương vị trí (/salary-bands)**
 
 Cách thao tác: Ảnh phiên doanh nghiệp cho thấy đường dẫn này chuyển về Khung lương theo vị trí. Trong chế độ khu vực công, mở danh mục ngạch bậc để tra cứu mã ngạch, hệ số và căn cứ áp dụng.
 
-![Hình 2.142. Đường dẫn ngạch bậc chuyển về khung lương trong chế độ doanh nghiệp](ui_screenshots/current/salary-ranks.jpg)
+![Hình 2.142. Đường dẫn ngạch bậc chuyển về khung lương trong chế độ doanh nghiệp](images/recovered_from_word/salary-ranks.jpg)
 
 **Hình 2.142. Danh mục ngạch, bậc lương (/salary-ranks; chỉ ở chế độ khu vực công)**
 
 Cách thao tác: Ảnh phiên doanh nghiệp cho thấy đường dẫn chuyển về Khung lương theo vị trí. Trong chế độ khu vực công, chọn tab Xét nâng bậc, rà soát điều kiện và minh chứng; đề xuất được chuyển sang quy trình phê duyệt nhân sự.
 
-![Hình 2.143. Đường dẫn xét nâng bậc chuyển về khung lương trong chế độ doanh nghiệp](ui_screenshots/current/salary-ranks-progression.jpg)
+![Hình 2.143. Đường dẫn xét nâng bậc chuyển về khung lương trong chế độ doanh nghiệp](images/recovered_from_word/salary-ranks-progression.jpg)
 
 **Hình 2.143. Xét lộ trình nâng bậc (/salary-ranks?tab=progression; khu vực công và quyền tương ứng)**
 
 Cách thao tác: Lọc theo nhóm hoặc tình trạng; mở hồ sơ tài sản để lập bàn giao, thu hồi hoặc cập nhật biên bản.
 
-![Hình 2.144. Tài sản (/assets)](ui_screenshots/current/assets.jpg)
+![Hình 2.144. Tài sản (/assets)](images/recovered_from_word/assets.jpg)
 
 **Hình 2.144. Tài sản (/assets)**
 
 Cách thao tác: Chọn ngày trên lịch hoặc bảng gần đây để xem giờ vào, giờ ra và trạng thái; gửi giải trình nếu dữ liệu cần đối chiếu.
 
-![Hình 2.145. Bảng chấm công cá nhân (/attendance)](ui_screenshots/current/attendance.jpg)
+![Hình 2.145. Bảng chấm công cá nhân (/attendance)](images/recovered_from_word/attendance.jpg)
 
 **Hình 2.145. Bảng chấm công cá nhân (/attendance)**
 
 Cách thao tác: Chọn tháng và ngày, rà soát sự kiện hoặc thiết bị; hiệu chỉnh kèm lý do, sau đó chốt tháng khi đã xử lý hết trường hợp cần xem lại.
 
-![Hình 2.146. Quản lý chấm công (/admin/attendance)](ui_screenshots/current/admin-attendance.jpg)
+![Hình 2.146. Quản lý chấm công (/admin/attendance)](images/recovered_from_word/admin-attendance.jpg)
 
 **Hình 2.146. Quản lý chấm công (/admin/attendance)**
 
 Cách thao tác: Chuyển giữa các tab ca làm, loại ca và phân ca; tạo khung giờ rồi gán nhân viên trong khoảng hiệu lực.
 
-![Hình 2.147. Ca làm việc và phân ca (/shifts)](ui_screenshots/current/shifts.jpg)
+![Hình 2.147. Ca làm việc và phân ca (/shifts)](images/recovered_from_word/shifts.jpg)
 
 **Hình 2.147. Ca làm việc và phân ca (/shifts)**
 
 Cách thao tác: Chọn Tạo đơn nghỉ, nhập thời gian và lý do, gửi duyệt; người duyệt mở hồ sơ để chấp thuận hoặc từ chối.
 
-![Hình 2.148. Nghỉ phép (/leave)](ui_screenshots/current/leave.jpg)
+![Hình 2.148. Nghỉ phép (/leave)](images/recovered_from_word/leave.jpg)
 
 **Hình 2.148. Nghỉ phép (/leave)**
 
 Cách thao tác: Chọn đăng ký làm thêm, ghi ngày, thời lượng và lý do; mở đề nghị để xem xét theo lịch làm việc và quy chế.
 
-![Hình 2.149. Làm thêm giờ (/overtime)](ui_screenshots/current/overtime.jpg)
+![Hình 2.149. Làm thêm giờ (/overtime)](images/recovered_from_word/overtime.jpg)
 
 **Hình 2.149. Làm thêm giờ (/overtime)**
 
 Cách thao tác: Chọn kỳ cần xem, lọc phòng ban hoặc nhân sự; mở phiếu để đối chiếu công, thành phần thu nhập và khấu trừ trước khi rà soát, duyệt hoặc khóa.
 
-![Hình 2.150. Kỳ bảng lương (/payroll-engine?tab=runs)](ui_screenshots/current/payroll-runs.jpg)
+![Hình 2.150. Kỳ bảng lương (/payroll-engine?tab=runs)](images/recovered_from_word/payroll-runs.jpg)
 
 **Hình 2.150. Kỳ bảng lương (/payroll-engine?tab=runs)**
 
 Cách thao tác: Chọn Tính bảng lương, đặt tên kỳ và khoảng ngày; kiểm tra công, cấu trúc lương và chính sách trước khi bấm Tính toán.
 
-![Hình 2.151. Biểu mẫu tính lương chu kỳ (/payroll-engine)](ui_screenshots/current/payroll-modal-calculate.jpg)
+![Hình 2.151. Biểu mẫu tính lương chu kỳ (/payroll-engine)](images/recovered_from_word/payroll-modal-calculate.jpg)
 
 **Hình 2.151. Biểu mẫu tính lương chu kỳ (/payroll-engine)**
 
 Cách thao tác: Chọn thành phần thu nhập hoặc khấu trừ; kiểm tra cách tính, thuế, bảo hiểm, OT và căn cứ áp dụng trước khi lưu.
 
-![Hình 2.152. Thành phần lương (/payroll-engine?tab=components)](ui_screenshots/current/payroll-components.jpg)
+![Hình 2.152. Thành phần lương (/payroll-engine?tab=components)](images/recovered_from_word/payroll-components.jpg)
 
 **Hình 2.152. Thành phần lương (/payroll-engine?tab=components)**
 
 Cách thao tác: Chọn Thêm thành phần lương, khai báo mã, phân loại, cách tính và văn bản nội bộ; chỉ lưu mức đã được doanh nghiệp phê duyệt.
 
-![Hình 2.153. Biểu mẫu thành phần lương (/payroll-engine?tab=components)](ui_screenshots/current/payroll-modal-component.jpg)
+![Hình 2.153. Biểu mẫu thành phần lương (/payroll-engine?tab=components)](images/recovered_from_word/payroll-modal-component.jpg)
 
 **Hình 2.153. Biểu mẫu thành phần lương (/payroll-engine?tab=components)**
 
 Cách thao tác: Mở cấu trúc cần dùng, kiểm tra thành phần và phạm vi áp dụng theo chức danh, đơn vị hoặc cá nhân trước khi gán.
 
-![Hình 2.154. Cấu trúc lương (/payroll-engine?tab=structures)](ui_screenshots/current/payroll-structures.jpg)
+![Hình 2.154. Cấu trúc lương (/payroll-engine?tab=structures)](images/recovered_from_word/payroll-structures.jpg)
 
 **Hình 2.154. Cấu trúc lương (/payroll-engine?tab=structures)**
 
 Cách thao tác: Mở chính sách có ngày hiệu lực, đối chiếu căn cứ thuế, bảo hiểm và OT; lưu phiên bản mới để kỳ sau dùng đúng mốc hiệu lực.
 
-![Hình 2.155. Chính sách và quy tắc lương (/payroll-engine?tab=policy)](ui_screenshots/current/payroll-policy.jpg)
+![Hình 2.155. Chính sách và quy tắc lương (/payroll-engine?tab=policy)](images/recovered_from_word/payroll-policy.jpg)
 
 **Hình 2.155. Chính sách và quy tắc lương (/payroll-engine?tab=policy)**
 
 Cách thao tác: Chọn tình huống phù hợp, lần theo nguồn dữ liệu và công thức; dùng ví dụ để đối chiếu từng khoản trước khi tính kỳ.
 
-![Hình 2.156. Cách tính lương (/payroll-guide)](ui_screenshots/current/payroll-guide.jpg)
+![Hình 2.156. Cách tính lương (/payroll-guide)](images/recovered_from_word/payroll-guide.jpg)
 
 **Hình 2.156. Cách tính lương (/payroll-guide)**
 
 Cách thao tác: Chọn kỳ, mở phiếu để xem thu nhập, khấu trừ và thực nhận; tải hoặc in phiếu của chính tài khoản.
 
-![Hình 2.157. Phiếu lương cá nhân (/my-payslips)](ui_screenshots/current/my-payslips.jpg)
+![Hình 2.157. Phiếu lương cá nhân (/my-payslips)](images/recovered_from_word/my-payslips.jpg)
 
 **Hình 2.157. Phiếu lương cá nhân (/my-payslips)**
 
 Cách thao tác: Chọn tab khoản vay hoặc hồ sơ chờ xử lý; xem thỏa thuận, lịch trả và chứng từ trước khi ghi nhận giải ngân hay khấu trừ.
 
-![Hình 2.158. Tạm ứng và vay phúc lợi (/loans)](ui_screenshots/current/loans.jpg)
+![Hình 2.158. Tạm ứng và vay phúc lợi (/loans)](images/recovered_from_word/loans.jpg)
 
 **Hình 2.158. Tạm ứng và vay phúc lợi (/loans)**
 
 Cách thao tác: Chọn công tác phí, chuyến đi hoặc tạm ứng; mở hồ sơ để kiểm tra dự toán, hóa đơn và quyết toán trước khi duyệt chi.
 
-![Hình 2.159. Công tác phí và tạm ứng (/expense-claims)](ui_screenshots/current/expense-claims.jpg)
+![Hình 2.159. Công tác phí và tạm ứng (/expense-claims)](images/recovered_from_word/expense-claims.jpg)
 
 **Hình 2.159. Công tác phí và tạm ứng (/expense-claims)**
 
 Cách thao tác: Chọn pipeline hoặc vị trí tuyển; mở hồ sơ ứng viên để cập nhật vòng tuyển, scorecard phỏng vấn và trạng thái thư mời.
 
-![Hình 2.160. Tuyển dụng (/recruitment-ats)](ui_screenshots/current/recruitment-ats.jpg)
+![Hình 2.160. Tuyển dụng (/recruitment-ats)](images/recovered_from_word/recruitment-ats.jpg)
 
 **Hình 2.160. Tuyển dụng (/recruitment-ats)**
 
 Cách thao tác: Chọn tab đào tạo hoặc kiến nghị; xem hồ sơ theo quyền, ghi nhận kết quả hoặc chuyển vụ việc tới người xử lý.
 
-![Hình 2.161. Đào tạo và kiến nghị (/training-grievance)](ui_screenshots/current/training-grievance.jpg)
+![Hình 2.161. Đào tạo và kiến nghị (/training-grievance)](images/recovered_from_word/training-grievance.jpg)
 
 **Hình 2.161. Đào tạo và kiến nghị (/training-grievance)**
 
 Cách thao tác: Chọn mẫu báo cáo và phạm vi, kiểm tra bộ lọc cùng kỳ dữ liệu; xem trước rồi mới in hoặc xuất.
 
-![Hình 2.162. Báo cáo nhân sự (/personnel-reports)](ui_screenshots/current/personnel-reports.jpg)
+![Hình 2.162. Báo cáo nhân sự (/personnel-reports)](images/recovered_from_word/personnel-reports.jpg)
 
 **Hình 2.162. Báo cáo nhân sự (/personnel-reports)**
 
 Cách thao tác: Tìm chính sách, quy trình hoặc biểu mẫu; mở tài liệu để đọc và cập nhật thông tin mô tả theo quyền.
 
-![Hình 2.163. Kho tài liệu (/documents)](ui_screenshots/current/documents.jpg)
+![Hình 2.163. Kho tài liệu (/documents)](images/recovered_from_word/documents.jpg)
 
 **Hình 2.163. Kho tài liệu (/documents)**
 
 Cách thao tác: Tìm tài khoản theo tên hoặc trạng thái; thêm người dùng hoặc mở menu hành động để cập nhật theo quy trình cấp quyền.
 
-![Hình 2.164. Tài khoản (/admin/users)](ui_screenshots/current/admin-users.jpg)
+![Hình 2.164. Tài khoản (/admin/users)](images/recovered_from_word/admin-users.jpg)
 
 **Hình 2.164. Tài khoản (/admin/users)**
 
 Cách thao tác: Chuyển giữa tài khoản, vai trò và ma trận quyền; đối chiếu phạm vi trước khi lưu thay đổi.
 
-![Hình 2.165. Vai trò và phân quyền (/admin/roles)](ui_screenshots/current/admin-roles.jpg)
+![Hình 2.165. Vai trò và phân quyền (/admin/roles)](images/recovered_from_word/admin-roles.jpg)
 
 **Hình 2.165. Vai trò và phân quyền (/admin/roles)**
 
 Cách thao tác: Chọn đơn vị trong cây, tạo hoặc sửa thông tin và quan hệ cấp trên; kiểm tra nhân sự trực thuộc trước khi lưu.
 
-![Hình 2.166. Đơn vị phòng ban (/admin/org-units)](ui_screenshots/current/admin-org-units.jpg)
+![Hình 2.166. Đơn vị phòng ban (/admin/org-units)](images/recovered_from_word/admin-org-units.jpg)
 
 **Hình 2.166. Đơn vị phòng ban (/admin/org-units)**
 
 Cách thao tác: Chọn danh mục, tìm bản ghi rồi sửa hoặc khôi phục dữ liệu theo quyền; xuất CSV khi cần đối chiếu.
 
-![Hình 2.167. Danh mục gốc (/admin/catalogs)](ui_screenshots/current/admin-catalogs.jpg)
+![Hình 2.167. Danh mục gốc (/admin/catalogs)](images/recovered_from_word/admin-catalogs.jpg)
 
 **Hình 2.167. Danh mục gốc (/admin/catalogs)**
 
 Cách thao tác: Rà soát từng tham số và giá trị hiện hành; thay đổi có căn cứ, sau đó lưu và kiểm tra lại trên màn hình nghiệp vụ.
 
-![Hình 2.168. Cấu hình hệ thống (/admin/settings)](ui_screenshots/current/admin-settings.jpg)
+![Hình 2.168. Cấu hình hệ thống (/admin/settings)](images/recovered_from_word/admin-settings.png)
 
 **Hình 2.168. Cấu hình hệ thống (/admin/settings)**
 
 Cách thao tác: Lọc theo thời gian, người thực hiện hoặc loại hành động; mở bản ghi để tra cứu. Màn hình này chỉ phục vụ kiểm tra, không sửa nghiệp vụ.
 
-![Hình 2.169. Nhật ký hệ thống (/admin/audit)](ui_screenshots/current/admin-audit.jpg)
+![Hình 2.169. Nhật ký hệ thống (/admin/audit)](images/recovered_from_word/admin-audit.png)
 
 **Hình 2.169. Nhật ký hệ thống (/admin/audit)**
 
 Cách thao tác: Đăng ký mẫu khuôn mặt theo hướng dẫn, cho phép trình duyệt dùng camera rồi thực hiện điểm danh vào hoặc ra; kiểm tra lại kết quả trong bảng công.
 
-![Hình 2.170. Điểm danh bằng khuôn mặt (/check-in)](ui_screenshots/current/check-in.jpg)
+![Hình 2.170. Điểm danh bằng khuôn mặt (/check-in)](images/recovered_from_word/check-in.png)
 
 **Hình 2.170. Điểm danh bằng khuôn mặt (/check-in)**
 

@@ -13,5 +13,10 @@ if [ "${SEED_ON_FIRST_RUN}" = "true" ]; then
   node scripts/seed-demo-role-accounts.cjs
 fi
 
+if [ "${DEMO_CONTRACT_SYNC}" = "true" ]; then
+  echo "[entrypoint] syncing active demo employment contracts and electronic copies..."
+  node prisma/seed-demo-contracts.cjs
+fi
+
 echo "[entrypoint] starting API..."
 exec node dist/main.js

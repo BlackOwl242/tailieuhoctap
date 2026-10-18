@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 
 /**
- * Bảo vệ dữ liệu sinh trắc học theo Nghị định 13/2023/NĐ-CP:
+ * Mã hóa mẫu khuôn mặt khi lưu trữ; đây chỉ là một biện pháp bảo vệ dữ liệu:
  * - Vector khuôn mặt được mã hóa AES-256-GCM trước khi lưu;
  * - KHÔNG lưu ảnh gốc; log không bao giờ ghi nội dung vector;
  * - So khớp bằng cosine similarity trên vector đã giải mã trong RAM.

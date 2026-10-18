@@ -9,7 +9,7 @@ export function workDate(at: Date = new Date()): Date {
 export function dateKey(value: Date | string): Date {
   const text = typeof value === 'string' ? value : value.toISOString();
   const result = new Date(text.slice(0, 10) + 'T00:00:00.000Z');
-  if (!Number.isFinite(result.getTime())) throw new BadRequestException('Ngày không hợp lệ');
+  if (!/^\d{4}-\d{2}-\d{2}/.test(text) || !Number.isFinite(result.getTime()) || result.toISOString().slice(0, 10) !== text.slice(0, 10)) throw new BadRequestException('Ngày không hợp lệ');
   return result;
 }
 export function clockMinutes(clock: string): number {

@@ -41,7 +41,7 @@ console.log('================================================================\n'
 // 1. Đăng nhập Admin
 console.log('== 1. Đăng nhập Quản trị viên (Admin) ==');
 const adminLogin = await api('POST', '/auth/login', {
-  body: { email: 'admin@demo.local', password: 'Admin@123' },
+  body: { email: 'admin@demo.local', password: '123' },
 });
 check('Đăng nhập Admin thành công', adminLogin.status === 200 && !!adminLogin.data?.accessToken);
 const adminToken = adminLogin.data?.accessToken;

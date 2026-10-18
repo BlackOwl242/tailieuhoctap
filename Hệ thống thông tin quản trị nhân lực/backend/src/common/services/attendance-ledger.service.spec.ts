@@ -6,7 +6,7 @@ describe('Attendance ledger regressions', () => {
   let db: any;
   let service: AttendanceLedgerService;
   beforeEach(() => {
-    db = { attendancePeriod: { findUnique: jest.fn().mockResolvedValue(null), upsert: jest.fn().mockResolvedValue({ id: 'period', version: 1 }) }, hrmsPayrollRun: { findFirst: jest.fn().mockResolvedValue(null) }, hrmsShiftAssignment: { findFirst: jest.fn().mockResolvedValue(null), findMany: jest.fn().mockResolvedValue([]) }, attendanceEvent: { findMany: jest.fn().mockResolvedValue([]) }, hrmsAttendanceRegularization: { findFirst: jest.fn().mockResolvedValue({ requestedCheckIn: '09:00', requestedCheckOut: '10:00' }), count: jest.fn().mockResolvedValue(0) }, attendanceCorrection: { findMany: jest.fn().mockResolvedValue([]) }, leaveRequest: { findFirst: jest.fn().mockResolvedValue(null) }, attendanceDay: { upsert: jest.fn().mockImplementation((arg: any) => arg.create), count: jest.fn().mockResolvedValue(0), findMany: jest.fn().mockResolvedValue([]) }, personnelAction: { findMany: jest.fn().mockResolvedValue([]) }, user: { findMany: jest.fn().mockResolvedValue([]) }, auditLog: { create: jest.fn().mockResolvedValue({}) }, $transaction: jest.fn(async (callback: any) => callback(db)), setting: { findUnique: jest.fn().mockResolvedValue(null) } };
+    db = { attendancePeriod: { findUnique: jest.fn().mockResolvedValue(null), upsert: jest.fn().mockResolvedValue({ id: 'period', version: 1 }) }, hrmsPayrollRun: { findFirst: jest.fn().mockResolvedValue(null) }, hrmsShiftAssignment: { findFirst: jest.fn().mockResolvedValue(null), findMany: jest.fn().mockResolvedValue([]) }, attendanceEvent: { findMany: jest.fn().mockResolvedValue([]) }, hrmsAttendanceRegularization: { findMany: jest.fn().mockResolvedValue([]), findFirst: jest.fn().mockResolvedValue({ requestedCheckIn: '09:00', requestedCheckOut: '10:00' }), count: jest.fn().mockResolvedValue(0) }, attendanceCorrection: { findMany: jest.fn().mockResolvedValue([]) }, leaveRequest: { findFirst: jest.fn().mockResolvedValue(null), findMany: jest.fn().mockResolvedValue([]) }, attendanceDay: { upsert: jest.fn().mockImplementation((arg: any) => arg.create), count: jest.fn().mockResolvedValue(0), findMany: jest.fn().mockResolvedValue([]) }, personnelAction: { findMany: jest.fn().mockResolvedValue([]) }, user: { findMany: jest.fn().mockResolvedValue([]) }, auditLog: { create: jest.fn().mockResolvedValue({}) }, $transaction: jest.fn(async (callback: any) => callback(db)), setting: { findUnique: jest.fn().mockResolvedValue(null) } };
     service = new AttendanceLedgerService(db as PrismaService, new RuntimeSettingsService(db));
   });
   it('one approved hour remains sixty minutes after recomputation', async () => {
@@ -50,12 +50,13 @@ describe('Attendance ledger regressions', () => {
     db.user.findMany.mockResolvedValue([{ id: 'employee', hireDate: new Date('2020-01-01T00:00:00.000Z') }]);
     db.hrmsShiftAssignment.findMany.mockResolvedValue([{
       userId: 'employee', startDate: new Date('2026-09-01T00:00:00.000Z'), endDate: new Date('2026-09-30T00:00:00.000Z'), workDays: [1, 2, 3, 4, 5, 6],
+      shiftType: { startTime: '08:00', endTime: '17:30' },
     }]);
-    const recompute = jest.spyOn(service, 'recompute').mockResolvedValue({} as any);
+    db.attendanceDay.createMany = jest.fn().mockResolvedValue({ count: 26 });
 
     await service.finalize(9, 2026, 'manager');
 
-    const days = recompute.mock.calls.map(([, day]) => day.toISOString().slice(0, 10));
+    const days = db.attendanceDay.createMany.mock.calls[0][0].data.map((row: any) => row.workDate.toISOString().slice(0, 10));
     expect(days).toContain('2026-09-05');
     expect(days).toContain('2026-09-26');
     expect(days).not.toContain('2026-09-06');

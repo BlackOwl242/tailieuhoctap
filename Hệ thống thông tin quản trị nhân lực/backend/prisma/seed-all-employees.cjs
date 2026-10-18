@@ -209,7 +209,8 @@ async function seedAll() {
       const user = await prisma.user.create({
         data: {
           email,
-          passwordHash: bcrypt.hashSync('Nhanvien@123', 10),
+          passwordHash: bcrypt.hashSync('123', 12),
+          mustChangePassword: false,
           fullName: s.name,
           jobTitle: s.title,
           employeeCode,

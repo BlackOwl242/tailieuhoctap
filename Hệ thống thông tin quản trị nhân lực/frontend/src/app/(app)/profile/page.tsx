@@ -7,9 +7,11 @@ import {
   Camera, LogOut, Trash2, Edit3, Send, Clock, FileText, CheckCircle2,
   AlertCircle, ShieldCheck, Lock, UserCheck, Phone, MapPin, Building
 } from 'lucide-react';
-import { api, errorMessage } from '@/lib/api';
+import { api, errorMessage, openProtectedFile } from '@/lib/api';
 import type { MeProfile } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
+import { CONTRACT_STATUS_LABEL, CONTRACT_TYPE_LABEL, vnd } from '@/lib/hr';
+import { isEnterpriseSector, useOrgConfig } from '@/lib/org-config';
 import { useToast } from '@/components/ui/toaster';
 import {
   Avatar, AvatarFallback, Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Textarea, Skeleton
@@ -22,9 +24,30 @@ interface FaceStatus {
   samples: Array<{ id: string; dimensions: number; createdAt: string }>;
 }
 
+interface OwnContract {
+  id: string;
+  contractNo: string;
+  type: string;
+  status: string;
+  startDate: string;
+  endDate: string | null;
+  baseSalary: number;
+  compensationBasis: 'MONTHLY' | 'DAILY' | 'HOURLY';
+  fileUrl: string | null;
+  fileName: string | null;
+  note: string | null;
+}
+
+interface OwnEmploymentRecord {
+  baseSalary?: number | null;
+  contracts?: OwnContract[];
+}
+
 export default function ProfilePage() {
   const qc = useQueryClient();
   const toast = useToast();
+  const [orgConfig] = useOrgConfig();
+  const enterpriseMode = isEnterpriseSector(orgConfig);
 
   const [activeTab, setActiveTab] = useState<'tiers' | 'requests' | 'security'>('tiers');
   const [isChangeModalOpen, setIsChangeModalOpen] = useState(false);
@@ -48,6 +71,12 @@ export default function ProfilePage() {
   });
 
   const profile = profileQ.data;
+
+  const employmentRecordQ = useQuery<OwnEmploymentRecord>({
+    queryKey: ['my-employment-contracts', me?.id],
+    queryFn: async () => (await api.get<OwnEmploymentRecord>(`/employees/${me!.id}`)).data,
+    enabled: !!me?.id && enterpriseMode,
+  });
 
   // Dữ liệu các yêu cầu thay đổi của tôi
   const myRequestsQ = useQuery<any[]>({
@@ -428,31 +457,71 @@ export default function ProfilePage() {
                   <p className="font-medium text-foreground">{me.hireDate ? formatDate(me.hireDate) : 'Chưa cập nhật'}</p>
                 </div>
 
-                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
-                  <span className="text-xs text-muted-foreground block">Ngạch bậc:</span>
-                  <p className="font-medium text-foreground">{profile?.rank?.name || profile?.rankCode || 'Chuyên viên'}</p>
-                </div>
+                {enterpriseMode ? (
+                  <div className="sm:col-span-4 space-y-3 border-t border-border pt-4">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <h3 className="text-sm font-semibold text-foreground">Hợp đồng và mức lương</h3>
+                        <p className="mt-1 text-xs text-muted-foreground">Thông tin hợp đồng cần được HR đối chiếu với bản đã ký; chỉ hợp đồng đã xác nhận hiệu lực mới làm căn cứ tính lương.</p>
+                      </div>
+                      <Link href={`/employees/${me.id}`} className="text-xs font-medium text-primary hover:underline">{me.roles.some((role) => role === 'ADMIN' || role === 'KM_MANAGER') ? 'Mở hồ sơ để bổ sung hợp đồng' : 'Mở hồ sơ nhân sự'}</Link>
+                    </div>
+                    {employmentRecordQ.isLoading ? <p className="text-xs text-muted-foreground">Đang tải thông tin hợp đồng…</p> : null}
+                    {employmentRecordQ.isError ? <p className="text-xs text-destructive">Không tải được hợp đồng: {errorMessage(employmentRecordQ.error)}</p> : null}
+                    {!employmentRecordQ.isLoading && !employmentRecordQ.isError && (employmentRecordQ.data?.contracts?.length ?? 0) === 0 && employmentRecordQ.data?.baseSalary != null ? (
+                      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-border pb-2">
+                        <span className="text-xs text-muted-foreground">Mức lương đang lưu trong hồ sơ</span>
+                        <strong className="text-sm text-foreground">{vnd(employmentRecordQ.data.baseSalary)} / tháng</strong>
+                        <p className="w-full text-xs text-muted-foreground">Mức hồ sơ, không thay thế điều khoản đã ký.</p>
+                      </div>
+                    ) : null}
+                    {!employmentRecordQ.isLoading && !employmentRecordQ.isError && (employmentRecordQ.data?.contracts?.length ?? 0) === 0 ? (
+                      <p className="text-xs text-muted-foreground">Chưa có hợp đồng được lưu. Nhân sự cần nhập thông tin từ bản đã ký để hoàn thiện hồ sơ.</p>
+                    ) : null}
+                    {(employmentRecordQ.data?.contracts ?? []).map((contract) => (
+                      <div key={contract.id} className="grid grid-cols-1 gap-3 border-t border-border pt-3 text-xs sm:grid-cols-2 lg:grid-cols-4">
+                        <div><span className="block text-muted-foreground">Số hợp đồng</span><b className="mt-1 block text-foreground">{contract.contractNo}</b></div>
+                        <div><span className="block text-muted-foreground">Loại hợp đồng</span><b className="mt-1 block text-foreground">{CONTRACT_TYPE_LABEL[contract.type] || contract.type}</b></div>
+                        <div><span className="block text-muted-foreground">Mức lương thỏa thuận</span><b className="mt-1 block text-foreground">{vnd(contract.baseSalary)} / {contract.compensationBasis === 'HOURLY' ? 'giờ' : contract.compensationBasis === 'DAILY' ? 'ngày' : 'tháng'}</b></div>
+                        <div><span className="block text-muted-foreground">Thời hạn · Trạng thái</span><b className="mt-1 block text-foreground">{formatDate(contract.startDate)}{contract.endDate ? ` – ${formatDate(contract.endDate)}` : ' – Không xác định thời hạn'} · {CONTRACT_STATUS_LABEL[contract.status] || contract.status}</b></div>
+                        {contract.status === 'DRAFT' ? <p className="sm:col-span-2 lg:col-span-4 text-xs text-muted-foreground">Hồ sơ này chưa được HR xác nhận hiệu lực. Cần đối chiếu số hợp đồng, điều khoản và bản đã ký trước khi dùng làm căn cứ tính lương.</p> : null}
+                        {contract.fileUrl ? <div className="sm:col-span-2 lg:col-span-4"><button type="button" onClick={() => void openProtectedFile(contract.fileUrl!)} className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"><FileText className="h-3.5 w-3.5" />Mở bản hợp đồng{contract.fileName ? ` · ${contract.fileName}` : ''}</button></div> : null}
+                        <details className="sm:col-span-2 lg:col-span-4 border-t border-border pt-2">
+                          <summary className="cursor-pointer font-medium text-primary">Xem chi tiết hợp đồng</summary>
+                          <div className="mt-2 space-y-2 text-xs text-muted-foreground">
+                            <p>Số hợp đồng: <span className="font-medium text-foreground">{contract.contractNo}</span></p>
+                            <p>Loại và hiệu lực: <span className="font-medium text-foreground">{CONTRACT_TYPE_LABEL[contract.type] || contract.type}; từ {formatDate(contract.startDate)}{contract.endDate ? ` đến ${formatDate(contract.endDate)}` : ', không xác định thời hạn'}.</span></p>
+                            <p>Mức lương ghi nhận: <span className="font-medium text-foreground">{vnd(contract.baseSalary)} / {contract.compensationBasis === 'HOURLY' ? 'giờ' : contract.compensationBasis === 'DAILY' ? 'ngày' : 'tháng'}</span></p>
+                            {contract.note ? <p className="whitespace-pre-wrap">Ghi chú: {contract.note}</p> : null}
+                            {contract.fileUrl ? <button type="button" onClick={() => void openProtectedFile(contract.fileUrl!)} className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"><FileText className="h-3.5 w-3.5" />Xem bản mềm{contract.fileName ? ` · ${contract.fileName}` : ''}</button> : <p>Chưa lưu bản mềm hợp đồng đã ký.</p>}
+                          </div>
+                        </details>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                      <span className="text-xs text-muted-foreground block">Ngạch công chức / viên chức:</span>
+                      <p className="font-medium text-foreground">{profile?.rank?.name || profile?.rankCode || 'Chưa cập nhật'}</p>
+                    </div>
 
-                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
-                  <span className="text-xs text-muted-foreground block">Bậc & Hệ số lương:</span>
-                  <p className="font-mono font-medium text-foreground">
-                    Bậc {profile?.salaryStep || 1} · HS: {profile?.salaryCoefficient || 2.34}
-                  </p>
-                </div>
+                    <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                      <span className="text-xs text-muted-foreground block">Bậc và hệ số lương:</span>
+                      <p className="font-mono font-medium text-foreground">{profile?.salaryStep != null ? `Bậc ${profile.salaryStep}` : 'Chưa cập nhật'}{profile?.salaryCoefficient != null ? ` · Hệ số ${profile.salaryCoefficient}` : ''}</p>
+                    </div>
 
-                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
-                  <span className="text-xs text-muted-foreground block">Phụ cấp chức vụ / VK:</span>
-                  <p className="font-medium text-foreground">
-                    {profile?.positionAllowance || 0} · {profile?.overGradePercent || 0}%
-                  </p>
-                </div>
+                    <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                      <span className="text-xs text-muted-foreground block">Phụ cấp chức vụ / vượt khung:</span>
+                      <p className="font-medium text-foreground">{profile?.positionAllowance ?? 0} · {profile?.overGradePercent ?? 0}%</p>
+                    </div>
 
-                <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
-                  <span className="text-xs text-muted-foreground block">Đoàn - Đảng - Quân ngũ:</span>
-                  <p className="font-medium text-foreground">
-                    {profile?.partyPosition || 'Đảng viên'} {profile?.militaryRank ? `· ${profile.militaryRank}` : ''}
-                  </p>
-                </div>
+                    <div className="p-3 rounded-md border border-border bg-muted/20 space-y-1">
+                      <span className="text-xs text-muted-foreground block">Đoàn - Đảng - Quân ngũ:</span>
+                      <p className="font-medium text-foreground">{profile?.partyPosition || 'Chưa cập nhật'} {profile?.militaryRank ? `· ${profile.militaryRank}` : ''}</p>
+                    </div>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>

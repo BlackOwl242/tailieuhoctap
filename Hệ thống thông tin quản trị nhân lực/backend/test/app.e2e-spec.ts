@@ -2,6 +2,9 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { setupTestApp } from './setup-app';
+import { PrismaService } from '../src/common/prisma.service';
+import bcrypt from 'bcryptjs';
 
 /**
  * E2E smoke — chạy khi có PostgreSQL thật:
@@ -19,9 +22,15 @@ const RUN = process.env.RUN_E2E === '1';
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = moduleRef.createNestApplication();
-    app.setGlobalPrefix('api/v1');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    setupTestApp(app);
     await app.init();
+    const prisma = app.get(PrismaService);
+    for (const code of ['ADMIN', 'USER']) await prisma.role.upsert({ where: { code }, create: { code, name: code }, update: {} });
+    const passwordHash = await bcrypt.hash('123', 4);
+    const admin = await prisma.user.upsert({ where: { email: 'admin@demo.local' }, create: { email: 'admin@demo.local', fullName: 'E2E Admin', passwordHash, hireDate: new Date('2030-01-01'), roles: { create: { roleCode: 'ADMIN' } } }, update: {} });
+    const pm = await prisma.user.upsert({ where: { email: 'pm.java@demo.local' }, create: { email: 'pm.java@demo.local', fullName: 'E2E PM', passwordHash, hireDate: new Date('2030-01-01'), roles: { create: { roleCode: 'USER' } } }, update: {} });
+    const space = await prisma.space.upsert({ where: { slug: 'devops-runbook' }, create: { slug: 'devops-runbook', name: 'E2E Runbook', createdBy: admin.id }, update: {} });
+    await prisma.spaceMember.upsert({ where: { spaceId_userId: { spaceId: space.id, userId: pm.id } }, create: { spaceId: space.id, userId: pm.id, spaceRole: 'CONTRIBUTOR' }, update: {} });
   }, 60_000);
 
   afterAll(async () => {
@@ -45,13 +54,13 @@ const RUN = process.env.RUN_E2E === '1';
   it('POST /auth/login đúng → access token cho ADMIN và PM', async () => {
     const admin = await request(app.getHttpServer())
       .post('/api/v1/auth/login')
-      .send({ email: 'admin@demo.local', password: process.env.SEED_ADMIN_PW || 'Admin@123' })
+      .send({ email: 'admin@demo.local', password: process.env.SEED_ADMIN_PW || '123' })
       .expect(200);
     adminToken = admin.body.accessToken;
 
     const pm = await request(app.getHttpServer())
       .post('/api/v1/auth/login')
-      .send({ email: 'pm.java@demo.local', password: process.env.SEED_PM_PW || 'Pm@123456' })
+      .send({ email: 'pm.java@demo.local', password: process.env.SEED_PM_PW || '123' })
       .expect(200);
     pmToken = pm.body.accessToken;
     expect(pm.body.tokenType).toBe('Bearer');

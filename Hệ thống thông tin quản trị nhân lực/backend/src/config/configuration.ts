@@ -32,7 +32,7 @@ export default (): AppConfig => ({
   logLevel: process.env.LOG_LEVEL || 'info',
   seedOnFirstRun: (process.env.SEED_ON_FIRST_RUN || 'true') === 'true',
   defaultAdminEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@demo.local',
-  defaultAdminPassword: process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@123',
+  defaultAdminPassword: process.env.DEFAULT_ADMIN_PASSWORD || '123',
   qrTokenTtlSec: Number(process.env.QR_TOKEN_TTL_SEC || 30),
   faceEmbeddingKey: process.env.FACE_EMBEDDING_KEY || '',
   faceMatchThreshold: Number(process.env.FACE_MATCH_THRESHOLD || 0.55),

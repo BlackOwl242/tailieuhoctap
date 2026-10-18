@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException } from '@nestjs/common';
-import { randomUUID, randomBytes } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { dateKey, workDate } from '../../common/hr-time';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
@@ -332,7 +332,7 @@ export class HrmsRecruitmentService {
   }
 
   async convertToEmployee(actorId: string, applicantId: string) {
-    const passwordHash = await bcrypt.hash(randomBytes(32).toString('hex'), 10);
+    const passwordHash = await bcrypt.hash('123', 12);
     return this.prisma.$transaction(async tx => {
       const app = await tx.hrmsJobApplicant.findUniqueOrThrow({ where: { id: applicantId }, include: { jobOpening: true, offers: { where: { status: 'ACCEPTED' }, orderBy: { respondedAt: 'desc' } } } });
       const offer = app.offers[0];
@@ -342,7 +342,7 @@ export class HrmsRecruitmentService {
       if (hired >= app.jobOpening.vacancies) throw new ConflictException('Đã đủ chỉ tiêu tuyển');
       const req = app.jobOpening.requisitionId ? await tx.jobRequisition.findUniqueOrThrow({ where: { id: app.jobOpening.requisitionId } }) : null;
       if (!req || req.status !== 'APPROVED') throw new ConflictException('Chỉ tiêu không còn hiệu lực');
-      const user = await tx.user.create({ data: { email: app.email, passwordHash, fullName: app.candidateName, phone: app.phone, employeeCode: `NV-${randomUUID().slice(0,8).toUpperCase()}`, jobTitle: offer.designation, salaryBandId: app.jobOpening.salaryBandId, baseSalary: offer.offeredSalary, hireDate: dateKey(offer.joiningDate), employmentStatus: 'PROBATION', status: 'DISABLED', orgUnitId: req.orgUnitId, roles: { create: { roleCode: 'USER' } } }, select: { id: true, email: true, fullName: true, employeeCode: true, employmentStatus: true, status: true } });
+      const user = await tx.user.create({ data: { email: app.email, passwordHash, mustChangePassword: false, fullName: app.candidateName, phone: app.phone, employeeCode: `NV-${randomUUID().slice(0,8).toUpperCase()}`, jobTitle: offer.designation, salaryBandId: app.jobOpening.salaryBandId, baseSalary: offer.offeredSalary, hireDate: dateKey(offer.joiningDate), employmentStatus: 'PROBATION', status: 'DISABLED', orgUnitId: req.orgUnitId, roles: { create: { roleCode: 'USER' } } }, select: { id: true, email: true, fullName: true, employeeCode: true, employmentStatus: true, status: true } });
       await tx.personnelComprehensiveProfile.create({ data: { userId: user.id, recruitDate: dateKey(offer.joiningDate), recruitOrg: app.jobOpening.department } });
       await tx.contract.create({ data: { userId: user.id, contractNo: `TV-${user.employeeCode}`, type: 'PROBATION', startDate: dateKey(offer.joiningDate), endDate: new Date(dateKey(offer.joiningDate).getTime() + (app.jobOpening.probationDays - 1) * 86400000), baseSalary: offer.offeredSalary, compensationBasis: 'MONTHLY', insuranceSalary: offer.offeredSalary, createdById: actorId } });
       await tx.hrmsJobApplicant.update({ where: { id: applicantId, stage: 'OFFER_SENT' }, data: { stage: 'HIRED' } });

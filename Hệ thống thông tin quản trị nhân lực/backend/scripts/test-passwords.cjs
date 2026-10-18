@@ -20,16 +20,7 @@ async function main() {
   });
 
   for (const u of users) {
-    const isPwAdmin = bcrypt.compareSync('Admin@123', u.passwordHash);
-    const isPwManager = bcrypt.compareSync('Manager@123', u.passwordHash);
-    const isPwPm = bcrypt.compareSync('Pm@123456', u.passwordHash);
-    const isPwFresher = bcrypt.compareSync('Fresher@123', u.passwordHash);
-    console.log(u.email, {
-      'Admin@123': isPwAdmin,
-      'Manager@123': isPwManager,
-      'Pm@123456': isPwPm,
-      'Fresher@123': isPwFresher,
-    });
+    console.log(u.email, { sharedPassword123: bcrypt.compareSync('123', u.passwordHash) });
   }
 }
 

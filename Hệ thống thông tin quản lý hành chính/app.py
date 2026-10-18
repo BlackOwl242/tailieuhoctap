@@ -17,6 +17,7 @@ import sqlite3
 import sys
 import threading
 import traceback
+import workflow_extensions
 import uuid
 from time import monotonic
 from getpass import getpass
@@ -26,6 +27,10 @@ from pathlib import Path
 from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, quote, unquote, urlparse
 from cryptography.fernet import Fernet
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
+from cryptography.hazmat.primitives.serialization import NoEncryption
 
 
 ROOT = Path(__file__).resolve().parent
@@ -100,6 +105,68 @@ STATUS_LABELS = {
 
 def now_iso() -> str:
     return datetime.now(TZ).isoformat(timespec="seconds")
+
+
+def sandbox_signing_key() -> Ed25519PrivateKey:
+    """Load a local-only Ed25519 key; never use this key for official issuance."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    key_path = DATA_DIR / "sandbox-signing-key.enc"
+    cipher = lookup_cipher()
+    if key_path.exists():
+        pem = cipher.decrypt(key_path.read_bytes())
+        key = serialization.load_pem_private_key(pem, password=None)
+        if not isinstance(key, Ed25519PrivateKey):
+            raise RuntimeError("Khóa ký thử nghiệm không đúng định dạng.")
+        return key
+    key = Ed25519PrivateKey.generate()
+    pem = key.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, NoEncryption())
+    try:
+        with key_path.open("xb") as stream:
+            stream.write(cipher.encrypt(pem))
+        key_path.chmod(0o600)
+    except FileExistsError:
+        pem = cipher.decrypt(key_path.read_bytes())
+        key = serialization.load_pem_private_key(pem, password=None)
+    return key
+
+
+def sandbox_signature_message(case_code: str, procedure_code: str, draft: str, approved_at: str) -> bytes:
+    return json.dumps(
+        {"case": case_code, "procedure": procedure_code, "document": draft, "approvedAt": approved_at, "mode": "LOCAL_SANDBOX"},
+        ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def payment_event(con: sqlite3.Connection, transaction_ref: str, actor_id: str, actor_name: str,
+                  action: str, detail: str = "", idempotency_key: str = "") -> None:
+    con.execute(
+        "INSERT INTO payment_events(transaction_ref,actor_id,actor_name,action,detail,idempotency_key,created_at) VALUES(?,?,?,?,?,?,?)",
+        (transaction_ref, actor_id, actor_name, action, detail, idempotency_key, now_iso()),
+    )
+
+
+def sandbox_signature_view(con: sqlite3.Connection, case_id: int, payload: dict | None = None) -> dict | None:
+    record = con.execute("SELECT * FROM sandbox_signatures WHERE case_id=? ORDER BY id DESC LIMIT 1", (case_id,)).fetchone()
+    if not record:
+        return None
+    data = payload or {}
+    message = sandbox_signature_message(
+        str(data.get("code", "")), str(data.get("procedureCode", "")),
+        str(data.get("draftResult", "")), str(data.get("approvedAt", "")),
+    )
+    valid = False
+    try:
+        public_key = Ed25519PublicKey.from_public_bytes(base64.b64decode(record["public_key_b64"], validate=True))
+        public_key.verify(base64.b64decode(record["signature_b64"], validate=True), message)
+        valid = hashlib.sha256(message).hexdigest() == record["document_hash"]
+    except (InvalidSignature, ValueError, TypeError):
+        valid = False
+    return {
+        "documentHash": record["document_hash"], "signature": record["signature_b64"],
+        "publicKey": record["public_key_b64"], "signer": record["signer_name"],
+        "authorityRef": record["authority_ref"], "signedAt": record["signed_at"],
+        "mode": record["mode"], "verified": valid,
+    }
 
 
 def parse_dt(value: str | None) -> datetime | None:
@@ -345,6 +412,60 @@ def init_db() -> None:
                 created_at TEXT NOT NULL,
                 reconciled_at TEXT
             );
+            CREATE TABLE IF NOT EXISTS payment_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                transaction_ref TEXT NOT NULL REFERENCES payment_records(transaction_ref) ON DELETE CASCADE,
+                actor_id TEXT NOT NULL DEFAULT '',
+                actor_name TEXT NOT NULL,
+                action TEXT NOT NULL,
+                detail TEXT NOT NULL DEFAULT '',
+                idempotency_key TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_payment_events_ref ON payment_events(transaction_ref, id);
+            CREATE TABLE IF NOT EXISTS payment_refunds (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                transaction_ref TEXT NOT NULL REFERENCES payment_records(transaction_ref) ON DELETE CASCADE,
+                reason TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'PENDING',
+                requested_by TEXT NOT NULL,
+                requested_at TEXT NOT NULL,
+                reviewed_by TEXT NOT NULL DEFAULT '',
+                reviewed_at TEXT,
+                review_note TEXT NOT NULL DEFAULT ''
+            );
+            CREATE TABLE IF NOT EXISTS sandbox_signing_authorities (
+                user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+                granted_by TEXT NOT NULL REFERENCES users(id),
+                authority_ref TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                active INTEGER NOT NULL DEFAULT 1,
+                granted_at TEXT NOT NULL,
+                revoked_at TEXT
+            );
+            CREATE TABLE IF NOT EXISTS sandbox_signing_authority_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT NOT NULL REFERENCES users(id),
+                actor_id TEXT NOT NULL REFERENCES users(id),
+                action TEXT NOT NULL,
+                authority_ref TEXT NOT NULL DEFAULT '',
+                reason TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS sandbox_signatures (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                case_id INTEGER NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+                document_hash TEXT NOT NULL,
+                signature_b64 TEXT NOT NULL,
+                public_key_b64 TEXT NOT NULL,
+                signer_id TEXT NOT NULL REFERENCES users(id),
+                signer_name TEXT NOT NULL,
+                authority_ref TEXT NOT NULL,
+                signed_at TEXT NOT NULL,
+                mode TEXT NOT NULL DEFAULT 'LOCAL_SANDBOX',
+                UNIQUE(case_id, document_hash)
+            );
+            CREATE INDEX IF NOT EXISTS idx_sandbox_signatures_case ON sandbox_signatures(case_id, id DESC);
             CREATE TABLE IF NOT EXISTS feedback (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 case_id INTEGER NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
@@ -510,6 +631,22 @@ def init_db() -> None:
         """)
         if "submission_hash" not in {row["name"] for row in con.execute("PRAGMA table_info(case_lookup_secrets)")} :
             con.execute("ALTER TABLE case_lookup_secrets ADD COLUMN submission_hash TEXT NOT NULL DEFAULT ''")
+        payment_columns = {row["name"] for row in con.execute("PRAGMA table_info(payment_records)").fetchall()}
+        for name, declaration in {
+            "provider_mode": "TEXT NOT NULL DEFAULT 'LOCAL_SANDBOX'",
+            "payment_method": "TEXT NOT NULL DEFAULT 'SANDBOX'",
+        }.items():
+            if name not in payment_columns:
+                con.execute(f"ALTER TABLE payment_records ADD COLUMN {name} {declaration}")
+        for table, declarations in {
+            "payment_records": {"payer_reference": "TEXT NOT NULL DEFAULT ''", "reconciliation_reference": "TEXT NOT NULL DEFAULT ''"},
+            "payment_refunds": {"executed_at": "TEXT", "execution_reference": "TEXT NOT NULL DEFAULT ''"},
+        }.items():
+            columns = {row["name"] for row in con.execute(f"PRAGMA table_info({table})")}
+            for name, declaration in declarations.items():
+                if name not in columns:
+                    con.execute(f"ALTER TABLE {table} ADD COLUMN {name} {declaration}")
+        workflow_extensions.init_schema(con)
         if "category_key" not in {row["name"] for row in con.execute("PRAGMA table_info(procedure_catalog_edits)")}:
             con.execute("ALTER TABLE procedure_catalog_edits ADD COLUMN category_key TEXT NOT NULL DEFAULT ''")
         if "local_code" not in {row["name"] for row in con.execute("PRAGMA table_info(procedure_catalog_edits)")}:
@@ -538,12 +675,6 @@ def init_db() -> None:
         }.items():
             if name not in request_columns:
                 con.execute(f"ALTER TABLE staff_access_requests ADD COLUMN {name} {declaration}")
-        # Remove records created by the retired, unlabelled demo build. The current
-        # simulation dataset has a version marker and is kept intact across restarts.
-        for row in con.execute("SELECT id,owner_id,payload_json FROM cases").fetchall():
-            payload = json.loads(row["payload_json"])
-            if row["owner_id"].startswith("demo-") or (payload.get("sample") and payload.get("sampleDatasetVersion") != SAMPLE_DATASET_VERSION):
-                con.execute("DELETE FROM cases WHERE id=?", (row["id"],))
         con.execute("DELETE FROM sessions WHERE expires_at < ?", (int(datetime.now(TZ).timestamp()),))
         global PROCEDURE_OVERRIDES
         PROCEDURE_OVERRIDES = {
@@ -574,7 +705,7 @@ def init_db() -> None:
             category_edit = PROCEDURE_CATEGORY_OVERRIDES.get(procedure.get("fieldSource") or "Chưa phân loại")
             if category_edit:
                 procedure["field"] = category_edit["displayName"]
-    seed_training_cases()
+    # Recovery keeps existing cases and accounts intact; no automatic sample seeding.
 
 
 def procedure_for(code: str) -> dict:
@@ -716,6 +847,7 @@ def case_dict(con: sqlite3.Connection, row: sqlite3.Row, include_internal: bool,
     item["updatedAt"] = row["updated_at"]
     item["events"] = events_for(con, row["id"], include_internal)
     item["canManageLookupKey"] = include_internal and role in {"intake", "registrar"}
+    item["sandboxSignature"] = sandbox_signature_view(con, row["id"], {**item, "code": row["code"], "procedureCode": row["procedure_code"]})
     def public_file_link(file_record: dict) -> dict:
         return {
             "name": file_record.get("name", "Tài liệu"),
@@ -741,7 +873,7 @@ def case_dict(con: sqlite3.Connection, row: sqlite3.Row, include_internal: bool,
             public_withdrawal["noticeDocument"] = public_file_link(notice_file)
         item["withdrawal"] = public_withdrawal
     if role in {"admin", "finance"}:
-        payments = con.execute("SELECT transaction_ref,amount,status,basis,created_at,reconciled_at FROM payment_records WHERE case_id=? ORDER BY id", (row["id"],)).fetchall()
+        payments = con.execute("SELECT transaction_ref,amount,status,basis,created_at,reconciled_at,provider_mode,payment_method,payer_reference,reconciliation_reference FROM payment_records WHERE case_id=? ORDER BY id", (row["id"],)).fetchall()
         item["payments"] = [dict(p) for p in payments]
     else:
         item["payments"] = []
@@ -778,11 +910,11 @@ def visible_to_user(user: sqlite3.Row, row: sqlite3.Row) -> bool:
         return (payload.get("assignment") or {}).get("assigneeId") == user["id"]
     if role == "leader":
         is_signatory = bool(user["may_sign_stop"]) and bool((payload.get("withdrawal") or {}).get("status") == "CHO_KY_PHAT_HANH")
-        return row["status"] == "TRINH_DUYET" or is_signatory
+        return row["status"] in {"TRINH_DUYET", "DA_PHE_DUYET"} or is_signatory
     if role == "registrar":
         return row["status"] in {"DA_PHE_DUYET", "DA_PHAT_HANH"}
     if role == "finance":
-        return payload.get("fee", {}).get("status") in {"DUE", "PAID"}
+        return payload.get("fee", {}).get("status") in {"DUE", "PAID", "RECONCILED", "REFUNDED"}
     return False
 
 
@@ -793,9 +925,13 @@ def public_case_view(con: sqlite3.Connection, row: sqlite3.Row) -> dict:
     procedure = payload.get("procedure") or procedure_for(row["procedure_code"])
     supplement = payload.get("supplement") or {}
     feedback_exists = con.execute("SELECT 1 FROM feedback WHERE case_id=?", (row["id"],)).fetchone() is not None
+    payment_rows = con.execute("SELECT transaction_ref,amount,status,basis,created_at,reconciled_at,provider_mode,payment_method,payer_reference,reconciliation_reference FROM payment_records WHERE case_id=? ORDER BY id", (row["id"],)).fetchall()
+    signature = sandbox_signature_view(con, row["id"], {**payload, "code": row["code"], "procedureCode": row["procedure_code"]})
     raw_result = payload.get("result") if row["status"] in {"DA_PHAT_HANH", "HOAN_THANH"} else None
     result = ({key: raw_result[key] for key in ("number", "content", "issuedAt", "publishedAt") if key in raw_result}
               if isinstance(raw_result, dict) else None)
+    if isinstance(result, dict) and signature:
+        result["signature"] = signature
     return {
         "code": row["code"],
         "procedureCode": row["procedure_code"],
@@ -816,9 +952,12 @@ def public_case_view(con: sqlite3.Connection, row: sqlite3.Row) -> dict:
         "declaration": payload.get("declaration", {}),
         "deliveryMethod": payload.get("deliveryMethod", ""),
         "deliveryAddress": payload.get("deliveryAddress", ""),
+        "delivery": ({key: payload["delivery"][key] for key in ("receiver", "evidence", "channel", "deliveredAt", "mode") if key in payload["delivery"]} if isinstance(payload.get("delivery"), dict) else None),
         "supplement": {key: supplement[key] for key in ("reason", "items", "requestedAt", "requestNumber", "stage", "submittedAt", "resumeStatus") if key in supplement},
         "publicNote": payload.get("publicNote", ""),
         "result": result,
+        "fee": ({key: payload["fee"][key] for key in ("status", "paymentStatus", "amount", "currency", "basis", "configuredAt", "paidAt", "reconciledAt", "refundStatus", "refundedAt", "transactionRef") if key in payload["fee"]} if isinstance(payload.get("fee"), dict) else None),
+        "payments": [{"transactionRef": p["transaction_ref"], "amount": p["amount"], "status": p["status"], "basis": p["basis"], "createdAt": p["created_at"], "reconciledAt": p["reconciled_at"], "mode": p["provider_mode"], "method": p["payment_method"], "payerReference": p["payer_reference"], "reconciliationReference": p["reconciliation_reference"]} for p in payment_rows],
         "feedbackSubmitted": feedback_exists,
         "sampleData": bool(payload.get("sampleDatasetVersion")),
         "sampleDataNote": payload.get("sampleNote", "") if payload.get("sampleDatasetVersion") else "",
@@ -871,6 +1010,8 @@ def validate_procedure_submission(procedure, body, applicant_type, files):
     schema = procedure.get("submission")
     if procedure.get("serviceMode") in {"INFORMATION", "UNKNOWN"} or not schema:
         raise ValueError("Thủ tục chưa có biểu mẫu và thành phần hồ sơ được cấu hình để tiếp nhận trực tuyến. Không thể gửi bằng biểu mẫu chung.")
+    if schema.get("sourceStatus") == "official-document-list-only" or not schema.get("fields"):
+        raise ValueError("Nguồn chính thức hiện chỉ cung cấp thành phần hồ sơ, chưa cung cấp biểu mẫu tờ khai điện tử. Không thể tiếp nhận trực tuyến bằng cấu hình tham chiếu này; hãy mở thủ tục trên Cổng Dịch vụ công quốc gia.")
     if body.get("schemaVersion") != schema["version"]:
         raise ValueError("Biểu mẫu đã thay đổi hoặc thiếu phiên bản. Hãy mở lại thủ tục để lập hồ sơ.")
     if body.get("confirmed") is not True:
@@ -975,7 +1116,12 @@ def validate_password(password: str) -> None:
 
 
 def public_user(user: sqlite3.Row) -> dict:
-    return {"id": user["id"], "email": user["email"], "phone": user["phone"], "name": user["full_name"], "role": user["role"], "emailVerified": False, "agencyScope": user["agency_scope"], "validFrom": user["valid_from"], "validUntil": user["valid_until"], "maySignStop": bool(user["may_sign_stop"]), "signingAuthorityRef": user["signing_authority_ref"], "mustChangePassword": bool(user["must_change_password"]), "canManageAgencyAccounts": bool(user["can_manage_agency_accounts"])}
+    today = datetime.now(TZ).date().isoformat()
+    may_sign_sandbox = False
+    if user["role"] == "leader" and user["active"] and (not user["valid_from"] or user["valid_from"] <= today) and (not user["valid_until"] or user["valid_until"] >= today):
+        with DB_LOCK, connect() as con:
+            may_sign_sandbox = bool(con.execute("SELECT 1 FROM sandbox_signing_authorities WHERE user_id=? AND active=1", (user["id"],)).fetchone())
+    return {"id": user["id"], "email": user["email"], "phone": user["phone"], "name": user["full_name"], "role": user["role"], "emailVerified": False, "agencyScope": user["agency_scope"], "validFrom": user["valid_from"], "validUntil": user["valid_until"], "maySignStop": bool(user["may_sign_stop"]), "signingAuthorityRef": user["signing_authority_ref"], "maySignSandbox": may_sign_sandbox, "mustChangePassword": bool(user["must_change_password"]), "canManageAgencyAccounts": bool(user["can_manage_agency_accounts"])}
 
 
 def can_manage_staff_accounts(user: sqlite3.Row) -> bool:
@@ -1093,8 +1239,8 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
     withdrawal = case.get("withdrawal") or {}
     if withdrawal.get("status") == "CHO_KY_PHAT_HANH" and action != "issue_stop_notice":
         raise ValueError("Đang chờ ký và phát hành Mẫu 06. Hồ sơ được giữ nguyên trạng thái; xử lý yêu cầu dừng trước các thao tác xung đột.")
-    if action in {"issue", "deliver", "sync", "set_fee", "waive_fee", "pay", "reconcile"}:
-        raise PermissionError("Nghiệp vụ này chưa được mở vì chưa có hợp đồng kết nối và thông tin xác thực của cơ quan cung cấp dịch vụ.")
+    if action == "sync":
+        raise PermissionError("Chưa có hợp đồng và thông tin xác thực để đồng bộ với hệ thống bên ngoài.")
     current = row["status"]
     expected = body.get("expectedVersion")
     if type(expected) is not int or expected < 1:
@@ -1107,7 +1253,73 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
     audience = "public"
     next_status = current
 
-    if action == "accept":
+    if action == "set_fee":
+        require_role(role, {"intake"})
+        if current not in {"DA_TIEP_NHAN", "DANG_THU_LY"}:
+            raise ValueError("Chỉ cấu hình khoản thu khi hồ sơ đã được tiếp nhận và đang giải quyết.")
+        if any(x["status"] in {"PENDING", "PAID", "RECONCILED", "REFUNDED"} for x in con.execute("SELECT status FROM payment_records WHERE case_id=?", (row["id"],)).fetchall()):
+            raise ValueError("Hồ sơ đã có giao dịch; không thể thay đổi căn cứ hoặc số tiền.")
+        amount = payload.get("amount")
+        if type(amount) is not int or amount <= 0 or amount > 100_000_000:
+            raise ValueError("Nhập số tiền nguyên dương, tối đa 100.000.000 đồng.")
+        basis = clean_text(payload.get("basis"), 1200)
+        if len(basis) < 15:
+            raise ValueError("Ghi căn cứ và nguồn xác định khoản thu trước khi thông báo cho người nộp.")
+        case["fee"] = {"status": "DUE", "amount": amount, "currency": "VND", "basis": basis, "configuredAt": now_iso(), "configuredBy": actor, "mode": "LOCAL_SANDBOX"}
+        title = "Đã cấu hình khoản thu cho hồ sơ"
+        detail = f"{amount:,} đồng · {basis} · môi trường thử nghiệm cục bộ; chưa thu tiền thật.".replace(",", ".")
+    elif action == "waive_fee":
+        require_role(role, {"leader"})
+        if current in {"DA_PHAT_HANH", "HOAN_THANH", "TU_CHOI", "KHONG_GIAI_QUYET", "DUNG"}:
+            raise ValueError("Không thể điều chỉnh khoản thu sau khi hồ sơ đã kết thúc.")
+        fee = case.get("fee") or {}
+        if fee.get("status") != "DUE":
+            raise ValueError("Chỉ khoản thu đang đến hạn và chưa phát sinh giao dịch mới được miễn/điều chỉnh.")
+        if con.execute("SELECT 1 FROM payment_records WHERE case_id=? AND status IN ('PENDING','PAID','RECONCILED') LIMIT 1", (row["id"],)).fetchone():
+            raise ValueError("Hồ sơ đã có giao dịch; không thể miễn khoản thu qua thao tác này.")
+        reason = clean_text(payload.get("reason"), 1200)
+        if len(reason) < 12: raise ValueError("Ghi căn cứ miễn hoặc điều chỉnh khoản thu.")
+        fee.update({"status": "WAIVED", "waivedAt": now_iso(), "waivedBy": actor, "waiverReason": reason})
+        case["fee"] = fee
+        title = "Đã ghi nhận miễn khoản thu"
+        detail = reason
+    elif action in {"create_payment", "confirm_payment"}:
+        require_role(role, {"citizen"})
+        if current in {"DA_PHAT_HANH", "HOAN_THANH", "TU_CHOI", "KHONG_GIAI_QUYET", "DUNG"}:
+            raise ValueError("Hồ sơ đã kết thúc, không thể tạo giao dịch mới.")
+        fee = case.get("fee") or {}
+        if fee.get("status") not in {"DUE", "PAID"} or type(fee.get("amount")) is not int or fee["amount"] <= 0:
+            raise ValueError("Hồ sơ chưa được cơ quan cấu hình khoản thu hợp lệ.")
+        if action == "create_payment":
+            if fee.get("status") != "DUE": raise ValueError("Khoản thu đã được thanh toán hoặc đã xử lý.")
+            pending = con.execute("SELECT transaction_ref FROM payment_records WHERE case_id=? AND status='PENDING' ORDER BY id DESC LIMIT 1", (row["id"],)).fetchone()
+            if pending: raise ValueError(f"Đang có giao dịch thử nghiệm {pending['transaction_ref']}; hãy tiếp tục giao dịch đó.")
+            transaction_ref = f"HN-THU-{datetime.now(TZ):%Y%m%d%H%M%S}-{secrets.token_hex(3).upper()}"
+            con.execute("INSERT INTO payment_records(case_id,transaction_ref,amount,status,basis,created_at,provider_mode,payment_method) VALUES(?,?,?,'PENDING',?,?, 'LOCAL_SANDBOX','SANDBOX')", (row["id"], transaction_ref, fee["amount"], fee["basis"], now_iso()))
+            payment_event(con, transaction_ref, clean_text(body.get("userId"), 80), actor, "CREATED", "Tạo giao dịch thử nghiệm; chưa có tiền thật.", transaction_ref)
+            fee["paymentStatus"] = "PENDING"
+            title = "Đã tạo giao dịch thanh toán thử nghiệm"
+            detail = f"Mã giao dịch {transaction_ref}; {fee['amount']:,} đồng. Chưa phát sinh thanh toán thật.".replace(",", ".")
+        else:
+            transaction_ref = clean_text(payload.get("transactionRef"), 80)
+            payment = con.execute("SELECT * FROM payment_records WHERE case_id=? AND transaction_ref=?", (row["id"], transaction_ref)).fetchone()
+            if not payment: raise ValueError("Không tìm thấy giao dịch của hồ sơ.")
+            if payment["status"] == "PAID":
+                title = "Giao dịch đã được xác nhận"
+                detail = f"{transaction_ref} đã ở trạng thái đã thanh toán trong môi trường thử nghiệm."
+            elif payment["status"] != "PENDING": raise ValueError("Chỉ giao dịch đang chờ mới được xác nhận.")
+            else:
+                payment_method = clean_text(payload.get("paymentMethod"), 40).upper()
+                evidence = clean_text(payload.get("paymentEvidence"), 160)
+                if payment_method not in {"BANK_TRANSFER", "COUNTER_RECEIPT", "POSTAL_RECEIPT", "OTHER"} or len(evidence) < 4:
+                    raise ValueError("Chọn hình thức đã nộp và nhập mã giao dịch hoặc số biên lai tối thiểu 4 ký tự.")
+                con.execute("UPDATE payment_records SET status='PAID',payment_method=?,payer_reference=? WHERE transaction_ref=? AND status='PENDING'", (payment_method, evidence, transaction_ref))
+                payment_event(con, transaction_ref, clean_text(body.get("userId"), 80), actor, "PAID_DECLARED", "Người nộp khai đã thanh toán; chờ kế toán đối chiếu chứng từ.", transaction_ref)
+                fee.update({"status": "PAID", "paymentStatus": "PAID", "paidAt": now_iso(), "transactionRef": transaction_ref})
+                title = "Đã ghi nhận thông tin người nộp khai đã thanh toán"
+                detail = f"Giao dịch {transaction_ref} đang chờ cán bộ tài chính đối chiếu chứng từ."
+        case["fee"] = fee
+    elif action == "accept":
         require_role(role, {"intake"})
         if current != "CHO_TIEP_NHAN": raise ValueError("Chỉ hồ sơ đang chờ tiếp nhận mới được xác nhận.")
         accepted = datetime.now(TZ)
@@ -1117,7 +1329,35 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         case["deadlineNote"] = note
         next_status = "DA_TIEP_NHAN"
         title = "Đã tiếp nhận hồ sơ"
-        detail = "Đã ghi thời điểm tiếp nhận hợp lệ và lập giấy tiếp nhận. " + (f"Hạn dự kiến theo quy tắc của thủ tục: {deadline}." if deadline else "Hạn giải quyết cần được đơn vị nghiệp vụ xác nhận.")
+        detail = "Đã ghi thời điểm tiếp nhận hợp lệ và lập giấy tiếp nhận (Mẫu số 01). " + (f"Hạn dự kiến theo quy tắc của thủ tục: {deadline}." if deadline else "Hạn giải quyết cần được đơn vị nghiệp vụ xác nhận.")
+    elif action == "digitize_documents":
+        require_role(role, {"intake"})
+        if case.get("submissionChannel") != "TRUC_TIEP":
+            raise ValueError("Chỉ ghi nhận số hóa tại quầy cho hồ sơ nộp trực tiếp.")
+        if current not in {"DA_TIEP_NHAN", "DANG_THU_LY"}:
+            raise ValueError("Hồ sơ cần được tiếp nhận trước khi bổ sung bản số hóa.")
+        raw_files = payload.get("files")
+        if not isinstance(raw_files, list) or not raw_files or len(raw_files) > 8:
+            raise ValueError("Chọn từ 1 đến 8 tệp quét thực tế của thành phần hồ sơ.")
+        if sum(len(str(file.get("data", ""))) for file in raw_files if isinstance(file, dict)) > 12 * 1024 * 1024:
+            raise ValueError("Tổng dung lượng tệp quét vượt quá 12 MB.")
+        register = clean_text(payload.get("documentRegister"), 1200)
+        if len(register) < 8:
+            raise ValueError("Ghi danh mục giấy tờ được quét để kiểm đếm với bản gốc.")
+        page_count = payload.get("pageCount")
+        if type(page_count) is not int or page_count < 1 or page_count > 500:
+            raise ValueError("Nhập số trang đã quét từ 1 đến 500.")
+        scanned_files = save_files(row["code"], raw_files)
+        for saved in scanned_files:
+            saved["componentId"] = "SOHOA_QUAY"
+        case.setdefault("attachments", []).extend(scanned_files)
+        digitized_at = now_iso()
+        batch = {"documents": scanned_files, "documentRegister": register, "pageCount": page_count, "digitizedAt": digitized_at, "digitizedBy": actor, "status": "DA_SO_HOA"}
+        case.setdefault("digitizationHistory", []).append(batch)
+        case["digitization"] = batch
+        title = "Đã số hóa thành phần hồ sơ tại quầy"
+        detail = f"Đã quét và ghi nhận {len(scanned_files)} tệp, {page_count} trang; danh mục đối chiếu: {register}."
+        audience = "internal"
     elif action == "request_supplement":
         require_role(role, {"intake", "specialist"})
         if current not in {"CHO_TIEP_NHAN", "DA_TIEP_NHAN", "DANG_THU_LY"}: raise ValueError("Không thể yêu cầu bổ sung ở bước hiện tại.")
@@ -1213,11 +1453,70 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         if current != "TRINH_DUYET": raise ValueError("Chỉ dự thảo đang trình mới được phê duyệt.")
         if len(clean_text(case.get("draftResult"), 5000)) < 10: raise ValueError("Không có dự thảo hợp lệ để phê duyệt.")
         case["approvedAt"] = now_iso()
+        case["approvedById"] = body.get("userId") or ""
         case["approvalNote"] = clean_text(payload.get("note"), 500)
         next_status = "DA_PHE_DUYET"
         title = "Đã phê duyệt kết quả"
         detail = "Quyết định phê duyệt được ghi nhận; chờ văn thư phát hành."
         audience = "internal"
+    elif action == "sign_result":
+        require_role(role, {"leader"})
+        if current != "DA_PHE_DUYET": raise ValueError("Chỉ kết quả đã được phê duyệt mới được ký.")
+        if not case.get("approvedAt") or not case.get("approvedById") or len(clean_text(case.get("draftResult"), 5000)) < 10:
+            raise ValueError("Thiếu thời điểm phê duyệt hoặc bản dự thảo đã chốt.")
+        if case["approvedById"] == body.get("userId"):
+            raise PermissionError("Người phê duyệt không được tự ký kết quả trong luồng tách biệt này.")
+        today = datetime.now(TZ).date().isoformat()
+        authority = con.execute("""SELECT a.authority_ref,a.active,u.role,u.active AS user_active,u.agency_scope,u.valid_from,u.valid_until
+            FROM sandbox_signing_authorities a JOIN users u ON u.id=a.user_id WHERE a.user_id=?""", (body.get("userId"),)).fetchone()
+        case_scope = (case.get("agencyScope") or case.get("receivingAgency") or "").strip()
+        if not authority or not authority["active"] or not authority["user_active"] or authority["role"] != "leader" or not authority["authority_ref"]:
+            raise PermissionError("Tài khoản chưa được quản trị viên cấp riêng quyền ký thử nghiệm.")
+        if authority["valid_from"] and today < authority["valid_from"] or authority["valid_until"] and today > authority["valid_until"]:
+            raise PermissionError("Quyền ký thử nghiệm đã hết hạn hoặc chưa có hiệu lực.")
+        if authority["agency_scope"].strip().casefold() not in {"toàn thành phố", case_scope.casefold()}:
+            raise PermissionError("Quyền ký thử nghiệm không bao gồm cơ quan xử lý hồ sơ.")
+        if con.execute("SELECT 1 FROM sandbox_signatures WHERE case_id=? LIMIT 1", (row["id"],)).fetchone():
+            raise ValueError("Kết quả này đã được ký; cần tạo phiên bản mới và phê duyệt lại để ký lần nữa.")
+        fee = case.get("fee") or {}
+        if fee.get("amount") is not None and fee.get("status") not in {"RECONCILED", "WAIVED"}:
+            raise ValueError("Cần hoàn tất đối soát hoặc miễn khoản thu trước khi ký phát hành.")
+        message_bytes = sandbox_signature_message(row["code"], row["procedure_code"], case["draftResult"], case["approvedAt"])
+        signing_key = sandbox_signing_key()
+        signature = signing_key.sign(message_bytes)
+        public_bytes = signing_key.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+        con.execute("INSERT INTO sandbox_signatures(case_id,document_hash,signature_b64,public_key_b64,signer_id,signer_name,authority_ref,signed_at,mode) VALUES(?,?,?,?,?,?,?,?, 'LOCAL_SANDBOX')", (row["id"], hashlib.sha256(message_bytes).hexdigest(), base64.b64encode(signature).decode("ascii"), base64.b64encode(public_bytes).decode("ascii"), body.get("userId"), actor, authority["authority_ref"], now_iso()))
+        case["sandboxSignature"] = {"signedAt": now_iso(), "mode": "LOCAL_SANDBOX"}
+        title = "Đã ký thử nghiệm kết quả"
+        detail = "Chữ ký Ed25519 cục bộ gắn với nội dung dự thảo đã phê duyệt; chỉ xác minh toàn vẹn trong ứng dụng, không phải chữ ký số công vụ hoặc chứng thư được cấp phép."
+        audience = "internal"
+    elif action == "issue":
+        require_role(role, {"registrar"})
+        if current != "DA_PHE_DUYET": raise ValueError("Chỉ kết quả đã được phê duyệt mới được phát hành.")
+        signed = sandbox_signature_view(con, row["id"], {**case, "code": row["code"], "procedureCode": row["procedure_code"]})
+        if not signed or not signed["verified"]: raise PermissionError("Chưa có chữ ký hợp lệ cho phép phát hành bản kết quả đã phê duyệt.")
+        fee = case.get("fee") or {}
+        if fee.get("amount") is not None and fee.get("status") not in {"RECONCILED", "WAIVED"}:
+            raise ValueError("Cần đối soát hoặc miễn khoản thu trước khi phát hành.")
+        result_number = clean_text(payload.get("resultNumber"), 100)
+        if len(result_number) < 3: raise ValueError("Ghi số kết quả nội bộ cho tình huống thử nghiệm.")
+        case["result"] = {"number": result_number, "content": case["draftResult"], "issuedAt": now_iso(), "mode": "LOCAL_SANDBOX", "signatureHash": signed["documentHash"]}
+        case["resultIssuedAt"] = case["result"]["issuedAt"]
+        next_status = "DA_PHAT_HANH"
+        title = "Đã phát hành kết quả thử nghiệm"
+        detail = f"Số nội bộ {result_number}; chỉ có hiệu lực trong cơ sở dữ liệu thử nghiệm, không phải quyết định hành chính."
+    elif action == "deliver":
+        require_role(role, {"registrar"})
+        if current != "DA_PHAT_HANH": raise ValueError("Chỉ kết quả đã phát hành mới được ghi nhận trả.")
+        receiver = clean_text(payload.get("receiver"), 180)
+        evidence = clean_text(payload.get("evidence"), 180)
+        channel = clean_text(payload.get("channel"), 30).upper()
+        if len(receiver) < 2 or len(evidence) < 3 or channel not in {"TRUC_TIEP", "BUU_CHINH", "DIEN_TU_SANDBOX"}:
+            raise ValueError("Ghi người nhận, chứng cứ giao và kênh trả kết quả.")
+        case["delivery"] = {"receiver": receiver, "evidence": evidence, "channel": channel, "deliveredAt": now_iso(), "mode": "LOCAL_SANDBOX"}
+        next_status = "HOAN_THANH"
+        title = "Đã ghi nhận trả kết quả thử nghiệm"
+        detail = f"Người nhận: {receiver}; kênh: {channel}; chứng cứ: {evidence}."
     elif action == "decline":
         require_role(role, {"leader"})
         if current != "TRINH_DUYET": raise ValueError("Chỉ hồ sơ đang trình mới có thể kết luận.")
@@ -1493,6 +1792,12 @@ def seed_training_cases() -> None:
             else:
                 deadline = (datetime.now(TZ).date() + timedelta(days=7)).isoformat()
             fee_status = "DUE" if procedure_code == "1.004237" and index in {3, 7} else "NOT_CONNECTED"
+            approval_actor = office.get("leader") if status == "DA_PHE_DUYET" else None
+            approval_action_index = next((i for i, (action, *_rest) in enumerate(actions, start=1) if action == "approve"), None)
+            approval_time = (
+                (created_dt + timedelta(hours=approval_action_index * 5)).isoformat(timespec="seconds")
+                if approval_actor and approval_action_index else ""
+            )
             payload = {
                 "procedureCode": procedure_code, "procedure": procedure, "applicantType": "citizen",
                 "agencyScope": agency, "receivingAgency": agency,
@@ -1508,6 +1813,13 @@ def seed_training_cases() -> None:
                 "sample": True, "sampleDatasetVersion": SAMPLE_DATASET_VERSION,
                 "sampleNote": "Dữ liệu tình huống sinh tại máy cục bộ để thực hành và kiểm tra; không phải hồ sơ công dân, không có giá trị pháp lý hoặc báo cáo chính thức.",
             }
+            if approval_actor and approval_time:
+                payload.update({
+                    "draftResult": f"Kết quả minh họa cho tình huống hồ sơ {code}. Nội dung phục vụ thực hành quy trình, không phải quyết định hành chính.",
+                    "approvedAt": approval_time,
+                    "approvedById": approval_actor["id"],
+                    "approvalSource": "Sự kiện phê duyệt thuộc dữ liệu tình huống mô phỏng.",
+                })
             if status == "CHO_BO_SUNG":
                 payload["supplement"] = {"reason": "Tình huống mô phỏng: cần bổ sung thông tin minh họa để kiểm tra nhánh phản hồi.", "items": [], "requestedAt": created, "stage": "CITIZEN", "resumeStatus": "DANG_THU_LY"}
             if status in {"DA_PHAT_HANH", "HOAN_THANH"}:
@@ -1533,6 +1845,63 @@ def seed_training_cases() -> None:
                 con.execute("INSERT INTO feedback(case_id,owner_id,score,content,created_at) VALUES(?,?,5,?,?)",
                             (case_id, owner_hash, "Giao diện và các bước được minh họa rõ ràng trong tình huống thực hành.", now_iso()))
         con.execute("INSERT INTO app_data_versions(data_key,version,applied_at) VALUES('training-cases',?,?) ON CONFLICT(data_key) DO UPDATE SET version=excluded.version,applied_at=excluded.applied_at", (SAMPLE_DATASET_VERSION, now_iso()))
+
+
+def repair_sample_approval_context() -> None:
+    """Backfill only missing approval metadata on current-version training scenarios.
+
+    The approval identity and timestamp must come from the scenario's recorded
+    approval event and matching agency leader account. No real case is touched.
+    """
+    with DB_LOCK, connect() as con:
+        rows = con.execute(
+            "SELECT id,code,payload_json,version FROM cases "
+            "WHERE status='DA_PHE_DUYET' AND json_extract(payload_json,'$.sampleDatasetVersion')=?",
+            (SAMPLE_DATASET_VERSION,),
+        ).fetchall()
+        for row in rows:
+            payload = json.loads(row["payload_json"])
+            event = con.execute(
+                "SELECT created_at,actor_name FROM case_events "
+                "WHERE case_id=? AND action='approve' AND actor_role='leader' ORDER BY id DESC LIMIT 1",
+                (row["id"],),
+            ).fetchone()
+            if not event:
+                continue
+            agency = (payload.get("agencyScope") or payload.get("receivingAgency") or "").strip()
+            approver = con.execute(
+                "SELECT id FROM users WHERE role='leader' AND full_name=? COLLATE NOCASE "
+                "AND agency_scope=? COLLATE NOCASE ORDER BY created_at,id LIMIT 1",
+                (event["actor_name"], agency),
+            ).fetchone()
+            if not approver:
+                continue
+            changed = False
+            if not payload.get("approvedAt"):
+                payload["approvedAt"] = event["created_at"]
+                changed = True
+            if not payload.get("approvedById"):
+                payload["approvedById"] = approver["id"]
+                changed = True
+            if len(clean_text(payload.get("draftResult"), 5000)) < 10:
+                payload["draftResult"] = (
+                    f"Kết quả minh họa cho tình huống hồ sơ {row['code']}. "
+                    "Nội dung phục vụ thực hành quy trình, không phải quyết định hành chính."
+                )
+                changed = True
+            if changed:
+                payload["approvalSource"] = "Sự kiện phê duyệt thuộc dữ liệu tình huống mô phỏng."
+                updated = con.execute(
+                    "UPDATE cases SET payload_json=?,version=version+1 WHERE id=? AND version=?",
+                    (json.dumps(payload, ensure_ascii=False), row["id"], row["version"]),
+                )
+                if updated.rowcount == 1:
+                    add_event(
+                        con, row["id"], "system", "Hệ thống ứng dụng", "repair_sample_approval_context",
+                        "Bổ sung dữ liệu phê duyệt cho tình huống mô phỏng",
+                        "Đối chiếu sự kiện phê duyệt và tài khoản lãnh đạo cùng phạm vi; không sửa hồ sơ thật.",
+                        "internal",
+                    )
 
 
 class AppHandler(BaseHTTPRequestHandler):
@@ -1804,8 +2173,13 @@ class AppHandler(BaseHTTPRequestHandler):
             raise ValueError("Tổng dung lượng tệp gửi lên vượt quá 12 MB.")
 
         declaration, delivery_method, delivery_address = validate_procedure_submission(procedure, body, applicant_type, files)
-        request_summary = (f"{declaration['dataRequested']}. Mục đích: {declaration['purpose']}" if procedure_code == "1.004237"
-                           else f"Đề nghị cấp {declaration['copies']} bản sao {declaration['documentName']} cho {declaration['originalOwner']}.")[:3000]
+        if procedure_code == "1.004237":
+            request_summary = f"{declaration['dataRequested']}. Mục đích: {declaration['purpose']}"
+        elif procedure_code == "2.000908":
+            request_summary = f"Đề nghị cấp {declaration['copies']} bản sao {declaration['documentName']} cho {declaration['originalOwner']}."
+        else:
+            request_summary = "; ".join(f"{key}: {value}" for key, value in declaration.items() if value) or "Hồ sơ trực tuyến theo biểu mẫu thủ tục đã cấu hình."
+        request_summary = request_summary[:3000]
 
         with DB_LOCK, connect() as con:
             prior = con.execute("SELECT c.code,c.owner_id,v.submission_hash FROM cases c LEFT JOIN case_lookup_secrets v ON v.case_id=c.id WHERE c.idempotency_key=?", (idempotency_hash,)).fetchone()
@@ -1891,7 +2265,7 @@ class AppHandler(BaseHTTPRequestHandler):
         if not re.fullmatch(r"[A-Fa-f0-9]{64}", access_key):
             return self.send_error_json("Không tìm thấy hồ sơ với thông tin tra cứu đã nhập.", 404)
         action = clean_text(body.get("action"), 40)
-        if action not in {"submit_supplement", "feedback"}:
+        if action not in {"submit_supplement", "feedback", "create_payment", "confirm_payment"}:
             return self.send_error_json("Thao tác công dân không được hỗ trợ.", 403)
         if action == "submit_supplement":
             uploads = (body.get("payload") or {}).get("files", [])
@@ -2490,6 +2864,31 @@ class AppHandler(BaseHTTPRequestHandler):
             if user["must_change_password"]:
                 return self.send_error_json("Đổi mật khẩu khởi tạo trước khi tiếp tục.", 403)
             return self.personal_account(user)
+        if path == "/api/sandbox-signers":
+            user = self.current_user()
+            if not user:
+                return self.send_error_json("Bạn cần đăng nhập để xem quyền ký thử nghiệm.", 401)
+            if user["must_change_password"]:
+                return self.send_error_json("Đổi mật khẩu khởi tạo trước khi tiếp tục.", 403)
+            with DB_LOCK, connect() as con:
+                if user["role"] == "admin":
+                    today = datetime.now(TZ).date().isoformat()
+                    rows = con.execute("""SELECT u.id,u.full_name,u.email,u.agency_scope,u.valid_from,u.valid_until,u.active AS user_active,
+                        a.authority_ref,a.reason,a.active AS authority_active,a.granted_at,a.revoked_at
+                        FROM users u LEFT JOIN sandbox_signing_authorities a ON a.user_id=u.id
+                        WHERE u.role='leader' ORDER BY u.agency_scope,u.full_name""").fetchall()
+                    signers = []
+                    for row in rows:
+                        item = dict(row)
+                        item["effective"] = bool(item["user_active"] and item["authority_active"] and (not item["valid_from"] or item["valid_from"] <= today) and (not item["valid_until"] or item["valid_until"] >= today))
+                        signers.append(item)
+                    return self.send_json({"signers": signers})
+                if user["role"] != "leader":
+                    return self.send_error_json("Chỉ quản trị viên hoặc lãnh đạo xem được quyền ký thử nghiệm.", 403)
+                row = con.execute("SELECT authority_ref,reason,active,granted_at,revoked_at FROM sandbox_signing_authorities WHERE user_id=?", (user["id"],)).fetchone()
+                today = datetime.now(TZ).date().isoformat()
+                effective = bool(row and row["active"] and (not user["valid_from"] or user["valid_from"] <= today) and (not user["valid_until"] or user["valid_until"] >= today))
+                return self.send_json({"authorized": effective, "authority": dict(row) if row else None})
         if path == "/api/procedure-categories":
             return self.send_json({"categories": procedure_category_records()})
         if path == "/api/public/news":
@@ -2531,6 +2930,27 @@ class AppHandler(BaseHTTPRequestHandler):
             return self.send_error_json("Bạn cần đăng nhập để truy cập dữ liệu này.", 401)
         if user["must_change_password"]:
             return self.send_error_json("Đổi mật khẩu khởi tạo trước khi tiếp tục.", 403)
+        if path == "/api/service-desk":
+            try:
+                return workflow_extensions.get_records(sys.modules[__name__], self, user)
+            except PermissionError as exc:
+                return self.send_error_json(str(exc), 403)
+        if path == "/api/payments":
+            if user["role"] not in {"admin", "finance"}:
+                return self.send_error_json("Chỉ quản trị viên hệ thống hoặc cán bộ tài chính được xem giao dịch.", 403)
+            with DB_LOCK, connect() as con:
+                records = con.execute("""SELECT p.*,c.code,c.procedure_code,c.status AS case_status,c.payload_json,c.version AS case_version
+                    FROM payment_records p JOIN cases c ON c.id=p.case_id ORDER BY p.id DESC LIMIT 500""").fetchall()
+                output = []
+                for record in records:
+                    case_row = con.execute("SELECT * FROM cases WHERE id=?", (record["case_id"],)).fetchone()
+                    if user["role"] == "finance" and not visible_to_user(user, case_row):
+                        continue
+                    refund = con.execute("SELECT status,reason,requested_by,requested_at,reviewed_by,reviewed_at,review_note,executed_at,execution_reference FROM payment_refunds WHERE transaction_ref=? ORDER BY id DESC LIMIT 1", (record["transaction_ref"],)).fetchone()
+                    events = con.execute("SELECT action,actor_name,detail,created_at FROM payment_events WHERE transaction_ref=? ORDER BY id", (record["transaction_ref"],)).fetchall()
+                    case_payload = json.loads(record["payload_json"])
+                    output.append({"transactionRef": record["transaction_ref"], "caseCode": record["code"], "caseVersion": record["case_version"], "procedureCode": record["procedure_code"], "agency": case_payload.get("agencyScope") or case_payload.get("receivingAgency", ""), "caseStatus": record["case_status"], "amount": record["amount"], "status": record["status"], "basis": record["basis"], "createdAt": record["created_at"], "reconciledAt": record["reconciled_at"], "mode": record["provider_mode"], "method": record["payment_method"], "payerReference": record["payer_reference"], "reconciliationReference": record["reconciliation_reference"], "refund": dict(refund) if refund else None, "events": [dict(event) for event in events]})
+                return self.send_json({"payments": output, "mode": "LOCAL_SANDBOX"})
         if path == "/api/news":
             if user["role"] != "admin":
                 return self.send_error_json("Chỉ quản trị viên hệ thống được quản lý nội dung cổng thông tin.", 403)
@@ -2783,6 +3203,8 @@ class AppHandler(BaseHTTPRequestHandler):
         path = unquote(parsed.path)
         try:
             body = self.read_json()
+            if not isinstance(body, dict):
+                raise ValueError("Nội dung yêu cầu phải là một đối tượng JSON.")
             if path == "/api/auth/register":
                 return self.send_json({"error": "Cổng Hà Nội không tạo tài khoản công dân. Vui lòng thực hiện giao dịch trên Cổng Dịch vụ công quốc gia.", "portal": "https://dichvucong.gov.vn/"}, 410)
             if path == "/api/auth/login":
@@ -2797,6 +3219,10 @@ class AppHandler(BaseHTTPRequestHandler):
                     with DB_LOCK, connect() as con:
                         con.execute("DELETE FROM sessions WHERE token_hash=?", (hashlib.sha256(token.encode("ascii", errors="ignore")).hexdigest(),))
                 return self.send_json({"ok": True}, headers={"Set-Cookie": self.session_cookie("", 0)})
+            if path in {"/api/public/appointments", "/api/public/pakn"}:
+                return workflow_extensions.create_public(sys.modules[__name__], self, path.rsplit("/", 1)[-1], body)
+            if path == "/api/public/service-lookup":
+                return workflow_extensions.lookup_public(sys.modules[__name__], self, body)
             if path == "/api/cases":
                 return self.create_public_case(body)
             if path == "/api/public/cases/lookup":
@@ -2812,6 +3238,10 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.change_password(body, user)
             if user["must_change_password"]:
                 raise PermissionError("Đổi mật khẩu khởi tạo trước khi tiếp tục.")
+            if path == "/api/service-desk/update":
+                return workflow_extensions.update_record(sys.modules[__name__], self, user, body)
+            if path == "/api/cases/counter":
+                return workflow_extensions.create_counter_case(sys.modules[__name__], self, user, body)
             if path.startswith("/api/procedures/") and path.endswith("/edit"):
                 code = path[len("/api/procedures/"):-len("/edit")].strip("/")
                 if not code or "/" in code:
@@ -2829,6 +3259,13 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.revoke_other_sessions(user)
             if path == "/api/news":
                 return self.save_managed_news(body, user)
+            if path == "/api/sandbox-signers":
+                return self.manage_sandbox_signer(body, user)
+            if path.startswith("/api/payments/"):
+                parts = path.strip("/").split("/")
+                if len(parts) != 4 or parts[0] != "api" or parts[1] != "payments":
+                    return self.send_error_json("Đường dẫn giao dịch không hợp lệ.", 404)
+                return self.manage_payment(unquote(parts[2]), parts[3], body, user)
             if path == "/api/users":
                 if not can_manage_staff_accounts(user):
                     return self.send_error_json("Tài khoản không có quyền lập đề nghị cấp tài khoản cán bộ.", 403)
@@ -2898,6 +3335,142 @@ class AppHandler(BaseHTTPRequestHandler):
                 key = lookup_cipher().decrypt(secret["encrypted_key"]).decode("ascii")
             add_event(con, row["id"], user["role"], user["full_name"], "lookup_key_" + action, "Đã xem khóa tra cứu" if action == "reveal" else "Đã cấp lại khóa tra cứu", "Thao tác của cán bộ được phân quyền; không ghi nội dung khóa vào nhật ký.", "internal")
             return self.send_json({"code": code, "accessKey": key, "version": row["version"] + (1 if action == "rotate" else 0)})
+
+    def manage_sandbox_signer(self, body: dict, user: sqlite3.Row):
+        if user["role"] != "admin":
+            return self.send_error_json("Chỉ quản trị viên hệ thống được cấp hoặc thu hồi quyền ký thử nghiệm.", 403)
+        target_id = clean_text(body.get("userId"), 80)
+        action = clean_text(body.get("action"), 20).lower()
+        reason = clean_text(body.get("reason"), 1200)
+        if action not in {"grant", "revoke"} or len(reason) < 12:
+            raise ValueError("Chọn cấp/thu hồi quyền và ghi lý do tối thiểu 12 ký tự.")
+        with DB_LOCK, connect() as con:
+            target = con.execute("SELECT * FROM users WHERE id=? AND role='leader'", (target_id,)).fetchone()
+            if not target or not target["active"]:
+                raise ValueError("Chỉ cấp quyền cho tài khoản lãnh đạo đang hoạt động.")
+            today = datetime.now(TZ).date().isoformat()
+            if (target["valid_from"] and today < target["valid_from"]) or (target["valid_until"] and today > target["valid_until"]):
+                raise ValueError("Tài khoản lãnh đạo chưa có hiệu lực hoặc đã hết hiệu lực.")
+            current = con.execute("SELECT * FROM sandbox_signing_authorities WHERE user_id=?", (target_id,)).fetchone()
+            if action == "grant":
+                authority_ref = clean_text(body.get("authorityRef"), 180)
+                if len(authority_ref) < 4:
+                    raise ValueError("Ghi số quyết định/văn bản làm căn cứ cấp quyền ký thử nghiệm.")
+                con.execute("""INSERT INTO sandbox_signing_authorities(user_id,granted_by,authority_ref,reason,active,granted_at,revoked_at)
+                    VALUES(?,?,?,?,1,?,NULL) ON CONFLICT(user_id) DO UPDATE SET granted_by=excluded.granted_by,authority_ref=excluded.authority_ref,reason=excluded.reason,active=1,granted_at=excluded.granted_at,revoked_at=NULL""",
+                    (target_id, user["id"], authority_ref, reason, now_iso()))
+                event_ref = authority_ref
+                message = "Đã cấp quyền ký thử nghiệm trong ứng dụng. Đây không phải quyền ký số công vụ."
+            else:
+                if not current or not current["active"]:
+                    raise ValueError("Tài khoản này không có quyền ký thử nghiệm đang hoạt động.")
+                event_ref = current["authority_ref"]
+                con.execute("UPDATE sandbox_signing_authorities SET active=0,revoked_at=?,reason=? WHERE user_id=?", (now_iso(), reason, target_id))
+                message = "Đã thu hồi quyền ký thử nghiệm; tài khoản không thể ký thêm kết quả."
+            con.execute("INSERT INTO sandbox_signing_authority_events(user_id,actor_id,action,authority_ref,reason,created_at) VALUES(?,?,?,?,?,?)", (target_id, user["id"], action.upper(), event_ref, reason, now_iso()))
+            return self.send_json({"ok": True, "message": message})
+
+    def manage_payment(self, transaction_ref: str, action: str, body: dict, user: sqlite3.Row):
+        if user["role"] != "finance":
+            return self.send_error_json("Thao tác giao dịch chỉ dành cho cán bộ tài chính được cấp quyền.", 403)
+        if action not in {"reconcile", "refund-request", "refund-review", "refund-execute"}:
+            return self.send_error_json("Thao tác giao dịch không được hỗ trợ.", 404)
+        with DB_LOCK, connect() as con:
+            payment = con.execute("SELECT * FROM payment_records WHERE transaction_ref=?", (transaction_ref,)).fetchone()
+            if not payment:
+                return self.send_error_json("Không tìm thấy giao dịch.", 404)
+            case_row = con.execute("SELECT * FROM cases WHERE id=?", (payment["case_id"],)).fetchone()
+            if not visible_to_user(user, case_row):
+                return self.send_error_json("Không tìm thấy giao dịch trong phạm vi tài khoản.", 404)
+            case = json.loads(case_row["payload_json"])
+            if action == "reconcile":
+                if payment["status"] == "RECONCILED":
+                    return self.send_json({"ok": True, "message": "Giao dịch đã được đối soát trước đó."})
+                if payment["status"] != "PAID":
+                    raise ValueError("Chỉ giao dịch đã được xác nhận thanh toán mới được đối soát.")
+                expected = body.get("expectedVersion")
+                if type(expected) is not int or expected != case_row["version"]:
+                    raise RuntimeError("Hồ sơ vừa thay đổi; hãy tải lại dữ liệu giao dịch.")
+                statement_reference = clean_text(body.get("statementReference"), 180)
+                if len(statement_reference) < 4:
+                    raise ValueError("Nhập số chứng từ thu hoặc dòng đối chiếu trong sổ quỹ/bảng kê.")
+                changed_payment = con.execute("UPDATE payment_records SET status='RECONCILED',provider_mode='LOCAL_RECONCILED',reconciled_at=?,reconciliation_reference=? WHERE transaction_ref=? AND status='PAID'", (now_iso(), statement_reference, transaction_ref))
+                if changed_payment.rowcount != 1:
+                    raise RuntimeError("Giao dịch vừa thay đổi; hãy tải lại danh sách trước khi đối soát.")
+                payment_event(con, transaction_ref, user["id"], user["full_name"], "RECONCILED", f"Đã kiểm tra chứng từ người nộp khai và ghi dòng đối chiếu nội bộ: {statement_reference}.", transaction_ref)
+                fee = case.get("fee") or {}
+                fee.update({"status": "RECONCILED", "paymentStatus": "RECONCILED", "reconciledAt": now_iso(), "reconciledBy": user["full_name"], "reconciliationReference": statement_reference})
+                case["fee"] = fee
+                case["updatedAt"] = now_iso()
+                changed_case = con.execute("UPDATE cases SET payload_json=?,updated_at=?,version=version+1 WHERE id=? AND version=?", (json.dumps(case, ensure_ascii=False), now_iso(), case_row["id"], expected))
+                if changed_case.rowcount != 1:
+                    raise RuntimeError("Hồ sơ vừa được cập nhật; hãy tải lại trước khi đối soát.")
+                add_event(con, case_row["id"], "finance", user["full_name"], "reconcile", "Đã đối soát giao dịch thử nghiệm", f"{transaction_ref}; chỉ đối soát trong ứng dụng.", "internal")
+                return self.send_json({"ok": True, "message": "Đã đối soát giao dịch nội bộ."})
+            if action == "refund-request":
+                if payment["status"] != "RECONCILED":
+                    raise ValueError("Chỉ đề nghị hoàn giao dịch đã đối soát.")
+                terminal = case_row["status"] in {"DUNG", "TU_CHOI", "KHONG_GIAI_QUYET"} or (case.get("withdrawal") or {}).get("status") == "DA_PHAT_HANH"
+                if not terminal:
+                    raise ValueError("Chỉ xem xét hoàn khi hồ sơ đã dừng, bị từ chối/không giải quyết hoặc có Thông báo dừng đã phát hành.")
+                if con.execute("SELECT 1 FROM payment_refunds WHERE transaction_ref=? AND status IN ('PENDING','APPROVED')", (transaction_ref,)).fetchone():
+                    raise ValueError("Đã có đề nghị hoàn đang chờ xem xét hoặc chờ thực hiện.")
+                reason = clean_text(body.get("reason"), 1200)
+                if len(reason) < 12: raise ValueError("Nêu căn cứ đề nghị hoàn khoản thu.")
+                con.execute("INSERT INTO payment_refunds(transaction_ref,reason,status,requested_by,requested_at) VALUES(?,?,'PENDING',?,?)", (transaction_ref, reason, user["id"], now_iso()))
+                payment_event(con, transaction_ref, user["id"], user["full_name"], "REFUND_REQUESTED", reason)
+                add_event(con, case_row["id"], "finance", user["full_name"], "refund_request", "Đã lập đề nghị hoàn thử nghiệm", reason, "internal")
+                return self.send_json({"ok": True, "message": "Đã lập đề nghị hoàn trong ứng dụng; chưa gửi tới ngân hàng hoặc nhà cung cấp."})
+            refund = con.execute("SELECT * FROM payment_refunds WHERE transaction_ref=? AND status='PENDING' ORDER BY id DESC LIMIT 1", (transaction_ref,)).fetchone()
+            if action == "refund-execute":
+                refund = con.execute("SELECT * FROM payment_refunds WHERE transaction_ref=? AND status='APPROVED' ORDER BY id DESC LIMIT 1", (transaction_ref,)).fetchone()
+                if not refund:
+                    raise ValueError("Chỉ ghi nhận chi hoàn sau khi đề nghị đã được phê duyệt.")
+                if payment["status"] != "RECONCILED":
+                    raise ValueError("Trạng thái khoản thu đã thay đổi; không thể ghi nhận chi hoàn.")
+                execution_reference = clean_text(body.get("executionReference"), 180)
+                if len(execution_reference) < 4:
+                    raise ValueError("Nhập số ủy nhiệm chi, mã giao dịch hoàn hoặc chứng từ chi hoàn.")
+                changed_refund = con.execute("UPDATE payment_refunds SET status='EXECUTED',executed_at=?,execution_reference=? WHERE id=? AND status='APPROVED'", (now_iso(), execution_reference, refund["id"]))
+                if changed_refund.rowcount != 1:
+                    raise RuntimeError("Đề nghị hoàn vừa được cập nhật ở phiên khác; hãy tải lại.")
+                changed_payment = con.execute("UPDATE payment_records SET status='REFUNDED' WHERE transaction_ref=? AND status='RECONCILED'", (transaction_ref,))
+                if changed_payment.rowcount != 1:
+                    raise RuntimeError("Khoản thu vừa thay đổi; không thể ghi nhận hoàn trả.")
+                fee = case.get("fee") or {}
+                fee.update({"status": "REFUNDED", "refundStatus": "EXECUTED", "refundedAt": now_iso(), "refundReference": execution_reference})
+                case["fee"] = fee
+                case["updatedAt"] = now_iso()
+                expected = body.get("expectedVersion")
+                if type(expected) is not int or expected != case_row["version"]:
+                    raise RuntimeError("Hồ sơ vừa thay đổi; hãy tải lại dữ liệu giao dịch trước khi ghi nhận hoàn.")
+                changed_case = con.execute("UPDATE cases SET payload_json=?,updated_at=?,version=version+1 WHERE id=? AND version=?", (json.dumps(case, ensure_ascii=False), now_iso(), case_row["id"], expected))
+                if changed_case.rowcount != 1:
+                    raise RuntimeError("Hồ sơ vừa được cập nhật; hãy tải lại trước khi ghi nhận hoàn.")
+                payment_event(con, transaction_ref, user["id"], user["full_name"], "REFUND_EXECUTED", f"Đã ghi nhận chứng từ chi hoàn: {execution_reference}.", transaction_ref)
+                add_event(con, case_row["id"], "finance", user["full_name"], "refund_execute", "Đã ghi nhận chứng từ thực hiện hoàn trả", f"Chứng từ chi hoàn: {execution_reference}.", "internal")
+                return self.send_json({"ok": True, "message": "Đã ghi nhận chứng từ thực hiện hoàn trả."})
+            if not refund:
+                raise ValueError("Không có đề nghị hoàn đang chờ xem xét.")
+            if refund["requested_by"] == user["id"]:
+                raise PermissionError("Người lập đề nghị hoàn không được tự duyệt đề nghị đó.")
+            decision = clean_text(body.get("decision"), 20).upper()
+            note = clean_text(body.get("note"), 1200)
+            if decision not in {"APPROVE", "REJECT"} or len(note) < 8:
+                raise ValueError("Chọn duyệt/từ chối và ghi ý kiến xem xét tối thiểu 8 ký tự.")
+            if payment["status"] != "RECONCILED":
+                raise ValueError("Giao dịch đã thay đổi trạng thái; không thể duyệt hoàn.")
+            next_refund_status = "APPROVED" if decision == "APPROVE" else "REJECTED"
+            changed_refund = con.execute("UPDATE payment_refunds SET status=?,reviewed_by=?,reviewed_at=?,review_note=? WHERE id=? AND status='PENDING'", (next_refund_status, user["id"], now_iso(), note, refund["id"]))
+            if changed_refund.rowcount != 1:
+                raise RuntimeError("Đề nghị hoàn vừa được xử lý ở phiên khác; hãy tải lại.")
+            if decision == "APPROVE":
+                expected = body.get("expectedVersion")
+                if type(expected) is not int or expected != case_row["version"]:
+                    raise RuntimeError("Hồ sơ vừa thay đổi; hãy tải lại dữ liệu giao dịch trước khi duyệt hoàn.")
+            payment_event(con, transaction_ref, user["id"], user["full_name"], "REFUND_" + next_refund_status, note)
+            add_event(con, case_row["id"], "finance", user["full_name"], "refund_review", "Đã " + ("duyệt" if decision == "APPROVE" else "từ chối") + " đề nghị hoàn thử nghiệm", note, "internal")
+            return self.send_json({"ok": True, "message": "Đã ghi nhận kết quả xem xét hoàn trong ứng dụng; không chuyển tiền thật."})
 
     def case_action(self, code: str, body: dict, user: sqlite3.Row):
         role, actor = actor_info(body, user)

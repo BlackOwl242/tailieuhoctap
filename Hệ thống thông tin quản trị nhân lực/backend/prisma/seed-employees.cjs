@@ -100,7 +100,8 @@ async function seedEmployees(prisma, hashOf) {
     const user = await prisma.user.create({
       data: {
         email,
-        passwordHash: hashOf('Nhanvien@123'),
+        passwordHash: hashOf('123'),
+        mustChangePassword: false,
         fullName: e.name,
         jobTitle: e.title,
         orgUnitId: unit?.id ?? null,

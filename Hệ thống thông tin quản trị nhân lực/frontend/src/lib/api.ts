@@ -25,6 +25,14 @@ api.interceptors.response.use(
   async (error: AxiosError<ApiErrorBody>) => {
     const original = error.config as (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined;
     const status = error.response?.status;
+    if (status === 403 && error.response?.data?.code === 'PASSWORD_CHANGE_REQUIRED') {
+      useAuthStore.getState().clear();
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+        const next = `${window.location.pathname}${window.location.search}`;
+        window.location.href = `/login?next=${encodeURIComponent(next)}`;
+      }
+      return Promise.reject(error);
+    }
     // Chỉ bỏ qua refresh với các endpoint xác thực thuần (login/refresh/logout);
     // /auth/me 401 do access token hết hạn → vẫn thử refresh rồi thử lại.
     const url = original?.url ?? '';

@@ -47,11 +47,11 @@ console.log(`\n=== SMOKE TEST against ${BASE} ===\n`);
 }
 
 // 3. Đăng nhập các vai
-const admin = await login('admin@demo.local', 'Admin@123');
+const admin = await login('admin@demo.local', '123');
 ok('Đăng nhập ADMIN', admin.status === 200 && !!admin.json.accessToken);
-const km = await login('km.manager@demo.local', 'Manager@123');
+const km = await login('km.manager@demo.local', '123');
 ok('Đăng nhập KM_MANAGER', km.status === 200);
-const pm = await login('pm.java@demo.local', 'Pm@123456');
+const pm = await login('pm.java@demo.local', '123');
 ok('Đăng nhập PM (USER)', pm.status === 200);
 const adminToken = admin.json.accessToken;
 const kmToken = km.json.accessToken;

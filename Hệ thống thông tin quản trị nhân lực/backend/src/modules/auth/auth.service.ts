@@ -1,10 +1,10 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from '../../common/prisma.service';
 import { BusinessException, ErrorCodes } from '../../common/errors/business.exception';
-import { LoginDto } from './dto';
+import { ChangePasswordDto, LoginDto } from './dto';
 import { RuntimeSettingsService } from '../../common/services/runtime-settings.service';
 
 // Tham số khóa tài khoản theo UC01 của tài liệu thiết kế:
@@ -144,6 +144,31 @@ export class AuthService {
     return result.count;
   }
 
+  /** Đổi mật khẩu khởi tạo rồi thu hồi các phiên cũ trước khi cấp phiên mới. */
+  async changePassword(userId: string, dto: ChangePasswordDto, ip?: string, userAgent?: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null, status: 'ACTIVE' },
+      include: { roles: { select: { roleCode: true } } },
+    });
+    if (!user) throw new UnauthorizedException('Tài khoản không còn hiệu lực');
+    if (!await bcrypt.compare(dto.currentPassword, user.passwordHash)) {
+      throw new UnauthorizedException('Mật khẩu hiện tại không đúng');
+    }
+    if (dto.currentPassword === dto.newPassword) {
+      throw new BadRequestException('Mật khẩu mới phải khác mật khẩu hiện tại');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.newPassword, 12);
+    await this.prisma.$transaction(async (tx) => {
+      await tx.user.update({ where: { id: user.id }, data: { passwordHash, mustChangePassword: false } });
+      await tx.refreshToken.updateMany({
+        where: { userId: user.id, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+    });
+    return this.issueTokens(user.id, user.email, user.fullName, user.roles.map((r) => r.roleCode), ip, userAgent);
+  }
+
   /** Hồ sơ an toàn của người dùng hiện tại (không bao giờ trả passwordHash). */
   async me(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -161,6 +186,12 @@ export class AuthService {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
+      employeeCode: user.employeeCode,
+      hireDate: user.hireDate,
+      phone: user.phone,
+      birthDate: user.birthDate,
+      address: user.address,
+      employmentStatus: user.employmentStatus,
       bankAccount: user.bankAccount, bankName: user.bankName, taxDependentCount: user.taxDependentCount,
       jobTitle: user.jobTitle,
       expertise: user.expertise,
@@ -169,6 +200,7 @@ export class AuthService {
       orgUnit: user.orgUnit,
       faceConsentAt: user.faceConsentAt,
       status: user.status,
+      mustChangePassword: user.mustChangePassword,
       roles,
       isAdminOrKm: roles.includes('ADMIN') || roles.includes('KM_MANAGER'),
     };

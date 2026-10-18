@@ -1,6 +1,11 @@
-import { isScheduledWorkday, isUnderThreeMonths } from './hr-time';
+import { dateKey, isScheduledWorkday, isUnderThreeMonths } from './hr-time';
 
 describe('payroll work calendar', () => {
+  it('rejects impossible calendar dates rather than silently rolling into another month', () => {
+    expect(() => dateKey('2026-02-31')).toThrow();
+    expect(() => dateKey('2026-02-29')).toThrow();
+    expect(dateKey('2024-02-29').toISOString().slice(0, 10)).toBe('2024-02-29');
+  });
   it('supports Saturday as a scheduled working day while retaining the office default', () => {
     const saturday = new Date('2026-10-03T00:00:00.000Z');
     expect(isScheduledWorkday(saturday)).toBe(false);

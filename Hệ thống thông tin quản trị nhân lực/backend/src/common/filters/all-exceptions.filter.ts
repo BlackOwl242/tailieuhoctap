@@ -44,6 +44,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = response;
       } else if (response && typeof response === 'object') {
         const r = response as Record<string, unknown>;
+        if (typeof r['code'] === 'string') code = r['code'];
         if (Array.isArray(r['message'])) {
           code = 'VALIDATION_ERROR';
           message = 'Dữ liệu không hợp lệ';
@@ -53,11 +54,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
           details = (r['error'] as unknown) ?? null;
         }
       }
-      if (status === 401) code = 'UNAUTHORIZED';
-      else if (status === 403) code = code === 'VALIDATION_ERROR' ? code : 'FORBIDDEN';
-      else if (status === 404) code = 'NOT_FOUND';
-      else if (status === 409) code = 'CONFLICT';
-      else if (status === 429) code = 'RATE_LIMITED';
+      if (status === 401) code = code === 'INTERNAL_ERROR' ? 'UNAUTHORIZED' : code;
+      else if (status === 403) code = code === 'INTERNAL_ERROR' ? 'FORBIDDEN' : code;
+      else if (status === 404) code = code === 'INTERNAL_ERROR' ? 'NOT_FOUND' : code;
+      else if (status === 409) code = code === 'INTERNAL_ERROR' ? 'CONFLICT' : code;
+      else if (status === 429) code = code === 'INTERNAL_ERROR' ? 'RATE_LIMITED' : code;
       else if (status >= 500) code = 'INTERNAL_ERROR';
     } else if (exception instanceof Prisma.PrismaClientKnownRequestError && ['P2034','P2002'].includes(exception.code)) {
       status=409;code='CONFLICT';message='Dữ liệu vừa thay đổi hoặc bị trùng; tải lại và thử thao tác lần nữa';

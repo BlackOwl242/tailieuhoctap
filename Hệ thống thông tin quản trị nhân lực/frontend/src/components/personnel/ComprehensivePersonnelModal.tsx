@@ -32,18 +32,21 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
   const [editingSalaryAllowanceId, setEditingSalaryAllowanceId] = useState<string | null>(null);
   const [salaryAllowanceDraft, setSalaryAllowanceDraft] = useState({ overGradeRate: '', positionAllowance: '', otherAllowance: '' });
 
+  useEffect(() => {
+    if (profileMode === 'ENTERPRISE' && subTab === 'salary') setSubTab('work');
+  }, [profileMode, subTab]);
+
   // Form State
   const [form, setForm] = useState<any>({
     // Thông tin tài khoản & cơ bản
     fullName: '',
     email: '',
     phone: '',
-    password: 'Password@123',
+    password: '123',
     employeeCode: '',
     orgUnitId: '',
     jobTitle: '',
     employmentStatus: 'ACTIVE',
-    baseSalary: 0,
     hireDate: new Date().toISOString().slice(0, 10),
 
     // TRANG 1: Định danh, Nơi sinh, Tuyển dụng, Ngạch bậc
@@ -166,7 +169,6 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
         orgUnitId: d.user?.orgUnitId || '',
         jobTitle: d.user?.jobTitle || '',
         employmentStatus: d.user?.employmentStatus || 'ACTIVE',
-        baseSalary: d.user?.baseSalary ?? 0,
         hireDate: d.user?.hireDate ? d.user.hireDate.slice(0, 10) : '',
         aliasName: d.aliasName || '',
         gender: d.gender || 'Nam',
@@ -280,7 +282,6 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
           jobTitle: form.jobTitle || undefined,
           orgUnitId: form.orgUnitId || undefined,
           employmentStatus: form.employmentStatus,
-          baseSalary: Number(form.baseSalary) > 0 ? Number(form.baseSalary) : undefined,
           hireDate: form.hireDate ? new Date(form.hireDate).toISOString() : undefined,
           roleCodes: ['USER'],
         });
@@ -316,9 +317,11 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
           salaryCoefficient: Number(form.salaryCoefficient),
           salaryStepDate: new Date(form.salaryStepDate).toISOString(),
         } : {}),
-        overGradePercent: Number(form.overGradePercent) || 0,
-        positionAllowance: Number(form.positionAllowance) || 0,
-        otherAllowance: Number(form.otherAllowance) || 0,
+        ...(profileMode === 'STATE' ? {
+          overGradePercent: Number(form.overGradePercent) || 0,
+          positionAllowance: Number(form.positionAllowance) || 0,
+          otherAllowance: Number(form.otherAllowance) || 0,
+        } : {}),
         socialInsuranceNo: form.socialInsuranceNo,
         generalEducation: form.generalEducation,
         highestDegree: form.highestDegree,
@@ -521,7 +524,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               className={`px-3.5 py-2 rounded-lg flex items-center gap-2 transition-all ${activeTab === 'p1' ? 'bg-primary/10 text-primary font-bold shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <User className="w-4 h-4" />
-              <span>Trang 1: Nhân thân & Tuyển dụng, Ngạch bậc</span>
+              <span>{profileMode === 'STATE' ? 'Trang 1: Nhân thân, tuyển dụng & ngạch bậc' : 'Trang 1: Nhân thân, tuyển dụng & đãi ngộ'}</span>
             </button>
 
             <button
@@ -545,7 +548,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               className={`px-3.5 py-2 rounded-lg flex items-center gap-2 transition-all ${activeTab === 'history' ? 'bg-primary/10 text-primary font-bold shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <Clock className="w-4 h-4" />
-              <span>7 Bảng Quá trình Lịch sử</span>
+              <span>{profileMode === 'STATE' ? '7 Bảng Quá trình Lịch sử' : '6 Bảng Lịch sử Hồ sơ'}</span>
             </button>
           </div>
 
@@ -903,31 +906,9 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                   {(profileQ.data?.salaryHistories?.length ?? 0) > 0 && <p className="text-xs text-muted-foreground">Đã có lịch sử quyết định lương; thay đổi ngạch/bậc tại tab Quá trình → Lương để giữ nguyên dữ liệu các kỳ trước.</p>}
                   </>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                    <div className="space-y-1">
-                      <label className="font-semibold text-foreground">Mức lương cơ bản (VNĐ) *</label>
-                      <Input
-                        type="number"
-                        value={form.baseSalary}
-                        onChange={(e) => setForm({ ...form, baseSalary: Number(e.target.value) })}
-                        className="font-bold text-primary"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="font-semibold text-foreground">Tỷ lệ hưởng lương thử việc (%)</label>
-                      <Input
-                        type="number"
-                        defaultValue={85}
-                        className="font-semibold"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="font-semibold text-foreground">Hình thức trả lương</label>
-                      <Select className="text-xs">
-                        <option value="BANK">Chuyển khoản qua ngân hàng</option>
-                        <option value="CASH">Tiền mặt</option>
-                      </Select>
-                    </div>
+                  <div className="rounded-md border border-border bg-background p-3 text-sm leading-6 text-muted-foreground">
+                    <p className="font-medium text-foreground">Mức lương của doanh nghiệp được quản lý bằng hợp đồng lao động.</p>
+                    <p>Sau khi lưu hồ sơ, mở hồ sơ nhân sự của người này và chọn “Thêm hợp đồng lao động” để nhập mức lương, căn cứ trả lương, thời hạn và bản hợp đồng. Hồ sơ không tự tạo lương hoặc điều khoản thử việc thay cho hợp đồng.</p>
                   </div>
                 )}
               </div>
@@ -1295,7 +1276,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-primary" />
                   <span className="text-sm font-bold text-foreground">
-                    Hệ thống 7 Quá trình Lịch sử Công tác & Vòng đời Cán bộ
+                    {profileMode === 'STATE' ? 'Quá trình công tác và lịch sử cán bộ' : 'Quá trình công tác và lịch sử hồ sơ nhân sự'}
                   </span>
                 </div>
                 {userId && (
@@ -1326,12 +1307,12 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                 >
                   2. QT Đào tạo ({profileQ.data?.educations?.length || 0})
                 </button>
-                <button
+                {profileMode === 'STATE' && <button
                   onClick={() => setSubTab('salary')}
                   className={`px-3 py-1.5 rounded-md transition-all ${subTab === 'salary' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                 >
-                  3. QT Lương ({profileQ.data?.salaryHistories?.length || 0})
-                </button>
+                  3. QT Lương theo quyết định ({profileQ.data?.salaryHistories?.length || 0})
+                </button>}
                 <button
                   onClick={() => setSubTab('family')}
                   className={`px-3 py-1.5 rounded-md transition-all ${subTab === 'family' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}

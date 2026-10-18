@@ -619,7 +619,7 @@ function CheckInInner() {
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-foreground">Đồng thuận xử lý dữ liệu sinh trắc học khuôn mặt</h3>
-                    <p className="text-xs text-muted-foreground">Bảo vệ quyền riêng tư theo Nghị định 13/2023/NĐ-CP & Tiêu chuẩn ISO/IEC 27001</p>
+                    <p className="text-xs text-muted-foreground">Mẫu khuôn mặt được mã hóa và dùng để đối chiếu khi chấm công.</p>
                   </div>
                 </div>
 

@@ -44,11 +44,11 @@ class Book:
   self.h('LỜI CẢM ƠN')
   self.p('Em xin trân trọng cảm ơn giảng viên hướng dẫn học phần Hệ thống thông tin quản lý hành chính đã góp ý cách tiếp cận đề tài. Những nhận xét về quy trình, dữ liệu, trách nhiệm nghiệp vụ và vận hành giúp em xác định rõ phần việc cần nghiên cứu cũng như giới hạn của đề tài.')
   self.p('Em cảm ơn các cơ quan đã công khai văn bản, hướng dẫn thủ tục, thông tin về Trung tâm Phục vụ hành chính công Hà Nội và các trang dịch vụ trực tuyến. Việc đối chiếu nguồn giúp em phân biệt thông tin hiện hành, tư liệu lịch sử và nội dung chỉ có thể đề xuất khi chưa được tiếp cận hệ thống nội bộ.')
-  self.p('Trong quá trình thực hiện, em đã tổng hợp các nhánh dịch vụ, xây dựng 36 Use case, mô hình dữ liệu và phần mềm nghiên cứu cục bộ để minh họa giao diện cùng một số luồng xử lý. Các kết quả này là sản phẩm học tập và là cơ sở để tiếp tục nhận góp ý; chúng chưa được cơ quan nghiệp vụ xác nhận hoặc kết nối vào hệ thống đang vận hành.')
+  self.p('Trong quá trình thực hiện, em đã đối chiếu các nhánh dịch vụ công khai, xây dựng 36 Use case, mô hình dữ liệu và hoàn thiện một ứng dụng có thể vận hành các quy trình nội bộ từ lúc gửi hồ sơ đến khi phát hành kết quả trong cơ sở dữ liệu của dự án. Hồ sơ, chứng từ và nhật ký được lưu theo từng giao dịch. Các kết nối với cổng quốc gia, định danh, thanh toán, chứng thư số công vụ và kho lưu trữ của Thành phố chưa được cấu hình vì dự án chưa có điểm cuối, tài khoản và môi trường kiểm thử do đơn vị quản lý cấp.')
   self.p('Em mong nhận được nhận xét của giảng viên về căn cứ, cách trình bày và những điểm cần khảo sát thêm. Em sẽ dùng các góp ý đó để sửa các nội dung chưa rõ, bổ sung nguồn kiểm chứng và hoàn thiện thiết kế trong phạm vi dữ liệu được phép tiếp cận.')
   self.h('LỜI CAM ĐOAN')
   self.p('Em cam đoan báo cáo do em thực hiện trên cơ sở tài liệu được dẫn nguồn và hồ sơ nghiên cứu của đề tài. Các số liệu, quyết định và ảnh giao diện công khai được ghi theo xuất xứ; nội dung tổng hợp, nhận định và thiết kế do em xây dựng được trình bày rõ theo phạm vi của chúng.')
-  self.p('Các mô hình, màn hình và quy tắc trong báo cáo là phương án phân tích, thiết kế cho ứng dụng nghiên cứu cục bộ. Ảnh ứng dụng tại mục 4.6 được chụp từ phần mềm React/Python do em xây dựng trong thư mục dự án; đó không phải ảnh bàn cán bộ hay giao dịch đang chạy trên hệ thống chính thức của thành phố Hà Nội.')
+  self.p('Ứng dụng React/Python trong dự án vận hành độc lập với hệ thống nghiệp vụ chính thức của thành phố Hà Nội. Ảnh tại mục 4.6 được chụp từ ứng dụng này; chúng thể hiện quy trình và dữ liệu đang lưu trong dự án, không phải ảnh bàn cán bộ hoặc hồ sơ trên hệ thống của Thành phố.')
   self.p('Em chưa được cấp quyền khảo sát tài khoản cán bộ, mã nguồn, dữ liệu nội bộ hoặc các hợp đồng kết nối của hệ thống Hà Nội. Vì vậy, báo cáo không khẳng định đã sao chép đầy đủ cấu hình nội bộ, đã tích hợp hoặc đã kiểm thử trên môi trường thật. Những nội dung chưa thể xác nhận được nêu thành giới hạn hoặc yêu cầu khảo sát tiếp; kết quả kiểm thử phần mềm thật không được suy ra từ tính nhất quán của mô hình.')
   fields=[('MỤC LỤC','TOC \\o "1-2" \\h \\z')]
   if not brief:fields += [('DANH MỤC BẢNG BIỂU','TOC \\h \\z \\c "Bảng"'),('DANH MỤC HÌNH VÀ SƠ ĐỒ','TOC \\h \\z \\c "Hình"')]
@@ -165,33 +165,8 @@ b.tab(4,'Ma trận phụ thuộc các gói đề xuất',[['Gói','Phụ thuộc
 b.p('Lõi miền và hợp đồng chung không phụ thuộc lớp giao diện, cơ sở dữ liệu hoặc nhà cung cấp ngoài. Hình gói minh họa ba phụ thuộc để giữ đường nối rõ; ma trận ghi đầy đủ quy tắc đề xuất. Gói 6 dùng mô hình đọc, không gọi thao tác đổi trạng thái. Gói 9 thực hiện giao diện trừu tượng của nghiệp vụ; gói 4 không nhập mã nhà cung cấp của gói 9.')
 
 b.h('4.6. Giao diện hệ thống',2)
-b.p('Các ảnh sau ghi lại giao diện của phần mềm React/Python trong bộ hồ sơ này, gồm cổng tra cứu, bố cục điện thoại, các phân hệ cán bộ và CMS tin tức. Dữ liệu nhận diện trong ảnh là dữ liệu minh họa do ứng dụng nghiên cứu tạo ra; ảnh không phải giao diện hay dữ liệu của hệ thống cán bộ Hà Nội. Màn hình cán bộ chỉ mở sau khi đăng nhập; hành động thay đổi dữ liệu được máy chủ kiểm tra quyền, phạm vi và trạng thái hồ sơ. Tin tức được lưu trong cơ sở dữ liệu ứng dụng; chỉ quản trị viên được biên tập và xuất bản.')
-b.p('Thiết kế quy trình tham chiếu Nghị định 118/2025/NĐ-CP và các sửa đổi có hiệu lực tại thời điểm nghiên cứu; phần thủ tục trên môi trường điện tử được đối chiếu Nghị định 310/2026/NĐ-CP và Thông tư 14/2026/TT-BTP. Nhánh yêu cầu dừng được tách thành tiếp nhận, kiểm tra lại điều kiện tại thời điểm phát hành, lập Mẫu 06 và ghi nhận số văn bản cùng chứng cứ giao theo hướng dẫn hiện hành. Ứng dụng chỉ lưu bản đã ký do cán bộ cung cấp và thông tin xác nhận; nó không ký số, kiểm tra chứng thư hoặc phát hành thay cơ quan. [11]–[15]')
-b.tab(4,'Các màn hình hệ thống',[['Khu vực','Màn hình thể hiện'],['Cổng công dân','Trang chủ trên máy tính và điện thoại; tin đã xuất bản; tra cứu thủ tục công khai'],['Bàn cán bộ','Đăng nhập; tổng quan; hộp xử lý; chi tiết hồ sơ; in/xuất danh sách trong phạm vi được cấp'],['Quản trị và kiểm soát','Tài khoản cán bộ theo cơ quan; đề nghị giao quyền quản lý cơ quan; báo cáo vận hành tổng hợp; CMS tin tức; giám sát quy trình; danh mục; nhật ký; tình trạng kết nối']])
-b.p('Quản lý tài khoản cơ quan là quyền giao thêm cho một tài khoản cán bộ, được quản trị viên hệ thống đề nghị và một quản trị viên khác duyệt. Người được giao chỉ xem và lập đề nghị tài khoản trong đúng cơ quan; không được tự duyệt, chuyển đơn vị hoặc quản lý tài khoản quản trị hệ thống. Dữ liệu hiện có chưa có tài khoản nào được giao quyền này; không tự suy ra hoặc tự chọn người quản lý. Danh sách tài khoản cho phép lọc theo cơ quan, in bảng kê nội bộ hoặc xuất CSV; tệp không chứa mật khẩu. Cán bộ nghiệp vụ in/xuất danh sách hồ sơ trong phạm vi mà máy chủ cấp; tài khoản quản trị hệ thống không đọc danh sách hồ sơ công dân.')
-b.p('Báo cáo vận hành hiện tổng hợp số hồ sơ theo cơ quan, trạng thái, thủ tục và kỳ; quản trị viên có thể in hoặc xuất CSV. Chọn dòng tổng hợp theo cơ quan/trạng thái hoặc thủ tục để mở danh sách hồ sơ giữ nguyên kỳ và điều kiện báo cáo. Đây là số liệu từ cơ sở dữ liệu ứng dụng, không phải biểu mẫu pháp định. Thông tư 09/2026/TT-BTP điều chỉnh chế độ báo cáo công tác kiểm soát thủ tục hành chính; Bộ Tư pháp thông tin nền tảng số chuyên ngành đang được xây dựng có chức năng phân quyền, cấp tài khoản và biểu mẫu/đề cương báo cáo để kiểm thử, tập huấn [47], [48]. Ứng dụng này chưa kết nối nền tảng đó và chưa có bản mẫu gốc chính thức để đối chiếu. Vì vậy bản in nội bộ không có Quốc hiệu, tiêu ngữ, tên cơ quan phát hành, chữ ký, dấu hoặc định dạng giả lập văn bản nhà nước. Chỉ phát hành mẫu pháp định khi có tệp gốc/phiên bản hiện hành và đã kiểm tra khổ giấy, lề, font, cỡ chữ và thành phần ký.')
-b.p('CMS tin tức được triển khai trong tài khoản quản trị viên, dùng chung cơ sở dữ liệu của ứng dụng. Quản trị viên tìm và lọc bài, tạo hoặc sửa bản nháp, chọn chuyên mục và ảnh trong thư viện, khai báo đường dẫn nguồn, đánh dấu tin nổi bật, xuất bản hoặc lưu trữ. Máy chủ giới hạn nguồn ở miền HTTPS .gov.vn, kiểm tra ảnh cục bộ và trường bắt buộc, kiểm tra phiên bản để tránh ghi đè đồng thời, đồng thời lưu người thao tác và trạng thái trước/sau. Cổng công dân chỉ đọc bài đã xuất bản; chưa có luồng duyệt độc lập thứ hai hoặc đồng bộ tự động từ trang Trung tâm.')
-b.tab(4,'Trạng thái và kiểm soát của CMS tin tức',[['Trạng thái/thao tác','Ai thực hiện','Kết quả công khai và dấu vết'],['Bản nháp','Quản trị viên hệ thống','Lưu trong cơ sở dữ liệu; không hiển thị ở cổng công dân; ghi người tạo'],['Xuất bản hoặc cập nhật','Quản trị viên hệ thống','Hiện ở trang chủ và chi tiết tin; lưu thời điểm, phiên bản và nhật ký trước/sau'],['Lưu trữ','Quản trị viên hệ thống','Ẩn khỏi cổng công dân nhưng giữ lịch sử và nội dung để tra cứu nội bộ'],['Khôi phục bản nháp','Quản trị viên hệ thống','Tin lưu trữ trở về trạng thái nháp; cần xuất bản lại mới xuất hiện công khai'],['Lưu khi bản đã đổi','Máy chủ kiểm tra phiên bản','Từ chối yêu cầu cũ và yêu cầu tải lại để tránh ghi đè thay đổi mới']])
-b.p('Tên người dùng trên thanh đầu trang mở Tài khoản cá nhân. Mục này hiển thị vai trò, phạm vi cơ quan, thời hạn và căn cứ phê duyệt; cho phép cập nhật điện thoại bằng mật khẩu hiện tại, đổi mật khẩu và kết thúc các phiên khác. Email hiện chưa được xác minh qua mã hoặc liên kết. Nút Đăng xuất được đặt ở cuối thanh bên. Trạng thái và số lượng được trình bày bằng chữ; không dùng chấm báo hoạt động. Các lối tắt trùng với điều hướng đã được bỏ.')
-APP_UI=ROOT/'03_Thiet_ke/Anh_giao_dien_he_thong'
-for file,title in [
- ('01_cong_dan_may_tinh.jpg','Cổng tra cứu công dân trên máy tính'),
- ('02_cong_dan_dien_thoai.jpg','Bố cục cổng công dân trên điện thoại'),
- ('03_dang_nhap_can_bo.jpg','Màn hình đăng nhập cán bộ hiện tại'),
- ('04_tong_quan_can_bo.jpg','Tổng quan công việc trong phạm vi tài khoản'),
- ('05_hop_xu_ly.jpg','Hộp xử lý và lọc hồ sơ'),
- ('06_chi_tiet_ho_so.jpg','Chi tiết hồ sơ và lịch sử xử lý'),
- ('07_quan_ly_tai_khoan.jpg','Quản lý đề nghị cấp quyền và tài khoản cán bộ'),
- ('08_giam_sat_quy_trinh.jpg','Giám sát tiến độ theo phạm vi được phép'),
- ('09_danh_muc_thu_tuc.jpg','Tra cứu danh mục thủ tục tham chiếu'),
- ('10_nhat_ky_ho_so.jpg','Nhật ký sự kiện theo hồ sơ'),
- ('11_ket_noi_dich_vu.jpg','Trạng thái kết nối và hàng chờ cục bộ'),
- ('12_cong_dan_tin_tuc.jpg','Trang chủ công dân hiển thị tin lấy từ dữ liệu đã xuất bản'),
- ('13_quan_ly_tin_tuc.jpg','Danh sách và trạng thái tin trong tài khoản quản trị viên'),
- ('14_soan_tin_tuc.jpg','Biểu mẫu biên tập tin với chuyên mục, ảnh và nguồn chính thức'),
- ('15_tai_khoan_ca_nhan.jpg','Tài khoản cá nhân, quyền công tác và tình trạng xác minh email'),
- ('16_bao_mat_tai_khoan.jpg','Cập nhật liên hệ, đổi mật khẩu và quản lý phiên đăng nhập')]:
- b.fig(4,'',title,APP_UI/file)
+from chen_noi_dung_hien_tai import add_ui_section, add_coverage_section
+add_ui_section(b.d)
 
 b.h('CHƯƠNG 5. HƯỚNG DẪN THEO THỦ TỤC CỤ THỂ')
 b.h('5.1. Thư viện 2.075 hồ sơ thủ tục',2)
@@ -228,6 +203,8 @@ b.h('6.4. Mức độ sẵn sàng và giới hạn bàn giao',2)
 b.p('Ứng dụng nghiên cứu cục bộ được xây dựng bằng React, TypeScript, Python và SQLite; có tài khoản cán bộ, phân quyền theo vai trò/phạm vi, lưu hồ sơ cục bộ, tra cứu bằng mã và khóa, cùng bàn xử lý. Danh sách 11 tài khoản cục bộ được bàn giao riêng trong DANH_SACH_TAI_KHOAN_DUOC_PHAN_QUYEN.md; cán bộ dùng mật khẩu trong danh sách và không bị buộc đổi mật khẩu lần đầu. Email mẫu chưa xác minh và tài khoản không thuộc cơ quan nhà nước.')
 b.p('Cổng chính thức hiện hướng dẫn công dân đăng nhập bằng VNeID, nhận mã hồ sơ qua SMS và tra cứu bằng mã hoặc tài khoản [46]. Theo phạm vi đã thống nhất, ứng dụng không gửi SMS/email và không yêu cầu tài khoản người dân; đây là khác biệt có chủ ý, không phải tương đương quy trình xác thực của cổng thật. Ứng dụng chưa kết nối VNeID, Cổng Dịch vụ công quốc gia, cơ sở dữ liệu chuyên ngành, thanh toán, ký số hoặc hệ thống tác nghiệp Hà Nội.')
 b.p('Danh mục 2.075 thủ tục là dữ liệu tham chiếu; chỉ hai mã 1.004237 và 2.000908 có cấu hình tờ khai để nộp cục bộ, các thủ tục khác bị chặn nộp cho tới khi cấu hình riêng được xác minh. Vì vậy phần mềm không thay thế hệ thống thật và chưa đủ điều kiện vận hành hồ sơ thật. Phần còn thiếu gồm khảo sát có thẩm quyền, cấu hình/phiên bản cho từng thủ tục, hợp đồng kết nối, mẫu tờ khai, dữ liệu kiểm thử được phép và xác nhận quy trình địa phương hiện hành.')
+
+add_coverage_section(b.d)
 
 b.h('CHƯƠNG 7. TRIỂN KHAI, KIỂM THỬ, VẬN HÀNH VÀ QUẢN TRỊ')
 b.h('7.1. Lộ trình triển khai đề xuất',2)

@@ -2,6 +2,13 @@ import { calculateOvertimePay, calculatePayroll, currentPayrollPolicies, evaluat
 
 const input = (patch: Partial<PayrollInput> = {}): PayrollInput => ({ year: 2026, baseSalary: 15e6, standardDays: 22, paidDays: 22, attendanceDays: 22, insuranceSalary: 15e6, insuranceCap: 50.6e6, unemploymentCap: 106.2e6, dependents: 0, overtime: 0, bonus: 0, items: [], loans: [], ...patch });
 describe('Payroll business regressions', () => {
+  it('shows an unfunded provisional balance while still blocking a negative payable payroll', () => {
+    const data = input({ baseSalary: 30_000_000, earnedBase: 1_000_000, paidDays: 1, attendanceDays: 1 });
+    expect(() => calculatePayroll(data)).toThrow('khấu trừ vượt thu nhập');
+    const preview = calculatePayroll({ ...data, provisional: true });
+    expect(preview.grossPay - preview.totalDeduction).toBe(preview.netPay);
+    expect(preview.netPay).toBeLessThan(0);
+  });
   it('does not turn missing/zero attendance into a full month', () => {
     const result = calculatePayroll(input({ paidDays: 0, attendanceDays: 0 }));
     expect(result.netPay).toBe(0);
@@ -67,8 +74,12 @@ describe('Payroll business regressions', () => {
     expect(result.breakdown.calculation.dependentRelief).toBe(0);
   });
   it('does not withhold flat 10 percent below the per-payment threshold', () => {
-    const result = calculatePayroll(input({ baseSalary: 4_999_999, insuranceSalary: 0, taxWithholdingMode: 'FLAT_10' }));
+    const result = calculatePayroll(input({ baseSalary: 4_999_999, insuranceSalary: 0, taxWithholdingMode: 'FLAT_10', policy: VN_PAYROLL_POLICIES[2] }));
     expect(result.breakdown.deductions.find(line => line.code === 'PIT')?.amount).toBe(0);
+  });
+  it('uses the historical 2 million withholding threshold before July 2026', () => {
+    const result = calculatePayroll(input({ year: 2025, baseSalary: 3_000_000, insuranceSalary: 0, taxWithholdingMode: 'FLAT_10', policy: VN_PAYROLL_POLICIES[0] }));
+    expect(result.breakdown.deductions.find(line => line.code === 'PIT')?.amount).toBe(300_000);
   });
   it('applies approved monthly loan installments together without exceeding remaining debt or net wages', () => {
     const result = calculatePayroll(input({ loans: [{ id: 'A', emi: 3e6, remaining: 10e6 }, { id: 'B', emi: 3e6, remaining: 10e6 }] }));

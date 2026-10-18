@@ -24,11 +24,14 @@ interface ActionRow {
   id: string;
   type: keyof typeof ACTION_TYPE_LABEL;
   subjectId?: string;
+  requestedById?: string;
   payload: { reason?: string; effectiveDate?: string; newSalary?: number; salaryReason?: string; salaryBandId?: string; newOrgUnitId?: string; newJobTitle?: string; amount?: number; subType?: string };
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   decisionNote: string | null;
   decidedAt: string | null;
   createdAt: string;
+  effectiveAt?: string | null;
+  appliedAt?: string | null;
   subject?: { id?: string; fullName: string; employeeCode: string | null; orgUnit?: { name: string } | null };
   requester?: { fullName: string };
   decider?: { fullName: string } | null;
@@ -47,7 +50,8 @@ export default function PersonnelActionsPage() {
   const meId = useAuthStore((s) => s.user?.id);
   const roles = useAuthStore((s) => s.user?.roles ?? []);
   const isAdmin = roles.includes('ADMIN');
-  const isManager = isAdmin || roles.includes('KM_MANAGER');
+  const canApprove = isAdmin || roles.includes('BOD');
+  const isManager = canApprove || roles.includes('KM_MANAGER') || roles.includes('HR_CB');
 
   // Subtab trong Quyết định: mine vs all
   const [actionSubTab, setActionSubTab] = useState<'mine' | 'all'>('mine');
@@ -57,7 +61,7 @@ export default function PersonnelActionsPage() {
   const [fallbackOrgUnitId, setFallbackOrgUnitId] = useState('');
   const [form, setForm] = useState({
     type: 'TRANSFER',
-    subType: 'BÃI NHIỆM',
+    subType: 'TRANSFER',
     subjectId: '',
     effectiveDate: '',
     reason: '',
@@ -67,6 +71,7 @@ export default function PersonnelActionsPage() {
     amount: '',
     newOrgUnitId: '',
     newJobTitle: '',
+    decisionNo: '', legalBasis: '', evidenceUrl: '', disciplinaryProcedureConfirmed: false, deferMonths: '1',
   });
 
   useEffect(() => {
@@ -136,7 +141,12 @@ export default function PersonnelActionsPage() {
         payload.salaryReason = form.salaryReason;
         if (form.salaryBandId) payload.salaryBandId = form.salaryBandId;
       }
-      if (form.amount) payload.amount = Number(form.amount);
+      if (form.type === 'AWARD' && form.amount) payload.amount = Number(form.amount);
+      if (form.type === 'DISCIPLINE') {
+        Object.assign(payload, { decisionNo: form.decisionNo, legalBasis: form.legalBasis, evidenceUrl: form.evidenceUrl, disciplinaryProcedureConfirmed: form.disciplinaryProcedureConfirmed });
+        if (form.subType === 'DEFER_RAISE') payload.deferMonths = Number(form.deferMonths);
+        if (form.subType === 'DEMOTION') payload.newJobTitle = form.newJobTitle.trim();
+      }
       if (form.type === 'TRANSFER') {
         if (!form.newOrgUnitId) throw new Error('Vui lòng chọn đơn vị chuyển đến');
         payload.newOrgUnitId = form.newOrgUnitId;
@@ -152,7 +162,7 @@ export default function PersonnelActionsPage() {
     onSuccess: () => {
       toast(form.type === 'RESIGNATION' ? 'Đã nộp đơn thôi việc — chờ duyệt' : 'Đã tạo đề xuất — chờ duyệt', 'success');
       setOpen(false);
-      setForm({ type: 'TRANSFER', subType: 'BÃI NHIỆM', subjectId: '', effectiveDate: '', reason: '', newSalary: '', salaryReason: 'MERIT', salaryBandId: '', amount: '', newOrgUnitId: '', newJobTitle: '' });
+      setForm({ type: 'TRANSFER', subType: 'TRANSFER', subjectId: '', effectiveDate: '', reason: '', newSalary: '', salaryReason: 'MERIT', salaryBandId: '', amount: '', newOrgUnitId: '', newJobTitle: '', decisionNo: '', legalBasis: '', evidenceUrl: '', disciplinaryProcedureConfirmed: false, deferMonths: '1' });
       invalidate();
     },
     onError: (e) => toast(errorMessage(e), 'error'),
@@ -164,7 +174,7 @@ export default function PersonnelActionsPage() {
         newOrgUnitId: vars.newOrgUnitId || undefined,
       }),
     onSuccess: (_, v) => {
-      toast(v.approve ? 'Đã duyệt — hiệu lực đã áp dụng' : 'Đã từ chối đề xuất', 'success');
+      toast(v.approve ? 'Đã duyệt — hệ thống áp dụng khi tới ngày hiệu lực' : 'Đã từ chối đề xuất', 'success');
       setApprovalPrompt(null);
       invalidate();
     },
@@ -227,8 +237,8 @@ export default function PersonnelActionsPage() {
       key: 'effectiveDate',
       header: 'Hiệu lực',
       sortable: true,
-      sortValue: (r) => r.payload?.effectiveDate ?? r.createdAt,
-      render: (r) => <span className="text-xs text-muted-foreground">{formatDate(r.payload?.effectiveDate ?? r.createdAt)}</span>,
+      sortValue: (r) => r.effectiveAt ?? r.payload?.effectiveDate ?? r.createdAt,
+      render: (r) => <span className="text-xs text-muted-foreground">{formatDate(r.effectiveAt ?? r.payload?.effectiveDate ?? r.createdAt)}</span>,
     },
     {
       key: 'handover',
@@ -368,7 +378,7 @@ export default function PersonnelActionsPage() {
                     setIsHandoverExpanded(true);
                   },
                 },
-                ...(isAdmin && r.status === 'PENDING' ? [
+                ...(canApprove && r.status === 'PENDING' && r.requestedById !== meId && r.subjectId !== meId ? [
                   'separator' as const,
                   {
                     label: 'Duyệt & áp dụng hiệu lực',
@@ -398,7 +408,8 @@ export default function PersonnelActionsPage() {
                 ['Người đề xuất', detail.requester?.fullName ?? 'Chưa cập nhật'],
                 ['Người duyệt', detail.decider?.fullName ?? 'Chưa cập nhật'],
                 ['Trạng thái', detail.status === 'PENDING' ? 'Chờ duyệt' : detail.status === 'APPROVED' ? 'Đã duyệt' : 'Đã từ chối'],
-                ['Ngày hiệu lực', formatDate(detail.payload?.effectiveDate ?? detail.createdAt)],
+                ['Ngày hiệu lực', formatDate(detail.effectiveAt ?? detail.payload?.effectiveDate ?? detail.createdAt)],
+                ['Áp dụng hồ sơ', detail.appliedAt ? formatDate(detail.appliedAt) : detail.status === 'APPROVED' ? 'Chờ ngày hiệu lực hoặc xử lý' : 'Chưa áp dụng'],
                 ['Lý do / nội dung', detail.payload?.reason ?? 'Chưa cập nhật'],
                 ...(detail.type === 'TRANSFER' ? [
                   ['Đơn vị hiện tại', detail.subject?.orgUnit?.name ?? 'Chưa cập nhật'],
@@ -573,15 +584,15 @@ export default function PersonnelActionsPage() {
         onOpenChange={setOpen}
         title="Tạo Quyết định / Đề xuất Biến động Nhân sự"
         size="lg"
-        description="Ban hành quyết định Thuyên chuyển/Điều động · Kỷ luật/Bãi nhiệm · Thôi việc · Nâng ngạch bậc · Khen thưởng liên thông với hồ sơ nhân sự."
+        description="Điều động, thay đổi chức vụ, kỷ luật lao động, chấm dứt hợp đồng, điều chỉnh lương và khen thưởng theo ngày hiệu lực."
       >
         <form onSubmit={(e) => { e.preventDefault(); create.mutate(); }} className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
           <div className="space-y-1.5 sm:col-span-2">
             <Label>Loại quyết định / đề xuất *</Label>
-            <Select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
-              <option value="TRANSFER">Thuyên chuyển · Điều động · Luân chuyển phòng ban</option>
-              <option value="DISCIPLINE">Kỷ luật · Bãi nhiệm · Cách chức · Cảnh cáo</option>
-              <option value="RESIGNATION">Thôi việc · Nghỉ hưu · Miễn nhiệm chức vụ</option>
+            <Select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, subType: e.target.value === 'DISCIPLINE' ? 'REPRIMAND' : 'TRANSFER', amount: '' })}>
+              <option value="TRANSFER">Điều động · Bổ nhiệm · Miễn nhiệm · Bãi nhiệm chức vụ</option>
+              <option value="DISCIPLINE">Kỷ luật lao động theo Điều 124</option>
+              <option value="RESIGNATION">Chấm dứt hợp đồng lao động · Thôi việc</option>
               <option value="SALARY_ADJUST">Điều chỉnh lương · Nâng ngạch bậc</option>
               <option value="AWARD">Khen thưởng · Biểu dương thành tích</option>
             </Select>
@@ -589,16 +600,17 @@ export default function PersonnelActionsPage() {
 
           {form.type === 'DISCIPLINE' ? (
             <div className="space-y-1.5 sm:col-span-2">
-              <Label>Hình thức kỷ luật / bãi nhiệm cụ thể *</Label>
+              <Label>Hình thức kỷ luật lao động *</Label>
               <Select
                 value={form.subType}
                 onChange={(e) => setForm({ ...form, subType: e.target.value })}
               >
-                <option value="BÃI NHIỆM">Bãi nhiệm chức vụ / Cách chức</option>
-                <option value="CẢNH CÁO">Cảnh cáo toàn đơn vị</option>
-                <option value="KHIỂN TRÁCH">Khiển trách bằng văn bản</option>
-                <option value="KHÁC">Hình thức kỷ luật khác</option>
+                <option value="REPRIMAND">Khiển trách</option>
+                <option value="DEFER_RAISE">Kéo dài thời hạn nâng lương (tối đa 6 tháng)</option>
+                <option value="DEMOTION">Cách chức</option>
+                <option value="DISMISSAL">Sa thải (căn cứ Điều 125)</option>
               </Select>
+              <p className="text-xs text-muted-foreground">Không phạt tiền hoặc cắt lương thay kỷ luật. Miễn nhiệm/bãi nhiệm chức vụ được lập ở mục thay đổi chức vụ.</p>
             </div>
           ) : null}
 
@@ -621,6 +633,7 @@ export default function PersonnelActionsPage() {
 
           {form.type === 'TRANSFER' ? (
             <>
+              <div className="space-y-1.5 sm:col-span-2"><Label>Nghiệp vụ chức vụ *</Label><Select value={form.subType} onChange={e => setForm({ ...form, subType: e.target.value })}><option value="TRANSFER">Thuyên chuyển / điều động</option><option value="APPOINTMENT">Bổ nhiệm</option><option value="RELIEVAL">Miễn nhiệm chức vụ</option><option value="REMOVAL">Bãi nhiệm chức vụ theo thẩm quyền</option></Select><p className="text-xs text-muted-foreground">Thay đổi chức vụ không tự chấm dứt hợp đồng hoặc khóa tài khoản. Ghi chức danh công việc sau quyết định; thay đổi lương cần quyết định riêng.</p></div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label>Đơn vị mới (chuyển đến / tiếp nhận) *</Label>
                 <Select required value={form.newOrgUnitId} onChange={(e) => setForm({ ...form, newOrgUnitId: e.target.value })}>
@@ -632,7 +645,7 @@ export default function PersonnelActionsPage() {
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label>Chức danh mới (nếu có thay đổi)</Label>
-                <Input maxLength={120} value={form.newJobTitle} onChange={(e) => setForm({ ...form, newJobTitle: e.target.value })} placeholder="Để trống nếu giữ nguyên chức danh" />
+                <Input required={form.subType !== 'TRANSFER'} maxLength={120} value={form.newJobTitle} onChange={(e) => setForm({ ...form, newJobTitle: e.target.value })} placeholder="Chức danh đảm nhiệm sau quyết định" />
               </div>
             </>
           ) : null}
@@ -675,17 +688,27 @@ export default function PersonnelActionsPage() {
             </>
           ) : null}
 
-          {form.type === 'AWARD' || form.type === 'DISCIPLINE' ? (
+          {form.type === 'AWARD' ? (
             <div className="space-y-1.5">
-              <Label>Mức thưởng / khấu trừ (VND)</Label>
+              <Label>Mức thưởng (VND)</Label>
               <Input type="number" min={0} value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
             </div>
           ) : null}
+
+          {form.type === 'DISCIPLINE' && <>
+            <div className="space-y-1.5"><Label>Số quyết định *</Label><Input required value={form.decisionNo} onChange={e => setForm({ ...form, decisionNo: e.target.value })} /></div>
+            <div className="space-y-1.5"><Label>Đường dẫn hồ sơ minh chứng *</Label><Input required value={form.evidenceUrl} onChange={e => setForm({ ...form, evidenceUrl: e.target.value })} placeholder="Biên bản họp, thông báo, hồ sơ xác minh" /></div>
+            {form.subType === 'DEFER_RAISE' && <div className="space-y-1.5"><Label>Số tháng kéo dài nâng lương *</Label><Input type="number" min={1} max={6} required value={form.deferMonths} onChange={e => setForm({ ...form, deferMonths: e.target.value })} /></div>}
+            {form.subType === 'DEMOTION' && <div className="space-y-1.5"><Label>Chức danh công việc sau cách chức *</Label><Input required value={form.newJobTitle} onChange={e => setForm({ ...form, newJobTitle: e.target.value })} /></div>}
+            <div className="space-y-1.5 sm:col-span-2"><Label>Căn cứ nội quy và pháp luật áp dụng *</Label><Textarea required minLength={10} value={form.legalBasis} onChange={e => setForm({ ...form, legalBasis: e.target.value })} /></div>
+            <label className="flex items-start gap-2 text-xs sm:col-span-2"><input type="checkbox" required checked={form.disciplinaryProcedureConfirmed} onChange={e => setForm({ ...form, disciplinaryProcedureConfirmed: e.target.checked })} />Đã kiểm tra thẩm quyền, thời hiệu, trường hợp không được xử lý, quyền giải trình, thành phần và biên bản họp theo Điều 122–125 Bộ luật Lao động, Điều 70 Nghị định 145/2020.</label>
+          </>}
 
           <div className="space-y-1.5 sm:col-span-2">
             <Label>Lý do / căn cứ ban hành quyết định *</Label>
             <Textarea
               required
+              minLength={10}
               placeholder="VD: Căn cứ nhu cầu nhân lực / Quyết định kỷ luật số 12... / Theo đơn xin thôi việc"
               value={form.reason}
               onChange={(e) => setForm({ ...form, reason: e.target.value })}

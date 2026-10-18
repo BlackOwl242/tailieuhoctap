@@ -168,7 +168,7 @@ export class AttendanceLedgerService {
       select: { id: true, hireDate: true },
     });
     const resignationActions = await this.prisma.personnelAction.findMany({
-      where: { type: 'RESIGNATION', status: 'APPROVED', effectiveAt: { lte: to } },
+      where: { OR: [{ type: 'RESIGNATION' }, { type: 'DISCIPLINE', payload: { path: ['subType'], equals: 'DISMISSAL' } }], status: 'APPROVED', effectiveAt: { lte: to } },
       select: { subjectId: true, effectiveAt: true },
       orderBy: { effectiveAt: 'asc' },
     });

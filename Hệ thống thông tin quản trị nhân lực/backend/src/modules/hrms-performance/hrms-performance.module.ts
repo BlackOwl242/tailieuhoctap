@@ -10,6 +10,7 @@ import { Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsBoolean, IsDateString, IsIn, IsNumber, IsOptional, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
+import { calculateKpiScore, KpiMeasurementMode } from '../../common/kpi-calculator';
 
 export class CreateCycleDto {
   @ApiProperty({ example: 'Chu kỳ đánh giá KPI 2026' })
@@ -58,6 +59,8 @@ export class CreateCycleDto {
 }
 
 export class ScoreGoalDto {
+  @IsOptional() @IsNumber() actualValue?: number;
+  @IsOptional() @IsString() @MinLength(10) @MaxLength(2000) scoreRationale?: string;
   @ApiPropertyOptional({ minimum: 0, maximum: 100 })
   @IsOptional() @IsNumber()
   managerScore?: number;
@@ -76,6 +79,9 @@ export class ScoreGoalDto {
 }
 
 export class CreateGoalItemDto {
+  @IsOptional() @IsIn(['MANUAL', 'HIGHER_BETTER', 'LOWER_BETTER', 'BINARY']) measurementMode?: KpiMeasurementMode;
+  @IsOptional() @IsNumber() targetValue?: number;
+  @IsOptional() @IsString() @MaxLength(50) measurementUnit?: string;
   @ApiProperty({ example: 'Nâng cao chất lượng kiến trúc hệ thống' })
   @IsString() @MinLength(3) @MaxLength(160)
   kraTitle!: string;
@@ -98,6 +104,9 @@ export class CreateGoalItemDto {
 }
 
 export class CreateGoalDto {
+  @IsOptional() @IsIn(['MANUAL', 'HIGHER_BETTER', 'LOWER_BETTER', 'BINARY']) measurementMode?: KpiMeasurementMode;
+  @IsOptional() @IsNumber() targetValue?: number;
+  @IsOptional() @IsString() @MaxLength(50) measurementUnit?: string;
   @ApiProperty()
   @IsString()
   cycleId: string;
@@ -601,17 +610,24 @@ export class HrmsPerformanceService {
         weightage: item.weightage ?? dto.weightage ?? 20,
         criteriaGroup: item.criteriaGroup ?? dto.criteriaGroup ?? 'RESULT',
         targetMetric: item.targetMetric.trim(),
+        measurementMode: item.measurementMode ?? 'MANUAL', targetValue: item.targetValue ?? null, measurementUnit: item.measurementUnit?.trim() || null,
       }))
       : dto.kraTitle?.trim() && dto.description?.trim() && dto.targetMetric?.trim()
         ? [{
           kraTitle: dto.kraTitle.trim(), description: dto.description.trim(),
           weightage: dto.weightage ?? 20, criteriaGroup: dto.criteriaGroup ?? 'RESULT', targetMetric: dto.targetMetric.trim(),
+          measurementMode: dto.measurementMode ?? 'MANUAL', targetValue: dto.targetValue ?? null, measurementUnit: dto.measurementUnit?.trim() || null,
         }]
         : [];
     if (!goalItems.length || goalItems.some(item => !item.kraTitle || !item.description || !item.targetMetric)) {
       throw new BadRequestException('Nhập tên mục tiêu, chỉ số đo và mô tả trước khi giao KPI');
     }
     for (const item of goalItems) {
+      if (cycle.organizationSector === 'state' && item.measurementMode !== 'MANUAL') throw new BadRequestException('Nhánh công vụ sử dụng tiêu chí và thang điểm riêng');
+      if (item.measurementMode !== 'MANUAL') {
+        try { calculateKpiScore(item.measurementMode, item.targetValue ?? NaN, item.measurementMode === 'BINARY' ? 1 : 0); }
+        catch (error) { throw new BadRequestException((error as Error).message); }
+      }
       if (!Number.isFinite(item.weightage) || item.weightage <= 0 || item.weightage > 100) throw new BadRequestException('Trọng số từng KPI phải lớn hơn 0% và không vượt 100%');
       if (!['GENERAL', 'RESULT'].includes(item.criteriaGroup)) throw new BadRequestException('Nhóm tiêu chí không hợp lệ');
       if (cycle.organizationSector === 'enterprise' && item.criteriaGroup !== 'RESULT') throw new BadRequestException('Kỳ doanh nghiệp chỉ dùng trọng số mục tiêu KPI');
@@ -703,6 +719,7 @@ export class HrmsPerformanceService {
           weightage: item.weightage,
           criteriaGroup: item.criteriaGroup,
           targetMetric: item.targetMetric,
+          measurementMode: item.measurementMode, targetValue: item.targetValue, measurementUnit: item.measurementUnit,
           assignmentScope: assignmentOrgUnit ? 'ORG_UNIT' : 'INDIVIDUAL',
           assignmentOrgUnitId: assignmentOrgUnit?.id ?? null,
           assignmentOrgUnitName: assignmentOrgUnit?.name ?? null,
@@ -760,11 +777,16 @@ export class HrmsPerformanceService {
         quantityScore, qualityScore, progressScore,
       };
     } else {
-      const managerScore = dto.managerScore;
+      let managerScore = dto.managerScore;
+      if (cycle.organizationSector === 'enterprise' && goal.measurementMode !== 'MANUAL') {
+        try { managerScore = calculateKpiScore(goal.measurementMode as KpiMeasurementMode, goal.targetValue ?? NaN, dto.actualValue ?? NaN); }
+        catch (error) { throw new BadRequestException((error as Error).message); }
+      }
       if (managerScore === undefined || !Number.isFinite(managerScore) || managerScore < 0 || managerScore > 100) throw new BadRequestException('Điểm KPI phải trong 0–100');
       scoreData = { managerScore, quantityScore: null, qualityScore: null, progressScore: null };
     }
     if (cycle.organizationSector === 'enterprise') {
+      if (String(dto.scoreRationale || '').trim().length < 10) throw new BadRequestException('Cần giải trình cách đối chiếu mục tiêu với kết quả, ít nhất 10 ký tự');
       const evidenceCount = await this.prisma.hrmsKraEvidence.count({ where: { goalId: id } });
       if (evidenceCount === 0) throw new ConflictException('Cần ghi kết quả thực tế và ít nhất một minh chứng trước khi chấm KPI');
     }
@@ -772,7 +794,7 @@ export class HrmsPerformanceService {
       const evidenceCount = await this.prisma.hrmsKraEvidence.count({ where: { goalId: id } });
       if (evidenceCount === 0) throw new ConflictException('Cần ghi kết quả và căn cứ đối chiếu nhiệm vụ trước khi chấm');
     }
-    await this.prisma.hrmsAppraisalGoal.update({ where: { id }, data: scoreData });
+    await this.prisma.hrmsAppraisalGoal.update({ where: { id }, data: { ...scoreData, actualValue: dto.actualValue, scoreRationale: dto.scoreRationale?.trim() } });
     await this.recompute(goal.cycleId, goal.userId);
     await this.audit.log({ actorId: actor.id, action: 'APPRAISAL_SCORED', entityType: 'HrmsAppraisalGoal', entityId: id });
     return this.prisma.hrmsAppraisalGoal.findUniqueOrThrow({ where: { id } });

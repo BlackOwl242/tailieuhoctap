@@ -5,6 +5,7 @@ export interface AuthUser {
   email: string;
   fullName?: string;
   roles: string[];
+  mustChangePassword?: boolean;
 }
 
 export interface MeProfile extends Omit<AuthUser, 'roles'> {

@@ -51,6 +51,8 @@ class UpdateContractDto {
   @ApiPropertyOptional() @IsOptional() @IsEnum(['ACTIVE', 'EXPIRED', 'TERMINATED']) status?: 'ACTIVE' | 'EXPIRED' | 'TERMINATED';
   @ApiPropertyOptional() @IsOptional() @IsDateString() endDate?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(500) note?: string;
+  /** Bản mềm hợp đồng đính kèm: { name, mimeType, sizeBytes, dataBase64 } ≤ 8MB. */
+  @ApiPropertyOptional() @IsOptional() @IsObject() file?: { name: string; mimeType: string; sizeBytes: number; dataBase64: string };
 }
 
 class CreateCertificateDto {
@@ -141,16 +143,21 @@ export class EmployeesService {
 
   /**
    * Hồ sơ chi tiết: thông tin + hợp đồng + văn bằng chứng chỉ (kho lưu trữ kép).
-   * RBAC: hợp đồng lao động (chứa lương) chỉ trả cho ADMIN/KM_MANAGER.
+   * RBAC: HR được xem hợp đồng trong phạm vi nghiệp vụ; nhân viên chỉ xem hợp đồng của chính mình.
    */
   async detail(id: string, viewer: AuthUser) {
     const privileged = isPrivilegedHr(viewer);
+    const canSeePersonalDetails = privileged || viewer.id === id;
     const user = await this.prisma.user.findFirst({
       where: { id, deletedAt: null },
       select: {
         ...(privileged ? EMPLOYEE_SELECT : EMPLOYEE_SELECT_PUBLIC),
+        // Nhân viên được xem mức lương hồ sơ của chính mình; người khác chỉ thấy khi có quyền HR.
+        ...(privileged || viewer.id === id ? { baseSalary: true } : {}),
+        ...(viewer.id === id && !privileged ? { birthDate: true, phone: true, address: true } : {}),
         bio: true, expertise: true,
-        ...(privileged ? { contracts: { orderBy: { startDate: 'desc' as const } } } : {}),
+        ...(privileged || viewer.id === id ? { contracts: { orderBy: { startDate: 'desc' as const } } } : {}),
+        ...(canSeePersonalDetails ? { comprehensiveProfile: { select: { currentAddress: true, permanentAddress: true, verificationStatus: true, verifiedAt: true, dataSource: true } } } : {}),
         certificates: { orderBy: { createdAt: 'desc' } },
         leaveBalances: { orderBy: { year: 'desc' }, take: 1 },
       },
@@ -165,7 +172,15 @@ export class EmployeesService {
       ]);
       if (!manager?.orgUnitId || manager.orgUnitId !== employee?.orgUnitId) throw new ForbiddenException('Chỉ được xem hồ sơ trong đơn vị phụ trách');
     }
-    return user;
+    const accountAddress = 'address' in user ? user.address : null;
+    const profileAddress = user.comprehensiveProfile?.currentAddress?.trim()
+      || user.comprehensiveProfile?.permanentAddress?.trim()
+      || null;
+    return {
+      ...user,
+      address: accountAddress?.trim() || profileAddress,
+      comprehensiveProfile: undefined,
+    };
   }
 
   async compensationBasis(id: string, effectiveDate?: string) {
@@ -251,14 +266,24 @@ export class EmployeesService {
     const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
     if (!user) throw new NotFoundException('Không tìm thấy nhân viên');
     const contractStart = dateKey(dto.startDate);
-    const existingContracts = await this.prisma.contract.count({ where: { userId } });
+    const contractEnd = dto.endDate ? dateKey(dto.endDate) : null;
+    if (dto.baseSalary <= 0) throw new ConflictException('Mức lương hợp đồng phải lớn hơn 0');
+    if (contractEnd && contractEnd < contractStart) throw new ConflictException('Ngày kết thúc hợp đồng không được trước ngày bắt đầu');
+    if (dto.type === 'INDEFINITE' && contractEnd) throw new ConflictException('Hợp đồng không xác định thời hạn không ghi ngày hết hạn');
+    if (['FIXED_TERM', 'PROBATION', 'INTERNSHIP'].includes(dto.type) && !contractEnd) throw new ConflictException('Cần ngày kết thúc cho hợp đồng có thời hạn');
+    if (dto.type === 'FIXED_TERM' && contractEnd) {
+      const limit = new Date(contractStart); limit.setUTCFullYear(limit.getUTCFullYear() + 3);
+      if (contractEnd >= limit) throw new ConflictException('Hợp đồng xác định thời hạn không quá 36 tháng');
+    }
+    const existingContracts = await this.prisma.contract.count({ where: { userId, status: { not: 'DRAFT' } } });
     const activeAtStart = await this.prisma.contract.findFirst({ where: { userId, status: 'ACTIVE', startDate: { lte: contractStart }, OR: [{ endDate: null }, { endDate: { gte: contractStart } }] }, orderBy: { startDate: 'desc' } });
-    if (existingContracts > 0 && !activeAtStart) throw new ConflictException('Không thể tạo hợp đồng mới tạo khoảng trống sau hợp đồng cũ; cần hoàn tất gia hạn hoặc quyết định nhân sự trước.');
+    const overlaps = await this.prisma.contract.findFirst({ where: { userId, type: { not: 'AMENDMENT' }, status: { not: 'DRAFT' }, startDate: { lte: contractEnd ?? new Date('9999-12-31') }, OR: [{ endDate: null, status: 'ACTIVE' }, { endDate: { gte: contractStart } }] } });
+    if (overlaps) throw new ConflictException('Thời hạn hợp đồng bị trùng với hợp đồng gốc đã lưu; phụ lục lương cần đi qua quyết định điều chỉnh');
     const compensationBasis = dto.compensationBasis ?? 'MONTHLY';
     const changesPayTerms = activeAtStart
       ? dto.baseSalary !== activeAtStart.baseSalary || compensationBasis !== activeAtStart.compensationBasis || (dto.insuranceSalary !== undefined && dto.insuranceSalary !== activeAtStart.insuranceSalary)
       : dto.baseSalary !== (user.baseSalary ?? 0);
-    if (changesPayTerms && existingContracts > 0) throw new ConflictException('Thay đổi lương, cách trả hoặc căn cứ bảo hiểm phải lập đề xuất ở mục Biến động nhân sự để được duyệt trước khi cập nhật hợp đồng.');
+    if (changesPayTerms && activeAtStart) throw new ConflictException('Thay đổi lương, cách trả hoặc căn cứ bảo hiểm phải lập đề xuất ở mục Biến động nhân sự để được duyệt trước khi cập nhật hợp đồng.');
     if (changesPayTerms) {
       const band = user.salaryBandId ? await this.prisma.hrmsSalaryBand.findUnique({ where: { id: user.salaryBandId } }) : null;
       if (!band || band.status !== 'ACTIVE' || band.effectiveFrom > contractStart || (band.effectiveTo && band.effectiveTo < contractStart) || band.compensationBasis !== compensationBasis || dto.baseSalary < band.minSalary || dto.baseSalary > band.maxSalary) {
@@ -271,6 +296,8 @@ export class EmployeesService {
     let fileMeta: { fileUrl: string; fileName: string } | undefined;
     if (dto.file) fileMeta = await this.saveFile(dto.file);
     const contract = await this.prisma.$transaction(async (tx) => {
+      // Khi hợp đồng thực tế được nhập, bỏ bản mẫu DRAFT đã tạo tự động cho tài khoản này.
+      await tx.contract.deleteMany({ where: { userId, status: 'DRAFT', contractNo: { startsWith: 'SAMPLE-' } } });
       const created = await tx.contract.create({ data: {
         userId,
         contractNo: dto.contractNo,
@@ -301,19 +328,25 @@ export class EmployeesService {
   async updateContract(userId: string, contractId: string, dto: UpdateContractDto, actor: AuthUser, requestId?: string) {
     const contract = await this.prisma.contract.findFirst({ where: { id: contractId, userId } });
     if (!contract) throw new NotFoundException('Không tìm thấy hợp đồng');
+    if (dto.status === 'ACTIVE' && contract.status !== 'ACTIVE') throw new ConflictException('Không kích hoạt lại hợp đồng nháp/đã kết thúc trực tiếp; cần hoàn tất giao kết hoặc quy trình gia hạn');
+    if (dto.endDate && dateKey(dto.endDate).getTime() !== contract.endDate?.getTime()) throw new ConflictException('Thay đổi thời hạn cần giao kết hợp đồng mới theo quy trình; không sửa thời hạn của bản đã lưu');
+    if (contract.status === 'ACTIVE' && dto.status === 'EXPIRED' && (!contract.endDate || dateKey(contract.endDate) >= workDate())) throw new ConflictException('Chưa đến ngày hết hạn hợp đồng');
     if (contract.status === 'ACTIVE' && dto.status === 'TERMINATED') throw new ConflictException('Chấm dứt quan hệ lao động phải đi qua đề xuất thôi việc và checklist bàn giao; không kết thúc hợp đồng trực tiếp ở đây.');
     if (contract.status === 'ACTIVE' && dto.endDate && dateKey(dto.endDate) < dateKey(workDate())) throw new ConflictException('Không thể kết thúc hồi tố hợp đồng đang hoạt động; hãy lập quyết định thôi việc với ngày hiệu lực phù hợp.');
+    const fileMeta = dto.file ? await this.saveFile(dto.file) : undefined;
     const updated = await this.prisma.contract.update({
       where: { id: contractId },
       data: {
         status: dto.status,
         endDate: dto.endDate ? new Date(dto.endDate) : contract.endDate,
         note: dto.note,
+        fileUrl: fileMeta?.fileUrl,
+        fileName: fileMeta?.fileName,
       },
     });
     await this.audit.log({
       actorId: actor.id, action: 'CONTRACT_UPDATED', entityType: 'Contract', entityId: contractId,
-      after: { status: updated.status, baseSalary: updated.baseSalary }, requestId,
+      after: { status: updated.status, baseSalary: updated.baseSalary, fileName: fileMeta?.fileName ?? contract.fileName }, requestId,
     });
     return updated;
   }

@@ -76,6 +76,8 @@ interface PayrollAssignmentTarget {
   jobTitle: string | null;
   salaryBandId: string | null;
   baseSalary: number | null;
+  compensationBasis: 'MONTHLY' | 'DAILY' | 'HOURLY' | null;
+  payrollBasisLabel: string;
   orgUnit?: { id: string; name: string } | null;
   currentStructureName: string | null;
   hasPayrollBasis: boolean;
@@ -94,6 +96,7 @@ interface PayrollSlip {
   actualWorkDays?: number;
   missingAttendanceDays?: number;
   calculationError?: string;
+  deductionReviewNote?: string;
   baseSalary: number;
   grossPay: number;
   totalDeduction: number;
@@ -117,7 +120,7 @@ interface PayrollSlip {
       attendance?: { standardDays: number; paidDays: number; actualWorkDays: number; workedHours: number; scheduledHours: number; shortHours: number; lateDays: number; lateMinutes: number; earlyLeaveDays: number; earlyLeaveMinutes: number; absenceDays: number; paidLeaveDays: number; unpaidLeaveDays: number; socialInsuranceLeaveDays: number; missingPairDays: number };
       overtimeRequests?: { workDate: string; status: string; hours: number; nightHours: number; dayCategory: string; paid: boolean }[];
       approvedOvertime?: { workDate: string; hours: number; nightHours: number; category: string; hourlyRate: number; pay: number }[];
-      attendanceDays?: { workDate: string; status: string; scheduledMinutes: number; workedMinutes: number; lateMinutes: number; earlyMinutes: number; leaveType?: string | null; paidLeave: boolean }[];
+      attendanceDays?: { workDate: string; status: string; scheduledMinutes: number; workedMinutes: number; lateMinutes: number; earlyMinutes: number; leaveType?: string | null; paidLeave: boolean; firstInAt?: string | null; lastOutAt?: string | null; eventCount?: number }[];
     };
     earnings?: { name: string; amount: number; basisReference?: string | null }[];
     deductions?: { name: string; amount: number; basisReference?: string | null }[];
@@ -141,6 +144,7 @@ interface PayrollPreviewSlip {
   totalDeduction: number;
   netPay: number;
   calculationError?: string;
+  deductionReviewNote?: string;
   breakdown?: PayrollSlip['breakdown'];
 }
 
@@ -157,6 +161,7 @@ interface PayrollPreview {
   totalNetPay: number;
   pendingAttendanceDays: number;
   unpricedEmployees: number;
+  deductionReviewEmployees?: number;
   slips: PayrollPreviewSlip[];
 }
 
@@ -244,7 +249,7 @@ export default function PayrollEnginePage() {
   const [isPayslipModalOpen, setIsPayslipModalOpen] = useState(false);
   const [payslipViewMode, setPayslipViewMode] = useState<'summary' | 'formula' | 'attendance'>('summary');
   const [selectedAttendanceDate, setSelectedAttendanceDate] = useState<string | null>(null);
-  const [activeAttendanceLegend, setActiveAttendanceLegend] = useState<'full' | 'late' | 'absent' | 'other' | null>(null);
+  const [activeAttendanceLegend, setActiveAttendanceLegend] = useState<'full' | 'late' | 'absent' | 'other' | 'unrecorded' | null>(null);
 
   // Giữ tương thích liên kết cũ; quy chế và cấu hình hiện nằm trong tab chính sách.
   useEffect(() => {
@@ -309,7 +314,7 @@ export default function PayrollEnginePage() {
 
   const slipAttendanceQuery = useQuery<SlipAttendanceDetail>({
     queryKey: ['hrms-slip-attendance', selectedSlip?.id],
-    enabled: isPayslipModalOpen && payslipViewMode === 'attendance' && !!selectedSlip,
+    enabled: isPayslipModalOpen && payslipViewMode === 'attendance' && !!selectedSlip && selectedSlip.status !== 'PROVISIONAL',
     queryFn: async () => (await api.get(`/hrms/payroll/slips/${selectedSlip!.id}/attendance`)).data,
   });
 
@@ -621,6 +626,7 @@ export default function PayrollEnginePage() {
           <span className="font-medium text-xs text-foreground">{s.employeeName}</span>
           <p className="text-xs text-muted-foreground">{s.jobTitle || 'Chuyên viên'}</p>
           {s.calculationError && <p className="mt-1 max-w-[22rem] text-[10px] text-amber-700">{s.calculationError}</p>}
+          {s.deductionReviewNote && <p className="mt-1 max-w-[22rem] text-[10px] text-amber-700">{s.deductionReviewNote}</p>}
           {s.breakdown?.calculation?.minimumWageReview?.status === 'REVIEW' && <p className="text-[10px] text-amber-600">Cần rà soát mức lương tối thiểu</p>}
           {s.breakdown?.calculation?.salaryBandReview?.bands.some((band) => band.status === 'BELOW_RANGE' || band.status === 'ABOVE_RANGE' || band.status === 'BASIS_MISMATCH') && <p className="text-[10px] text-amber-700">Lương hợp đồng cần đối chiếu khung vị trí đã duyệt</p>}
         </div>
@@ -700,7 +706,7 @@ export default function PayrollEnginePage() {
     },
     {
       key: 'netPay',
-      header: 'Thực lĩnh',
+      header: isPreviewSelected ? 'Số dư tạm tính' : 'Thực lĩnh',
       sortable: true,
       render: (s: PayrollSlip) => (
         <span className="text-xs font-mono font-semibold text-foreground">
@@ -714,7 +720,7 @@ export default function PayrollEnginePage() {
       render: (s: PayrollSlip) => (
         <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className={`h-1.5 w-1.5 rounded-full ${s.calculationError ? 'bg-amber-500' : s.status === 'PROVISIONAL' ? 'bg-sky-500' : 'bg-emerald-500'}`} />
-          {s.calculationError ? 'Cần đối soát' : s.status === 'PROVISIONAL' ? 'Tạm tính' : s.status}
+          {s.calculationError || s.deductionReviewNote ? 'Cần đối soát' : s.status === 'PROVISIONAL' ? 'Tạm tính' : s.status}
         </span>
       ),
     },
@@ -880,7 +886,7 @@ export default function PayrollEnginePage() {
                     <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Tính được / tổng nhân sự</span><b className="block text-foreground">{payrollPreviewQuery.data.totalEmployees - payrollPreviewQuery.data.unpricedEmployees} / {payrollPreviewQuery.data.totalEmployees}</b>{payrollPreviewQuery.data.unpricedEmployees > 0 && <span className="block text-amber-700">Cần đối soát: {payrollPreviewQuery.data.unpricedEmployees}</span>}</div>
                     <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Thu nhập gộp đã tính</span><b className="block whitespace-nowrap font-mono text-foreground">{payrollPreviewQuery.data.totalGrossPay.toLocaleString('vi-VN')} đ</b></div>
                     <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Khấu trừ tạm tính</span><b className="block whitespace-nowrap font-mono text-foreground">{payrollPreviewQuery.data.totalDeduction.toLocaleString('vi-VN')} đ</b></div>
-                    <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Thực lĩnh tạm tính</span><b className="block whitespace-nowrap font-mono text-foreground">{payrollPreviewQuery.data.totalNetPay.toLocaleString('vi-VN')} đ</b></div>
+                    <div className="min-w-0 rounded-md bg-muted/30 px-2 py-1.5"><span className="block">Số dư tạm tính</span><b className="block whitespace-nowrap font-mono text-foreground">{payrollPreviewQuery.data.totalNetPay.toLocaleString('vi-VN')} đ</b></div>
                   </div>
                 ) : currentRun ? (
                   <div className="grid min-w-0 grid-cols-2 gap-2 text-xs text-muted-foreground xl:grid-cols-3">
@@ -929,6 +935,7 @@ export default function PayrollEnginePage() {
                 Tạm tính đến {new Date(`${payrollPreviewQuery.data.asOfDate}T00:00:00`).toLocaleDateString('vi-VN')}; công tháng {payrollPreviewQuery.data.attendanceStatus === 'FINALIZED' ? 'đã chốt' : 'đang mở'}.
                 {payrollPreviewQuery.data.pendingAttendanceDays > 0 && ` Còn ${payrollPreviewQuery.data.pendingAttendanceDays} ngày công chưa ghi nhận.`}
                 {payrollPreviewQuery.data.unpricedEmployees > 0 && ` Tổng tiền chỉ gồm ${payrollPreviewQuery.data.totalEmployees - payrollPreviewQuery.data.unpricedEmployees} người tính được; ${payrollPreviewQuery.data.unpricedEmployees} người chưa tính được và cần đối soát.`}
+                {!!payrollPreviewQuery.data.deductionReviewEmployees && ` Có ${payrollPreviewQuery.data.deductionReviewEmployees} hồ sơ có số dư tạm tính âm vì thu nhập tích lũy chưa đủ bù nghĩa vụ bảo hiểm/khấu trừ dự kiến. Chưa dùng số này để chi trả; kỳ lương chính thức vẫn phải đối soát và không được có thực lĩnh âm.`}
                 {' '}Số liệu thay đổi khi công hoặc khoản lương được cập nhật; làm mới lúc {new Date(payrollPreviewQuery.data.generatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}.
               </p>
             )}
@@ -1592,7 +1599,7 @@ export default function PayrollEnginePage() {
               <option value="">-- Chọn nhân viên --</option>
               {assignmentTargets.filter((employee) => assignOrgUnitFilter === 'ALL' || (employee.orgUnit?.id ?? 'UNASSIGNED') === assignOrgUnitFilter).map((employee) => (
                 <option key={employee.id} value={employee.id} disabled={!employee.hasPayrollBasis}>
-                  {employee.fullName} ({employee.employeeCode || 'Chưa có mã'}) · {employee.orgUnit?.name || 'Chưa xếp đơn vị'}{employee.currentStructureName ? ` · Đang dùng: ${employee.currentStructureName}` : ''}{employee.hasPayrollBasis ? '' : ' · Chưa có lương căn cứ'}
+                  {employee.fullName} ({employee.employeeCode || 'Chưa có mã'}) · {employee.orgUnit?.name || 'Chưa xếp đơn vị'}{employee.currentStructureName ? ` · Đang dùng: ${employee.currentStructureName}` : ''}{employee.hasPayrollBasis ? ` · ${employee.payrollBasisLabel}` : ` · ${employee.payrollBasisLabel || 'Chưa có căn cứ lương'}`}
                 </option>
               ))}
             </Select>
@@ -1602,7 +1609,7 @@ export default function PayrollEnginePage() {
             if (!employee) return null;
             return <div className="rounded-md border border-border bg-muted/30 p-3 text-xs">
               <p><b>{employee.fullName}</b> · {employee.jobTitle || 'Chưa có chức danh'} · {employee.orgUnit?.name || 'Chưa xếp đơn vị'}</p>
-              <p className="mt-1">Lương căn cứ lấy từ hồ sơ: <b>{Number(employee.baseSalary || 0).toLocaleString('vi-VN')} VND</b></p>
+              <p className="mt-1">Lương căn cứ lấy từ {employee.payrollBasisLabel}: <b>{employee.hasPayrollBasis ? `${Number(employee.baseSalary || 0).toLocaleString('vi-VN')} VND/${employee.compensationBasis === 'HOURLY' ? 'giờ' : employee.compensationBasis === 'DAILY' ? 'ngày' : 'tháng'}` : 'chưa có'}</b></p>
               {employee.currentStructureName ? <p className="mt-1 text-amber-700">Đang áp dụng “{employee.currentStructureName}”; gán cấu trúc mới sẽ thay cấu trúc đang hoạt động.</p> : null}
             </div>;
           })() : <p className="text-xs text-muted-foreground">Chọn nhân sự đang hoạt động có mức lương căn cứ đã được ghi nhận.</p>}
@@ -1665,7 +1672,7 @@ export default function PayrollEnginePage() {
                 >
                   Giải Trình Công Thức Chi Tiết
                 </button>
-                {selectedSlip.status !== 'PROVISIONAL' && <button
+                <button
                   type="button"
                   onClick={() => setPayslipViewMode('attendance')}
                   className={`px-3 py-1.5 rounded-md font-medium text-xs transition-colors ${
@@ -1675,7 +1682,7 @@ export default function PayrollEnginePage() {
                   }`}
                 >
                   Chấm công & hồ sơ
-                </button>}
+                </button>
               </div>
               <span className="text-2xs text-muted-foreground font-mono">
                 {selectedSlip.status === 'PROVISIONAL' ? 'Bản xem trước' : `Mã phiếu: ${selectedSlip.id.slice(0, 8).toUpperCase()}`}
@@ -1711,7 +1718,7 @@ export default function PayrollEnginePage() {
                       {selectedSlip.breakdown!.calculation!.attendanceWageReduction !== undefined ? <p className="font-semibold">Thu nhập theo đủ lịch − thu nhập được hưởng theo công = giảm do thiếu công: {selectedSlip.breakdown!.calculation!.expectedCompensation?.toLocaleString('vi-VN')} đ − {selectedSlip.breakdown!.calculation!.earnedCompensation?.toLocaleString('vi-VN')} đ = <span className="text-rose-700">{selectedSlip.breakdown!.calculation!.attendanceWageReduction!.toLocaleString('vi-VN')} đ</span>. Con số này gồm lương căn cứ và các khoản thu nhập trong cấu trúc bị tính theo tỷ lệ công; thuế, bảo hiểm, OT và khấu trừ khác được tính riêng.</p> : null}
                       <p>Đi muộn {attendance.lateDays} ngày / {attendance.lateMinutes} phút; về sớm {attendance.earlyLeaveDays} ngày / {attendance.earlyLeaveMinutes} phút; vắng {attendance.absenceDays} ngày; phép năm hưởng lương {attendance.paidLeaveDays} ngày; nghỉ không lương {attendance.unpaidLeaveDays} ngày; nghỉ ốm/thai sản ghi nhận theo chế độ BHXH {attendance.socialInsuranceLeaveDays} ngày.</p>
                       {attendance.missingPairDays > 0 ? <p className="font-semibold text-rose-700">Có {attendance.missingPairDays} ngày thiếu cặp vào/ra cần đối soát.</p> : null}
-                      {(selectedSlip.breakdown!.calculation!.attendanceDays ?? []).length > 0 ? <div className="max-h-64 overflow-auto"><table className="w-full text-left"><thead><tr><th>Ngày</th><th>Trạng thái</th><th>Giờ chuẩn</th><th>Giờ ghi nhận</th><th>Muộn / sớm</th></tr></thead><tbody>{selectedSlip.breakdown!.calculation!.attendanceDays!.map((day) => <tr key={day.workDate}><td>{day.workDate}</td><td>{day.status === 'ON_LEAVE' ? (day.leaveType === 'ANNUAL' ? 'Phép năm hưởng lương' : day.leaveType === 'UNPAID' ? 'Nghỉ không lương' : `${day.leaveType === 'SICK' ? 'Nghỉ ốm' : 'Thai sản'} · BHXH`) : day.status === 'HOLIDAY' ? 'Ngày lễ' : day.status === 'ABSENT' ? 'Vắng' : day.status === 'LATE' ? 'Đi muộn' : day.status === 'EARLY_LEAVE' ? 'Về sớm' : day.status === 'MISSING_PAIR' ? 'Thiếu cặp công' : 'Đủ công'}</td><td>{(day.scheduledMinutes / 60).toFixed(2)}</td><td>{(day.workedMinutes / 60).toFixed(2)}</td><td>{day.lateMinutes} / {day.earlyMinutes} phút</td></tr>)}</tbody></table></div> : null}
+                      {(selectedSlip.breakdown!.calculation!.attendanceDays ?? []).length > 0 ? <div className="max-h-64 overflow-auto"><table className="w-full text-left"><thead><tr><th>Ngày</th><th>Trạng thái</th><th>Giờ chuẩn</th><th>Giờ ghi nhận</th><th>Muộn / sớm</th></tr></thead><tbody>{selectedSlip.breakdown!.calculation!.attendanceDays!.map((day) => <tr key={day.workDate}><td>{day.workDate}</td><td>{day.status === 'UNRECORDED' ? 'Chưa ghi nhận' : day.status === 'ON_LEAVE' ? (day.leaveType === 'ANNUAL' ? 'Phép năm hưởng lương' : day.leaveType === 'UNPAID' ? 'Nghỉ không lương' : `${day.leaveType === 'SICK' ? 'Nghỉ ốm' : 'Thai sản'} · BHXH`) : day.status === 'HOLIDAY' ? 'Ngày lễ' : day.status === 'ABSENT' ? 'Vắng' : day.status === 'LATE' ? 'Đi muộn' : day.status === 'EARLY_LEAVE' ? 'Về sớm' : day.status === 'MISSING_PAIR' ? 'Thiếu cặp công' : 'Đủ công'}</td><td>{(day.scheduledMinutes / 60).toFixed(2)}</td><td>{(day.workedMinutes / 60).toFixed(2)}</td><td>{day.lateMinutes} / {day.earlyMinutes} phút</td></tr>)}</tbody></table></div> : null}
                       <p>OT đã duyệt: {overtime.reduce((sum, item) => sum + item.hours, 0)} giờ · Tiền OT {overtime.reduce((sum, item) => sum + item.pay, 0).toLocaleString('vi-VN')} đ. Yêu cầu OT đang chờ duyệt: {requests.filter((item) => item.status === 'PENDING').reduce((sum, item) => sum + item.hours, 0)} giờ; chưa được tính vào lương.</p>
                       {overtime.length > 0 ? <div className="overflow-x-auto"><table className="w-full text-left"><thead><tr><th>Ngày</th><th>Loại ngày</th><th>Giờ</th><th>Giờ đêm</th><th>Đơn giá giờ</th><th className="text-right">Tiền OT</th></tr></thead><tbody>{overtime.map((item) => <tr key={`${item.workDate}-${item.category}`}><td>{item.workDate}</td><td>{item.category === 'PUBLIC_HOLIDAY' ? 'Lễ' : item.category === 'WEEKLY_REST' ? 'Nghỉ tuần' : 'Ngày thường'}</td><td>{item.hours}</td><td>{item.nightHours}</td><td>{item.hourlyRate.toLocaleString('vi-VN')} đ</td><td className="text-right">{item.pay.toLocaleString('vi-VN')} đ</td></tr>)}</tbody></table></div> : null}
                     </section>;
@@ -1730,23 +1737,37 @@ export default function PayrollEnginePage() {
                   </div>}
                   {selectedSlip.breakdown?.calculation?.salaryBandReview?.bands.some((band) => band.status !== 'IN_RANGE') ? <div className="border-y border-border py-3 text-xs"><b>Đối chiếu khung lương vị trí đã duyệt</b>{selectedSlip.breakdown?.calculation?.salaryBandReview?.bands.map((band) => <p key={band.code} className="mt-1">{band.code}: {band.minSalary.toLocaleString('vi-VN')}–{band.maxSalary.toLocaleString('vi-VN')} đ · {band.status === 'BELOW_RANGE' ? 'Mức hợp đồng dưới sàn' : band.status === 'ABOVE_RANGE' ? 'Mức hợp đồng trên trần' : band.status === 'BASIS_MISMATCH' ? 'Khác cơ sở trả lương' : 'Khung thay đổi trong kỳ'}. Hãy đối chiếu hồ sơ lương đã duyệt; bảng lương không tự thay đổi hợp đồng.</p>)}</div> : null}
                   {selectedSlip.breakdown?.calculation && <p>Thuế năm {selectedSlip.breakdown.calculation.year}: giảm trừ bản thân {selectedSlip.breakdown.calculation.personalRelief.toLocaleString('vi-VN')} đ; người phụ thuộc {selectedSlip.breakdown.calculation.dependentRelief.toLocaleString('vi-VN')} đ; thu nhập tính thuế {selectedSlip.breakdown.calculation.taxableIncome.toLocaleString('vi-VN')} đ.</p>}
-                  <p className="font-bold">Thực lĩnh = {selectedSlip.grossPay.toLocaleString('vi-VN')} − {selectedSlip.totalDeduction.toLocaleString('vi-VN')} = {selectedSlip.netPay.toLocaleString('vi-VN')} đ</p>
+                  <p className="font-bold">{selectedSlip.status === 'PROVISIONAL' ? 'Số dư tạm tính' : 'Thực lĩnh'} = {selectedSlip.grossPay.toLocaleString('vi-VN')} − {selectedSlip.totalDeduction.toLocaleString('vi-VN')} = {selectedSlip.netPay.toLocaleString('vi-VN')} đ</p>
+                  {selectedSlip.deductionReviewNote && <p className="text-amber-700">{selectedSlip.deductionReviewNote}</p>}
                 </div>
 
               </div>
             ) : payslipViewMode === 'attendance' ? (
               <section className="space-y-3">
-                {slipAttendanceQuery.isLoading ? <LoadingState text="Đang tải lịch sử chấm công..." /> : null}
-                {slipAttendanceQuery.isError ? <div className="rounded-md border border-rose-300 p-3 text-rose-800">Không tải được lịch sử chấm công: {errorMessage(slipAttendanceQuery.error)}</div> : null}
-                {slipAttendanceQuery.data ? (() => {
-                  const detail = slipAttendanceQuery.data;
+                {selectedSlip.status !== 'PROVISIONAL' && slipAttendanceQuery.isLoading ? <LoadingState text="Đang tải lịch sử chấm công..." /> : null}
+                {selectedSlip.status !== 'PROVISIONAL' && slipAttendanceQuery.isError ? <div className="rounded-md border border-rose-300 p-3 text-rose-800">Không tải được lịch sử chấm công: {errorMessage(slipAttendanceQuery.error)}</div> : null}
+                {(selectedSlip.status === 'PROVISIONAL' ? payrollPreviewQuery.data : slipAttendanceQuery.data) ? (() => {
+                  const isProvisional = selectedSlip.status === 'PROVISIONAL';
+                  const preview = payrollPreviewQuery.data;
+                  const detail: SlipAttendanceDetail = isProvisional ? {
+                    employeeName: selectedSlip.employeeName,
+                    employeeCode: selectedSlip.employeeCode ?? null,
+                    fromDate: preview?.periodFrom ?? new Date().toISOString().slice(0, 10),
+                    toDate: preview?.asOfDate ?? new Date().toISOString().slice(0, 10),
+                    source: 'CURRENT_ATTENDANCE',
+                    days: (selectedSlip.breakdown?.calculation?.attendanceDays ?? []).map((day) => ({
+                      ...day, leaveType: day.leaveType ?? null, firstInAt: day.firstInAt ?? null, lastOutAt: day.lastOutAt ?? null, eventCount: day.eventCount ?? 0, events: [], corrections: [],
+                      leaveRequests: [], overtimeRequests: [], evidence: [], missingEvidence: false,
+                    })),
+                  } : slipAttendanceQuery.data!;
                   const missingCount = detail.days.filter((day) => day.missingEvidence).length;
                   const dateText = (value: string) => new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(value));
                   const timeText = (value: string | null) => value ? new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' }).format(new Date(value)) : '—';
-                  const statusText = (day: SlipAttendanceDay) => day.status === 'ON_LEAVE' ? (day.leaveType === 'ANNUAL' ? 'Nghỉ phép hưởng lương' : day.leaveType === 'UNPAID' ? 'Nghỉ không lương' : `Nghỉ ${day.leaveType === 'SICK' ? 'ốm' : 'chế độ BHXH'}`) : day.status === 'HOLIDAY' ? 'Ngày lễ' : day.status === 'ABSENT' ? 'Vắng' : day.status === 'LATE' ? 'Đi muộn' : day.status === 'EARLY_LEAVE' ? 'Về sớm' : day.status === 'MISSING_PAIR' ? 'Thiếu lượt vào/ra' : day.status === 'PRESENT' ? day.workedMinutes < day.scheduledMinutes ? 'Thiếu giờ' : 'Đủ công' : day.status;
+                  const statusText = (day: SlipAttendanceDay) => day.status === 'UNRECORDED' ? 'Chưa ghi nhận' : day.status === 'ON_LEAVE' ? (day.leaveType === 'ANNUAL' ? 'Nghỉ phép hưởng lương' : day.leaveType === 'UNPAID' ? 'Nghỉ không lương' : `Nghỉ ${day.leaveType === 'SICK' ? 'ốm' : 'chế độ BHXH'}`) : day.status === 'HOLIDAY' ? 'Ngày lễ' : day.status === 'ABSENT' ? 'Vắng' : day.status === 'LATE' ? 'Đi muộn' : day.status === 'EARLY_LEAVE' ? 'Về sớm' : day.status === 'MISSING_PAIR' ? 'Thiếu lượt vào/ra' : day.status === 'PRESENT' ? day.workedMinutes < day.scheduledMinutes ? 'Thiếu giờ' : 'Đủ công' : day.status;
                   const evidenceKind = (day: SlipAttendanceDay): SlipAttendanceEvidence['kind'] => (day.corrections.length > 0 || day.status === 'MISSING_PAIR') && !day.evidence.some((item) => item.kind === 'ATTENDANCE_CORRECTION') ? 'ATTENDANCE_CORRECTION' : day.leaveRequests.some((item) => item.status === 'APPROVED') && !day.evidence.some((item) => item.kind === 'LEAVE') ? 'LEAVE' : day.overtimeRequests.some((item) => item.status === 'APPROVED') && !day.evidence.some((item) => item.kind === 'OVERTIME') ? 'OVERTIME' : 'OTHER';
                   const categoryFor = (day?: SlipAttendanceDay) => {
                     if (!day) return 'none';
+                    if (day.status === 'UNRECORDED') return 'unrecorded';
                     if (day.status === 'ABSENT') return 'absent';
                     if (day.status === 'MISSING_PAIR' || day.missingEvidence || day.status === 'LATE' || day.status === 'EARLY_LEAVE' || day.lateMinutes > 0 || day.earlyMinutes > 0 || day.workedMinutes < day.scheduledMinutes) return 'late';
                     if (day.status === 'HOLIDAY' || day.status === 'ON_LEAVE') return 'other';
@@ -1771,19 +1792,21 @@ export default function PayrollEnginePage() {
                     late: detail.days.filter((day) => categoryFor(day) === 'late').length,
                     absent: detail.days.filter((day) => categoryFor(day) === 'absent').length,
                     other: detail.days.filter((day) => categoryFor(day) === 'other').length,
+                    unrecorded: detail.days.filter((day) => categoryFor(day) === 'unrecorded').length,
                   };
                   const legend = {
                     full: { label: 'Đủ công', swatch: 'bg-emerald-100 border-emerald-300', cell: 'bg-emerald-100 border-emerald-300 text-emerald-950', help: 'Xanh dịu: có dữ liệu chấm công, không muộn/về sớm và số giờ đạt lịch chuẩn.' },
                     late: { label: 'Cần xem lại', swatch: 'bg-amber-100 border-amber-300', cell: 'bg-amber-100 border-amber-300 text-amber-950', help: 'Vàng dịu: đi muộn, về sớm, thiếu lượt vào/ra hoặc còn thiếu tệp hồ sơ hỗ trợ.' },
                     absent: { label: 'Vắng', swatch: 'bg-rose-100 border-rose-300', cell: 'bg-rose-100 border-rose-300 text-rose-950', help: 'Đỏ dịu: hệ thống ghi nhận vắng trong ngày. Mở ngày để xem dữ liệu và hồ sơ liên quan.' },
                     other: { label: 'Nghỉ / ngày lễ', swatch: 'bg-slate-100 border-slate-200', cell: 'bg-slate-100 border-slate-200 text-slate-800', help: 'Xám dịu: ngày nghỉ hoặc ngày lễ, xem đơn nghỉ và trạng thái phê duyệt ở chi tiết ngày.' },
+                    unrecorded: { label: 'Chưa ghi nhận', swatch: 'bg-white border-slate-300', cell: 'bg-white border-slate-300 text-slate-600', help: 'Ngày làm việc chưa có bản ghi chấm công. Với phiếu tạm tính, ngày này không tự động bị tính là vắng; cần đối soát trước khi chốt công.' },
                   } as const;
                   return <>
                     <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-muted/20 p-4">
-                      <div><h3 className="text-sm font-semibold">Lịch sử chấm công · {detail.employeeName}</h3><p className="mt-1 text-muted-foreground">{detail.employeeCode || 'Chưa có mã nhân viên'} · Kỳ {dateText(detail.fromDate)} – {dateText(detail.toDate)}</p><p className="mt-1 text-muted-foreground">{detail.source === 'ATTENDANCE_SNAPSHOT' ? 'Dữ liệu chốt công đã lưu cùng kỳ lương' : 'Kỳ cũ không có ảnh chụp chốt công; đang hiển thị dữ liệu chấm công hiện tại'}</p></div>
-                      <div className="text-right"><p className="font-semibold">{detail.days.length} ngày có dữ liệu</p><p className={missingCount ? 'mt-1 font-medium text-amber-800' : 'mt-1 text-muted-foreground'}>{missingCount ? `${missingCount} ngày chưa có tệp hồ sơ đính kèm` : 'Không có hồ sơ thiếu tệp đính kèm'}</p></div>
+                      <div><h3 className="text-sm font-semibold">Lịch sử chấm công · {detail.employeeName}</h3><p className="mt-1 text-muted-foreground">{detail.employeeCode || 'Chưa có mã nhân viên'} · Kỳ {dateText(detail.fromDate)} – {dateText(detail.toDate)}</p><p className="mt-1 text-muted-foreground">{isProvisional ? 'Dữ liệu chấm công hiện có đến ngày tạm tính; ngày chưa ghi nhận không được xem là ngày vắng.' : detail.source === 'ATTENDANCE_SNAPSHOT' ? 'Dữ liệu chốt công đã lưu cùng kỳ lương' : 'Kỳ cũ không có ảnh chụp chốt công; đang hiển thị dữ liệu chấm công hiện tại'}</p></div>
+                      <div className="text-right"><p className="font-semibold">{detail.days.length} ngày làm việc trong lịch</p><p className={isProvisional ? 'mt-1 text-muted-foreground' : missingCount ? 'mt-1 font-medium text-amber-800' : 'mt-1 text-muted-foreground'}>{isProvisional ? `${detail.days.filter((day) => day.status === 'UNRECORDED').length} ngày chưa ghi nhận` : missingCount ? `${missingCount} ngày chưa có tệp hồ sơ đính kèm` : 'Không có hồ sơ thiếu tệp đính kèm'}</p></div>
                     </div>
-                    <p className="rounded-md border border-border p-3 text-muted-foreground">Giờ vào/ra và công lấy từ dữ liệu chốt của kỳ. Các đơn nghỉ/OT hiển thị trạng thái phê duyệt; tệp đính kèm là hồ sơ hỗ trợ để đối soát. Tải lên tệp thật của ngày tương ứng (PDF, Office, ảnh, TXT/CSV; tối đa 8 MB).</p>
+                    <p className="rounded-md border border-border p-3 text-muted-foreground">{isProvisional ? 'Bản tạm tính chỉ hiển thị dữ liệu chấm công đang có và chưa kèm hồ sơ đính kèm. Mở ngày để xem số giờ; ngày chưa ghi nhận cần đối soát trước khi chốt công.' : 'Giờ vào/ra và công lấy từ dữ liệu chốt của kỳ. Các đơn nghỉ/OT hiển thị trạng thái phê duyệt; tệp đính kèm là hồ sơ hỗ trợ để đối soát. Tải lên tệp thật của ngày tương ứng (PDF, Office, ảnh, TXT/CSV; tối đa 8 MB).'}</p>
                     {detail.days.length === 0 ? <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">Kỳ lương này chưa có dữ liệu ngày công để hiển thị.</div> : <div className="space-y-3">
                       <div className="rounded-lg border border-border bg-background p-4">
                         <div className="flex flex-wrap items-start justify-between gap-3"><div><h4 className="font-semibold">Lịch chấm công tháng</h4><p className="mt-1 text-muted-foreground">Chọn một ngày để xem giờ vào/ra, đơn nghỉ, OT và hồ sơ. Mỗi cột là một ngày trong tuần.</p></div><span className="font-medium text-foreground">{new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', month: 'long', year: 'numeric' }).format(from)}</span></div>
@@ -1801,7 +1824,7 @@ export default function PayrollEnginePage() {
                             </div>
                           </div>
                         </div>
-                        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
                           {(Object.entries(legend) as [keyof typeof legend, typeof legend.full][]).map(([key, item]) => <button key={key} type="button" aria-pressed={activeAttendanceLegend === key} onClick={() => setActiveAttendanceLegend(activeAttendanceLegend === key ? null : key)} className={`flex items-center gap-2 rounded-md border px-2.5 py-2 text-left transition-colors ${activeAttendanceLegend === key ? 'border-foreground/50 bg-muted' : 'border-border hover:bg-muted/50'}`}><span className={`h-3.5 w-3.5 shrink-0 rounded-[3px] border ${item.swatch}`} /><span className="min-w-0"><span className="block font-medium">{item.label}</span><span className="text-muted-foreground">{counts[key]} ngày</span></span></button>)}
                         </div>
                         {activeAttendanceLegend ? <p className="mt-3 rounded-md bg-muted/50 px-3 py-2 text-muted-foreground" role="status">{legend[activeAttendanceLegend].help}</p> : null}
@@ -1810,7 +1833,7 @@ export default function PayrollEnginePage() {
                         <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-semibold">{dateText(selectedDay.workDate)} · {statusText(selectedDay)}</p><p className="mt-1 text-muted-foreground">Vào {timeText(selectedDay.firstInAt)} · Ra {timeText(selectedDay.lastOutAt)} · {(selectedDay.workedMinutes / 60).toFixed(2)} / {(selectedDay.scheduledMinutes / 60).toFixed(2)} giờ</p><p className="mt-1 text-muted-foreground">Muộn {selectedDay.lateMinutes} phút · Về sớm {selectedDay.earlyMinutes} phút · {selectedDay.eventCount} lượt chấm</p></div>
                           {selectedDay.missingEvidence ? <label className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5 font-medium hover:bg-muted"><Upload className="h-3.5 w-3.5" />{attendanceEvidenceMutation.isPending ? 'Đang tải...' : 'Bổ sung tệp'}<input type="file" className="sr-only" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt,.csv" disabled={attendanceEvidenceMutation.isPending} onChange={(event) => { const file = event.currentTarget.files?.[0]; if (file) attendanceEvidenceMutation.mutate({ workDate: selectedDay.workDate, kind: evidenceKind(selectedDay), file }); event.currentTarget.value = ''; }} /></label> : null}
                         </div>
-                        {(selectedDay.events.length > 0 || selectedDay.corrections.length > 0 || selectedDay.leaveRequests.length > 0 || selectedDay.overtimeRequests.length > 0 || selectedDay.evidence.length > 0) ? <div className="mt-3 space-y-1.5 border-t border-border/70 pt-3 text-muted-foreground">
+                        {isProvisional && selectedDay.status === 'UNRECORDED' ? <p className="mt-3 border-t border-border/70 pt-3 text-muted-foreground">Chưa có bản ghi chấm công cho ngày này. Đây không phải kết luận vắng; hãy kiểm tra lại dữ liệu trước khi chốt công.</p> : (selectedDay.events.length > 0 || selectedDay.corrections.length > 0 || selectedDay.leaveRequests.length > 0 || selectedDay.overtimeRequests.length > 0 || selectedDay.evidence.length > 0) ? <div className="mt-3 space-y-1.5 border-t border-border/70 pt-3 text-muted-foreground">
                           {selectedDay.events.length ? <p><b className="text-foreground">Lượt chấm:</b> {selectedDay.events.map((event) => `${timeText(event.occurredAt)}${event.anomalyReason ? ` (${event.anomalyReason})` : ''}`).join(' · ')}</p> : null}
                           {selectedDay.corrections.map((correction) => <p key={correction.id}><b className="text-foreground">Hiệu chỉnh {correction.field}:</b> {correction.oldValue || '—'} → {correction.newValue || '—'} · {correction.reason} · {correction.correctedBy} ({timeText(correction.createdAt)}){!selectedDay.evidence.some((item) => item.kind === 'ATTENDANCE_CORRECTION') ? ' · Chưa có tệp hỗ trợ' : ''}</p>)}
                           {selectedDay.leaveRequests.map((item) => <p key={item.id}><b className="text-foreground">Đơn nghỉ {item.type} · {item.status}:</b> {item.reason}{item.decisionNote ? ` · Ghi chú duyệt: ${item.decisionNote}` : ''}{item.status === 'APPROVED' && !selectedDay.evidence.some((file) => file.kind === 'LEAVE') ? ' · Chưa đính kèm tệp' : ''}</p>)}
@@ -1939,9 +1962,9 @@ export default function PayrollEnginePage() {
                 </section>
 
                 <section className="payslip-section border-y border-black py-3">
-                  <p className="font-bold uppercase">Số tiền thực lĩnh</p>
+                  <p className="font-bold uppercase">{selectedSlip.status === 'PROVISIONAL' ? 'Số dư tạm tính' : 'Số tiền thực lĩnh'}</p>
                   <p className="mt-1 text-lg font-bold">{selectedSlip.netPay.toLocaleString('vi-VN')} VND</p>
-                  <p className="mt-1 text-xs">Thực lĩnh = tổng thu nhập − tổng khấu trừ.</p>
+                  <p className="mt-1 text-xs">{selectedSlip.status === 'PROVISIONAL' ? 'Số dư tạm tính' : 'Thực lĩnh'} = tổng thu nhập − tổng khấu trừ.{selectedSlip.deductionReviewNote ? ' Số dư âm cần đối soát, không dùng để chi trả.' : ''}</p>
                 </section>
 
                 <footer className="grid grid-cols-3 gap-3 pt-5 text-center">

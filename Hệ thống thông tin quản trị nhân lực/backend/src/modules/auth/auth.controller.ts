@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { AuthService } from './auth.service';
-import { LoginDto, RefreshDto } from './dto';
+import { ChangePasswordDto, LoginDto, RefreshDto } from './dto';
 import { CurrentUser, Public } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 
@@ -55,6 +55,15 @@ export class AuthController {
   async logoutAll(@CurrentUser() user: AuthUser): Promise<{ revoked: number }> {
     const revoked = await this.authService.logoutAll(user.id);
     return { revoked };
+  }
+
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Đổi mật khẩu khởi tạo và thu hồi các phiên cũ' })
+  async changePassword(@Body() dto: ChangePasswordDto, @CurrentUser() user: AuthUser, @Req() req: Request) {
+    const { ip, userAgent } = clientMeta(req);
+    return { ...(await this.authService.changePassword(user.id, dto, ip, userAgent)), tokenType: 'Bearer' };
   }
 
   @Get('me')

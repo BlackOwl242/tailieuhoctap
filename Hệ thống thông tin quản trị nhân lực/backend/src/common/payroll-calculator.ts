@@ -4,6 +4,7 @@ export interface PayrollPolicy {
   version: string; effectiveFrom: string; effectiveTo?: string | null;
   basisReference: string;
   personalRelief: number; dependentRelief: number; taxBrackets: [number | null, number][];
+  shortContractThreshold?: number;
   nonResidentTaxRate: number; overtimeExemptMode: 'ALL' | 'PREMIUM_ONLY' | 'TAXABLE'; nightWorkExemptMode: 'ALL' | 'PREMIUM_ONLY' | 'TAXABLE';
   employeeRates: { socialInsurance: number; healthInsurance: number; unemployment: number };
   employerRates: { socialInsurance: number; healthInsurance: number; unemployment: number; occupationalAccident: number; tradeUnionFund: number };
@@ -19,6 +20,7 @@ export const VN_PAYROLL_POLICIES: PayrollPolicy[] = [
     version: 'VN-PAYROLL-2025.02', effectiveFrom: '2025-01-01', effectiveTo: '2025-12-31',
     basisReference: 'Bộ luật Lao động 45/2019/QH14; Luật BHXH 58/2014/QH13 và văn bản hướng dẫn; Luật BHYT 25/2008/QH12; Luật Việc làm 38/2013/QH13; Luật TNCN 04/2007/QH12 và văn bản sửa đổi (áp dụng theo hiệu lực từng kỳ).',
     personalRelief: 11_000_000, dependentRelief: 4_400_000,
+    shortContractThreshold: 2_000_000,
     taxBrackets: [[5e6, .05], [10e6, .1], [18e6, .15], [32e6, .2], [52e6, .25], [80e6, .3], [null, .35]],
     nonResidentTaxRate: .2, overtimeExemptMode: 'PREMIUM_ONLY', nightWorkExemptMode: 'PREMIUM_ONLY',
     employeeRates: { socialInsurance: .08, healthInsurance: .015, unemployment: .01 },
@@ -35,6 +37,7 @@ export const VN_PAYROLL_POLICIES: PayrollPolicy[] = [
     version: 'VN-PAYROLL-2026.02', effectiveFrom: '2026-01-01', effectiveTo: '2026-06-30',
     basisReference: 'Luật BHXH 41/2024/QH15; Luật BHYT 25/2008/QH12 được sửa đổi bởi Luật 51/2024/QH15 và Nghị định 188/2025/NĐ-CP; Luật Việc làm 74/2025/QH15 và Nghị định 374/2025/NĐ-CP; pháp luật TNCN có hiệu lực đến 30/06/2026.',
     personalRelief: 15_500_000, dependentRelief: 6_200_000,
+    shortContractThreshold: 2_000_000,
     taxBrackets: [[10e6, .05], [30e6, .1], [60e6, .2], [100e6, .3], [null, .35]],
     nonResidentTaxRate: .2, overtimeExemptMode: 'ALL', nightWorkExemptMode: 'ALL',
     employeeRates: { socialInsurance: .08, healthInsurance: .015, unemployment: .01 },
@@ -54,6 +57,7 @@ VN_PAYROLL_POLICIES.push({
   version: 'VN-PAYROLL-2026.07.02',
   effectiveFrom: '2026-07-01',
   effectiveTo: null,
+  shortContractThreshold: 5_000_000,
   stateBaseSalary: 2_530_000,
   basisReference: 'Luật BHXH 41/2024/QH15; Luật BHYT 51/2024/QH15 và Nghị định 188/2025/NĐ-CP; Luật Việc làm 74/2025/QH15 và Nghị định 374/2025/NĐ-CP; Luật TNCN 109/2025/QH15 và Nghị định 253/2026/NĐ-CP (hiệu lực 01/07/2026).',
   bhxhCap: 50_600_000,
@@ -88,6 +92,7 @@ export function currentPayrollPolicies(value: unknown): PayrollPolicy[] {
       ...normalized,
       basisReference: normalized.basisReference || source?.basisReference || 'Cần quản trị cập nhật căn cứ pháp lý chính thức áp dụng cho kỳ này.',
       stateBaseSalary: normalized.stateBaseSalary ?? source?.stateBaseSalary ?? 2_340_000,
+      shortContractThreshold: normalized.shortContractThreshold ?? source?.shortContractThreshold ?? 2_000_000,
       minimumHourlyWageByRegion: normalized.minimumHourlyWageByRegion || source?.minimumHourlyWageByRegion,
     };
   });
@@ -136,6 +141,8 @@ export function monthlyHourlyRate(monthlySalary: number, standardHours: number):
   return standardHours > 0 ? monthlySalary / standardHours : 0;
 }
 export interface PayrollInput {
+  /** Read-only mid-month balance; never enables a negative payable payroll. */
+  provisional?: boolean;
   earnedBase?: number; overtimeTaxable?: number; nightWorkBase?: number; nightWorkPremium?: number; insuranceRequired?: boolean; year: number; baseSalary: number; standardDays: number; paidDays: number; attendanceDays: number;
   insuranceSalary: number; insuranceCap: number; unemploymentCap: number; dependents: number;
   overtime: number; bonus: number; items: SalaryItem[]; loans: { id: string; emi: number; remaining: number }[];
@@ -223,14 +230,15 @@ export function calculatePayroll(input: PayrollInput) {
   const personalRelief = taxResidency === 'RESIDENT' && !shortContractWithholding ? policy.personalRelief : 0;
   const dependentRelief = taxResidency === 'RESIDENT' && !shortContractWithholding ? input.dependents * policy.dependentRelief : 0;
   const taxableIncome = Math.max(0, taxableEarnings - insurance - personalRelief - dependentRelief);
+  const shortContractThreshold = policy.shortContractThreshold ?? (policy.effectiveFrom >= '2026-07-01' ? 5_000_000 : 2_000_000);
   const pit = taxResidency === 'NON_RESIDENT'
     ? Math.round(taxableEarnings * policy.nonResidentTaxRate)
     : shortContractWithholding
-      ? (taxableEarnings >= 5_000_000 ? Math.round(taxableEarnings * 0.1) : 0)
+      ? (taxableEarnings >= shortContractThreshold ? Math.round(taxableEarnings * 0.1) : 0)
       : progressiveTax(taxableIncome, year, policy.taxBrackets);
   const taxLabel = taxResidency === 'NON_RESIDENT'
     ? `Thuế TNCN cá nhân không cư trú (${policy.nonResidentTaxRate * 100}%)`
-    : shortContractWithholding ? 'Khấu trừ TNCN 10% hợp đồng dưới 3 tháng (ngưỡng chi trả 5 triệu đồng)' : `Thuế TNCN lũy tiến năm ${year}`;
+    : shortContractWithholding ? `Khấu trừ TNCN 10% hợp đồng dưới 3 tháng (ngưỡng chi trả ${shortContractThreshold.toLocaleString('vi-VN')} đồng/lần)` : `Thuế TNCN lũy tiến năm ${year}`;
   deductions.push({ code: 'PIT', name: taxLabel, amount: pit, basisReference: policy.basisReference });
   const grossPay = earnings.reduce((sum, line) => sum + line.amount, 0);
   const beforeLoan = Math.max(0, grossPay - deductions.reduce((sum, line) => sum + line.amount, 0));
@@ -241,7 +249,7 @@ export function calculatePayroll(input: PayrollInput) {
     if (amount > 0) { deductions.push({ code: `LOAN_${loan.id}`, name: 'Khấu trừ vay phúc lợi', amount }); loanDeductions.push({ loanId: loan.id, amount }); available -= amount; }
   }
   const totalDeduction = deductions.reduce((sum, line) => sum + line.amount, 0);
-  if (totalDeduction > grossPay) {
+  if (totalDeduction > grossPay && !input.provisional) {
     const detail = deductions.map(line => `${line.code}=${Math.round(line.amount)}`).join(', ');
     throw new Error(`Các khoản khấu trừ vượt thu nhập (thu nhập ${Math.round(grossPay)}; khấu trừ ${Math.round(totalDeduction)}; chi tiết ${detail}); cần đối soát trước khi tính lương`);
   }

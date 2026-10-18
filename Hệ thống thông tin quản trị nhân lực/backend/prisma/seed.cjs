@@ -32,7 +32,7 @@ async function main() {
         "space_members","spaces","audit_logs","notifications","settings",
         "refresh_tokens","user_roles","roles","users","org_units" CASCADE`);
 
-      const passwordHash = await bcrypt.hash('Admin@123', 12);
+      const passwordHash = await bcrypt.hash('123', 12);
       const hashOf = (pw) => bcrypt.hashSync(pw, 12);
 
       // ---------------------------------------------------------------- cơ cấu tổ chức theo báo cáo PTTK_OOP_HR
@@ -118,7 +118,7 @@ async function main() {
       });
       const km = await tx.user.create({
         data: {
-          email: 'km.manager@demo.local', passwordHash: hashOf('Manager@123'), fullName: 'Võ Thị Thanh Hà',
+          email: 'km.manager@demo.local', passwordHash: hashOf('123'), fullName: 'Võ Thị Thanh Hà',
           jobTitle: 'Chuyên viên chính Nhân sự Vận hành', orgUnitId: hrOps.id,
           employeeCode: 'NV0002', hireDate: new Date('2018-06-11'), employmentStatus: 'ACTIVE', baseSalary: 32000000,
           expertise: ['quy-trình', 'chính-sách', 'onboarding'],
@@ -127,7 +127,7 @@ async function main() {
       });
       const pm = await tx.user.create({
         data: {
-          email: 'pm.java@demo.local', passwordHash: hashOf('Pm@123456'), fullName: 'Lê Minh Tuấn',
+          email: 'pm.java@demo.local', passwordHash: hashOf('123'), fullName: 'Lê Minh Tuấn',
           jobTitle: 'Trưởng nhóm Java', orgUnitId: javaSquadId,
           employeeCode: 'NV0003', hireDate: new Date('2020-09-14'), employmentStatus: 'ACTIVE', baseSalary: 40000000,
           expertise: ['java', 'spring', 'fintech'],
@@ -136,7 +136,7 @@ async function main() {
       });
       const fresher = await tx.user.create({
         data: {
-          email: 'dev.fresher@demo.local', passwordHash: hashOf('Fresher@123'), fullName: 'Đỗ Gia Hân',
+          email: 'dev.fresher@demo.local', passwordHash: hashOf('123'), fullName: 'Đỗ Gia Hân',
           jobTitle: 'Lập trình viên Java (Fresher)', orgUnitId: javaSquadId,
           employeeCode: 'NV0004', hireDate: new Date(Date.now() - 45 * 86400000), employmentStatus: 'PROBATION', baseSalary: 12000000,
           expertise: ['java'],
@@ -145,7 +145,7 @@ async function main() {
       });
       const editor = await tx.user.create({
         data: {
-          email: 'editor.qa@demo.local', passwordHash: hashOf('Editor@123'), fullName: 'Hồ Ngọc Sơn',
+          email: 'editor.qa@demo.local', passwordHash: hashOf('123'), fullName: 'Hồ Ngọc Sơn',
           jobTitle: 'Trưởng nhóm Kiểm thử', expertise: ['qa', 'automation'], orgUnitId: qaAuto.id,
           employeeCode: 'NV0005', hireDate: new Date('2021-02-22'), employmentStatus: 'ACTIVE', baseSalary: 30000000,
           roles: { create: [{ roleCode: 'USER' }] },
@@ -397,12 +397,7 @@ async function main() {
     }, { maxWait: 15000, timeout: 60000 });
 
     console.log('[seed] Done ✔');
-    console.log('[seed] Accounts:');
-    console.log('  admin@demo.local / Admin@123          (ADMIN)');
-    console.log('  km.manager@demo.local / Manager@123   (KM_MANAGER)');
-    console.log('  pm.java@demo.local / Pm@123456        (USER — Trưởng nhóm)');
-    console.log('  dev.fresher@demo.local / Fresher@123  (USER — Nhân viên mới)');
-    console.log('  editor.qa@demo.local / Editor@123     (USER — EDITOR Space QA)');
+    console.log('[seed] Tài khoản đã tạo. Mật khẩu ban đầu của tài khoản người dùng là 123.');
     return true;
   } finally {
     await prisma.$executeRawUnsafe(`SELECT pg_advisory_unlock(727101)`).catch(() => undefined);
@@ -427,6 +422,10 @@ main()
     // Seed Phân hệ Mở rộng Chuẩn mực Frappe HRMS
     const { seedFrappeHrms } = require('./seed-frappe-hrms.cjs');
     await seedFrappeHrms();
+
+    // Đồng bộ hồ sơ hợp đồng mô phỏng và bản điện tử cho dữ liệu HRMS hiện có.
+    const { createOrUpdateContracts } = require('./seed-demo-contracts.cjs');
+    await createOrUpdateContracts(prisma);
   })
   .catch((e) => {
     console.error('[seed] Failed:', e.message || e);
