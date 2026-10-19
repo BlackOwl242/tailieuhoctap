@@ -1,6 +1,6 @@
 # Hồ sơ nghiên cứu hệ thống thông tin giải quyết thủ tục hành chính Hà Nội
 
-Bản chính là [Báo cáo phân tích và thiết kế hướng đối tượng](04_Bao_cao/Phan_tich_thiet_ke_huong_doi_tuong_Ha_Noi.docx). Bản hiện hành có 184 trang, 136 hình, 97 bảng có số hiệu và một bảng từ viết tắt. Trích dẫn dùng số trong ngoặc vuông; Use case mang mã UC01 đến UC36.
+Bản chính là [Báo cáo phân tích và thiết kế hướng đối tượng](04_Bao_cao/Phan_tich_thiet_ke_huong_doi_tuong_Ha_Noi.docx). Bản hiện hành có 200 trang trong PDF, 136 hình, 97 bảng có số hiệu và một bảng từ viết tắt. Trích dẫn dùng số trong ngoặc vuông; Use case mang mã UC01 đến UC36.
 
 ## Nội dung bộ hồ sơ
 
@@ -28,3 +28,6 @@ Báo cáo có bảy chương và phần mở đầu riêng về lý do chọn đ
 Chương 3 trình bày biểu đồ Use Case cùng biểu đồ trình tự và hoạt động cho 36 Use case. Chương 4 trình bày kiến trúc, mô hình lớp và ERD; từ điển dữ liệu hiện có 37 thực thể cùng 74 khóa ngoại/quan hệ. Các sơ đồ được chia nhóm để giữ trên khổ A4, còn định nghĩa chi tiết nằm trong bảng và từ điển dữ liệu.
 
 Danh mục bảng và hình căn cùng lề trái, số trang bên phải và có dấu chấm dẫn. Ảnh kết xuất và bản sao phục vụ kiểm tra được lưu trong thư mục tạm ngoài kho tài liệu.
+
+
+Bộ ảnh giao diện đã được đối chiếu lại với bản ứng dụng đang chạy ngày 19/10/2026: đủ 45 ảnh cho các tuyến người dân, cán bộ, quản trị viên và hướng dẫn. Các bảng trong Word/PDF dùng nền trắng, chữ đen và đường kẻ lưới đơn giản. Danh mục ảnh hiện hành nằm tại `03_Thiet_ke/Anh_giao_dien_he_thong/Danh_muc_anh_giao_dien.json`.

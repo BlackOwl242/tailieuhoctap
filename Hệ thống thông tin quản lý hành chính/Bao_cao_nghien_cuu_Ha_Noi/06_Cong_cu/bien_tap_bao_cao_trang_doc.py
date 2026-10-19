@@ -39,7 +39,7 @@ def update_report():
             cells=row.cells
             label=cells[0].text.replace('\u200b','')
             if 'Anh_giao_dien_he_thong' in label:
-                replace_text(cells[1].paragraphs[0],'45 ảnh giao diện ứng dụng, chụp ngày 16/10/2026; có danh mục ảnh kèm theo.')
+                replace_text(cells[1].paragraphs[0],'45 ảnh giao diện ứng dụng, chụp ngày 19/10/2026; có danh mục ảnh kèm theo.')
     doc.save(REPORT)
     print(f'Đã biên tập {count} đoạn; {len(doc.inline_shapes)} hình; {len(doc.sections)} phần, đều khổ A4 dọc.')
 
@@ -165,8 +165,8 @@ def update_sources():
     path=ROOT/'03_Thiet_ke/Anh_giao_dien_he_thong/Danh_muc_anh_giao_dien.json'
     data=json.loads(path.read_text('utf8'))
     capture=folder/'chup_giao_dien_hien_tai.cjs';code=capture.read_text('utf8')
-    for row in data['captures']:
-        n=int(row['file'].split('_')[0]);old=row['title'];new=UI_TITLES[n]
+    for n,row in enumerate(data['captures'],start=1):
+        old=row['title'];new=UI_TITLES[n]
         code=code.replace(old,new);row['title']=new
     path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n','utf8');capture.write_text(code,'utf8')
 

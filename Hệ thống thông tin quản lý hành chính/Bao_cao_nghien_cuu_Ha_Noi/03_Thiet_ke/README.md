@@ -12,3 +12,4 @@ Các lược đồ và giao tiếp ở đây là phương án thiết kế nghi�
 * `Kich_ban_kiem_thu.csv`: 101 ca; tất cả chưa thực hiện.
 
 Quy trình, quyền và nguyên tắc chuyển bước ở các chương III, IV, VII trong `02_Noi_dung`. Điều kiện khảo sát bổ sung ở phụ lục A.
+Ảnh giao diện bàn cán bộ được cập nhật ngày 19/10/2026 tại `Anh_giao_dien_he_thong/can_bo_danh_muc_thu_tuc_20261019.jpg` và `Anh_giao_dien_he_thong/can_bo_chi_tiet_thu_tuc_20261019.jpg`. Danh sách có bộ lọc, tình trạng dữ liệu và quản lý lĩnh vực; trang chi tiết thể hiện nội dung công bố cùng cấu hình nội bộ, lịch sử và thao tác sửa theo quyền. Báo cáo Word/PDF đã thay các hình 4.58 và 4.59 bằng ảnh mới.

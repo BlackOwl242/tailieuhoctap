@@ -1,8 +1,10 @@
-# Danh sách tài khoản sau khôi phục ngày 18/10/2026
+# Danh sách 79 tài khoản gốc sau khôi phục ngày 18/10/2026
 
-Đọc trực tiếp từ cơ sở dữ liệu đang dùng (`data/hanoi-services.sqlite3`): **79 tài khoản**, gồm 2 quản trị viên, 19 tiếp nhận, 19 chuyên viên, 19 lãnh đạo, 19 văn thư và 1 tài chính. Đây là tài khoản của dự án môn học. Danh sách không xác nhận quyền công vụ ngoài hệ thống.
+Đây là bản chụp danh sách có **79 tài khoản tại thời điểm khôi phục**, không phải tổng số hiện tại. Ngày 18/10/2026, hệ thống được bổ sung 626 tài khoản cho 126 UBND phường, xã mới; tổng số hiện tại là **705 tài khoản**. Xem [danh sách tài khoản UBND phường, xã](TAI_KHOAN_UBND_CAP_XA_HANOI_2026.md) và [danh sách phân quyền cốt lõi](DANH_SACH_TAI_KHOAN_DUOC_PHAN_QUYEN.md).
 
-- **Mật khẩu mặc định của toàn bộ 79 tài khoản:** `123` (không bắt buộc đổi mật khẩu lần đầu khi đăng nhập tại `/staff`).
+Tài khoản trong tài liệu này thuộc dự án môn học; danh sách không xác nhận quyền công vụ ngoài hệ thống.
+
+- **Mật khẩu mặc định của 79 tài khoản gốc:** `123` (không bắt buộc đổi mật khẩu lần đầu khi đăng nhập tại `/staff`).
 - Giá trị “Đang hoạt động” là cờ `active`; hiệu lực truy cập còn phụ thuộc ngày bắt đầu/kết thúc và các quyền được cấp.
 
 | STT | Họ tên | Email đăng nhập | Vai trò | Phạm vi | Trạng thái | Từ ngày | Đến ngày | Mật khẩu mặc định | Buộc đổi mật khẩu |

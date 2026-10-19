@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import './App.css'
 import { CitizenApplicationForm, type SubmissionSchema } from './CitizenSubmission'
 import { serviceModeLabel } from './procedureLabels'
 import { InformationHome } from './InformationHome'
 import { AdministrativeServiceDesk, PublicAdministrativeServices } from './AdministrativeServices'
 import { CitizenProcedureCatalog } from './CitizenProcedureCatalog'
+import { CitizenProcedureDetail } from './CitizenProcedureDetail'
+import './StaffProcedureCatalog.css'
 import { showcaseProcedureCodes } from './serviceTopics'
 
 type User = { id: string; email: string; phone: string; name: string; role: string; emailVerified: boolean; agencyScope?: string; validFrom?: string; validUntil?: string; maySignStop?: boolean; maySignSandbox?: boolean; signingAuthorityRef?: string; mustChangePassword?: boolean; canManageAgencyAccounts?: boolean }
@@ -99,8 +101,8 @@ function validateCitizenFiles(files: File[]) {
   if (files.reduce((sum, file) => sum + file.size, 0) > 9 * 1024 * 1024) return 'Tổng dung lượng tệp một lần gửi không được vượt quá 9 MB.'
   return ''
 }
-type PortalRoute = 'public' | 'staff' | 'guide' | 'catalog' | 'submit' | 'track'
-const routeFromPath = (): PortalRoute => window.location.pathname.startsWith('/staff') ? 'staff' : window.location.pathname.startsWith('/huong-dan') ? 'guide' : window.location.pathname.startsWith('/thu-tuc') ? 'catalog' : window.location.pathname.startsWith('/nop-ho-so') ? 'submit' : window.location.pathname.startsWith('/tra-cuu-ho-so') ? 'track' : 'public'
+type PortalRoute = 'public' | 'staff' | 'guide' | 'catalog' | 'submit' | 'track' | 'citizen-services'
+const routeFromPath = (): PortalRoute => window.location.pathname.startsWith('/staff') ? 'staff' : window.location.pathname.startsWith('/huong-dan') ? 'guide' : window.location.pathname.startsWith('/tien-ich') ? 'citizen-services' : window.location.pathname.startsWith('/thu-tuc') ? 'catalog' : window.location.pathname.startsWith('/nop-ho-so') ? 'submit' : window.location.pathname.startsWith('/tra-cuu-ho-so') ? 'track' : 'public'
 
 function AuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user: User, csrf: string) => void; onBack: () => void }) {
   const [busy, setBusy] = useState(false)
@@ -117,7 +119,7 @@ function AuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user: User,
     <AgencyMasthead staff />
     <section className="auth-content">
       <div className="auth-intro">
-        <button className="staff-back-link" onClick={onBack}>← Quay về cổng thông tin</button>
+        <button className="staff-back-link" onClick={onBack}> Quay về cổng thông tin</button>
         <span className="eyebrow">KHU VỰC LÀM VIỆC NỘI BỘ</span>
         <h1>Bàn làm việc nội bộ</h1>
         <p>Đăng nhập để tiếp nhận, phân công và theo dõi hồ sơ trong phạm vi tài khoản được cấp.</p>
@@ -232,30 +234,36 @@ function PublicProcedureSearch({ onOpenProcedure }: { onOpenProcedure: (code: st
     <div className="public-search-controls"><label>Tên hoặc mã thủ tục<input type="search" value={query} onChange={event => { setQuery(event.target.value); setLimit(8) }} placeholder="Ví dụ: khai sinh, đăng ký hộ kinh doanh…" /></label><label>Lĩnh vực<select value={field} onChange={event => { setField(event.target.value); setLimit(8) }}><option value="all">Tất cả lĩnh vực</option>{fields.map(value => <option key={value} value={value}>{value}</option>)}</select></label></div>
     {loading && <p className="catalog-status" role="status">Đang tải danh mục thủ tục…</p>}
     {error && <p className="catalog-status catalog-error" role="alert">{error}</p>}
-    {!loading && !error && <><p className="catalog-status">Đang xem {Math.min(limit, results.length).toLocaleString('vi-VN')} trong {results.length.toLocaleString('vi-VN')} thủ tục tham chiếu</p><div className="public-procedure-results">{results.slice(0, limit).map(item => <article key={item.code}><div><small>{item.code} · {item.field || 'Chưa phân nhóm'} · {serviceModeLabel(item.level)}</small><h3>{item.name}</h3><p>{item.agency || 'Cơ quan thực hiện theo thủ tục trên Cổng quốc gia'}</p>{item.routing?.summary && <p className="public-route-summary">{item.routing.summary}</p>}</div><button className="procedure-detail-link" onClick={() => onOpenProcedure(item.code)}>Xem thông tin thủ tục →</button></article>)}</div>{results.length === 0 && <div className="catalog-empty">Không tìm thấy kết quả. Thử từ khóa khác hoặc chọn tất cả lĩnh vực.</div>}{results.length > limit && <button className="button secondary catalog-more" onClick={() => setLimit(value => value + 8)}>Xem thêm thủ tục</button>}</>}
+    {!loading && !error && <><p className="catalog-status">Đang xem {Math.min(limit, results.length).toLocaleString('vi-VN')} trong {results.length.toLocaleString('vi-VN')} thủ tục tham chiếu</p><div className="public-procedure-results">{results.slice(0, limit).map(item => <article key={item.code}><div><small>{item.code} · {item.field || 'Chưa phân nhóm'} · {serviceModeLabel(item.level)}</small><h3>{item.name}</h3><p>{item.agency || 'Cơ quan thực hiện theo thủ tục trên Cổng quốc gia'}</p>{item.routing?.summary && <p className="public-route-summary">{item.routing.summary}</p>}</div><button className="procedure-detail-link" onClick={() => onOpenProcedure(item.code)}>Xem thông tin thủ tục</button></article>)}</div>{results.length === 0 && <div className="catalog-empty">Không tìm thấy kết quả. Thử từ khóa khác hoặc chọn tất cả lĩnh vực.</div>}{results.length > limit && <button className="button secondary catalog-more" onClick={() => setLimit(value => value + 8)}>Xem thêm thủ tục</button>}</>}
   </section>
 }
 
 type PublicView = 'public' | 'catalog' | 'submit' | 'track' | 'receipt'
 type SubmissionReceipt = { code: string; accessKey?: string; status?: string; statusLabel?: string }
 
-function PublicPortal({ onStaff, onGuide, onNavigate, onStartProcedure, onReceipt, receipt, signedIn, initialView, initialProcedureCode }: { onStaff: () => void; onGuide: () => void; onNavigate: (route: PortalRoute, procedureCode?: string, applicantType?: 'citizen' | 'organization') => void; onStartProcedure: (code: string) => void; onReceipt: (value: SubmissionReceipt) => void; receipt: SubmissionReceipt | null; signedIn: boolean; initialView: 'public' | 'catalog' | 'submit' | 'track'; initialProcedureCode: string }) {
+function PublicPortal({ onStaff, onGuide, onNavigate, onReceipt, receipt, signedIn, initialView, initialProcedureCode }: { onStaff: () => void; onGuide: () => void; onNavigate: (route: PortalRoute, procedureCode?: string, applicantType?: 'citizen' | 'organization') => void; onReceipt: (value: SubmissionReceipt) => void; receipt: SubmissionReceipt | null; signedIn: boolean; initialView: 'public' | 'catalog' | 'submit' | 'track'; initialProcedureCode: string }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [view, setView] = useState<PublicView>(initialView)
-  if (view !== 'public') return <CitizenWorkflow view={view} receipt={receipt} initialProcedureCode={initialProcedureCode} onBack={() => { setView('public'); onNavigate('public') }} onSubmit={() => { setView('submit'); onNavigate('submit') }} onTrack={() => { setView('track'); onNavigate('track') }} onCatalog={() => { setView('catalog'); onNavigate('catalog') }} onStartProcedure={onStartProcedure} onSubmitted={value => { onReceipt(value); setView('receipt') }} />
+  if (view !== 'public') return <CitizenWorkflow view={view} receipt={receipt} initialProcedureCode={initialProcedureCode} onBack={() => { setView('public'); onNavigate('public') }} onSubmit={() => { setView('submit'); onNavigate('submit') }} onTrack={() => { setView('track'); onNavigate('track') }} onCatalog={() => { setView('catalog'); onNavigate('catalog') }} onSubmitted={value => { onReceipt(value); setView('receipt') }} />
   return <div className="public-site">
     <AgencyMasthead />
     <header className={`public-header official-header${mobileNavOpen ? ' mobile-open' : ''}`}>
       <button className="mobile-nav-toggle" type="button" aria-expanded={mobileNavOpen} aria-controls="public-main-navigation" onClick={() => setMobileNavOpen(open => !open)}>
         <span aria-hidden="true">☰</span> Danh mục
-      </button>
+     </button>
       <nav className="public-nav" id="public-main-navigation" aria-label="Điều hướng chính">
         <a className="nav-home" href="/" onClick={event => { event.preventDefault(); onNavigate('public') }}>⌂ <span>Trang chủ</span></a>
-        <a href="/#gioi-thieu">Giới thiệu</a>
-        <a href="/#tin-tuc">Tin tức, sự kiện</a>
-        <a href="/#thu-vien-anh">Thư viện ảnh</a>
-        <a href="#ho-tro">Liên hệ</a>
+        <a href="/thu-tuc" onClick={event => { event.preventDefault(); onNavigate('catalog') }}>Danh mục thủ tục</a>
+        <a href="/nop-ho-so" onClick={event => { event.preventDefault(); onNavigate('submit') }}>Nộp hồ sơ</a>
+        <a href="/tra-cuu-ho-so" onClick={event => { event.preventDefault(); onNavigate('track') }}>Tra cứu hồ sơ</a>
+        <a href="/tien-ich" onClick={event => { event.preventDefault(); onNavigate('citizen-services') }}>Lịch hẹn &amp; phản ánh</a>
         <a href="/huong-dan" onClick={event => { event.preventDefault(); onGuide() }}>Hướng dẫn sử dụng</a>
+        <details className="official-nav-info"><summary>Thông tin</summary><div className="official-nav-info-menu">
+          <a href="/#gioi-thieu">Giới thiệu</a>
+          <a href="/#tin-tuc">Tin tức, sự kiện</a>
+          <a href="/#thu-vien-anh">Thư viện ảnh</a>
+          <a href="/#ho-tro">Liên hệ</a>
+        </div></details>
       </nav>
       <div className="public-header-actions">
         <button className="button staff-entry-button" onClick={onStaff}>{signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}</button>
@@ -267,29 +275,44 @@ function PublicPortal({ onStaff, onGuide, onNavigate, onStartProcedure, onReceip
       <InformationHome />
 
       <PublicProcedureSearch onOpenProcedure={code => onNavigate('catalog', code)} />
-      <PublicAdministrativeServices request={api} />
 
-      <section className="support-strip" id="ho-tro"><div><span className="eyebrow">CẦN HỖ TRỢ?</span><h2>Trung tâm Phục vụ hành chính công Hà Nội</h2><p>Thông tin, hướng dẫn và thông báo về việc thực hiện thủ tục hành chính tại Thành phố.</p></div><div className="support-actions"><a className="button secondary" href={CITY_SUPPORT} target="_blank" rel="noreferrer">Trang thông tin Trung tâm <span>↗</span></a><a className="support-phone" href="tel:0241022">024 1022 <small>nhánh 7, 8</small></a><a className="support-phone" href="tel:19001009">1900 1009 <small>tổng đài thông minh</small></a></div></section>
+      <section className="support-strip" id="ho-tro"><div><span className="eyebrow">CẦN HỖ TRỢ?</span><h2>Trung tâm Phục vụ hành chính công Hà Nội</h2><p>Thông tin, hướng dẫn và thông báo về việc thực hiện thủ tục hành chính tại Thành phố.</p></div><div className="support-actions"><a className="button secondary" href={CITY_SUPPORT} target="_blank" rel="noreferrer">Trang thông tin Trung tâm <span></span></a><a className="support-phone" href="tel:0241022">024 1022 <small>nhánh 7, 8</small></a><a className="support-phone" href="tel:19001009">1900 1009 <small>tổng đài thông minh</small></a></div></section>
     </main>
 
     <footer className="public-footer"><a className="public-brand" href={CENTER_HOME} aria-label="Mở Trang thông tin Trung tâm Phục vụ hành chính công Hà Nội"><img className="footer-emblem" src="/images/hanoi-logo.png" alt="" /><span><b>TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG</b><small>THÀNH PHỐ HÀ NỘI</small></span></a><span>Giao dịch trực tuyến của cá nhân, tổ chức và doanh nghiệp được thực hiện trên Cổng Dịch vụ công quốc gia. Tuyến xử lý phụ thuộc thủ tục và cơ quan thực hiện được chọn.</span><a href={NATIONAL_PORTAL} target="_blank" rel="noreferrer">dichvucong.gov.vn ↗</a></footer>
   </div>
 }
 
-function CitizenWorkflow({ view, receipt, initialProcedureCode, onBack, onSubmit, onTrack, onCatalog, onStartProcedure, onSubmitted }: { view: PublicView; receipt: SubmissionReceipt | null; initialProcedureCode: string; onBack: () => void; onSubmit: () => void; onTrack: () => void; onCatalog: () => void; onStartProcedure: (code: string) => void; onSubmitted: (value: SubmissionReceipt) => void }) {
+function CitizenWorkflow({ view, receipt, initialProcedureCode, onBack, onSubmit, onTrack, onCatalog, onSubmitted }: { view: PublicView; receipt: SubmissionReceipt | null; initialProcedureCode: string; onBack: () => void; onSubmit: () => void; onTrack: () => void; onCatalog: () => void; onSubmitted: (value: SubmissionReceipt) => void }) {
   return <div className="public-site citizen-workflow-site">
     <AgencyMasthead />
     <header className="citizen-workflow-header">
-      <button className="text-button" onClick={onBack}>← Về cổng dịch vụ</button>
+      <button className="text-button" onClick={onBack}> Về cổng dịch vụ</button>
       <nav aria-label="Dịch vụ công dân"><button className={view === 'catalog' ? 'active' : ''} onClick={onCatalog}>Danh mục thủ tục</button><button className={view === 'submit' ? 'active' : ''} onClick={onSubmit}>Nộp hồ sơ</button><button className={view === 'track' ? 'active' : ''} onClick={onTrack}>Tra cứu hồ sơ</button><a href="/huong-dan">Hướng dẫn</a></nav>
     </header>
     <main className="citizen-workflow-main">
-      {view === 'catalog' && <CitizenProcedureCatalog request={api} onStartProcedure={onStartProcedure} />}
+      {view === 'catalog' && <CitizenProcedureCatalog request={api} />}
       {view === 'submit' && <CitizenApplicationForm request={api} initialProcedureCode={initialProcedureCode} onSubmitted={onSubmitted} />}
       {view === 'receipt' && receipt && <CitizenReceiptView receipt={receipt} onTrack={onTrack} />}
       {view === 'track' && <CitizenTrackingPage initialReceipt={receipt} />}
     </main>
     <footer className="citizen-workflow-footer"><span>Giữ mã hồ sơ sau khi gửi. Khóa tra cứu do cán bộ tiếp nhận hoặc trả kết quả cung cấp cho chủ hồ sơ.</span><button className="text-button" onClick={onBack}>Về trang chủ</button></footer>
+  </div>
+}
+
+function PublicCitizenServicesPage({ onHome, onStaff, signedIn }: { onHome: () => void; onStaff: () => void; signedIn: boolean }) {
+  return <div className="public-site citizen-services-site">
+    <AgencyMasthead />
+    <header className="citizen-workflow-header citizen-services-header">
+      <button className="text-button" onClick={onHome}>Về trang chủ</button>
+      <nav aria-label="Điều hướng dịch vụ công"><a href="/thu-tuc">Danh mục thủ tục</a><a href="/nop-ho-so">Nộp hồ sơ</a><a href="/tra-cuu-ho-so">Tra cứu hồ sơ</a><a href="/huong-dan">Hướng dẫn</a></nav>
+      <button className="button secondary" onClick={onStaff}>{signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}</button>
+    </header>
+    <main className="citizen-service-page-main">
+      <div className="citizen-page-heading"><span className="eyebrow">HỖ TRỢ CÔNG DÂN</span><h1>Lịch hẹn và phản ánh, kiến nghị</h1><p>Đặt lịch làm việc tại cơ quan hoặc gửi phản ánh, kiến nghị. Nộp hồ sơ và tra cứu tiến độ hồ sơ đã gửi tại các trang riêng.</p></div>
+      <PublicAdministrativeServices request={api} />
+    </main>
+    <footer className="citizen-workflow-footer"><span>Thông tin gửi tại đây được xử lý trong ứng dụng. Lịch hẹn không thay thế việc nộp hồ sơ theo thủ tục.</span><a className="text-link" href="/">Về trang chủ</a></footer>
   </div>
 }
 
@@ -448,10 +471,10 @@ function App() {
   }, [captureMode])
 
   function navigateRoute(next: PortalRoute, procedureCode = '', applicantType?: 'citizen' | 'organization') {
-    const path = next === 'staff' ? '/staff' : next === 'guide' ? '/huong-dan' : next === 'submit' ? '/nop-ho-so' : next === 'track' ? '/tra-cuu-ho-so' : '/'
-    const targetPath = next === 'catalog' ? '/thu-tuc' : path
+    const path = next === 'staff' ? '/staff' : next === 'guide' ? '/huong-dan' : next === 'citizen-services' ? '/tien-ich' : next === 'submit' ? '/nop-ho-so' : next === 'track' ? '/tra-cuu-ho-so' : '/'
+    const targetPath = next === 'catalog' ? `/thu-tuc${procedureCode ? '/' + encodeURIComponent(procedureCode) : ''}` : path
     const queryParams = new URLSearchParams()
-    if (procedureCode) queryParams.set(next === 'catalog' ? 'code' : 'procedure', procedureCode)
+    if (procedureCode && next !== 'catalog') queryParams.set('procedure', procedureCode)
     if (applicantType) sessionStorage.setItem('hanoiApplicantType', applicantType)
     const activeApplicantType = applicantType || sessionStorage.getItem('hanoiApplicantType') || ''
     if (next === 'submit' && activeApplicantType) queryParams.set('applicant', activeApplicantType)
@@ -588,8 +611,9 @@ function App() {
 
   if (user?.mustChangePassword) return <PasswordChangeScreen onChanged={passwordChanged} onSignOut={signOut} />
   if (route === 'guide') return <StandaloneGuide signedIn={!!user} onHome={() => navigateRoute(user ? 'staff' : 'public')} onStaff={() => navigateRoute('staff')} />
+  if (route === 'citizen-services') return <PublicCitizenServicesPage onHome={() => navigateRoute('public')} onStaff={() => navigateRoute('staff')} signedIn={!!user} />
   if (!user && route === 'staff') return <AuthScreen onAuthenticated={authenticate} onBack={() => navigateRoute('public')} />
-  if (route === 'public' || route === 'catalog' || route === 'submit' || route === 'track') return <PublicPortal key={route} onStaff={() => navigateRoute('staff')} onGuide={() => navigateRoute('guide')} onNavigate={navigateRoute} onStartProcedure={code => navigateRoute('submit', code)} onReceipt={setCitizenReceipt} receipt={citizenReceipt} signedIn={!!user} initialView={route} initialProcedureCode={citizenProcedureCode} />
+  if (route === 'public' || route === 'catalog' || route === 'submit' || route === 'track') return <PublicPortal key={route} onStaff={() => navigateRoute('staff')} onGuide={() => navigateRoute('guide')} onNavigate={navigateRoute} onReceipt={setCitizenReceipt} receipt={citizenReceipt} signedIn={!!user} initialView={route} initialProcedureCode={citizenProcedureCode} />
   if (!user) return <AuthScreen onAuthenticated={authenticate} onBack={() => navigateRoute('public')} />
   const pageMeta: Record<string, { title: string; eyebrow: string; description: string }> = {
     overview: { title: 'Tổng quan quản trị', eyebrow: 'TÀI KHOẢN VÀ THẨM QUYỀN', description: 'Theo dõi đề nghị cấp quyền, thay đổi tài khoản, hiệu lực và phạm vi công tác.' },
@@ -598,7 +622,7 @@ function App() {
     inbox: { title: 'Hộp xử lý hồ sơ', eyebrow: 'TIẾP NHẬN VÀ GIẢI QUYẾT', description: 'Lọc danh sách hồ sơ theo trạng thái, người phụ trách và tình trạng thời hạn.' },
     service_desk: { title: 'Quầy một cửa & Lịch hẹn', eyebrow: 'TIẾP NHẬN TRỰC TIẾP · LỊCH HẸN · PHẢN ÁNH', description: 'Tiếp nhận hồ sơ trực tiếp tại quầy Một cửa, xử lý lịch hẹn công dân và trả lời phản ánh kiến nghị trong phạm vi cơ quan.' },
     monitoring: { title: 'Giám sát quy trình', eyebrow: 'KIỂM SOÁT VẬN HÀNH', description: 'Các chỉ số được tính từ hồ sơ và sự kiện cán bộ có quyền xem; không cộng dữ liệu ngoài phạm vi.' },
-    procedures: { title: 'Danh mục thủ tục', eyebrow: 'TRA CỨU NGHIỆP VỤ', description: 'Tra cứu danh mục tham chiếu và xem rõ tình trạng xác minh tuyến, hiệu lực và nguồn.' },
+    procedures: { title: 'Danh mục thủ tục', eyebrow: 'TRA CỨU NGHIỆP VỤ', description: 'Tìm thủ tục, xem nội dung công bố và quản lý các cập nhật trong danh mục.' },
     activity: { title: 'Nhật ký hồ sơ', eyebrow: 'TRUY VẾT TÁC NGHIỆP', description: 'Lần theo mốc thời gian, người thực hiện và nội dung sự kiện trong hồ sơ được phép xem.' },
     connections: { title: 'Kết nối dịch vụ', eyebrow: 'TÍCH HỢP VÀ ĐỐI SOÁT', description: 'Theo dõi phụ thuộc bên ngoài và vận hành giao dịch thử nghiệm, đối soát, hoàn tiền cùng quyền ký nội bộ.' },
     users: { title: 'Quản lý tài khoản cán bộ', eyebrow: 'QUẢN TRỊ VÀ PHÂN QUYỀN', description: 'Cấp tài khoản theo cơ quan, vai trò, thời hạn và phê duyệt tách biệt.' },
@@ -674,7 +698,7 @@ function App() {
       <div className="sidebar-footer"><button className="nav-link sidebar-signout" onClick={signOut}><i aria-hidden="true">↪</i><span>Đăng xuất</span></button></div>
     </aside>
     <main className="workspace">
-       <div className="page-heading"><div><span className="eyebrow">{pageInfo.eyebrow}</span><h1>{pageInfo.title}</h1><p>{pageInfo.description}</p></div><div className="page-heading-tools">{pageHistory.length > 1 && <button className="staff-back-action" onClick={goBack}>← Quay lại</button>}{page !== 'profile' && <><span className="scope-stamp">{user.agencyScope || 'Phạm vi được cấp'}</span><button className="refresh-data-button" onClick={() => refresh().then(() => setMessage('Đã tải lại dữ liệu trong phạm vi tài khoản.')).catch(e => setError(e instanceof Error ? e.message : 'Không thể tải lại dữ liệu.'))}>↻ Tải lại dữ liệu</button></>}</div></div>
+       <div className="page-heading"><div><span className="eyebrow">{pageInfo.eyebrow}</span><h1>{pageInfo.title}</h1><p>{pageInfo.description}</p></div><div className="page-heading-tools">{pageHistory.length > 1 && <button className="staff-back-action" onClick={goBack}> Quay lại</button>}{page !== 'profile' && <><span className="scope-stamp">{user.agencyScope || 'Phạm vi được cấp'}</span><button className="refresh-data-button" onClick={() => refresh().then(() => setMessage('Đã tải lại dữ liệu trong phạm vi tài khoản.')).catch(e => setError(e instanceof Error ? e.message : 'Không thể tải lại dữ liệu.'))}>↻ Tải lại dữ liệu</button></>}</div></div>
        {!!data.storage?.sampleCaseCount && <aside className="sample-data-notice" role="note"><b>Bộ dữ liệu tình huống mô phỏng</b><span>{data.storage.sampleCaseCount.toLocaleString('vi-VN')} hồ sơ dùng để thực hành và kiểm tra giao diện; không phải hồ sơ công dân hoặc số liệu báo cáo chính thức. Chi tiết vẫn bị giới hạn theo phạm vi tài khoản.</span></aside>}
       {message && <div className="toast-success" role="status">✓ {message}<button onClick={() => setMessage('')}>Đóng</button></div>}{error && <div className="form-error page-error" role="alert">{error}<button onClick={() => setError('')}>×</button></div>}
        {page === 'inbox' && <CaseQueue key={queueFocusVersion} user={user} data={data} initialFocus={queueFocus} onOpen={openCase} />}
@@ -810,13 +834,33 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
   const [editing, setEditing] = useState<ManagedUser | null>(null)
   const [proposedActive, setProposedActive] = useState(true)
   const [agencyFilter, setAgencyFilter] = useState('all')
+  const [roleFilter, setRoleFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [accountQuery, setAccountQuery] = useState('')
+  const [accountPage, setAccountPage] = useState(1)
+  const [accountPageSize, setAccountPageSize] = useState(20)
+  const [showCreateForm, setShowCreateForm] = useState(false)
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({})
   const [signingAuthorityChecks, setSigningAuthorityChecks] = useState<Record<string, boolean>>({})
   const [today] = useState(() => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date()))
   const accessState = (account: ManagedUser) => !account.active ? 'Chưa được duyệt' : account.validFrom && today < account.validFrom ? 'Chờ ngày hiệu lực' : account.validUntil && today > account.validUntil ? 'Hết thời hạn' : 'Đang hiệu lực'
   const agencyOptions = [...new Set(users.map(account => account.agencyScope).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'vi'))
   const managedAgencies = [...new Set(users.filter(account => account.canManageAgencyAccounts).map(account => account.agencyScope).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'vi'))
-  const visibleUsers = users.filter(account => agencyFilter === 'all' || account.agencyScope === agencyFilter)
+  const visibleUsers = users.filter(account => {
+    if (agencyFilter !== 'all' && account.agencyScope !== agencyFilter) return false
+    if (roleFilter !== 'all' && account.role !== roleFilter) return false
+    const effectiveState = !account.active ? 'Tạm ngưng' : accessState(account)
+    if (statusFilter === 'active' && effectiveState !== 'Đang hiệu lực') return false
+    if (statusFilter === 'suspended' && effectiveState !== 'Tạm ngưng') return false
+    if (statusFilter === 'expired' && effectiveState !== 'Hết thời hạn') return false
+    const term = accountQuery.trim().toLocaleLowerCase('vi')
+    if (term && !`${account.name} ${account.email} ${roleNames[account.role] || account.role} ${account.agencyScope} ${account.signingAuthorityRef || ''}`.toLocaleLowerCase('vi').includes(term)) return false
+    return true
+  })
+  const hasActiveFilter = accountQuery.trim() !== '' || agencyFilter !== 'all' || roleFilter !== 'all' || statusFilter !== 'all'
+  const accountPageCount = Math.max(1, Math.ceil(visibleUsers.length / accountPageSize))
+  const currentAccountPage = Math.min(accountPage, accountPageCount)
+  const pagedUsers = visibleUsers.slice((currentAccountPage - 1) * accountPageSize, currentAccountPage * accountPageSize)
 
   async function refresh() {
     const result = await api<{ users: ManagedUser[]; accessRequests: StaffAccessRequest[]; accountChanges: StaffAccountChange[] }>('/api/users')
@@ -851,6 +895,7 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
     try {
       await api('/api/users', { ...request, agencyScope: isSystemAdmin ? request.agencyScope : actor.agencyScope, maySignStop, signingAuthorityRef: String(values.signingAuthorityRef || '').trim() })
       form.reset()
+      setShowCreateForm(false)
       onNotice('Đã lập đề nghị cấp tài khoản. Tài khoản chỉ hoạt động sau khi một quản trị viên khác duyệt.')
       await refresh()
     } catch (e) { setError(e instanceof Error ? e.message : 'Không thể lập đề nghị cấp tài khoản.') } finally { setBusy(false) }
@@ -912,11 +957,32 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
   }
 
   const accessSummary = (value: AccountAccess) => `${roleNames[value.role] || value.role} · ${value.active ? 'Đang kích hoạt' : 'Tạm ngưng'} · ${value.agencyScope} · ${value.validFrom || 'Không giới hạn'} – ${value.validUntil || 'Không giới hạn'}${value.canManageAgencyAccounts ? ' · Có quyền quản lý tài khoản cơ quan' : ''}`
+  const pendingTotal = requests.filter(r => r.status === 'PENDING').length + changes.filter(r => r.status === 'PENDING').length
 
   return <div className="account-workspace">
-    <section className="panel account-intro"><div><span className="eyebrow">QUẢN TRỊ QUYỀN CÁN BỘ</span><h2>Cấp và điều chỉnh quyền truy cập</h2><p>{isSystemAdmin ? 'Quản trị hệ thống xem danh sách tài khoản toàn hệ thống; quyền này không cho phép xem hồ sơ công dân.' : `Quản lý cơ quan chỉ lập đề nghị và xem tài khoản thuộc ${actor.agencyScope}; quản trị hệ thống khác phải duyệt.`} Khi thay đổi được duyệt, phiên đăng nhập cũ bị thu hồi.</p>{isSystemAdmin && <p><b>Cơ quan đã giao quyền quản lý tài khoản:</b> {managedAgencies.length ? managedAgencies.join('; ') : 'Chưa có cơ quan nào. Giao quyền qua đề nghị điều chỉnh và cần quản trị viên khác duyệt.'}</p>}</div><span className="count-chip">{requests.filter(r => r.status === 'PENDING').length + changes.filter(r => r.status === 'PENDING').length} chờ duyệt</span></section>
+    <section className="panel account-intro">
+      <div>
+        <span className="eyebrow">QUẢN TRỊ QUYỀN CÁN BỘ</span>
+        <h2>Danh bạ tài khoản và phân quyền cơ quan</h2>
+        <p>{isSystemAdmin ? 'Quản trị hệ thống tra cứu, rà soát danh sách tài khoản toàn hệ thống; quyền này không cho phép xem hồ sơ công dân.' : `Quản lý cơ quan chỉ lập đề nghị và xem tài khoản thuộc ${actor.agencyScope}; quản trị hệ thống khác phải duyệt.`} Khi thay đổi được duyệt, phiên đăng nhập cũ bị thu hồi.</p>
+        {isSystemAdmin && <p><b>Cơ quan đã giao quyền quản lý tài khoản:</b> {managedAgencies.length ? managedAgencies.join('; ') : 'Chưa có cơ quan nào. Giao quyền qua đề nghị điều chỉnh và cần quản trị viên khác duyệt.'}</p>}
+      </div>
+      <div className="account-intro-actions">
+        <span className="count-chip">{pendingTotal} đề nghị chờ duyệt</span>
+        <button type="button" className="button primary" onClick={() => setShowCreateForm(open => !open)}>
+          {showCreateForm ? 'Đóng biểu mẫu cấp tài khoản' : '+ Lập đề nghị cấp tài khoản'}
+        </button>
+      </div>
+    </section>
     {error && <div className="form-error" role="alert">{error}</div>}
-    <section className="panel"><div className="panel-title"><div><h2>Lập đề nghị cấp tài khoản</h2><p>Cán bộ không tự đăng ký. Quản trị viên hệ thống hoặc người quản lý cơ quan được phân quyền lập đề nghị; tài khoản chỉ hoạt động sau khi quản trị viên hệ thống độc lập duyệt.</p></div></div>
+    {showCreateForm && <section className="panel account-create-panel">
+      <div className="panel-title">
+        <div>
+          <h2>Lập đề nghị cấp tài khoản</h2>
+          <p>Cán bộ không tự đăng ký. Quản trị viên hệ thống hoặc người quản lý cơ quan được phân quyền lập đề nghị; tài khoản chỉ hoạt động sau khi quản trị viên hệ thống độc lập duyệt.</p>
+        </div>
+        <button type="button" className="text-button" onClick={() => setShowCreateForm(false)}>Thu gọn</button>
+      </div>
       <form className="form-grid account-form" onSubmit={createRequest}>
         <label>Họ và tên<input name="name" autoComplete="name" maxLength={150} required /></label>
         <label>Email công vụ<input name="email" type="email" autoComplete="off" maxLength={254} required /></label>
@@ -930,36 +996,204 @@ function StaffAccountManagement({ actor, onNotice }: { actor: User; onNotice: (m
         <label className="span-two">Căn cứ cấp quyền<textarea name="reason" rows={3} minLength={12} maxLength={1200} placeholder="Số quyết định, phân công nhiệm vụ hoặc căn cứ nghiệp vụ" required /></label>
         <label>Mật khẩu khởi tạo<input name="password" type="password" autoComplete="new-password" minLength={12} maxLength={128} required /><small className="field-help">Tối thiểu 12 ký tự, có chữ hoa, chữ thường và chữ số.</small></label>
         <label>Xác nhận mật khẩu<input name="confirmPassword" type="password" autoComplete="new-password" minLength={12} maxLength={128} required /></label>
-        <div className="form-actions span-two"><button className="button primary" disabled={busy}>{busy ? 'Đang lập đề nghị…' : 'Gửi người duyệt'}</button></div>
+        <div className="form-actions span-two"><button type="button" className="button secondary" onClick={() => setShowCreateForm(false)}>Hủy</button><button className="button primary" disabled={busy}>{busy ? 'Đang lập đề nghị…' : 'Gửi người duyệt'}</button></div>
       </form>
+    </section>}
+    <section className="panel account-directory-panel">
+      <div className="panel-title">
+        <div>
+          <span className="ops-kicker">DANH BẠ HỆ THỐNG</span>
+          <h2>Tài khoản theo cơ quan</h2>
+          <p>Tra cứu, lọc theo cơ quan, vai trò, trạng thái hiệu lực và điều chỉnh phân quyền. Danh sách không lưu hoặc hiển thị mật khẩu.</p>
+        </div>
+        <span className="count-chip">{visibleUsers.length.toLocaleString('vi-VN')} / {users.length.toLocaleString('vi-VN')} tài khoản</span>
+      </div>
+      <div className="account-list-tools" role="search" aria-label="Bộ lọc và tìm kiếm tài khoản">
+        <label className="account-search-field">
+          <span>Tìm kiếm tài khoản</span>
+          <input className="search-input" type="search" value={accountQuery} onChange={e => { setAccountQuery(e.target.value); setAccountPage(1) }} placeholder="Nhập họ tên, email công vụ, cơ quan, vai trò…" />
+        </label>
+        {isSystemAdmin && <label className="account-filter-field">
+          <span>Cơ quan / Đơn vị</span>
+          <select value={agencyFilter} onChange={e => { setAgencyFilter(e.target.value); setAccountPage(1) }}>
+            <option value="all">Tất cả cơ quan ({agencyOptions.length})</option>
+            {agencyOptions.map(agency => <option key={agency} value={agency}>{agency}</option>)}
+          </select>
+        </label>}
+        <label className="account-role-field">
+          <span>Vai trò nghiệp vụ</span>
+          <select value={roleFilter} onChange={e => { setRoleFilter(e.target.value); setAccountPage(1) }}>
+            <option value="all">Tất cả vai trò</option>
+            {Object.entries(roleNames).filter(([role]) => role !== 'citizen').map(([role, label]) => <option key={role} value={role}>{label}</option>)}
+          </select>
+        </label>
+        <label className="account-status-field">
+          <span>Trạng thái</span>
+          <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setAccountPage(1) }}>
+            <option value="all">Tất cả trạng thái</option>
+            <option value="active">Đang hiệu lực</option>
+            <option value="suspended">Tạm ngưng / Chưa duyệt</option>
+            <option value="expired">Hết thời hạn</option>
+          </select>
+        </label>
+        <div className="account-list-export">
+          {hasActiveFilter && <button type="button" className="button secondary" onClick={() => { setAccountQuery(''); setAgencyFilter('all'); setRoleFilter('all'); setStatusFilter('all'); setAccountPage(1) }}>Xóa bộ lọc</button>}
+          <a className="button secondary" href={`/api/export/users.csv${agencyFilter !== 'all' ? `?agency=${encodeURIComponent(agencyFilter)}` : ''}`}>Xuất CSV</a>
+          <button type="button" className="button secondary" onClick={() => printInternalTable('Danh sách tài khoản cán bộ', agencyFilter === 'all' ? 'Tất cả cơ quan trong phạm vi quản trị hệ thống' : agencyFilter, ['STT','Họ tên','Email công vụ','Vai trò','Cơ quan / Đơn vị','Thời hạn hiệu lực','Trạng thái','Quản lý TK cơ quan'], visibleUsers.map((account, idx) => [String(idx + 1), account.name, account.email, roleNames[account.role] || account.role, account.agencyScope, `${account.validFrom || 'Không giới hạn'} – ${account.validUntil || 'Không giới hạn'}`, !account.active ? 'Tạm ngưng' : accessState(account), account.canManageAgencyAccounts ? 'Có' : 'Không']))}>In danh sách</button>
+        </div>
+      </div>
+      {visibleUsers.length ? <>
+        <div className="data-table-wrap">
+          <table className="data-table account-table">
+            <thead>
+              <tr>
+                <th className="col-stt">STT</th>
+                <th className="col-user">Họ tên &amp; Email công vụ</th>
+                <th className="col-role">Vai trò</th>
+                <th className="col-agency">Cơ quan / Đơn vị</th>
+                <th className="col-validity">Thời hạn hiệu lực</th>
+                <th className="col-status">Trạng thái</th>
+                <th className="col-actions">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pagedUsers.map((account, index) => {
+                const state = accessState(account)
+                const pendingChange = changes.some(change => change.userId === account.id && change.status === 'PENDING')
+                const stt = (currentAccountPage - 1) * accountPageSize + index + 1
+                const isEditing = editing?.id === account.id
+                return <Fragment key={account.id}>
+                  <tr className={isEditing ? 'is-editing' : undefined}>
+                    <td className="col-stt" data-label="STT">{stt}</td>
+                    <td className="col-user" data-label="Tài khoản cán bộ">
+                      <div className="account-cell-user">
+                        <b>{account.name}</b>
+                        <span className="account-cell-email">{account.email}</span>
+                        {(account.canManageAgencyAccounts || account.maySignStop || account.mustChangePassword) && <div className="account-cell-badges">
+                          {account.canManageAgencyAccounts && <span className="account-meta-tag">Quản lý TK cơ quan</span>}
+                          {account.maySignStop && <span className="account-meta-tag">Ký Mẫu 06 · {account.signingAuthorityRef}</span>}
+                          {account.mustChangePassword && <span className="account-meta-tag warning">Chưa đổi mật khẩu khởi tạo</span>}
+                        </div>}
+                      </div>
+                    </td>
+                    <td className="col-role" data-label="Vai trò">
+                      <span className="account-role-badge">{roleNames[account.role] || account.role}</span>
+                    </td>
+                    <td className="col-agency" data-label="Cơ quan / Đơn vị">
+                      <span className="account-cell-agency">{account.agencyScope || 'Chưa khai báo phạm vi'}</span>
+                    </td>
+                    <td className="col-validity" data-label="Thời hạn hiệu lực">
+                      <span className="account-cell-validity">{account.validFrom || 'Không giới hạn'} <small>đến</small> {account.validUntil || 'Không giới hạn'}</span>
+                    </td>
+                    <td className="col-status" data-label="Trạng thái">
+                      <span className={`request-status ${state === 'Đang hiệu lực' ? 'request-approved' : state === 'Hết thời hạn' || !account.active ? 'request-rejected' : 'request-pending'}`}>
+                        {!account.active ? 'Tạm ngưng' : state}
+                      </span>
+                    </td>
+                    <td className="col-actions" data-label="Thao tác">
+                      <div className="managed-user-actions">
+                        <button type="button" className="button secondary" disabled={busy || pendingChange || account.id === actor.id || (!isSystemAdmin && account.role === 'admin')} onClick={() => isEditing ? setEditing(null) : beginAccountChange(account)}>
+                          {pendingChange ? 'Đang chờ duyệt' : isEditing ? 'Đóng' : 'Điều chỉnh quyền'}
+                        </button>
+                        {account.active && <button type="button" className="button secondary" disabled={busy || pendingChange || account.id === actor.id || (!isSystemAdmin && account.role === 'admin')} onClick={() => beginAccountChange(account, false)}>
+                          Tạm ngưng
+                        </button>}
+                        {isSystemAdmin && account.maySignStop && <button type="button" className="button secondary" disabled={busy} onClick={() => revokeStopSigning(account)}>
+                          Thu hồi ký Mẫu 06
+                        </button>}
+                      </div>
+                    </td>
+                  </tr>
+                  {isEditing && <tr className="account-edit-row">
+                    <td colSpan={7}>
+                      <form className="account-change-form" onSubmit={submitAccountChange}>
+                        <div className="account-change-form-title">
+                          <b>Đề nghị thay đổi quyền truy cập · {account.name} ({account.email})</b>
+                          <button type="button" className="text-button" onClick={() => setEditing(null)}>Đóng</button>
+                        </div>
+                        <div className="form-grid account-form">
+                          <label>Vai trò<select name="role" defaultValue={account.role} required>{Object.entries(roleNames).filter(([role]) => isSystemAdmin || role !== 'admin').map(([role, label]) => <option key={role} value={role}>{label}</option>)}</select></label>
+                          <label>Cơ quan / phạm vi<input name="agencyScope" defaultValue={account.agencyScope} maxLength={180} required readOnly={!isSystemAdmin} /></label>
+                          <label>Hiệu lực từ<input name="validFrom" type="date" defaultValue={account.validFrom} /></label>
+                          <label>Hiệu lực đến<input name="validUntil" type="date" defaultValue={account.validUntil} /></label>
+                          {isSystemAdmin && account.role !== 'admin' && <label className="span-two check-row"><input name="canManageAgencyAccounts" type="checkbox" defaultChecked={account.canManageAgencyAccounts} /> Quản lý tài khoản cán bộ trong cơ quan được giao</label>}
+                          <label className="span-two check-row"><input type="checkbox" checked={proposedActive} onChange={e => setProposedActive(e.target.checked)} /> Tài khoản được kích hoạt sau khi duyệt</label>
+                          <label className="span-two">Căn cứ điều chỉnh<textarea name="reason" rows={3} minLength={12} maxLength={1200} placeholder="Quyết định điều động, phân công, chấm dứt nhiệm vụ hoặc căn cứ nghiệp vụ" required /></label>
+                          <div className="form-actions span-two">
+                            <button type="button" className="button secondary" onClick={() => setEditing(null)}>Hủy</button>
+                            <button className="button primary" disabled={busy}>{busy ? 'Đang gửi…' : 'Gửi người duyệt'}</button>
+                          </div>
+                        </div>
+                      </form>
+                    </td>
+                  </tr>}
+                </Fragment>
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="account-pagination">
+          <div className="account-pagination-info">
+            <span>Hiển thị <b>{(currentAccountPage - 1) * accountPageSize + 1}–{Math.min(currentAccountPage * accountPageSize, visibleUsers.length)}</b> trong tổng số <b>{visibleUsers.length.toLocaleString('vi-VN')}</b> tài khoản</span>
+            <label className="account-pagesize-select">
+              <span>Số dòng:</span>
+              <select value={accountPageSize} onChange={e => { setAccountPageSize(Number(e.target.value)); setAccountPage(1) }}>
+                <option value={20}>20 / trang</option>
+                <option value={50}>50 / trang</option>
+                <option value={100}>100 / trang</option>
+                <option value={1000}>Tất cả</option>
+              </select>
+            </label>
+          </div>
+          {accountPageCount > 1 && <div className="account-pagination-controls">
+            <button type="button" className="button secondary" disabled={currentAccountPage <= 1} onClick={() => setAccountPage(1)}>« Đầu</button>
+            <button type="button" className="button secondary" disabled={currentAccountPage <= 1} onClick={() => setAccountPage(p => Math.max(1, p - 1))}>‹ Trước</button>
+            <span className="account-page-indicator">Trang <b>{currentAccountPage}</b> / {accountPageCount}</span>
+            <button type="button" className="button secondary" disabled={currentAccountPage >= accountPageCount} onClick={() => setAccountPage(p => Math.min(accountPageCount, p + 1))}>Sau ›</button>
+            <button type="button" className="button secondary" disabled={currentAccountPage >= accountPageCount} onClick={() => setAccountPage(accountPageCount)}>Cuối »</button>
+          </div>}
+        </div>
+      </> : <div className="empty-state">Không tìm thấy tài khoản phù hợp với điều kiện tìm kiếm hoặc bộ lọc hiện tại.</div>}
     </section>
-    <section className="panel"><div className="panel-title"><div><h2>Đề nghị cấp quyền</h2><p>Lưu lịch sử người lập, người duyệt, phạm vi và thời gian áp dụng.</p></div></div>
-      {requests.length ? <div className="access-request-list">{requests.map(request => <article className="access-request-card" key={request.id}>
-        <div className="access-request-top"><div><b>{request.name}</b><small>{request.email} · {roleNames[request.role] || request.role}</small></div><span className={`request-status request-${request.status.toLowerCase()}`}>{request.status === 'PENDING' ? 'Chờ duyệt' : request.status === 'APPROVED' ? 'Đã duyệt' : 'Từ chối'}</span></div>
-        <div className="access-request-facts"><span><small>Cơ quan</small><b>{request.agencyScope}</b></span><span><small>Thời hạn</small><b>{request.validFrom} – {request.validUntil}</b></span><span><small>Người đề nghị</small><b>{request.requestedBy}</b></span>{request.reviewedBy && <span><small>Người duyệt</small><b>{request.reviewedBy}</b></span>}</div>
-        {request.maySignStop && <p className="request-reason"><b>Đề nghị quyền ký Mẫu 06:</b> {request.signingAuthorityRef}. Quyền chỉ có hiệu lực nếu người duyệt xác nhận đã đối chiếu văn bản phân công.</p>}
-        <p className="request-reason"><b>Căn cứ:</b> {request.reason}</p>
-        {request.status === 'PENDING' && request.requestedById === actor.id && <p className="form-notice">Bạn đã lập đề nghị này; cần một quản trị viên khác xử lý.</p>}
-        {!isSystemAdmin && request.status === 'PENDING' && request.requestedById !== actor.id && <p className="form-notice">Đề nghị đang chờ quản trị viên hệ thống duyệt.</p>}
-        {isSystemAdmin && request.status === 'PENDING' && request.requestedById !== actor.id && <div className="request-review">{request.maySignStop && <label className="check-row"><input type="checkbox" checked={signingAuthorityChecks[request.id] === true} onChange={e => setSigningAuthorityChecks(current => ({ ...current, [request.id]: e.target.checked }))} /> Đã đối chiếu văn bản phân công thẩm quyền ký Mẫu 06</label>}<label>Ý kiến duyệt / căn cứ từ chối<textarea value={reviewNotes[request.id] || ''} onChange={e => setReviewNotes(current => ({ ...current, [request.id]: e.target.value }))} rows={2} maxLength={1200} /></label><div className="form-actions"><button className="button secondary" disabled={reviewing === request.id} onClick={() => reviewRequest(request, 'reject')}>Từ chối</button><button className="button primary" disabled={reviewing === request.id} onClick={() => reviewRequest(request, 'approve')}>{reviewing === request.id ? 'Đang xử lý…' : 'Duyệt quyền'}</button></div></div>}
-        {request.status === 'REJECTED' && request.reviewNote && <p className="request-reason"><b>Căn cứ từ chối:</b> {request.reviewNote}</p>}
-      </article>)}</div> : <div className="empty-state">Chưa có đề nghị cấp quyền.</div>}
-    </section>
-    <section className="panel"><div className="panel-title"><div><h2>Đề nghị điều chỉnh tài khoản</h2><p>Thay đổi quyền hiện hữu hoặc tạm ngưng tài khoản sẽ có hiệu lực sau khi quản trị viên độc lập duyệt. Đề nghị liên quan tài khoản quản trị cần người thứ ba duyệt.</p></div><span className="count-chip">{changes.filter(change => change.status === 'PENDING').length} chờ xử lý</span></div>
-      {changes.length ? <div className="access-request-list">{changes.map(change => <article className="access-request-card" key={change.id}>
-        <div className="access-request-top"><div><b>{change.name}</b><small>{change.email}</small></div><span className={`request-status request-${change.status.toLowerCase()}`}>{change.status === 'PENDING' ? 'Chờ duyệt' : change.status === 'APPROVED' ? 'Đã áp dụng' : 'Từ chối'}</span></div>
-        <div className="account-change-diff"><span><small>Quyền hiện tại</small><b>{accessSummary(change.before)}</b></span><span><small>Đề nghị mới</small><b>{accessSummary(change.proposed)}</b></span></div>
-        <p className="request-reason"><b>Căn cứ:</b> {change.reason} · <b>Người lập:</b> {change.requestedBy}</p>
-        {change.status === 'PENDING' && (change.requestedById === actor.id || change.userId === actor.id) && <p className="form-notice">Người lập và chủ tài khoản không được duyệt đề nghị này.</p>}
-        {!isSystemAdmin && change.status === 'PENDING' && change.requestedById !== actor.id && change.userId !== actor.id && <p className="form-notice">Đề nghị đang chờ quản trị viên hệ thống duyệt.</p>}
-        {isSystemAdmin && change.status === 'PENDING' && change.requestedById !== actor.id && change.userId !== actor.id && <div className="request-review"><label>Ý kiến duyệt / căn cứ từ chối<textarea value={reviewNotes[change.id] || ''} onChange={e => setReviewNotes(current => ({ ...current, [change.id]: e.target.value }))} rows={2} maxLength={1200} /></label><div className="form-actions"><button className="button secondary" disabled={reviewing === change.id} onClick={() => reviewAccountChange(change, 'reject')}>Từ chối</button><button className="button primary" disabled={reviewing === change.id} onClick={() => reviewAccountChange(change, 'approve')}>{reviewing === change.id ? 'Đang xử lý…' : 'Duyệt và áp dụng'}</button></div></div>}
-        {change.reviewedBy && <p className="request-reason"><b>Người xử lý:</b> {change.reviewedBy}{change.reviewNote && <> · <b>Ý kiến:</b> {change.reviewNote}</>}</p>}
-      </article>)}</div> : <div className="empty-state">Chưa có lịch sử điều chỉnh tài khoản.</div>}
-    </section>
-    <section className="panel"><div className="panel-title"><div><h2>Tài khoản theo cơ quan</h2><p>Danh sách không chứa mật khẩu; quyền chỉ có hiệu lực sau phê duyệt.</p></div><span className="count-chip">{visibleUsers.length} tài khoản</span></div>
-      <div className="account-list-tools">{isSystemAdmin && <label>Cơ quan<select value={agencyFilter} onChange={e => setAgencyFilter(e.target.value)}><option value="all">Tất cả cơ quan</option>{agencyOptions.map(agency => <option key={agency} value={agency}>{agency}</option>)}</select></label>}<a className="button secondary" href={`/api/export/users.csv${agencyFilter !== 'all' ? `?agency=${encodeURIComponent(agencyFilter)}` : ''}`}>Xuất CSV</a><button className="button secondary" onClick={() => printInternalTable('Danh sách tài khoản cán bộ', agencyFilter === 'all' ? 'Tất cả cơ quan trong phạm vi quản trị hệ thống' : agencyFilter, ['Họ tên','Email','Vai trò','Cơ quan','Trạng thái','Hiệu lực','Quản lý tài khoản cơ quan'], visibleUsers.map(account => [account.name,account.email,roleNames[account.role] || account.role,account.agencyScope,!account.active?'Chưa kích hoạt / tạm ngưng':accessState(account),`${account.validFrom || 'Không giới hạn'} – ${account.validUntil || 'Không giới hạn'}`,account.canManageAgencyAccounts?'Có':'Không']))}>In danh sách</button></div>
-      {visibleUsers.length ? <div className="managed-user-list">{visibleUsers.map(account => { const state = accessState(account); const pendingChange = changes.some(change => change.userId === account.id && change.status === 'PENDING'); return <article className="managed-user-row" key={account.id}><div><b>{account.name}</b><small>{account.email} · {roleNames[account.role] || account.role}</small>{account.canManageAgencyAccounts && <small>Được quản lý tài khoản tại cơ quan này</small>}{account.mustChangePassword && <small className="account-password-note">Chưa đổi mật khẩu khởi tạo</small>}{account.maySignStop && <small>Được ký Mẫu 06 · {account.signingAuthorityRef}</small>}</div><span className={`request-status ${state === 'Đang hiệu lực' ? 'request-approved' : state === 'Hết thời hạn' || !account.active ? 'request-rejected' : 'request-pending'}`}>{!account.active ? 'Tạm ngưng' : state}</span><span className="managed-user-scope">{account.agencyScope || 'Chưa khai báo phạm vi'}<small>{account.validFrom || 'Không giới hạn'} – {account.validUntil || 'Không giới hạn'}</small></span><div className="managed-user-actions">{isSystemAdmin && account.maySignStop && <button className="button secondary" disabled={busy} onClick={() => revokeStopSigning(account)}>Thu hồi quyền ký</button>}<button className="button secondary" disabled={busy || pendingChange || account.id === actor.id || (!isSystemAdmin && account.role === 'admin')} onClick={() => beginAccountChange(account)}>{pendingChange ? 'Đang chờ duyệt' : 'Điều chỉnh quyền'}</button>{account.active && <button className="button secondary" disabled={busy || pendingChange || account.id === actor.id || (!isSystemAdmin && account.role === 'admin')} onClick={() => beginAccountChange(account, false)}>Đề nghị tạm ngưng</button>}</div>{editing?.id === account.id && <form className="account-change-form" onSubmit={submitAccountChange}><div className="account-change-form-title"><b>Đề nghị thay đổi · {account.name}</b><button type="button" className="text-button" onClick={() => setEditing(null)}>Đóng</button></div><div className="form-grid account-form"><label>Vai trò<select name="role" defaultValue={account.role} required>{Object.entries(roleNames).filter(([role]) => isSystemAdmin || role !== 'admin').map(([role, label]) => <option key={role} value={role}>{label}</option>)}</select></label><label>Cơ quan / phạm vi<input name="agencyScope" defaultValue={account.agencyScope} maxLength={180} required readOnly={!isSystemAdmin} /></label><label>Hiệu lực từ<input name="validFrom" type="date" defaultValue={account.validFrom} /></label><label>Hiệu lực đến<input name="validUntil" type="date" defaultValue={account.validUntil} /></label>{isSystemAdmin && account.role !== 'admin' && <label className="span-two check-row"><input name="canManageAgencyAccounts" type="checkbox" defaultChecked={account.canManageAgencyAccounts} /> Quản lý tài khoản cán bộ trong cơ quan được giao</label>}<label className="span-two check-row"><input type="checkbox" checked={proposedActive} onChange={e => setProposedActive(e.target.checked)} /> Tài khoản được kích hoạt sau khi duyệt</label><label className="span-two">Căn cứ điều chỉnh<textarea name="reason" rows={3} minLength={12} maxLength={1200} placeholder="Quyết định điều động, phân công, chấm dứt nhiệm vụ hoặc căn cứ nghiệp vụ" required /></label><div className="form-actions span-two"><button className="button primary" disabled={busy}>{busy ? 'Đang gửi…' : 'Gửi người duyệt'}</button></div></div></form>}</article> })}</div> : <div className="empty-state">Không có tài khoản trong cơ quan hoặc điều kiện lọc này.</div>}
-    </section>
+    <div className="account-Secondary-grid">
+      <section className="panel">
+        <div className="panel-title">
+          <div>
+            <h2>Đề nghị cấp quyền mới</h2>
+            <p>Lưu lịch sử người lập, người duyệt, phạm vi và thời gian áp dụng.</p>
+          </div>
+          <span className="count-chip">{requests.filter(r => r.status === 'PENDING').length} chờ duyệt</span>
+        </div>
+        {requests.length ? <div className="access-request-list">{requests.map(request => <article className="access-request-card" key={request.id}>
+          <div className="access-request-top"><div><b>{request.name}</b><small>{request.email} · {roleNames[request.role] || request.role}</small></div><span className={`request-status request-${request.status.toLowerCase()}`}>{request.status === 'PENDING' ? 'Chờ duyệt' : request.status === 'APPROVED' ? 'Đã duyệt' : 'Từ chối'}</span></div>
+          <div className="access-request-facts"><span><small>Cơ quan</small><b>{request.agencyScope}</b></span><span><small>Thời hạn</small><b>{request.validFrom} – {request.validUntil}</b></span><span><small>Người đề nghị</small><b>{request.requestedBy}</b></span>{request.reviewedBy && <span><small>Người duyệt</small><b>{request.reviewedBy}</b></span>}</div>
+          {request.maySignStop && <p className="request-reason"><b>Đề nghị quyền ký Mẫu 06:</b> {request.signingAuthorityRef}. Quyền chỉ có hiệu lực nếu người duyệt xác nhận đã đối chiếu văn bản phân công.</p>}
+          <p className="request-reason"><b>Căn cứ:</b> {request.reason}</p>
+          {request.status === 'PENDING' && request.requestedById === actor.id && <p className="form-notice">Bạn đã lập đề nghị này; cần một quản trị viên khác xử lý.</p>}
+          {!isSystemAdmin && request.status === 'PENDING' && request.requestedById !== actor.id && <p className="form-notice">Đề nghị đang chờ quản trị viên hệ thống duyệt.</p>}
+          {isSystemAdmin && request.status === 'PENDING' && request.requestedById !== actor.id && <div className="request-review">{request.maySignStop && <label className="check-row"><input type="checkbox" checked={signingAuthorityChecks[request.id] === true} onChange={e => setSigningAuthorityChecks(current => ({ ...current, [request.id]: e.target.checked }))} /> Đã đối chiếu văn bản phân công thẩm quyền ký Mẫu 06</label>}<label>Ý kiến duyệt / căn cứ từ chối<textarea value={reviewNotes[request.id] || ''} onChange={e => setReviewNotes(current => ({ ...current, [request.id]: e.target.value }))} rows={2} maxLength={1200} /></label><div className="form-actions"><button className="button secondary" disabled={reviewing === request.id} onClick={() => reviewRequest(request, 'reject')}>Từ chối</button><button className="button primary" disabled={reviewing === request.id} onClick={() => reviewRequest(request, 'approve')}>{reviewing === request.id ? 'Đang xử lý…' : 'Duyệt quyền'}</button></div></div>}
+          {request.status === 'REJECTED' && request.reviewNote && <p className="request-reason"><b>Căn cứ từ chối:</b> {request.reviewNote}</p>}
+        </article>)}</div> : <div className="empty-state">Chưa có đề nghị cấp quyền mới.</div>}
+      </section>
+      <section className="panel">
+        <div className="panel-title">
+          <div>
+            <h2>Đề nghị điều chỉnh tài khoản</h2>
+            <p>Thay đổi quyền hiện hữu hoặc tạm ngưng tài khoản sẽ có hiệu lực sau khi quản trị viên độc lập duyệt.</p>
+          </div>
+          <span className="count-chip">{changes.filter(change => change.status === 'PENDING').length} chờ xử lý</span>
+        </div>
+        {changes.length ? <div className="access-request-list">{changes.map(change => <article className="access-request-card" key={change.id}>
+          <div className="access-request-top"><div><b>{change.name}</b><small>{change.email}</small></div><span className={`request-status request-${change.status.toLowerCase()}`}>{change.status === 'PENDING' ? 'Chờ duyệt' : change.status === 'APPROVED' ? 'Đã áp dụng' : 'Từ chối'}</span></div>
+          <div className="account-change-diff"><span><small>Quyền hiện tại</small><b>{accessSummary(change.before)}</b></span><span><small>Đề nghị mới</small><b>{accessSummary(change.proposed)}</b></span></div>
+          <p className="request-reason"><b>Căn cứ:</b> {change.reason} · <b>Người lập:</b> {change.requestedBy}</p>
+          {change.status === 'PENDING' && (change.requestedById === actor.id || change.userId === actor.id) && <p className="form-notice">Người lập và chủ tài khoản không được duyệt đề nghị này.</p>}
+          {!isSystemAdmin && change.status === 'PENDING' && change.requestedById !== actor.id && change.userId !== actor.id && <p className="form-notice">Đề nghị đang chờ quản trị viên hệ thống duyệt.</p>}
+          {isSystemAdmin && change.status === 'PENDING' && change.requestedById !== actor.id && change.userId !== actor.id && <div className="request-review"><label>Ý kiến duyệt / căn cứ từ chối<textarea value={reviewNotes[change.id] || ''} onChange={e => setReviewNotes(current => ({ ...current, [change.id]: e.target.value }))} rows={2} maxLength={1200} /></label><div className="form-actions"><button className="button secondary" disabled={reviewing === change.id} onClick={() => reviewAccountChange(change, 'reject')}>Từ chối</button><button className="button primary" disabled={reviewing === change.id} onClick={() => reviewAccountChange(change, 'approve')}>{reviewing === change.id ? 'Đang xử lý…' : 'Duyệt và áp dụng'}</button></div></div>}
+          {change.reviewedBy && <p className="request-reason"><b>Người xử lý:</b> {change.reviewedBy}{change.reviewNote && <> · <b>Ý kiến:</b> {change.reviewNote}</>}</p>}
+        </article>)}</div> : <div className="empty-state">Chưa có lịch sử điều chỉnh tài khoản.</div>}
+      </section>
+    </div>
   </div>
 }
 
@@ -1018,8 +1252,8 @@ function AdministrativeReports({ data, onOpenQueue }: { data: Bootstrap; onOpenQ
       <aside className="report-data-provenance" role="note"><b>Số liệu trong ứng dụng</b><span>{report.sampleTotal.toLocaleString('vi-VN')} tình huống mô phỏng · {report.realTotal.toLocaleString('vi-VN')} hồ sơ phát sinh thật trong ứng dụng. Tình huống mô phỏng không phải số liệu báo cáo chính thức.</span></aside>
       <section className="metric-grid report-metrics"><MetricCard label="Hồ sơ trong phạm vi" value={report.total} note="Gồm tình huống mô phỏng và dữ liệu ứng dụng" tone="navy" /><MetricCard label="Cơ quan có hồ sơ" value={report.byAgency.length} note="Theo cơ quan tiếp nhận lưu trên hồ sơ" tone="blue" /><MetricCard label="Nhóm trạng thái" value={report.byStatus.length} note="Theo trạng thái hiện tại" tone="green" /></section>
       {report.total===0&&<section className="report-empty-state"><h2>{report.storedTotal===0?'Chưa có hồ sơ nào được lưu trong ứng dụng':'Không có hồ sơ khớp điều kiện lọc'}</h2><p>{report.storedTotal===0?'Kết nối API và cơ sở dữ liệu đang hoạt động; hiện chưa có công dân gửi hồ sơ vào ứng dụng. Danh mục tham chiếu được nạp riêng và không được tính thành hồ sơ.':'Hồ sơ có trong cơ sở dữ liệu nhưng không thuộc cơ quan hoặc khoảng ngày đang chọn.'}</p>{report.storedTotal===0&&<a className="button secondary" href="/nop-ho-so">Mở luồng nộp hồ sơ của ứng dụng</a>}</section>}
-      <section className="panel report-table-panel"><PanelHeading kicker="TỔNG HỢP THEO ĐƠN VỊ" title="Hồ sơ theo cơ quan và trạng thái" description={`${subtitle} · chọn một dòng để mở đúng nhóm hồ sơ.`} />{report.byAgencyStatus.length ? <div className="report-table-wrap"><table className="report-table"><thead><tr><th>Cơ quan tiếp nhận</th><th>Trạng thái hiện tại</th><th>Số hồ sơ</th><th>Thao tác</th></tr></thead><tbody>{report.byAgencyStatus.map(row => { const statuses = Object.entries(data.statusLabels).filter(([, label]) => label === row.status).map(([code]) => code); return <tr key={`${row.agency}-${row.status}`}><td>{row.agency}</td><td>{row.status}</td><td>{row.count}</td><td><button className="report-drilldown-link" onClick={() => onOpenQueue({ agencyFilter: row.agency, statuses, createdFrom: from, createdTo: to, label: `${row.agency} · ${row.status}` })}>Mở hồ sơ →</button></td></tr> })}</tbody></table></div> : <div className="report-compact-empty">Chưa có dòng tổng hợp theo cơ quan và trạng thái trong điều kiện đã chọn.</div>}</section>
-      <section className="panel report-table-panel"><PanelHeading kicker="THEO THỦ TỤC" title="Phân bố hồ sơ theo thủ tục" description="Chọn một dòng để mở danh sách hồ sơ tương ứng." />{report.byProcedure.length ? <div className="report-table-wrap"><table className="report-table"><thead><tr><th>Mã và tên thủ tục</th><th>Số hồ sơ</th><th>Thao tác</th></tr></thead><tbody>{report.byProcedure.map(row => { const code = row.name.split(' · ')[0]; return <tr key={row.name}><td>{row.name}</td><td>{row.count}</td><td><button className="report-drilldown-link" onClick={() => onOpenQueue({ procedureCode: code, createdFrom: from, createdTo: to, label: row.name })}>Mở hồ sơ →</button></td></tr> })}</tbody></table></div> : <div className="report-compact-empty">Chưa có hồ sơ để phân bổ theo thủ tục.</div>}</section>
+      <section className="panel report-table-panel"><PanelHeading kicker="TỔNG HỢP THEO ĐƠN VỊ" title="Hồ sơ theo cơ quan và trạng thái" description={`${subtitle} · chọn một dòng để mở đúng nhóm hồ sơ.`} />{report.byAgencyStatus.length ? <div className="report-table-wrap"><table className="report-table"><thead><tr><th>Cơ quan tiếp nhận</th><th>Trạng thái hiện tại</th><th>Số hồ sơ</th><th>Thao tác</th></tr></thead><tbody>{report.byAgencyStatus.map(row => { const statuses = Object.entries(data.statusLabels).filter(([, label]) => label === row.status).map(([code]) => code); return <tr key={`${row.agency}-${row.status}`}><td data-label="Cơ quan tiếp nhận">{row.agency}</td><td data-label="Trạng thái hiện tại">{row.status}</td><td data-label="Số hồ sơ">{row.count}</td><td data-label="Thao tác"><button className="report-drilldown-link" onClick={() => onOpenQueue({ agencyFilter: row.agency, statuses, createdFrom: from, createdTo: to, label: `${row.agency} · ${row.status}` })}>Mở hồ sơ</button></td></tr> })}</tbody></table></div> : <div className="report-compact-empty">Chưa có dòng tổng hợp theo cơ quan và trạng thái trong điều kiện đã chọn.</div>}</section>
+      <section className="panel report-table-panel"><PanelHeading kicker="THEO THỦ TỤC" title="Phân bố hồ sơ theo thủ tục" description="Chọn một dòng để mở danh sách hồ sơ tương ứng." />{report.byProcedure.length ? <div className="report-table-wrap"><table className="report-table"><thead><tr><th>Mã và tên thủ tục</th><th>Số hồ sơ</th><th>Thao tác</th></tr></thead><tbody>{report.byProcedure.map(row => { const code = row.name.split(' · ')[0]; return <tr key={row.name}><td data-label="Mã và tên thủ tục">{row.name}</td><td data-label="Số hồ sơ">{row.count}</td><td data-label="Thao tác"><button className="report-drilldown-link" onClick={() => onOpenQueue({ procedureCode: code, createdFrom: from, createdTo: to, label: row.name })}>Mở hồ sơ</button></td></tr> })}</tbody></table></div> : <div className="report-compact-empty">Chưa có hồ sơ để phân bổ theo thủ tục.</div>}</section>
     </>}
   </div>
 }
@@ -1110,21 +1344,21 @@ function AdminOverview({ onNavigate }: { onNavigate: (page: string) => void }) {
     {loading && <div className="panel empty-state" role="status">Đang tải danh sách tài khoản và lịch sử phê duyệt…</div>}
     <div className="dashboard-columns admin-overview-grid">
       <section className="panel dashboard-panel">
-        <PanelHeading kicker="PHÂN QUYỀN" title="Tài khoản theo vai trò" description="Số liệu đọc từ danh sách cán bộ đang được cấp trong hệ thống." action={<button className="text-button" onClick={() => onNavigate('users')}>Mở quản lý tài khoản →</button>} />
+        <PanelHeading kicker="PHÂN QUYỀN" title="Tài khoản theo vai trò" description="Số liệu đọc từ danh sách cán bộ đang được cấp trong hệ thống." action={<button className="text-button" onClick={() => onNavigate('users')}>Mở quản lý tài khoản</button>} />
         {roleBreakdown.length ? <div className="admin-role-list">{roleBreakdown.map(item => <div key={item.role}><span>{item.label}</span><b>{item.count}</b><button className="text-button" onClick={() => onNavigate('users')}>Xem tài khoản</button></div>)}</div> : !loading && <div className="empty-state compact-empty">Chưa có tài khoản cán bộ. Quản trị viên có thể lập đề nghị cấp tài khoản tại mục Tài khoản cán bộ.</div>}
       </section>
       <section className="panel dashboard-panel">
-        <PanelHeading kicker="CẦN XỬ LÝ" title="Đề nghị chờ duyệt" description="Đề nghị chỉ có hiệu lực sau khi người có thẩm quyền độc lập xử lý." action={<button className="text-button" onClick={() => onNavigate('users')}>Mở hàng chờ →</button>} />
+        <PanelHeading kicker="CẦN XỬ LÝ" title="Đề nghị chờ duyệt" description="Đề nghị chỉ có hiệu lực sau khi người có thẩm quyền độc lập xử lý." action={<button className="text-button" onClick={() => onNavigate('users')}>Mở hàng chờ</button>} />
         {pending.length ? <div className="admin-review-list">{pending.slice(0, 6).map(item => <div key={`${item.kind}-${item.id}`}><span><b>{item.name}</b><small>{item.kind} · {item.detail}</small></span><time>{toDate(item.at)}</time></div>)}</div> : !loading && <div className="empty-state compact-empty">Không có đề nghị cấp mới hoặc điều chỉnh quyền đang chờ.</div>}
       </section>
     </div>
     <div className="dashboard-columns admin-overview-grid">
       <section className="panel dashboard-panel">
-        <PanelHeading kicker="THỜI HẠN TRUY CẬP" title="Tài khoản sắp hết hạn" description="Kiểm tra căn cứ điều động hoặc lập đề nghị gia hạn trước khi quyền truy cập kết thúc." action={<button className="text-button" onClick={() => onNavigate('users')}>Quản lý thời hạn →</button>} />
+        <PanelHeading kicker="THỜI HẠN TRUY CẬP" title="Tài khoản sắp hết hạn" description="Kiểm tra căn cứ điều động hoặc lập đề nghị gia hạn trước khi quyền truy cập kết thúc." action={<button className="text-button" onClick={() => onNavigate('users')}>Quản lý thời hạn</button>} />
         {expiring.length ? <div className="admin-expiry-list">{expiring.map(account => <div key={account.id}><span><b>{account.name}</b><small>{account.email} · {account.agencyScope}</small></span><time>Hết hạn {toDate(account.validUntil)}</time></div>)}</div> : !loading && <div className="empty-state compact-empty">Không có tài khoản còn hiệu lực sẽ hết hạn trong 30 ngày tới.</div>}
       </section>
       <section className="panel dashboard-panel">
-        <PanelHeading kicker="LỊCH SỬ QUYỀN" title="Cấp và điều chỉnh gần đây" description="Lần theo người lập, trạng thái và thời điểm cập nhật quyền." action={<button className="text-button" onClick={() => onNavigate('users')}>Mở toàn bộ lịch sử →</button>} />
+        <PanelHeading kicker="LỊCH SỬ QUYỀN" title="Cấp và điều chỉnh gần đây" description="Lần theo người lập, trạng thái và thời điểm cập nhật quyền." action={<button className="text-button" onClick={() => onNavigate('users')}>Mở toàn bộ lịch sử</button>} />
         {recent.length ? <div className="admin-review-list">{recent.map(item => <div key={item.id}><span><b>{item.name}</b><small>{item.detail}</small></span><time>{toDate(item.at)}</time></div>)}</div> : !loading && <div className="empty-state compact-empty">Chưa có lịch sử cấp hoặc điều chỉnh tài khoản.</div>}
       </section>
     </div>
@@ -1139,7 +1373,7 @@ function GuideContent({ isStaff = false }: { isStaff?: boolean }) {
       <button className={audience === 'staff' ? 'active' : ''} aria-pressed={audience === 'staff'} onClick={() => setAudience('staff')}>Cán bộ</button>
     </section>
     {audience === 'citizen' ? <>
-      <section className="guide-lead"><span className="eyebrow">HƯỚNG DẪN NGƯỜI DÂN VÀ TỔ CHỨC</span><h2>Tra cứu, gửi và theo dõi hồ sơ</h2><p>Người dân không cần đăng ký tài khoản. Mã hồ sơ cùng khóa tra cứu được dùng để trở lại hồ sơ và phản hồi các yêu cầu của cơ quan.</p><div className="guide-links"><a className="button secondary" href="/thu-tuc">Tra cứu danh mục thủ tục →</a><a className="button primary" href="/nop-ho-so">Mở trang nộp hồ sơ →</a></div></section>
+      <section className="guide-lead"><span className="eyebrow">HƯỚNG DẪN NGƯỜI DÂN VÀ TỔ CHỨC</span><h2>Tra cứu, gửi và theo dõi hồ sơ</h2><p>Người dân không cần đăng ký tài khoản. Mã hồ sơ cùng khóa tra cứu được dùng để trở lại hồ sơ và phản hồi các yêu cầu của cơ quan.</p><div className="guide-links"><a className="button secondary" href="/thu-tuc">Tra cứu danh mục thủ tục </a><a className="button primary" href="/nop-ho-so">Mở trang nộp hồ sơ </a></div></section>
       <ol className="guide-steps">
         <li><b>Tìm và xem thông tin thủ tục</b><p>Mở “Danh mục thủ tục”, lọc theo tên, mã hoặc lĩnh vực rồi chọn một kết quả. Trang chi tiết cho biết dữ liệu tham chiếu, cơ quan trong danh mục, mốc đối chiếu nếu có và đường dẫn nguồn. Chọn “Lập hồ sơ theo thủ tục này” để chuyển sang biểu mẫu trong ứng dụng.</p></li>
         <li><b>Chọn thủ tục, cơ quan và khai tờ khai</b><p>Trang nộp có 5 bước. Ở bước 1, xác nhận thủ tục và cơ quan Hà Nội; bước 2 khai cá nhân hoặc tổ chức cùng thông tin liên hệ; bước 3 điền tờ khai riêng của thủ tục. Lựa chọn đối tượng sẽ thay đổi trường và giấy tờ bắt buộc. Thủ tục chưa có biểu mẫu được cấu hình chỉ xem được thông tin.</p></li>
@@ -1178,7 +1412,7 @@ function GuideContent({ isStaff = false }: { isStaff?: boolean }) {
 function StandaloneGuide({ signedIn, onHome, onStaff }: { signedIn: boolean; onHome: () => void; onStaff: () => void }) {
   return <div className="public-site guide-site">
     <div className="agency-masthead"><div className="agency-masthead-inner"><a className="agency-emblem" href="/" aria-label="Về cổng thông tin Hà Nội"><img src="/images/hanoi-logo.png" alt="Biểu trưng Hà Nội" /></a><div className="agency-title"><span>TRANG THÔNG TIN ĐIỆN TỬ</span><b>TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG<br /> THÀNH PHỐ HÀ NỘI</b><small>HƯỚNG DẪN THAO TÁC TRÊN CỔNG VÀ BÀN CÁN BỘ</small></div></div></div>
-    <header className="guide-site-header"><button className="text-button" onClick={onHome}>← {signedIn ? 'Về bàn cán bộ' : 'Về trang chủ'}</button><button className="button primary" onClick={onStaff}>{signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}</button></header>
+    <header className="guide-site-header"><button className="text-button" onClick={onHome}> {signedIn ? 'Về bàn cán bộ' : 'Về trang chủ'}</button><button className="button primary" onClick={onStaff}>{signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}</button></header>
     <main className="guide-site-main"><GuideContent /></main>
     <footer className="public-footer"><span>Hướng dẫn thao tác trong ứng dụng. Giao dịch chính thức cần thực hiện trên cổng có thẩm quyền.</span><a href="/#tra-cuu-thu-tuc">Về danh mục tra cứu trong ứng dụng ↑</a></footer>
   </div>
@@ -1195,14 +1429,14 @@ function StaffHome({ user, data, onOpen, onOpenQueue, onNavigate }: { user: User
   const attention = [...new Map([...overdue, ...dueSoon, ...unassigned, ...actionable].map(item => [item.code, item])).values()]
     .sort((a, b) => (daysUntil(a.deadline) ?? 999) - (daysUntil(b.deadline) ?? 999)).slice(0, 6)
   return <div className="staff-dashboard">
-    <section className="welcome-banner staff-banner ops-welcome"><div><span className="eyebrow">KHÔNG GIAN CÔNG VIỆC · {user.agencyScope || 'PHẠM VI ĐƯỢC CẤP'}</span><h2>{roleNames[user.role] || 'Cán bộ'}</h2><p>Ưu tiên công việc theo hạn và trạng thái. Dữ liệu trên màn hình được giới hạn theo vai trò, cơ quan và hồ sơ tài khoản được phép xem.</p><button className="button light" onClick={() => onNavigate('inbox')}>Mở hàng đợi của tôi <span>→</span></button></div><div className="ops-date"><small>NGÀY LÀM VIỆC</small><b>{workingDate}</b><span>{actionable.length} hồ sơ đang có thao tác khả dụng</span></div></section>
+    <section className="welcome-banner staff-banner ops-welcome"><div><span className="eyebrow">KHÔNG GIAN CÔNG VIỆC · {user.agencyScope || 'PHẠM VI ĐƯỢC CẤP'}</span><h2>{roleNames[user.role] || 'Cán bộ'}</h2><p>Ưu tiên công việc theo hạn và trạng thái. Dữ liệu trên màn hình được giới hạn theo vai trò, cơ quan và hồ sơ tài khoản được phép xem.</p><button className="button light" onClick={() => onNavigate('inbox')}>Mở hàng đợi của tôi <span></span></button></div><div className="ops-date"><small>NGÀY LÀM VIỆC</small><b>{workingDate}</b><span>{actionable.length} hồ sơ đang có thao tác khả dụng</span></div></section>
      <section className="metric-grid" aria-label="Chỉ số công việc"><MetricCard label="Trong phạm vi" value={data.cases.length} note="Mở danh sách hồ sơ được xem" tone="navy" onClick={() => onOpenQueue({ label: 'Toàn bộ hồ sơ trong phạm vi' })} /><MetricCard label="Có thể xử lý" value={actionable.length} note="Theo vai trò và trạng thái" tone="blue" onClick={actionable.length ? () => onOpenQueue({ statuses: [...new Set(actionable.map(item => item.status))], label: 'Hồ sơ đang chờ thao tác theo vai trò' }) : undefined} /><MetricCard label="Sắp đến hạn" value={dueSoon.length} note="Trong 3 ngày theo lịch" tone="amber" onClick={dueSoon.length ? () => onOpenQueue({ deadlineFilter: 'soon', label: 'Hồ sơ đến hạn trong 3 ngày' }) : undefined} /><MetricCard label="Đã quá hạn" value={overdue.length} note="Hồ sơ còn đang mở" tone="red" onClick={overdue.length ? () => onOpenQueue({ deadlineFilter: 'overdue', label: 'Hồ sơ quá hạn' }) : undefined} /></section>
     <div className="dashboard-columns">
-      <section className="panel dashboard-panel"><PanelHeading kicker="TRẠNG THÁI HIỆN TẠI" title="Luồng hồ sơ" description="Số hồ sơ đang hiển thị theo từng nhóm trạng thái." action={<button className="text-button" onClick={() => onNavigate('inbox')}>Mở danh sách →</button>} />
+      <section className="panel dashboard-panel"><PanelHeading kicker="TRẠNG THÁI HIỆN TẠI" title="Luồng hồ sơ" description="Số hồ sơ đang hiển thị theo từng nhóm trạng thái." action={<button className="text-button" onClick={() => onNavigate('inbox')}>Mở danh sách</button>} />
          <div className="stage-list">{OPERATION_STAGES.map((stage, index) => { const count = data.cases.filter(item => stage.statuses.includes(item.status)).length; const width = data.cases.length ? Math.max(count ? 5 : 0, count / Math.max(...OPERATION_STAGES.map(s => data.cases.filter(item => s.statuses.includes(item.status)).length), 1) * 100) : 0; return <button type="button" className="stage-row stage-row-button" key={stage.label} aria-label={`Mở ${count} hồ sơ ở giai đoạn ${stage.label}`} onClick={() => onOpenQueue({ statuses: stage.statuses, label: `Giai đoạn ${stage.label}` })}><span className="stage-number">0{index + 1}</span><span className="stage-label">{stage.label}</span><span className="stage-track"><i style={{ width: `${width}%` }} /></span><b>{count}</b></button> })}</div>
         <div className="stage-footnote">Bảng điều hành này không tự kết luận đúng hạn/nghiệp vụ; hãy mở hồ sơ để xem căn cứ, lịch sử và bước kế tiếp.</div>
       </section>
-      <section className="panel dashboard-panel"><PanelHeading kicker="ƯU TIÊN XỬ LÝ" title="Hồ sơ cần chú ý" description="Sắp xếp theo hạn gần nhất; không thay quyết định của cán bộ." action={<button className="text-button" onClick={() => onNavigate('monitoring')}>Xem giám sát →</button>} />
+      <section className="panel dashboard-panel"><PanelHeading kicker="ƯU TIÊN XỬ LÝ" title="Hồ sơ cần chú ý" description="Sắp xếp theo hạn gần nhất; không thay quyết định của cán bộ." action={<button className="text-button" onClick={() => onNavigate('monitoring')}>Xem giám sát</button>} />
         {attention.length ? <div className="attention-list">{attention.map(item => <button className="attention-row" key={item.code} onClick={() => onOpen(item)}><span className="attention-mark" data-tone={(daysUntil(item.deadline) ?? 999) < 0 ? 'red' : item.status === 'DA_TIEP_NHAN' && !item.assignment?.assigneeId ? 'amber' : 'blue'} /><span className="attention-main"><b>{item.procedure?.name || item.procedureCode}</b><small>{item.code} · {item.applicant?.name || 'Chưa có thông tin người nộp'}</small></span><span className="attention-side"><span className={`status-pill status-${item.status}`}>{data.statusLabels[item.status] || item.status}</span><small>{dueText(item)}</small></span></button>)}</div> : <div className="empty-state compact-empty">Chưa có hồ sơ quá hạn, sắp đến hạn hoặc chờ thao tác trong phạm vi này.</div>}
       </section>
     </div>
@@ -1210,7 +1444,7 @@ function StaffHome({ user, data, onOpen, onOpenQueue, onNavigate }: { user: User
       <section className="panel dashboard-panel"><PanelHeading kicker="TRÁCH NHIỆM" title="Tồn theo người phụ trách" description="Chỉ đếm các hồ sơ đang mở và đã có thông tin phân công." />
          <WorkloadList cases={openCases} onOpenQueue={onOpenQueue} />
       </section>
-      <section className="panel dashboard-panel"><PanelHeading kicker="TRUY VẾT" title="Hoạt động gần đây" description="Các sự kiện gần nhất trong hồ sơ mà tài khoản được phép xem." action={<button className="text-button" onClick={() => onNavigate('activity')}>Mở nhật ký →</button>} />
+      <section className="panel dashboard-panel"><PanelHeading kicker="TRUY VẾT" title="Hoạt động gần đây" description="Các sự kiện gần nhất trong hồ sơ mà tài khoản được phép xem." action={<button className="text-button" onClick={() => onNavigate('activity')}>Mở nhật ký</button>} />
         {recent.length ? <div className="recent-activity">{recent.map((event, index) => <div className="recent-event" key={`${event.code}-${event.at}-${index}`}><span className="timeline-dot"/><div><b>{event.title}</b><small>{event.code} · {event.actor} · {toDate(event.at)}</small></div></div>)}</div> : <div className="empty-state compact-empty">Chưa có sự kiện trong phạm vi tài khoản.</div>}
       </section>
     </div>
@@ -1286,6 +1520,7 @@ function CaseQueue({ user, data, initialFocus, onOpen }: { user: User; data: Boo
      <div className="queue-tabs" role="tablist" aria-label="Lọc nhóm trạng thái hồ sơ">{QUEUE_FILTERS.map(filter => <button key={filter.key} role="tab" aria-selected={bucket === filter.key} className={bucket === filter.key ? 'queue-tab active' : 'queue-tab'} onClick={() => { setBucket(filter.key); setFocusedStatuses([]); setFocusLabel('') }}><span>{filter.label}</span><b>{counts(filter)}</b></button>)}</div>
     <section className="panel queue-panel"><PanelHeading kicker="DANH SÁCH TÁC NGHIỆP" title={`${filtered.length.toLocaleString('vi-VN')} hồ sơ`} description="Tìm theo mã, tên thủ tục, người nộp, cơ quan hoặc người được phân công." />
         <div className="queue-filter-grid"><label className="queue-search"><span>Tìm hồ sơ</span><input className="search-input" type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Mã hồ sơ, thủ tục, người nộp…" /></label>{agencyOptions.length > 1 && <label><span>Cơ quan tiếp nhận</span><select value={agencyFilter} onChange={e => setAgencyFilter(e.target.value)}><option value="all">Tất cả trong phạm vi</option>{agencyOptions.map(agency => <option key={agency} value={agency}>{agency}</option>)}</select></label>}{procedureFilter && <label><span>Mã thủ tục</span><input value={procedureFilter} readOnly /></label>}<label><span>Thời hạn</span><select value={deadlineFilter} onChange={e => setDeadlineFilter(e.target.value)}><option value="all">Mọi thời hạn</option><option value="overdue">Quá hạn</option><option value="soon">Đến hạn trong 3 ngày</option><option value="unknown">Chưa xác định</option></select></label><label><span>Phân công</span><select value={assigneeFilter} onChange={e => setAssigneeFilter(e.target.value)}><option value="all">Tất cả</option><option value="assigned">Đã phân công</option><option value="unassigned">Chưa phân công</option>{assigneeOptions.map(person=><option key={person.id} value={person.id}>{person.name}</option>)}</select></label><label><span>Sắp xếp</span><select value={sort} onChange={e => setSort(e.target.value)}><option value="deadline">Hạn gần nhất</option><option value="updated">Cập nhật gần nhất</option><option value="created">Mới tiếp nhận</option></select></label></div>
+      <div className="queue-table-head" aria-hidden="true"><span>Mã hồ sơ &amp; Thủ tục hành chính</span><span>Cơ quan &amp; Người phụ trách</span><span>Trạng thái &amp; Thời hạn</span><span>Thao tác</span></div>
       <div className="queue-list">{filtered.map(item => <QueueItem key={item.code} item={item} label={data.statusLabels[item.status] || item.status} onOpen={onOpen} />)}{filtered.length === 0 && <div className="empty-state">Không tìm thấy hồ sơ phù hợp. Hãy thay từ khóa hoặc bỏ bớt điều kiện lọc.</div>}</div>
        <div className="queue-footer"><span>Đang xem {filtered.length.toLocaleString('vi-VN')} / {data.cases.length.toLocaleString('vi-VN')} hồ sơ trong phạm vi.</span><span>Bản in và CSV lấy đúng danh sách sau các bộ lọc đang chọn.</span></div>
     </section>
@@ -1295,7 +1530,7 @@ function QueueItem({ item, label, onOpen }: { item: CaseFile; label: string; onO
   const assignee = item.assignment?.assignee || item.assignment?.assigneeName || (item.assignment?.assigneeId ? 'Đã phân công' : 'Chưa phân công')
   const dueDays = daysUntil(item.deadline)
   const tone = dueDays !== null && dueDays < 0 && !CLOSED_STATUSES.has(item.status) ? 'overdue' : dueDays !== null && dueDays <= 3 && !CLOSED_STATUSES.has(item.status) ? 'soon' : 'normal'
-  return <article className="queue-item"><div className="queue-item-main"><span className="case-code">{item.code}</span><h3>{item.procedure?.name || item.procedureCode}</h3><p>{item.applicant?.name || 'Chưa có thông tin người nộp'} · Gửi {toDate(item.createdAt)}</p></div><div className="queue-item-facts"><span><small>Cơ quan</small><b>{item.agencyScope || item.receivingAgency || item.procedure?.agency || 'Chưa xác định'}</b></span><span><small>Người phụ trách</small><b>{assignee}</b></span></div><div className="queue-item-status"><span className={`status-pill status-${item.status}`}>{label}</span><span className={`deadline-mark ${tone}`}>{dueText(item)}</span></div><button className="queue-open" onClick={() => onOpen(item)} aria-label={`Mở hồ sơ ${item.code}`}>Mở hồ sơ <b>→</b></button></article>
+  return <article className="queue-item"><div className="queue-item-main"><span className="case-code">{item.code}</span><h3>{item.procedure?.name || item.procedureCode}</h3><p>{item.applicant?.name || 'Chưa có thông tin người nộp'} · Gửi {toDate(item.createdAt)}</p></div><div className="queue-item-facts"><span><small>Cơ quan</small><b>{item.agencyScope || item.receivingAgency || item.procedure?.agency || 'Chưa xác định'}</b></span><span><small>Người phụ trách</small><b>{assignee}</b></span></div><div className="queue-item-status"><span className={`status-pill status-${item.status}`}>{label}</span><span className={`deadline-mark ${tone}`}>{dueText(item)}</span></div><button className="queue-open" onClick={() => onOpen(item)} aria-label={`Mở hồ sơ ${item.code}`}>Mở hồ sơ <b></b></button></article>
 }
 
 function OperationsMonitor({ user, data, onOpen, onOpenQueue, onNavigate }: { user: User; data: Bootstrap; onOpen: (item: CaseFile) => void; onOpenQueue: (focus?: QueueFocus) => void; onNavigate: (page: string) => void }) {
@@ -1326,9 +1561,9 @@ function OperationsMonitor({ user, data, onOpen, onOpenQueue, onNavigate }: { us
      <section className="metric-grid monitor-metrics"><MetricCard label="Hồ sơ trong kỳ" value={cases.length} note="Mở danh sách đã lọc theo kỳ" tone="navy" onClick={() => onOpenQueue({ updatedSince, label: `Hồ sơ cập nhật từ ${period === 'all' ? 'toàn bộ thời gian' : reportDateDisplay(updatedSince)}` })} /><MetricCard label="Đang mở" value={open.length} note="Chưa ở trạng thái kết thúc" tone="blue" onClick={open.length ? () => onOpenQueue({ statuses: [...new Set(open.map(item => item.status))], updatedSince, label: 'Hồ sơ đang mở trong kỳ' }) : undefined} /><MetricCard label="Quá hạn" value={overdue.length} note="Theo hạn đang lưu trên hồ sơ" tone="red" onClick={overdue.length ? () => onOpenQueue({ deadlineFilter: 'overdue', updatedSince, label: 'Hồ sơ quá hạn' }) : undefined} /><MetricCard label="Đã phát hành / hoàn tất" value={completed} note="Không bao gồm hồ sơ từ chối" tone="green" onClick={completed ? () => onOpenQueue({ statuses: [...new Set(cases.filter(item => ['HOAN_THANH', 'DA_PHAT_HANH'].includes(item.status)).map(item => item.status))], updatedSince, label: 'Hồ sơ đã phát hành hoặc hoàn tất' }) : undefined} /></section>
      <div className="dashboard-columns monitor-columns"><section className="panel dashboard-panel"><PanelHeading kicker="PHÂN BỐ TỒN" title="Hồ sơ theo trạng thái" description="Chọn một trạng thái để mở danh sách đúng nhóm hồ sơ trong phạm vi." />{statusRows.length ? <div className="monitor-status-list">{statusRows.map(row => <button type="button" className="monitor-status-row monitor-status-button" key={row.status} onClick={() => onOpenQueue({ statuses: [row.status], updatedSince, label: `Trạng thái: ${row.label}` })}><span>{row.label}</span><i><b style={{ width: `${row.count / highestStatus * 100}%` }} /></i><strong>{row.count}</strong></button>)}</div> : <div className="empty-state compact-empty">Không có hồ sơ trong kỳ.</div>}</section>
        <section className="panel dashboard-panel"><PanelHeading kicker="TẢI CÔNG VIỆC" title="Theo cơ quan và người phụ trách" description="Chọn một nhóm để mở các hồ sơ đang mở tương ứng." />{[...byAgency.entries()].length ? <div className="monitor-groups"><h3>Cơ quan / đơn vị</h3>{[...byAgency.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,count])=><button type="button" className="monitor-group-row monitor-group-button" key={name} onClick={() => onOpenQueue({ agencyFilter: name, updatedSince, statuses: [...new Set(open.filter(item => (item.agencyScope || item.receivingAgency || 'Chưa xác định cơ quan') === name).map(item => item.status))], label: `Cơ quan: ${name}` })}><span>{name}</span><b>{count}</b></button>)}<h3>Người phụ trách</h3>{[...byAssignee.entries()].sort((a,b)=>b[1].count-a[1].count).slice(0,5).map(([id,item])=><button type="button" className="monitor-group-row monitor-group-button" key={id} onClick={() => onOpenQueue({ assigneeFilter: id === 'unassigned' ? 'unassigned' : id, updatedSince, label: `Người phụ trách: ${item.name}` })}><span>{item.name}</span><b>{item.count}</b></button>)}</div> : <div className="empty-state compact-empty">Chưa có hồ sơ mở trong kỳ.</div>}</section></div>
-    <div className="dashboard-columns monitor-columns"><section className="panel dashboard-panel"><PanelHeading kicker="TUỔI HỒ SƠ" title="Hồ sơ đang mở lâu nhất" description="Sắp theo ngày tạo; cần xem nhật ký để biết thời gian thực tế ở từng bước." action={<button className="text-button" onClick={() => onNavigate('inbox')}>Mở hàng đợi →</button>} />{oldest.length ? <div className="attention-list">{oldest.map(item => <button className="attention-row" key={item.code} onClick={() => onOpen(item)}><span className="attention-mark" data-tone={daysUntil(item.deadline) !== null && (daysUntil(item.deadline) as number) < 0 ? 'red' : 'blue'} /><span className="attention-main"><b>{item.procedure?.name || item.procedureCode}</b><small>{item.code} · Tạo {toDate(item.createdAt)}</small></span><span className="attention-side"><span className={`status-pill status-${item.status}`}>{data.statusLabels[item.status] || item.status}</span><small>{dueText(item)}</small></span></button>)}</div> : <div className="empty-state compact-empty">Không có hồ sơ đang mở.</div>}</section>
+    <div className="dashboard-columns monitor-columns"><section className="panel dashboard-panel"><PanelHeading kicker="TUỔI HỒ SƠ" title="Hồ sơ đang mở lâu nhất" description="Sắp theo ngày tạo; cần xem nhật ký để biết thời gian thực tế ở từng bước." action={<button className="text-button" onClick={() => onNavigate('inbox')}>Mở hàng đợi</button>} />{oldest.length ? <div className="attention-list">{oldest.map(item => <button className="attention-row" key={item.code} onClick={() => onOpen(item)}><span className="attention-mark" data-tone={daysUntil(item.deadline) !== null && (daysUntil(item.deadline) as number) < 0 ? 'red' : 'blue'} /><span className="attention-main"><b>{item.procedure?.name || item.procedureCode}</b><small>{item.code} · Tạo {toDate(item.createdAt)}</small></span><span className="attention-side"><span className={`status-pill status-${item.status}`}>{data.statusLabels[item.status] || item.status}</span><small>{dueText(item)}</small></span></button>)}</div> : <div className="empty-state compact-empty">Không có hồ sơ đang mở.</div>}</section>
       <section className="panel dashboard-panel"><PanelHeading kicker="CHẤT LƯỢNG PHỤC VỤ" title="Phản hồi sau kết quả" description="Chỉ tổng hợp đánh giá đã lưu; nội dung không làm thay đổi quyết định hồ sơ." />{feedback.length ? <><div className="feedback-score"><b>{averageScore?.toFixed(1)}</b><span>/ 5</span><small>{feedback.length} phản hồi trong phạm vi dữ liệu được phép</small></div><div className="feedback-list">{feedback.slice(0,4).map((row,index)=><article key={`${row.code}-${index}`}><b>{'★'.repeat(row.score)}{'☆'.repeat(5-row.score)}</b><span>{row.code}</span><p>{row.content || 'Không có nội dung nhận xét.'}</p></article>)}</div></> : <div className="empty-state compact-empty">Chưa có đánh giá trong dữ liệu hồ sơ được phép xem.</div>}</section></div>
-    <section className="panel integration-summary"><PanelHeading kicker="PHỤ THUỘC HỆ THỐNG" title="Hàng chờ đồng bộ" description="Dữ liệu hàng chờ trong ứng dụng; đây không phải xác nhận đã kết nối tới hệ thống bên ngoài." action={<button className="text-button" onClick={() => onNavigate('connections')}>Chi tiết kết nối →</button>} />{activeOutbox.length ? <div className="outbox-list">{activeOutbox.map(row=><div className="outbox-row" key={row.code}><b>{row.code}</b><span className={`request-status ${row.status === 'ERROR' ? 'request-rejected' : 'request-pending'}`}>{row.status === 'ERROR' ? 'Có lỗi' : 'Đang chờ'}</span><span>{row.attempts} lần thử</span><small>{row.lastError || 'Chưa có phản hồi xác nhận.'}</small></div>)}</div> : <div className="empty-state compact-empty">Không có bản ghi PENDING/ERROR trong hàng chờ hiện tại.</div>}</section>
+    <section className="panel integration-summary"><PanelHeading kicker="PHỤ THUỘC HỆ THỐNG" title="Hàng chờ đồng bộ" description="Dữ liệu hàng chờ trong ứng dụng; đây không phải xác nhận đã kết nối tới hệ thống bên ngoài." action={<button className="text-button" onClick={() => onNavigate('connections')}>Chi tiết kết nối</button>} />{activeOutbox.length ? <div className="outbox-list">{activeOutbox.map(row=><div className="outbox-row" key={row.code}><b>{row.code}</b><span className={`request-status ${row.status === 'ERROR' ? 'request-rejected' : 'request-pending'}`}>{row.status === 'ERROR' ? 'Có lỗi' : 'Đang chờ'}</span><span>{row.attempts} lần thử</span><small>{row.lastError || 'Chưa có phản hồi xác nhận.'}</small></div>)}</div> : <div className="empty-state compact-empty">Không có bản ghi PENDING/ERROR trong hàng chờ hiện tại.</div>}</section>
   </div>
 }
 
@@ -1341,6 +1576,8 @@ function ProcedureCatalog({ procedures, procedureCategories, canManage, onUpdate
   const [page, setPage] = useState(1)
   const [selectedCode, setSelectedCode] = useState(() => procedures[0]?.sourceCode || procedures[0]?.code || '')
   const [editing, setEditing] = useState(false)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
@@ -1481,14 +1718,43 @@ function ProcedureCatalog({ procedures, procedureCategories, canManage, onUpdate
       setCategoryHistory(result.history); setShowCategoryHistory(true)
     } catch (e) { setError(e instanceof Error ? e.message : 'Không tải được lịch sử lĩnh vực.') }
   }
-  return <div className="catalog-workspace">
-    <section className="catalog-summary-grid" aria-label="Tình trạng danh mục">
-      <article className="catalog-summary"><span>Thủ tục đã nạp</span><b>{procedures.length.toLocaleString('vi-VN')}</b><small>Dữ liệu tham chiếu lưu trong ứng dụng</small></article>
-      <article className="catalog-summary"><span>Lĩnh vực đã phân loại</span><b>{classifiedFieldCount.toLocaleString('vi-VN')}</b><small>{categories.some(item=>item.key==='Chưa phân loại')?'Còn bản ghi chưa phân loại':'Nhóm theo danh mục hiện có'}</small></article>
-      <article className="catalog-summary"><span>Tờ khai có thể tiếp nhận cục bộ</span><b>{configuredForms.toLocaleString('vi-VN')}</b><small>{documentReferences.toLocaleString('vi-VN')} thủ tục có thành phần hồ sơ tham chiếu nhưng chưa có cấu trúc tờ khai điện tử</small></article>
-    </section>
-    <section className="panel catalog-source-note"><b>Nguồn dữ liệu</b><p>Danh mục 2.075 thủ tục trong ứng dụng được giữ theo bộ tham chiếu hiện có. Phần đối chiếu Cổng Dịch vụ công quốc gia được tái tạo từ dữ liệu công khai ngày 18/10/2026 sau khi khôi phục dự án, không tự đồng bộ trực tiếp khi nguồn thay đổi. Mọi chỉnh sửa tại đây là dữ liệu nội bộ, có ghi phiên bản và nguồn đối chiếu, không tự trở thành thông tin đã được cơ quan có thẩm quyền xác nhận.</p></section>
-    <section className="panel field-catalog-panel" aria-label="Danh mục lĩnh vực thủ tục">
+  function openProcedure(code: string) {
+    setSelectedCode(code); setDetailOpen(true); setEditing(false); setShowHistory(false); setError(''); setNotice('')
+    document.querySelector('.workspace')?.scrollTo(0, 0); window.scrollTo(0, 0)
+  }
+  function returnToCatalog() {
+    setDetailOpen(false); setEditing(false); setShowHistory(false); setError('')
+    document.querySelector('.workspace')?.scrollTo(0, 0); window.scrollTo(0, 0)
+  }
+  if (detailOpen && selected) return <div className="staff-catalog-detail">
+    <div className="staff-catalog-detail-toolbar"><button type="button" className="button secondary" disabled={saving} onClick={returnToCatalog}>Về danh sách thủ tục</button><div>{canManage && !editing && <><button type="button" className="button secondary" onClick={toggleHistory}>{showHistory?'Ẩn lịch sử':'Lịch sử cập nhật'}</button><button type="button" className="button primary" onClick={startEdit}>Chỉnh sửa danh mục</button></>}<a className="button secondary" href={`/thu-tuc/${encodeURIComponent(selected.sourceCode || selected.code)}`} target="_blank" rel="noreferrer">Xem trang công dân</a></div></div>
+    {notice && <p className="form-notice" role="status">{notice}</p>}
+    {error && !editing && <p className="form-error" role="alert">{error}</p>}
+    {showHistory && canManage && <section className="panel staff-procedure-audit"><h2>Lịch sử cập nhật danh mục</h2><div className="catalog-history-list">{history.length?history.map(entry=><article key={`${entry.createdAt}-${entry.actor}`}><b>Phiên bản {String(entry.after.version ?? '—')} · {entry.actor}</b><time>{toDate(entry.createdAt)}</time><p>{entry.reason}</p></article>):<p>Thủ tục này chưa có lần chỉnh sửa nội bộ.</p>}</div></section>}
+    {editing ? <section className="panel staff-procedure-editor">
+      <div className="catalog-editor-heading"><div><h2>Chỉnh sửa danh mục nội bộ</h2><p>{selected.code}</p></div><button type="button" className="button secondary" disabled={saving} onClick={()=>setEditing(false)}>Hủy chỉnh sửa</button></div>
+      <p className="catalog-editor-warning">Thay đổi được lưu thành phiên bản nội bộ. Ghi nguồn chính thức và ngày đối chiếu khi đã kiểm tra nội dung; bản công bố gốc vẫn được giữ riêng để đối chiếu.</p>
+      <form className="catalog-edit-form" onSubmit={saveEdit}>
+        <label>Mã thủ tục<input name="code" defaultValue={selected.code} required minLength={2} maxLength={40} autoCapitalize="characters" /></label>
+        <label>Tên thủ tục<input name="name" defaultValue={selected.name} required maxLength={500} /></label>
+        <label>Lĩnh vực / danh mục<select name="categoryKey" defaultValue={selected.categoryKey || selected.field} required>{categories.map(category=><option key={category.key} value={category.key}>{category.name}{category.source==='internal'?' · nội bộ':''}</option>)}</select></label>
+        <label>Mức dịch vụ<select name="level" defaultValue={selected.level} required><option value="Toàn trình">Toàn trình</option><option value="Một phần">Một phần</option><option value="Cung cấp thông tin">Cung cấp thông tin</option></select></label>
+        <label>Cơ quan thực hiện theo nguồn<input name="agency" defaultValue={selected.agency} required maxLength={300} /></label>
+        <label>Nguồn chính thức nếu đã đối chiếu<input name="sourceUrl" type="url" defaultValue={selected.localEdit?.sourceUrl || selected.routing?.officialUrl || ''} maxLength={600} placeholder="https://...gov.vn/..." /></label>
+        <label>Ngày đối chiếu nếu có<input name="checkedAt" type="date" defaultValue={selected.localEdit?.checkedAt || selected.routing?.checkedAt || ''} /></label>
+        <label>Căn cứ và nội dung đã đối chiếu<textarea name="reason" rows={3} defaultValue={selected.localEdit?.reason || ''} required minLength={20} maxLength={1200} /></label>
+        {error&&<p className="form-error" role="alert">{error}</p>}
+        <div className="catalog-editor-actions"><button className="button primary" disabled={saving}>{saving?'Đang lưu…':'Lưu phiên bản nội bộ'}</button><button type="button" className="button secondary" disabled={saving} onClick={()=>setEditing(false)}>Hủy chỉnh sửa</button></div>
+      </form>
+    </section> : <>
+      <details className="staff-procedure-config" open={Boolean(selected.localEdit || selected.categoryEdit)}><summary>Cấu hình danh mục đang dùng <span>{sourceStatus(selected)}</span></summary><dl><div><dt>Mã đang dùng</dt><dd>{selected.code}</dd></div><div><dt>Mã bản ghi nguồn</dt><dd>{selected.ref || 'Chưa có'}</dd></div><div><dt>Lĩnh vực</dt><dd>{selected.field}</dd></div><div><dt>Mức dịch vụ</dt><dd>{serviceModeLabel(selected.level)}</dd></div><div><dt>Cơ quan trong danh mục</dt><dd>{selected.agency}</dd></div>{selected.sourceCode && selected.sourceCode !== selected.code && <div><dt>Mã nguồn chính thức</dt><dd>{selected.sourceCode}</dd></div>}</dl>{(selected.localEdit || selected.categoryEdit) && <p>Bản cập nhật nội bộ bởi {selected.localEdit?.updatedBy || selected.categoryEdit?.updatedBy}, phiên bản {selected.localEdit?.version || selected.categoryEdit?.version}. Ngày đối chiếu: {toDate(selected.localEdit?.checkedAt || selected.categoryEdit?.checkedAt)}.</p>}</details>
+      <section className="panel staff-procedure-detail-content"><CitizenProcedureDetail key={`${selected.sourceCode || selected.code}-${selected.localEdit?.version || 0}`} code={selected.sourceCode || selected.code} request={api} audience="staff" /></section>
+    </>}
+  </div>
+  return <div className="catalog-workspace staff-catalog-workspace">
+    <div className="staff-catalog-toolbar"><div className="staff-catalog-totals"><span><b>{procedures.length.toLocaleString('vi-VN')}</b> thủ tục</span><span><b>{classifiedFieldCount.toLocaleString('vi-VN')}</b> lĩnh vực</span><span><b>{configuredForms.toLocaleString('vi-VN')}</b> có tờ khai trong hệ thống</span>{documentReferences > 0 && <span>{documentReferences.toLocaleString('vi-VN')} có hồ sơ tham chiếu</span>}</div><button type="button" className="button secondary" aria-expanded={categoryManagerOpen} aria-controls="staff-category-manager" onClick={()=>setCategoryManagerOpen(open=>!open)}>{categoryManagerOpen?'Đóng lĩnh vực':canManage?'Quản lý lĩnh vực':'Duyệt theo lĩnh vực'}</button></div>
+    <details className="staff-catalog-source"><summary>Nguồn dữ liệu và phạm vi cập nhật</summary><p>Danh mục được giữ theo bộ tham chiếu hiện có. Trang chi tiết sử dụng bản công bố từ Cổng Dịch vụ công quốc gia, có ngày đối chiếu theo từng thủ tục. Các cập nhật của quản trị viên được lưu thành phiên bản nội bộ và có lịch sử; dữ liệu chưa được tự đồng bộ khi nguồn thay đổi.</p></details>
+    {categoryManagerOpen && <div id="staff-category-manager"><section className="panel field-catalog-panel" aria-label="Danh mục lĩnh vực thủ tục">
       <div className="field-catalog-header"><div><span className="ops-kicker">DANH MỤC PHÂN LOẠI</span><h2>Lĩnh vực thủ tục</h2><p>{classifiedFieldCount.toLocaleString('vi-VN')} lĩnh vực đã phân loại{categories.some(item=>item.key==='Chưa phân loại')?' · có nhóm thủ tục chưa phân loại':''} · mở nhóm để quản lý đầy đủ các thủ tục trực thuộc.</p></div><div className="field-catalog-header-actions">{canManage&&<button className="button secondary" onClick={()=>{setNewCategoryOpen(open=>!open);setError('')}}>{newCategoryOpen?'Đóng tạo lĩnh vực':'Tạo lĩnh vực'}</button>}<label className="field-catalog-search">Tìm lĩnh vực<input type="search" value={categoryQuery} onChange={event=>setCategoryQuery(event.target.value)} placeholder="Nhập tên lĩnh vực" /></label></div></div>
       {newCategoryOpen&&<form className="catalog-edit-form new-category-form" onSubmit={saveNewCategory}><h3>Tạo lĩnh vực nội bộ</h3><p>Nhóm mới bắt đầu ở trạng thái nội bộ. Có thể chuyển thủ tục vào nhóm; chỉ gắn nguồn chính thức khi đã đối chiếu thật.</p><label>Tên lĩnh vực<input name="name" required minLength={3} maxLength={180} /></label><label>Nguồn chính thức nếu đã đối chiếu<input name="sourceUrl" type="url" maxLength={600} placeholder="https://...gov.vn/..." /></label><label>Ngày đối chiếu nếu có<input name="checkedAt" type="date" /></label><label>Mục đích và căn cứ tạo nhóm<textarea name="reason" rows={2} required minLength={20} maxLength={1200} /></label><div className="catalog-editor-actions"><button className="button primary" disabled={savingNewCategory}>{savingNewCategory?'Đang tạo…':'Lưu lĩnh vực nội bộ'}</button></div></form>}
       <div className="field-catalog-layout">
@@ -1513,55 +1779,28 @@ function ProcedureCatalog({ procedures, procedureCategories, canManage, onUpdate
             {selectedCategory.categoryEdit&&<div className="field-catalog-provenance"><b>{selectedCategory.source==='internal'?'Nhóm lĩnh vực nội bộ':'Phiên bản nội bộ'} {selectedCategory.categoryEdit.version}</b><span>Cập nhật bởi {selectedCategory.categoryEdit.updatedBy} · {toDate(selectedCategory.categoryEdit.updatedAt)}{selectedCategory.source==='reference'?' · cần cơ quan nghiệp vụ xác nhận':' · không phải nhóm phân loại chính thức'}</span><p>{selectedCategory.categoryEdit.reason}</p>{selectedCategory.categoryEdit.sourceUrl&&<a href={selectedCategory.categoryEdit.sourceUrl} target="_blank" rel="noreferrer">Mở nguồn đối chiếu ↗</a>}</div>}
             <div className="field-member-toolbar"><label>Tìm trong lĩnh vực<input type="search" value={memberQuery} onChange={event=>{setMemberQuery(event.target.value);setMemberPage(1);setSelectedMembers([])}} placeholder="Mã thủ tục hoặc tên thủ tục" /></label><span>{categoryMemberMatches.length.toLocaleString('vi-VN')} / {selectedCategory.procedures.length.toLocaleString('vi-VN')} thủ tục</span></div>
             {managingMembers&&canManage&&<form className="field-member-manager" onSubmit={moveSelectedMembers}><div className="field-member-selection"><span>Đã chọn {selectedMembers.length.toLocaleString('vi-VN')} thủ tục · chọn trong trang hiện tại</span><div><button type="button" className="text-button" onClick={()=>setSelectedMembers(current=>[...new Set([...current,...categoryMemberShown.map(item=>item.sourceCode||item.code)])])}>Chọn trang này</button><button type="button" className="text-button" onClick={()=>setSelectedMembers(current=>current.filter(code=>!categoryMemberShown.some(item=>(item.sourceCode||item.code)===code)))}>Bỏ chọn trang này</button></div></div><label>Chuyển các thủ tục đã chọn sang lĩnh vực<select value={targetCategoryKey} onChange={event=>setTargetCategoryKey(event.target.value)} required><option value="">Chọn lĩnh vực đích</option>{categories.filter(item=>item.key!==selectedCategory.key).map(item=><option key={item.key} value={item.key}>{item.name} · {item.procedures.length.toLocaleString('vi-VN')}</option>)}</select></label><label>Nguồn chính thức nếu chuyển vào lĩnh vực tham chiếu<input name="sourceUrl" type="url" maxLength={600} placeholder="https://...gov.vn/..." /></label><label>Ngày đối chiếu nếu có<input name="checkedAt" type="date" /></label><label>Căn cứ phân loại và lý do chuyển nhóm<textarea name="reason" required minLength={20} maxLength={1200} rows={2} /></label><button className="button primary" disabled={savingMove||!selectedMembers.length||!targetCategoryKey}>{savingMove?'Đang chuyển…':`Chuyển ${selectedMembers.length.toLocaleString('vi-VN')} thủ tục`}</button></form>}
-            <div className="field-procedure-list"><b>Thủ tục trong lĩnh vực</b>{categoryMemberShown.map(item=><div className="field-procedure-row" key={item.sourceCode||item.code}>{managingMembers&&canManage&&<input type="checkbox" aria-label={`Chọn thủ tục ${item.code}`} checked={selectedMembers.includes(item.sourceCode||item.code)} onChange={event=>setSelectedMembers(current=>event.target.checked?[...current,item.sourceCode||item.code]:current.filter(code=>code!==(item.sourceCode||item.code)))} />}<button type="button" onClick={()=>{const stableCode=item.sourceCode||item.code;setSelectedCode(stableCode);setField(item.field);setMode('all');setQuery('');const group=procedures.filter(value=>value.field===item.field);setPage(Math.floor(group.findIndex(value=>(value.sourceCode||value.code)===stableCode)/pageSize)+1)}}><span><b>{item.code}</b> · {item.name}</span><span aria-hidden="true">›</span></button></div>)}{!categoryMemberShown.length&&<p className="field-catalog-no-results">Lĩnh vực này chưa có thủ tục{memberQuery?' khớp nội dung tìm kiếm':''}. Chọn “Quản lý thủ tục” để phân loại bản ghi vào nhóm.</p>}</div>
-            {categoryMemberPages>1&&<div className="catalog-pagination field-member-pagination"><button className="button secondary" disabled={memberPage<=1} onClick={()=>setMemberPage(value=>Math.max(1,value-1))}>← Trang trước</button><span>Trang {memberPage} / {categoryMemberPages}</span><button className="button secondary" disabled={memberPage>=categoryMemberPages} onClick={()=>setMemberPage(value=>Math.min(categoryMemberPages,value+1))}>Trang sau →</button></div>}
+            <div className="field-procedure-list"><b>Thủ tục trong lĩnh vực</b>{categoryMemberShown.map(item=><div className="field-procedure-row" key={item.sourceCode||item.code}>{managingMembers&&canManage&&<input type="checkbox" aria-label={`Chọn thủ tục ${item.code}`} checked={selectedMembers.includes(item.sourceCode||item.code)} onChange={event=>setSelectedMembers(current=>event.target.checked?[...current,item.sourceCode||item.code]:current.filter(code=>code!==(item.sourceCode||item.code)))} />}<button type="button" onClick={()=>{const stableCode=item.sourceCode||item.code;openProcedure(stableCode);setField(item.field);setMode('all');setQuery('');const group=procedures.filter(value=>value.field===item.field);setPage(Math.floor(group.findIndex(value=>(value.sourceCode||value.code)===stableCode)/pageSize)+1)}}><span><b>{item.code}</b> · {item.name}</span></button></div>)}{!categoryMemberShown.length&&<p className="field-catalog-no-results">Lĩnh vực này chưa có thủ tục{memberQuery?' khớp nội dung tìm kiếm':''}. Chọn “Quản lý thủ tục” để phân loại bản ghi vào nhóm.</p>}</div>
+            {categoryMemberPages>1&&<div className="catalog-pagination field-member-pagination"><button className="button secondary" disabled={memberPage<=1} onClick={()=>setMemberPage(value=>Math.max(1,value-1))}> Trang trước</button><span>Trang {memberPage} / {categoryMemberPages}</span><button className="button secondary" disabled={memberPage>=categoryMemberPages} onClick={()=>setMemberPage(value=>Math.min(categoryMemberPages,value+1))}>Trang sau</button></div>}
             {canManage&&<button className="text-button field-history-button" onClick={toggleCategoryHistory}>{showCategoryHistory?'Ẩn lịch sử lĩnh vực':'Xem lịch sử lĩnh vực'}</button>}
             {showCategoryHistory&&<div className="catalog-history-list">{categoryHistory.length?categoryHistory.map(entry=><article key={`${entry.createdAt}-${entry.actor}`}><b>{String(entry.after.version ?? '—')} · {entry.actor}</b><time>{toDate(entry.createdAt)}</time><p>{entry.reason}</p></article>):<p>Lĩnh vực này chưa có lần chỉnh sửa nội bộ.</p>}</div>}
             {error&&<p className="form-error" role="alert">{error}</p>}
           </>}
         </div>}
       </div>
-    </section>
+    </section></div>}
+    {notice && <p className="form-notice" role="status">{notice}</p>}
     <section className="panel catalog-controls">
       <label className="catalog-search"><span>Tìm theo mã, tên, lĩnh vực hoặc cơ quan</span><input className="search-input" type="search" value={query} onChange={e=>{setQuery(e.target.value);setPage(1)}} placeholder="Ví dụ: 2.000908, hộ tịch…" /></label>
       <label><span>Lĩnh vực</span><select value={field} onChange={e=>{setField(e.target.value);setPage(1)}}><option value="all">Tất cả lĩnh vực</option>{fields.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
       <label><span>Mức dịch vụ</span><select value={mode} onChange={e=>{setMode(e.target.value);setPage(1)}}><option value="all">Tất cả mức</option><option value="FULL">Toàn trình</option><option value="PARTIAL">Một phần</option><option value="INFORMATION">Cung cấp thông tin</option></select></label>
       <div className="catalog-count"><b>{filtered.length.toLocaleString('vi-VN')}</b><small>thủ tục phù hợp</small></div>
     </section>
-    <div className="catalog-layout">
-      <section className="panel catalog-list-panel"><div className="catalog-list-head"><div><span className="ops-kicker">DANH MỤC THAM CHIẾU</span><h2>Kết quả tra cứu</h2><p>Chọn một dòng để xem đầy đủ thông tin khả dụng.</p></div><span>{filtered.length ? `${(page-1)*pageSize+1}–${Math.min(page*pageSize,filtered.length)} / ${filtered.length}` : '0 kết quả'}</span></div>
-        <div className="catalog-list">{shown.map(item=>{const stableCode=item.sourceCode||item.code;const isSelected=(selected?.sourceCode||selected?.code)===stableCode;return <button aria-label={`Xem thông tin thủ tục ${item.code}: ${item.name}`} aria-pressed={isSelected} className={`catalog-row${isSelected?' selected':''}`} key={`${stableCode}-${item.ref}`} onClick={()=>{setSelectedCode(stableCode);setEditing(false);setShowHistory(false);setError('')}}><span className="catalog-row-code">{item.code}</span><span className="catalog-row-main"><b>{item.name}</b><small>{item.field} · {serviceModeLabel(item.level)}</small></span><span className={`catalog-verify ${item.localEdit || item.categoryEdit || item.routing?.status==='catalog-reference-only' || item.routing?.status==='unverified'?'unverified':'verified'}`}>{sourceStatus(item)}</span><span className="row-arrow" aria-hidden="true">›</span></button>})}</div>
-        {filtered.length===0&&<div className="empty-state">Không tìm thấy thủ tục phù hợp. Hãy kiểm tra từ khóa hoặc bỏ bớt bộ lọc.</div>}
-        {filtered.length>pageSize&&<div className="catalog-pagination"><button className="button secondary" disabled={page<=1} onClick={()=>setPage(current=>Math.max(1,current-1))}>← Trước</button><span>Trang {page} / {pageCount}</span><button className="button secondary" disabled={page>=pageCount} onClick={()=>setPage(current=>Math.min(pageCount,current+1))}>Tiếp →</button></div>}
-      </section>
-      <aside className="panel procedure-detail-panel" aria-live="polite">
-        {selected ? editing ? <>
-          <div className="catalog-editor-heading"><div><span className="ops-kicker">CHỈNH SỬA NỘI BỘ</span><h2>{selected.code}</h2></div><button type="button" className="text-button" onClick={()=>setEditing(false)}>Hủy</button></div>
-          <p className="catalog-editor-warning">Mã, tên, lĩnh vực và mức dịch vụ được lưu thành phiên bản nội bộ. Chỉ ghi nguồn và ngày khi đã đối chiếu thật với trang HTTPS thuộc miền .gov.vn hoặc chinhphu.vn; nếu bỏ trống, bản sửa vẫn được đánh dấu cần xác minh.</p>
-          <form className="catalog-edit-form" onSubmit={saveEdit}>
-            <label>Mã thủ tục<input name="code" defaultValue={selected.code} required minLength={2} maxLength={40} autoCapitalize="characters" /></label>
-            <label>Tên thủ tục<input name="name" defaultValue={selected.name} required maxLength={500} /></label>
-            <label>Lĩnh vực / danh mục<select name="categoryKey" defaultValue={selected.categoryKey || selected.field} required>{categories.map(category=><option key={category.key} value={category.key}>{category.name}{category.source==='internal'?' · nội bộ':''}</option>)}</select></label>
-            <label>Mức dịch vụ<select name="level" defaultValue={selected.level} required><option value="Toàn trình">Toàn trình</option><option value="Một phần">Một phần</option><option value="Cung cấp thông tin">Cung cấp thông tin</option></select></label>
-            <label>Cơ quan thực hiện theo nguồn<input name="agency" defaultValue={selected.agency} required maxLength={300} /></label>
-            <label>Nguồn chính thức nếu đã đối chiếu<input name="sourceUrl" type="url" defaultValue={selected.localEdit?.sourceUrl || selected.routing?.officialUrl || ''} maxLength={600} placeholder="https://...gov.vn/..." /></label>
-            <label>Ngày đối chiếu nếu có<input name="checkedAt" type="date" defaultValue={selected.localEdit?.checkedAt || selected.routing?.checkedAt || ''} /></label>
-            <label>Căn cứ và nội dung đã đối chiếu<textarea name="reason" rows={3} defaultValue={selected.localEdit?.reason || ''} required minLength={20} maxLength={1200} /></label>
-            {error&&<p className="form-error" role="alert">{error}</p>}
-            <div className="catalog-editor-actions"><button className="button primary" disabled={saving}>{saving?'Đang lưu…':'Lưu phiên bản nội bộ'}</button></div>
-          </form>
-        </> : <>
-          <div className="procedure-detail-heading"><div><span className="ops-kicker">THÔNG TIN THỦ TỤC</span><small className="procedure-detail-code">Mã đang dùng: {selected.code}{selected.ref ? ` · Mã bản ghi tham chiếu: ${selected.ref}` : ''}{selected.sourceCode&&selected.sourceCode!==selected.code?` · Mã nguồn: ${selected.sourceCode}`:''}</small></div>{canManage&&<button className="button secondary" onClick={startEdit}>Chỉnh sửa</button>}</div>
-          <h2>{selected.name}</h2>
-          <dl className="procedure-facts"><div><dt>Lĩnh vực</dt><dd>{selected.field || 'Chưa xác định'}</dd></div><div><dt>Mức dịch vụ</dt><dd>{serviceModeLabel(selected.level)}</dd></div><div><dt>Cơ quan trong bản tham chiếu</dt><dd>{selected.agency || 'Chưa xác định'}</dd></div><div><dt>Mã bản ghi</dt><dd>{selected.ref || 'Không có mã tham chiếu trong tệp nguồn'}</dd></div></dl>
-          {selected.submission ? <section className="procedure-form-detail"><h3>{selected.submission.sourceStatus === 'official-document-list-only' ? 'Thành phần hồ sơ tham chiếu từ nguồn công khai' : selected.submission.title}</h3><p><b>Căn cứ pháp lý:</b> {selected.submission.legalBasis}</p><p><b>Thời hạn:</b> {selected.submission.deadlineText}</p><p><b>Phí:</b> {selected.submission.feeText}</p>{selected.submission.sourceStatus === 'official-document-list-only' && <p className="routing-evidence warning">Nguồn công khai hiện không trả cấu trúc tờ khai điện tử. Ứng dụng hiển thị dữ liệu giấy tờ để tham khảo và không nhận hồ sơ cục bộ cho thủ tục này.</p>}<div className="procedure-requirement-list"><b>{selected.submission.sourceStatus === 'official-document-list-only' ? 'Thành phần hồ sơ theo nguồn (chưa xác nhận cờ bắt buộc)' : 'Trường khai báo và giấy tờ đã cấu hình'}</b>{[...selected.submission.fields,...selected.submission.documents].slice(0,12).map((entry,index)=><div key={`${entry.id}-${index}`}><span>{entry.label}</span><small>{selected.submission?.sourceStatus === 'official-document-list-only' ? (entry.officialAttachmentNames?.length ? `Tệp mẫu được liệt kê: ${entry.officialAttachmentNames.join('; ')}` : 'Cờ bắt buộc chưa được nguồn công khai xác nhận') : entry.required?'Bắt buộc':'Tùy trường hợp / không bắt buộc'}</small></div>)}{selected.submission.fields.length+selected.submission.documents.length>12&&<small>Hiển thị 12 mục đầu; mở nguồn chính thức để xem toàn bộ.</small>}</div>{selected.submission.sourceStatus === 'official-document-list-only' ? <a className="source-link text-link" href={selected.submission.formSourceUrl || selected.submission.sourceUrl} target="_blank" rel="noreferrer">{selected.submission.formSourceLabel || 'Mở thành phần hồ sơ trên nguồn chính thức ↗'}</a> : <><a className="source-link text-link" href={selected.submission.sourceUrl} target="_blank" rel="noreferrer">Mở nguồn thủ tục ↗</a>{selected.submission.formSourceUrl&&<a className="source-link text-link" href={selected.submission.formSourceUrl} target="_blank" rel="noreferrer">{selected.submission.formSourceLabel || 'Mở nguồn biểu mẫu ↗'}</a>}</>}</section> : <div className="routing-evidence warning"><b>Chưa cấu hình biểu mẫu tiếp nhận trong ứng dụng</b><p>Danh mục có thông tin tham chiếu nhưng chưa đủ căn cứ để nhận hồ sơ điện tử cho thủ tục này. Ứng dụng sẽ không tự dựng tờ khai hoặc thành phần hồ sơ còn thiếu.</p></div>}
-          <div className={`routing-evidence ${selected.localEdit || selected.categoryEdit || selected.routing?.status==='catalog-reference-only' || selected.routing?.status==='unverified'?'warning':'confirmed'}`}><b>{sourceStatus(selected)}</b><p>{selected.localEdit ? `Đã cập nhật tại ứng dụng bởi ${selected.localEdit.updatedBy}, phiên bản ${selected.localEdit.version}. Cần cơ quan nghiệp vụ đối chiếu trước khi dùng.` : selected.categoryEdit ? `Lĩnh vực được cập nhật nội bộ bởi ${selected.categoryEdit.updatedBy}, phiên bản ${selected.categoryEdit.version}. Cần cơ quan nghiệp vụ đối chiếu trước khi dùng.` : selected.routing?.summary || 'Bản ghi lấy từ danh mục tham chiếu; cần chọn địa bàn/cơ quan và xác minh trên Cổng quốc gia trước khi hướng dẫn giao dịch.'}</p>{selected.localEdit&&<small>Ngày đối chiếu khai báo: {toDate(selected.localEdit.checkedAt)} · Lưu lúc {toDate(selected.localEdit.updatedAt)}</small>}{selected.categoryEdit&&<small>Ngày đối chiếu khai báo: {toDate(selected.categoryEdit.checkedAt)} · Lưu lúc {toDate(selected.categoryEdit.updatedAt)}</small>}{selected.routing?.checkedAt&&!selected.localEdit&&!selected.categoryEdit&&<small>Mốc đối chiếu: {toDate(selected.routing.checkedAt)}</small>}</div>
-          {(selected.localEdit?.sourceUrl || selected.categoryEdit?.sourceUrl || selected.routing?.officialUrl)&&<a className="button secondary source-link" href={selected.localEdit?.sourceUrl || selected.categoryEdit?.sourceUrl || selected.routing?.officialUrl} target="_blank" rel="noreferrer">Mở nguồn công khai ↗</a>}
-          {canManage&&<div className="catalog-history-control"><button className="text-button" onClick={toggleHistory}>{showHistory?'Ẩn lịch sử':'Xem lịch sử chỉnh sửa'}</button>{showHistory&&<div className="catalog-history-list">{history.length?history.map(entry=><article key={`${entry.createdAt}-${entry.actor}`}><b>Phiên bản {String(entry.after.version ?? '—')} · {entry.actor}</b><time>{toDate(entry.createdAt)}</time><p>{entry.reason}</p></article>):<p>Thủ tục này chưa có lần chỉnh sửa nội bộ.</p>}</div>}</div>}
-        </> : <div className="catalog-placeholder"><h2>Chưa có thủ tục phù hợp</h2><p>Thay điều kiện tìm kiếm để xem chi tiết bản ghi.</p></div>}
-        {notice&&!editing&&<p className="form-notice" role="status">{notice}</p>}
-      </aside>
-    </div>
+    <section className="panel staff-catalog-table-panel" aria-labelledby="staff-procedure-results-heading">
+      <div className="catalog-list-head"><div><h2 id="staff-procedure-results-heading">Danh sách thủ tục</h2><p>Chọn tên thủ tục để xem nội dung công bố và cấu hình đang dùng.</p></div><span>{filtered.length ? `${(page-1)*pageSize+1}–${Math.min(page*pageSize,filtered.length)} / ${filtered.length.toLocaleString('vi-VN')}` : '0 kết quả'}</span></div>
+      <div className="staff-procedure-results"><table className="staff-procedure-table"><thead><tr><th scope="col">Mã thủ tục</th><th scope="col">Tên thủ tục / mức dịch vụ</th><th scope="col">Cơ quan</th><th scope="col">Tình trạng dữ liệu</th></tr></thead><tbody>{shown.map(item=>{const stableCode=item.sourceCode||item.code;return <tr key={`${stableCode}-${item.ref}`}><td data-label="Mã thủ tục"><span className="staff-procedure-code">{item.code}</span></td><td data-label="Tên thủ tục"><button type="button" className="staff-procedure-title" aria-label={`Xem chi tiết thủ tục ${item.code}: ${item.name}`} onClick={()=>openProcedure(stableCode)}>{item.name}</button><div className="staff-procedure-meta"><span>{item.field}</span><span>{serviceModeLabel(item.level)}</span></div></td><td data-label="Cơ quan">{item.agency || 'Chưa xác định'}</td><td data-label="Tình trạng dữ liệu"><span className={`staff-procedure-data-status${item.localEdit || item.categoryEdit?' internal':''}`}>{sourceStatus(item)}</span></td></tr>})}</tbody></table></div>
+      {filtered.length===0&&<div className="empty-state">Không tìm thấy thủ tục phù hợp. Hãy kiểm tra từ khóa hoặc bỏ bớt bộ lọc.</div>}
+      {filtered.length>pageSize&&<div className="catalog-pagination"><button type="button" className="button secondary" disabled={page<=1} onClick={()=>setPage(current=>Math.max(1,current-1))}>Trang trước</button><span>Trang {page} / {pageCount}</span><button type="button" className="button secondary" disabled={page>=pageCount} onClick={()=>setPage(current=>Math.min(pageCount,current+1))}>Trang sau</button></div>}
+    </section>
   </div>
 }
 
@@ -1623,12 +1862,12 @@ function ServiceConnections({ user, data, onNavigate, onOpenCase }: { user: User
     <AdministrativeServiceDesk user={user} procedures={data.procedures} request={api} onCaseCreated={onOpenCase} />
     {error && <div className="form-error" role="alert">{error}</div>}{notice && <div className="citizen-success" role="status">{notice}</div>}
     {(user.role === 'admin' || user.role === 'finance' || user.role === 'leader') && <section className="panel sandbox-payment-workspace"><PanelHeading kicker="NGHIỆP VỤ TÀI CHÍNH CỤC BỘ" title="Giao dịch, đối soát và hoàn thử nghiệm" description="Dữ liệu được lưu trong SQLite của ứng dụng. Mọi thao tác ở đây chỉ thay đổi bản ghi sandbox, không gọi ngân hàng hoặc chuyển tiền." /><div className="sandbox-payment-summary"><MetricCard label="Tổng giao dịch" value={payments.length} note="Trong phạm vi được phép xem" tone="navy"/><MetricCard label="Chờ đối soát" value={payments.filter(item=>item.status==='PAID').length} note="Chờ đối chiếu chứng từ" tone="amber"/><MetricCard label="Đang chờ hoàn" value={payments.filter(item=>item.refund?.status==='PENDING').length} note="Cần người khác xem xét" tone="red"/></div>{payments.length ? <div className="sandbox-payment-list">{payments.map(payment=><SandboxPaymentRow key={payment.transactionRef} payment={payment} user={user} onChanged={async message=>{ await loadOperations(); setNotice(message) }} />)}</div> : <div className="connection-empty-state"><b>Chưa có giao dịch trong phạm vi này</b><p>Cán bộ tiếp nhận cấu hình khoản thu có căn cứ trên hồ sơ; người nộp tạo giao dịch tại trang tra cứu.</p></div>}</section>}
-    {user.role === 'admin' && <section className="panel sandbox-signer-workspace"><PanelHeading kicker="THẨM QUYỀN NỘI BỘ" title="Quản lý quyền ký thử nghiệm" description="Quyền riêng, cấp/thu hồi có căn cứ và lưu nhật ký. Không thay thế quyết định phân công hay chứng thư số công vụ." />{error && <div className="form-error" role="alert">{error}</div>}{notice && <div className="citizen-success" role="status">{notice}</div>}<form className="sandbox-signer-form" onSubmit={event=>{event.preventDefault();void changeSigner('grant')}}><label>Lãnh đạo<select value={signerId} onChange={event=>setSignerId(event.target.value)} required><option value="">Chọn tài khoản lãnh đạo</option>{signers.map(person=><option key={person.id} value={person.id}>{person.full_name} · {person.agency_scope} · {person.effective?'đang có quyền':'chưa có quyền'}</option>)}</select></label><label>Căn cứ văn bản cấp quyền<input value={authorityRef} onChange={event=>setAuthorityRef(event.target.value)} minLength={4} maxLength={180} required placeholder="Số văn bản phân quyền nội bộ" /></label><label>Lý do và phạm vi<input value={authorityReason} onChange={event=>setAuthorityReason(event.target.value)} minLength={12} maxLength={1200} required placeholder="Nêu lý do cấp quyền thử nghiệm" /></label><button className="button primary" disabled={busy||!signerId}>{busy?'Đang lưu…':'Cấp quyền ký thử nghiệm'}</button></form>{signers.length ? <div className="sandbox-signer-list">{signers.map(person=><article key={person.id}><div><b>{person.full_name}</b><span>{person.agency_scope} · {person.email}</span><small>{person.authority_ref ? `Căn cứ: ${person.authority_ref} · ${person.reason||''}` : 'Chưa có quyền ký thử nghiệm'}</small></div><span>{person.effective?'Đang hiệu lực':'Không hoạt động'}</span>{person.authority_ref && <button type="button" className="button secondary" disabled={busy||!person.effective} onClick={()=>{setSignerId(person.id);void changeSigner('revoke',person.id,'Thu hồi quyền ký thử nghiệm theo rà soát quản trị.')}}>Thu hồi</button>}</article>)}</div>:<div className="connection-empty-state">Chưa có tài khoản lãnh đạo để cấp quyền ký.</div>}</section>}
+    {user.role === 'admin' && <section className="panel sandbox-signer-workspace"><PanelHeading kicker="THẨM QUYỀN NỘI BỘ" title="Quản lý quyền ký thử nghiệm" description="Quyền riêng, cấp/thu hồi có căn cứ và lưu nhật ký. Không thay thế quyết định phân công hay chứng thư số công vụ." />{error && <div className="form-error" role="alert">{error}</div>}{notice && <div className="citizen-success" role="status">{notice}</div>}<form className="sandbox-signer-form" onSubmit={event=>{event.preventDefault();void changeSigner('grant')}}><label>Lãnh đạo<select value={signerId} onChange={event=>setSignerId(event.target.value)} required><option value="">Chọn tài khoản lãnh đạo</option>{signers.map(person=><option key={person.id} value={person.id}>{person.full_name} · {person.agency_scope} · {person.effective?'đang có quyền':'chưa có quyền'}</option>)}</select></label><label>Căn cứ văn bản cấp quyền<input value={authorityRef} onChange={event=>setAuthorityRef(event.target.value)} minLength={4} maxLength={180} required placeholder="Số văn bản phân quyền nội bộ" /></label><label>Lý do và phạm vi<input value={authorityReason} onChange={event=>setAuthorityReason(event.target.value)} minLength={12} maxLength={1200} required placeholder="Nêu lý do cấp quyền thử nghiệm" /></label><button className="button primary" disabled={busy||!signerId}>{busy?'Đang lưu…':'Cấp quyền ký thử nghiệm'}</button></form>{signers.length ? <div className="data-table-wrap"><table className="data-table signer-table"><thead><tr><th className="col-stt">STT</th><th className="col-user">Lãnh đạo &amp; Email công vụ</th><th className="col-agency">Cơ quan / Đơn vị</th><th>Căn cứ phân quyền ký</th><th className="col-status">Trạng thái</th><th className="col-actions">Thao tác</th></tr></thead><tbody>{signers.map((person, idx)=><tr key={person.id}><td className="col-stt" data-label="STT">{idx + 1}</td><td className="col-user" data-label="Lãnh đạo & Email công vụ"><div className="account-cell-user"><b>{person.full_name}</b><span className="account-cell-email">{person.email}</span></div></td><td className="col-agency" data-label="Cơ quan / Đơn vị"><span className="account-cell-agency">{person.agency_scope}</span></td><td data-label="Căn cứ phân quyền ký">{person.authority_ref ? <div className="account-cell-user"><b>{person.authority_ref}</b><span className="account-cell-email">{person.reason || ''}</span></div> : <span className="account-cell-email">Chưa cấp quyền ký thử nghiệm</span>}</td><td className="col-status" data-label="Trạng thái"><span className={`request-status ${person.effective ? 'request-approved' : 'request-pending'}`}>{person.effective ? 'Đang hiệu lực' : 'Chưa kích hoạt'}</span></td><td className="col-actions" data-label="Thao tác">{person.authority_ref ? <button type="button" className="button secondary" disabled={busy||!person.effective} onClick={()=>{setSignerId(person.id);void changeSigner('revoke',person.id,'Thu hồi quyền ký thử nghiệm theo rà soát quản trị.')}}>Thu hồi</button> : <span className="account-cell-email">—</span>}</td></tr>)}</tbody></table></div>:<div className="connection-empty-state">Chưa có tài khoản lãnh đạo để cấp quyền ký.</div>}</section>}
     <section className="panel connection-state-banner"><div><span className="ops-kicker">KẾT NỐI NỘI BỘ</span><h2>{storage?.database==='connected'?'API và cơ sở dữ liệu đang hoạt động':'Chưa xác nhận được kết nối cơ sở dữ liệu'}</h2><p>{storage?.database==='connected'?'Dữ liệu dưới đây vừa được đọc từ máy chủ ứng dụng và SQLite cục bộ. Đây là kết nối nội bộ, không đồng nghĩa với liên thông hệ thống Chính phủ.':'Không đọc được trạng thái từ máy chủ. Tải lại dữ liệu hoặc kiểm tra tiến trình backend.'}</p></div><span className={`environment-badge ${storage?.database==='connected'?'environment-connected':'environment-disconnected'}`}>{storage?.database==='connected'?'Đã kết nối nội bộ':'Mất kết nối'}</span></section>
-    <section className="local-data-grid" aria-label="Dữ liệu đang lưu cục bộ"><article><span>Thủ tục tham chiếu</span><b>{(storage?.procedureCount ?? data.procedures.length).toLocaleString('vi-VN')}</b><small>Tệp danh mục trong dự án; chưa đồng bộ trực tuyến</small><button className="text-button" onClick={()=>onNavigate('procedures')}>Mở danh mục và chi tiết →</button></article><article><span>Hồ sơ đã lưu</span><b>{(storage?.caseRecords ?? data.cases.length).toLocaleString('vi-VN')}</b><small>{storage?.caseCountScope || 'Phạm vi được cấp'} · cơ sở dữ liệu hiện tại</small><a className="text-link" href="/nop-ho-so">Mở luồng nộp hồ sơ →</a></article><article><span>Tin đang công khai</span><b>{(storage?.publishedNews ?? 0).toLocaleString('vi-VN')}</b><small>Nội dung đã lưu tại ứng dụng</small></article></section>
+    <section className="local-data-grid" aria-label="Dữ liệu đang lưu cục bộ"><article><span>Thủ tục tham chiếu</span><b>{(storage?.procedureCount ?? data.procedures.length).toLocaleString('vi-VN')}</b><small>Tệp danh mục trong dự án; chưa đồng bộ trực tuyến</small><button className="text-button" onClick={()=>onNavigate('procedures')}>Mở danh mục và chi tiết</button></article><article><span>Hồ sơ đã lưu</span><b>{(storage?.caseRecords ?? data.cases.length).toLocaleString('vi-VN')}</b><small>{storage?.caseCountScope || 'Phạm vi được cấp'} · cơ sở dữ liệu hiện tại</small><a className="text-link" href="/nop-ho-so">Mở luồng nộp hồ sơ →</a></article><article><span>Tin đang công khai</span><b>{(storage?.publishedNews ?? 0).toLocaleString('vi-VN')}</b><small>Nội dung đã lưu tại ứng dụng</small></article></section>
     <section className="panel external-boundary"><h2>Các dịch vụ bên ngoài</h2><p>Các kết nối này chưa được thiết lập. Cần hợp đồng, thông tin truy cập và quy trình kiểm thử do cơ quan/nhà cung cấp cấp; ứng dụng không tự dò hoặc giả lập kết nối thật.</p></section>
     <div className="integration-cards">{services.map(service=><article className="panel integration-card" key={service.name}><div className="integration-card-top"><span className="ops-kicker">{service.category}</span><span className="connection-state-text">Chưa kết nối</span></div><h3>{service.name}</h3><p>{service.detail}</p><div className="integration-prerequisites"><b>Điều kiện cần cấu hình</b><ul>{service.prerequisites.map(item=><li key={item}>{item}</li>)}</ul></div></article>)}</div>
-    <section className="panel integration-summary"><PanelHeading kicker="THEO DÕI TÁC VỤ" title="Hàng chờ đồng bộ bên ngoài" description="Các mục chỉ xuất hiện khi ứng dụng đã ghi nhận tác vụ. Chúng không thay thế biên nhận từ hệ thống đích." action={<button className="text-button" onClick={()=>onNavigate('monitoring')}>Mở giám sát quy trình →</button>} /><div className="outbox-summary"><MetricCard label="Tổng tác vụ" value={outbox.length} note="Bản ghi hàng chờ đọc từ ứng dụng" tone="navy"/><MetricCard label="Đang chờ" value={pendingCount} note="Chưa được bên nhận xác nhận" tone="amber"/><MetricCard label="Có lỗi" value={errorCount} note="Cần xem lại chi tiết tác vụ" tone="red"/></div>{outbox.length ? <div className="outbox-list">{outbox.map(row=><div className="outbox-row" key={row.code}><b>{row.code}</b><span>{row.status}</span><span>{row.attempts} lần thử</span><small>{row.lastError||'Bản ghi hàng chờ cục bộ; chưa phải xác nhận giao nhận bên ngoài.'}</small></div>)}</div> : <div className="connection-empty-state"><b>Chưa có tác vụ đồng bộ</b><p>Hiện chưa có dịch vụ ngoài nào được kết nối để nhận hồ sơ hoặc phản hồi trạng thái.</p></div>}</section>
+    <section className="panel integration-summary"><PanelHeading kicker="THEO DÕI TÁC VỤ" title="Hàng chờ đồng bộ bên ngoài" description="Các mục chỉ xuất hiện khi ứng dụng đã ghi nhận tác vụ. Chúng không thay thế biên nhận từ hệ thống đích." action={<button className="text-button" onClick={()=>onNavigate('monitoring')}>Mở giám sát quy trình</button>} /><div className="outbox-summary"><MetricCard label="Tổng tác vụ" value={outbox.length} note="Bản ghi hàng chờ đọc từ ứng dụng" tone="navy"/><MetricCard label="Đang chờ" value={pendingCount} note="Chưa được bên nhận xác nhận" tone="amber"/><MetricCard label="Có lỗi" value={errorCount} note="Cần xem lại chi tiết tác vụ" tone="red"/></div>{outbox.length ? <div className="outbox-list">{outbox.map(row=><div className="outbox-row" key={row.code}><b>{row.code}</b><span>{row.status}</span><span>{row.attempts} lần thử</span><small>{row.lastError||'Bản ghi hàng chờ cục bộ; chưa phải xác nhận giao nhận bên ngoài.'}</small></div>)}</div> : <div className="connection-empty-state"><b>Chưa có tác vụ đồng bộ</b><p>Hiện chưa có dịch vụ ngoài nào được kết nối để nhận hồ sơ hoặc phản hồi trạng thái.</p></div>}</section>
     <section className="panel integration-boundary"><b>Điều kiện mở kết nối</b><p>Đơn vị quản lý cần cấp đầu mối, hợp đồng giao tiếp, thông tin xác thực môi trường thử, quy tắc chống gửi lặp và quy trình đối soát. Sau khi có các căn cứ này mới có thể cấu hình và kiểm thử từng dịch vụ.</p></section>
   </div>
 }
@@ -1691,7 +1930,7 @@ function CaseDetail({ item, isStaff, signingAuthorityRef, labels, actionOptions,
   const noticeDoc = item.withdrawal?.noticeFile || item.withdrawal?.noticeDocument
   return <div className="detail-layout">
     <section className="panel detail-main">
-      <button className="back-link" onClick={onBack}>← Quay lại danh sách</button>
+      <button className="back-link" onClick={onBack}> Quay lại danh sách</button>
       <div className="detail-heading"><div><span className="eyebrow">{item.procedureCode} · {item.code}</span><h2>{item.procedure?.name}</h2></div><span className={`status-pill status-${item.status}`}>{labels[item.status] || item.status}</span></div>
       {item.sampleData && <aside className="sample-data-notice case-sample-note" role="note"><b>Hồ sơ tình huống mô phỏng</b><span>{item.sampleDataNote || 'Thông tin được tạo để thực hành; không phải hồ sơ thật và không có giá trị pháp lý hoặc báo cáo chính thức.'}</span></aside>}
       {isStaff && item.canManageLookupKey && <StaffLookupKey key={item.code} item={item} onChanged={onLookupKeyChanged} />}

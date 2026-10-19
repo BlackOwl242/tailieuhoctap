@@ -18,6 +18,7 @@ import sys
 import threading
 import traceback
 import workflow_extensions
+from procedure_details import published_procedure_detail, published_template, download_published_template
 import uuid
 from time import monotonic
 from getpass import getpass
@@ -213,6 +214,354 @@ class RateLimitError(Exception):
     pass
 
 
+def _specialized_fields_for_procedure(proc: dict) -> list[dict]:
+    field_text = f"{proc.get('field', '')} {proc.get('name', '')} {proc.get('agency', '')}".casefold()
+    if any(k in field_text for k in ("hộ tịch", "khai sinh", "kết hôn", "khai tử", "nhận cha", "nuôi con nuôi", "quốc tịch", "chứng thực")):
+        return [
+            {"id": "subjectFullName", "label": "Họ, chữ đệm và tên người được đăng ký / cấp giấy tờ hộ tịch", "type": "text", "required": True, "maxLength": 150},
+            {"id": "subjectBirthDate", "label": "Ngày, tháng, năm sinh của người được khai", "type": "date", "required": True},
+            {"id": "subjectGender", "label": "Giới tính", "type": "select", "required": True, "options": ["Nam", "Nữ"]},
+            {"id": "applicantRelation", "label": "Quan hệ của người nộp với người được đăng ký", "type": "select", "required": True, "options": ["Bản thân", "Cha / Mẹ đẻ", "Vợ / Chồng", "Con", "Người giám hộ / Người đại diện theo pháp luật", "Người được ủy quyền hợp pháp"]},
+            {"id": "civilRegistryPlace", "label": "Nơi đăng ký hộ tịch trước đây / Số quyển, số trang sổ gốc (nếu có)", "type": "text", "required": False, "maxLength": 250},
+        ]
+    if any(k in field_text for k in ("đất đai", "thửa đất", "quyền sử dụng đất", "bản đồ", "nhà ở", "bất động sản")):
+        return [
+            {"id": "landParcelNumber", "label": "Số hiệu thửa đất", "type": "text", "required": True, "maxLength": 80},
+            {"id": "mapSheetNumber", "label": "Số tờ bản đồ địa chính", "type": "text", "required": True, "maxLength": 80},
+            {"id": "landArea", "label": "Diện tích sử dụng đất / diện tích sàn (m²)", "type": "text", "required": True, "maxLength": 80},
+            {"id": "landAddress", "label": "Địa chỉ thửa đất / khu đất / nhà ở tại Hà Nội", "type": "text", "required": True, "maxLength": 300},
+            {"id": "landUsePurpose", "label": "Loại đất / Mục đích sử dụng đất", "type": "select", "required": True, "options": ["Đất ở tại đô thị (ODT)", "Đất ở tại nông thôn (ONT)", "Đất thương mại, dịch vụ (TMD)", "Đất cơ sở sản xuất phi nông nghiệp (SKC)", "Đất nông nghiệp / Lâm nghiệp / Thủy sản", "Đất sử dụng hỗn hợp / Công cộng"]},
+            {"id": "certificateNumber", "label": "Số phát hành Giấy chứng nhận (Sổ đỏ/Sổ hồng) hoặc Quyết định giao đất (nếu có)", "type": "text", "required": False, "maxLength": 150},
+        ]
+    if any(k in field_text for k in ("xây dựng", "quy hoạch", "kiến trúc", "công trình", "hạ tầng kỹ thuật")):
+        return [
+            {"id": "projectName", "label": "Tên công trình / Dự án đầu tư xây dựng", "type": "text", "required": True, "maxLength": 250},
+            {"id": "constructionLocation", "label": "Địa điểm xây dựng (Số nhà, đường/phố, phường/xã, Hà Nội)", "type": "text", "required": True, "maxLength": 300},
+            {"id": "constructionGrade", "label": "Loại và cấp công trình xây dựng", "type": "select", "required": True, "options": ["Nhà ở riêng lẻ", "Công trình dân dụng (Cấp I - IV)", "Công trình công nghiệp", "Công trình hạ tầng kỹ thuật đô thị", "Công trình giao thông / Nông nghiệp và PTNT"]},
+            {"id": "constructionScale", "label": "Quy mô công trình (Diện tích xây dựng, tổng diện tích sàn, số tầng, chiều cao)", "type": "text", "required": True, "maxLength": 250},
+            {"id": "designUnit", "label": "Đơn vị tư vấn khảo sát, thiết kế / Chủ nhiệm thiết kế (nếu có)", "type": "text", "required": False, "maxLength": 200},
+        ]
+    if any(k in field_text for k in ("đường bộ", "hàng hải", "đường thủy", "vận tải", "phương tiện", "giao thông", "sát hạch", "lái xe")):
+        return [
+            {"id": "vehicleCategory", "label": "Nhóm phương tiện / Loại hình kinh doanh vận tải", "type": "select", "required": True, "options": ["Phương tiện vận tải đường bộ (Ô tô kinh doanh vận tải)", "Phương tiện thủy nội địa / Tàu biển", "Đơn vị kinh doanh vận tải hành khách / hàng hóa", "Kết cấu hạ tầng giao thông / Bến xe / Bến thủy nội địa"]},
+            {"id": "licensePlateOrRegNo", "label": "Biển kiểm soát / Số đăng ký phương tiện / Số giấy phép (nếu có)", "type": "text", "required": True, "maxLength": 120},
+            {"id": "operatingRouteOrScope", "label": "Tuyến khai thác / Phạm vi hoạt động / Vùng hoạt động", "type": "text", "required": True, "maxLength": 250},
+            {"id": "vehicleCountOrTonnage", "label": "Số lượng phương tiện / Trọng tải / Số chỗ ngồi (nếu có)", "type": "text", "required": False, "maxLength": 120},
+        ]
+    if any(k in field_text for k in ("khám bệnh", "chữa bệnh", "y tế", "dược", "mỹ phẩm", "phòng bệnh", "an toàn thực phẩm", "trang thiết bị y tế")):
+        return [
+            {"id": "medicalFacilityName", "label": "Tên cơ sở khám chữa bệnh / Cơ sở dược / Cơ sở thực phẩm", "type": "text", "required": True, "maxLength": 250},
+            {"id": "practiceAddress", "label": "Địa điểm hoạt động của cơ sở tại Hà Nội", "type": "text", "required": True, "maxLength": 300},
+            {"id": "professionalManager", "label": "Họ và tên người chịu trách nhiệm chuyên môn kỹ thuật", "type": "text", "required": True, "maxLength": 150},
+            {"id": "practiceCertificateNo", "label": "Số chứng chỉ hành nghề / Giấy phép hoạt động đã cấp (nếu có)", "type": "text", "required": False, "maxLength": 120},
+            {"id": "medicalScope", "label": "Hình thức tổ chức và phạm vi hoạt động chuyên môn đề nghị", "type": "text", "required": True, "maxLength": 300},
+        ]
+    if any(k in field_text for k in ("giáo dục", "đào tạo", "trường", "học sinh", "sinh viên", "văn bằng", "dạy nghề")):
+        return [
+            {"id": "eduInstitutionName", "label": "Tên cơ sở giáo dục / Trung tâm đào tạo / Đơn vị đề nghị", "type": "text", "required": True, "maxLength": 250},
+            {"id": "eduLevelOrType", "label": "Cấp học / Loại hình hoạt động giáo dục", "type": "select", "required": True, "options": ["Giáo dục mầm non / Tiểu học / THCS / THPT", "Trung tâm ngoại ngữ, tin học, bồi dưỡng kỹ năng", "Tư vấn du học / Liên kết đào tạo với nước ngoài", "Giáo dục nghề nghiệp / Đào tạo thường xuyên"]},
+            {"id": "eduLocation", "label": "Địa điểm đặt trụ sở / Địa điểm tổ chức đào tạo", "type": "text", "required": True, "maxLength": 300},
+            {"id": "trainingScale", "label": "Quy mô đào tạo / Chương trình học hoặc thông tin văn bằng, chứng chỉ", "type": "text", "required": False, "maxLength": 250},
+        ]
+    if any(k in field_text for k in ("khoa học", "công nghệ", "sở hữu trí tuệ", "tiêu chuẩn", "đo lường", "tần số", "viễn thông", "bức xạ", "hạt nhân")):
+        return [
+            {"id": "techObjectName", "label": "Tên đề tài / Phương tiện đo / Thiết bị bức xạ / Tần số / Đối tượng đăng ký", "type": "text", "required": True, "maxLength": 250},
+            {"id": "techCategory", "label": "Phân nhóm chuyên ngành Khoa học & Công nghệ", "type": "select", "required": True, "options": ["Hoạt động khoa học, công nghệ và đổi mới sáng tạo", "Tiêu chuẩn, đo lường, chất lượng sản phẩm hàng hóa", "An toàn bức xạ và hạt nhân", "Sở hữu công nghiệp / Chuyển giao công nghệ", "Tần số vô tuyến điện / Viễn thông và Internet"]},
+            {"id": "techSpecification", "label": "Ký hiệu, số seri, thông số kỹ thuật hoặc mã số hồ sơ", "type": "text", "required": True, "maxLength": 250},
+            {"id": "techUsageScope", "label": "Phạm vi ứng dụng / Địa điểm lắp đặt, vận hành thiết bị", "type": "text", "required": True, "maxLength": 250},
+        ]
+    if any(k in field_text for k in ("luật sư", "công chứng", "đấu giá", "thừa phát lại", "giám định tư pháp", "trọng tài", "hòa giải", "tư pháp")):
+        return [
+            {"id": "legalPracticeOrg", "label": "Tên tổ chức hành nghề (Văn phòng luật sư / Công chứng / Đấu giá / Giám định)", "type": "text", "required": True, "maxLength": 250},
+            {"id": "legalPracticeType", "label": "Lĩnh vực bổ trợ tư pháp / Hành chính tư pháp", "type": "select", "required": True, "options": ["Hành nghề Luật sư / Tư vấn pháp luật", "Hành nghề Công chứng", "Đấu giá tài sản / Quản tài viên", "Thừa phát lại / Giám định tư pháp / Hòa giải thương mại"]},
+            {"id": "practitionerInfo", "label": "Họ tên, số Chứng chỉ hành nghề / Thẻ hành nghề của người đề nghị", "type": "text", "required": True, "maxLength": 200},
+        ]
+    if any(k in field_text for k in ("người có công", "bảo trợ", "việc làm", "lao động", "tiền lương", "an toàn lao động", "nội vụ", "tín ngưỡng", "tôn giáo", "thi đua", "khen thưởng")):
+        return [
+            {"id": "beneficiaryOrOrgName", "label": "Họ tên đối tượng hưởng chính sách / Người lao động / Tổ chức liên quan", "type": "text", "required": True, "maxLength": 200},
+            {"id": "policyCategory", "label": "Nhóm chế độ, chính sách / Lĩnh vực giải quyết", "type": "select", "required": True, "options": ["Chính sách đối với người có công với cách mạng và thân nhân", "Lao động, việc làm, an toàn vệ sinh lao động / Người lao động nước ngoài", "Bảo trợ xã hội / Trẻ em / Phòng, chống tệ nạn xã hội", "Tổ chức bộ máy, công chức, viên chức, thi đua - khen thưởng", "Tín ngưỡng, tôn giáo và dân tộc"]},
+            {"id": "localityOrUnit", "label": "Đơn vị, địa phương quản lý hồ sơ hoặc nơi cư trú/làm việc", "type": "text", "required": True, "maxLength": 250},
+        ]
+    if any(k in field_text for k in ("văn hóa", "thể thao", "du lịch", "di sản", "lữ hành", "lưu trú", "quảng cáo", "xuất bản", "báo chí", "nghệ thuật", "điện ảnh")):
+        return [
+            {"id": "culturalEventOrFacility", "label": "Tên chương trình, sự kiện, di tích, cơ sở lưu trú/lữ hành hoặc ấn phẩm", "type": "text", "required": True, "maxLength": 250},
+            {"id": "culturalCategory", "label": "Loại hình hoạt động Văn hóa, Thể thao & Du lịch", "type": "select", "required": True, "options": ["Nghệ thuật biểu diễn / Điện ảnh / Mỹ thuật, nhiếp ảnh, triển lãm", "Quảng cáo / Xuất bản, in, phát hành / Báo chí", "Bảo tồn di sản văn hóa / Lễ hội / Văn hóa cơ sở", "Thể dục thể thao quần chúng và thể thao thành tích cao", "Lữ hành, hướng dẫn viên, cơ sở lưu trú du lịch"]},
+            {"id": "eventTimeAndVenue", "label": "Thời gian và địa điểm tổ chức / Địa điểm kinh doanh tại Hà Nội", "type": "text", "required": True, "maxLength": 250},
+        ]
+    if any(k in field_text for k in ("môi trường", "tài nguyên nước", "khoáng sản", "địa chất", "lâm nghiệp", "thủy lợi", "thú y", "chăn nuôi", "trồng trọt", "thủy sản", "nông nghiệp")):
+        return [
+            {"id": "resourceProjectName", "label": "Tên dự án, cơ sở sản xuất hoặc khu vực khai thác/canh tác", "type": "text", "required": True, "maxLength": 250},
+            {"id": "resourceCategory", "label": "Phân nhóm Nông nghiệp, Tài nguyên & Môi trường", "type": "select", "required": True, "options": ["Bảo vệ môi trường / Giấy phép môi trường / Chất thải", "Tài nguyên nước / Khí tượng thủy văn", "Địa chất và khoáng sản", "Trồng trọt, bảo vệ thực vật, chăn nuôi, thú y, thủy sản", "Lâm nghiệp, kiểm lâm, thủy lợi và phòng chống thiên tai"]},
+            {"id": "resourceLocation", "label": "Địa điểm thực hiện dự án / cơ sở (Phường/Xã, Thành phố Hà Nội)", "type": "text", "required": True, "maxLength": 300},
+            {"id": "resourceCapacity", "label": "Quy mô, công suất, lưu lượng hoặc diện tích thực hiện", "type": "text", "required": True, "maxLength": 200},
+        ]
+    return [
+        {"id": "businessFacilityName", "label": "Tên doanh nghiệp / Hợp tác xã / Cơ sở kinh doanh / Dự án", "type": "text", "required": True, "maxLength": 250},
+        {"id": "businessLocation", "label": "Địa điểm hoạt động kinh doanh / Thực hiện dự án tại Hà Nội", "type": "text", "required": True, "maxLength": 300},
+        {"id": "businessLine", "label": "Ngành nghề, mặt hàng kinh doanh hoặc nội dung chuyên ngành đề nghị cấp phép", "type": "text", "required": True, "maxLength": 250},
+        {"id": "businessScaleOrCapital", "label": "Quy mô công suất / Sản lượng / Vốn đầu tư đăng ký (nếu có)", "type": "text", "required": False, "maxLength": 200},
+    ]
+
+
+def default_submission_fields(proc: dict | None = None) -> list[dict]:
+    proc = proc or {}
+    proc_name = proc.get("name", "thủ tục hành chính")
+    base_fields = [
+        {
+            "id": "submissionRole",
+            "label": "Hình thức nộp hồ sơ",
+            "type": "select",
+            "required": True,
+            "options": ["Tự nộp", "Nộp thay theo ủy quyền"],
+            "help": "Chọn 'Tự nộp' nếu trực tiếp đứng tên hồ sơ, hoặc 'Nộp thay theo ủy quyền' nếu được chủ hồ sơ ủy quyền.",
+        },
+        {
+            "id": "submitterName",
+            "label": "Họ và tên người được ủy quyền nộp thay",
+            "type": "text",
+            "required": True,
+            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
+        },
+        {
+            "id": "submitterIdentity",
+            "label": "Số Căn cước / Định danh cá nhân của người nộp thay",
+            "type": "text",
+            "required": True,
+            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
+        },
+        {
+            "id": "submitterPhone",
+            "label": "Số điện thoại người nộp thay (nếu có)",
+            "type": "tel",
+            "required": False,
+            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
+        },
+        {
+            "id": "submitterAddress",
+            "label": "Địa chỉ liên hệ của người nộp thay",
+            "type": "text",
+            "required": True,
+            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
+        },
+        {
+            "id": "address",
+            "label": "Địa chỉ thường trú / Nơi ở hiện tại (hoặc địa chỉ trụ sở chính của tổ chức)",
+            "type": "text",
+            "required": True,
+            "maxLength": 300,
+        },
+        {
+            "id": "identityType",
+            "label": "Loại giấy tờ định danh của người đứng tên",
+            "type": "select",
+            "required": True,
+            "options": [
+                "Thẻ căn cước công dân",
+                "Thẻ căn cước",
+                "Định danh điện tử VNeID mức độ 2",
+                "Hộ chiếu",
+                "Giấy chứng nhận căn cước",
+            ],
+            "applicantTypes": ["citizen"],
+        },
+        {
+            "id": "identityNumber",
+            "label": "Số Căn cước / Số định danh cá nhân / Số Hộ chiếu",
+            "type": "text",
+            "required": True,
+            "maxLength": 40,
+            "applicantTypes": ["citizen"],
+        },
+        {
+            "id": "identityIssueDate",
+            "label": "Ngày cấp giấy tờ định danh (nếu có)",
+            "type": "date",
+            "required": False,
+            "applicantTypes": ["citizen"],
+        },
+        {
+            "id": "identityIssuePlace",
+            "label": "Cơ quan cấp giấy tờ định danh (nếu có)",
+            "type": "text",
+            "required": False,
+            "maxLength": 180,
+            "applicantTypes": ["citizen"],
+        },
+        {
+            "id": "organizationCode",
+            "label": "Mã số doanh nghiệp / Mã số thuế / Số quyết định thành lập",
+            "type": "text",
+            "required": True,
+            "maxLength": 60,
+            "applicantTypes": ["organization"],
+        },
+        {
+            "id": "representative",
+            "label": "Họ và tên người đại diện theo pháp luật / Người ký văn bản",
+            "type": "text",
+            "required": True,
+            "maxLength": 150,
+            "applicantTypes": ["organization"],
+        },
+        {
+            "id": "representativeTitle",
+            "label": "Chức vụ của người đại diện (nếu có)",
+            "type": "text",
+            "required": False,
+            "maxLength": 120,
+            "applicantTypes": ["organization"],
+        },
+        {
+            "id": "requestType",
+            "label": "Loại yêu cầu giải quyết thủ tục",
+            "type": "select",
+            "required": True,
+            "options": [
+                "Cấp mới / Đăng ký lần đầu",
+                "Cấp lại / Cấp đổi",
+                "Điều chỉnh / Sửa đổi, bổ sung / Gia hạn",
+                "Thẩm định / Phê duyệt / Công nhận / Xác nhận",
+                "Chấm dứt hiệu lực / Thu hồi / Hủy bỏ theo đề nghị",
+            ],
+        },
+    ]
+    specialized = _specialized_fields_for_procedure(proc)
+    closing_fields = [
+        {
+            "id": "verificationMethod",
+            "label": "Hình thức xuất trình, đối chiếu hồ sơ gốc và xác thực thông tin",
+            "type": "select",
+            "required": True,
+            "options": [
+                "Sử dụng văn bản điện tử / bản sao điện tử có ký số hợp lệ",
+                "Khai thác dữ liệu từ Cơ sở dữ liệu quốc gia về dân cư và cơ sở dữ liệu chuyên ngành",
+                "Xuất trình bản chính để đối chiếu khi nhận kết quả tại Bộ phận Một cửa",
+                "Gửi kèm bản sao có chứng thực qua dịch vụ bưu chính công ích",
+            ],
+        },
+        {
+            "id": "requestContent",
+            "label": "Nội dung đề nghị giải quyết chi tiết",
+            "type": "textarea",
+            "required": True,
+            "maxLength": 2000,
+            "help": f"Kê khai cụ thể nội dung đề nghị giải quyết đối với thủ tục: {proc_name}.",
+        },
+        {
+            "id": "relatedDocumentsInfo",
+            "label": "Số hiệu, ngày cấp giấy phép/văn bản đã được cấp trước đây hoặc ghi chú bổ sung (nếu có)",
+            "type": "textarea",
+            "required": False,
+            "maxLength": 1500,
+            "help": "Ghi thông tin số giấy phép cũ, số quyết định hoặc thông tin đối chiếu chuyên ngành (nếu có).",
+        },
+    ]
+    return base_fields + specialized + closing_fields
+
+
+def default_submission_documents(proc: dict | None = None) -> list[dict]:
+    proc_name = (proc or {}).get("name", "thủ tục hành chính")
+    return [
+        {
+            "id": "mainApplication",
+            "label": f"Tờ khai / Đơn đề nghị giải quyết: {proc_name}",
+            "required": False,
+            "help": "Bản chính hoặc bản điện tử (PDF, PNG, JPG, JPEG). Nếu đã kê khai đầy đủ trên tờ khai điện tử ở Bước 3, có thể đính kèm bản ký số hoặc bản chụp tờ khai giấy (nếu có).",
+        },
+        {
+            "id": "legalIdentityDoc",
+            "label": "Bản sao/bản chụp Căn cước công dân hoặc Giấy chứng nhận đăng ký doanh nghiệp/tổ chức",
+            "required": False,
+            "help": "Đính kèm để đối chiếu thông tin chủ hồ sơ.",
+        },
+        {
+            "id": "specializedDocs",
+            "label": "Hồ sơ, giấy tờ chuyên ngành kèm theo quy định của thủ tục",
+            "required": False,
+            "help": "Đính kèm các văn bản, giấy phép, bản vẽ, chứng chỉ hoặc tài liệu liên quan theo thành phần hồ sơ công bố.",
+        },
+        {
+            "id": "authorizationDoc",
+            "label": "Giấy ủy quyền / Văn bản cử người đại diện nộp hồ sơ (trường hợp nộp thay)",
+            "required": False,
+            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
+            "help": "Đính kèm văn bản ủy quyền hợp lệ khi thực hiện nộp hồ sơ thay chủ thể đứng tên.",
+        },
+    ]
+
+
+def ensure_procedure_submission(proc: dict) -> None:
+    mode = proc.get("serviceMode") or {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}.get(proc.get("level", ""), "UNKNOWN")
+    proc["serviceMode"] = mode
+    if mode in {"INFORMATION", "UNKNOWN"}:
+        proc["submission"] = None
+        return
+    default_methods = ["Điện tử", "Trực tiếp", "Bưu chính"] if mode == "FULL" else ["Trực tiếp", "Bưu chính"]
+    default_note = (
+        "Thủ tục dịch vụ công trực tuyến toàn trình: hỗ trợ nhận kết quả bản điện tử, nhận trực tiếp tại Bộ phận Một cửa hoặc qua dịch vụ bưu chính công ích."
+        if mode == "FULL"
+        else "Thủ tục dịch vụ công trực tuyến một phần: nộp hồ sơ và theo dõi tiến độ trực tuyến; nhận kết quả trực tiếp tại Bộ phận Một cửa hoặc qua dịch vụ bưu chính công ích."
+    )
+    official_url = (proc.get("routing") or {}).get("officialUrl") or f"https://dichvucong.gov.vn/dvc-ket-qua-thu-tuc?keyword={quote(proc.get('name', proc['code']))}"
+    sub = proc.get("submission")
+    if isinstance(sub, dict):
+        sub = dict(sub)
+        if not sub.get("version"):
+            sub["version"] = f"{proc['code']}-hanoi-v1"
+        if not sub.get("title"):
+            sub["title"] = f"Tờ khai điện tử — {proc.get('name', proc['code'])}"
+        if not sub.get("sourceUrl"):
+            sub["sourceUrl"] = official_url
+        if not sub.get("legalBasis"):
+            sub["legalBasis"] = "Thực hiện theo Nghị định số 61/2018/NĐ-CP, Nghị định số 107/2021/NĐ-CP và Quyết định công bố thủ tục hành chính hiện hành của UBND Thành phố Hà Nội."
+        if not sub.get("deadlineText"):
+            sub["deadlineText"] = "Thời hạn giải quyết: Theo quy định tại Quyết định công bố thủ tục hành chính của UBND Thành phố Hà Nội."
+        if not sub.get("feeText"):
+            sub["feeText"] = "Phí, lệ phí: Theo quy định hiện hành của HĐND Thành phố Hà Nội và Bộ Tài chính (nếu có)."
+        if not sub.get("fields"):
+            sub["fields"] = default_submission_fields(proc)
+        if not sub.get("documents"):
+            sub["documents"] = default_submission_documents(proc)
+        # Imported document variants refer to officialCase. Keep their selector
+        # even when a previously configured form only retained declaration fields.
+        case_names = list(dict.fromkeys(
+            document["when"]["equals"] for document in sub["documents"]
+            if isinstance(document.get("when"), dict)
+            and document["when"].get("field") == "officialCase"
+            and document["when"].get("equals")
+        ))
+        if case_names and not any(field.get("id") == "officialCase" for field in sub["fields"]):
+            sub["fields"] = [{"id": "officialCase", "label": "Trường hợp thực hiện thủ tục",
+                              "type": "select", "required": True, "options": case_names,
+                              "help": "Chọn đúng trường hợp để hiển thị thành phần hồ sơ tương ứng."}, *sub["fields"]]
+        existing_methods = list(sub.get("deliveryMethods") or [])
+        for m in default_methods:
+            if m not in existing_methods:
+                existing_methods.append(m)
+        sub["deliveryMethods"] = existing_methods or default_methods
+        if not sub.get("deliveryNote") or "Ứng dụng không tự tải tệp mẫu" in str(sub.get("deliveryNote", "")):
+            sub["deliveryNote"] = default_note
+        if sub.get("sourceStatus") == "official-document-list-only":
+            sub["sourceStatus"] = "configured-with-official-documents"
+        elif not sub.get("sourceStatus"):
+            sub["sourceStatus"] = "configured"
+        proc["submission"] = sub
+    else:
+        proc["submission"] = {
+            "version": f"{proc['code']}-hanoi-v1",
+            "title": f"Tờ khai điện tử — {proc.get('name', proc['code'])}",
+            "sourceUrl": official_url,
+            "sourceStatus": "configured-standard",
+            "legalBasis": "Thực hiện theo Nghị định số 61/2018/NĐ-CP, Nghị định số 107/2021/NĐ-CP và Quyết định công bố thủ tục hành chính hiện hành của UBND Thành phố Hà Nội.",
+            "deadlineText": "Thời hạn giải quyết: Theo quy định tại Quyết định công bố thủ tục hành chính của UBND Thành phố Hà Nội (thông thường từ 03 đến 15 ngày làm việc tùy thủ tục).",
+            "feeText": "Phí, lệ phí: Theo mức thu quy định tại Nghị quyết của HĐND Thành phố Hà Nội hoặc Thông tư của Bộ Tài chính (nếu có).",
+            "fields": default_submission_fields(proc),
+            "documents": default_submission_documents(proc),
+            "deliveryMethods": default_methods,
+            "deliveryNote": default_note,
+        }
+
+
 def load_catalog() -> list[dict]:
     parser = CatalogParser()
     if CATALOG_PATH.exists():
@@ -264,7 +613,7 @@ def load_catalog() -> list[dict]:
             proc["routing"] = {
                 "mode": "select-locality-and-authority",
                 "status": "catalog-reference-only",
-                "summary": "Tên và cơ quan trong danh mục là dữ liệu tham chiếu. Chưa xác minh tuyến hiện hành của thủ tục này; chọn địa bàn và cơ quan trực tiếp trên Cổng quốc gia.",
+                "summary": "Tên và cơ quan trong danh mục là dữ liệu tham chiếu. Đã kích hoạt tờ khai điện tử chuẩn hóa theo mức dịch vụ công bố của thủ tục.",
                 "officialUrl": "https://dichvucong.gov.vn/dvc-dich-vu-cong-truc-tuyen",
             }
     forms_path = ROOT / "procedure_forms.json"
@@ -276,6 +625,7 @@ def load_catalog() -> list[dict]:
             proc["name"] = "Khai thác và sử dụng thông tin, dữ liệu tài nguyên và môi trường (cấp tỉnh)"
             proc["routing"] = {"mode": "provincial-authority", "status": "verified", "summary": "Thẩm quyền: Sở Nông nghiệp và Môi trường Hà Nội. Yêu cầu cung cấp dữ liệu theo Mẫu 02 hoặc Mẫu 03.", "officialUrl": "https://datafiles.hanoi.gov.vn/gov-hni/6244/VanBan/2026/1/5/QDPVHCC-2273-2025.pdf"}
             proc["verified"] = True
+        ensure_procedure_submission(proc)
     return procedures
 
 
@@ -302,6 +652,7 @@ def procedure_catalog_records() -> list[dict]:
             if isinstance(edit.get("submission"), dict):
                 item["submission"] = edit["submission"]
             item["localEdit"] = {key: edit[key] for key in ("sourceUrl", "checkedAt", "reason", "version", "updatedBy", "updatedAt")}
+        ensure_procedure_submission(item)
         item["field"] = item.get("field", "").strip() or "Chưa phân loại"
         category_edit = PROCEDURE_CATEGORY_OVERRIDES.get(item.get("fieldSource") or "Chưa phân loại")
         if category_edit:
@@ -705,6 +1056,7 @@ def init_db() -> None:
                 PROCEDURE_BY_CODE[code]["serviceMode"] = {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}.get(edit["level"], "UNKNOWN")
                 if isinstance(edit.get("submission"), dict):
                     PROCEDURE_BY_CODE[code]["submission"] = edit["submission"]
+                ensure_procedure_submission(PROCEDURE_BY_CODE[code])
                 if edit.get("localCode") and edit["localCode"] != code:
                     PROCEDURE_BY_CODE[edit["localCode"]] = PROCEDURE_BY_CODE[code]
         global PROCEDURE_CATEGORY_OVERRIDES
@@ -1065,7 +1417,7 @@ def validate_procedure_submission(procedure, body, applicant_type, files):
     if schema.get("sourceStatus") == "official-document-list-only" or not schema.get("fields"):
         raise ValueError("Nguồn chính thức hiện chỉ cung cấp thành phần hồ sơ, chưa cung cấp biểu mẫu tờ khai điện tử. Không thể tiếp nhận trực tuyến bằng cấu hình tham chiếu này; hãy mở thủ tục trên Cổng Dịch vụ công quốc gia.")
     if body.get("schemaVersion") != schema["version"]:
-        raise ValueError("Biểu mẫu đã thay đổi hoặc thiếu phiên bản. Hãy mở lại thủ tục để lập hồ sơ.")
+        raise ValueError("Không khớp phiên bản biểu mẫu của thủ tục. Hãy mở lại thủ tục để lập hồ sơ.")
     if body.get("confirmed") is not True:
         raise ValueError("Cần kiểm tra và xác nhận hồ sơ trước khi gửi.")
     raw = body.get("declaration")
@@ -2225,7 +2577,8 @@ class AppHandler(BaseHTTPRequestHandler):
         receiving_agency = clean_text(body.get("receivingAgency"), 180)
         if len(receiving_agency) < 3:
             raise ValueError("Chọn hoặc ghi cơ quan tiếp nhận theo tuyến thủ tục đã đối chiếu.")
-        if not any(same_agency_scope(receiving_agency, opt) and opt != "toàn thành phố" for opt in procedure_agency_options(procedure)):
+        commune_authority_ok = procedure_code in {"2.000908", "2.000635"} and bool(re.match(r"^(ubnd\s+(phường|xã)\s+.+|sở\s+tư\s+pháp.*)$", receiving_agency, re.IGNORECASE))
+        if not commune_authority_ok and not any(same_agency_scope(receiving_agency, opt) and opt != "toàn thành phố" for opt in procedure_agency_options(procedure)):
             raise ValueError("Cơ quan tiếp nhận không khớp với cơ quan được nêu trong danh mục của thủ tục đã chọn.")
         subject_input = body.get("subject") or {}
         if not isinstance(subject_input, dict):
@@ -2245,6 +2598,10 @@ class AppHandler(BaseHTTPRequestHandler):
             request_summary = f"{declaration['dataRequested']}. Mục đích: {declaration['purpose']}"
         elif procedure_code == "2.000908":
             request_summary = f"Đề nghị cấp {declaration['copies']} bản sao {declaration['documentName']} cho {declaration['originalOwner']}."
+        elif declaration.get("requestContent"):
+            request_summary = declaration["requestContent"]
+            if declaration.get("relatedDocumentsInfo"):
+                request_summary += f" ({declaration['relatedDocumentsInfo']})"
         else:
             request_summary = "; ".join(f"{key}: {value}" for key, value in declaration.items() if value) or "Hồ sơ trực tuyến theo biểu mẫu thủ tục đã cấu hình."
         request_summary = request_summary[:3000]
@@ -2754,6 +3111,7 @@ class AppHandler(BaseHTTPRequestHandler):
         current.update({"name": name, "field": field, "level": level, "agency": agency,
             "serviceMode": {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}[level]})
         current["fieldSource"] = category_key
+        ensure_procedure_submission(current)
         for alias, procedure in list(PROCEDURE_BY_CODE.items()):
             if procedure is current and alias not in {source_code, local_code}:
                 del PROCEDURE_BY_CODE[alias]
@@ -2990,7 +3348,36 @@ class AppHandler(BaseHTTPRequestHandler):
             with DB_LOCK, connect() as con:
                 rows = con.execute("SELECT actor_name,reason,before_json,after_json,created_at FROM procedure_category_audit WHERE source_field=? ORDER BY id DESC LIMIT 30", (source_field,)).fetchall()
             return self.send_json({"history": [{"actor": row["actor_name"], "reason": row["reason"], "before": json.loads(row["before_json"]) if row["before_json"] else None, "after": json.loads(row["after_json"]), "createdAt": row["created_at"]} for row in rows]})
-        if path.startswith("/api/procedures"):
+        template_route = re.fullmatch(r"/api/procedures/([^/]+)/templates/([^/]+)", path)
+        if template_route:
+            code, attachment_id = template_route.groups()
+            attachment = published_template(code, attachment_id) if code in PROCEDURE_BY_CODE else None
+            if not attachment:
+                return self.send_error_json("Không tìm thấy mẫu đơn của thủ tục này.", 404)
+            try:
+                check_public_rate_limit(self.public_address(), "official-template", 60)
+                raw, content_type = download_published_template(attachment_id)
+            except RateLimitError as exc:
+                return self.send_error_json(str(exc), 429)
+            except Exception:
+                return self.send_error_json("Chưa tải được mẫu đơn từ Cổng quốc gia. Vui lòng thử lại hoặc mở bản công bố gốc.", 502)
+            filename = str(attachment.get("fileName") or "mau-don").replace("\\", "/").rsplit("/", 1)[-1]
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(raw)))
+            self.send_header("Content-Disposition", f"attachment; filename*=UTF-8''{quote(filename, safe='')}")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Cache-Control", "public, max-age=3600")
+            self.end_headers()
+            self.wfile.write(raw)
+            return
+        if path.startswith("/api/procedures/") and path.endswith("/detail"):
+            code = unquote(path[len("/api/procedures/"):-len("/detail")].strip("/"))
+            if not code or "/" in code or code not in PROCEDURE_BY_CODE:
+                return self.send_error_json("Không tìm thấy thủ tục.", 404)
+            procedure = next(item for item in procedure_catalog_records() if item["sourceCode"] == code)
+            return self.send_json({"procedure": procedure, "detail": published_procedure_detail(code)})
+        if path == "/api/procedures":
             records = procedure_catalog_records()
             return self.send_json({"procedures": records, "count": len(records)})
         if path == "/api/public/agencies":
@@ -3241,7 +3628,9 @@ class AppHandler(BaseHTTPRequestHandler):
         return self.send_error_json("Không tìm thấy API.", 404)
 
     def serve_static(self, path: str):
-        rel = "index.html" if path in {"", "/"} else path.lstrip("/")
+        # Procedure codes contain dots, but detail routes are still SPA pages.
+        is_procedure_page = re.fullmatch(r"/thu-tuc/[^/]+/?", path) is not None
+        rel = "index.html" if path in {"", "/"} or is_procedure_page else path.lstrip("/")
         frontend_root = ROOT / "frontend" / "dist"
         if not (frontend_root / "index.html").is_file():
             return self.send_error_json("Giao diện chưa được biên dịch. Hãy chạy frontend\\npm run build.", 503)

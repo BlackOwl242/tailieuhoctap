@@ -14,7 +14,7 @@ Các tệp học tập 230926, bài viết `.md` và mẫu trình chiếu APAG �
 - Nhấp đúp `MO_HE_THONG.bat` để khởi động hệ thống và tự mở trình duyệt khi máy chủ sẵn sàng. Nếu hệ thống đã chạy, tệp này mở thẳng trang chủ. Có thể dùng `run.bat` để chạy thủ công.
 - Địa chỉ hệ thống: `http://127.0.0.1:8766`.
 - Để phát triển giao diện: giữ máy chủ `python app.py` chạy, sau đó chạy `npm run dev` trong `frontend/`; Vite sử dụng cổng `5173` và chuyển `/api` tới máy chủ Python.
-- Dữ liệu ứng dụng lưu tại `data/hanoi-services.sqlite3`. Bộ dữ liệu phục hồi ngày 18/10/2026 có 79 tài khoản và 213 hồ sơ của dự án môn học. **Mật khẩu mặc định của toàn bộ 79 tài khoản là `123`** (không bắt buộc đổi mật khẩu lần đầu). Danh sách hiện tại nằm trong [Tài khoản sau khôi phục](TAI_KHOAN_SAU_KHOI_PHUC_20261018.md).
+- Dữ liệu ứng dụng lưu tại `data/hanoi-services.sqlite3`. Cơ sở dữ liệu hiện có 705 tài khoản và 213 hồ sơ của dự án môn học: 79 tài khoản gốc và 626 tài khoản mới cho UBND 126 phường, xã. Mật khẩu ban đầu của tài khoản UBND phường, xã là `123`, không buộc đổi ở lần đăng nhập đầu. Xem [danh sách tài khoản phường, xã](TAI_KHOAN_UBND_CAP_XA_HANOI_2026.md), [danh sách 79 tài khoản gốc](TAI_KHOAN_SAU_KHOI_PHUC_20261018.md) và [danh sách phân quyền cốt lõi](DANH_SACH_TAI_KHOAN_DUOC_PHAN_QUYEN.md). Lệnh cấp tài khoản có thể chạy lại an toàn bằng `python scripts/provision_hanoi_commune_accounts.py`; tài khoản trùng email được giữ nguyên.
 
 ## Tài khoản và phân quyền
 
@@ -64,3 +64,21 @@ Trang chủ đọc tin đã xuất bản từ cơ sở dữ liệu. Quản trị
 - Lịch hẹn mới giới hạn 10 lịch mỗi cơ quan/khung giờ, trong 30 ngày tới và theo lịch ngày làm việc đã cấu hình. Đây là cấu hình vận hành của dự án, không phải định mức của cơ quan nhà nước.
 - Nguồn mới gồm `workflow_extensions.py`, `frontend/src/AdministrativeServices.tsx` và `tests/test_recovered_workflows.py`.
 - 31/31 kiểm thử đạt; TypeScript/Vite build (`frontend/dist`) đã được đồng bộ đầy đủ với mã nguồn.
+
+
+## Trang chi tiết thủ tục (19/10/2026)
+
+Mở **Danh mục thủ tục**, chọn một thủ tục để đến `/thu-tuc/<mã thủ tục>`. Các liên kết cũ dạng `/thu-tuc?code=...` vẫn mở được cùng trang chi tiết. Trang có thông tin công bố, trình tự, thời hạn và phí theo phương thức nộp, thành phần hồ sơ theo từng trường hợp, mẫu đơn gốc, căn cứ pháp lý, cơ quan thực hiện, điều kiện và kết quả giải quyết.
+
+Nội dung được lấy từ 1.549 bản ghi chính thức đã đối chiếu với Cổng Dịch vụ công quốc gia; bản ghi 1.014677 được lấy lại ngày 19/10/2026. Ngày đối chiếu và liên kết nguồn hiện ngay trên trang. Các thủ tục chưa có bản công bố chi tiết được giữ ở mức thông tin đã có; không tự điền thời hạn, khoản thu, điều kiện hay căn cứ pháp lý còn thiếu.
+
+Người dùng chọn trường hợp hồ sơ và cơ quan tại Hà Nội, sau đó bấm **Nộp hồ sơ**. Mã thủ tục, cơ quan và trường hợp đã chọn được chuyển sang trang nộp đang có. Danh sách cơ quan dùng chung với bước đầu của trang nộp và chỉ cho chọn đơn vị có bộ phận tiếp nhận. Nút **In / Lưu PDF** dùng khổ A4 dọc; bảng chuyển thành từng khối trên điện thoại.
+
+Mẫu đơn được tải trực tiếp từ dịch vụ tệp công khai của Cổng quốc gia qua API `/api/procedures/<code>/templates/<attachmentId>`. Máy chủ kiểm tra tệp có thuộc đúng bản công bố của thủ tục, giới hạn dung lượng 16 MB và không gửi dữ liệu người nộp đến nguồn ngoài. Khi nguồn tệp không phản hồi, trang báo lỗi và vẫn có liên kết mở bản công bố gốc.
+
+Nguồn trình bày: `procedure_details.py`, `frontend/src/CitizenProcedureDetail.tsx`, `frontend/src/ProcedureDetail.css`. Bản dữ liệu công bố đi kèm mã nguồn ở `resources/official_procedure_details.json.gz` để hệ thống vẫn mở được chi tiết khi chuyển máy và chưa có thư mục `data`. Lệnh `python tools/sync_official_procedure_forms.py --write` cập nhật lại bản nguồn và gói dữ liệu công bố; cần khởi động lại máy chủ sau khi đồng bộ. Đây là bản dữ liệu theo thời điểm đối chiếu, chưa phải đồng bộ tự động theo thời gian thực.
+
+
+Trang **Danh mục thủ tục** trong bàn cán bộ hiển thị bảng tra cứu toàn chiều rộng, với mã, tên, mức dịch vụ, cơ quan và tình trạng dữ liệu. Chọn thủ tục để mở màn chi tiết trong bàn cán bộ; nội dung công bố và chức năng tải mẫu dùng chung với trang công dân. Cấu hình nội bộ được hiển thị riêng, kèm chức năng chỉnh sửa và lịch sử theo quyền quản trị. Nút **Về danh sách thủ tục** giữ bộ lọc và trang kết quả đã chọn. Quản lý lĩnh vực, tạo nhóm và chuyển thủ tục vẫn có trong khu **Quản lý lĩnh vực**.
+
+Giao diện **Danh mục thủ tục** trong bàn cán bộ được cập nhật ngày 19/10/2026: danh sách có bộ lọc và trạng thái dữ liệu; trang chi tiết dùng chung nội dung công bố với cổng công dân, còn cấu hình nội bộ, lịch sử và quyền sửa được tách riêng. Báo cáo Word, mô tả thiết kế, cẩm nang vận hành và danh mục ảnh đã được đồng bộ với màn hình này.

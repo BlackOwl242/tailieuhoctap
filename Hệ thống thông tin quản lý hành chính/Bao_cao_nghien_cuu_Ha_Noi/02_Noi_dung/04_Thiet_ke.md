@@ -391,7 +391,7 @@ Bảng 4.17: Phân hệ cán bộ và mức hiện thực trong phần mềm ngh
 | Chi tiết và xử lý hồ sơ | Xem chủ thể, thủ tục, hạn, thành phần, lịch sử; tiếp nhận, phân công, yêu cầu bổ sung, lập dự thảo, trình duyệt, phê duyệt; nhánh ký/phát hành/giao kết quả sandbox được tách theo vai trò; xử lý riêng hồ sơ yêu cầu dừng theo Mẫu 05/06 | Máy chủ kiểm tra vai trò, phạm vi, hiệu lực quyền, trạng thái và phiên bản. Chữ ký kết quả yêu cầu quyền ký sandbox riêng; người phê duyệt không tự ký | Không phát hành kết quả hành chính, không tạo chữ ký số công vụ và không ghi nhận giao nhận ngoài ứng dụng |
 | Số hóa hồ sơ giấy | Bản chạy hiện tại chỉ nhận tệp thuộc định dạng cho phép; chưa có màn hình kiểm đếm trang, đối chiếu bản gốc, bóc tách OCR/nhập tay, lập dữ liệu đặc tả, cấp mã kết quả số hóa hoặc ký bản sao | Chưa hiện thực; đây là yêu cầu cần bổ sung theo Thông tư 14/2026/TT-BTP | Không được coi tệp tải lên là hồ sơ đã số hóa, đã kiểm tra toàn vẹn, đã ký hoặc đã lưu trữ chính thức |
 | Giám sát quy trình | Chọn kỳ; tổng hợp trạng thái, hồ sơ mở/quá hạn, tải theo cơ quan và người phụ trách, hồ sơ tồn lâu, phản hồi và hàng chờ cục bộ; chọn chỉ số hoặc dòng phân bố để mở danh sách hồ sơ tương ứng trong cùng phạm vi/kỳ | Tổng hợp trên tập hồ sơ cán bộ được xem; bộ lọc từ trang giám sát được giữ khi mở hộp xử lý | Không phải số liệu chính thức, không suy rộng ra toàn Thành phố; phản hồi và hàng chờ có thể trống |
-| Danh mục thủ tục | Tìm theo mã/tên/lĩnh vực/cơ quan; xem cấp và dấu vết nguồn; phân biệt bản ghi đã đối chiếu, đối chiếu một phần hoặc chỉ tham chiếu | Tra cứu chỉ đọc | Danh mục cục bộ không bảo đảm toàn bộ tuyến, thành phần, lệ phí hay thời hạn đang có hiệu lực cho mọi địa bàn |
+| Danh mục thủ tục | Lọc theo tên/mã, lĩnh vực và mức dịch vụ; mở từng thủ tục để xem nội dung công bố, cơ quan, thành phần, thời hạn, phí/lệ phí, căn cứ và tệp biểu mẫu. Quản trị viên được sửa dữ liệu nội bộ, xem lịch sử phiên bản và quản lý lĩnh vực | Cán bộ khác tra cứu theo quyền; thay đổi danh mục cần quyền quản trị, ghi lý do và được lưu thành phiên bản có nhật ký. Chi tiết dùng chung nguồn nội dung với trang công dân; cấu hình nội bộ được trình bày riêng | Dữ liệu tham chiếu và cập nhật nội bộ không tự trở thành nội dung đã được cơ quan nghiệp vụ xác nhận, không đồng bộ ngược lên Cổng quốc gia; cần đối chiếu hiệu lực và tuyến tại từng địa bàn |
 | Nhật ký hồ sơ | Tìm sự kiện theo mã, nội dung, người thực hiện; lọc sự kiện công khai/nội bộ; mở hồ sơ tương ứng | Tập sự kiện được giới hạn theo hồ sơ mà phiên đăng nhập được phép xem | Nhật ký cục bộ không phải nhật ký hệ thống chính thức của Thành phố |
 | Kết nối dịch vụ | Theo dõi biên tích hợp, hàng chờ và trạng thái API nội bộ; quản trị viên cấp/thu hồi quyền ký sandbox; người dân tạo/xác nhận giao dịch sandbox; tài chính đối soát và xử lý đề nghị hoàn theo phân quyền; mở lịch sử từng sự kiện | Các thao tác sandbox được lưu trong SQLite và API kiểm tra vai trò, cơ quan, phiên bản cùng nguyên tắc hai người khi duyệt hoàn. Tích hợp ngoài vẫn bị khóa cho tới khi có hợp đồng và thông tin xác thực | Chữ ký Ed25519 và trạng thái thanh toán chỉ là cục bộ; không kết nối Cổng quốc gia, nhà cung cấp ký số, ngân hàng, không phát sinh tiền thật hoặc hiệu lực pháp lý |
 | Quản trị tài khoản cán bộ | Lập đề nghị cấp; đề nghị tạm ngưng/khôi phục hoặc đổi vai trò, cơ quan và thời hạn; giao quyền quản lý tài khoản trong một cơ quan; duyệt/từ chối độc lập; thu hồi quyền ký Mẫu 06; in bảng kê hoặc xuất CSV tài khoản theo cơ quan | Người quản lý cơ quan chỉ xem tài khoản có đúng phạm vi, không đổi cơ quan và không duyệt; quản trị viên hệ thống duyệt, kiểm tra người lập/chủ tài khoản, chặn đề nghị trùng và giữ quản trị viên cuối cùng. Xuất tài khoản không chứa mật khẩu; đổi quyền thu hồi phiên | Trong bộ dữ liệu hiện có chưa tài khoản nào được giao quyền quản lý cơ quan. Chưa đồng bộ danh tính, đơn vị hoặc quyền với kho công vụ Hà Nội; thay đổi tài khoản quản trị cần quản trị viên thứ ba |
@@ -407,39 +407,43 @@ Phạm vi hiện thực chưa bao phủ toàn bộ 36 Use case mục tiêu. Ứn
 
 Hình 4.9: Tổng quan bàn xử lý cán bộ trong phần mềm nghiên cứu
 
-![Tổng quan cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/04_tong_quan_can_bo.jpg)
+![Tổng quan cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_15.jpg)
 
 Hình 4.10: Hộp xử lý với bộ lọc trạng thái, hạn và phân công
 
-![Hộp xử lý cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/05_hop_xu_ly.jpg)
+![Hộp xử lý cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_16.jpg)
 
 Hình 4.11: Giám sát hồ sơ, thời hạn và tải xử lý trong phạm vi tài khoản
 
-![Giám sát quy trình](../03_Thiet_ke/Anh_giao_dien_he_thong/08_giam_sat_quy_trinh.jpg)
+![Giám sát quy trình](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_23.jpg)
 
-Hình 4.12: Tra cứu danh mục thủ tục và trạng thái xác minh nguồn
+Hình 4.12: Danh sách, bộ lọc và trạng thái dữ liệu trong bàn cán bộ
 
-![Danh mục thủ tục](../03_Thiet_ke/Anh_giao_dien_he_thong/09_danh_muc_thu_tuc.jpg)
+![Danh mục thủ tục cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_33.jpg)
+
+**Trang chi tiết** hiển thị nội dung công bố cùng cấu hình quản trị và lịch sử cập nhật riêng. Bộ ảnh hiện hành được chụp ngày 19/10/2026; danh mục đủ 45 màn hình, gồm cổng công dân, năm bước lập hồ sơ, tra cứu, lịch hẹn, phản ánh, từng hàng đợi cán bộ, màn hình quản trị và hướng dẫn theo vai trò. Xem [danh mục ảnh giao diện](../03_Thiet_ke/Anh_giao_dien_he_thong/Danh_muc_anh_giao_dien.json).
+
+![Chi tiết thủ tục cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_34.jpg)
 
 Hình 4.13: Nhật ký sự kiện hồ sơ theo quyền tài khoản
 
-![Nhật ký hồ sơ](../03_Thiet_ke/Anh_giao_dien_he_thong/10_nhat_ky_ho_so.jpg)
+![Nhật ký hồ sơ](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_24.jpg)
 
 Hình 4.14: Trạng thái các phụ thuộc tích hợp và hàng chờ cục bộ
 
-![Kết nối dịch vụ](../03_Thiet_ke/Anh_giao_dien_he_thong/11_ket_noi_dich_vu.jpg)
+![Kết nối dịch vụ](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_25.jpg)
 
 Hình 4.15: Trang chủ hiển thị bài viết đã xuất bản từ cơ sở dữ liệu ứng dụng
 
-![Cổng công dân và tin đã xuất bản](../03_Thiet_ke/Anh_giao_dien_he_thong/12_cong_dan_tin_tuc.jpg)
+![Cổng công dân và tin đã xuất bản](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_13.jpg)
 
 Hình 4.16: Danh sách tin và trạng thái biên tập trong tài khoản quản trị viên
 
-![Quản lý tin tức](../03_Thiet_ke/Anh_giao_dien_he_thong/13_quan_ly_tin_tuc.jpg)
+![Quản lý tin tức](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_35.jpg)
 
 Hình 4.17: Biểu mẫu tạo nội dung, chọn chuyên mục, ảnh và nguồn tin
 
-![Soạn tin tức](../03_Thiet_ke/Anh_giao_dien_he_thong/14_soan_tin_tuc.jpg)
+![Soạn tin tức](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_36.jpg)
 
 
 Các ảnh minh họa trong mục này được chụp từ ứng dụng nghiên cứu hiện có. Dữ liệu hồ sơ và tài khoản trong ảnh là dữ liệu minh họa; không phải dữ liệu thật của người dân hoặc tài khoản công vụ Hà Nội.

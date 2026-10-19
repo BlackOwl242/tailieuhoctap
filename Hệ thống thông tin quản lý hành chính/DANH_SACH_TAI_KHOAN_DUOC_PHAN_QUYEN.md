@@ -1,12 +1,12 @@
 # Tài khoản cục bộ được phân quyền
 
-> Bản ghi khởi tạo ngày 11/10/2026, đã đồng bộ lại ngày 18/10/2026. Bộ dữ liệu hiện có 79 tài khoản; xem [danh sách đầy đủ 79 tài khoản](TAI_KHOAN_SAU_KHOI_PHUC_20261018.md). **Mật khẩu mặc định hiện tại của toàn bộ tài khoản trong hệ thống là `123`** (không bắt buộc đổi mật khẩu lần đầu).
+> Bản ghi khởi tạo ngày 11/10/2026, cập nhật ngày 18/10/2026. Cơ sở dữ liệu hiện có **705 tài khoản**: 79 tài khoản có từ trước và 626 tài khoản bổ sung cho UBND 126 phường, xã mới. Xem [danh sách tài khoản gốc](TAI_KHOAN_SAU_KHOI_PHUC_20261018.md) và [danh sách UBND phường, xã](TAI_KHOAN_UBND_CAP_XA_HANOI_2026.md). Mật khẩu ban đầu của các tài khoản mẫu là `123`; các tài khoản phường, xã không buộc đổi mật khẩu khi đăng nhập lần đầu.
 
 **Cơ sở dữ liệu:** `data/hanoi-services.sqlite3`
-**Ngày tạo/kiểm tra:** 11/10/2026 (cập nhật mật khẩu mặc định `123` ngày 18/10/2026)
-**Trạng thái:** 79 tài khoản cục bộ đang hoạt động (dưới đây là 11 tài khoản cốt lõi). Đây không phải tài khoản do cơ quan Hà Nội cấp.
+**Ngày tạo/kiểm tra:** 18/10/2026
+**Trạng thái:** 705 tài khoản cục bộ đang hoạt động (dưới đây là 11 tài khoản cốt lõi). Đây không phải tài khoản do cơ quan Hà Nội cấp.
 
-Các địa chỉ `example.test` là định danh dành riêng cho môi trường thử nghiệm, không phải hộp thư thật. Email chưa được xác minh. Tài khoản không có quyền ký Mẫu 06 vì chưa có căn cứ phân công thẩm quyền ký. Thời hạn các quyền nghiệp vụ: **11/10/2026–11/10/2027**.
+Các địa chỉ `example.test` là định danh dành riêng cho môi trường thử nghiệm, không phải hộp thư thật. Email chưa được xác minh. Tài khoản không có quyền ký Mẫu 06 vì chưa có căn cứ phân công thẩm quyền ký. Quyền của các tài khoản có trước còn thời hạn đến **11/10/2027**; tài khoản UBND phường, xã mới có thời hạn **18/10/2026–18/10/2027**.
 
 ## Quản trị viên
 

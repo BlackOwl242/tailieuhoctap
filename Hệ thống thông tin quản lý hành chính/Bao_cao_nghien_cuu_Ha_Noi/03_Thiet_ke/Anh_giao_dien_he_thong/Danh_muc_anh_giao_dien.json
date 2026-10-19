@@ -1,411 +1,411 @@
 {
-  "version": "2026-10-16-recovered-from-final-report-source",
-  "dataScope": "Ảnh trích từ báo cáo Word trước biên tập cuối; giữ nguyên ảnh nhúng gốc để tái tạo bộ 45 hình.",
+  "version": "2026-10-19-current-ui",
+  "dataScope": "Ảnh chụp từ phiên ứng dụng chạy trên bản sao cơ sở dữ liệu; không thay đổi hồ sơ của môi trường đang vận hành.",
   "captures": [
     {
-      "file": "01_recovered_from_word.jpg",
-      "title": "Trang chủ trên máy tính sau khi bỏ khối tra cứu trùng",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_01.jpg",
+      "title": "Trang chủ dịch vụ công Hà Nội trên máy tính",
+      "role": "Người dân",
+      "route": "/",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:43.149Z"
     },
     {
-      "file": "02_recovered_from_word.jpg",
+      "file": "ui_current_02.jpg",
       "title": "Trang chủ trên điện thoại",
-      "role": "recovered_from_word",
-      "route": "",
+      "role": "Người dân",
+      "route": "/",
       "width": 390,
       "height": 844,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:43.210Z"
     },
     {
-      "file": "17_recovered_from_word.jpg",
-      "title": "Danh mục thủ tục dành cho công dân và tổ chức",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_03.jpg",
+      "title": "Danh mục thủ tục công dân",
+      "role": "Người dân",
+      "route": "/thu-tuc",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:44.450Z"
     },
     {
-      "file": "18_recovered_from_word.jpg",
-      "title": "Chi tiết thủ tục và cơ quan thực hiện",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_04.jpg",
+      "title": "Chi tiết thủ tục và thông tin thực hiện",
+      "role": "Người dân",
+      "route": "/thu-tuc/1.014677",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:45.315Z"
     },
     {
-      "file": "19_recovered_from_word.jpg",
+      "file": "ui_current_05.jpg",
       "title": "Bước 1 chọn thủ tục và cơ quan tiếp nhận",
-      "role": "recovered_from_word",
-      "route": "",
+      "role": "Người dân",
+      "route": "/nop-ho-so",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:46.953Z"
     },
     {
-      "file": "42_recovered_from_word.jpg",
+      "file": "ui_current_06.jpg",
       "title": "Bước 2 khai thông tin người yêu cầu",
-      "role": "recovered_from_word",
-      "route": "",
+      "role": "Người dân",
+      "route": "/nop-ho-so",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:47.093Z"
     },
     {
-      "file": "43_recovered_from_word.jpg",
-      "title": "Bước 3 tờ khai theo cấu hình chuyên ngành",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_07.jpg",
+      "title": "Bước 3 tờ khai theo thủ tục được chọn",
+      "role": "Người dân",
+      "route": "/nop-ho-so",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:47.281Z"
     },
     {
-      "file": "44_recovered_from_word.jpg",
-      "title": "Bước 4 tải tài liệu thực tế theo từng thành phần",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_08.jpg",
+      "title": "Bước 4 thành phần hồ sơ và tài liệu đính kèm",
+      "role": "Người dân",
+      "route": "/nop-ho-so",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:47.390Z"
     },
     {
-      "file": "45_recovered_from_word.jpg",
-      "title": "Bước 5 kiểm tra hồ sơ với dữ liệu minh họa trước khi xác nhận gửi",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_09.jpg",
+      "title": "Bước 5 kiểm tra trước khi gửi hồ sơ",
+      "role": "Người dân",
+      "route": "/nop-ho-so",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:47.463Z"
     },
     {
-      "file": "20_recovered_from_word.jpg",
-      "title": "Trang tra cứu riêng bằng mã hồ sơ và khóa tra cứu",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_10.jpg",
+      "title": "Tra cứu hồ sơ bằng mã và khóa tra cứu",
+      "role": "Người dân",
+      "route": "/tra-cuu-ho-so",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:48.262Z"
     },
     {
-      "file": "21_recovered_from_word.jpg",
-      "title": "Đặt lịch và tra cứu phiếu hẹn Một cửa",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 956,
-      "height": 974,
-      "capturedAt": "2026-10-16"
-    },
-    {
-      "file": "22_recovered_from_word.jpg",
-      "title": "Gửi và theo dõi phản ánh kiến nghị",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_11.jpg",
+      "title": "Đặt lịch hẹn tại bộ phận một cửa",
+      "role": "Người dân",
+      "route": "/tien-ich",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:49.088Z"
     },
     {
-      "file": "12_recovered_from_word.jpg",
-      "title": "Chi tiết tin tức công khai trong hệ thống",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_12.jpg",
+      "title": "Gửi phản ánh, kiến nghị",
+      "role": "Người dân",
+      "route": "/tien-ich",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:49.193Z"
     },
     {
-      "file": "03_recovered_from_word.jpg",
-      "title": "Đăng nhập bằng tài khoản nội bộ được cấp",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_13.jpg",
+      "title": "Chi tiết tin tức công khai",
+      "role": "Người dân",
+      "route": "/?tin=khai-sinh",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:50.540Z"
     },
     {
-      "file": "04_recovered_from_word.jpg",
-      "title": "Tổng quan công việc của cán bộ tiếp nhận",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_14.jpg",
+      "title": "Đăng nhập bàn cán bộ",
+      "role": "Cán bộ",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:51.341Z"
     },
     {
-      "file": "05_recovered_from_word.jpg",
-      "title": "Hộp xử lý và hàng đợi hồ sơ theo phạm vi cơ quan",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_15.jpg",
+      "title": "Tổng quan công việc cán bộ tiếp nhận",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:53.199Z"
     },
     {
-      "file": "30_recovered_from_word.jpg",
-      "title": "Lập phiếu tiếp nhận trực tiếp và ghi nhận tệp quét",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1136,
-      "height": 1174,
-      "capturedAt": "2026-10-16"
-    },
-    {
-      "file": "06_recovered_from_word.jpg",
-      "title": "Chi tiết hồ sơ và các thao tác theo trạng thái",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_16.jpg",
+      "title": "Hộp xử lý hồ sơ theo phạm vi cơ quan",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:53.313Z"
     },
     {
-      "file": "37_recovered_from_word.jpg",
-      "title": "Hộp xử lý của Chuyên viên thụ lý",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_17.jpg",
+      "title": "Lập phiếu tiếp nhận trực tiếp tại quầy",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:53.642Z"
     },
     {
-      "file": "38_recovered_from_word.jpg",
-      "title": "Hộp xử lý của Lãnh đạo phê duyệt",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_18.jpg",
+      "title": "Chi tiết hồ sơ và thao tác được phép",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:53.858Z"
     },
     {
-      "file": "39_recovered_from_word.jpg",
-      "title": "Hộp xử lý của Văn thư phát hành",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_19.jpg",
+      "title": "Hộp xử lý của chuyên viên thụ lý",
+      "role": "specialist",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:55.573Z"
     },
     {
-      "file": "40_recovered_from_word.jpg",
-      "title": "Hộp xử lý của Kế toán và tài chính",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_20.jpg",
+      "title": "Hộp xử lý của lãnh đạo phê duyệt",
+      "role": "leader",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:57.289Z"
     },
     {
-      "file": "08_recovered_from_word.jpg",
-      "title": "Giám sát SLA và tiến độ hồ sơ trong đơn vị",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_21.jpg",
+      "title": "Hộp xử lý của văn thư phát hành",
+      "role": "registrar",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:26:59.072Z"
     },
     {
-      "file": "10_recovered_from_word.jpg",
+      "file": "ui_current_22.jpg",
+      "title": "Hộp xử lý của cán bộ tài chính",
+      "role": "finance",
+      "route": "/staff",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:00.962Z"
+    },
+    {
+      "file": "ui_current_23.jpg",
+      "title": "Giám sát tiến độ và hạn xử lý hồ sơ",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/staff",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:02.817Z"
+    },
+    {
+      "file": "ui_current_24.jpg",
       "title": "Nhật ký xử lý và luân chuyển hồ sơ",
-      "role": "recovered_from_word",
-      "route": "",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:02.924Z"
     },
     {
-      "file": "11_recovered_from_word.jpg",
-      "title": "Trạng thái kết nối và các dịch vụ nội bộ",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_25.jpg",
+      "title": "Trạng thái tích hợp và dịch vụ nội bộ",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:03.234Z"
     },
     {
-      "file": "15_recovered_from_word.jpg",
-      "title": "Thông tin tài khoản và phạm vi quyền nội bộ",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_26.jpg",
+      "title": "Thông tin tài khoản và phạm vi quyền",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:03.326Z"
     },
     {
-      "file": "16_recovered_from_word.jpg",
-      "title": "Đổi mật khẩu và quản lý các phiên đăng nhập",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_27.jpg",
+      "title": "Bảo mật tài khoản và phiên đăng nhập",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:03.372Z"
     },
     {
-      "file": "31_recovered_from_word.jpg",
-      "title": "Tổng quan số liệu và tài khoản đang lưu trong hệ thống",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_28.jpg",
+      "title": "Tổng quan quản trị hệ thống",
+      "role": "Quản trị viên",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:05.129Z"
     },
     {
-      "file": "07_recovered_from_word.jpg",
-      "title": "Danh sách tài khoản theo vai trò và cơ quan",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_29.jpg",
+      "title": "Danh bạ tài khoản và phân quyền",
+      "role": "Quản trị viên",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:05.269Z"
     },
     {
-      "file": "32_recovered_from_word.jpg",
-      "title": "Ma trận phân quyền theo sáu vai trò cán bộ",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1136,
-      "height": 711,
-      "capturedAt": "2026-10-16"
-    },
-    {
-      "file": "33_recovered_from_word.jpg",
-      "title": "Cấp tài khoản và chọn kích hoạt trực tiếp hoặc chờ duyệt",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1094,
-      "height": 859,
-      "capturedAt": "2026-10-16"
-    },
-    {
-      "file": "34_recovered_from_word.jpg",
-      "title": "Báo cáo theo cơ quan kỳ thống kê và sổ Mẫu 08",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_30.jpg",
+      "title": "Đề nghị cấp mới và điều chỉnh quyền tài khoản",
+      "role": "Quản trị viên",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:05.377Z"
     },
     {
-      "file": "09_recovered_from_word.jpg",
-      "title": "Quản trị danh mục thủ tục và cấu hình biểu mẫu",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_31.jpg",
+      "title": "Biểu mẫu lập đề nghị cấp tài khoản",
+      "role": "Quản trị viên",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:05.484Z"
     },
     {
-      "file": "35_recovered_from_word.jpg",
-      "title": "Cập nhật thủ tục và căn cứ pháp lý riêng của thủ tục",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 406,
-      "height": 1076,
-      "capturedAt": "2026-10-16"
-    },
-    {
-      "file": "13_recovered_from_word.jpg",
-      "title": "Quản lý trạng thái tin tức trong CMS",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_32.jpg",
+      "title": "Báo cáo hồ sơ theo cơ quan và trạng thái",
+      "role": "Quản trị viên",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:05.604Z"
     },
     {
-      "file": "14_recovered_from_word.jpg",
-      "title": "Biểu mẫu biên tập tin tức và nguồn công khai",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 697,
-      "height": 826,
-      "capturedAt": "2026-10-16"
-    },
-    {
-      "file": "36_recovered_from_word.jpg",
-      "title": "Phân công và thu hồi quyền ký xác nhận Ed25519 nội bộ",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_33.jpg",
+      "title": "Danh mục thủ tục trong bàn quản trị",
+      "role": "Quản trị viên",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:05.745Z"
     },
     {
-      "file": "41_recovered_from_word.jpg",
-      "title": "Sổ khoản thu đối chiếu và đề nghị hoàn phí",
-      "role": "recovered_from_word",
-      "route": "",
+      "file": "ui_current_34.jpg",
+      "title": "Chi tiết và dữ liệu tham chiếu thủ tục",
+      "role": "Quản trị viên",
+      "route": "/staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-16"
+      "capturedAt": "2026-10-18T19:27:32.641Z"
     },
     {
-      "file": "23_recovered_from_word.jpg",
-      "title": "Cẩm nang hướng dẫn dành cho Công dân / Tổ chức",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1392,
-      "height": 758,
-      "capturedAt": "2026-10-16"
+      "file": "ui_current_35.jpg",
+      "title": "Danh sách và trạng thái tin trên cổng",
+      "role": "Quản trị viên",
+      "route": "/staff",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:15.850Z"
     },
     {
-      "file": "24_recovered_from_word.jpg",
-      "title": "Cẩm nang hướng dẫn dành cho Cán bộ tiếp nhận",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1392,
-      "height": 829,
-      "capturedAt": "2026-10-16"
+      "file": "ui_current_36.jpg",
+      "title": "Biểu mẫu biên tập tin tức",
+      "role": "Quản trị viên",
+      "route": "/staff",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:15.939Z"
     },
     {
-      "file": "25_recovered_from_word.jpg",
-      "title": "Cẩm nang hướng dẫn dành cho Chuyên viên thụ lý",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1392,
-      "height": 782,
-      "capturedAt": "2026-10-16"
+      "file": "ui_current_37.jpg",
+      "title": "Quản lý quyền ký thử nghiệm nội bộ",
+      "role": "Quản trị viên",
+      "route": "/staff",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:16.251Z"
     },
     {
-      "file": "26_recovered_from_word.jpg",
-      "title": "Cẩm nang hướng dẫn dành cho Lãnh đạo phê duyệt",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1392,
-      "height": 746,
-      "capturedAt": "2026-10-16"
+      "file": "ui_current_38.jpg",
+      "title": "Sổ khoản thu và đối soát trong phạm vi cơ quan",
+      "role": "Cán bộ tài chính",
+      "route": "/staff",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:18.171Z"
     },
     {
-      "file": "27_recovered_from_word.jpg",
-      "title": "Cẩm nang hướng dẫn dành cho Văn thư phát hành",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1392,
-      "height": 675,
-      "capturedAt": "2026-10-16"
+      "file": "ui_current_39.jpg",
+      "title": "Hướng dẫn người dân: tra cứu và lập hồ sơ",
+      "role": "Người dân",
+      "route": "/huong-dan",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:18.993Z"
     },
     {
-      "file": "28_recovered_from_word.jpg",
-      "title": "Cẩm nang hướng dẫn dành cho Kế toán / Tài chính",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1392,
-      "height": 675,
-      "capturedAt": "2026-10-16"
+      "file": "ui_current_40.jpg",
+      "title": "Hướng dẫn cán bộ: Cán bộ tiếp nhận",
+      "role": "Cán bộ tiếp nhận",
+      "route": "/huong-dan",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:19.150Z"
     },
     {
-      "file": "29_recovered_from_word.jpg",
-      "title": "Cẩm nang hướng dẫn dành cho Quản trị hệ thống",
-      "role": "recovered_from_word",
-      "route": "",
-      "width": 1392,
-      "height": 972,
-      "capturedAt": "2026-10-16"
+      "file": "ui_current_41.jpg",
+      "title": "Hướng dẫn cán bộ: Chuyên viên thụ lý",
+      "role": "Chuyên viên thụ lý",
+      "route": "/huong-dan",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:19.225Z"
+    },
+    {
+      "file": "ui_current_42.jpg",
+      "title": "Hướng dẫn cán bộ: Lãnh đạo phê duyệt",
+      "role": "Lãnh đạo phê duyệt",
+      "route": "/huong-dan",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:19.303Z"
+    },
+    {
+      "file": "ui_current_43.jpg",
+      "title": "Hướng dẫn cán bộ: Văn thư phát hành",
+      "role": "Văn thư phát hành",
+      "route": "/huong-dan",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:19.395Z"
+    },
+    {
+      "file": "ui_current_44.jpg",
+      "title": "Hướng dẫn cán bộ: Cán bộ tài chính",
+      "role": "Cán bộ tài chính",
+      "route": "/huong-dan",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:19.473Z"
+    },
+    {
+      "file": "ui_current_45.jpg",
+      "title": "Hướng dẫn cán bộ: Quản trị hệ thống",
+      "role": "Quản trị hệ thống",
+      "route": "/huong-dan",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-18T19:27:19.547Z"
     }
   ],
   "errors": []

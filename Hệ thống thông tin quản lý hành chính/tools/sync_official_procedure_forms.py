@@ -360,6 +360,11 @@ def main() -> int:
     }
     DATA_DIR.mkdir(exist_ok=True)
     SNAPSHOT_PATH.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if args.write:
+        sys.path.insert(0, str(ROOT))
+        from procedure_details import official_snapshot, export_bundled_details
+        official_snapshot.cache_clear()
+        export_bundled_details()
 
     report = [
         "# Đối chiếu thành phần hồ sơ và biểu mẫu thủ tục với Cổng Dịch vụ công quốc gia",

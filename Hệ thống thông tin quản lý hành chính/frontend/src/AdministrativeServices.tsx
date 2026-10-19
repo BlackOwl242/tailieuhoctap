@@ -81,9 +81,9 @@ function DeskRecordRow({ record, appointment, canEdit, request, onChanged }: { r
       {record.reply && <p><b>Nội dung trả lời:</b> {record.reply}{record.replied_by ? ` — ${record.replied_by}` : ''}{record.replied_at ? ` (${record.replied_at})` : ''}</p>}
     </>}
     {!closed && <form className="sandbox-payment-action form-grid account-form" onSubmit={save}>
-      {appointment && <label>Trạng thái tiếp theo<select required value={status} onChange={event => setStatus(event.target.value)}><option value="">Chọn thao tác</option>{options.map(value => <option key={value} value={value}>{statusNames[value]}</option>)}</select></label>}
-      <label>{appointment ? 'Ghi chú xử lý' : 'Nội dung trả lời'}<textarea required minLength={8} maxLength={2000} rows={3} value={note} onChange={event => setNote(event.target.value)} /></label>
-      <button className="button primary" disabled={busy}>{busy ? 'Đang lưu…' : 'Lưu nội dung xử lý'}</button>
+      {appointment && <label className="span-two">Trạng thái tiếp theo<select required value={status} onChange={event => setStatus(event.target.value)}><option value="">Chọn thao tác</option>{options.map(value => <option key={value} value={value}>{statusNames[value]}</option>)}</select></label>}
+      <label className="span-two">{appointment ? 'Ghi chú xử lý' : 'Nội dung trả lời'}<textarea required minLength={8} maxLength={2000} rows={3} value={note} onChange={event => setNote(event.target.value)} /></label>
+      <div className="form-actions span-two"><button className="button primary" disabled={busy}>{busy ? 'Đang lưu…' : 'Lưu nội dung xử lý'}</button></div>
     </form>}
     {error && <p className="form-error" role="alert">{error}</p>}
   </article>
@@ -126,75 +126,67 @@ export function AdministrativeServiceDesk({ user, procedures, request, onCaseCre
   }
   if (!eligible) return null
   return <>
-    {user.role === 'intake' && <section className="panel"><details open><summary><b>Tiếp nhận hồ sơ trực tiếp tại quầy Một cửa</b></summary>
-      <p>Ghi nhận giấy tờ bản chính/bản sao đã đối chiếu với người nộp. Tệp quét số hóa được bổ sung trong chi tiết hồ sơ sau khi tiếp nhận.</p>
-      <form className="sandbox-signer-form form-grid account-form" onSubmit={create}>
-        <label>Thủ tục<select name="procedureCode" required><option value="">Chọn thủ tục</option>{procedures.map(p => <option key={p.code} value={p.code}>{p.code} · {p.name}</option>)}</select></label>
+    {user.role === 'intake' && <section className="panel service-desk-intake"><details open><summary className="service-desk-summary"><b>Tiếp nhận hồ sơ trực tiếp tại quầy Một cửa</b></summary>
+      <p className="muted" style={{ margin: '8px 0 16px' }}>Ghi nhận giấy tờ bản chính/bản sao đã đối chiếu với người nộp. Tệp quét số hóa được bổ sung trong chi tiết hồ sơ sau khi tiếp nhận.</p>
+      <form className="form-grid account-form" onSubmit={create}>
+        <label className="span-two">Thủ tục<select name="procedureCode" required><option value="">Chọn thủ tục</option>{procedures.map(p => <option key={p.code} value={p.code}>{p.code} · {p.name}</option>)}</select></label>
         <label>Cơ quan tiếp nhận<input name="receivingAgency" required maxLength={180} defaultValue={user.agencyScope === 'Toàn thành phố' ? '' : user.agencyScope} readOnly={!!user.agencyScope && user.agencyScope !== 'Toàn thành phố'} /></label>
         <label>Chủ thể<select name="applicantType"><option value="citizen">Cá nhân</option><option value="organization">Tổ chức</option></select></label>
         <label>Họ tên / tên tổ chức<input name="applicantName" required minLength={2} maxLength={150} /></label>
         <label>Số định danh / mã tổ chức<input name="citizenId" required minLength={3} maxLength={40} /></label>
         <label>Điện thoại<input name="applicantPhone" type="tel" required minLength={8} maxLength={40} /></label>
         <label>Email<input name="applicantEmail" type="email" maxLength={254} /></label>
-        <label>Địa chỉ<input name="applicantAddress" required minLength={3} maxLength={300} /></label>
-        <label>Nội dung yêu cầu<textarea name="requestSummary" required minLength={8} maxLength={1200} rows={3} /></label>
-        <label>Danh mục giấy tờ đã nhận<textarea name="paperOriginals" required minLength={8} maxLength={2000} rows={3} /></label>
-        <label className="check-row"><input type="checkbox" name="identityVerified" style={{ minHeight: 16, padding: 0 }} required /> Đã đối chiếu người nộp và kiểm đếm giấy tờ tiếp nhận</label>
-        <button className="button primary" disabled={busy}>{busy ? 'Đang tiếp nhận…' : 'Ghi nhận tiếp nhận tại quầy'}</button>
+        <label className="span-two">Địa chỉ<input name="applicantAddress" required minLength={3} maxLength={300} /></label>
+        <label className="span-two">Nội dung yêu cầu<textarea name="requestSummary" required minLength={8} maxLength={1200} rows={3} /></label>
+        <label className="span-two">Danh mục giấy tờ đã nhận<textarea name="paperOriginals" required minLength={8} maxLength={2000} rows={3} /></label>
+        <label className="span-two check-row"><input type="checkbox" name="identityVerified" required /> Đã đối chiếu người nộp và kiểm đếm giấy tờ tiếp nhận</label>
+        <div className="form-actions span-two"><button className="button primary" disabled={busy}>{busy ? 'Đang tiếp nhận…' : 'Ghi nhận tiếp nhận tại quầy'}</button></div>
       </form>
     </details></section>}
     {error && <p className="form-error" role="alert">{error}</p>}
     {notice && <p className="citizen-success" role="status">{notice} {createdCase && onCaseCreated && <button type="button" className="button secondary" style={{ marginLeft: 8 }} onClick={() => void onCaseCreated(createdCase)}>Mở hồ sơ {createdCase.code}</button>}</p>}
-    {summary && user.role === 'admin' && <section className="panel"><h2>Tổng hợp Lịch hẹn & Phản ánh kiến nghị toàn thành phố</h2>
+    {summary && user.role === 'admin' && <section className="panel"><div className="panel-title"><div><h2>Tổng hợp Lịch hẹn &amp; Phản ánh kiến nghị toàn thành phố</h2><p>Thống kê theo trạng thái xử lý trên toàn hệ thống.</p></div></div>
       <p><b>Lịch hẹn:</b> {Object.entries(summary.appointments || {}).map(([st, cnt]) => `${statusNames[st] || st}: ${cnt}`).join(' · ') || 'Chưa có dữ liệu'}</p>
       <p><b>Phản ánh, kiến nghị:</b> {Object.entries(summary.feedback || {}).map(([st, cnt]) => `${statusNames[st] || st}: ${cnt}`).join(' · ') || 'Chưa có dữ liệu'}</p>
     </section>}
     {canEdit && <>
-      <section className="panel"><h2>Lịch hẹn tại cơ quan ({appointments.length})</h2><button className="text-button" onClick={() => { setError(''); void load().catch(cause => setError(String(cause))) }}>Tải lại danh sách</button>
+      <section className="panel"><div className="panel-title"><div><h2>Lịch hẹn tại cơ quan ({appointments.length})</h2><p>Xác nhận lịch hẹn, ghi nhận công dân đến quầy và kết quả hướng dẫn.</p></div><button className="button secondary" onClick={() => { setError(''); void load().catch(cause => setError(String(cause))) }}>↻ Tải lại danh sách</button></div>
         <div className="sandbox-payment-list">{appointments.map(record => <DeskRecordRow key={record.code} record={record} appointment canEdit={canEdit} request={request} onChanged={load} />)}</div>
-        {!appointments.length && <p>Chưa có lịch hẹn trong phạm vi được cấp.</p>}
+        {!appointments.length && <div className="empty-state compact-empty">Chưa có lịch hẹn trong phạm vi được cấp.</div>}
       </section>
-      <section className="panel"><h2>Phản ánh, kiến nghị gửi đến cơ quan ({feedback.length})</h2>
+      <section className="panel"><div className="panel-title"><div><h2>Phản ánh, kiến nghị gửi đến cơ quan ({feedback.length})</h2><p>Tiếp nhận và phản hồi kiến nghị của người dân, tổ chức thuộc thẩm quyền cơ quan.</p></div></div>
         <div className="sandbox-payment-list">{feedback.map(record => <DeskRecordRow key={record.code} record={record} appointment={false} canEdit={canEdit} request={request} onChanged={load} />)}</div>
-        {!feedback.length && <p>Chưa có phản ánh trong phạm vi được cấp.</p>}
+        {!feedback.length && <div className="empty-state compact-empty">Chưa có phản ánh trong phạm vi được cấp.</div>}
       </section>
     </>}
   </>
 }
 
 export function PublicAdministrativeServices({ request }: { request: Request }) {
-  const [open, setOpen] = useState(false)
   const [kind, setKind] = useState('appointments')
   const [agencies, setAgencies] = useState<string[]>([])
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
-  const [record, setRecord] = useState<DeskRecord | null>(null)
   useEffect(() => {
-    if (!open) return
     void request<{ agencies: string[] }>('/api/public/agencies').then(r => setAgencies(r.agencies)).catch(cause => setError(String(cause)))
-  }, [open, request])
+  }, [request])
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const form = event.currentTarget
-    const values = Object.fromEntries(new FormData(form)); setBusy(true); setError(''); setNotice(''); setRecord(null)
+    const values = Object.fromEntries(new FormData(form)); setBusy(true); setError(''); setNotice('')
     try {
-      if (kind === 'lookup') {
-        const result = await request<{ record: DeskRecord }>('/api/public/service-lookup', values); setRecord(result.record)
-      } else {
-        const result = await request<{ code: string; queueNumber?: string | number; message: string }>(`/api/public/${kind}`, values)
-        const queueInfo = result.queueNumber ? ` Số thứ tự quầy: ${result.queueNumber}.` : ''
-        setNotice(`${result.message} Mã theo dõi: ${result.code}.${queueInfo} Giữ mã này cùng số điện thoại đã khai để tra cứu.`); form.reset()
-      }
+      const result = await request<{ code: string; queueNumber?: string | number; message: string }>(`/api/public/${kind}`, values)
+      const queueInfo = result.queueNumber ? ` Số thứ tự quầy: ${result.queueNumber}.` : ''
+      setNotice(`${result.message} Mã theo dõi: ${result.code}.${queueInfo} Giữ mã này để liên hệ cơ quan xử lý.`); form.reset()
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Chưa gửi được thông tin.') }
     finally { setBusy(false) }
   }
-  return <section className="portal-section"><details onToggle={event => setOpen(event.currentTarget.open)}><summary><b>Đặt lịch hẹn, gửi phản ánh và tra cứu kết quả</b></summary>
-    {open && <div className="panel"><div className="form-actions">{[['appointments', 'Đặt lịch hẹn'], ['pakn', 'Gửi phản ánh'], ['lookup', 'Tra cứu']].map(([value, label]) => <button type="button" className={`button ${kind === value ? 'primary' : 'secondary'}`} key={value} onClick={() => { setKind(value); setNotice(''); setError(''); setRecord(null) }}>{label}</button>)}</div>
+  return <section className="citizen-service-card"><div className="panel"><div className="form-actions citizen-service-tabs" role="group" aria-label="Chọn tiện ích">{[['appointments', 'Đặt lịch hẹn'], ['pakn', 'Gửi phản ánh']].map(([value, label]) => <button type="button" className={`button ${kind === value ? 'primary' : 'secondary'}`} aria-pressed={kind === value} key={value} onClick={() => { setKind(value); setNotice(''); setError('') }}>{label}</button>)}</div>
       <form className="citizen-action-form" key={kind} onSubmit={submit}>
-        {kind === 'lookup' ? <label className="citizen-field">Mã lịch hẹn / phản ánh (LH-... hoặc PAKN-...)<input name="code" required maxLength={40} placeholder="Ví dụ: LH-2026-0001 hoặc PAKN-2026-0001" /></label> : <>
+        <>
           <label className="citizen-field">Họ và tên<input name="name" required minLength={2} maxLength={150} /></label>
           <label className="citizen-field">Cơ quan<select name="agency" required><option value="">Chọn cơ quan</option>{agencies.map(a => <option key={a}>{a}</option>)}</select></label>
-        </>}
+        </>
         <label className="citizen-field">Số điện thoại<input name="phone" type="tel" required minLength={8} maxLength={40} /></label>
         {kind === 'appointments' && <>
           <label className="citizen-field">Mã thủ tục<input name="procedureCode" required maxLength={40} placeholder="Mã thủ tục từ danh mục bên trên" /></label>
@@ -203,20 +195,9 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
           <label className="citizen-field">Nội dung cần hướng dẫn<textarea name="note" rows={3} maxLength={1000} /></label>
         </>}
         {kind === 'pakn' && <><label className="citizen-field">Email<input name="email" type="email" maxLength={254} /></label><label className="citizen-field">Tiêu đề<input name="title" required minLength={8} maxLength={180} /></label><label className="citizen-field">Nội dung<textarea name="content" required minLength={20} maxLength={4000} rows={5} /></label></>}
-        <button className="button primary" disabled={busy}>{busy ? 'Đang xử lý…' : kind === 'lookup' ? 'Tra cứu' : 'Gửi thông tin'}</button>
+        <button className="button primary" disabled={busy}>{busy ? 'Đang xử lý…' : 'Gửi thông tin'}</button>
       </form>
       {error && <p className="form-error" role="alert">{error}</p>}{notice && <p className="citizen-success" role="status">{notice}</p>}
-      {record && <article className="citizen-case-section">
-        <h3>{record.code} · {statusNames[record.status] || record.status}</h3>
-        <p><b>Cơ quan:</b> {record.agency}</p>
-        {(record.citizen_name || record.sender_name) && <p><b>Người gửi / Đặt lịch:</b> {record.citizen_name || record.sender_name}</p>}
-        {record.appointment_date && <p><b>Thời gian hẹn:</b> {record.appointment_date} · {record.time_slot}{record.queue_number ? ` (Số thứ tự: ${record.queue_number})` : ''}</p>}
-        {(record.procedure_code || record.procedure_name) && <p><b>Thủ tục:</b> {[record.procedure_code, record.procedure_name].filter(Boolean).join(' · ')}</p>}
-        {record.note && <p><b>Nội dung đăng ký:</b> {record.note}</p>}
-        {record.title && <p><b>Tiêu đề:</b> {record.title}{record.topic ? ` (${record.topic})` : ''}</p>}
-        {record.content && <p><b>Nội dung phản ánh:</b> {record.content}</p>}
-        <p><b>Kết quả xử lý / Ghi chú:</b> {record.reply || record.counter_note || 'Chưa có nội dung trả lời mới.'}{record.replied_by ? ` — ${record.replied_by}` : ''}{record.replied_at ? ` (${record.replied_at})` : ''}</p>
-      </article>}
-    </div>}
-  </details></section>
+      <p className="citizen-service-existing-track">Muốn xem tiến độ hồ sơ đã nộp? <a href="/tra-cuu-ho-so">Đến trang Tra cứu hồ sơ</a>.</p>
+    </div></section>
 }

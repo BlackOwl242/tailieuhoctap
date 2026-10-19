@@ -49,12 +49,13 @@ class Writer:
 
     def table(self, rows, widths):
         t = self.doc.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style='Table Grid'
         t.autofit=False
         self.place(t._tbl)
         pr=t._tbl.tblPr
         borders=OxmlElement('w:tblBorders')
         for edge in ('top','left','bottom','right','insideH','insideV'):
-            e=OxmlElement('w:'+edge);e.set(qn('w:val'),'single');e.set(qn('w:sz'),'4');e.set(qn('w:color'),'D9D9D9');borders.append(e)
+            e=OxmlElement('w:'+edge);e.set(qn('w:val'),'single');e.set(qn('w:sz'),'4');e.set(qn('w:color'),'000000');borders.append(e)
         pr.append(borders)
         for col,w in zip(t.columns,widths): col.width=Twips(w)
         for i,row in enumerate(t.rows):
@@ -63,7 +64,7 @@ class Writer:
             for j,cell in enumerate(row.cells):
                 cell.width=Twips(widths[j]);cell.text=str(rows[i][j]);cell.vertical_alignment=WD_CELL_VERTICAL_ALIGNMENT.CENTER
                 tcpr=cell._tc.get_or_add_tcPr()
-                sh=OxmlElement('w:shd');sh.set(qn('w:fill'),'203A63' if i==0 else 'F3F6FA' if i%2 else 'FFFFFF');tcpr.append(sh)
+                sh=OxmlElement('w:shd');sh.set(qn('w:fill'),'FFFFFF');tcpr.append(sh)
                 margins=OxmlElement('w:tcMar')
                 for edge in ('top','left','bottom','right'):
                     e=OxmlElement('w:'+edge);e.set(qn('w:w'),'85');e.set(qn('w:type'),'dxa');margins.append(e)
@@ -72,7 +73,7 @@ class Writer:
                     p.paragraph_format.first_line_indent=Twips(0);p.paragraph_format.space_before=Pt(2);p.paragraph_format.space_after=Pt(2);p.paragraph_format.line_spacing=1.05;p.paragraph_format.keep_with_next=False
                     p.alignment=WD_ALIGN_PARAGRAPH.CENTER if i==0 or (j==0 and len(cell.text)<10) else WD_ALIGN_PARAGRAPH.LEFT
                     for r in p.runs:
-                        r.font.name='Times New Roman';r.font.size=Pt(11);r.bold=i==0;r.font.color.rgb=RGBColor(255,255,255) if i==0 else RGBColor(0,0,0)
+                        r.font.name='Times New Roman';r.font.size=Pt(11);r.bold=i==0;r.font.color.rgb=RGBColor(0,0,0)
         return t
 
     def section_break(self, properties):
@@ -99,8 +100,8 @@ def add_ui_section(doc, anchor=None):
     w.caption('Bảng','4',11,'Trạng thái và kiểm soát tin tức')
     w.table([['Trạng thái hoặc thao tác','Người thực hiện','Kết quả'],*CMS_ROWS],[2250,1800,5022])
     w.p(f'Các hình dưới đây minh họa giao diện ứng dụng do em xây dựng, được chụp ngày {DATE}. Số liệu xuất hiện trong ảnh thuộc cơ sở dữ liệu của ứng dụng.')
-    order=[1,2,17,18,19,42,43,44,45,20,21,22,12,3,4,5,30,6,37,38,39,40,8,10,11,15,16,31,7,32,33,34,9,35,13,14,36,41,23,24,25,26,27,28,29]
-    by_num={int(r['file'].split('_')[0]):r for r in captures}
+    order=list(range(1,46))
+    by_num={i+1:r for i,r in enumerate(captures)}
     captions=[]
     for i,n in enumerate(order):
         record=by_num[n];file=ROOT/'03_Thiet_ke/Anh_giao_dien_he_thong'/record['file']
