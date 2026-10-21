@@ -97,7 +97,7 @@ c.line([(1550,320),(1550,475),(450,475),(450,650)],arrow=True);c.text(930,500,'2
 c.line([(1550,320),(1550,650)],arrow=True);c.text(1775,360,'3. Lưu bản phát hành, nhật ký và thông điệp cùng giao dịch',380,size=36,background=True)
 c.text(1000,940,'4. Chỉ sau khi lưu thành công, tiến trình nền lấy thông điệp để gửi.',1840,size=36,background=True);c.text(1000,1060,'Thứ tự thông điệp được đánh số; liên kết biểu thị đối tượng trao đổi.',1840,size=36,background=True);c.save('cong_tac_phat_hanh')
 
-c=Canvas(2000,1050);c.text(1000,20,'Lớp phân tích của Use case tiếp nhận',1840,bold=True)
+c=Canvas(2000,1050);c.text(1000,20,'Lớp phân tích của use case tiếp nhận',1840,bold=True)
 labs=['«giao diện»\nManHinhTiepNhan\n+ guiLenh()','«điều khiển»\nDieuKhienHoSo\n+ tiepNhan()','«thực thể»\nHoSo\n− phien_ban: SốNguyên\n+ tiepNhan()','KhoHoSo\n+ luuGiaoDich()']
 for i,lab in enumerate(labs):x=80+(i%2)*1040;y=130+(i//2)*500;c.box(x,y,780,300,lab)
 c.line([(860,280),(1120,280)],dash=True,arrow=True);c.line([(1510,430),(1510,560),(470,560),(470,630)],dash=True,arrow=True);c.line([(1510,430),(1510,630)],dash=True,arrow=True);c.save('lop_phan_tich_tiep_nhan')

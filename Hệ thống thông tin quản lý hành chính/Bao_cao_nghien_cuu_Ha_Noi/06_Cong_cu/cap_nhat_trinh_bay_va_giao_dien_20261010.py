@@ -125,7 +125,7 @@ def insert_local_ui_section(doc: Document) -> bool:
     scope._p.getparent().remove(scope._p)
     nodes.append(scope)
     boundary = doc.add_paragraph(
-        "Bàn cán bộ trong chương này là ứng dụng độc lập, không phải phần mềm tác nghiệp chính thức của Hà Nội. Ảnh cho thấy những màn hình đã dựng và một phần luồng đã chạy; các chức năng còn lại trong Use case vẫn là yêu cầu thiết kế. Ký số, thanh toán, phát hành kết quả, đồng bộ định danh và liên thông chưa được kết nối hoặc xác nhận trên môi trường thật."
+        "Bàn cán bộ trong chương này là ứng dụng độc lập, không phải phần mềm tác nghiệp chính thức của Hà Nội. Ảnh cho thấy những màn hình đã dựng và một phần luồng đã chạy; các chức năng còn lại trong use case vẫn là yêu cầu thiết kế. Ký số, thanh toán, phát hành kết quả, đồng bộ định danh và liên thông chưa được kết nối hoặc xác nhận trên môi trường thật."
     )
     boundary._p.getparent().remove(boundary._p)
     nodes.append(boundary)
@@ -216,7 +216,7 @@ def extend_front_matter(doc: Document) -> bool:
     ack_text = (
         "Em xin trân trọng cảm ơn giảng viên Hoàng Minh Ngọc đã hướng dẫn học phần Hệ thống thông tin quản lý hành chính và góp ý cách tiếp cận đề tài. Những nội dung về phân tích quy trình, mô hình hóa dữ liệu, trách nhiệm nghiệp vụ và tổ chức vận hành giúp em đặt bài toán phần mềm trong bối cảnh phục vụ người dân và cơ quan nhà nước.",
         "Em cảm ơn các cơ quan đã công khai văn bản, hướng dẫn thủ tục, thông tin về Trung tâm Phục vụ hành chính công Hà Nội và các trang dịch vụ trực tuyến. Việc đối chiếu nguồn giúp em phân biệt thông tin hiện hành, tư liệu lịch sử và nội dung cần xác minh thêm khi chưa được tiếp cận hệ thống nội bộ.",
-        "Trong quá trình thực hiện, em đã tổng hợp các nhánh dịch vụ, xây dựng 36 Use case, mô hình dữ liệu và phần mềm nghiên cứu cục bộ để minh họa giao diện cùng một số luồng xử lý. Đây là kết quả học tập để tiếp tục nhận góp ý; thiết kế và phần mềm chưa được cơ quan nghiệp vụ xác nhận hoặc kết nối vào hệ thống đang vận hành.",
+        "Trong quá trình thực hiện, em đã tổng hợp các nhánh dịch vụ, xây dựng 36 use case, mô hình dữ liệu và phần mềm nghiên cứu cục bộ để minh họa giao diện cùng một số luồng xử lý. Đây là kết quả học tập để tiếp tục nhận góp ý; thiết kế và phần mềm chưa được cơ quan nghiệp vụ xác nhận hoặc kết nối vào hệ thống đang vận hành.",
         "Em mong nhận được nhận xét của giảng viên về căn cứ, cách trình bày và những điểm cần khảo sát thêm. Em sẽ dùng các góp ý đó để sửa phần chưa rõ, bổ sung nguồn kiểm chứng và hoàn thiện thiết kế trong phạm vi dữ liệu được phép tiếp cận.",
     )
     pledge_text = (
@@ -347,7 +347,7 @@ def reorder_use_cases(doc: Document) -> bool:
     concurrent_heading.text = re.sub(r"^3\.\d+\.", "3.4.", concurrent_heading.text.strip(), count=1)
 
     h2_groups = make_heading(doc, "3.2. Phân nhóm mục tiêu nghiệp vụ", 2)
-    h2_cases = make_heading(doc, "3.3. Đặc tả 36 Use case theo mã", 2)
+    h2_cases = make_heading(doc, "3.3. Đặc tả 36 use case theo mã", 2)
     ordered = list(prelude) + [h2_groups._p]
     ordered += [node for _, block in sorted(groups) for node in block]
     ordered.append(h2_cases._p)
@@ -370,7 +370,7 @@ def image_target(caption: str, class_counts: defaultdict[int, int], class_names:
     elif activity:
         stem = f"UC{activity.group(1)}_hoat_dong"
     else:
-        group = re.search(r"Use Case nhóm (\d+)(?:, phần (\d+))?", caption, re.IGNORECASE)
+        group = re.search(r"use case nhóm (\d+)(?:, phần (\d+))?", caption, re.IGNORECASE)
         if group:
             stem = f"ca_su_dung_nhom_{group.group(1)}"
             if group.group(2):
@@ -385,7 +385,7 @@ def image_target(caption: str, class_counts: defaultdict[int, int], class_names:
             else:
                 fixed = {
                     "tổng quát hóa tác nhân cán bộ": "phan_cap_tac_nhan",
-                    "Biểu đồ Use Case tổng thể theo mục tiêu": "ca_su_dung_tong_the",
+                    "Biểu đồ use case tổng thể theo mục tiêu": "ca_su_dung_tong_the",
                     "Biểu đồ hoạt động phối hợp đồng thời trong UC15": "hoat_dong_phoi_hop_song_song",
                     "Biểu đồ lớp phân tích theo mô hình Boundary": "lop_phan_tich_tiep_nhan",
                     "Biểu đồ lớp miền cốt lõi quanh hồ sơ": "lop_mien_cot_loi",
@@ -473,7 +473,7 @@ def clean_and_label_uml_figures(doc: Document) -> tuple[int, int]:
             case_names[match.group(1)] = match.group(2)
     fixed = {
         "Phân cấp vai trò cán bộ": "Biểu đồ tổng quát hóa tác nhân cán bộ theo vai trò",
-        "Use case tổng thể theo mục tiêu": "Biểu đồ Use Case tổng thể theo mục tiêu",
+        "use case tổng thể theo mục tiêu": "Biểu đồ use case tổng thể theo mục tiêu",
         "Phân tách giao diện, điều khiển, thực thể và truy xuất": "Biểu đồ lớp phân tích theo mô hình Boundary–Control–Entity",
         "Quan hệ miền cốt lõi quanh hồ sơ": "Biểu đồ lớp miền cốt lõi quanh hồ sơ",
         "Các nhánh tiếp nhận và kết luận": "Biểu đồ trạng thái hồ sơ: các nhánh tiếp nhận và kết luận",
@@ -502,7 +502,7 @@ def clean_and_label_uml_figures(doc: Document) -> tuple[int, int]:
         label = None
         sequence = re.match(r"Tương tác một thao tác của UC(\d{2})", suffix)
         activity = re.match(r"Hoạt động một thao tác của UC(\d{2})", suffix)
-        group = re.match(r"Use Case nhóm (\d+)(, phần \d+)?", suffix, re.IGNORECASE)
+        group = re.match(r"use case nhóm (\d+)(, phần \d+)?", suffix, re.IGNORECASE)
         classes = re.match(r"Các lớp miền nhóm (\d+):\s*(.*)", suffix)
         if sequence:
             uc = sequence.group(1)
@@ -511,7 +511,7 @@ def clean_and_label_uml_figures(doc: Document) -> tuple[int, int]:
             uc = activity.group(1)
             label = f"Biểu đồ hoạt động UC{uc}: {case_names.get(uc, '')}".rstrip()
         elif group:
-            label = f"Biểu đồ Use Case nhóm {group.group(1)}{group.group(2) or ''}"
+            label = f"Biểu đồ use case nhóm {group.group(1)}{group.group(2) or ''}"
         elif classes:
             label = f"Biểu đồ lớp miền nhóm {classes.group(1)}: {classes.group(2)}"
         else:

@@ -9,8 +9,8 @@ export const normalizeAgency = (value: string) => value.toLocaleLowerCase('vi').
 // Keep the detail page and the first submission step on the same agency list.
 export function procedureAgencies(procedure: RoutedProcedure, agencies: string[]) {
   const observed = procedure.routing?.observedAuthorities || []
-  const communeAgencies = ['2.000908', '2.000635'].includes(procedure.code)
-    ? agencies.filter(agency => /^(ubnd\s+(phường|xã)\s+|sở\s+tư\s+pháp)/i.test(agency)) : []
+  const communeAgencies = procedure.code === '2.000908'
+    ? agencies.filter(agency => /^ubnd\s+(phường|xã)\s+/i.test(agency)) : []
   return [...new Set([
     ...observed.map(item => item.authority), ...communeAgencies,
     ...(!observed.length && !communeAgencies.length && procedure.agency ? [procedure.agency] : []),

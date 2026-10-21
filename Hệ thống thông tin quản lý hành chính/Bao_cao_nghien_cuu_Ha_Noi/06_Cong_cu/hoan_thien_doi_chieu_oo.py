@@ -35,15 +35,15 @@ Ngày 02/10/2026. Mẫu phương pháp: PTTK_OOP_HR.docx; mẫu trình bày: Bao
 
 ## Kết luận đối với bản cũ
 
-Chưa đạt yêu cầu phân tích hướng đối tượng. Có 22 hình thực tế, không phải 45; số cũ tính lặp danh mục hình. Bảy Use case chưa bao phủ 31 chức năng. Hình Use case chỉ có bốn ca; hình trình tự chưa có đường sống; sơ đồ quan hệ dữ liệu không thay cho biểu đồ lớp. Nhánh bổ sung chưa trở về đúng giai đoạn, các nhánh kết thúc chưa được nối đầy đủ. 678 kiểm tra định dạng không chứng minh nội dung hướng đối tượng đúng và đủ.
+Chưa đạt yêu cầu phân tích hướng đối tượng. Có 22 hình thực tế, không phải 45; số cũ tính lặp danh mục hình. Bảy use case chưa bao phủ 31 chức năng. Hình use case chỉ có bốn ca; hình trình tự chưa có đường sống; sơ đồ quan hệ dữ liệu không thay cho biểu đồ lớp. Nhánh bổ sung chưa trở về đúng giai đoạn, các nhánh kết thúc chưa được nối đầy đủ. 678 kiểm tra định dạng không chứng minh nội dung hướng đối tượng đúng và đủ.
 
 ## Đối chiếu mẫu
 
-Đếm trực tiếp: 47 trình tự, 47 hoạt động, 12 lớp, 5 trạng thái, 11 Use case, một tác nhân, một gói, một thành phần, hai cơ sở dữ liệu và bốn tổ chức. Tổng 131 ảnh có chú thích. Mục cộng tác chỉ có mô tả, không có hình tương ứng. Bản mới bổ sung cộng tác và triển khai; không sao chép lỗi thống kê của mẫu.
+Đếm trực tiếp: 47 trình tự, 47 hoạt động, 12 lớp, 5 trạng thái, 11 use case, một tác nhân, một gói, một thành phần, hai cơ sở dữ liệu và bốn tổ chức. Tổng 131 ảnh có chú thích. Mục cộng tác chỉ có mô tả, không có hình tương ứng. Bản mới bổ sung cộng tác và triển khai; không sao chép lỗi thống kê của mẫu.
 
 ## Phạm vi bản bổ sung
 
-36 Use case, 36 hướng dẫn chức năng, 36 màn hình đề xuất, 36 trình tự, 36 hoạt động theo ca, một hoạt động phối hợp. Có Use case tổng thể và từng nhóm, 35 lớp miền, 62 quan hệ, lớp phân tích và lớp cốt lõi. Có 12 trạng thái hồ sơ, 18 chuyển bước, sáu vòng đời đối tượng; gói, thành phần, cộng tác và triển khai được tách. Hợp đồng 36 thao tác có thêm chín lệnh phân pha để phân tách người yêu cầu, cán bộ, người ký và văn thư.
+36 use case, 36 hướng dẫn chức năng, 36 màn hình đề xuất, 36 trình tự, 36 hoạt động theo ca, một hoạt động phối hợp. Có use case tổng thể và từng nhóm, 35 lớp miền, 62 quan hệ, lớp phân tích và lớp cốt lõi. Có 12 trạng thái hồ sơ, 18 chuyển bước, sáu vòng đời đối tượng; gói, thành phần, cộng tác và triển khai được tách. Hợp đồng 36 thao tác có thêm chín lệnh phân pha để phân tách người yêu cầu, cán bộ, người ký và văn thư.
 
 11 kiểm tra dữ liệu mô hình đã chạy; kết quả được lưu trong Ket_qua_kiem_tra_mo_hinh.json. Đây là kiểm tra dữ liệu thiết kế. 168 ca kiểm thử phần mềm đều chưa thực hiện. Kiểm tra hình bằng mắt và kiểm tra bản kết xuất được ghi riêng; không coi phép đếm hình là kiểm tra ký pháp đạt 100%.
 

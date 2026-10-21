@@ -265,7 +265,8 @@
       "Trực tiếp",
       "Bưu chính"
     ],
-    "deliveryNote": "Lựa chọn nhận kết quả là yêu cầu của người nộp; cơ quan xác nhận phương thức phù hợp với dữ liệu được cung cấp."
+    "deliveryNote": "Lựa chọn nhận kết quả là yêu cầu của người nộp; cơ quan xác nhận phương thức phù hợp với dữ liệu được cung cấp.",
+    "sourceStatus": "reviewed-interactive"
   },
   "2.000908": {
     "version": "2.000908-858-2026-v1",
@@ -385,7 +386,8 @@
       "Trực tiếp",
       "Bưu chính"
     ],
-    "deliveryNote": "Bản sao phải được cấp từ sổ gốc. Hình thức trả bản điện tử cần được cơ quan xác nhận; ứng dụng chưa ký số hoặc phát hành bản sao có giá trị pháp lý."
+    "deliveryNote": "Bản sao phải được cấp từ sổ gốc. Hình thức trả bản điện tử cần được cơ quan xác nhận; ứng dụng chưa ký số hoặc phát hành bản sao có giá trị pháp lý.",
+    "sourceStatus": "reviewed-interactive"
   },
   "1.012531": {
     "version": "dvcqg-019d2bfa-675f-7649-b8b2-b92e5c359abf-1778459897418",

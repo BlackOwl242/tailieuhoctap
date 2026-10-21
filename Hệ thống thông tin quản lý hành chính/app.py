@@ -18,6 +18,7 @@ import sys
 import threading
 import traceback
 import workflow_extensions
+import procedure_workflows as workflows
 from procedure_details import published_procedure_detail, published_template, download_published_template
 import uuid
 from time import monotonic
@@ -214,352 +215,18 @@ class RateLimitError(Exception):
     pass
 
 
-def _specialized_fields_for_procedure(proc: dict) -> list[dict]:
-    field_text = f"{proc.get('field', '')} {proc.get('name', '')} {proc.get('agency', '')}".casefold()
-    if any(k in field_text for k in ("hộ tịch", "khai sinh", "kết hôn", "khai tử", "nhận cha", "nuôi con nuôi", "quốc tịch", "chứng thực")):
-        return [
-            {"id": "subjectFullName", "label": "Họ, chữ đệm và tên người được đăng ký / cấp giấy tờ hộ tịch", "type": "text", "required": True, "maxLength": 150},
-            {"id": "subjectBirthDate", "label": "Ngày, tháng, năm sinh của người được khai", "type": "date", "required": True},
-            {"id": "subjectGender", "label": "Giới tính", "type": "select", "required": True, "options": ["Nam", "Nữ"]},
-            {"id": "applicantRelation", "label": "Quan hệ của người nộp với người được đăng ký", "type": "select", "required": True, "options": ["Bản thân", "Cha / Mẹ đẻ", "Vợ / Chồng", "Con", "Người giám hộ / Người đại diện theo pháp luật", "Người được ủy quyền hợp pháp"]},
-            {"id": "civilRegistryPlace", "label": "Nơi đăng ký hộ tịch trước đây / Số quyển, số trang sổ gốc (nếu có)", "type": "text", "required": False, "maxLength": 250},
-        ]
-    if any(k in field_text for k in ("đất đai", "thửa đất", "quyền sử dụng đất", "bản đồ", "nhà ở", "bất động sản")):
-        return [
-            {"id": "landParcelNumber", "label": "Số hiệu thửa đất", "type": "text", "required": True, "maxLength": 80},
-            {"id": "mapSheetNumber", "label": "Số tờ bản đồ địa chính", "type": "text", "required": True, "maxLength": 80},
-            {"id": "landArea", "label": "Diện tích sử dụng đất / diện tích sàn (m²)", "type": "text", "required": True, "maxLength": 80},
-            {"id": "landAddress", "label": "Địa chỉ thửa đất / khu đất / nhà ở tại Hà Nội", "type": "text", "required": True, "maxLength": 300},
-            {"id": "landUsePurpose", "label": "Loại đất / Mục đích sử dụng đất", "type": "select", "required": True, "options": ["Đất ở tại đô thị (ODT)", "Đất ở tại nông thôn (ONT)", "Đất thương mại, dịch vụ (TMD)", "Đất cơ sở sản xuất phi nông nghiệp (SKC)", "Đất nông nghiệp / Lâm nghiệp / Thủy sản", "Đất sử dụng hỗn hợp / Công cộng"]},
-            {"id": "certificateNumber", "label": "Số phát hành Giấy chứng nhận (Sổ đỏ/Sổ hồng) hoặc Quyết định giao đất (nếu có)", "type": "text", "required": False, "maxLength": 150},
-        ]
-    if any(k in field_text for k in ("xây dựng", "quy hoạch", "kiến trúc", "công trình", "hạ tầng kỹ thuật")):
-        return [
-            {"id": "projectName", "label": "Tên công trình / Dự án đầu tư xây dựng", "type": "text", "required": True, "maxLength": 250},
-            {"id": "constructionLocation", "label": "Địa điểm xây dựng (Số nhà, đường/phố, phường/xã, Hà Nội)", "type": "text", "required": True, "maxLength": 300},
-            {"id": "constructionGrade", "label": "Loại và cấp công trình xây dựng", "type": "select", "required": True, "options": ["Nhà ở riêng lẻ", "Công trình dân dụng (Cấp I - IV)", "Công trình công nghiệp", "Công trình hạ tầng kỹ thuật đô thị", "Công trình giao thông / Nông nghiệp và PTNT"]},
-            {"id": "constructionScale", "label": "Quy mô công trình (Diện tích xây dựng, tổng diện tích sàn, số tầng, chiều cao)", "type": "text", "required": True, "maxLength": 250},
-            {"id": "designUnit", "label": "Đơn vị tư vấn khảo sát, thiết kế / Chủ nhiệm thiết kế (nếu có)", "type": "text", "required": False, "maxLength": 200},
-        ]
-    if any(k in field_text for k in ("đường bộ", "hàng hải", "đường thủy", "vận tải", "phương tiện", "giao thông", "sát hạch", "lái xe")):
-        return [
-            {"id": "vehicleCategory", "label": "Nhóm phương tiện / Loại hình kinh doanh vận tải", "type": "select", "required": True, "options": ["Phương tiện vận tải đường bộ (Ô tô kinh doanh vận tải)", "Phương tiện thủy nội địa / Tàu biển", "Đơn vị kinh doanh vận tải hành khách / hàng hóa", "Kết cấu hạ tầng giao thông / Bến xe / Bến thủy nội địa"]},
-            {"id": "licensePlateOrRegNo", "label": "Biển kiểm soát / Số đăng ký phương tiện / Số giấy phép (nếu có)", "type": "text", "required": True, "maxLength": 120},
-            {"id": "operatingRouteOrScope", "label": "Tuyến khai thác / Phạm vi hoạt động / Vùng hoạt động", "type": "text", "required": True, "maxLength": 250},
-            {"id": "vehicleCountOrTonnage", "label": "Số lượng phương tiện / Trọng tải / Số chỗ ngồi (nếu có)", "type": "text", "required": False, "maxLength": 120},
-        ]
-    if any(k in field_text for k in ("khám bệnh", "chữa bệnh", "y tế", "dược", "mỹ phẩm", "phòng bệnh", "an toàn thực phẩm", "trang thiết bị y tế")):
-        return [
-            {"id": "medicalFacilityName", "label": "Tên cơ sở khám chữa bệnh / Cơ sở dược / Cơ sở thực phẩm", "type": "text", "required": True, "maxLength": 250},
-            {"id": "practiceAddress", "label": "Địa điểm hoạt động của cơ sở tại Hà Nội", "type": "text", "required": True, "maxLength": 300},
-            {"id": "professionalManager", "label": "Họ và tên người chịu trách nhiệm chuyên môn kỹ thuật", "type": "text", "required": True, "maxLength": 150},
-            {"id": "practiceCertificateNo", "label": "Số chứng chỉ hành nghề / Giấy phép hoạt động đã cấp (nếu có)", "type": "text", "required": False, "maxLength": 120},
-            {"id": "medicalScope", "label": "Hình thức tổ chức và phạm vi hoạt động chuyên môn đề nghị", "type": "text", "required": True, "maxLength": 300},
-        ]
-    if any(k in field_text for k in ("giáo dục", "đào tạo", "trường", "học sinh", "sinh viên", "văn bằng", "dạy nghề")):
-        return [
-            {"id": "eduInstitutionName", "label": "Tên cơ sở giáo dục / Trung tâm đào tạo / Đơn vị đề nghị", "type": "text", "required": True, "maxLength": 250},
-            {"id": "eduLevelOrType", "label": "Cấp học / Loại hình hoạt động giáo dục", "type": "select", "required": True, "options": ["Giáo dục mầm non / Tiểu học / THCS / THPT", "Trung tâm ngoại ngữ, tin học, bồi dưỡng kỹ năng", "Tư vấn du học / Liên kết đào tạo với nước ngoài", "Giáo dục nghề nghiệp / Đào tạo thường xuyên"]},
-            {"id": "eduLocation", "label": "Địa điểm đặt trụ sở / Địa điểm tổ chức đào tạo", "type": "text", "required": True, "maxLength": 300},
-            {"id": "trainingScale", "label": "Quy mô đào tạo / Chương trình học hoặc thông tin văn bằng, chứng chỉ", "type": "text", "required": False, "maxLength": 250},
-        ]
-    if any(k in field_text for k in ("khoa học", "công nghệ", "sở hữu trí tuệ", "tiêu chuẩn", "đo lường", "tần số", "viễn thông", "bức xạ", "hạt nhân")):
-        return [
-            {"id": "techObjectName", "label": "Tên đề tài / Phương tiện đo / Thiết bị bức xạ / Tần số / Đối tượng đăng ký", "type": "text", "required": True, "maxLength": 250},
-            {"id": "techCategory", "label": "Phân nhóm chuyên ngành Khoa học & Công nghệ", "type": "select", "required": True, "options": ["Hoạt động khoa học, công nghệ và đổi mới sáng tạo", "Tiêu chuẩn, đo lường, chất lượng sản phẩm hàng hóa", "An toàn bức xạ và hạt nhân", "Sở hữu công nghiệp / Chuyển giao công nghệ", "Tần số vô tuyến điện / Viễn thông và Internet"]},
-            {"id": "techSpecification", "label": "Ký hiệu, số seri, thông số kỹ thuật hoặc mã số hồ sơ", "type": "text", "required": True, "maxLength": 250},
-            {"id": "techUsageScope", "label": "Phạm vi ứng dụng / Địa điểm lắp đặt, vận hành thiết bị", "type": "text", "required": True, "maxLength": 250},
-        ]
-    if any(k in field_text for k in ("luật sư", "công chứng", "đấu giá", "thừa phát lại", "giám định tư pháp", "trọng tài", "hòa giải", "tư pháp")):
-        return [
-            {"id": "legalPracticeOrg", "label": "Tên tổ chức hành nghề (Văn phòng luật sư / Công chứng / Đấu giá / Giám định)", "type": "text", "required": True, "maxLength": 250},
-            {"id": "legalPracticeType", "label": "Lĩnh vực bổ trợ tư pháp / Hành chính tư pháp", "type": "select", "required": True, "options": ["Hành nghề Luật sư / Tư vấn pháp luật", "Hành nghề Công chứng", "Đấu giá tài sản / Quản tài viên", "Thừa phát lại / Giám định tư pháp / Hòa giải thương mại"]},
-            {"id": "practitionerInfo", "label": "Họ tên, số Chứng chỉ hành nghề / Thẻ hành nghề của người đề nghị", "type": "text", "required": True, "maxLength": 200},
-        ]
-    if any(k in field_text for k in ("người có công", "bảo trợ", "việc làm", "lao động", "tiền lương", "an toàn lao động", "nội vụ", "tín ngưỡng", "tôn giáo", "thi đua", "khen thưởng")):
-        return [
-            {"id": "beneficiaryOrOrgName", "label": "Họ tên đối tượng hưởng chính sách / Người lao động / Tổ chức liên quan", "type": "text", "required": True, "maxLength": 200},
-            {"id": "policyCategory", "label": "Nhóm chế độ, chính sách / Lĩnh vực giải quyết", "type": "select", "required": True, "options": ["Chính sách đối với người có công với cách mạng và thân nhân", "Lao động, việc làm, an toàn vệ sinh lao động / Người lao động nước ngoài", "Bảo trợ xã hội / Trẻ em / Phòng, chống tệ nạn xã hội", "Tổ chức bộ máy, công chức, viên chức, thi đua - khen thưởng", "Tín ngưỡng, tôn giáo và dân tộc"]},
-            {"id": "localityOrUnit", "label": "Đơn vị, địa phương quản lý hồ sơ hoặc nơi cư trú/làm việc", "type": "text", "required": True, "maxLength": 250},
-        ]
-    if any(k in field_text for k in ("văn hóa", "thể thao", "du lịch", "di sản", "lữ hành", "lưu trú", "quảng cáo", "xuất bản", "báo chí", "nghệ thuật", "điện ảnh")):
-        return [
-            {"id": "culturalEventOrFacility", "label": "Tên chương trình, sự kiện, di tích, cơ sở lưu trú/lữ hành hoặc ấn phẩm", "type": "text", "required": True, "maxLength": 250},
-            {"id": "culturalCategory", "label": "Loại hình hoạt động Văn hóa, Thể thao & Du lịch", "type": "select", "required": True, "options": ["Nghệ thuật biểu diễn / Điện ảnh / Mỹ thuật, nhiếp ảnh, triển lãm", "Quảng cáo / Xuất bản, in, phát hành / Báo chí", "Bảo tồn di sản văn hóa / Lễ hội / Văn hóa cơ sở", "Thể dục thể thao quần chúng và thể thao thành tích cao", "Lữ hành, hướng dẫn viên, cơ sở lưu trú du lịch"]},
-            {"id": "eventTimeAndVenue", "label": "Thời gian và địa điểm tổ chức / Địa điểm kinh doanh tại Hà Nội", "type": "text", "required": True, "maxLength": 250},
-        ]
-    if any(k in field_text for k in ("môi trường", "tài nguyên nước", "khoáng sản", "địa chất", "lâm nghiệp", "thủy lợi", "thú y", "chăn nuôi", "trồng trọt", "thủy sản", "nông nghiệp")):
-        return [
-            {"id": "resourceProjectName", "label": "Tên dự án, cơ sở sản xuất hoặc khu vực khai thác/canh tác", "type": "text", "required": True, "maxLength": 250},
-            {"id": "resourceCategory", "label": "Phân nhóm Nông nghiệp, Tài nguyên & Môi trường", "type": "select", "required": True, "options": ["Bảo vệ môi trường / Giấy phép môi trường / Chất thải", "Tài nguyên nước / Khí tượng thủy văn", "Địa chất và khoáng sản", "Trồng trọt, bảo vệ thực vật, chăn nuôi, thú y, thủy sản", "Lâm nghiệp, kiểm lâm, thủy lợi và phòng chống thiên tai"]},
-            {"id": "resourceLocation", "label": "Địa điểm thực hiện dự án / cơ sở (Phường/Xã, Thành phố Hà Nội)", "type": "text", "required": True, "maxLength": 300},
-            {"id": "resourceCapacity", "label": "Quy mô, công suất, lưu lượng hoặc diện tích thực hiện", "type": "text", "required": True, "maxLength": 200},
-        ]
-    return [
-        {"id": "businessFacilityName", "label": "Tên doanh nghiệp / Hợp tác xã / Cơ sở kinh doanh / Dự án", "type": "text", "required": True, "maxLength": 250},
-        {"id": "businessLocation", "label": "Địa điểm hoạt động kinh doanh / Thực hiện dự án tại Hà Nội", "type": "text", "required": True, "maxLength": 300},
-        {"id": "businessLine", "label": "Ngành nghề, mặt hàng kinh doanh hoặc nội dung chuyên ngành đề nghị cấp phép", "type": "text", "required": True, "maxLength": 250},
-        {"id": "businessScaleOrCapital", "label": "Quy mô công suất / Sản lượng / Vốn đầu tư đăng ký (nếu có)", "type": "text", "required": False, "maxLength": 200},
-    ]
-
-
-def default_submission_fields(proc: dict | None = None) -> list[dict]:
-    proc = proc or {}
-    proc_name = proc.get("name", "thủ tục hành chính")
-    base_fields = [
-        {
-            "id": "submissionRole",
-            "label": "Hình thức nộp hồ sơ",
-            "type": "select",
-            "required": True,
-            "options": ["Tự nộp", "Nộp thay theo ủy quyền"],
-            "help": "Chọn 'Tự nộp' nếu trực tiếp đứng tên hồ sơ, hoặc 'Nộp thay theo ủy quyền' nếu được chủ hồ sơ ủy quyền.",
-        },
-        {
-            "id": "submitterName",
-            "label": "Họ và tên người được ủy quyền nộp thay",
-            "type": "text",
-            "required": True,
-            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
-        },
-        {
-            "id": "submitterIdentity",
-            "label": "Số Căn cước / Định danh cá nhân của người nộp thay",
-            "type": "text",
-            "required": True,
-            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
-        },
-        {
-            "id": "submitterPhone",
-            "label": "Số điện thoại người nộp thay (nếu có)",
-            "type": "tel",
-            "required": False,
-            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
-        },
-        {
-            "id": "submitterAddress",
-            "label": "Địa chỉ liên hệ của người nộp thay",
-            "type": "text",
-            "required": True,
-            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
-        },
-        {
-            "id": "address",
-            "label": "Địa chỉ thường trú / Nơi ở hiện tại (hoặc địa chỉ trụ sở chính của tổ chức)",
-            "type": "text",
-            "required": True,
-            "maxLength": 300,
-        },
-        {
-            "id": "identityType",
-            "label": "Loại giấy tờ định danh của người đứng tên",
-            "type": "select",
-            "required": True,
-            "options": [
-                "Thẻ căn cước công dân",
-                "Thẻ căn cước",
-                "Định danh điện tử VNeID mức độ 2",
-                "Hộ chiếu",
-                "Giấy chứng nhận căn cước",
-            ],
-            "applicantTypes": ["citizen"],
-        },
-        {
-            "id": "identityNumber",
-            "label": "Số Căn cước / Số định danh cá nhân / Số Hộ chiếu",
-            "type": "text",
-            "required": True,
-            "maxLength": 40,
-            "applicantTypes": ["citizen"],
-        },
-        {
-            "id": "identityIssueDate",
-            "label": "Ngày cấp giấy tờ định danh (nếu có)",
-            "type": "date",
-            "required": False,
-            "applicantTypes": ["citizen"],
-        },
-        {
-            "id": "identityIssuePlace",
-            "label": "Cơ quan cấp giấy tờ định danh (nếu có)",
-            "type": "text",
-            "required": False,
-            "maxLength": 180,
-            "applicantTypes": ["citizen"],
-        },
-        {
-            "id": "organizationCode",
-            "label": "Mã số doanh nghiệp / Mã số thuế / Số quyết định thành lập",
-            "type": "text",
-            "required": True,
-            "maxLength": 60,
-            "applicantTypes": ["organization"],
-        },
-        {
-            "id": "representative",
-            "label": "Họ và tên người đại diện theo pháp luật / Người ký văn bản",
-            "type": "text",
-            "required": True,
-            "maxLength": 150,
-            "applicantTypes": ["organization"],
-        },
-        {
-            "id": "representativeTitle",
-            "label": "Chức vụ của người đại diện (nếu có)",
-            "type": "text",
-            "required": False,
-            "maxLength": 120,
-            "applicantTypes": ["organization"],
-        },
-        {
-            "id": "requestType",
-            "label": "Loại yêu cầu giải quyết thủ tục",
-            "type": "select",
-            "required": True,
-            "options": [
-                "Cấp mới / Đăng ký lần đầu",
-                "Cấp lại / Cấp đổi",
-                "Điều chỉnh / Sửa đổi, bổ sung / Gia hạn",
-                "Thẩm định / Phê duyệt / Công nhận / Xác nhận",
-                "Chấm dứt hiệu lực / Thu hồi / Hủy bỏ theo đề nghị",
-            ],
-        },
-    ]
-    specialized = _specialized_fields_for_procedure(proc)
-    closing_fields = [
-        {
-            "id": "verificationMethod",
-            "label": "Hình thức xuất trình, đối chiếu hồ sơ gốc và xác thực thông tin",
-            "type": "select",
-            "required": True,
-            "options": [
-                "Sử dụng văn bản điện tử / bản sao điện tử có ký số hợp lệ",
-                "Khai thác dữ liệu từ Cơ sở dữ liệu quốc gia về dân cư và cơ sở dữ liệu chuyên ngành",
-                "Xuất trình bản chính để đối chiếu khi nhận kết quả tại Bộ phận Một cửa",
-                "Gửi kèm bản sao có chứng thực qua dịch vụ bưu chính công ích",
-            ],
-        },
-        {
-            "id": "requestContent",
-            "label": "Nội dung đề nghị giải quyết chi tiết",
-            "type": "textarea",
-            "required": True,
-            "maxLength": 2000,
-            "help": f"Kê khai cụ thể nội dung đề nghị giải quyết đối với thủ tục: {proc_name}.",
-        },
-        {
-            "id": "relatedDocumentsInfo",
-            "label": "Số hiệu, ngày cấp giấy phép/văn bản đã được cấp trước đây hoặc ghi chú bổ sung (nếu có)",
-            "type": "textarea",
-            "required": False,
-            "maxLength": 1500,
-            "help": "Ghi thông tin số giấy phép cũ, số quyết định hoặc thông tin đối chiếu chuyên ngành (nếu có).",
-        },
-    ]
-    return base_fields + specialized + closing_fields
-
-
-def default_submission_documents(proc: dict | None = None) -> list[dict]:
-    proc_name = (proc or {}).get("name", "thủ tục hành chính")
-    return [
-        {
-            "id": "mainApplication",
-            "label": f"Tờ khai / Đơn đề nghị giải quyết: {proc_name}",
-            "required": False,
-            "help": "Bản chính hoặc bản điện tử (PDF, PNG, JPG, JPEG). Nếu đã kê khai đầy đủ trên tờ khai điện tử ở Bước 3, có thể đính kèm bản ký số hoặc bản chụp tờ khai giấy (nếu có).",
-        },
-        {
-            "id": "legalIdentityDoc",
-            "label": "Bản sao/bản chụp Căn cước công dân hoặc Giấy chứng nhận đăng ký doanh nghiệp/tổ chức",
-            "required": False,
-            "help": "Đính kèm để đối chiếu thông tin chủ hồ sơ.",
-        },
-        {
-            "id": "specializedDocs",
-            "label": "Hồ sơ, giấy tờ chuyên ngành kèm theo quy định của thủ tục",
-            "required": False,
-            "help": "Đính kèm các văn bản, giấy phép, bản vẽ, chứng chỉ hoặc tài liệu liên quan theo thành phần hồ sơ công bố.",
-        },
-        {
-            "id": "authorizationDoc",
-            "label": "Giấy ủy quyền / Văn bản cử người đại diện nộp hồ sơ (trường hợp nộp thay)",
-            "required": False,
-            "when": {"field": "submissionRole", "equals": "Nộp thay theo ủy quyền"},
-            "help": "Đính kèm văn bản ủy quyền hợp lệ khi thực hiện nộp hồ sơ thay chủ thể đứng tên.",
-        },
-    ]
-
-
 def ensure_procedure_submission(proc: dict) -> None:
-    mode = proc.get("serviceMode") or {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}.get(proc.get("level", ""), "UNKNOWN")
-    proc["serviceMode"] = mode
-    if mode in {"INFORMATION", "UNKNOWN"}:
+    """Keep reference documents visible; enable intake only for reviewed form/workflow pairs."""
+    proc["serviceMode"] = proc.get("serviceMode") or {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}.get(proc.get("level", ""), "UNKNOWN")
+    profile = workflows.configured_profile(proc)
+    proc["submissionEnabled"] = bool(profile)
+    proc["workflowSummary"] = ({"version": profile["version"], "title": profile["title"], "stages": profile["stages"],
+                                "authority": profile["authority"], "sourceUrl": profile["sourceUrl"], "checkedAt": profile["checkedAt"]} if profile else None)
+    proc["submissionDisabledReason"] = "" if profile else "Chưa mở tiếp nhận: tờ khai tương tác và quy trình của thủ tục chưa được đối chiếu đầy đủ. Vẫn có thể xem thông tin công bố và tải mẫu giấy tờ."
+    if proc["serviceMode"] in {"INFORMATION", "UNKNOWN"}:
         proc["submission"] = None
-        return
-    default_methods = ["Điện tử", "Trực tiếp", "Bưu chính"] if mode == "FULL" else ["Trực tiếp", "Bưu chính"]
-    default_note = (
-        "Thủ tục dịch vụ công trực tuyến toàn trình: hỗ trợ nhận kết quả bản điện tử, nhận trực tiếp tại Bộ phận Một cửa hoặc qua dịch vụ bưu chính công ích."
-        if mode == "FULL"
-        else "Thủ tục dịch vụ công trực tuyến một phần: nộp hồ sơ và theo dõi tiến độ trực tuyến; nhận kết quả trực tiếp tại Bộ phận Một cửa hoặc qua dịch vụ bưu chính công ích."
-    )
-    official_url = (proc.get("routing") or {}).get("officialUrl") or f"https://dichvucong.gov.vn/dvc-ket-qua-thu-tuc?keyword={quote(proc.get('name', proc['code']))}"
-    sub = proc.get("submission")
-    if isinstance(sub, dict):
-        sub = dict(sub)
-        if not sub.get("version"):
-            sub["version"] = f"{proc['code']}-hanoi-v1"
-        if not sub.get("title"):
-            sub["title"] = f"Tờ khai điện tử — {proc.get('name', proc['code'])}"
-        if not sub.get("sourceUrl"):
-            sub["sourceUrl"] = official_url
-        if not sub.get("legalBasis"):
-            sub["legalBasis"] = "Thực hiện theo Nghị định số 61/2018/NĐ-CP, Nghị định số 107/2021/NĐ-CP và Quyết định công bố thủ tục hành chính hiện hành của UBND Thành phố Hà Nội."
-        if not sub.get("deadlineText"):
-            sub["deadlineText"] = "Thời hạn giải quyết: Theo quy định tại Quyết định công bố thủ tục hành chính của UBND Thành phố Hà Nội."
-        if not sub.get("feeText"):
-            sub["feeText"] = "Phí, lệ phí: Theo quy định hiện hành của HĐND Thành phố Hà Nội và Bộ Tài chính (nếu có)."
-        if not sub.get("fields"):
-            sub["fields"] = default_submission_fields(proc)
-        if not sub.get("documents"):
-            sub["documents"] = default_submission_documents(proc)
-        # Imported document variants refer to officialCase. Keep their selector
-        # even when a previously configured form only retained declaration fields.
-        case_names = list(dict.fromkeys(
-            document["when"]["equals"] for document in sub["documents"]
-            if isinstance(document.get("when"), dict)
-            and document["when"].get("field") == "officialCase"
-            and document["when"].get("equals")
-        ))
-        if case_names and not any(field.get("id") == "officialCase" for field in sub["fields"]):
-            sub["fields"] = [{"id": "officialCase", "label": "Trường hợp thực hiện thủ tục",
-                              "type": "select", "required": True, "options": case_names,
-                              "help": "Chọn đúng trường hợp để hiển thị thành phần hồ sơ tương ứng."}, *sub["fields"]]
-        existing_methods = list(sub.get("deliveryMethods") or [])
-        for m in default_methods:
-            if m not in existing_methods:
-                existing_methods.append(m)
-        sub["deliveryMethods"] = existing_methods or default_methods
-        if not sub.get("deliveryNote") or "Ứng dụng không tự tải tệp mẫu" in str(sub.get("deliveryNote", "")):
-            sub["deliveryNote"] = default_note
-        if sub.get("sourceStatus") == "official-document-list-only":
-            sub["sourceStatus"] = "configured-with-official-documents"
-        elif not sub.get("sourceStatus"):
-            sub["sourceStatus"] = "configured"
-        proc["submission"] = sub
-    else:
-        proc["submission"] = {
-            "version": f"{proc['code']}-hanoi-v1",
-            "title": f"Tờ khai điện tử — {proc.get('name', proc['code'])}",
-            "sourceUrl": official_url,
-            "sourceStatus": "configured-standard",
-            "legalBasis": "Thực hiện theo Nghị định số 61/2018/NĐ-CP, Nghị định số 107/2021/NĐ-CP và Quyết định công bố thủ tục hành chính hiện hành của UBND Thành phố Hà Nội.",
-            "deadlineText": "Thời hạn giải quyết: Theo quy định tại Quyết định công bố thủ tục hành chính của UBND Thành phố Hà Nội (thông thường từ 03 đến 15 ngày làm việc tùy thủ tục).",
-            "feeText": "Phí, lệ phí: Theo mức thu quy định tại Nghị quyết của HĐND Thành phố Hà Nội hoặc Thông tư của Bộ Tài chính (nếu có).",
-            "fields": default_submission_fields(proc),
-            "documents": default_submission_documents(proc),
-            "deliveryMethods": default_methods,
-            "deliveryNote": default_note,
-        }
+    elif not profile and isinstance(proc.get("submission"), dict):
+        proc["submission"] = {**proc["submission"], "sourceStatus": "official-document-list-only", "fields": []}
 
 
 def load_catalog() -> list[dict]:
@@ -613,7 +280,7 @@ def load_catalog() -> list[dict]:
             proc["routing"] = {
                 "mode": "select-locality-and-authority",
                 "status": "catalog-reference-only",
-                "summary": "Tên và cơ quan trong danh mục là dữ liệu tham chiếu. Đã kích hoạt tờ khai điện tử chuẩn hóa theo mức dịch vụ công bố của thủ tục.",
+                "summary": "Tên và cơ quan trong danh mục là dữ liệu tham chiếu; mức dịch vụ không tự cho phép tiếp nhận khi chưa có cấu hình tờ khai và quy trình đã đối chiếu.",
                 "officialUrl": "https://dichvucong.gov.vn/dvc-dich-vu-cong-truc-tuyen",
             }
     forms_path = ROOT / "procedure_forms.json"
@@ -1081,19 +748,19 @@ def procedure_for(code: str) -> dict:
     }
 
 
-def compute_deadline(procedure_code: str, accepted_at: datetime) -> tuple[str | None, str | None]:
-    """Only calculate a legal-style deadline where the supplied research defines it."""
-    if procedure_code != "2.000908":
-        if procedure_code == "1.004237":
-            return None, "05 ngày làm việc áp dụng cho kiểm tra yêu cầu và thông báo nghĩa vụ tài chính, không phải hạn trả dữ liệu."
-        return None, "Chưa cấu hình hạn: cần xác nhận đúng phiên bản thủ tục và cơ quan."
+def compute_deadline(procedure_code: str, accepted_at: datetime, profile: dict | None = None) -> tuple[str | None, str | None]:
+    """Use the case's pinned policy; never invent a final deadline from a milestone."""
+    profile = profile or workflows.PROFILES.get(procedure_code) or {}
+    rule = profile.get("deadline") or {}
+    if rule.get("kind") != "SAME_DAY":
+        return None, rule.get("note") or "Chưa cấu hình hạn: cần xác nhận đúng phiên bản thủ tục và cơ quan."
     local = accepted_at.astimezone(TZ)
     due = local.date()
     if not is_workday(due):
         due = next_workday(due)
-    elif local.time() > time(15, 0):
+    elif local.time() > time(rule["cutoffHour"], 0):
         due = next_workday(due)
-    return due.isoformat(), "Lịch ngày nghỉ lễ/đổi ngày làm việc lấy từ working_calendar.json; danh sách hiện có cần đơn vị vận hành xác nhận."
+    return due.isoformat(), rule["note"]
 
 
 def calendar_dates() -> tuple[set[str], set[str]]:
@@ -1204,8 +871,8 @@ def same_agency_scope(scope_a: str, scope_b: str) -> bool:
     b = (scope_b or "").strip()
     if not a or not b:
         return False
-    if a.casefold() == "toàn thành phố" or b.casefold() == "toàn thành phố":
-        return True
+    if not workflows.concrete_agency(a) or not workflows.concrete_agency(b):
+        return False
     return normalize_agency_name(a) == normalize_agency_name(b)
 
 
@@ -1234,6 +901,7 @@ def case_dict(con: sqlite3.Connection, row: sqlite3.Row, include_internal: bool,
     item["createdAt"] = row["created_at"]
     item["updatedAt"] = row["updated_at"]
     item["events"] = events_for(con, row["id"], include_internal)
+    item["workflowGuard"] = workflows.guard_summary(item)
     item["canManageLookupKey"] = include_internal and role in {"intake", "registrar"}
     item["sandboxSignature"] = sandbox_signature_view(con, row["id"], {**item, "code": row["code"], "procedureCode": row["procedure_code"]})
     def public_file_link(file_record: dict) -> dict:
@@ -1271,7 +939,7 @@ def case_dict(con: sqlite3.Connection, row: sqlite3.Row, include_internal: bool,
         item.pop("subject", None)
         item["attachments"] = []
         item["events"] = [event for event in item["events"] if event.get("action") in {"set_fee", "waive_fee", "pay", "reconcile"}]
-        for key in ("draftResult", "supplement", "supplementHistory", "approvalNote", "publicNote", "withdrawal", "sync", "paperOriginals", "declaration", "requestSummary", "deliveryAddress"):
+        for key in ("draftResult", "supplement", "supplementHistory", "approvalNote", "publicNote", "withdrawal", "sync", "paperOriginals", "declaration", "requestSummary", "deliveryAddress", "workflowEvidence", "workflowEvidenceHistory"):
             item.pop(key, None)
     return item
 
@@ -1291,6 +959,8 @@ def visible_to_user(user: sqlite3.Row, row: sqlite3.Row) -> bool:
     if not agency_scope or not case_scope:
         return False
     if not same_agency_scope(agency_scope, case_scope):
+        return False
+    if payload.get("receivingAgency") and not same_agency_scope(case_scope, payload["receivingAgency"]):
         return False
     if role == "intake":
         return True
@@ -1341,6 +1011,7 @@ def public_case_view(con: sqlite3.Connection, row: sqlite3.Row) -> dict:
         "procedure": procedure,
         "status": row["status"],
         "statusLabel": STATUS_LABELS.get(row["status"], row["status"]),
+        "milestones": payload.get("milestones", []),
         "version": row["version"],
         "createdAt": row["created_at"],
         "updatedAt": row["updated_at"],
@@ -1390,7 +1061,9 @@ def case_progress(con, row, payload) -> list[dict]:
         transitions = {"submit": "intake", "accept": "handling", "assign": "handling", "submit_review": "review", "send_back": "handling", "approve": "issue", "issue": "delivery"}
         active = next((transitions[e["action"]] for e in reversed(events) if e["action"] in transitions), "intake")
     result = []
+    profile = workflows.case_profile(payload) or {}
     for stage, label, completion_action in definitions:
+        label = profile.get("stages", {}).get(stage, label)
         evidence = [e for e in events if e["action"] == completion_action]
         state = "completed" if evidence else "pending"
         if stage == active and status != "HOAN_THANH":
@@ -1411,6 +1084,7 @@ def form_item_visible(item: dict, applicant_type: str, declaration: dict) -> boo
 
 
 def validate_procedure_submission(procedure, body, applicant_type, files):
+    workflows.require_submission(procedure)
     schema = procedure.get("submission")
     if procedure.get("serviceMode") in {"INFORMATION", "UNKNOWN"} or not schema:
         raise ValueError("Thủ tục chưa có biểu mẫu và thành phần hồ sơ được cấu hình để tiếp nhận trực tuyến. Không thể gửi bằng biểu mẫu chung.")
@@ -1651,13 +1325,32 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         raise ValueError("Thiếu phiên bản hồ sơ. Hãy tải lại hồ sơ trước khi thao tác.")
     if expected != row["version"]:
         raise RuntimeError("Hồ sơ vừa được cập nhật ở phiên khác. Hãy tải lại trước khi thao tác.")
+    workflows.authorize_action(role, action)
+    profile = workflows.action_guard(case, action)
+    if profile and not case.get("workflow"):
+        case["workflow"] = {**profile, "procedureCode": row["procedure_code"]}
 
     title = ""
     detail = ""
     audience = "public"
     next_status = current
 
-    if action == "set_fee":
+    if profile and action == profile["verificationAction"]:
+        require_role(role, {"specialist"})
+        if current != "DANG_THU_LY":
+            raise ValueError("Chỉ ghi kết quả kiểm tra khi hồ sơ đang thụ lý; hồ sơ đã trình/duyệt cần trả lại trước.")
+        evidence = workflows.verify_evidence(profile, payload.get("evidence"))
+        evidence.update({"verifiedAt": now_iso(), "verifiedBy": actor, "verifiedById": body.get("userId"), "profileVersion": profile["version"]})
+        case["workflowEvidence"] = evidence
+        case.setdefault("workflowEvidenceHistory", []).append(evidence)
+        for milestone in case.get("milestones", []):
+            if profile.get("milestone", {}).get("id") == milestone["id"]:
+                # Financial notice is completed by set_fee, not just an internal assessment.
+                milestone["completedAt"] = now_iso() if evidence.get("financialAssessment") == "Không phát sinh nghĩa vụ tài chính" else None
+        title = profile["verificationLabel"]
+        detail = evidence["outcome"] + ". " + evidence["verificationBasis"]
+        audience = "internal"
+    elif action == "set_fee":
         require_role(role, {"intake"})
         if current not in {"DA_TIEP_NHAN", "DANG_THU_LY"}:
             raise ValueError("Chỉ cấu hình khoản thu khi hồ sơ đã được tiếp nhận và đang giải quyết.")
@@ -1670,6 +1363,9 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         if len(basis) < 15:
             raise ValueError("Ghi căn cứ và nguồn xác định khoản thu trước khi thông báo cho người nộp.")
         case["fee"] = {"status": "DUE", "amount": amount, "currency": "VND", "basis": basis, "configuredAt": now_iso(), "configuredBy": actor, "mode": "LOCAL_SANDBOX"}
+        for milestone in case.get("milestones", []):
+            if profile and milestone["id"] == profile.get("milestone", {}).get("id"):
+                milestone["completedAt"] = now_iso()
         title = "Đã cấu hình khoản thu cho hồ sơ"
         detail = f"{amount:,} đồng · {basis} · môi trường thử nghiệm cục bộ; chưa thu tiền thật.".replace(",", ".")
     elif action == "waive_fee":
@@ -1727,11 +1423,12 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         require_role(role, {"intake"})
         if current != "CHO_TIEP_NHAN": raise ValueError("Chỉ hồ sơ đang chờ tiếp nhận mới được xác nhận.")
         accepted = datetime.now(TZ)
-        deadline, note = compute_deadline(case["procedureCode"], accepted)
+        deadline, note = compute_deadline(case["procedureCode"], accepted, profile)
         case["acceptedAt"] = accepted.isoformat(timespec="seconds")
         case["deadline"] = deadline
         case["deadlineNote"] = note
         next_status = "DA_TIEP_NHAN"
+        case["milestones"] = workflows.milestones(profile, accepted, is_workday) if profile else []
         title = "Đã tiếp nhận hồ sơ"
         detail = "Đã ghi thời điểm tiếp nhận hợp lệ và lập giấy tiếp nhận (Mẫu số 01). " + (f"Hạn dự kiến theo quy tắc của thủ tục: {deadline}." if deadline else "Hạn giải quyết cần được đơn vị nghiệp vụ xác nhận.")
     elif action == "digitize_documents":
@@ -1796,20 +1493,21 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         case.setdefault("attachments", []).extend(files)
         submitted_now = datetime.now(TZ)
         req_dt = parse_dt((case.get("supplement") or {}).get("requestedAt"))
-        if case.get("deadline") and req_dt:
-            try:
-                due_day = date.fromisoformat(str(case["deadline"])[:10])
-                cursor_day = req_dt.astimezone(TZ).date()
-                paused_workdays = 0
-                while cursor_day < submitted_now.date():
-                    if is_workday(cursor_day):
-                        paused_workdays += 1
-                    cursor_day += timedelta(days=1)
+        if req_dt:
+            cursor_day = req_dt.astimezone(TZ).date()
+            paused_workdays = 0
+            while cursor_day < submitted_now.date():
+                if is_workday(cursor_day):
+                    paused_workdays += 1
+                cursor_day += timedelta(days=1)
+            deadlines = [(case, "deadline")] + [(milestone, "dueDate") for milestone in case.get("milestones", []) if not milestone.get("completedAt")]
+            for record, key in deadlines:
+                if not record.get(key):
+                    continue
+                due_day = date.fromisoformat(str(record[key])[:10])
                 for _ in range(paused_workdays):
                     due_day = next_workday(due_day)
-                case["deadline"] = due_day.isoformat()
-            except ValueError:
-                pass
+                record[key] = due_day.isoformat()
         case["supplement"]["submittedAt"] = submitted_now.isoformat(timespec="seconds")
         case["supplement"]["citizenNote"] = note
         case["supplement"]["newFiles"] = files
@@ -1862,7 +1560,13 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         audience = "internal"
     elif action == "send_back":
         require_role(role, {"leader"})
-        if current != "TRINH_DUYET": raise ValueError("Hồ sơ không chờ phê duyệt.")
+        if current not in {"TRINH_DUYET", "DA_PHE_DUYET"}: raise ValueError("Hồ sơ không chờ xem xét hoặc chưa được phê duyệt.")
+        if has_issued_result(case) or con.execute("SELECT 1 FROM sandbox_signatures WHERE case_id=?", (row["id"],)).fetchone():
+            raise ValueError("Kết quả đã ký hoặc phát hành; không thể trả lại bằng thao tác chỉnh sửa dự thảo.")
+        if current == "DA_PHE_DUYET":
+            case.setdefault("approvalHistory", []).append({"approvedAt": case.get("approvedAt"), "approvedById": case.get("approvedById"), "reopenedAt": now_iso(), "reopenedBy": actor})
+            case.pop("approvedAt", None)
+            case.pop("approvedById", None)
         reason = clean_text(payload.get("reason"), 1200)
         if len(reason) < 8: raise ValueError("Nêu nội dung cần chuyên viên chỉnh sửa.")
         case["approvalNote"] = reason
@@ -2577,6 +2281,9 @@ class AppHandler(BaseHTTPRequestHandler):
         receiving_agency = clean_text(body.get("receivingAgency"), 180)
         if len(receiving_agency) < 3:
             raise ValueError("Chọn hoặc ghi cơ quan tiếp nhận theo tuyến thủ tục đã đối chiếu.")
+        profile = workflows.require_submission(procedure)
+        if not workflows.agency_matches(profile, receiving_agency):
+            raise ValueError("Cơ quan không thuộc tuyến xử lý đã cấu hình cho thủ tục.")
         commune_authority_ok = procedure_code in {"2.000908", "2.000635"} and bool(re.match(r"^(ubnd\s+(phường|xã)\s+.+|sở\s+tư\s+pháp.*)$", receiving_agency, re.IGNORECASE))
         if not commune_authority_ok and not any(same_agency_scope(receiving_agency, opt) and opt != "toàn thành phố" for opt in procedure_agency_options(procedure)):
             raise ValueError("Cơ quan tiếp nhận không khớp với cơ quan được nêu trong danh mục của thủ tục đã chọn.")
@@ -2634,6 +2341,7 @@ class AppHandler(BaseHTTPRequestHandler):
                 created = now_iso()
                 payload = {
                     "procedureCode": procedure_code,
+                    "workflow": workflows.snapshot(procedure),
                     "procedure": procedure,
                     "applicantType": applicant_type,
                     "agencyScope": receiving_agency,
@@ -2841,8 +2549,8 @@ class AppHandler(BaseHTTPRequestHandler):
         password = body.get("password", "")
         validate_password(password)
         agency_scope = clean_text(body.get("agencyScope"), 180)
-        if len(agency_scope) < 3:
-            raise ValueError("Hãy khai báo cơ quan hoặc đơn vị được giao.")
+        if len(agency_scope) < 3 or not workflows.concrete_agency(agency_scope):
+            raise ValueError("Tài khoản nghiệp vụ phải thuộc một cơ quan cụ thể; không dùng phạm vi Toàn thành phố.")
         if requester["role"] != "admin":
             req_scope = (requester["agency_scope"] or "").strip()
             if not req_scope or req_scope.casefold() == "toàn thành phố" or not same_agency_scope(agency_scope, req_scope):
@@ -2900,6 +2608,8 @@ class AppHandler(BaseHTTPRequestHandler):
                 if not authorize_sign_stop or len(request["signing_authority_ref"].strip()) < 3:
                     raise ValueError("Đối chiếu văn bản phân công thẩm quyền ký Mẫu 06 rồi xác nhận riêng trước khi duyệt.")
             if decision == "approve":
+                if not workflows.concrete_agency(request["agency_scope"]):
+                    raise ValueError("Đề nghị cấp quyền nghiệp vụ phải ghi cơ quan cụ thể; hãy lập lại đề nghị cũ.")
                 if request["valid_until"] < today:
                     raise ValueError("Thời hạn đề nghị đã hết; hãy lập đề nghị mới.")
                 can_sign_stop = bool(request["requested_sign_stop"] and authorize_sign_stop)
@@ -2934,8 +2644,8 @@ class AppHandler(BaseHTTPRequestHandler):
         if role not in STAFF_ROLES:
             raise ValueError("Vai trò cán bộ không hợp lệ.")
         agency_scope = clean_text(body.get("agencyScope"), 180)
-        if len(agency_scope) < 3:
-            raise ValueError("Hãy khai báo cơ quan hoặc đơn vị được giao.")
+        if len(agency_scope) < 3 or (role != "admin" and not workflows.concrete_agency(agency_scope)):
+            raise ValueError("Tài khoản nghiệp vụ phải thuộc một cơ quan cụ thể.")
         valid_from = clean_text(body.get("validFrom"), 10)
         valid_until = clean_text(body.get("validUntil"), 10)
         try:
@@ -3012,6 +2722,8 @@ class AppHandler(BaseHTTPRequestHandler):
                 raise RuntimeError("Quyền tài khoản đã đổi sau khi lập đề nghị. Hãy lập đề nghị mới dựa trên thông tin hiện tại.")
             status = "APPROVED" if decision == "approve" else "REJECTED"
             if decision == "approve":
+                if proposed["role"] != "admin" and not workflows.concrete_agency(proposed["agencyScope"]):
+                    raise ValueError("Tài khoản nghiệp vụ phải thuộc cơ quan cụ thể.")
                 if proposed["active"] and proposed["validUntil"] and proposed["validUntil"] < today:
                     raise ValueError("Thời hạn đề nghị đã kết thúc; hãy lập đề nghị mới.")
                 if target["role"] == "admin":

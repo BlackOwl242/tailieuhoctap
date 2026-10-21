@@ -59,7 +59,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả thông tin quyền được áp dụng, thời hạn và phiên bản tài khoản sau khi quyết định cấp quyền được lưu."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -74,7 +75,8 @@
     "tables": [
       "tai_khoan",
       "quyen_pham_vi"
-    ]
+    ],
+    "businessErrors": "Người đề nghị tự duyệt quyền; đề nghị chưa được duyệt hoặc quyền đã hết thời hạn."
   },
   {
     "uc": "UC02",
@@ -138,7 +140,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả bản danh mục đã cập nhật, gồm mã, nguồn và khoảng hiệu lực."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -153,7 +156,8 @@
     "tables": [
       "co_quan",
       "diem_tiep_nhan"
-    ]
+    ],
+    "businessErrors": "Mã danh mục bị trùng hoặc khoảng hiệu lực chồng lấn với bản đang sử dụng."
   },
   {
     "uc": "UC03",
@@ -217,7 +221,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả phiên bản thủ tục đã công bố và ngày bắt đầu áp dụng."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -233,7 +238,8 @@
       "thu_tuc",
       "phien_ban_thu_tuc",
       "tuyen_xu_ly"
-    ]
+    ],
+    "businessErrors": "Thiếu quyết định, tuyến xử lý chưa được duyệt hoặc yêu cầu sửa phiên bản đã gắn với hồ sơ."
   },
   {
     "uc": "UC04",
@@ -289,7 +295,7 @@
         "phienBanMongDoi"
       ]
     },
-    "guard": "Không có bước kết thúc không thể đến hoặc chuyển bước trái quyền",
+    "guard": "Các bước kết thúc đều có thể đạt tới từ bước bắt đầu; thao tác chuyển bước phải đúng quyền.",
     "success": {
       "code": 200,
       "fields": [
@@ -297,7 +303,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả cấu hình trạng thái cùng kết quả kiểm tra điều kiện chuyển bước."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -311,7 +318,8 @@
     "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
     "tables": [
       "phien_ban_thu_tuc"
-    ]
+    ],
+    "businessErrors": "Nhánh không có đường kết thúc hoặc chuyển bước chưa được khai báo quyền hợp lệ."
   },
   {
     "uc": "UC05",
@@ -374,7 +382,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả mã hồ sơ và phiên bản sau khi tờ khai, tài liệu và cơ quan nhận đã được lưu."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -391,7 +400,8 @@
       "chu_the",
       "uy_quyen",
       "thanh_phan_ho_so"
-    ]
+    ],
+    "businessErrors": "Thiếu trường hoặc tài liệu bắt buộc, sai chủ thể hay cơ quan; cùng mã gửi lại nhưng nội dung khác."
   },
   {
     "uc": "UC06",
@@ -442,7 +452,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả kết quả bàn giao, đơn vị nhận và thông tin xác nhận còn cần theo dõi."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -458,7 +469,8 @@
       "ho_so",
       "tuyen_xu_ly",
       "tham_chieu_lien_thong"
-    ]
+    ],
+    "businessErrors": "Đơn vị nhận không có thẩm quyền hoặc chưa xác nhận nhận đủ gói bàn giao."
   },
   {
     "uc": "UC07",
@@ -507,7 +519,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả trạng thái và phiên bản hồ sơ sau khi thực hiện bước xử lý."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -523,7 +536,8 @@
       "ho_so",
       "su_kien_xu_ly",
       "phan_cong"
-    ]
+    ],
+    "businessErrors": "Sai phân công, thiếu bằng chứng hoặc phiên bản hồ sơ đã thay đổi."
   },
   {
     "uc": "UC08",
@@ -553,7 +567,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả tiến trình, thời hạn và thông báo công khai trong phạm vi được xem."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -568,7 +583,8 @@
     "tables": [
       "ho_so",
       "su_kien_xu_ly"
-    ]
+    ],
+    "businessErrors": "Hồ sơ không tồn tại trong phạm vi được xem hoặc chủ thể không đủ quyền truy cập."
   },
   {
     "uc": "UC09",
@@ -624,7 +640,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả kết quả kiểm tra đồ thị và bản quy trình đủ điều kiện trình duyệt."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -638,7 +655,8 @@
     "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
     "tables": [
       "phien_ban_thu_tuc"
-    ]
+    ],
+    "businessErrors": "Đồ thị không hợp lệ, nhánh thiếu lối ra hoặc thiếu quy tắc tổng hợp khi xử lý song song."
   },
   {
     "uc": "UC10",
@@ -684,7 +702,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả phiên bản tài liệu đã ký và kết quả kiểm tra chữ ký trên chính tài liệu đó."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -699,7 +718,8 @@
     "tables": [
       "ket_qua",
       "chu_ky"
-    ]
+    ],
+    "businessErrors": "Dự thảo chưa được duyệt, tệp không khớp giá trị băm hoặc chứng thư không đạt điều kiện."
   },
   {
     "uc": "UC11",
@@ -745,7 +765,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả kết quả kiểm tra kết nối dịch vụ ký và thông tin cấu hình được phép công khai."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -760,7 +781,8 @@
     "tables": [
       "he_thong_ket_noi",
       "chu_ky"
-    ]
+    ],
+    "businessErrors": "Sai cấu hình xác thực, chưa được cấp môi trường hoặc phản hồi dịch vụ ký không hợp lệ."
   },
   {
     "uc": "UC12",
@@ -806,7 +828,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả hồ sơ đã tiếp nhận, phiên bản mới và thông tin giấy hẹn."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -822,7 +845,8 @@
       "ho_so",
       "phien_ban_thu_tuc",
       "lich_lam_viec"
-    ]
+    ],
+    "businessErrors": "Hồ sơ chưa đủ thành phần, sai thẩm quyền hoặc không đáp ứng phiên bản thủ tục áp dụng."
   },
   {
     "uc": "UC13",
@@ -876,7 +900,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả kết quả đối chiếu tài liệu bổ sung, giai đoạn tiếp tục xử lý và thông tin hạn được áp dụng."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -892,7 +917,8 @@
       "ho_so",
       "yeu_cau_bo_sung",
       "thanh_phan_ho_so"
-    ]
+    ],
+    "businessErrors": "Không có yêu cầu bổ sung còn mở hoặc tài liệu phản hồi chưa đáp ứng nội dung được yêu cầu."
   },
   {
     "uc": "UC14",
@@ -938,7 +964,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả người được phân công hiện hành cùng phiên bản phân công mới."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -954,7 +981,8 @@
       "ho_so",
       "phan_cong",
       "tai_khoan"
-    ]
+    ],
+    "businessErrors": "Người nhận đã hết quyền, sai cơ quan hoặc hồ sơ đã kết thúc."
   },
   {
     "uc": "UC15",
@@ -1010,7 +1038,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả bản tổng hợp ý kiến hợp lệ, căn cứ thẩm định và tham chiếu dự thảo."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1026,7 +1055,8 @@
       "ho_so",
       "nhiem_vu_phoi_hop",
       "ket_qua"
-    ]
+    ],
+    "businessErrors": "Thiếu ý kiến bắt buộc, chưa đủ căn cứ thẩm định hoặc dùng phản hồi lỗi làm dữ liệu kết luận."
   },
   {
     "uc": "UC16",
@@ -1077,7 +1107,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả số văn bản, bản kết quả phát hành và thời điểm phát hành."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1094,7 +1125,8 @@
       "chu_ky",
       "ho_so",
       "hang_doi_gui"
-    ]
+    ],
+    "businessErrors": "Chưa đủ phê duyệt, chữ ký không hợp lệ hoặc bản phát hành khác phiên bản đã ký."
   },
   {
     "uc": "UC17",
@@ -1166,7 +1198,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả bản Thông báo dừng được chuẩn bị và kết quả kiểm tra điều kiện. Ký, phát hành Mẫu 06 được thực hiện bằng lệnh riêng tại mục 6.2."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1252,7 +1285,8 @@
           "condition": "Ghi nhận Mẫu 06 đã ký/phát hành, bằng chứng gửi và chuyển hồ sơ sang DUNG trong cùng giao dịch; thời gian do máy chủ đóng dấu"
         }
       }
-    ]
+    ],
+    "businessErrors": "Yêu cầu không đúng chủ thể, kênh hoặc thời điểm; đã có kết quả; người phát hành thiếu quyền ký còn hiệu lực."
   },
   {
     "uc": "UC18",
@@ -1306,7 +1340,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả thông tin giao nhận đã lưu, gồm người nhận, kênh và chứng cứ."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1322,7 +1357,8 @@
       "ket_qua",
       "giao_nhan",
       "chu_the"
-    ]
+    ],
+    "businessErrors": "Kết quả chưa phát hành, người nhận chưa được xác minh hoặc chưa có chứng cứ giao nhận."
   },
   {
     "uc": "UC19",
@@ -1368,7 +1404,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả bản in hoặc tệp kết xuất đúng mẫu và phiên bản được phép."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1383,7 +1420,8 @@
     "tables": [
       "ho_so",
       "ket_qua"
-    ]
+    ],
+    "businessErrors": "Thiếu quyền kết xuất, chọn sai mẫu hoặc tài liệu không đúng phiên bản được phép."
   },
   {
     "uc": "UC20",
@@ -1437,7 +1475,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả mã thông báo, nơi nhận, kênh gửi và trạng thái xử lý thông báo."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1452,7 +1491,8 @@
     "tables": [
       "thong_bao",
       "ho_so"
-    ]
+    ],
+    "businessErrors": "Nơi nhận, kênh hoặc mức công khai không phù hợp; gửi lại làm thay đổi mã thông báo."
   },
   {
     "uc": "UC21",
@@ -1508,7 +1548,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả danh sách phân trang và tổng số đã lọc theo quyền."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1523,7 +1564,8 @@
     "tables": [
       "ho_so",
       "ket_qua"
-    ]
+    ],
+    "businessErrors": "Bộ lọc vượt phạm vi được cấp quyền hoặc kết quả tổng hợp có thể làm lộ hồ sơ ngoài quyền."
   },
   {
     "uc": "UC22",
@@ -1564,7 +1606,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả hướng dẫn, nguồn và thông tin hiệu lực phù hợp ngày áp dụng."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1578,7 +1621,8 @@
     "idempotency": "Không áp dụng với đọc",
     "tables": [
       "tai_lieu_huong_dan"
-    ]
+    ],
+    "businessErrors": "Không có nguồn phù hợp ngày áp dụng hoặc tài liệu hướng dẫn đã hết hiệu lực."
   },
   {
     "uc": "UC23",
@@ -1628,7 +1672,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả báo cáo theo mẫu, kỳ, cơ quan và thời điểm tổng hợp đã chọn."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1643,7 +1688,8 @@
     "tables": [
       "mau_bao_cao",
       "ho_so"
-    ]
+    ],
+    "businessErrors": "Chưa xác định mẫu hay kỳ, dữ liệu ngoài phạm vi hoặc tổng hợp trùng hồ sơ giữa các nguồn."
   },
   {
     "uc": "UC24",
@@ -1703,7 +1749,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả phiên bản mẫu báo cáo và công thức được công bố."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1717,7 +1764,8 @@
     "idempotency": "Bắt buộc khóa yêu cầu cho lệnh; lưu cùng nội dung băm, chủ thể và kết quả",
     "tables": [
       "mau_bao_cao"
-    ]
+    ],
+    "businessErrors": "Công thức chưa được kiểm tra, thiếu người phê duyệt hoặc sửa mẫu của báo cáo đã lập."
   },
   {
     "uc": "UC25",
@@ -1768,7 +1816,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả số liệu thống kê cùng chỉ tiêu, công thức và khoảng thời gian áp dụng."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1783,7 +1832,8 @@
     "tables": [
       "ho_so",
       "tham_chieu_lien_thong"
-    ]
+    ],
+    "businessErrors": "Chưa xác định công thức, mẫu số hoặc nguồn hồ sơ; dữ liệu chưa được cập nhật đầy đủ."
   },
   {
     "uc": "UC26",
@@ -1829,7 +1879,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả danh sách hồ sơ cần theo dõi và người phụ trách trong phạm vi quản lý."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1845,7 +1896,8 @@
       "ho_so",
       "phan_cong",
       "lich_lam_viec"
-    ]
+    ],
+    "businessErrors": "Truy vấn đơn vị ngoài quyền quản lý hoặc bộ lọc thời hạn không hợp lệ."
   },
   {
     "uc": "UC27",
@@ -1901,7 +1953,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả chỉ đạo đã lưu với nơi nhận, trách nhiệm và hạn phản hồi."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1916,7 +1969,8 @@
     "tables": [
       "chi_dao_dieu_hanh",
       "ho_so"
-    ]
+    ],
+    "businessErrors": "Người chỉ đạo thiếu quyền, nơi nhận chưa được xác định hoặc nội dung vượt thẩm quyền."
   },
   {
     "uc": "UC28",
@@ -1973,7 +2027,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả thông tin quyền khai thác tài liệu và thời hạn sau khi cập nhật."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -1988,7 +2043,8 @@
     "tables": [
       "tai_lieu_kho",
       "quyen_khai_thac_kho"
-    ]
+    ],
+    "businessErrors": "Không có căn cứ khai thác, sai chủ sở hữu hoặc quyền vượt thời hạn bảo quản cho phép."
   },
   {
     "uc": "UC29",
@@ -2034,7 +2090,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả tham chiếu tài liệu nguồn đã gắn với thành phần hồ sơ."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -2049,7 +2106,8 @@
     "tables": [
       "tai_lieu_kho",
       "thanh_phan_ho_so"
-    ]
+    ],
+    "businessErrors": "Tài liệu đã bị thay thế, bị thu hồi quyền hoặc không phù hợp thành phần hồ sơ đích."
   },
   {
     "uc": "UC30",
@@ -2106,7 +2164,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả kết quả ghi nhận sự kiện, thứ tự áp dụng hoặc yêu cầu đối chiếu."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -2122,7 +2181,8 @@
       "thong_diep_nhan",
       "tham_chieu_lien_thong",
       "he_thong_ket_noi"
-    ]
+    ],
+    "businessErrors": "Nguồn không được xác thực, sự kiện sai thứ tự hoặc trùng mã nhưng khác nội dung."
   },
   {
     "uc": "UC31",
@@ -2168,7 +2228,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả kết quả gửi, biên nhận hợp lệ hoặc thông tin cần gửi lại."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -2184,7 +2245,8 @@
       "hang_doi_gui",
       "ho_so",
       "tham_chieu_lien_thong"
-    ]
+    ],
+    "businessErrors": "Phản hồi không hợp lệ, chưa xác định bên nhận đã áp dụng hoặc dịch vụ ngoài chưa đáp ứng."
   },
   {
     "uc": "UC32",
@@ -2231,7 +2293,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả giao dịch được tạo cho khoản thu và thông tin theo dõi thanh toán."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -2246,7 +2309,8 @@
     "tables": [
       "khoan_thu",
       "giao_dich"
-    ]
+    ],
+    "businessErrors": "Khoản thu không áp dụng, sai người nộp hoặc số tiền không khớp nghĩa vụ đã thông báo."
   },
   {
     "uc": "UC33",
@@ -2305,7 +2369,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả kết quả đối soát và chênh lệch hoặc đề nghị hoàn cần xử lý."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -2320,7 +2385,8 @@
     "tables": [
       "giao_dich",
       "khoan_thu"
-    ]
+    ],
+    "businessErrors": "Thông báo chưa được xác thực, không ghép được giao dịch hoặc đề nghị hoàn chưa được duyệt."
   },
   {
     "uc": "UC34",
@@ -2382,7 +2448,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả phiên bản bản số hóa, số trang, nguồn và giá trị băm đã xác nhận."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -2397,7 +2464,8 @@
     "tables": [
       "thanh_phan_ho_so",
       "ho_so"
-    ]
+    ],
+    "businessErrors": "Tệp không đọc được, thiếu trang, sai thành phần hoặc thiếu xác nhận đúng thẩm quyền."
   },
   {
     "uc": "UC35",
@@ -2456,7 +2524,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả mã theo dõi phản ánh hoặc đánh giá và thông tin tiếp nhận."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -2471,7 +2540,8 @@
     "tables": [
       "phan_anh_kien_nghi",
       "ho_so"
-    ]
+    ],
+    "businessErrors": "Sai kênh tiếp nhận hoặc gửi trùng cùng nội dung; phản ánh không được dùng để tự sửa quyết định hồ sơ."
   },
   {
     "uc": "UC36",
@@ -2530,7 +2600,8 @@
         "duLieu",
         "phienBanMoi"
       ],
-      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận"
+      "condition": "Chỉ trả thành công khi thao tác đã đọc đúng phạm vi hoặc giao dịch lưu đã được xác nhận",
+      "description": "Trả tham chiếu gói nộp lưu và biên nhận hoặc lý do kho trả lại gói."
     },
     "errors": {
       "400": "Dữ liệu không hợp lệ",
@@ -2546,6 +2617,7 @@
       "ho_so_nop_luu",
       "dot_nop_luu",
       "ho_so"
-    ]
+    ],
+    "businessErrors": "Hồ sơ chưa kết thúc, thiếu tệp, sai giá trị băm hoặc kho không chấp nhận gói nộp lưu."
   }
 ]

@@ -1,3 +1,7 @@
+# Xây dựng hệ thống thông tin quản lý tiếp nhận và giải quyết thủ tục hành chính theo cơ chế một cửa tại thành phố Hà Nội
+
+Dự án xây dựng phần mềm hỗ trợ người dân nộp và theo dõi hồ sơ hành chính; hỗ trợ cán bộ tiếp nhận, phân công, thụ lý, phê duyệt và trả kết quả; đồng thời giúp lãnh đạo giám sát tiến độ, thời hạn và trách nhiệm xử lý theo từng cơ quan.
+
 # I. MỞ ĐẦU VÀ PHƯƠNG PHÁP NGHIÊN CỨU
 
 ## 1.1. Lý do lựa chọn hệ thống
@@ -14,9 +18,9 @@ Thủ tục cấp bản sao trích lục hộ tịch, bản sao giấy khai sinh
 
 ### 1.2.1. Mục tiêu nghiên cứu
 
-Mục tiêu của báo cáo là xây dựng một hồ sơ phân tích và thiết kế có thể sử dụng làm cơ sở trao đổi với cán bộ nghiệp vụ, đơn vị quản lý và đơn vị phát triển phần mềm. Hồ sơ phải thể hiện được dữ liệu đầu vào, kết quả đầu ra, người chịu trách nhiệm, điều kiện chuyển bước, trường hợp ngoại lệ và bằng chứng cần lưu giữ. Kế hoạch triển khai, vận hành, kiểm thử và quản trị được xây dựng trên cùng mô hình nghiệp vụ để tránh tình trạng mỗi phần mô tả một hệ thống khác nhau.
+Mục tiêu của đề tài là phân tích, thiết kế và xây dựng ứng dụng quản lý tiếp nhận, giải quyết thủ tục hành chính theo cơ chế một cửa tại Hà Nội. Báo cáo giải thích nghiệp vụ, cách tổ chức dữ liệu và kết quả đã hiện thực, làm cơ sở đánh giá và tiếp tục hoàn thiện phần mềm. Hồ sơ phải thể hiện được dữ liệu đầu vào, kết quả đầu ra, người chịu trách nhiệm, điều kiện chuyển bước, trường hợp ngoại lệ và bằng chứng cần lưu giữ. Kế hoạch triển khai, vận hành, kiểm thử và quản trị được xây dựng trên cùng mô hình nghiệp vụ để tránh tình trạng mỗi phần mô tả một hệ thống khác nhau.
 
-Nghiên cứu không đặt mục tiêu tái tạo mã nguồn hay chứng minh kiến trúc nội bộ của hệ thống đang vận hành. Mục tiêu kỹ thuật là đề xuất thiết kế đáp ứng các chức năng được xác định từ nguồn công khai, đồng thời chỉ ra thông tin cần xác nhận trước khi triển khai. Việc lựa chọn công nghệ, quy mô máy chủ và chỉ tiêu dịch vụ trong báo cáo là quyết định thiết kế có điều kiện, không phải số liệu đo kiểm của hệ thống Hà Nội.
+Nghiên cứu không đặt mục tiêu tái tạo mã nguồn hay chứng minh kiến trúc nội bộ của hệ thống đang vận hành. Mục tiêu kỹ thuật là hiện thực các chức năng tiếp nhận và giải quyết hồ sơ đã xác định từ nguồn công khai, đồng thời ghi rõ chức năng đã chạy và nội dung còn cần cơ quan nghiệp vụ xác nhận. Việc lựa chọn công nghệ, quy mô máy chủ và chỉ tiêu dịch vụ trong báo cáo là quyết định thiết kế có điều kiện, không phải số liệu đo kiểm của hệ thống Hà Nội.
 
 ### 1.2.2. Câu hỏi nghiên cứu
 
@@ -25,14 +29,14 @@ Bảng 1.1: Câu hỏi nghiên cứu và sản phẩm đối chiếu
 | Mã | Câu hỏi | Sản phẩm trả lời |
 | --- | --- | --- |
 | NC01 | Hệ thống thực tế phục vụ ai và thuộc trách nhiệm của chủ thể nào? | Ranh giới hệ thống, ma trận chủ thể và nguồn chứng cứ |
-| NC02 | Hồ sơ được tiếp nhận, giải quyết và trả kết quả theo quy trình nào? | Luồng nghiệp vụ hiện trạng, Use case và quy tắc ngoại lệ |
+| NC02 | Hồ sơ được tiếp nhận, giải quyết và trả kết quả theo quy trình nào? | Luồng nghiệp vụ hiện trạng, use case và quy tắc ngoại lệ |
 | NC03 | Dữ liệu và kiến trúc nào có thể đáp ứng quy trình đó? | Mô hình dữ liệu, đặc tả giao tiếp và sơ đồ kiến trúc đề xuất |
 | NC04 | Làm thế nào đưa thiết kế vào sử dụng mà vẫn kiểm soát rủi ro? | Kế hoạch chuyển đổi, nghiệm thu và quay lui |
 | NC05 | Chất lượng và trách nhiệm công vụ được kiểm chứng như thế nào? | Ma trận truy vết, kế hoạch kiểm thử và cơ chế quản trị |
 
 ## 1.3. Đối tượng, phạm vi và giới hạn
 
-Đối tượng nghiên cứu là Hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội trong toàn bộ vòng đời quản lý. Phạm vi chức năng được đối chiếu theo chín nhóm tại Điều 5 Thông tư 21/2023/TT-BTTTT, được sửa đổi bởi Thông tư 11/2025/TT-BKHCN: tài khoản; danh mục và hồ sơ; ký số; tiếp nhận và giải quyết; tiện ích; báo cáo; điều hành; kho dữ liệu; liên thông. Nghiên cứu phân tích cả quản lý nguồn lực, an toàn, lưu trữ, chuyển đổi tổ chức và kiểm soát nhà cung cấp. Hộ tịch là trường hợp đặc tả sâu; thủ tục cấp bản sao từ sổ gốc tại cấp xã được dùng làm trường hợp đối chiếu để kiểm tra khả năng áp dụng thiết kế cho nghiệp vụ khác. [18], [22]
+Đối tượng xây dựng là ứng dụng quản lý tiếp nhận và giải quyết thủ tục hành chính theo cơ chế một cửa tại Hà Nội. Hệ thống thông tin giải quyết thủ tục hành chính của Thành phố là đối tượng tham khảo khi nghiên cứu quy trình và yêu cầu quản lý. Phạm vi chức năng được đối chiếu theo chín nhóm tại Điều 5 Thông tư 21/2023/TT-BTTTT, được sửa đổi bởi Thông tư 11/2025/TT-BKHCN: tài khoản; danh mục và hồ sơ; ký số; tiếp nhận và giải quyết; tiện ích; báo cáo; điều hành; kho dữ liệu; liên thông. Nghiên cứu phân tích cả quản lý nguồn lực, an toàn, lưu trữ, chuyển đổi tổ chức và kiểm soát nhà cung cấp. Hộ tịch là trường hợp đặc tả sâu; thủ tục cấp bản sao từ sổ gốc tại cấp xã được dùng làm trường hợp đối chiếu để kiểm tra khả năng áp dụng thiết kế cho nghiệp vụ khác. [18], [22]
 
 Các nền tảng quốc gia, hệ thống giải quyết thủ tục của bộ, cơ sở dữ liệu chuyên ngành, thanh toán, chuyển phát và lưu trữ là những đầu mối liên quan. Báo cáo xác định trách nhiệm, dữ liệu trao đổi và xử lý thất bại tại điểm kết nối; không suy đoán cấu trúc lưu trữ bên trong của các đầu mối này.
 
@@ -46,8 +50,8 @@ Bảng 1.2: Phân định phạm vi nghiên cứu
 | Trường hợp chuyên sâu | Cấp bản sao trích lục hộ tịch tại Sở Tư pháp theo phương án 1811 | Không suy rộng thẩm quyền sang mọi cấp |
 | Phân tích nghiệp vụ | Tiếp nhận, bổ sung, giải quyết, ký, trả và theo dõi | Quy trình chuyên ngành được ưu tiên khi khác quy trình chung |
 | Thiết kế kỹ thuật | Mô hình logic và phương án hoàn thiện | Không khẳng định đó là thiết kế nội bộ hiện hữu |
-| Kiểm thử | Kịch bản, dữ liệu, tiêu chí và biểu mẫu ghi nhận | Chưa thực thi trên môi trường vận hành |
-| Triển khai và vận hành | Kế hoạch, trách nhiệm, điều kiện và phương án phục hồi | Chưa triển khai phần mềm trong phạm vi báo cáo |
+| Kiểm thử | 46 bài hồi quy đã đạt trên dữ liệu tạm ngày 20/10/2026; các bộ thiết kế 180 và 101 ca được lưu riêng | Chưa chạy đủ bộ thiết kế và chưa kiểm thử trên hệ thống nhà nước |
+| Triển khai và vận hành | Ứng dụng React/Python/SQLite đã chạy cục bộ, có hướng dẫn và phân quyền theo cơ quan | Chưa triển khai trên hạ tầng nhà nước hoặc được cơ quan sử dụng nghiệm thu |
 
 ## 1.4. Phương pháp thu thập và đánh giá chứng cứ
 
@@ -82,4 +86,8 @@ Hình 1.1: Quan hệ giữa chứng cứ và các sản phẩm nghiên cứu
 
 Báo cáo trình bày lựa chọn hệ thống và phương pháp ở chương I; phân tích hiện trạng và căn cứ áp dụng ở chương II; yêu cầu và nghiệp vụ ở chương III; thiết kế ở chương IV; triển khai và vận hành ở chương V; kiểm thử ở chương VI; quản trị và kết luận ở chương VII. Tài liệu tham khảo và phụ lục tạo thành phần tra cứu, hỗ trợ kiểm chứng.
 
-Bộ thiết kế đi kèm gồm sơ đồ có thể chỉnh sửa, mô hình dữ liệu, danh mục giao tiếp, ma trận quyền và kịch bản kiểm thử. Các sản phẩm này được tổ chức riêng để có thể tiếp tục phát triển mà không phải tách lại từ tệp Word. Mối liên hệ với báo cáo được giữ bằng mã yêu cầu, mã Use case và mã kiểm thử thống nhất.
+Bộ thiết kế đi kèm gồm sơ đồ có thể chỉnh sửa, mô hình dữ liệu, danh mục giao tiếp, ma trận quyền và kịch bản kiểm thử. Các sản phẩm này được tổ chức riêng để có thể tiếp tục phát triển mà không phải tách lại từ tệp Word. Mối liên hệ với báo cáo được giữ bằng mã yêu cầu, mã use case và mã kiểm thử thống nhất.
+
+## Phạm vi ứng dụng đã hoàn thành ngày 20/10/2026
+
+Hiện mở tiếp nhận hai mã 2.000908 và 1.004237. Thủ tục hộ tịch 2.000635 là ví dụ phân tích theo nguồn, chưa mở nộp. Khung tác nghiệp dùng chung có điều kiện chuyên môn riêng, bản chụp cấu hình cho từng hồ sơ và cơ quan tiếp nhận được máy chủ kiểm tra. Không mở các thủ tục còn lại chỉ vì có tên trong danh mục.

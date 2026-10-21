@@ -1,7 +1,7 @@
 from ve_uml_hanoi import *
 from math import ceil
 # Giản đồ tổng thể chỉ thể hiện chức năng ở cấp mục tiêu, chi tiết 36 ca có ở từng nhóm.
-c=Canvas(2000,1350);c.text(1000,20,'Phạm vi các Use case của hệ thống nghiên cứu',1850,bold=True);c.rect(600,110,1330,1170)
+c=Canvas(2000,1350);c.text(1000,20,'Phạm vi các use case của hệ thống nghiên cứu',1850,bold=True);c.rect(600,110,1330,1170)
 items=[('Người yêu cầu','Kê khai, bổ sung, thanh toán và nhận kết quả'),('Cán bộ xử lý','Tiếp nhận, phân công, thẩm định và phát hành'),('Quản trị được giao','Quyền, danh mục, quy trình và kho tài liệu'),('Lãnh đạo giám sát','Chỉ đạo, thống kê và kiểm tra trách nhiệm'),('Hệ thống đối tác','Xác thực, ký, thanh toán và trao đổi sự kiện')]
 for i,(a,t) in enumerate(items):
  y=180+i*220;c.actor(230,y-55,a);c.d.ellipse((720,y,1840,y+150),outline='black',width=3);c.svg.append(f'<ellipse cx="1280" cy="{y+75}" rx="560" ry="75" fill="white" stroke="black" stroke-width="3"/>');c.text(1280,y+22,t,1010);c.line([(270,y+10),(720,y+75)])

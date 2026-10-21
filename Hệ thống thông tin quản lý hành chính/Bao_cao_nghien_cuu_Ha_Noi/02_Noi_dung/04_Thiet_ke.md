@@ -403,7 +403,7 @@ Hộp xử lý và trang giám sát dùng dữ liệu có phạm vi được ki�
 
 Các bản in trong ứng dụng dùng để theo dõi nội bộ, có nhãn “Bảng kê nội bộ · Trích xuất từ hệ thống”, khổ A4 ngang, tên bảng, phạm vi cơ quan/kỳ và thời điểm in. Đây không phải hồ sơ hành chính để trình ký hoặc phát hành. Nguồn Bộ Tư pháp xác nhận nền tảng số kiểm soát TTHC đang được xây dựng với chức năng phân quyền, cấp tài khoản và biểu mẫu/đề cương báo cáo theo Thông tư 09/2026/TT-BTP [47]; tài liệu chưa có bản mẫu gốc chính thức để kiểm tra khung giấy, căn lề, cỡ chữ, font, Quốc hiệu–tiêu ngữ và thành phần ký. Vì vậy màn hình báo cáo chỉ xuất số liệu vận hành; không mô phỏng hình thức văn bản nhà nước.
 
-Phạm vi hiện thực chưa bao phủ toàn bộ 36 Use case mục tiêu. Ứng dụng có quản lý tài khoản cán bộ, CMS tin tức, xử lý hồ sơ theo vai trò, nhật ký, danh mục tham chiếu và các luồng tài chính/ký số sandbox có thể thao tác, lưu và kiểm tra trong cơ sở dữ liệu cục bộ. CMS không tự lấy tin hay đồng bộ với trang Trung tâm. Chưa có số hóa hồ sơ theo quy trình tại Thông tư 14, tích hợp chữ ký số công vụ, thanh toán/hoàn phí thật, liên thông đang vận hành, đồng bộ danh tính, lưu trữ chính thức hoặc cấu hình quy trình của cơ quan. Chưa có tài khoản do Hà Nội cấp để kiểm tra. Vì vậy cần phân biệt chức năng sandbox đã thực hiện với dịch vụ bên ngoài còn chưa tích hợp; 36 Use case vẫn là phạm vi tổng thể, không phải toàn bộ chức năng chính thức đã hoàn thành.
+Phạm vi hiện thực chưa bao phủ toàn bộ 36 use case mục tiêu. Ứng dụng có quản lý tài khoản cán bộ, CMS tin tức, xử lý hồ sơ theo vai trò, nhật ký, danh mục tham chiếu và các luồng tài chính/ký số sandbox có thể thao tác, lưu và kiểm tra trong cơ sở dữ liệu cục bộ. CMS không tự lấy tin hay đồng bộ với trang Trung tâm. Chưa có số hóa hồ sơ theo quy trình tại Thông tư 14, tích hợp chữ ký số công vụ, thanh toán/hoàn phí thật, liên thông đang vận hành, đồng bộ danh tính, lưu trữ chính thức hoặc cấu hình quy trình của cơ quan. Chưa có tài khoản do Hà Nội cấp để kiểm tra. Vì vậy cần phân biệt chức năng sandbox đã thực hiện với dịch vụ bên ngoài còn chưa tích hợp; 36 use case vẫn là phạm vi tổng thể, không phải toàn bộ chức năng chính thức đã hoàn thành.
 
 Hình 4.9: Tổng quan bàn xử lý cán bộ trong phần mềm nghiên cứu
 
@@ -421,7 +421,7 @@ Hình 4.12: Danh sách, bộ lọc và trạng thái dữ liệu trong bàn cán
 
 ![Danh mục thủ tục cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_33.jpg)
 
-**Trang chi tiết** hiển thị nội dung công bố cùng cấu hình quản trị và lịch sử cập nhật riêng. Bộ ảnh hiện hành được chụp ngày 19/10/2026; danh mục đủ 45 màn hình, gồm cổng công dân, năm bước lập hồ sơ, tra cứu, lịch hẹn, phản ánh, từng hàng đợi cán bộ, màn hình quản trị và hướng dẫn theo vai trò. Xem [danh mục ảnh giao diện](../03_Thiet_ke/Anh_giao_dien_he_thong/Danh_muc_anh_giao_dien.json).
+**Trang chi tiết** hiển thị nội dung công bố cùng cấu hình quản trị và lịch sử cập nhật riêng. Bộ ảnh hiện hành được chụp ngày 19 và 20/10/2026; danh mục có 47 màn hình, gồm cổng công dân, năm bước lập hồ sơ, tra cứu, lịch hẹn, phản ánh, từng hàng đợi cán bộ, màn hình quản trị và hướng dẫn theo vai trò. Xem [danh mục ảnh giao diện](../03_Thiet_ke/Anh_giao_dien_he_thong/Danh_muc_anh_giao_dien.json).
 
 ![Chi tiết thủ tục cán bộ](../03_Thiet_ke/Anh_giao_dien_he_thong/ui_current_34.jpg)
 
@@ -447,3 +447,11 @@ Hình 4.17: Biểu mẫu tạo nội dung, chọn chuyên mục, ảnh và ngu�
 
 
 Các ảnh minh họa trong mục này được chụp từ ứng dụng nghiên cứu hiện có. Dữ liệu hồ sơ và tài khoản trong ảnh là dữ liệu minh họa; không phải dữ liệu thật của người dân hoặc tài khoản công vụ Hà Nội.
+
+## Cấu hình quy trình và bản chụp theo hồ sơ
+
+procedure_workflows.json quy định phiên bản tờ khai, nguồn, cơ quan, bằng chứng thẩm tra, chính sách phí và hạn. Hồ sơ mới lưu toàn bộ cấu hình ở workflow. Bản sao từ sổ gốc có hạn trong ngày hoặc ngày làm việc tiếp theo sau 15 giờ. Dữ liệu môi trường có mốc kiểm tra 05 ngày, không gán thành hạn cung cấp cuối cùng. Trình duyệt và API cùng chặn thủ tục chưa có cấu hình tương tác khớp phiên bản.
+
+Xem [đối chiếu thủ tục với DVCQG](../05_Doi_chieu/Doi_chieu_thu_tuc_DVCQG_20261020.md) để phân biệt dữ liệu công bố, chức năng đã thực hiện và nội dung còn thiếu.
+
+Bộ ảnh hiện có 47 màn hình. Các hình 4.64–4.72 được cập nhật ngày 20/10/2026; ảnh cẩm nang thể hiện hai thủ tục đang mở và hướng dẫn theo trách nhiệm. Hai ảnh bổ sung giải thích thời hạn, khoản thu trên trang chi tiết. Mỗi ảnh giữ ngày chụp thực tế trong danh mục, không coi ảnh ngày 19/10 là ảnh mới.

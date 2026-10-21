@@ -27,11 +27,11 @@ elif sys.argv[1]=='check':
  checks={
   'Không có mã UCN':not re.search(r'UCN\d+',text),
   'Không có trích dẫn R':not re.search(r'\bR\d+\b',text),
-  'Không còn thuật ngữ ca sử dụng':not re.search('ca sử dụng',text,re.I),
+  'Không còn thuật ngữ use case':not re.search('use case',text,re.I),
   'Không nhắc tới tài liệu mẫu':not any(x in text.lower() for x in ['pttk_oop_hr','talentconnect','đối chiếu mẫu phân tích','tài liệu mẫu','audit mẫu']),
   'Không bàn giao bản tóm tắt':not any(x in text.lower() for x in ['tom_tat_thuyet_trinh','bản tóm tắt']),
-  'Đủ 36 biểu đồ trình tự':len([p for p in d.paragraphs if re.search(r'^Hình .*Biểu đồ trình tự của Use case UC\d+',p.text) and '\t' not in p.text])==36,
-  'Đủ 36 biểu đồ hoạt động':len([p for p in d.paragraphs if re.search(r'^Hình .*Biểu đồ hoạt động của Use case UC\d+',p.text) and '\t' not in p.text])==36,
+  'Đủ 36 biểu đồ trình tự':len([p for p in d.paragraphs if re.search(r'^Hình .*Biểu đồ trình tự của use case UC\d+',p.text) and '\t' not in p.text])==36,
+  'Đủ 36 biểu đồ hoạt động':len([p for p in d.paragraphs if re.search(r'^Hình .*Biểu đồ hoạt động của use case UC\d+',p.text) and '\t' not in p.text])==36,
  }
  references=set(re.findall(r'\[(\d+)\]',text));checks['Dẫn đầy đủ 10 nguồn']=references==set(str(i) for i in range(1,11))
  figure_checks=[]

@@ -27,7 +27,7 @@ if sys.argv[1]=='edit':
    assert current in models,(current,t)
    settext(el,models[current]['exception']+'.');fixed.append(current);pending=False
   if t.startswith('Hướng dẫn thực hiện theo thiết kế:'):pending=True
-  m=re.search(r'Biểu đồ hoạt động của Use case (UC13|UC16)$',t)
+  m=re.search(r'Biểu đồ hoạt động của use case (UC13|UC16)$',t)
   if m and previous is not None:
    blips=previous.xpath('.//a:blip',namespaces=NS)
    if blips:
@@ -78,7 +78,7 @@ elif sys.argv[1]=='figures':
  for p in root.find('w:body',NS):
   if p.tag!='{'+NS['w']+'}p':continue
   t=txt(p)
-  if t.endswith('Biểu đồ hoạt động của Use case UC16') and previous is not None and not p.xpath('.//w:tab',namespaces=NS):
+  if t.endswith('Biểu đồ hoạt động của use case UC16') and previous is not None and not p.xpath('.//w:tab',namespaces=NS):
    blips=previous.xpath('.//a:blip',namespaces=NS)
    if blips:data['word/'+rels[blips[0].attrib['{'+NS['r']+'}embed']]]=(assets/'UC16_hoat_dong.png').read_bytes();count+=1
   previous=p

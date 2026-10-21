@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-20",
+  "projectTitle": "Xây dựng hệ thống thông tin quản lý tiếp nhận và giải quyết thủ tục hành chính theo cơ chế một cửa tại thành phố Hà Nội",
+  "catalogRows": 2075,
+  "savedOfficialDetails": 1549,
+  "formConfigurations": 1429,
+  "formStatuses": {
+    "reviewed-interactive": 2,
+    "official-document-list-only": 1427
+  },
+  "submissionEnabledCodes": [
+    "1.004237",
+    "2.000908"
+  ],
+  "nameComparison": {
+    "Khác cách viết hoặc dấu câu": 638,
+    "Chưa có bản công bố lưu trữ": 526,
+    "Trùng nguyên văn": 592,
+    "Khác tên cần rà soát": 319
+  },
+  "scope": "So sánh toàn bộ danh mục với bản công bố đã lưu; đối chiếu thêm nguồn công khai được lập chỉ mục cho hai luồng đang mở. Không xác nhận 2.075 thủ tục còn hiệu lực bằng truy cập trực tiếp mới.",
+  "wordNumberedFigures": 172,
+  "wordNumberedTables": 104,
+  "wordAllTables": 106,
+  "wordInlineShapes": 174,
+  "interfaceScreenshots": 47,
+  "mobileGuidePages": 4,
+  "pdfPages": 201,
+  "pdfPortraitPages": 201,
+  "pdfExportMethod": "Microsoft Word ExportAsFixedFormat trực tiếp từ DOCX đã lưu; cập nhật mục lục, danh mục hình và bảng trước xuất; không ghép nội dung mới lên PDF cũ.",
+  "pdfProducer": "Microsoft® Word for Microsoft 365",
+  "wordSha256": "4071069b4a3d9f7d8421af16c8e61a13372b3af04394500147c74ff46d535b72",
+  "pdfSha256": "7196625c2ef1849c7ff0b3684f8ab67a82fdb3aea26c61638756631041d9efd9",
+  "allTableCellsWhite": true,
+  "renderedPages": 201,
+  "visualReview": "Đã kết xuất 201 trang A4 dọc, rà soát các trang thu nhỏ và kiểm tra riêng bìa, bảng use case, bảng quy ước API, ảnh 4.61, kết luận và trang cuối.",
+  "frontendBuild": "TypeScript và Vite build đạt; trang chi tiết hai thủ tục hiển thị giải thích hạn và khoản thu ở khung điện thoại 390px, không tràn ngang.",
+  "lastLayoutUpdate": "2026-10-21",
+  "lastLayoutChanges": "Bỏ dòng phụ đề Báo cáo phân tích thiết kế và triển khai ứng dụng; căn giữa và xóa thụt lề dòng học phần trên cả hai trang bìa.",
+  "lastEditorialUpdate": "2026-10-21",
+  "editorialRecord": "Ket_qua_bien_tap_van_phong_20261021.json",
+  "frontMatterUpdate": {
+    "date": "2026-10-21",
+    "reference": "Công nghệ phần mềm/Bao_Cao_Bai_Tap_Lon_CNPM_TalentConnect.docx",
+    "sections": [
+      "LỜI CẢM ƠN",
+      "LỜI CAM ĐOAN"
+    ],
+    "layout": "Mỗi phần một trang, bốn đoạn nội dung và lời kết.",
+    "teacher": "Hoàng Minh Ngọc",
+    "student": "Lê Quốc Huy",
+    "preservedMainBody": true
+  }
+}

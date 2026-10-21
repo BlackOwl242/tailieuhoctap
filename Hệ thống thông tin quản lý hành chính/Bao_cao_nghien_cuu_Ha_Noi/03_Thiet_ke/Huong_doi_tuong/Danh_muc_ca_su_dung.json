@@ -25,7 +25,9 @@
     "test": "OO01",
     "controller": "DieuKhienTaiKhoan",
     "route": "/nghien-cuu/chuc-nang/01",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Quyền đã được phê duyệt được áp dụng theo thời hạn; hệ thống lưu người phê duyệt và lịch sử thay đổi quyền.",
+    "narrative": "Quyền được cấp theo đề nghị có căn cứ và thời hạn. Người duyệt phải khác người đề nghị; hệ thống lưu lịch sử để xác định quyền của cán bộ tại từng thời điểm."
   },
   {
     "id": "UC02",
@@ -53,7 +55,9 @@
     "test": "OO02",
     "controller": "DieuKhienCoQuan",
     "route": "/nghien-cuu/chuc-nang/02",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Danh mục có bản cập nhật với mã, nguồn và thời gian hiệu lực. Thông tin cũ được giữ để tra cứu hồ sơ đã tiếp nhận.",
+    "narrative": "Danh mục cung cấp mã và thông tin dùng chung cho các phân hệ. Mỗi bản cập nhật gắn với nguồn và khoảng hiệu lực. Ứng dụng hiện đã lưu lịch sử chỉnh sửa; việc quản lý hiệu lực liên ngành cần tiếp tục hoàn thiện."
   },
   {
     "id": "UC03",
@@ -82,7 +86,9 @@
     "test": "OO03",
     "controller": "DieuKhienPhienBanThuTuc",
     "route": "/nghien-cuu/chuc-nang/03",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Phiên bản thủ tục được công bố theo ngày hiệu lực. Hồ sơ đang giải quyết tiếp tục sử dụng phiên bản đã gắn khi tiếp nhận.",
+    "narrative": "Theo thiết kế, phiên bản thủ tục phải được duyệt và công bố theo ngày hiệu lực. Hồ sơ đang giải quyết giữ phiên bản đã tiếp nhận. Ứng dụng hiện mới hỗ trợ lưu thay đổi và phiên bản, chưa có đầy đủ quy trình duyệt công bố."
   },
   {
     "id": "UC04",
@@ -96,12 +102,12 @@
     ],
     "operation": "cauHinhTrangThai",
     "inputs": "Trạng thái nguồn, đích, sự kiện, điều kiện và quyền",
-    "guard": "Không có bước kết thúc không thể đến hoặc chuyển bước trái quyền",
+    "guard": "Các bước kết thúc đều có thể đạt tới từ bước bắt đầu; thao tác chuyển bước phải đúng quyền.",
     "steps": [
       "Chọn bản quy trình nháp",
       "Khai báo trạng thái và sự kiện",
       "Kiểm tra đường đi và điều kiện",
-      "Trình duyệt cấu hình"
+      "Trình phê duyệt cấu hình"
     ],
     "exception": "Không gộp tài chính, giao nhận và đồng bộ vào trạng thái chuyên môn",
     "read_only": false,
@@ -109,7 +115,9 @@
     "test": "OO04",
     "controller": "DieuKhienPhienBanThuTuc",
     "route": "/nghien-cuu/chuc-nang/04",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Cấu hình lưu các trạng thái, sự kiện, điều kiện và quyền chuyển bước đã được kiểm tra, phê duyệt.",
+    "narrative": "Cấu hình xác định trạng thái, sự kiện và quyền chuyển bước. Theo thiết kế, các đường chuyển trạng thái phải được kiểm tra và phê duyệt trước khi áp dụng. Ứng dụng hiện quy định các điều kiện này trong mã nguồn và tệp cấu hình, chưa có màn hình biên tập trạng thái."
   },
   {
     "id": "UC05",
@@ -139,7 +147,9 @@
     "test": "OO05",
     "controller": "DieuKhienHoSo",
     "route": "/nghien-cuu/chuc-nang/05",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Hồ sơ được lưu ở trạng thái chờ tiếp nhận, kèm tờ khai, tài liệu, cơ quan nhận và mã hồ sơ để người nộp theo dõi.",
+    "narrative": "Người nộp chọn thủ tục và cơ quan, kê khai thông tin, đính kèm tài liệu rồi kiểm tra trước khi gửi. Ứng dụng mở luồng năm bước cho hai thủ tục đã cấu hình. Sau khi lưu thành công, hồ sơ nhận mã để liên hệ và tra cứu theo quyền."
   },
   {
     "id": "UC06",
@@ -168,7 +178,9 @@
     "test": "OO06",
     "controller": "DieuKhienHoSo",
     "route": "/nghien-cuu/chuc-nang/06",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Gói bàn giao được lưu cùng đơn vị gửi, đơn vị nhận và xác nhận tiếp nhận. Mã hồ sơ, hạn giải quyết và trách nhiệm bàn giao được giữ lại.",
+    "narrative": "Thiết kế bàn giao hồ sơ xác định đơn vị gửi, đơn vị nhận và thời điểm bên nhận xác nhận đủ thông tin. Ứng dụng hiện luân chuyển giữa các vai trò trong cùng cơ quan; tuyến bàn giao liên cơ quan còn cần phát triển."
   },
   {
     "id": "UC07",
@@ -197,7 +209,9 @@
     "test": "OO07",
     "controller": "DieuKhienHoSo",
     "route": "/nghien-cuu/chuc-nang/07",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Kết quả xử lý được ghi vào bước hiện tại; hồ sơ chuyển sang trạng thái được phép và lưu bằng chứng của người thực hiện.",
+    "narrative": "Cán bộ xem công việc được giao, ghi bằng chứng và thực hiện thao tác được phép. Máy chủ kiểm tra vai trò, trạng thái và phiên bản hồ sơ trước khi lưu để tránh ghi đè khi có cập nhật đồng thời."
   },
   {
     "id": "UC08",
@@ -225,7 +239,9 @@
     "test": "OO08",
     "controller": "DieuKhienHoSo",
     "route": "/nghien-cuu/chuc-nang/08",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Người yêu cầu xem được các mốc xử lý, thời hạn và thông báo công khai của hồ sơ thuộc quyền truy cập.",
+    "narrative": "Người nộp dùng mã hồ sơ và khóa tra cứu để xem các mốc xử lý, thời hạn và yêu cầu bổ sung. Cán bộ theo dõi trong phạm vi cơ quan và nhiệm vụ được giao; ý kiến nội bộ được phân quyền riêng."
   },
   {
     "id": "UC09",
@@ -244,7 +260,7 @@
       "Tạo bản nháp quy trình",
       "Nối bước và khai báo điều kiện",
       "Chạy kiểm tra cấu trúc",
-      "Trình duyệt trước khi áp dụng"
+      "Trình phê duyệt trước khi áp dụng"
     ],
     "exception": "Nhánh song song phải có quy tắc tổng hợp; không tự đổi hồ sơ đang xử lý",
     "read_only": false,
@@ -252,7 +268,9 @@
     "test": "OO09",
     "controller": "DieuKhienPhienBanThuTuc",
     "route": "/nghien-cuu/chuc-nang/09",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Bản quy trình lưu các bước, điều kiện và kết quả kiểm tra cấu trúc. Chỉ bản hợp lệ mới được trình phê duyệt để áp dụng.",
+    "narrative": "Chức năng đề xuất cho phép tạo các bước xử lý và điều kiện chuyển bước. Bản quy trình được kiểm tra cấu trúc, gồm cách tổng hợp các nhánh song song, trước khi trình phê duyệt. Ứng dụng hiện chưa có màn hình thiết kế quy trình trực quan."
   },
   {
     "id": "UC10",
@@ -280,7 +298,9 @@
     "test": "OO10",
     "controller": "DieuKhienKetQua",
     "route": "/nghien-cuu/chuc-nang/10",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Chữ ký hợp lệ được gắn với đúng phiên bản dự thảo đã duyệt; hệ thống lưu người ký, thời điểm và kết quả kiểm tra chữ ký.",
+    "narrative": "Người ký kiểm tra đúng phiên bản dự thảo đã duyệt trước khi ký. Ứng dụng hiện dùng chữ ký Ed25519 nội bộ và lưu người ký, thời điểm, giá trị băm. Việc dùng chứng thư số công vụ cần được tích hợp riêng."
   },
   {
     "id": "UC11",
@@ -308,7 +328,9 @@
     "test": "OO11",
     "controller": "DieuKhienHeThongKetNoi",
     "route": "/nghien-cuu/chuc-nang/11",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Cấu hình dịch vụ ký và kết quả kết nối thử được lưu. Dịch vụ chỉ được sử dụng cho nghiệp vụ sau khi kiểm tra đạt yêu cầu.",
+    "narrative": "Thiết kế kết nối dịch vụ ký yêu cầu cấu hình xác thực riêng và kiểm tra phản hồi trên tài liệu được phép. Khóa bí mật được quản lý tách khỏi hồ sơ. Ứng dụng hiện chưa kết nối nhà cung cấp chứng thư công vụ."
   },
   {
     "id": "UC12",
@@ -337,7 +359,9 @@
     "test": "OO12",
     "controller": "DieuKhienHoSo",
     "route": "/nghien-cuu/chuc-nang/12",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Hồ sơ đủ điều kiện chuyển sang đã tiếp nhận và có giấy hẹn theo quy tắc thời hạn của thủ tục. Hồ sơ chưa đủ điều kiện nhận thông báo tương ứng.",
+    "narrative": "Cán bộ kiểm tra chủ thể, thành phần và thẩm quyền rồi chọn tiếp nhận, yêu cầu bổ sung hoặc từ chối có căn cứ. Hồ sơ đủ điều kiện được lập giấy hẹn; thời hạn được tính theo thủ tục và lịch làm việc."
   },
   {
     "id": "UC13",
@@ -366,7 +390,9 @@
     "test": "OO13",
     "controller": "DieuKhienYeuCauBoSung",
     "route": "/nghien-cuu/chuc-nang/13",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Tài liệu bổ sung được gắn với yêu cầu còn mở. Sau khi cán bộ xác nhận đủ, hồ sơ tiếp tục từ giai đoạn đã lưu và ghi nhận điều chỉnh hạn theo quy định.",
+    "narrative": "Yêu cầu bổ sung nêu rõ tài liệu còn thiếu và căn cứ. Khi người nộp phản hồi, cán bộ đối chiếu với yêu cầu đang mở trước khi cho hồ sơ tiếp tục từ giai đoạn đã lưu. Điều chỉnh hạn được ghi nhận theo quy định áp dụng."
   },
   {
     "id": "UC14",
@@ -395,7 +421,9 @@
     "test": "OO14",
     "controller": "DieuKhienPhanCong",
     "route": "/nghien-cuu/chuc-nang/14",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Hồ sơ có người chịu trách nhiệm hiện hành. Phân công cũ được kết thúc và lịch sử bàn giao được lưu khi thay đổi người xử lý.",
+    "narrative": "Người được giao hồ sơ phải còn quyền và thuộc cơ quan giải quyết. Khi phân công lại, hệ thống kết thúc phân công cũ, lưu người nhận mới và thời điểm bàn giao."
   },
   {
     "id": "UC15",
@@ -416,7 +444,7 @@
       "Đối chiếu dữ liệu chuyên ngành",
       "Giao nhiệm vụ khi cần phối hợp",
       "Kiểm tra ý kiến đã xác nhận",
-      "Lập dự thảo và trình duyệt"
+      "Lập dự thảo và trình phê duyệt"
     ],
     "exception": "Không dùng phản hồi lỗi như dữ liệu âm tính; ý kiến thay đổi phải tăng phiên bản",
     "read_only": false,
@@ -424,7 +452,9 @@
     "test": "OO15",
     "controller": "DieuKhienNhiemVuPhoiHop",
     "route": "/nghien-cuu/chuc-nang/15",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Dự thảo được lập từ dữ liệu và ý kiến đã kiểm tra; hồ sơ lưu căn cứ thẩm định và những ý kiến phối hợp cần thiết để trình duyệt.",
+    "narrative": "Chuyên viên lưu kết quả thẩm tra và căn cứ trước khi lập dự thảo, trình duyệt. Hai thủ tục đang mở có bước đối chiếu sổ gốc hoặc kiểm tra dữ liệu và nghĩa vụ tài chính riêng. Nhiệm vụ phối hợp liên cơ quan trong mô hình chưa được hiện thực đầy đủ."
   },
   {
     "id": "UC16",
@@ -454,7 +484,9 @@
     "test": "OO16",
     "controller": "DieuKhienKetQua",
     "route": "/nghien-cuu/chuc-nang/16",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Kết quả được phát hành với số văn bản, người ký và phiên bản đã duyệt. Nội dung đã ký được giữ nguyên để giao nhận và tra cứu.",
+    "narrative": "Lãnh đạo duyệt hoặc trả lại dự thảo để sửa. Người được cấp quyền ký ký bản đã duyệt; văn thư kiểm tra điều kiện, cấp số và phát hành. Bản kết quả đã ký được giữ nguyên để phục vụ giao nhận và tra cứu."
   },
   {
     "id": "UC17",
@@ -486,7 +518,9 @@
     "test": "OO17",
     "controller": "DieuKhienYeuCauDung",
     "route": "/nghien-cuu/chuc-nang/17",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Yêu cầu dừng và Thông báo dừng được lưu. Hồ sơ chỉ chuyển sang DUNG sau khi Mẫu 06 đã được ký, phát hành; việc trả giấy tờ và hoàn phí được theo dõi riêng.",
+    "narrative": "Bộ phận Một cửa tiếp nhận Mẫu 05, kiểm tra người yêu cầu, kênh, thời điểm và tình trạng giải quyết. Nếu đáp ứng điều kiện, Mẫu 06 được lập để người có thẩm quyền ký và phát hành. Sau đó hồ sơ mới được ghi nhận dừng; việc trả giấy tờ và hoàn phí được theo dõi riêng."
   },
   {
     "id": "UC18",
@@ -515,7 +549,9 @@
     "test": "OO18",
     "controller": "DieuKhienGiaoNhan",
     "route": "/nghien-cuu/chuc-nang/18",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Hệ thống lưu người nhận, thời điểm, phương thức và chứng cứ giao. Nếu chưa giao được, hồ sơ ghi lý do để tiếp tục theo dõi.",
+    "narrative": "Cán bộ xác minh người nhận và phương thức đã đăng ký trước khi giao kết quả. Hệ thống lưu thời điểm, kênh và chứng cứ giao; trường hợp chưa giao được phải ghi lý do để tiếp tục xử lý."
   },
   {
     "id": "UC19",
@@ -543,7 +579,9 @@
     "test": "OO19",
     "controller": "DieuKhienHoSo",
     "route": "/nghien-cuu/chuc-nang/19",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Người dùng nhận bản in hoặc tệp đúng mẫu, đúng phiên bản và phạm vi được phép; hệ thống ghi nhận lần kết xuất.",
+    "narrative": "Người dùng chọn mẫu hoặc kết quả, kiểm tra phiên bản rồi xem trước khi in hay tải tệp. Bản dự thảo được ghi rõ để người nhận phân biệt với bản đã phát hành."
   },
   {
     "id": "UC20",
@@ -571,7 +609,9 @@
     "test": "OO20",
     "controller": "DieuKhienThongBao",
     "route": "/nghien-cuu/chuc-nang/20",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Thông báo được tạo cho đúng người nhận, kênh và sự kiện. Kết quả gửi hoặc lỗi gửi được lưu để theo dõi và thử lại.",
+    "narrative": "Thông báo phát sinh từ sự kiện hồ sơ hoặc lịch nhắc. Thiết kế quy định nơi nhận, kênh gửi và cách theo dõi lỗi. Ứng dụng hiện hiển thị thông tin trong hệ thống, chưa gửi SMS hoặc email tự động."
   },
   {
     "id": "UC21",
@@ -599,7 +639,9 @@
     "test": "OO21",
     "controller": "DieuKhienHoSo",
     "route": "/nghien-cuu/chuc-nang/21",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Kết quả tìm kiếm, tổng số và dữ liệu kết xuất chỉ gồm hồ sơ thuộc phạm vi được cấp quyền; việc tra cứu không thay đổi trạng thái hồ sơ.",
+    "narrative": "Kết quả tìm kiếm được lọc theo quyền trước khi hiển thị danh sách, tổng số hoặc cho kết xuất. Người dùng chỉ mở được hồ sơ trong phạm vi được giao."
   },
   {
     "id": "UC22",
@@ -626,7 +668,9 @@
     "test": "OO22",
     "controller": "DieuKhienTaiLieuHuongDan",
     "route": "/nghien-cuu/chuc-nang/22",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Cán bộ nhận được hướng dẫn kèm nguồn và thời điểm áp dụng. Tài liệu hết hiệu lực được nhận diện trước khi dùng làm căn cứ xử lý.",
+    "narrative": "Cẩm nang hiện hướng dẫn thao tác theo trách nhiệm và có liên kết mở chức năng. Mô hình còn đề xuất kho hướng dẫn theo ngày hiệu lực và tra cứu toàn văn; các khả năng này chưa được triển khai đầy đủ."
   },
   {
     "id": "UC23",
@@ -654,7 +698,9 @@
     "test": "OO23",
     "controller": "DieuKhienMauBaoCao",
     "route": "/nghien-cuu/chuc-nang/23",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Báo cáo thể hiện mẫu, kỳ thống kê, nguồn dữ liệu và thời điểm tổng hợp; các số liệu và trường hợp loại trừ có thể được đối chiếu lại.",
+    "narrative": "Báo cáo tổng hợp hồ sơ theo mẫu, cơ quan và kỳ thống kê. Người lập đối chiếu tổng số và các trường hợp loại trừ trước khi kết xuất. Báo cáo vận hành trong ứng dụng sử dụng dữ liệu cục bộ; kết nối báo cáo ngoài cần phát triển thêm."
   },
   {
     "id": "UC24",
@@ -681,7 +727,9 @@
     "test": "OO24",
     "controller": "DieuKhienMauBaoCao",
     "route": "/nghien-cuu/chuc-nang/24",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Phiên bản mẫu báo cáo được công bố cùng công thức và điều kiện loại trừ đã duyệt. Các báo cáo đã lập giữ nguyên phiên bản mẫu áp dụng.",
+    "narrative": "Theo thiết kế, mẫu báo cáo lưu công thức, điều kiện loại trừ và phiên bản được phê duyệt. Ứng dụng hiện dùng mẫu đã lập trình, chưa có công cụ cho người quản trị tự thiết kế và công bố mẫu mới."
   },
   {
     "id": "UC25",
@@ -709,7 +757,9 @@
     "test": "OO25",
     "controller": "DieuKhienHoSo",
     "route": "/nghien-cuu/chuc-nang/25",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Kết quả thống kê hiển thị chỉ tiêu, cơ quan, khoảng thời gian và công thức tính; người có quyền có thể đối chiếu các hồ sơ tạo nên chỉ tiêu.",
+    "narrative": "Người dùng chọn chỉ tiêu, cơ quan và khoảng thời gian để xem số liệu. Kết quả cần đi kèm công thức, thời điểm cập nhật và dữ liệu hồ sơ dùng để đối chiếu theo quyền."
   },
   {
     "id": "UC26",
@@ -738,7 +788,9 @@
     "test": "OO26",
     "controller": "DieuKhienHoSo",
     "route": "/nghien-cuu/chuc-nang/26",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Lãnh đạo xem được hồ sơ cần theo dõi và người phụ trách trong đơn vị được giao quản lý. Cảnh báo giữ nguyên thời hạn pháp lý của hồ sơ.",
+    "narrative": "Màn hình giám sát cho biết hồ sơ sắp hạn, quá hạn và cán bộ đang phụ trách. Lãnh đạo dùng thông tin này để đôn đốc xử lý; cảnh báo không tự làm thay đổi thời hạn giải quyết."
   },
   {
     "id": "UC27",
@@ -766,7 +818,9 @@
     "test": "OO27",
     "controller": "DieuKhienChiDaoDieuHanh",
     "route": "/nghien-cuu/chuc-nang/27",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Chỉ đạo được lưu với nội dung, nơi nhận, người chịu trách nhiệm và hạn phản hồi; tiến độ tiếp nhận và trả lời được theo dõi riêng.",
+    "narrative": "Thiết kế chỉ đạo điều hành có người nhận, trách nhiệm và hạn phản hồi riêng. Ứng dụng hiện lưu ý kiến khi duyệt, trả lại hoặc từ chối; quy trình ban hành và theo dõi văn bản chỉ đạo còn cần bổ sung."
   },
   {
     "id": "UC28",
@@ -794,7 +848,9 @@
     "test": "OO28",
     "controller": "DieuKhienTaiLieuKho",
     "route": "/nghien-cuu/chuc-nang/28",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Tài liệu có thông tin phân loại, phiên bản và hiệu lực; quyền khai thác được cấp hoặc thu hồi theo chủ thể và căn cứ đã xác định.",
+    "narrative": "Mô hình kho tài liệu quản lý nguồn, phiên bản, hiệu lực và quyền khai thác. Ứng dụng hiện đã lưu tệp hồ sơ và kiểm tra quyền truy cập; phân loại và thời hạn bảo quản của kho chuyên ngành chưa hoàn thiện."
   },
   {
     "id": "UC29",
@@ -822,7 +878,9 @@
     "test": "OO29",
     "controller": "DieuKhienTaiLieuKho",
     "route": "/nghien-cuu/chuc-nang/29",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Hồ sơ ghi tham chiếu đến tài liệu nguồn còn hợp lệ, người sử dụng và thành phần được đáp ứng; việc dùng lại tuân theo quyền khai thác.",
+    "narrative": "Theo thiết kế, người nộp chọn tài liệu được phép dùng lại và kiểm tra nội dung còn phù hợp với thủ tục đích. Hồ sơ giữ tham chiếu đến nguồn tài liệu. Ứng dụng hiện chưa có chức năng tái sử dụng tài liệu từ hồ sơ khác."
   },
   {
     "id": "UC30",
@@ -851,7 +909,9 @@
     "test": "OO30",
     "controller": "DieuKhienThongDiepNhan",
     "route": "/nghien-cuu/chuc-nang/30",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Sự kiện hợp lệ được ghi nhận và áp dụng đúng thứ tự. Thông điệp trùng mã nhưng khác nội dung được tách riêng để đối chiếu.",
+    "narrative": "Giao tiếp đề xuất kiểm tra danh tính nguồn, nội dung, mã và thứ tự sự kiện trước khi áp dụng. Thông điệp trùng mã nhưng khác nội dung được giữ để đối chiếu. Ứng dụng hiện chưa có kết nối nhận sự kiện từ hệ thống đối tác."
   },
   {
     "id": "UC31",
@@ -880,7 +940,9 @@
     "test": "OO31",
     "controller": "DieuKhienHangDoiGui",
     "route": "/nghien-cuu/chuc-nang/31",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Thông điệp lưu mã tương quan và biên nhận của bên nhận. Nếu chưa có phản hồi hợp lệ, hệ thống giữ thông điệp để gửi lại và tiếp tục theo dõi.",
+    "narrative": "Thiết kế trao đổi với cổng quốc gia dùng mã tương quan để theo dõi một yêu cầu qua nhiều lần gửi. Biên nhận và kết quả áp dụng được lưu riêng. Ứng dụng hiện có liên kết mở cổng, chưa gửi hồ sơ hoặc đồng bộ trạng thái qua API."
   },
   {
     "id": "UC32",
@@ -908,7 +970,9 @@
     "test": "OO32",
     "controller": "DieuKhienKhoanThu",
     "route": "/nghien-cuu/chuc-nang/32",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Giao dịch được gắn với khoản thu, người nộp và chứng từ. Trạng thái thanh toán chỉ được xác nhận theo phản hồi hoặc bằng chứng hợp lệ của quy trình áp dụng.",
+    "narrative": "Người nộp xem thông báo khoản thu rồi thực hiện nghĩa vụ qua phương thức được hỗ trợ. Ứng dụng hiện ghi giao dịch và chứng từ thử nghiệm; việc chuyển tiền qua ngân hàng hoặc Kho bạc chưa được tích hợp."
   },
   {
     "id": "UC33",
@@ -936,7 +1000,9 @@
     "test": "OO33",
     "controller": "DieuKhienGiaoDich",
     "route": "/nghien-cuu/chuc-nang/33",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Giao dịch lưu kết quả đối soát hoặc chênh lệch cần xử lý. Đề nghị hoàn trả có quyết định phê duyệt và chứng từ thực hiện riêng.",
+    "narrative": "Cán bộ tài chính ghép giao dịch với khoản thu và chứng từ để đối soát. Chênh lệch cần có căn cứ xử lý; đề nghị hoàn được duyệt riêng trước khi ghi chứng từ thực hiện. Trong ứng dụng, các bước này được ghi nhận cục bộ."
   },
   {
     "id": "UC34",
@@ -964,7 +1030,9 @@
     "test": "OO34",
     "controller": "DieuKhienThanhPhanHoSo",
     "route": "/nghien-cuu/chuc-nang/34",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Bản số hóa được gắn đúng thành phần hồ sơ, kèm số trang, nguồn, giá trị băm và người xác nhận; phiên bản cũ được giữ để tra cứu.",
+    "narrative": "Cán bộ quét đủ trang, kiểm tra chất lượng và đối chiếu với bản được xuất trình. Bản số hóa được lưu theo đúng thành phần hồ sơ, kèm nguồn, số trang, giá trị băm và thông tin xác nhận."
   },
   {
     "id": "UC35",
@@ -992,7 +1060,9 @@
     "test": "OO35",
     "controller": "DieuKhienPhanAnh",
     "route": "/nghien-cuu/chuc-nang/35",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Phản ánh hoặc đánh giá được lưu với nội dung và mã theo dõi; cơ quan tiếp nhận có thể trả lời hoặc yêu cầu bổ sung qua quy trình tương ứng.",
+    "narrative": "Người dân gửi phản ánh hoặc đánh giá và giữ mã theo dõi. Cơ quan tiếp nhận trả lời hoặc yêu cầu làm rõ trong phạm vi được giao. Kết quả phản ánh không tự sửa quyết định giải quyết hồ sơ."
   },
   {
     "id": "UC36",
@@ -1021,6 +1091,8 @@
     "test": "OO36",
     "controller": "DieuKhienHoSoNopLuu",
     "route": "/nghien-cuu/chuc-nang/36",
-    "status": "Thiết kế đề xuất"
+    "status": "Thiết kế đề xuất",
+    "postcondition": "Gói nộp lưu có danh mục tệp, phiên bản và giá trị băm. Biên nhận của kho được lưu; gói bị trả lại giữ lý do để bổ sung đúng phiên bản.",
+    "narrative": "Thiết kế nộp lưu tập hợp hồ sơ kết thúc thành gói có danh mục và phiên bản rõ ràng. Tệp và giá trị băm được kiểm tra trước khi gửi, sau đó lưu biên nhận hoặc lý do trả lại của kho. Chức năng nộp lưu chưa có trong ứng dụng hiện tại."
   }
 ]

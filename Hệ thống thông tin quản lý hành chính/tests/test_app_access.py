@@ -361,6 +361,24 @@ class ApplicationAccessTests(unittest.TestCase):
         self.assertTrue(result["case"]["feedbackSubmitted"])
         self.assertEqual(public.call("POST", f"/api/public/cases/{code}/actions", {"accessKey": access_key, "action": "feedback", "expectedVersion": result["case"]["version"], "payload": {"score": 5, "content": "Gửi lại đánh giá."}}, include_csrf=False)[0], 422)
 
+    def test_citywide_operational_account_cannot_read_dossiers(self) -> None:
+        citywide = self.client("citywide-intake@example.test")
+        self.assertEqual(citywide.call("GET", "/api/cases/CASE-A")[0], 404)
+        status, data = citywide.call("GET", "/api/bootstrap")
+        self.assertEqual(status, 200)
+        self.assertEqual(data["cases"], [])
+
+    def test_unreviewed_form_and_wildcard_agency_cannot_create_cases(self) -> None:
+        public = Client(self.base_url)
+        for procedure, agency in [("1.000477", "UBND phường Tây Hồ"), ("2.000908", "Toàn thành phố")]:
+            body = {"submissionKey": str(uuid.uuid4()), "accessKey": secrets.token_hex(32), "procedureCode": procedure,
+                    "applicantType": "citizen", "applicant": {"name": "Test Applicant", "phone": "0900000000"}, "receivingAgency": agency}
+            with service.connect() as con:
+                before = con.execute("SELECT COUNT(*) FROM cases").fetchone()[0]
+            self.assertEqual(public.call("POST", "/api/cases", body, include_csrf=False)[0], 422)
+            with service.connect() as con:
+                self.assertEqual(con.execute("SELECT COUNT(*) FROM cases").fetchone()[0], before)
+
     def test_role_scope_and_version_guard(self) -> None:
         intake = self.client("intake@example.test")
         self.assertEqual(intake.call("GET", "/api/cases/CASE-A")[0], 200)
@@ -383,7 +401,9 @@ class ApplicationAccessTests(unittest.TestCase):
         self.assertEqual(specialist.call("POST", "/api/cases/CASE-A/actions", {"action": "accept", "expectedVersion": 3, "payload": {}})[0], 403)
         status, drafted = specialist.call("POST", "/api/cases/CASE-A/actions", {"action": "save_draft", "expectedVersion": 3, "payload": {"draft": "A valid test draft for this case"}})
         self.assertEqual(status, 200)
-        status, submitted = specialist.call("POST", "/api/cases/CASE-A/actions", {"action": "submit_review", "expectedVersion": drafted["version"], "payload": {}})
+        status, checked = specialist.call("POST", "/api/cases/CASE-A/actions", {"action": "verify_original_register", "expectedVersion": drafted["version"], "payload": {"evidence": {"outcome": "Khớp sổ gốc và đủ quyền yêu cầu", "registerReference": "Sổ kiểm thử, trang 1, cơ quan kiểm thử", "verificationBasis": "Đã đối chiếu quyền yêu cầu và sổ gốc trong bộ dữ liệu kiểm thử"}}})
+        self.assertEqual(status, 200, checked)
+        status, submitted = specialist.call("POST", "/api/cases/CASE-A/actions", {"action": "submit_review", "expectedVersion": checked["version"], "payload": {}})
         self.assertEqual(status, 200)
         self.assertEqual(submitted["status"], "TRINH_DUYET")
 

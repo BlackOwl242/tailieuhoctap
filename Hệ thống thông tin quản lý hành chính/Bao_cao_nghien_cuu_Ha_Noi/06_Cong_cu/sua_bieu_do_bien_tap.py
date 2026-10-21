@@ -13,7 +13,7 @@ DOC=ROOT/'04_Bao_cao/Phan_tich_thiet_ke_huong_doi_tuong_Ha_Noi.docx'
 NS={'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main','a':'http://schemas.openxmlformats.org/drawingml/2006/main','wp':'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing','r':'http://schemas.openxmlformats.org/officeDocument/2006/relationships'}
 def wording(s):
  s=s.replace('UCN','UC')
- s=re.sub(r'ca sử dụng','Use case',s,flags=re.I)
+ s=re.sub(r'use case','use case',s,flags=re.I)
  s=re.sub(r'\[R(\d+)\]',r'[\1]',s)
  s=re.sub(r'\bR(\d+)\b',r'[\1]',s)
  return s
@@ -112,16 +112,16 @@ elif sys.argv[1]=='document':
   ts=p.xpath('.//w:t',namespaces=NS)
   original=''.join(x.text or '' for x in ts)
   edits=[]
-  for pattern,repl in [(r'UCN','UC'),(r'ca sử dụng','Use case'),(r'\[R(\d+)\]',lambda m:'['+m[1]+']'),(r'\bR(\d+)\b',lambda m:'['+m[1]+']')]:
+  for pattern,repl in [(r'UCN','UC'),(r'use case','use case'),(r'\[R(\d+)\]',lambda m:'['+m[1]+']'),(r'\bR(\d+)\b',lambda m:'['+m[1]+']')]:
    # Thay trên từng nút đủ để giữ trường, sau đó kiểm tra chuỗi nối.
-   for node in ts:node.text=re.sub(pattern,repl,node.text or '',flags=re.I if pattern=='ca sử dụng' else 0)
+   for node in ts:node.text=re.sub(pattern,repl,node.text or '',flags=re.I if pattern=='use case' else 0)
   for node in ts:
    if node.text:node.text=node.text.replace('1.4. Phương pháp','1.3. Phương pháp').replace('tương tác một thao tác','luồng thực hiện')
  # Chèn quy ước một lần ở phần phương pháp.
  for p in root.xpath('.//w:p',namespaces=NS):
   if text(p).startswith('1.3. Phương pháp') and '\t' not in text(p):
    e=E.Element('{'+NS['w']+'}p');r=E.SubElement(e,'{'+NS['w']+'}r');t=E.SubElement(r,'{'+NS['w']+'}t')
-   t.text='Các nguồn được dẫn bằng số trong ngoặc vuông, chẳng hạn [1]; số này tương ứng với danh mục tài liệu tham khảo. Mỗi Use case có mã UC và số thứ tự. Màn hình mang mã MH, chức năng dùng chung mang mã CN. Khi thực hiện thao tác, người dùng kiểm tra cơ quan, vai trò và phiên bản dữ liệu. Nếu chưa nhận được kết quả, cần tra cứu mã giao dịch trước khi gửi lại.'
+   t.text='Các nguồn được dẫn bằng số trong ngoặc vuông, chẳng hạn [1]; số này tương ứng với danh mục tài liệu tham khảo. Mỗi use case có mã UC và số thứ tự. Màn hình mang mã MH, chức năng dùng chung mang mã CN. Khi thực hiện thao tác, người dùng kiểm tra cơ quan, vai trò và phiên bản dữ liệu. Nếu chưa nhận được kết quả, cần tra cứu mã giao dịch trước khi gửi lại.'
    p.addnext(e);break
  # Đổi ảnh theo ánh xạ nội dung để giữ đúng hình và chú thích.
  old=json.loads((QA/'anh_truoc_sua.json').read_text('utf-8'))

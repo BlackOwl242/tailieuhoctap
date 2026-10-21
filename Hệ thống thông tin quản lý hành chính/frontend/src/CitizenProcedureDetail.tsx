@@ -15,7 +15,7 @@ type OfficialDetail = {
   legalBases: Named[]; conditions: string; results: Named[]; relatedProcedures: Named[]; keywords: string; description: string
 }
 type Procedure = {
-  code: string; sourceCode?: string; name: string; field: string; agency: string; level: string; serviceMode?: string; submission?: SubmissionSchema
+  code: string; sourceCode?: string; name: string; field: string; agency: string; level: string; submissionEnabled?: boolean; submissionDisabledReason?: string; serviceMode?: string; submission?: SubmissionSchema
   routing?: { observedAuthorities?: { authority: string }[] }
 }
 type DetailResponse = { procedure: Procedure; detail: OfficialDetail | null }
@@ -110,7 +110,7 @@ export function CitizenProcedureDetail({ code, request, audience = 'citizen' }: 
   const { procedure, detail } = response
   const sourceCode = procedure.sourceCode || procedure.code
   const schema = procedure.submission
-  const configured = Boolean(schema?.fields?.length && schema.sourceStatus !== 'official-document-list-only' && procedure.serviceMode !== 'INFORMATION')
+  const configured = procedure.submissionEnabled === true
   const matching = procedureAgencies({ ...procedure, code: sourceCode }, agencies)
   const eligible = matching.filter(agency => agencies.some(registered => normalizeAgency(agency) === normalizeAgency(registered)))
   const activeCase = detail?.cases[selectedCase]
@@ -137,6 +137,7 @@ export function CitizenProcedureDetail({ code, request, audience = 'citizen' }: 
         <Block id="lien-quan" title="Thủ tục hành chính liên quan">{detail?.relatedProcedures.length ? detail.relatedProcedures.map((item, index) => <p key={item.id || index}>{item.name}{item.code && ` (${item.code})`}</p>) : <p className="procedure-missing">Chưa có thông tin trong bản công bố.</p>}</Block>
         <Block id="trinh-tu" title="Trình tự thực hiện">{detail?.steps.length ? detail.steps.map((step, index) => <div key={index} className="procedure-step">{step.name && <h3>{plain(step.name)}</h3>}<Text>{step.description}</Text></div>) : <Text>{undefined}</Text>}</Block>
         <Block id="cach-thuc" title="Cách thức thực hiện">{detail?.methods.length ? <table className="procedure-data-table procedure-method-table"><thead><tr><th scope="col">Hình thức nộp</th><th scope="col">Thời hạn giải quyết</th><th scope="col">Phí, lệ phí</th><th scope="col">Mô tả</th></tr></thead><tbody>{detail.methods.map((method, index) => <tr key={index}><td data-label="Hình thức nộp">{methodNames[method.submissionMethod || ''] || method.submissionMethod || 'Chưa công bố'}</td><td data-label="Thời hạn giải quyết">{duration(method)}</td><td data-label="Phí, lệ phí"><Fees fees={method.fees} /></td><td data-label="Mô tả"><Text>{method.description}</Text></td></tr>)}</tbody></table> : <Text>{undefined}</Text>}</Block>
+        {configured && schema && <section className="procedure-section" aria-labelledby="configured-deadline-heading"><h2 id="configured-deadline-heading">Thời hạn và khoản thu khi lập hồ sơ</h2><p className="procedure-text">{schema.deadlineText}</p><p className="procedure-text">{schema.feeText}</p><p className="procedure-source-line">Quy tắc tiếp nhận đã cấu hình cho cơ quan trong ứng dụng. Bảng phía trên giữ số liệu của bản công bố đã lưu; phần diễn giải này làm rõ mốc áp dụng cho hồ sơ.</p></section>}
         <Block id="thanh-phan" title="Thành phần hồ sơ">
           {downloadError && <p className="form-error" role="alert">{downloadError} {sourceUrl && <a href={sourceUrl} target="_blank" rel="noreferrer">Mở bản công bố gốc</a>}</p>}
           {detail && detail.cases.length > 1 && <label className="procedure-case-select">Chọn trường hợp thực hiện<select value={selectedCase} onChange={event => setSelectedCase(Number(event.target.value))}>{detail.cases.map((item, index) => <option value={index} key={index}>{index + 1}. {plain(item.name) || `Trường hợp ${index + 1}`}</option>)}</select></label>}
@@ -152,7 +153,7 @@ export function CitizenProcedureDetail({ code, request, audience = 'citizen' }: 
       </div>
       <aside className="procedure-detail-sidebar">
         {!staffView && <section className="procedure-intake-panel" aria-labelledby="procedure-intake-title"><h2 id="procedure-intake-title">Chọn cơ quan thực hiện</h2><p>Chọn nơi tiếp nhận tại Hà Nội để bắt đầu lập hồ sơ.</p><label>Tỉnh / Thành phố<input value="Thành phố Hà Nội" readOnly /></label><label>Cơ quan tiếp nhận<select value={selectedAgency} onChange={event => setSelectedAgency(event.target.value)} disabled={!configured || !eligible.length}><option value="">Chọn cơ quan thực hiện</option>{eligible.map(agency => <option key={agency}>{agency}</option>)}</select></label>
-          {directoryError ? <p role="alert">{directoryError} <button className="text-button" onClick={retry}>Thử lại</button></p> : <p className="procedure-intake-hint">{!configured ? 'Thủ tục này chưa hỗ trợ lập hồ sơ trực tuyến trong hệ thống. Xem cách thức thực hiện ở bên cạnh.' : !eligible.length ? 'Chưa có đơn vị tiếp nhận trực tuyến cho thủ tục này trong hệ thống.' : 'Danh sách chỉ gồm cơ quan đã có bộ phận tiếp nhận trong hệ thống.'}</p>}
+          {directoryError ? <p role="alert">{directoryError} <button className="text-button" onClick={retry}>Thử lại</button></p> : <p className="procedure-intake-hint">{!configured ? (procedure.submissionDisabledReason || 'Thủ tục chưa có tờ khai và quy trình đã đối chiếu. Xem cách thức thực hiện ở bên cạnh.') : !eligible.length ? 'Chưa có đơn vị tiếp nhận trực tuyến cho thủ tục này trong hệ thống.' : 'Danh sách chỉ gồm cơ quan đã có bộ phận tiếp nhận trong hệ thống.'}</p>}
           {selectedAgency && configured ? <a className="button primary" href={`/nop-ho-so?${new URLSearchParams({ procedure: sourceCode, agency: selectedAgency, ...(formCase ? { case: formCase } : {}) })}`}>Nộp hồ sơ</a> : <button className="button primary" disabled type="button">Nộp hồ sơ</button>}
           <dl className="procedure-intake-mode"><dt>Mức dịch vụ trong danh mục Hà Nội</dt><dd>{serviceModeLabel(procedure.level)}</dd></dl>
         </section>}

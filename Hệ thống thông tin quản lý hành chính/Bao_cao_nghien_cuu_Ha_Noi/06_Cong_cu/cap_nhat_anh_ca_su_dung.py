@@ -25,4 +25,4 @@ data['word/document.xml']=etree.tostring(doc,xml_declaration=True,encoding='UTF-
 tmp=file.with_suffix('.layout.docx')
 with ZipFile(tmp,'w',ZIP_DEFLATED) as z:
  for n,b in data.items():z.writestr(n,b)
-tmp.replace(file);print('Cập nhật',len(changed),'hình Use case và tác nhân; giữ đúng tỷ lệ hình.')
+tmp.replace(file);print('Cập nhật',len(changed),'hình use case và tác nhân; giữ đúng tỷ lệ hình.')

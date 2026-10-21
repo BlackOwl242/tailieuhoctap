@@ -101,7 +101,7 @@ Bảng 7.6: Đóng góp và bằng chứng trong hồ sơ nghiên cứu
 | Nội dung | Sản phẩm | Giá trị sử dụng |
 | --- | --- | --- |
 | Phân tích hệ thống thực tế | Nguồn và ranh giới hiện trạng | Có cơ sở để kiểm tra đối tượng nghiên cứu |
-| Phân tích nghiệp vụ | Use case, quy tắc và ngoại lệ | Trao đổi với cán bộ chuyên môn |
+| Phân tích nghiệp vụ | use case, quy tắc và ngoại lệ | Trao đổi với cán bộ chuyên môn |
 | Thiết kế | Trạng thái, dữ liệu, giao tiếp và màn hình | Cơ sở phát triển và rà soát kỹ thuật |
 | Triển khai, vận hành | Điều kiện, chuyển đổi và phục hồi | Chuẩn bị tổ chức đưa vào sử dụng |
 | Kiểm thử | Truy vết và ca có điều kiện mong đợi | Chuẩn bị kiểm chứng khi có môi trường |
@@ -200,7 +200,7 @@ Bảng 7.11: Ma trận phạm vi và khoảng trống chứng cứ
 | 14. Năng lực và hiệu năng | Mô hình tải, dung lượng, hàng đợi và tăng trưởng | Ví dụ tính minh họa; cần số đo giờ cao điểm thực tế |
 | 15. Vận hành và sự cố | Giám sát, phân loại, khôi phục kết nối, đối soát | Quy trình đề xuất; cần nhật ký và mức dịch vụ được duyệt |
 | 16. Liên tục phục vụ | Sao lưu, khôi phục, diễn tập và chuyển chế độ | Chưa có kết quả diễn tập của hệ thống đang vận hành |
-| 17. Kiểm thử và nghiệm thu | 95 ca, truy vết, dữ liệu thử và bằng chứng | Các ca chưa thực hiện; cần môi trường và người nghiệm thu |
+| 17. Kiểm thử và nghiệm thu | 180 ca hướng đối tượng và 101 ca tổng hợp được thiết kế; 46 bài hồi quy đã đạt | Chưa chạy đủ các bộ thiết kế, chưa nghiệm thu trên hệ thống nhà nước |
 | 18. Kho và lưu trữ | Kho cá nhân, hồ sơ tác nghiệp, nộp lưu và biên nhận | Căn cứ [26], [27]; cần danh mục thời hạn và kết nối lưu trữ |
 | 19. Kinh tế và nhà cung cấp | Chi phí ba năm, lợi ích, bàn giao và rủi ro | Chưa có hợp đồng, đơn giá và số liệu chi phí thực tế |
 | 20. Hiệu quả và quản trị | Chỉ số, mẫu số, thay đổi và trách nhiệm | Báo cáo công khai [20]; cần dữ liệu gốc để kiểm tra tác động |
@@ -213,8 +213,14 @@ Bảng 7.11: Ma trận phạm vi và khoảng trống chứng cứ
 
 ## 7.8. Kết luận và giới hạn
 
-Nghiên cứu lựa chọn Hệ thống thông tin giải quyết thủ tục hành chính thành phố Hà Nội, có bằng chứng vận hành và sử dụng thực tế. Báo cáo phân tích chín nhóm chức năng và hai mươi khía cạnh của vòng đời hệ thống, đồng thời dùng nhánh cấp bản sao trích lục hộ tịch theo phương án 1811 và thủ tục cấp bản sao từ sổ gốc theo Quyết định 663 để kiểm tra chiều sâu nghiệp vụ. Phạm vi năm 2026 được đặt trong quan hệ với Cổng Dịch vụ công quốc gia và các hệ thống tập trung của bộ, tránh giả định toàn bộ hồ sơ đều xử lý trên một hệ thống thành phố. [1], [15], [18], [19], [22], [23]
+Đề tài “Xây dựng hệ thống thông tin quản lý tiếp nhận và giải quyết thủ tục hành chính theo cơ chế một cửa tại thành phố Hà Nội” đã tạo ứng dụng React, TypeScript, Python và SQLite. Người dân có thể gửi và theo dõi hồ sơ; cán bộ tiếp nhận, phân công, thẩm tra, duyệt, ký nội bộ, phát hành và ghi nhận trả kết quả trong đúng cơ quan. Danh mục có 2.075 dòng tham chiếu, nhưng chỉ hai mã 2.000908 và 1.004237 được mở tiếp nhận theo cấu hình đã rà soát.
 
-Giới hạn của nghiên cứu là chưa được tiếp cận đặc tả nội bộ, môi trường cán bộ, nhật ký và kết quả thử của hệ thống vận hành. Do đó, phần kiến trúc, dữ liệu và giao tiếp là phương án đề xuất; các mục tiêu dịch vụ cần được xác nhận; hiệu quả dự kiến của văn bản chưa được coi là kết quả đo. Bước phát triển tiếp theo là khảo sát có sự phối hợp của đơn vị sử dụng, kiểm tra từng khoảng trống chứng cứ và thử nghiệm bộ thiết kế trên môi trường được phép.
+Hai thủ tục có kiểm tra chuyên môn, cơ quan và quy tắc thời hạn khác nhau. Hồ sơ bản sao phải đối chiếu sổ gốc và quyền yêu cầu. Hồ sơ dữ liệu tài nguyên và môi trường phải kiểm tra khả năng cung cấp, xác định nghĩa vụ tài chính và tách mốc kiểm tra 05 ngày khỏi việc cung cấp dữ liệu. Các bước dùng chung không thay thế mọi quy trình chuyên ngành.
 
-Kết luận về chất lượng một hệ thống quản lý hành chính cần dựa vào khả năng giải quyết hồ sơ đúng thẩm quyền, đúng hạn và có bằng chứng, đồng thời bảo vệ dữ liệu và duy trì phục vụ. Hình thức trình bày nhất quán giúp người đọc theo dõi lập luận, nhưng giá trị của báo cáo vẫn phụ thuộc sự chính xác của nguồn và khả năng kiểm chứng các quyết định thiết kế.
+Chưa tiếp cận cấu hình nội bộ của hệ thống cán bộ Hà Nội hoặc thực hiện nghiệm thu với cơ quan sử dụng. Mô hình liên thông, nhiệm vụ phối hợp và giao tiếp chuyên ngành trong tài liệu vẫn có phần đề xuất. 46 bài hồi quy trên dữ liệu tạm là kết quả kiểm tra ứng dụng, chưa phải kết quả chạy đầy đủ 180 ca hướng đối tượng hay 101 ca tổng hợp. Cần xác minh hiệu lực và tuyến xử lý trước khi mở rộng; định danh, chứng thư công vụ, thanh toán và kho chuyên ngành còn phụ thuộc quyền kết nối được cấp.
+
+## Kết quả triển khai và kết luận cập nhật ngày 20/10/2026
+
+Dự án xây dựng phần mềm hỗ trợ người dân nộp và theo dõi hồ sơ hành chính; hỗ trợ cán bộ tiếp nhận, phân công, thụ lý, phê duyệt và trả kết quả; đồng thời giúp lãnh đạo giám sát tiến độ, thời hạn và trách nhiệm xử lý theo từng cơ quan. Sản phẩm đã có dữ liệu dùng chung giữa người dân và cán bộ, kiểm soát riêng cho hai thủ tục, phân quyền cơ quan cụ thể và 46 bài hồi quy đạt trên dữ liệu tạm. Chưa hoàn thành toàn bộ 2.075 quy trình; chưa kết nối hệ thống nhà nước, chữ ký công vụ, thanh toán thật hoặc kho chuyên ngành. Cần cơ quan nghiệp vụ xác nhận tuyến xử lý và nghiệm thu trước khi vận hành chính thức.
+
+Xem [đối chiếu thủ tục với DVCQG](../05_Doi_chieu/Doi_chieu_thu_tuc_DVCQG_20261020.md) để phân biệt dữ liệu công bố, chức năng đã thực hiện và nội dung còn thiếu.

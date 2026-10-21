@@ -39,14 +39,14 @@ def update_report():
             cells=row.cells
             label=cells[0].text.replace('\u200b','')
             if 'Anh_giao_dien_he_thong' in label:
-                replace_text(cells[1].paragraphs[0],'45 ảnh giao diện ứng dụng, chụp ngày 19/10/2026; có danh mục ảnh kèm theo.')
+                replace_text(cells[1].paragraphs[0],'47 ảnh giao diện ứng dụng, chụp ngày 19 và 20/10/2026; ngày chụp từng ảnh có trong danh mục.')
     doc.save(REPORT)
     print(f'Đã biên tập {count} đoạn; {len(doc.inline_shapes)} hình; {len(doc.sections)} phần, đều khổ A4 dọc.')
 
 def write_coverage():
-    lines=['# Kết quả triển khai theo ca sử dụng','',
-           'Bảng sau đối chiếu các chức năng của ứng dụng với 36 ca sử dụng trong mô hình thiết kế. Cột cuối nêu nội dung đã thực hiện và phần cần tiếp tục bổ sung. Tình trạng kết nối dịch vụ ngoài được ghi riêng theo từng chức năng.','',
-           '| Ca sử dụng | Kết quả | Chức năng | Nội dung đáp ứng và phần cần bổ sung |',
+    lines=['# Kết quả triển khai theo use case','',
+           'Bảng sau đối chiếu các chức năng của ứng dụng với 36 use case trong mô hình thiết kế. Cột cuối nêu nội dung đã thực hiện và phần cần tiếp tục bổ sung. Tình trạng kết nối dịch vụ ngoài được ghi riêng theo từng chức năng.','',
+           '| use case | Kết quả | Chức năng | Nội dung đáp ứng và phần cần bổ sung |',
            '|---|---|---|---|']
     for r in COVERAGE:
         lines.append('| '+' | '.join([r['id']+' '+r['name'],r['status'],r['ui'],r['note']])+' |')
@@ -119,7 +119,7 @@ Luồng thông thường gồm `CHO_TIEP_NHAN`, `DA_TIEP_NHAN`, `DANG_THU_LY`, `
 
 ## Tài liệu liên quan
 
-- [Kết quả triển khai theo 36 ca sử dụng](../05_Doi_chieu/Doi_chieu_36_use_case_hien_tai.md)
+- [Kết quả triển khai theo 36 use case](../05_Doi_chieu/Doi_chieu_36_use_case_hien_tai.md)
 - [Quản lý tài khoản và phân quyền](../../DANH_SACH_TAI_KHOAN_DUOC_PHAN_QUYEN.md)
 - Cẩm nang trên giao diện: `/huong-dan`; bàn làm việc cán bộ: `/staff`.
 '''
@@ -159,7 +159,7 @@ def update_sources():
         for old,new in HEADINGS.items():text=text.replace(old,new)
         marker='## Đối chiếu với bản triển khai hiện tại'
         if marker in text:
-            text=text.split(marker)[0].rstrip()+'\n\n## Kết quả triển khai\n\n'+IMPLEMENTATION_NOTES[0]+'\n\nXem [bảng đánh giá theo 36 ca sử dụng](../05_Doi_chieu/Doi_chieu_36_use_case_hien_tai.md) để đối chiếu chức năng đã hỗ trợ và nội dung cần bổ sung.\n'
+            text=text.split(marker)[0].rstrip()+'\n\n## Kết quả triển khai\n\n'+IMPLEMENTATION_NOTES[0]+'\n\nXem [bảng đánh giá theo 36 use case](../05_Doi_chieu/Doi_chieu_36_use_case_hien_tai.md) để đối chiếu chức năng đã hỗ trợ và nội dung cần bổ sung.\n'
         path.write_text(text,'utf8')
     # Chú thích ảnh mô tả chức năng, giữ nguyên tệp ảnh và ngày chụp.
     path=ROOT/'03_Thiet_ke/Anh_giao_dien_he_thong/Danh_muc_anh_giao_dien.json'

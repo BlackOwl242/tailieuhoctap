@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-19-current-ui",
-  "dataScope": "Ảnh chụp từ phiên ứng dụng chạy trên bản sao cơ sở dữ liệu; không thay đổi hồ sơ của môi trường đang vận hành.",
+  "version": "2026-10-20-workflow-docs",
+  "dataScope": "Ảnh giao diện cũ giữ ngày chụp 19/10/2026; ảnh cẩm nang và đối chiếu hạn/thu được chụp lại ngày 20/10/2026, chỉ đọc, không tạo hoặc sửa hồ sơ.",
   "captures": [
     {
       "file": "ui_current_01.jpg",
@@ -346,66 +346,93 @@
     },
     {
       "file": "ui_current_39.jpg",
-      "title": "Hướng dẫn người dân: tra cứu và lập hồ sơ",
+      "title": "Hướng dẫn người dân tra cứu và lập hồ sơ",
       "role": "Người dân",
       "route": "/huong-dan",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-18T19:27:18.993Z"
+      "capturedAt": "2026-10-20T14:51:09.304Z",
+      "captureScope": "Khung nhìn trình duyệt; ảnh không cắt hoặc kéo giãn sau khi chụp."
     },
     {
       "file": "ui_current_40.jpg",
-      "title": "Hướng dẫn cán bộ: Cán bộ tiếp nhận",
-      "role": "Cán bộ tiếp nhận",
-      "route": "/huong-dan",
+      "title": "Hướng dẫn cán bộ về tài khoản và phạm vi tiếp nhận",
+      "role": "Cán bộ",
+      "route": "/huong-dan?role=staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-18T19:27:19.150Z"
+      "capturedAt": "2026-10-20T14:51:09.940Z",
+      "captureScope": "Khung nhìn trình duyệt; ảnh không cắt hoặc kéo giãn sau khi chụp."
     },
     {
       "file": "ui_current_41.jpg",
-      "title": "Hướng dẫn cán bộ: Chuyên viên thụ lý",
-      "role": "Chuyên viên thụ lý",
-      "route": "/huong-dan",
+      "title": "Hướng dẫn kiểm tra riêng cho hai thủ tục đang mở",
+      "role": "Cán bộ",
+      "route": "/huong-dan?role=staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-18T19:27:19.225Z"
+      "capturedAt": "2026-10-20T14:51:10.562Z",
+      "captureScope": "Khung nhìn trình duyệt; ảnh không cắt hoặc kéo giãn sau khi chụp."
     },
     {
       "file": "ui_current_42.jpg",
-      "title": "Hướng dẫn cán bộ: Lãnh đạo phê duyệt",
-      "role": "Lãnh đạo phê duyệt",
-      "route": "/huong-dan",
+      "title": "Hướng dẫn cấp quyền ký và phát hành kết quả",
+      "role": "Cán bộ",
+      "route": "/huong-dan?role=staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-18T19:27:19.303Z"
+      "capturedAt": "2026-10-20T14:51:11.203Z",
+      "captureScope": "Khung nhìn trình duyệt; ảnh không cắt hoặc kéo giãn sau khi chụp."
     },
     {
       "file": "ui_current_43.jpg",
-      "title": "Hướng dẫn cán bộ: Văn thư phát hành",
-      "role": "Văn thư phát hành",
-      "route": "/huong-dan",
+      "title": "Hướng dẫn giao kết quả và xử lý yêu cầu dừng",
+      "role": "Cán bộ",
+      "route": "/huong-dan?role=staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-18T19:27:19.395Z"
+      "capturedAt": "2026-10-20T14:51:11.824Z",
+      "captureScope": "Khung nhìn trình duyệt; ảnh không cắt hoặc kéo giãn sau khi chụp."
     },
     {
       "file": "ui_current_44.jpg",
-      "title": "Hướng dẫn cán bộ: Cán bộ tài chính",
-      "role": "Cán bộ tài chính",
-      "route": "/huong-dan",
+      "title": "Hướng dẫn xác định khoản thu và đối soát",
+      "role": "Cán bộ",
+      "route": "/huong-dan?role=staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-18T19:27:19.473Z"
+      "capturedAt": "2026-10-20T14:51:12.454Z",
+      "captureScope": "Khung nhìn trình duyệt; ảnh không cắt hoặc kéo giãn sau khi chụp."
     },
     {
       "file": "ui_current_45.jpg",
-      "title": "Hướng dẫn cán bộ: Quản trị hệ thống",
-      "role": "Quản trị hệ thống",
-      "route": "/huong-dan",
+      "title": "Hướng dẫn quản trị tài khoản và biên tập tin",
+      "role": "Cán bộ",
+      "route": "/huong-dan?role=staff",
       "width": 1440,
       "height": 1000,
-      "capturedAt": "2026-10-18T19:27:19.547Z"
+      "capturedAt": "2026-10-20T14:51:13.098Z",
+      "captureScope": "Khung nhìn trình duyệt; ảnh không cắt hoặc kéo giãn sau khi chụp."
+    },
+    {
+      "file": "ui_current_46.jpg",
+      "title": "Thời hạn và khoản thu của cấp bản sao từ sổ gốc",
+      "role": "Cán bộ",
+      "route": "/thu-tuc/2.000908",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-20T14:51:13.749Z",
+      "captureScope": "Khung nhìn trình duyệt; ảnh không cắt hoặc kéo giãn sau khi chụp."
+    },
+    {
+      "file": "ui_current_47.jpg",
+      "title": "Mốc kiểm tra và khoản thu của yêu cầu dữ liệu môi trường",
+      "role": "Cán bộ",
+      "route": "/thu-tuc/1.004237",
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-10-20T14:51:14.449Z",
+      "captureScope": "Khung nhìn trình duyệt; ảnh không cắt hoặc kéo giãn sau khi chụp."
     }
   ],
   "errors": []

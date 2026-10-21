@@ -13,3 +13,9 @@ Các lược đồ và giao tiếp ở đây là phương án thiết kế nghi�
 
 Quy trình, quyền và nguyên tắc chuyển bước ở các chương III, IV, VII trong `02_Noi_dung`. Điều kiện khảo sát bổ sung ở phụ lục A.
 Ảnh giao diện bàn cán bộ được cập nhật ngày 19/10/2026 tại `Anh_giao_dien_he_thong/can_bo_danh_muc_thu_tuc_20261019.jpg` và `Anh_giao_dien_he_thong/can_bo_chi_tiet_thu_tuc_20261019.jpg`. Danh sách có bộ lọc, tình trạng dữ liệu và quản lý lĩnh vực; trang chi tiết thể hiện nội dung công bố cùng cấu hình nội bộ, lịch sử và thao tác sửa theo quyền. Báo cáo Word/PDF đã thay các hình 4.58 và 4.59 bằng ảnh mới.
+
+## Phạm vi cấu hình hiện tại
+
+Tên đề tài: **Xây dựng hệ thống thông tin quản lý tiếp nhận và giải quyết thủ tục hành chính theo cơ chế một cửa tại thành phố Hà Nội**. Hai quy trình tiếp nhận là 2.000908 và 1.004237; cấu hình và điều kiện mới nằm ở procedure_workflows.json và procedure_workflows.py tại thư mục gốc ứng dụng. Mô hình PostgreSQL và các API trong tài liệu thiết kế là tham chiếu; cơ sở dữ liệu đang chạy là SQLite, API thực tế ở app.py và workflow_extensions.py. Không dùng số lượng mô hình làm số lượng kết nối đã hoạt động.
+
+Bộ ảnh hiện có 47 màn hình. Các hình 4.64–4.72 được cập nhật ngày 20/10/2026; ảnh cẩm nang thể hiện hai thủ tục đang mở và hướng dẫn theo trách nhiệm. Hai ảnh bổ sung giải thích thời hạn, khoản thu trên trang chi tiết. Mỗi ảnh giữ ngày chụp thực tế trong danh mục, không coi ảnh ngày 19/10 là ảnh mới.

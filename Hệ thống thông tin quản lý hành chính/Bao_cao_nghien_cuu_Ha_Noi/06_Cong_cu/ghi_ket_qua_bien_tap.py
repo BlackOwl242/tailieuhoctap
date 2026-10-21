@@ -35,11 +35,11 @@ metadata_path.write_text(json.dumps(metadata,ensure_ascii=False,indent=2),encodi
 
 Tệp chính: `04_Bao_cao/Phan_tich_thiet_ke_huong_doi_tuong_Ha_Noi.docx`.
 
-Đã viết lại 36 bảng đặc tả và phần giải thích của từng Use case theo mục tiêu, người thực hiện, điều kiện, các bước, ngoại lệ và kết quả. Đã thay 146 hình thiết kế trong báo cáo, gồm biểu đồ và bản thiết kế màn hình. Các ảnh tư liệu có nguồn được giữ riêng với hình thiết kế đề xuất.
+Đã viết lại 36 bảng đặc tả và phần giải thích của từng use case theo mục tiêu, người thực hiện, điều kiện, các bước, ngoại lệ và kết quả. Đã thay 146 hình thiết kế trong báo cáo, gồm biểu đồ và bản thiết kế màn hình. Các ảnh tư liệu có nguồn được giữ riêng với hình thiết kế đề xuất.
 
 Đã kết xuất 206 trang và xem toàn bộ ở lượt đối chiếu chính. Sau các lần chỉnh sửa, đối chiếu ảnh trang và xem lại các trang thay đổi. Không phát hiện chữ bị cắt hoặc nhãn chồng lên nhau trong bản cuối. 29 kiểm tra cấu trúc định dạng và 8 kiểm tra nội dung đều đạt. 146 ảnh thiết kế được nhúng trong Word khớp với các tệp hình đã sửa.
 
-Các lỗi đã sửa gồm nhãn dài khó đọc, xuống dòng giữa tên đối tượng, chữ sát cạnh hình thoi, mũi tên trùng, nhánh gửi thông báo trước khi kiểm tra và việc gộp các vai trò duyệt, ký, phát hành. Báo cáo sử dụng Use case, mã UC và dẫn nguồn theo số trong ngoặc vuông; không nhắc tên tài liệu được cung cấp để đối chiếu.
+Các lỗi đã sửa gồm nhãn dài khó đọc, xuống dòng giữa tên đối tượng, chữ sát cạnh hình thoi, mũi tên trùng, nhánh gửi thông báo trước khi kiểm tra và việc gộp các vai trò duyệt, ký, phát hành. Báo cáo sử dụng use case, mã UC và dẫn nguồn theo số trong ngoặc vuông; không nhắc tên tài liệu được cung cấp để đối chiếu.
 
 Kết quả này xác nhận bản báo cáo và thiết kế đã biên tập. Phần thiết kế đề xuất không được trình bày như mã nguồn hoặc kiến trúc nội bộ đã được xác nhận của hệ thống đang vận hành.
 ''',encoding='utf-8')

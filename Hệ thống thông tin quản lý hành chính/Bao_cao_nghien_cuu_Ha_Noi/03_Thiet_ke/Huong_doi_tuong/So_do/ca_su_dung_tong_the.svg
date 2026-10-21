@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2700" height="1824" viewBox="0 0 900 608"><rect width="900" height="608" fill="white"/>
-<text x="450" y="31.09" font-family="Arial" font-size="23" font-weight="bold" text-anchor="middle">Use case tổng thể</text>
+<text x="450" y="31.09" font-family="Arial" font-size="23" font-weight="bold" text-anchor="middle">use case tổng thể</text>
 <rect x="270" y="49" width="605" height="545" rx="0" fill="white" stroke="#181818"/>
 <circle cx="130" cy="64" r="8" fill="#E2E2EF" stroke="#181818"/>
 <polyline points="130,72 130,99" fill="none" stroke="#181818" stroke-width="1"/>

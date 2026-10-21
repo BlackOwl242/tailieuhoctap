@@ -79,15 +79,15 @@ Thời hạn giải quyết được tính từ thời điểm tiếp nhận h�
 
 Sự cố nền tảng, chờ xử lý nội bộ hoặc chờ người phê duyệt không tự cho phép tạm dừng hạn pháp lý. Mỗi khoảng loại trừ thời gian chỉ được ghi khi có căn cứ áp dụng và chứng từ tương ứng. Hệ thống lưu hạn ban đầu, hạn hiện hành và lịch sử điều chỉnh để báo cáo vẫn phản ánh được việc thay đổi. Quá hạn kích hoạt cảnh báo, trách nhiệm giải trình và chứng từ theo quy định; thao tác trả kết quả vẫn được tổ chức để không tiếp tục kéo dài việc phục vụ.
 
-## 3.4. Đặc tả Use case trọng tâm
+## 3.4. Đặc tả use case trọng tâm
 
-Hình 3.3: Các chủ thể và Use case trọng tâm
+Hình 3.3: Các chủ thể và use case trọng tâm
 
-![Use case](../03_Thiet_ke/So_do/13_ca_su_dung.png)
+![use case](../03_Thiet_ke/So_do/13_ca_su_dung.png)
 
 ### 3.4.1. Nộp yêu cầu trực tuyến
 
-Bảng 3.4: Use case UC01 về nộp yêu cầu
+Bảng 3.4: use case UC01 về nộp yêu cầu
 
 | Thuộc tính | Nội dung |
 | --- | --- |
@@ -101,7 +101,7 @@ Bảng 3.4: Use case UC01 về nộp yêu cầu
 
 ### 3.4.2. Kiểm tra và tiếp nhận
 
-Bảng 3.5: Use case UC02 về tiếp nhận hồ sơ
+Bảng 3.5: use case UC02 về tiếp nhận hồ sơ
 
 | Thuộc tính | Nội dung |
 | --- | --- |
@@ -120,7 +120,7 @@ Hình 3.4: Phân rã tiến trình tiếp nhận và kiểm tra hồ sơ
 
 ![Tiến trình tiếp nhận](../03_Thiet_ke/So_do/14_tiep_nhan.png)
 
-Bảng 3.6: Use case UC03 về thẩm định
+Bảng 3.6: use case UC03 về thẩm định
 
 | Thuộc tính | Nội dung |
 | --- | --- |
@@ -134,7 +134,7 @@ Bảng 3.6: Use case UC03 về thẩm định
 
 ### 3.4.4. Ký, phát hành và giao kết quả
 
-Bảng 3.7: Use case UC04 về ký và phát hành
+Bảng 3.7: use case UC04 về ký và phát hành
 
 | Thuộc tính | Nội dung |
 | --- | --- |
@@ -145,7 +145,7 @@ Bảng 3.7: Use case UC04 về ký và phát hành
 | Bản bị thay sau ký | Kiểm tra giá trị băm; từ chối phát hành; yêu cầu quy trình sửa đổi |
 | Kết quả | Bản phát hành bất biến, số văn bản và bằng chứng chữ ký |
 
-Bảng 3.8: Use case UC05 về trả kết quả
+Bảng 3.8: use case UC05 về trả kết quả
 
 | Thuộc tính | Nội dung |
 | --- | --- |
@@ -158,7 +158,7 @@ Bảng 3.8: Use case UC05 về trả kết quả
 
 ### 3.4.5. Đối soát tài chính và dừng yêu cầu
 
-Bảng 3.9: Use case UC06 và UC07 về tài chính và dừng yêu cầu
+Bảng 3.9: use case UC06 và UC07 về tài chính và dừng yêu cầu
 
 | Thuộc tính | UC06 đối soát | UC07 dừng yêu cầu |
 | --- | --- | --- |
@@ -200,7 +200,7 @@ Bảng 3.11: Rủi ro và biện pháp trong phân tích yêu cầu
 
 Bảng 3.12: Truy vết từ yêu cầu đến thiết kế và kiểm thử
 
-| Yêu cầu | Use case | Thành phần thiết kế | Kiểm thử |
+| Yêu cầu | use case | Thành phần thiết kế | Kiểm thử |
 | --- | --- | --- | --- |
 | YC01 | UC01, UC02 | phien_ban_thu_tuc | KT01, KT02 |
 | YC02 | UC01, UC05 | chu_the, uy_quyen, quyền hồ sơ | KT03, KT04 |
@@ -426,3 +426,9 @@ Bảng 3.24: Chuỗi kiểm chứng liên kết nhiều nhóm chức năng
 | Nộp lưu | Hồ sơ, kho, danh mục, lưu trữ, quyền | Gói đủ tài liệu; toàn vẹn; biên nhận; quyền khai thác |
 
 Phân tích riêng một nhánh chưa đủ chứng minh hệ thống hoạt động đúng. Từng chuỗi phải giữ định danh, căn cứ và phiên bản xuyên các điểm chuyển. Các ca HT01 đến HT20 cùng bộ ca trọng tâm chuẩn bị kiểm chứng; nếu một đầu mối chưa có môi trường hoặc hợp đồng kết nối, kết luận của chuỗi là chưa kiểm chứng, không phải đạt.
+
+## Phạm vi nghiệp vụ đã hiện thực ngày 20/10/2026
+
+Khung tiếp nhận, phân công, thụ lý, duyệt, ký và giao được sử dụng cho hai quy trình có điều kiện riêng. 2.000908 bắt buộc đối chiếu sổ và quyền yêu cầu; 1.004237 bắt buộc kiểm tra dữ liệu và nghĩa vụ tài chính. Chưa có bộ máy tùy biến mọi tuyến liên cơ quan hoặc nhiều cấp duyệt. Tài khoản nghiệp vụ và hồ sơ phải khớp cơ quan cụ thể, chuyên viên chỉ xử lý hồ sơ được giao, quản trị viên không đọc hồ sơ cá nhân.
+
+Xem [đối chiếu thủ tục với DVCQG](../05_Doi_chieu/Doi_chieu_thu_tuc_DVCQG_20261020.md) để phân biệt dữ liệu công bố, chức năng đã thực hiện và nội dung còn thiếu.

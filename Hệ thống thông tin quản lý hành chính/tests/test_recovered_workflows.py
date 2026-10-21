@@ -49,7 +49,7 @@ class RecoveredWorkflowTests(unittest.TestCase):
         app.UPLOAD_DIR = app.DATA_DIR / 'uploads'
         app.init_db()
         with app.connect() as con:
-            for name, role, scope in [('intake', 'intake', 'Ward A'), ('other', 'intake', 'Ward B'), ('finance', 'finance', 'Ward A'), ('finance2', 'finance', 'Ward A'), ('admin', 'admin', 'Toàn thành phố'), ('leader', 'leader', 'Ward A')]:
+            for name, role, scope in [('intake', 'intake', 'UBND phường Kiểm thử A'), ('other', 'intake', 'UBND phường Kiểm thử B'), ('finance', 'finance', 'UBND phường Kiểm thử A'), ('finance2', 'finance', 'UBND phường Kiểm thử A'), ('admin', 'admin', 'Toàn thành phố'), ('leader', 'leader', 'UBND phường Kiểm thử A')]:
                 salt = uuid.uuid4().bytes
                 now = app.now_iso()
                 con.execute('INSERT INTO users(id,email,full_name,password_salt,password_hash,role,active,agency_scope,created_at,updated_at) VALUES(?,?,?,?,?,?,1,?,?,?)',
@@ -81,16 +81,16 @@ class RecoveredWorkflowTests(unittest.TestCase):
 
     def case(self, code='RECOVERY-CASE'):
         key = 'a' * 64
-        payload = {'code': code, 'procedureCode': '2.000908', 'agencyScope': 'Ward A', 'receivingAgency': 'Ward A', 'applicant': {'name': 'Test applicant', 'phone': '0900000000'}, 'fee': {'status': 'DUE', 'amount': 20000, 'basis': 'Căn cứ khoản thu của dữ liệu kiểm thử'}, 'attachments': []}
+        payload = {'code': code, 'procedureCode': '1.004237', 'agencyScope': 'UBND phường Kiểm thử A', 'receivingAgency': 'UBND phường Kiểm thử A', 'applicant': {'name': 'Test applicant', 'phone': '0900000000'}, 'fee': {'status': 'DUE', 'amount': 20000, 'basis': 'Căn cứ khoản thu của dữ liệu kiểm thử'}, 'attachments': []}
         with app.connect() as con:
-            con.execute('INSERT INTO cases(code,owner_id,procedure_code,status,payload_json,created_at,updated_at) VALUES(?,?,?,?,?,?,?)', (code, hashlib.sha256(key.encode()).hexdigest(), '2.000908', 'DA_TIEP_NHAN', json.dumps(payload), app.now_iso(), app.now_iso()))
+            con.execute('INSERT INTO cases(code,owner_id,procedure_code,status,payload_json,created_at,updated_at) VALUES(?,?,?,?,?,?,?)', (code, hashlib.sha256(key.encode()).hexdigest(), '1.004237', 'DA_TIEP_NHAN', json.dumps(payload), app.now_iso(), app.now_iso()))
         return key
 
     def action(self, key, action, payload, version):
         return self.public.call('/api/public/cases/RECOVERY-CASE/actions', {'accessKey': key, 'action': action, 'expectedVersion': version, 'payload': payload})
 
     def counter(self):
-        return {'procedureCode': '2.000908', 'receivingAgency': 'Ward A', 'applicantType': 'citizen', 'applicantName': 'Người nộp kiểm thử', 'citizenId': 'TEST-ID', 'applicantPhone': '0900000000', 'applicantAddress': 'Địa chỉ kiểm thử', 'requestSummary': 'Đề nghị giải quyết hồ sơ tại quầy', 'paperOriginals': 'Bản gốc và bản sao đã đối chiếu', 'identityVerified': True, 'submissionKey': str(uuid.uuid4())}
+        return {'procedureCode': '2.000908', 'receivingAgency': 'UBND phường Kiểm thử A', 'applicantType': 'citizen', 'applicantName': 'Người nộp kiểm thử', 'citizenId': 'TEST-ID', 'applicantPhone': '0900000000', 'applicantAddress': 'Địa chỉ kiểm thử', 'requestSummary': 'Đề nghị giải quyết hồ sơ tại quầy', 'paperOriginals': 'Bản gốc và bản sao đã đối chiếu', 'identityVerified': True, 'submissionKey': str(uuid.uuid4())}
 
     def test_counter_scope_csrf_and_duplicate_submission(self):
         intake = self.client('intake'); body = self.counter()
@@ -160,7 +160,7 @@ class RecoveredWorkflowTests(unittest.TestCase):
     def test_appointment_lookup_scope_status_and_audit(self):
         day = datetime.now(app.TZ).date() + timedelta(days=1)
         while not app.is_workday(day): day += timedelta(days=1)
-        body = {'name': 'Người hẹn kiểm thử', 'phone': '0900000000', 'agency': 'Ward A', 'procedureCode': '2.000908', 'date': day.isoformat(), 'timeSlot': '08:00-09:00'}
+        body = {'name': 'Người hẹn kiểm thử', 'phone': '0900000000', 'agency': 'UBND phường Kiểm thử A', 'procedureCode': '2.000908', 'date': day.isoformat(), 'timeSlot': '08:00-09:00'}
         status, created = self.public.call('/api/public/appointments', body)
         self.assertEqual(status, 201, created)
         code = created['code']
@@ -177,7 +177,7 @@ class RecoveredWorkflowTests(unittest.TestCase):
             self.assertEqual(con.execute('SELECT count(*) FROM public_appointment_events WHERE appointment_code=?', (code,)).fetchone()[0], 1)
 
     def test_feedback_reply_is_scoped_and_not_overwritten(self):
-        body = {'name': 'Người gửi kiểm thử', 'phone': '0900000000', 'agency': 'Ward A', 'title': 'Góp ý chất lượng phục vụ', 'content': 'Đề nghị bổ sung hướng dẫn tại bộ phận tiếp nhận.'}
+        body = {'name': 'Người gửi kiểm thử', 'phone': '0900000000', 'agency': 'UBND phường Kiểm thử A', 'title': 'Góp ý chất lượng phục vụ', 'content': 'Đề nghị bổ sung hướng dẫn tại bộ phận tiếp nhận.'}
         status, result = self.public.call('/api/public/pakn', body)
         self.assertEqual(status, 201, result)
         update = {'code': result['code'], 'expectedStatus': 'RECEIVED', 'note': 'Đã tiếp nhận góp ý và chuyển bộ phận phụ trách.'}

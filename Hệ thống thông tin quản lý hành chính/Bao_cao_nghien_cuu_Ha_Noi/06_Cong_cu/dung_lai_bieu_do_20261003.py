@@ -281,7 +281,7 @@ def restyle_other_figures():
  module.MODEL=list(DATA.values());module.CLASS_DIAGRAMS=[]
  # Không chèn diễn giải dài vào hình lớp; diễn giải nằm dưới hình trong báo cáo.
  oldtext=module.Canvas.text
- substitutions={'Bội số đặt ở phía đối tượng tương ứng; các quan hệ còn lại được đặc tả trong bảng ánh xạ.':'','Phạm vi các Use case của hệ thống nghiên cứu':'Use case tổng thể','Chuyên biệt hóa trỏ về tác nhân chung; từng quyền vẫn kiểm tra cơ quan và thời gian hiệu lực.':'','Lớp miền ':'Biểu đồ lớp ','HoSo các nhánh tiếp nhận và giải quyết':'Trạng thái tiếp nhận và giải quyết hồ sơ','Vòng đời KetQua':'Trạng thái kết quả','Vòng đời KhoanThu':'Trạng thái khoản thu','Vòng đời NhiemVuPhoiHop':'Trạng thái công việc phối hợp','Vòng đời ThongDiep':'Trạng thái thông tin trao đổi','Vòng đời GoiNopLuu':'Trạng thái gói nộp lưu','Bổ sung quay lại giai đoạn đã lưu. Sau TRINH_DUYET: ký duyệt, phát hành, xác nhận giao.':'','CHỜ THU':'CHỜ THANH TOÁN','phát hành\n[đã kiểm tra chữ ký]':'phát hành\n[chữ ký hợp lệ]','Bản đã ký bất biến.\nGửi thông báo chưa đủ\nđể xác nhận đã giao.':'Bản đã ký được giữ nguyên.\nGiao kết quả được xác nhận riêng.','Vùng tiếp xúc ngoài\nCổng kết nối và xác thực':'Vùng kết nối bên ngoài\nCổng kết nối và xác thực'}
+ substitutions={'Bội số đặt ở phía đối tượng tương ứng; các quan hệ còn lại được đặc tả trong bảng ánh xạ.':'','Phạm vi các use case của hệ thống nghiên cứu':'use case tổng thể','Chuyên biệt hóa trỏ về tác nhân chung; từng quyền vẫn kiểm tra cơ quan và thời gian hiệu lực.':'','Lớp miền ':'Biểu đồ lớp ','HoSo các nhánh tiếp nhận và giải quyết':'Trạng thái tiếp nhận và giải quyết hồ sơ','Vòng đời KetQua':'Trạng thái kết quả','Vòng đời KhoanThu':'Trạng thái khoản thu','Vòng đời NhiemVuPhoiHop':'Trạng thái công việc phối hợp','Vòng đời ThongDiep':'Trạng thái thông tin trao đổi','Vòng đời GoiNopLuu':'Trạng thái gói nộp lưu','Bổ sung quay lại giai đoạn đã lưu. Sau TRINH_DUYET: ký duyệt, phát hành, xác nhận giao.':'','CHỜ THU':'CHỜ THANH TOÁN','phát hành\n[đã kiểm tra chữ ký]':'phát hành\n[chữ ký hợp lệ]','Bản đã ký bất biến.\nGửi thông báo chưa đủ\nđể xác nhận đã giao.':'Bản đã ký được giữ nguyên.\nGiao kết quả được xác nhận riêng.','Vùng tiếp xúc ngoài\nCổng kết nối và xác thực':'Vùng kết nối bên ngoài\nCổng kết nối và xác thực'}
  state_names={'NHAP':'Nháp','CHO_TIEP_NHAN':'Chờ tiếp nhận','CHO_BO_SUNG':'Chờ bổ sung','DA_TIEP_NHAN':'Đã tiếp nhận','DANG_THU_LY':'Đang thụ lý','TRINH_DUYET':'Chờ phê duyệt','TU_CHOI':'Từ chối tiếp nhận','KHONG_GIAI_QUYET':'Không giải quyết','DUNG':'Dừng giải quyết','DA_PHE_DUYET':'Đã ký duyệt','DA_PHAT_HANH':'Đã phát hành','HOAN_THANH':'Hoàn thành'}
  def natural_text(self,x,y,t,*args,**kwargs):
   if t.startswith(('Mũi tên nét đứt chỉ phụ thuộc','Hợp đồng xác thực, dữ liệu','Các kết nối ngoài được tách','Mỗi yêu cầu phối hợp','Các nhánh chạy song song')):return 0
@@ -314,7 +314,7 @@ def restyle_other_figures():
  # Xóa nhận xét dưới hình bằng cách không vẽ chúng, không xóa tệp nguồn.
 
 def overview():
- c=Drawing(900,608);c.text(450,12,'Use case tổng thể',860,23,True);c.rect(270,49,605,545,'white')
+ c=Drawing(900,608);c.text(450,12,'use case tổng thể',860,23,True);c.rect(270,49,605,545,'white')
  items=[('Người nộp','Kê khai, bổ sung, thanh toán và nhận kết quả'),('Cán bộ xử lý','Tiếp nhận, phân công, thẩm định và phát hành'),('Người quản trị','Quyền, danh mục, quy trình và kho tài liệu'),('Lãnh đạo','Chỉ đạo, thống kê và kiểm tra trách nhiệm'),('Hệ thống đối tác','Xác thực, ký, thanh toán và trao đổi dữ liệu')]
  for i,(a,t) in enumerate(items):
   y=56+i*106;x=130;c.circle(x,y+8,8);c.line([(x,y+16),(x,y+43)]);c.line([(x-15,y+25),(x+15,y+25)]);c.line([(x,y+43),(x-13,y+61)]);c.line([(x,y+43),(x+13,y+61)]);c.text(x,y+67,a,220,17)
@@ -329,4 +329,4 @@ if __name__=='__main__':
   for u in DATA.values():sequence(u);activity(u);wireframe(u)
   restyle_other_figures()
   (ROOT/'05_Doi_chieu/Bien_tap_lai_20261003/Kiem_tra_hinh.json').write_text(json.dumps(AUDIT,ensure_ascii=False,indent=2),encoding='utf-8')
-  print('Đã dựng lại',len(AUDIT),'hình của 36 Use case và thống nhất các hình UML còn lại.')
+  print('Đã dựng lại',len(AUDIT),'hình của 36 use case và thống nhất các hình UML còn lại.')

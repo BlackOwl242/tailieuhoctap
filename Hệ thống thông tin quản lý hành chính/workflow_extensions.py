@@ -8,6 +8,7 @@ import json
 import re
 import secrets
 import uuid
+import procedure_workflows as workflows
 
 
 def init_schema(con):
@@ -54,7 +55,7 @@ def _agency_allowed(user, agency):
     target = (agency or '').strip()
     if not scope or not target:
         return False
-    return scope.casefold() == 'toàn thành phố' or _normalize_agency(scope) == _normalize_agency(target)
+    return workflows.concrete_agency(scope) and workflows.concrete_agency(target) and _normalize_agency(scope) == _normalize_agency(target)
 
 
 def get_records(service, handler, user):
@@ -78,6 +79,8 @@ def create_public(service, handler, kind, body):
     name = service.clean_text(body.get('name'), 150)
     phone = service.clean_text(body.get('phone'), 40)
     agency = service.clean_text(body.get('agency'), 180)
+    if not workflows.concrete_agency(agency):
+        raise ValueError('Chọn một cơ quan tiếp nhận cụ thể.')
     if len(name) < 2 or not re.fullmatch(r'[+0-9(). -]{8,40}', phone):
         raise ValueError('Nhập họ tên và số điện thoại liên hệ hợp lệ.')
     now = service.now_iso()
@@ -193,6 +196,9 @@ def create_counter_case(service, handler, user, body):
     agency = service.clean_text(body.get('receivingAgency'), 180)
     if not procedure or not agency or not _agency_allowed(user, agency):
         raise ValueError('Chọn thủ tục và cơ quan thuộc phạm vi tiếp nhận.')
+    profile = workflows.require_submission(procedure)
+    if not workflows.agency_matches(profile, agency):
+        raise ValueError('Cơ quan không thuộc tuyến xử lý đã cấu hình cho thủ tục.')
     applicant_type = service.clean_text(body.get('applicantType'), 20)
     name = service.clean_text(body.get('applicantName'), 150)
     citizen_id = service.clean_text(body.get('citizenId'), 40)
@@ -219,8 +225,10 @@ def create_counter_case(service, handler, user, body):
         code = f'HN-{datetime.now(service.TZ).year}-' + secrets.token_hex(4).upper()
         lookup = secrets.token_hex(32)
         created = service.now_iso()
-        deadline, deadline_note = service.compute_deadline(procedure_code, datetime.now(service.TZ))
+        deadline, deadline_note = service.compute_deadline(procedure_code, datetime.now(service.TZ), profile)
         payload = {'code': code, 'procedureCode': procedure_code, 'applicantType': applicant_type,
+                   'procedure': procedure, 'workflow': workflows.snapshot(procedure),
+                   'milestones': workflows.milestones(profile, datetime.now(service.TZ), service.is_workday),
                    'applicant': {'name': name, 'citizenId': citizen_id, 'phone': phone, 'email': email, 'address': address},
                    'subject': {'name': name, 'relation': 'Người nộp'}, 'requestSummary': summary,
                    'paperOriginals': originals, 'receivingAgency': agency, 'agencyScope': agency,

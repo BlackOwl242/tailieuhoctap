@@ -1,4 +1,4 @@
-"""Nội dung nghiệp vụ được biên tập theo từng Use case, ngày 03/10/2026."""
+"""Nội dung nghiệp vụ được biên tập theo từng use case, ngày 03/10/2026."""
 from pathlib import Path
 import json
 ROOT=Path(__file__).resolve().parents[1]
@@ -300,4 +300,4 @@ add(36,'Lập và chuyển hồ sơ đã hoàn thành vào lưu trữ của cơ 
 assert len(DATA)==36
 if __name__=='__main__':
  (ROOT/'03_Thiet_ke/Huong_doi_tuong/Noi_dung_Use_case_20261003.json').write_text(json.dumps(list(DATA.values()),ensure_ascii=False,indent=2),encoding='utf-8')
- print('Đã biên tập nội dung cho 36 Use case.')
+ print('Đã biên tập nội dung cho 36 use case.')

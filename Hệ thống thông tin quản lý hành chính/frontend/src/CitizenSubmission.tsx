@@ -5,7 +5,7 @@ import { normalizeAgency, procedureAgencies } from './procedureAgencies'
 type Condition = { field: string; equals?: string; not?: string }
 export type SubmissionField = { id: string; label: string; type?: string; required?: boolean; options?: string[]; applicantTypes?: string[]; when?: Condition; maxLength?: number; min?: number; max?: number; help?: string; officialAttachmentNames?: string[]; templateSourceUrl?: string }
 export type SubmissionSchema = { version: string; title: string; sourceUrl: string; formSourceUrl?: string; formSourceLabel?: string; sourceStatus?: string; legalBasis: string; deadlineText: string; feeText: string; fields: SubmissionField[]; documents: SubmissionField[]; deliveryMethods: string[]; deliveryNote: string }
-type Procedure = { code: string; name: string; field: string; agency: string; level: string; serviceMode?: string; submission?: SubmissionSchema; routing?: { observedAuthorities?: { authority: string }[] } }
+type Procedure = { code: string; name: string; field: string; agency: string; level: string; submissionEnabled?: boolean; submissionDisabledReason?: string; serviceMode?: string; submission?: SubmissionSchema; routing?: { observedAuthorities?: { authority: string }[] } }
 type Receipt = { code: string; accessKey?: string; status?: string; statusLabel?: string; duplicate?: boolean }
 type Request = <T>(path: string, body?: unknown) => Promise<T>
 function visibleFormItem(item: SubmissionField, applicantType: string, values: Record<string, string>) {
@@ -81,7 +81,7 @@ export function CitizenApplicationForm({ initialProcedureCode, onSubmitted, requ
   const fields = schema?.fields.filter(f => visibleFormItem(f, applicantType, values)) || []
   const components = schema?.documents.filter(f => visibleFormItem(f, applicantType, values)) || []
   const files = components.flatMap(c => (documents[c.id] || []).map(file => ({ file, componentId: c.id })))
-  const submittableProcedures = procedures.filter(p => p.serviceMode !== 'INFORMATION' && p.submission && p.submission.sourceStatus !== 'official-document-list-only')
+  const submittableProcedures = procedures.filter(p => p.submissionEnabled === true)
   const results = !query.trim() ? submittableProcedures : submittableProcedures.filter(p => `${p.code} ${p.name} ${p.field} ${p.agency}`.toLocaleLowerCase('vi').includes(query.trim().toLocaleLowerCase('vi')))
   function changeProcedure(code: string) {
     setSelectedCode(code); setStep(0); setAgency(''); setValues(defaultValues); setDocuments({}); setDelivery(''); setConfirmed(false); setKeys(null); setError('')
@@ -92,6 +92,7 @@ export function CitizenApplicationForm({ initialProcedureCode, onSubmitted, requ
   function changeValue(id: string, value: string) { setValues(old => ({ ...old, [id]: value })); setConfirmed(false); setKeys(null) }
   function validateStage(index: number) {
     if (index === 0 && procedure?.serviceMode === 'INFORMATION') return 'Thủ tục này thuộc mức Cung cấp thông tin, thực hiện nộp trực tiếp tại Bộ phận Một cửa.'
+    if (index === 0 && procedure?.submissionEnabled !== true) return procedure?.submissionDisabledReason || 'Thủ tục chưa có tờ khai và quy trình đã đối chiếu.'
     if (index === 0 && !schema) return 'Thủ tục này chưa có biểu mẫu trực tuyến. Vui lòng chọn thủ tục mức Toàn trình hoặc Một phần.'
     if (index === 0 && schema?.sourceStatus === 'official-document-list-only') return 'Nguồn công khai mới xác nhận thành phần hồ sơ, chưa có cấu trúc tờ khai điện tử.'
     if (index === 0 && !agency) return 'Chọn đúng cơ quan tiếp nhận. Nếu danh sách trống, đơn vị quản trị cần cấp tài khoản tiếp nhận cho cơ quan.'

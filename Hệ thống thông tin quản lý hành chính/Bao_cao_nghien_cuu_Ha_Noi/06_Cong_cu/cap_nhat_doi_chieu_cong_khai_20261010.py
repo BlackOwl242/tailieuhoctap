@@ -63,7 +63,7 @@ test_plan = next(
     or p.text.startswith("Bộ kế hoạch có 101 ca kiểm thử")
 )
 test_plan.text = (
-    "Bộ kế hoạch có 101 ca kiểm thử gắn với 36 Use case, gồm 50 ca trọng tâm, 20 ca mở rộng và 31 ca chức năng. "
+    "Bộ kế hoạch có 101 ca kiểm thử gắn với 36 use case, gồm 50 ca trọng tâm, 20 ca mở rộng và 31 ca chức năng. "
     "Các tình huống bao phủ điều kiện hợp lệ, thiếu dữ liệu, sai quyền, gửi lặp, lỗi tích hợp và cập nhật đồng thời. "
     "Đây là kế hoạch; chưa chạy kiểm thử hệ thống với tài khoản, dữ liệu hoặc môi trường do cơ quan vận hành cấp. "
     "Kiểm tra tính nhất quán của mô hình không được tính là kết quả kiểm thử phần mềm."

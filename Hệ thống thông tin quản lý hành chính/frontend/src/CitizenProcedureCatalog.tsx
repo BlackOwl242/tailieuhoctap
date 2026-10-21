@@ -11,6 +11,7 @@ type Procedure = {
   field: string
   level: string
   agency: string
+  submissionEnabled?: boolean
   verified: boolean
   submission?: SubmissionSchema
   routing?: { status?: string; summary?: string; checkedAt?: string; officialUrl?: string }
@@ -20,7 +21,7 @@ const format = (value: number) => value.toLocaleString('vi-VN')
 const levels = ['Toàn trình', 'Một phần', 'Cung cấp thông tin']
 const catalogField = (item: Procedure) => item.field || (item.code === '2.000908' ? 'Chứng thực' : '')
 const catalogAgency = (item: Procedure) => item.agency || (['2.000908', '2.000635'].includes(item.code) ? 'Sở Tư pháp' : '')
-const hasInteractiveForm = (item: Procedure | null | undefined) => Boolean(item?.submission && item.submission.sourceStatus !== 'official-document-list-only' && item.submission.fields?.length)
+const hasInteractiveForm = (item: Procedure | null | undefined) => item?.submissionEnabled === true
 
 type Request = <T>(path: string) => Promise<T>
 

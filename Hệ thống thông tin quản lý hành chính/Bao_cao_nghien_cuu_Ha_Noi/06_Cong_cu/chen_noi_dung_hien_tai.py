@@ -100,7 +100,7 @@ def add_ui_section(doc, anchor=None):
     w.caption('Bảng','4',11,'Trạng thái và kiểm soát tin tức')
     w.table([['Trạng thái hoặc thao tác','Người thực hiện','Kết quả'],*CMS_ROWS],[2250,1800,5022])
     w.p(f'Các hình dưới đây minh họa giao diện ứng dụng do em xây dựng, được chụp ngày {DATE}. Số liệu xuất hiện trong ảnh thuộc cơ sở dữ liệu của ứng dụng.')
-    order=list(range(1,46))
+    order=list(range(1,len(captures)+1))
     by_num={i+1:r for i,r in enumerate(captures)}
     captions=[]
     for i,n in enumerate(order):
@@ -118,10 +118,10 @@ def add_ui_section(doc, anchor=None):
 
 def add_coverage_section(doc,anchor=None):
     w=Writer(doc,anchor)
-    w.p('6.5. Đánh giá mức độ đáp ứng các ca sử dụng', 'Heading 2')
-    w.p('Kết quả triển khai được đối chiếu với 36 ca sử dụng đã phân tích ở chương 3. Bảng 6.40 nêu chức năng đã thực hiện được và những nội dung cần tiếp tục bổ sung. Các ca sử dụng liên quan đến dịch vụ bên ngoài được đánh giá theo tình trạng kết nối của ứng dụng.')
-    w.caption('Bảng','6',40,'Kết quả triển khai theo ca sử dụng')
-    w.table([['Ca sử dụng','Kết quả','Chức năng','Nội dung đáp ứng và phần cần bổ sung'],*[[r['id']+' '+r['name'],r['status'],r['ui'],r['note']] for r in COVERAGE]],[1800,1450,1850,3972])
+    w.p('6.5. Đánh giá mức độ đáp ứng các use case', 'Heading 2')
+    w.p('Kết quả triển khai được đối chiếu với 36 use case đã phân tích ở chương 3. Bảng 6.40 nêu chức năng đã thực hiện được và những nội dung cần tiếp tục bổ sung. Các use case liên quan đến dịch vụ bên ngoài được đánh giá theo tình trạng kết nối của ứng dụng.')
+    w.caption('Bảng','6',40,'Kết quả triển khai theo use case')
+    w.table([['use case','Kết quả','Chức năng','Nội dung đáp ứng và phần cần bổ sung'],*[[r['id']+' '+r['name'],r['status'],r['ui'],r['note']] for r in COVERAGE]],[1800,1450,1850,3972])
 
 
 def add_implementation_section(doc,anchor=None):
