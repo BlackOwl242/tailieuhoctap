@@ -3363,6 +3363,16 @@ class AppHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(raw)))
+        # SPA routes (including /staff) serve index.html. Keep that entry point
+        # fresh so a launcher rebuild cannot leave browsers with an old bundle
+        # reference and an empty React root; Vite's fingerprinted assets are safe
+        # to cache for a long time.
+        if target.name == "index.html":
+            self.send_header("Cache-Control", "no-store, max-age=0")
+        elif re.search(r"\.[A-Za-z0-9_-]{8,}\.(?:js|css)$", target.name):
+            self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+        else:
+            self.send_header("Cache-Control", "no-cache")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
         self.send_header("X-Frame-Options", "DENY")

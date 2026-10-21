@@ -807,7 +807,7 @@ function getActions(user: User, item: CaseFile) {
   }
   const permitted: Record<string, string[]> = { intake: ['accept', 'request_supplement', 'reject_intake', 'assign', 'prepare_stop_notice', 'set_fee', 'digitize_documents', 'deliver', 'submit_supplement'], specialist: ['save_draft', 'submit_review', 'request_supplement', 'verify_original_register', 'assess_data_request'], leader: ['approve', 'send_back', 'decline', 'waive_fee', 'sign_result'], registrar: ['issue', 'deliver'], finance: [] }
   const options = [...(all[status] || [])]
-  const finish = (values: { value: string; label: string }[]) => values.filter(option => permitted[role]?.includes(option.value) && (!item.workflowGuard || item.workflowGuard.allowedActions.includes(option.value)))
+  const finish = (values: { value: string; label: string }[]) => values.filter(option => permitted[role]?.includes(option.value) && (!item.workflowGuard || !Array.isArray(item.workflowGuard.allowedActions) || item.workflowGuard.allowedActions.includes(option.value)))
   if (role === 'specialist' && status === 'DANG_THU_LY' && item.workflowGuard?.verificationAction) options.unshift({ value: item.workflowGuard.verificationAction, label: item.workflowGuard.verificationLabel })
   if (role === 'leader' && status === 'DA_PHE_DUYET' && !item.sandboxSignature?.verified) options.push({ value: 'send_back', label: 'Trả lại để kiểm tra, trình duyệt lại' })
   if (role === 'leader' && status === 'DA_PHE_DUYET' && (!item.approvedAt || !item.approvedById || String(item.draftResult || '').trim().length < 10)) {

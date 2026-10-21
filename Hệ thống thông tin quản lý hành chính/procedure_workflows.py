@@ -44,7 +44,7 @@ PROFILES: dict[str, dict] = {
         "checkedAt": "2026-10-20",
         "authority": "Sở Nông nghiệp và Môi trường Hà Nội",
         "stages": {"submitted": "Gửi yêu cầu", "intake": "Kiểm tra hồ sơ", "handling": "Xem xét yêu cầu và nghĩa vụ tài chính", "review": "Xác nhận kết quả xử lý", "issue": "Cung cấp dữ liệu", "delivery": "Trả kết quả"},
-        "verificationAction": "verify_data_request",
+        "verificationAction": "assess_data_request",
         "verificationLabel": "Ghi kết quả xem xét yêu cầu",
         "evidenceFields": [
             {"id": "outcome", "label": "Kết luận về khả năng cung cấp", "minLength": 8},
@@ -100,9 +100,20 @@ def case_profile(case: dict) -> dict | None:
 
 def guard_summary(case: dict) -> dict:
     profile = case_profile(case)
+    allowed_actions = [
+        "accept", "request_supplement", "reject_intake", "assign", "prepare_stop_notice",
+        "set_fee", "digitize_documents", "deliver", "submit_supplement", "save_draft",
+        "submit_review", "verify_original_register", "verify_data_request", "assess_data_request",
+        "approve", "send_back", "decline", "waive_fee", "sign_result", "issue", "issue_stop_notice",
+    ]
     if not profile:
-        return {"verificationAction": "", "evidenceFields": []}
-    return {"verificationAction": profile["verificationAction"], "verificationLabel": profile["verificationLabel"], "evidenceFields": profile["evidenceFields"], "milestone": profile.get("milestone")}
+        return {"verificationAction": "", "evidenceFields": [], "allowedActions": allowed_actions}
+    evidence = case.get("workflowEvidence") or {}
+    if profile.get("procedureCode") == "2.000908" and evidence.get("outcome") != "Khớp sổ gốc và đủ quyền yêu cầu" and "submit_review" in allowed_actions:
+        allowed_actions.remove("submit_review")
+    if profile.get("procedureCode") == "1.004237" and not evidence.get("financialAssessment") and "submit_review" in allowed_actions:
+        allowed_actions.remove("submit_review")
+    return {"verificationAction": profile["verificationAction"], "verificationLabel": profile["verificationLabel"], "evidenceFields": profile["evidenceFields"], "milestone": profile.get("milestone"), "allowedActions": allowed_actions}
 
 
 def authorize_action(role: str, action: str) -> None:
