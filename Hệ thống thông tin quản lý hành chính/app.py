@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import base64
+import io
+import zipfile
 import csv
 import hashlib
 import hmac
@@ -68,10 +70,13 @@ AUTH_EMAIL_FAILURE_LIMIT = 10
 AUTH_IP_FAILURE_LIMIT = 60
 PUBLIC_WINDOW_SECONDS = 15 * 60
 
-MAX_BODY = 14 * 1024 * 1024
+MAX_BODY = 46 * 1024 * 1024
+MAX_DOSSIER_FILES = 32
+MAX_DOSSIER_BASE64 = 44 * 1024 * 1024
 MAX_FILE = 8 * 1024 * 1024
-ALLOWED_EXTS = {".pdf", ".png", ".jpg", ".jpeg"}
+ALLOWED_EXTS = {".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx"}
 SESSION_COOKIE = "hni_session"
+CITIZEN_SESSION_COOKIE = "hni_citizen_session"
 SESSION_TTL = 60 * 60 * 12
 PASSWORD_ITERATIONS = 600_000
 COOKIE_SECURE = os.environ.get("HANOI_COOKIE_SECURE", "0") == "1"
@@ -219,11 +224,15 @@ def ensure_procedure_submission(proc: dict) -> None:
     """Keep reference documents visible; enable intake only for reviewed form/workflow pairs."""
     proc["serviceMode"] = proc.get("serviceMode") or {"Toàn trình": "FULL", "Một phần": "PARTIAL", "Cung cấp thông tin": "INFORMATION"}.get(proc.get("level", ""), "UNKNOWN")
     profile = workflows.configured_profile(proc)
-    proc["submissionEnabled"] = bool(profile)
+    if profile and profile.get("kind") == "PUBLISHED_DOSSIER":
+        proc["submission"] = workflows.form_for(proc["code"])
+        proc["routing"] = {**(proc.get("routing") or {}), "officialAgencyHints": profile.get("agencyHints", [])}
+    proc["counterEnabled"] = bool(profile and "DIRECT" in profile.get("channels", ["ONLINE", "DIRECT"]))
+    proc["submissionEnabled"] = bool(profile and "ONLINE" in profile.get("channels", ["ONLINE", "DIRECT"]) and proc["serviceMode"] not in {"INFORMATION", "UNKNOWN"})
     proc["workflowSummary"] = ({"version": profile["version"], "title": profile["title"], "stages": profile["stages"],
                                 "authority": profile["authority"], "sourceUrl": profile["sourceUrl"], "checkedAt": profile["checkedAt"]} if profile else None)
     proc["submissionDisabledReason"] = "" if profile else "Chưa mở tiếp nhận: tờ khai tương tác và quy trình của thủ tục chưa được đối chiếu đầy đủ. Vẫn có thể xem thông tin công bố và tải mẫu giấy tờ."
-    if proc["serviceMode"] in {"INFORMATION", "UNKNOWN"}:
+    if proc["serviceMode"] in {"INFORMATION", "UNKNOWN"} and not profile:
         proc["submission"] = None
     elif not profile and isinstance(proc.get("submission"), dict):
         proc["submission"] = {**proc["submission"], "sourceStatus": "official-document-list-only", "fields": []}
@@ -305,7 +314,7 @@ PROCEDURE_CATEGORY_OVERRIDES: dict[str, dict] = {}
 SAMPLE_DATASET_VERSION = 2
 
 
-def procedure_catalog_records() -> list[dict]:
+def procedure_catalog_records(summary: bool = False) -> list[dict]:
     records = []
     for source in PROCEDURES:
         item = dict(source)
@@ -327,6 +336,9 @@ def procedure_catalog_records() -> list[dict]:
             item["categoryEdit"] = {key: category_edit[key] for key in ("sourceUrl", "checkedAt", "reason", "version", "updatedBy", "updatedAt")}
         item["categoryKey"] = item.get("fieldSource") or "Chưa phân loại"
         item.pop("fieldSource", None)
+        if summary:
+            item.pop("submission", None)
+            item.pop("workflowSummary", None)
         records.append(item)
     return records
 
@@ -640,6 +652,12 @@ def init_db() -> None:
                 created_at TEXT NOT NULL
             );
             CREATE INDEX IF NOT EXISTS idx_staff_authority_user ON staff_authority_events(user_id, id);
+            CREATE TABLE IF NOT EXISTS citizen_record_owners (
+                record_code TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL REFERENCES users(id),
+                created_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_citizen_records_user ON citizen_record_owners(user_id);
             CREATE TABLE IF NOT EXISTS sessions (
                 token_hash TEXT PRIMARY KEY,
                 user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -752,6 +770,15 @@ def compute_deadline(procedure_code: str, accepted_at: datetime, profile: dict |
     """Use the case's pinned policy; never invent a final deadline from a milestone."""
     profile = profile or workflows.PROFILES.get(procedure_code) or {}
     rule = profile.get("deadline") or {}
+    if rule.get("kind") in {"DAY", "WORKING_DAY", "HOUR"}:
+        quantity = rule["quantity"]
+        due = accepted_at.astimezone(TZ)
+        if rule["kind"] == "WORKING_DAY":
+            for _ in range(quantity):
+                due = datetime.combine(next_workday(due.date()), due.timetz())
+        else:
+            due += timedelta(**({"days": quantity} if rule["kind"] == "DAY" else {"hours": quantity}))
+        return due.date().isoformat(), rule.get("note")
     if rule.get("kind") != "SAME_DAY":
         return None, rule.get("note") or "Chưa cấu hình hạn: cần xác nhận đúng phiên bản thủ tục và cơ quan."
     local = accepted_at.astimezone(TZ)
@@ -1024,6 +1051,7 @@ def public_case_view(con: sqlite3.Connection, row: sqlite3.Row) -> dict:
         "events": citizen_processing_events(con, row["id"]),
         "progress": case_progress(con, row, payload),
         "declaration": payload.get("declaration", {}),
+        "documentExemptions": payload.get("documentExemptions", {}),
         "deliveryMethod": payload.get("deliveryMethod", ""),
         "deliveryAddress": payload.get("deliveryAddress", ""),
         "delivery": ({key: payload["delivery"][key] for key in ("receiver", "evidence", "channel", "deliveredAt", "mode") if key in payload["delivery"]} if isinstance(payload.get("delivery"), dict) else None),
@@ -1134,6 +1162,15 @@ def validate_procedure_submission(procedure, body, applicant_type, files):
     for item in documents:
         if item.get("required") and not any(file.get("componentId") == item["id"] for file in files):
             raise ValueError(f"Thiếu thành phần hồ sơ: {item['label']}.")
+    if schema.get("declarationMode") == "OFFICIAL_ATTACHMENTS":
+        exemptions = body.get("documentExemptions") or {}
+        if not isinstance(exemptions, dict) or any(key not in allowed for key in exemptions):
+            raise ValueError("Giải trình thành phần hồ sơ không hợp lệ.")
+        for item in documents:
+            if not any(file.get("componentId") == item["id"] for file in files):
+                reason = exemptions.get(item["id"], "")
+                if not isinstance(reason, str) or not 12 <= len(reason.strip()) <= 1200:
+                    raise ValueError(f"Đính kèm hoặc ghi căn cứ không phải nộp: {item['label']}.")
     delivery = clean_text(body.get("deliveryMethod"), 40)
     if delivery not in schema["deliveryMethods"]:
         raise ValueError("Chọn phương thức nhận kết quả.")
@@ -1221,7 +1258,7 @@ def save_files(case_code: str, files) -> list[dict]:
         name = Path(str(file.get("name", "tai-lieu"))).name
         ext = Path(name).suffix.lower()
         if ext not in ALLOWED_EXTS:
-            raise ValueError(f"Tệp {name} không đúng định dạng. Chỉ nhận PDF, PNG, JPG hoặc JPEG.")
+            raise ValueError(f"Tệp {name} không đúng định dạng. Chỉ nhận PDF, Word (DOC, DOCX), PNG, JPG hoặc JPEG.")
         try:
             raw = base64.b64decode(file.get("data", ""), validate=True)
         except (ValueError, TypeError) as exc:
@@ -1230,11 +1267,25 @@ def save_files(case_code: str, files) -> list[dict]:
             raise ValueError(f"Tệp {name} vượt quá giới hạn 8 MB.")
         if not raw:
             raise ValueError(f"Tệp {name} đang trống.")
+        docx_valid = False
+        if ext in {".doc", ".docx"}:
+            try:
+                with zipfile.ZipFile(io.BytesIO(raw)) as document:
+                    entries = document.infolist()
+                    names = {entry.filename for entry in entries}
+                    docx_valid = (len(entries) <= 2048 and sum(entry.file_size for entry in entries) <= 64 * 1024 * 1024
+                                  and {"[Content_Types].xml", "word/document.xml"} <= names
+                                  and not any("vbaproject" in name.casefold() for name in names)
+                                  and not any(entry.flag_bits & 1 for entry in entries))
+            except (zipfile.BadZipFile, OSError):
+                pass
         signatures = {
             ".pdf": raw.startswith(b"%PDF-"),
             ".png": raw.startswith(b"\x89PNG\r\n\x1a\n"),
             ".jpg": raw.startswith(b"\xff\xd8\xff"),
             ".jpeg": raw.startswith(b"\xff\xd8\xff"),
+            ".doc": raw.startswith(bytes.fromhex("D0CF11E0A1B11AE1")) or docx_valid,
+            ".docx": docx_valid,
         }
         if not signatures[ext]:
             raise ValueError(f"Nội dung tệp {name} không khớp với định dạng .{ext.lstrip('.')}.")
@@ -1250,7 +1301,7 @@ def save_files(case_code: str, files) -> list[dict]:
             target = case_dir / stored
             target.write_bytes(raw)
             created_paths.append(target)
-            media_type = {".pdf": "application/pdf", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}[ext]
+            media_type = {".pdf": "application/pdf", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".doc": "application/msword", ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}[ext]
             saved.append({"name": name, "stored": stored, "size": len(raw), "type": media_type, "sha256": hashlib.sha256(raw).hexdigest()})
     except Exception:
         for target in created_paths:
@@ -1326,7 +1377,7 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
     if expected != row["version"]:
         raise RuntimeError("Hồ sơ vừa được cập nhật ở phiên khác. Hãy tải lại trước khi thao tác.")
     workflows.authorize_action(role, action)
-    profile = workflows.action_guard(case, action)
+    profile = workflows.case_profile(case)
     if profile and not case.get("workflow"):
         case["workflow"] = {**profile, "procedureCode": row["procedure_code"]}
 
@@ -1356,7 +1407,12 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
             raise ValueError("Chỉ cấu hình khoản thu khi hồ sơ đã được tiếp nhận và đang giải quyết.")
         if any(x["status"] in {"PENDING", "PAID", "RECONCILED", "REFUNDED"} for x in con.execute("SELECT status FROM payment_records WHERE case_id=?", (row["id"],)).fetchall()):
             raise ValueError("Hồ sơ đã có giao dịch; không thể thay đổi căn cứ hoặc số tiền.")
+        policy = (profile or {}).get("feePolicy") or {}
+        if policy.get("kind") == "NO_FEE":
+            raise ValueError("Công bố của thủ tục không quy định khoản thu này.")
         amount = payload.get("amount")
+        if policy.get("kind") == "FIXED" and amount != policy["amount"]:
+            raise ValueError("Số tiền không khớp mức thu cố định trong công bố của thủ tục.")
         if type(amount) is not int or amount <= 0 or amount > 100_000_000:
             raise ValueError("Nhập số tiền nguyên dương, tối đa 100.000.000 đồng.")
         basis = clean_text(payload.get("basis"), 1200)
@@ -1552,6 +1608,12 @@ def apply_action(con: sqlite3.Connection, row: sqlite3.Row, body: dict) -> tuple
         if current != "DANG_THU_LY": raise ValueError("Hồ sơ không ở bước thẩm định.")
         draft = clean_text(payload.get("draft"), 5000) or clean_text(case.get("draftResult"), 5000)
         if len(draft) < 10: raise ValueError("Cần lưu dự thảo trước khi trình duyệt.")
+        if profile:
+            evidence = case.get("workflowEvidence") or {}
+            required_outcome = "Đủ điều kiện trình xem xét" if profile.get("kind") == "PUBLISHED_DOSSIER" else "Khớp sổ gốc và đủ quyền yêu cầu" if profile["procedureCode"] == "2.000908" else None
+            if (required_outcome and evidence.get("outcome") != required_outcome) or (profile["procedureCode"] == "1.004237" and not evidence.get("financialAssessment")):
+                raise ValueError("Hoàn thành thẩm tra hồ sơ và kết luận đủ điều kiện trước khi trình duyệt.")
+            if profile.get("kind") == "PUBLISHED_DOSSIER": workflows.verify_evidence(profile, evidence)
         case["draftResult"] = draft
         case["submittedForApprovalAt"] = now_iso()
         next_status = "TRINH_DUYET"
@@ -2072,8 +2134,20 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.send_error_json("Không tìm thấy tệp đã lưu.", 404)
             raw = target.read_bytes()
             extension = Path(record.get("name", stored)).suffix.lower()
-            content_type = {".pdf": "application/pdf", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}.get(extension, "application/octet-stream")
-            signatures = {".pdf": raw.startswith(b"%PDF-"), ".png": raw.startswith(b"\x89PNG\r\n\x1a\n"), ".jpg": raw.startswith(b"\xff\xd8\xff"), ".jpeg": raw.startswith(b"\xff\xd8\xff")}
+            content_type = {".pdf": "application/pdf", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".doc": "application/msword", ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}.get(extension, "application/octet-stream")
+            docx_ok = False
+            if extension in {".doc", ".docx"}:
+                try:
+                    with zipfile.ZipFile(io.BytesIO(raw)) as document:
+                        entries = document.infolist()
+                        names = {entry.filename for entry in entries}
+                        docx_ok = (len(entries) <= 2048 and sum(entry.file_size for entry in entries) <= 64 * 1024 * 1024
+                                   and {"[Content_Types].xml", "word/document.xml"} <= names
+                                   and not any("vbaproject" in name.casefold() for name in names)
+                                   and not any(entry.flag_bits & 1 for entry in entries))
+                except (zipfile.BadZipFile, OSError):
+                    pass
+            signatures = {".pdf": raw.startswith(b"%PDF-"), ".png": raw.startswith(b"\x89PNG\r\n\x1a\n"), ".jpg": raw.startswith(b"\xff\xd8\xff"), ".jpeg": raw.startswith(b"\xff\xd8\xff"), ".doc": raw.startswith(bytes.fromhex("D0CF11E0A1B11AE1")) or docx_ok, ".docx": docx_ok}
             if extension not in signatures or not signatures[extension]:
                 return self.send_error_json("Tệp lưu trữ không khớp định dạng được phép.", 415)
             self.send_response(200)
@@ -2085,18 +2159,18 @@ class AppHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(raw)
 
-    def session_cookie(self, token: str, max_age: int) -> str:
-        attributes = [f"{SESSION_COOKIE}={token}", "Path=/", f"Max-Age={max_age}", "HttpOnly", "SameSite=Strict"]
+    def session_cookie(self, token: str, max_age: int, cookie_name: str = SESSION_COOKIE) -> str:
+        attributes = [f"{cookie_name}={token}", "Path=/", f"Max-Age={max_age}", "HttpOnly", "SameSite=Strict"]
         if COOKIE_SECURE:
             attributes.append("Secure")
         return "; ".join(attributes)
 
-    def current_user(self) -> sqlite3.Row | None:
+    def current_user(self, cookie_name: str = SESSION_COOKIE, allowed_roles=None) -> sqlite3.Row | None:
         cookie_header = self.headers.get("Cookie", "")
         jar = SimpleCookie()
         try:
             jar.load(cookie_header)
-            morsel = jar.get(SESSION_COOKIE)
+            morsel = jar.get(cookie_name)
             raw_token = morsel.value if morsel else ""
         except Exception:
             raw_token = ""
@@ -2107,11 +2181,56 @@ class AppHandler(BaseHTTPRequestHandler):
             row = con.execute("SELECT u.*,s.csrf_token,s.expires_at FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=?", (token_hash,)).fetchone()
             today = datetime.now(TZ).date().isoformat()
             out_of_scope_time = bool(row and ((row["valid_from"] and today < row["valid_from"]) or (row["valid_until"] and today > row["valid_until"])))
-            if not row or not row["active"] or row["expires_at"] <= int(datetime.now(TZ).timestamp()) or row["role"] not in STAFF_ROLES or out_of_scope_time:
+            if not row or not row["active"] or row["expires_at"] <= int(datetime.now(TZ).timestamp()) or row["role"] not in (STAFF_ROLES if allowed_roles is None else allowed_roles) or out_of_scope_time:
                 if row:
                     con.execute("DELETE FROM sessions WHERE token_hash=?", (token_hash,))
                 return None
             return row
+
+    def require_citizen(self, csrf: bool = True) -> sqlite3.Row:
+        user = self.current_user(CITIZEN_SESSION_COOKIE, {"citizen"})
+        if not user:
+            raise AuthenticationError("Đăng nhập tài khoản công dân trước khi sử dụng dịch vụ.")
+        if csrf:
+            self.require_csrf(user)
+        return user
+
+    def register_citizen(self, body: dict):
+        self._auth_email = clean_text(body.get("email"), 254).lower()
+        self.check_auth_rate_limit()
+        check_public_rate_limit(self.public_address(), "citizen-register", 8)
+        email = normalize_email(self._auth_email)
+        name = clean_text(body.get("name"), 150)
+        phone = clean_text(body.get("phone"), 40)
+        password = body.get("password", "")
+        validate_password(password)
+        if len(name) < 2 or not re.fullmatch(r"[+0-9(). -]{8,40}", phone):
+            raise ValueError("Nhập họ tên và số điện thoại liên hệ hợp lệ.")
+        if password != body.get("confirmPassword"):
+            raise ValueError("Mật khẩu xác nhận chưa khớp.")
+        salt = secrets.token_bytes(16)
+        uid = str(uuid.uuid4())
+        with DB_LOCK, connect() as con:
+            try:
+                con.execute("INSERT INTO users(id,email,phone,full_name,password_salt,password_hash,role,active,email_verified,created_at,updated_at) VALUES(?,?,?,?,?,?,'citizen',1,0,?,?)",
+                            (uid, email, phone, name, salt.hex(), password_hash(password, salt).hex(), now_iso(), now_iso()))
+            except sqlite3.IntegrityError:
+                self.record_auth_failure(email)
+                raise ValueError("Không thể đăng ký bằng thông tin này. Nếu đã có tài khoản, hãy đăng nhập.") from None
+            user = con.execute("SELECT * FROM users WHERE id=?", (uid,)).fetchone()
+            token, csrf, expires = new_session(con, uid)
+        return self.send_json({"user": public_user(user), "csrfToken": csrf}, 201,
+                              {"Set-Cookie": self.session_cookie(token, expires - int(datetime.now(TZ).timestamp()), CITIZEN_SESSION_COOKIE)})
+
+    @staticmethod
+    def citizen_owns_case(con, row, user, access_key: str) -> bool:
+        if not row:
+            return False
+        account = con.execute("SELECT user_id FROM citizen_record_owners WHERE record_code=?", (row["code"],)).fetchone()
+        if account:
+            return account["user_id"] == user["id"]
+        # Existing cases retain their original lookup-key access after login.
+        return bool(re.fullmatch(r"[A-Fa-f0-9]{64}", access_key)) and hmac.compare_digest(row["owner_id"], hashlib.sha256(access_key.encode("ascii")).hexdigest())
 
     def require_user(self) -> sqlite3.Row:
         user = self.current_user()
@@ -2236,6 +2355,7 @@ class AppHandler(BaseHTTPRequestHandler):
         return self.client_address[0] if self.client_address else "unknown"
 
     def create_public_case(self, body: dict):
+        citizen = self.require_citizen()
         if not isinstance(body, dict):
             raise ValueError("Thông tin hồ sơ không hợp lệ.")
         check_public_rate_limit(self.public_address(), "submit", 8)
@@ -2249,7 +2369,7 @@ class AppHandler(BaseHTTPRequestHandler):
         submission_hash = hashlib.sha256(access_key.encode("ascii")).hexdigest()
         lookup_key = secrets.token_hex(32)
         owner_hash = hashlib.sha256(lookup_key.encode("ascii")).hexdigest()
-        idempotency_hash = hashlib.sha256(f"{self.public_address()}:{request_id}".encode("utf-8")).hexdigest()
+        idempotency_hash = hashlib.sha256(f"{citizen['id']}:{request_id}".encode("utf-8")).hexdigest()
         with DB_LOCK, connect() as con:
             prior = con.execute("SELECT c.code,c.owner_id,v.submission_hash FROM cases c LEFT JOIN case_lookup_secrets v ON v.case_id=c.id WHERE c.idempotency_key=?", (idempotency_hash,)).fetchone()
             if prior:
@@ -2285,7 +2405,7 @@ class AppHandler(BaseHTTPRequestHandler):
         if not workflows.agency_matches(profile, receiving_agency):
             raise ValueError("Cơ quan không thuộc tuyến xử lý đã cấu hình cho thủ tục.")
         commune_authority_ok = procedure_code in {"2.000908", "2.000635"} and bool(re.match(r"^(ubnd\s+(phường|xã)\s+.+|sở\s+tư\s+pháp.*)$", receiving_agency, re.IGNORECASE))
-        if not commune_authority_ok and not any(same_agency_scope(receiving_agency, opt) and opt != "toàn thành phố" for opt in procedure_agency_options(procedure)):
+        if profile.get("kind") != "PUBLISHED_DOSSIER" and not commune_authority_ok and not any(same_agency_scope(receiving_agency, opt) and opt != "toàn thành phố" for opt in procedure_agency_options(procedure)):
             raise ValueError("Cơ quan tiếp nhận không khớp với cơ quan được nêu trong danh mục của thủ tục đã chọn.")
         subject_input = body.get("subject") or {}
         if not isinstance(subject_input, dict):
@@ -2293,12 +2413,12 @@ class AppHandler(BaseHTTPRequestHandler):
         subject_name = clean_text(subject_input.get("name"), 150) or applicant_name
         relation = clean_text(subject_input.get("relation"), 100) or ("Tổ chức đứng tên" if applicant_type == "organization" else "Người nộp hồ sơ")
         files = body.get("files", [])
-        if not isinstance(files, list) or len(files) > 8:
-            raise ValueError("Mỗi hồ sơ nhận tối đa 8 tệp đính kèm.")
+        if not isinstance(files, list) or len(files) > MAX_DOSSIER_FILES:
+            raise ValueError("Mỗi hồ sơ nhận tối đa 32 tệp đính kèm.")
         if any(not isinstance(file, dict) for file in files):
             raise ValueError("Danh sách tệp đính kèm không hợp lệ.")
-        if sum(len(str(file.get("data", ""))) for file in files if isinstance(file, dict)) > 12 * 1024 * 1024:
-            raise ValueError("Tổng dung lượng tệp gửi lên vượt quá 12 MB.")
+        if sum(len(str(file.get("data", ""))) for file in files if isinstance(file, dict)) > MAX_DOSSIER_BASE64:
+            raise ValueError("Tổng dung lượng tệp gửi lên vượt quá 32 MB.")
 
         declaration, delivery_method, delivery_address = validate_procedure_submission(procedure, body, applicant_type, files)
         if procedure_code == "1.004237":
@@ -2351,6 +2471,7 @@ class AppHandler(BaseHTTPRequestHandler):
                     "requestSummary": request_summary,
                     "schemaVersion": procedure["submission"]["version"],
                     "declaration": declaration,
+                    "documentExemptions": body.get("documentExemptions") or {},
                     "deliveryMethod": delivery_method,
                     "deliveryAddress": delivery_address,
                     "attachments": saved_files,
@@ -2363,6 +2484,7 @@ class AppHandler(BaseHTTPRequestHandler):
                     (code, owner_hash, procedure_code, idempotency_hash, json.dumps(payload, ensure_ascii=False), created, created),
                 )
                 case_id = con.execute("SELECT id FROM cases WHERE code=?", (code,)).fetchone()["id"]
+                con.execute("INSERT INTO citizen_record_owners(record_code,user_id,created_at) VALUES(?,?,?)", (code, citizen["id"], created))
                 con.execute("INSERT INTO case_lookup_secrets(case_id,encrypted_key,submission_hash,updated_at) VALUES(?,?,?,?)", (case_id, lookup_cipher().encrypt(lookup_key.encode("ascii")), submission_hash, created))
                 add_event(con, case_id, "citizen", "Người nộp", "submit", "Đã gửi hồ sơ", "Hồ sơ đã được lưu và đang chờ cơ quan tiếp nhận kiểm tra.", "public", created)
             except Exception:
@@ -2377,27 +2499,26 @@ class AppHandler(BaseHTTPRequestHandler):
         return self.send_json({"code": code, "status": "CHO_TIEP_NHAN", "statusLabel": STATUS_LABELS["CHO_TIEP_NHAN"], "duplicate": False}, 201)
 
     def lookup_public_case(self, body: dict):
+        citizen = self.require_citizen()
         check_public_rate_limit(self.public_address(), "lookup", 30)
         if not isinstance(body, dict):
             return self.send_error_json("Không tìm thấy hồ sơ với thông tin tra cứu đã nhập.", 404)
         code = clean_text(body.get("code"), 40).upper()
         access_key = clean_text(body.get("accessKey"), 80)
-        if not re.fullmatch(r"HN-\d{4}-[A-F0-9]{8}", code) or not re.fullmatch(r"[A-Fa-f0-9]{64}", access_key):
+        if not re.fullmatch(r"HN-\d{4}-[A-F0-9]{8}", code):
             return self.send_error_json("Không tìm thấy hồ sơ với thông tin tra cứu đã nhập.", 404)
         with DB_LOCK, connect() as con:
             row = con.execute("SELECT * FROM cases WHERE code=?", (code,)).fetchone()
-            expected = hashlib.sha256(access_key.encode("ascii")).hexdigest()
-            if not row or not hmac.compare_digest(row["owner_id"], expected):
+            if not self.citizen_owns_case(con, row, citizen, access_key):
                 return self.send_error_json("Không tìm thấy hồ sơ với thông tin tra cứu đã nhập.", 404)
             return self.send_json({"case": public_case_view(con, row)})
 
     def public_case_action(self, code: str, body: dict):
+        citizen = self.require_citizen()
         check_public_rate_limit(self.public_address(), "action", 20)
         if not isinstance(body, dict) or not isinstance(body.get("payload") or {}, dict):
             raise ValueError("Thông tin thao tác không hợp lệ.")
         access_key = clean_text(body.get("accessKey"), 80)
-        if not re.fullmatch(r"[A-Fa-f0-9]{64}", access_key):
-            return self.send_error_json("Không tìm thấy hồ sơ với thông tin tra cứu đã nhập.", 404)
         action = clean_text(body.get("action"), 40)
         if action not in {"submit_supplement", "feedback", "create_payment", "confirm_payment"}:
             return self.send_error_json("Thao tác công dân không được hỗ trợ.", 403)
@@ -2409,10 +2530,9 @@ class AppHandler(BaseHTTPRequestHandler):
                 raise ValueError("Danh sách tệp bổ sung không hợp lệ.")
             if sum(len(str(file.get("data", ""))) for file in uploads if isinstance(file, dict)) > 12 * 1024 * 1024:
                 raise ValueError("Tổng dung lượng tệp bổ sung vượt quá 9 MB.")
-        owner_hash = hashlib.sha256(access_key.encode("ascii")).hexdigest()
         with DB_LOCK, connect() as con:
             row = con.execute("SELECT * FROM cases WHERE code=?", (code.upper(),)).fetchone()
-            if not row or not hmac.compare_digest(row["owner_id"], owner_hash):
+            if not self.citizen_owns_case(con, row, citizen, access_key):
                 return self.send_error_json("Không tìm thấy hồ sơ với thông tin tra cứu đã nhập.", 404)
             case_dir = (UPLOAD_DIR / row["code"]).resolve()
             case_dir.relative_to(UPLOAD_DIR.resolve())
@@ -2430,7 +2550,7 @@ class AppHandler(BaseHTTPRequestHandler):
             fresh = con.execute("SELECT * FROM cases WHERE id=?", (row["id"],)).fetchone()
             return self.send_json({"case": public_case_view(con, fresh)})
 
-    def login_account(self, body: dict):
+    def login_account(self, body: dict, citizen: bool = False):
         email_candidate = clean_text(body.get("email", ""), 254).lower()
         self._auth_email = email_candidate
         self.check_auth_rate_limit()
@@ -2451,10 +2571,10 @@ class AppHandler(BaseHTTPRequestHandler):
                 raise AuthenticationError("Email hoặc mật khẩu không đúng.")
             if not user["active"]:
                 self.record_auth_failure(email)
-                raise AuthenticationError("Tài khoản cán bộ chưa được cấp quyền hoặc đã bị thu hồi.")
-            if user["role"] not in STAFF_ROLES:
+                raise AuthenticationError("Tài khoản chưa được kích hoạt hoặc đã bị thu hồi.")
+            if user["role"] not in ({"citizen"} if citizen else STAFF_ROLES):
                 self.record_auth_failure(email)
-                raise PermissionError("Khu vực này chỉ dành cho cán bộ có tài khoản do cơ quan cấp.")
+                raise PermissionError("Tài khoản không thuộc khu vực đăng nhập này.")
             today = datetime.now(TZ).date().isoformat()
             if user["valid_from"] and today < user["valid_from"]:
                 self.record_auth_failure(email)
@@ -2464,7 +2584,7 @@ class AppHandler(BaseHTTPRequestHandler):
                 raise PermissionError("Thời hạn quyền truy cập đã kết thúc.")
             token, csrf, expires = new_session(con, user["id"])
         self.clear_auth_email_failures(email)
-        return self.send_json({"user": public_user(user), "csrfToken": csrf}, 200, {"Set-Cookie": self.session_cookie(token, expires - int(datetime.now(TZ).timestamp()))})
+        return self.send_json({"user": public_user(user), "csrfToken": csrf}, 200, {"Set-Cookie": self.session_cookie(token, expires - int(datetime.now(TZ).timestamp()), CITIZEN_SESSION_COOKIE if citizen else SESSION_COOKIE)})
 
     def change_password(self, body: dict, user: sqlite3.Row):
         self._auth_email = user["email"]
@@ -2999,6 +3119,16 @@ class AppHandler(BaseHTTPRequestHandler):
         path = unquote(parsed.path)
         if path == "/api/health":
             return self.send_json({"status": "ok"})
+        if path == "/api/citizen/auth/me":
+            user = self.current_user(CITIZEN_SESSION_COOKIE, {"citizen"})
+            return self.send_json({"user": public_user(user) if user else None, "csrfToken": user["csrf_token"] if user else None})
+        if path == "/api/citizen/cases":
+            user = self.current_user(CITIZEN_SESSION_COOKIE, {"citizen"})
+            if not user:
+                return self.send_error_json("Đăng nhập công dân để xem hồ sơ của bạn.", 401)
+            with DB_LOCK, connect() as con:
+                rows = con.execute("SELECT c.* FROM cases c JOIN citizen_record_owners o ON o.record_code=c.code WHERE o.user_id=? ORDER BY c.created_at DESC", (user["id"],)).fetchall()
+                return self.send_json({"cases": [public_case_view(con, row) for row in rows]})
         if path == "/api/auth/me":
             user = self.current_user()
             return self.send_json({"user": public_user(user) if user else None, "csrfToken": user["csrf_token"] if user else None})
@@ -3090,7 +3220,7 @@ class AppHandler(BaseHTTPRequestHandler):
             procedure = next(item for item in procedure_catalog_records() if item["sourceCode"] == code)
             return self.send_json({"procedure": procedure, "detail": published_procedure_detail(code)})
         if path == "/api/procedures":
-            records = procedure_catalog_records()
+            records = procedure_catalog_records(summary=parse_qs(parsed.query).get("summary") == ["1"])
             return self.send_json({"procedures": records, "count": len(records)})
         if path == "/api/public/agencies":
             today = datetime.now(TZ).date().isoformat()
@@ -3152,7 +3282,7 @@ class AppHandler(BaseHTTPRequestHandler):
                     staff = []
             outbox = [{"code": c["code"], "status": c["sync"]["status"], "attempts": c["sync"]["attempts"], "lastError": c["sync"].get("lastError"), "messageId": c["sync"].get("messageId")} for c in cases if c.get("sync", {}).get("status") in {"ERROR", "PENDING"}]
             storage = {"database": "connected", "procedureCount": len(PROCEDURES), "caseRecords": total_case_records if role == "admin" else len(cases), "sampleCaseCount": sample_case_count, "sampleDataVersion": SAMPLE_DATASET_VERSION if sample_case_count else 0, "publishedNews": published_news_count, "caseCountScope": "toàn ứng dụng" if role == "admin" else "phạm vi được cấp"}
-            return self.send_json({"user": public_user(user), "procedures": procedure_catalog_records(), "procedureCategories": procedure_category_records(), "cases": cases, "stats": build_stats(cases), "storage": storage, "feedback": rows_to_dicts(feedback_rows), "outbox": outbox, "staff": [{"id": r["id"], "name": r["full_name"], "role": r["role"]} for r in staff], "statusLabels": STATUS_LABELS})
+            return self.send_json({"user": public_user(user), "procedures": procedure_catalog_records(summary=True), "procedureCategories": procedure_category_records(), "cases": cases, "stats": build_stats(cases), "storage": storage, "feedback": rows_to_dicts(feedback_rows), "outbox": outbox, "staff": [{"id": r["id"], "name": r["full_name"], "role": r["role"]} for r in staff], "statusLabels": STATUS_LABELS})
         if path.startswith("/api/cases/") and "/files/" in path:
             user = self.require_user()
             parts = path.split("/")
@@ -3340,6 +3470,13 @@ class AppHandler(BaseHTTPRequestHandler):
         return self.send_error_json("Không tìm thấy API.", 404)
 
     def serve_static(self, path: str):
+        if (path == "/staff" or path.startswith("/staff/")) and self.current_user(CITIZEN_SESSION_COOKIE, {"citizen"}) and not self.current_user():
+            self.send_response(303)
+            self.send_header("Location", "/")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
         # Procedure codes contain dots, but detail routes are still SPA pages.
         is_procedure_page = re.fullmatch(r"/thu-tuc/[^/]+/?", path) is not None
         rel = "index.html" if path in {"", "/"} or is_procedure_page else path.lstrip("/")
@@ -3387,8 +3524,17 @@ class AppHandler(BaseHTTPRequestHandler):
             body = self.read_json()
             if not isinstance(body, dict):
                 raise ValueError("Nội dung yêu cầu phải là một đối tượng JSON.")
-            if path == "/api/auth/register":
-                return self.send_json({"error": "Cổng Hà Nội không tạo tài khoản công dân. Vui lòng thực hiện giao dịch trên Cổng Dịch vụ công quốc gia.", "portal": "https://dichvucong.gov.vn/"}, 410)
+            if path in {"/api/auth/register", "/api/citizen/auth/register"}:
+                return self.register_citizen(body)
+            if path == "/api/citizen/auth/login":
+                return self.login_account(body, citizen=True)
+            if path == "/api/citizen/auth/logout":
+                user = self.require_citizen()
+                with DB_LOCK, connect() as con:
+                    con.execute("DELETE FROM sessions WHERE user_id=? AND csrf_token=?", (user["id"], user["csrf_token"]))
+                return self.send_json({"ok": True}, headers={"Set-Cookie": self.session_cookie("", 0, CITIZEN_SESSION_COOKIE)})
+            if path.startswith("/api/public/"):
+                self.require_citizen()
             if path == "/api/auth/login":
                 return self.login_account(body)
             if path == "/api/auth/logout":

@@ -46,7 +46,7 @@ function ProcedureCatalogList({ request }: { request: Request }) {
 
   useEffect(() => {
     let active = true
-    request<{ procedures: Procedure[] }>('/api/procedures')
+    request<{ procedures: Procedure[] }>('/api/procedures?summary=1')
       .then(result => { if (active) setProcedures(result.procedures) })
       .catch(reason => { if (active) setError(reason instanceof Error ? reason.message : 'Không tải được danh mục thủ tục.') })
       .finally(() => { if (active) setLoading(false) })

@@ -21,15 +21,20 @@ type StaffAccountChange = { id: string; userId: string; email: string; name: str
 type ManagedNews = { id: string; title: string; summary: string; body: string; category: string; image: string; sourceUrl: string; featured: boolean; status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'; publishedAt: string; date?: string; version: number; updatedAt: string }
 
 let csrfToken = ''
+let citizenCsrfToken = ''
 async function api<T>(path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = {}
   if (body !== undefined) {
     headers['Content-Type'] = 'application/json'
-    if (csrfToken) headers['X-CSRF-Token'] = csrfToken
+    const token = path.startsWith('/api/citizen/') || path.startsWith('/api/public/') || path === '/api/cases' ? citizenCsrfToken : csrfToken
+    if (token) headers['X-CSRF-Token'] = token
   }
   const response = await fetch(path, { method: body === undefined ? 'GET' : 'POST', credentials: 'include', headers, body: body === undefined ? undefined : JSON.stringify(body) })
   const result = await response.json().catch(() => ({}))
-  if (!response.ok) throw new Error(result.error || `Yêu cầu thất bại (${response.status}).`)
+  if (!response.ok) {
+    if (response.status === 401 && (path.startsWith('/api/citizen/') || path.startsWith('/api/public/') || path === '/api/cases')) window.dispatchEvent(new Event('citizen-session-expired'))
+    throw new Error(result.error || `Yêu cầu thất bại (${response.status}).`)
+  }
   return result as T
 }
 const roleNames: Record<string, string> = { intake: 'Cán bộ tiếp nhận', specialist: 'Chuyên viên thụ lý', leader: 'Lãnh đạo phê duyệt', registrar: 'Văn thư phát hành', finance: 'Tài chính', admin: 'Quản trị hệ thống' }
@@ -101,8 +106,8 @@ function validateCitizenFiles(files: File[]) {
   if (files.reduce((sum, file) => sum + file.size, 0) > 9 * 1024 * 1024) return 'Tổng dung lượng tệp một lần gửi không được vượt quá 9 MB.'
   return ''
 }
-type PortalRoute = 'public' | 'staff' | 'guide' | 'catalog' | 'submit' | 'track' | 'citizen-services'
-const routeFromPath = (): PortalRoute => window.location.pathname.startsWith('/staff') ? 'staff' : window.location.pathname.startsWith('/huong-dan') ? 'guide' : window.location.pathname.startsWith('/tien-ich') ? 'citizen-services' : window.location.pathname.startsWith('/thu-tuc') ? 'catalog' : window.location.pathname.startsWith('/nop-ho-so') ? 'submit' : window.location.pathname.startsWith('/tra-cuu-ho-so') ? 'track' : 'public'
+type PortalRoute = 'citizen-login' | 'public' | 'staff' | 'guide' | 'catalog' | 'submit' | 'track' | 'citizen-services'
+const routeFromPath = (): PortalRoute => window.location.pathname.startsWith('/dang-nhap') ? 'citizen-login' : window.location.pathname.startsWith('/staff') ? 'staff' : window.location.pathname.startsWith('/huong-dan') ? 'guide' : window.location.pathname.startsWith('/tien-ich') ? 'citizen-services' : window.location.pathname.startsWith('/thu-tuc') ? 'catalog' : window.location.pathname.startsWith('/nop-ho-so') ? 'submit' : window.location.pathname.startsWith('/tra-cuu-ho-so') ? 'track' : 'public'
 
 function AuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user: User, csrf: string) => void; onBack: () => void }) {
   const [busy, setBusy] = useState(false)
@@ -140,6 +145,48 @@ function AuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user: User,
       </div></section>
     </section>
     <footer className="auth-legal">Hệ thống hiện vận hành độc lập; chưa kết nối dữ liệu, đăng nhập một lần hoặc tài khoản công vụ của cơ quan nhà nước.</footer>
+  </main>
+}
+
+function CitizenAuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user: User, csrf: string) => void; onBack: () => void }) {
+  const [register, setRegister] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setBusy(true); setError('')
+    const values = Object.fromEntries(new FormData(event.currentTarget).entries())
+    try {
+      const result = await api<{ user: User; csrfToken: string }>(`/api/citizen/auth/${register ? 'register' : 'login'}`, values)
+      onAuthenticated(result.user, result.csrfToken)
+    } catch (reason) { setError(reason instanceof Error ? reason.message : 'Không thể xác thực tài khoản.') }
+    finally { setBusy(false) }
+  }
+  return <main className="auth-page official-auth citizen-auth-page">
+    <AgencyMasthead />
+    <section className="auth-content">
+      <div className="auth-intro">
+        <button className="staff-back-link" onClick={onBack}>Quay về cổng thông tin</button>
+        <span className="eyebrow">DỊCH VỤ DÀNH CHO CÔNG DÂN</span>
+        <h1>Một tài khoản để sử dụng dịch vụ</h1>
+        <p>Đăng nhập để nộp và theo dõi hồ sơ, bổ sung giấy tờ, đặt lịch hẹn và gửi phản ánh.</p>
+        <div className="auth-guidance"><p><b>Hồ sơ của bạn</b><span>Theo dõi những hồ sơ được gửi bằng tài khoản này.</span></p></div>
+      </div>
+      <section className="auth-panel" aria-labelledby="citizen-auth-title"><div className="auth-card">
+        <span className="eyebrow">TÀI KHOẢN CÔNG DÂN</span>
+        <h2 id="citizen-auth-title">{register ? 'Đăng ký tài khoản' : 'Đăng nhập'}</h2>
+        <p className="muted">Tài khoản riêng của ứng dụng, chưa liên kết hoặc xác thực qua VNeID.</p>
+        <form className="form-stack" onSubmit={submit} key={register ? 'register' : 'login'}>
+          {register && <><label>Họ và tên<input name="name" autoComplete="name" minLength={2} maxLength={150} required /></label><label>Số điện thoại<input name="phone" type="tel" autoComplete="tel" minLength={8} maxLength={40} required /></label></>}
+          <label>Email<input name="email" type="email" autoComplete="username" maxLength={254} required /></label>
+          <label>Mật khẩu<input name="password" type="password" autoComplete={register ? 'new-password' : 'current-password'} minLength={register ? 12 : undefined} maxLength={128} required /></label>
+          {register && <><small className="muted">Từ 12 ký tự, gồm chữ hoa, chữ thường và chữ số.</small><label>Nhập lại mật khẩu<input name="confirmPassword" type="password" autoComplete="new-password" minLength={12} maxLength={128} required /></label></>}
+          {error && <div className="form-error" role="alert">{error}</div>}
+          <button className="button primary full" disabled={busy}>{busy ? 'Đang xử lý…' : register ? 'Đăng ký và tiếp tục' : 'Đăng nhập và tiếp tục'}</button>
+          <button type="button" className="text-button" disabled={busy} onClick={() => { setRegister(value => !value); setError('') }}>{register ? 'Đã có tài khoản? Đăng nhập' : 'Chưa có tài khoản? Đăng ký'}</button>
+        </form>
+      </div></section>
+    </section>
+    <footer className="auth-legal">Thông tin tài khoản do người dùng tự khai; chưa được xác minh danh tính hoặc liên thông với cơ quan nhà nước.</footer>
   </main>
 }
 
@@ -241,7 +288,7 @@ function PublicProcedureSearch({ onOpenProcedure }: { onOpenProcedure: (code: st
 type PublicView = 'public' | 'catalog' | 'submit' | 'track' | 'receipt'
 type SubmissionReceipt = { code: string; accessKey?: string; status?: string; statusLabel?: string }
 
-function PublicPortal({ onStaff, onGuide, onNavigate, onReceipt, receipt, signedIn, initialView, initialProcedureCode }: { onStaff: () => void; onGuide: () => void; onNavigate: (route: PortalRoute, procedureCode?: string, applicantType?: 'citizen' | 'organization') => void; onReceipt: (value: SubmissionReceipt) => void; receipt: SubmissionReceipt | null; signedIn: boolean; initialView: 'public' | 'catalog' | 'submit' | 'track'; initialProcedureCode: string }) {
+function PublicPortal({ onStaff, onGuide, onNavigate, onReceipt, receipt, signedIn, initialView, initialProcedureCode, citizenSignedIn = false }: { citizenSignedIn?: boolean; onStaff: () => void; onGuide: () => void; onNavigate: (route: PortalRoute, procedureCode?: string, applicantType?: 'citizen' | 'organization') => void; onReceipt: (value: SubmissionReceipt) => void; receipt: SubmissionReceipt | null; signedIn: boolean; initialView: 'public' | 'catalog' | 'submit' | 'track'; initialProcedureCode: string }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [view, setView] = useState<PublicView>(initialView)
   if (view !== 'public') return <CitizenWorkflow view={view} receipt={receipt} initialProcedureCode={initialProcedureCode} onBack={() => { setView('public'); onNavigate('public') }} onSubmit={() => { setView('submit'); onNavigate('submit') }} onTrack={() => { setView('track'); onNavigate('track') }} onCatalog={() => { setView('catalog'); onNavigate('catalog') }} onSubmitted={value => { onReceipt(value); setView('receipt') }} />
@@ -266,7 +313,7 @@ function PublicPortal({ onStaff, onGuide, onNavigate, onReceipt, receipt, signed
         </div></details>
       </nav>
       <div className="public-header-actions">
-        <button className="button staff-entry-button" onClick={onStaff}>{signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}</button>
+        {!citizenSignedIn && <button className="button staff-entry-button" onClick={onStaff}>{signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}</button>}
       </div>
     </header>
     <div className="official-announcement"><span>THÔNG TIN DỊCH VỤ CÔNG</span><p>Cổng này có luồng lập, gửi và theo dõi hồ sơ trong cơ sở dữ liệu của ứng dụng; hiện chưa liên thông giao dịch chính thức với cơ quan nhà nước.</p><a href={NATIONAL_PORTAL} target="_blank" rel="noreferrer">Đến Cổng Dịch vụ công quốc gia <b>↗</b></a></div>
@@ -296,17 +343,17 @@ function CitizenWorkflow({ view, receipt, initialProcedureCode, onBack, onSubmit
       {view === 'receipt' && receipt && <CitizenReceiptView receipt={receipt} onTrack={onTrack} />}
       {view === 'track' && <CitizenTrackingPage initialReceipt={receipt} />}
     </main>
-    <footer className="citizen-workflow-footer"><span>Giữ mã hồ sơ sau khi gửi. Khóa tra cứu do cán bộ tiếp nhận hoặc trả kết quả cung cấp cho chủ hồ sơ.</span><button className="text-button" onClick={onBack}>Về trang chủ</button></footer>
+    <footer className="citizen-workflow-footer"><span>Theo dõi hồ sơ trong tài khoản công dân. Với hồ sơ cũ, liên hệ cán bộ để nhận khóa tra cứu sau khi xác minh chủ hồ sơ.</span><button className="text-button" onClick={onBack}>Về trang chủ</button></footer>
   </div>
 }
 
-function PublicCitizenServicesPage({ onHome, onStaff, signedIn }: { onHome: () => void; onStaff: () => void; signedIn: boolean }) {
+function PublicCitizenServicesPage({ onHome, onStaff, signedIn, citizenSignedIn = false }: { onHome: () => void; onStaff: () => void; signedIn: boolean; citizenSignedIn?: boolean }) {
   return <div className="public-site citizen-services-site">
     <AgencyMasthead />
     <header className="citizen-workflow-header citizen-services-header">
       <button className="text-button" onClick={onHome}>Về trang chủ</button>
       <nav aria-label="Điều hướng dịch vụ công"><a href="/thu-tuc">Danh mục thủ tục</a><a href="/nop-ho-so">Nộp hồ sơ</a><a href="/tra-cuu-ho-so">Tra cứu hồ sơ</a><a href="/huong-dan">Hướng dẫn</a></nav>
-      <button className="button secondary" onClick={onStaff}>{signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}</button>
+      {!citizenSignedIn && <button className="button secondary" onClick={onStaff}>{signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}</button>}
     </header>
     <main className="citizen-service-page-main">
       <div className="citizen-page-heading"><span className="eyebrow">HỖ TRỢ CÔNG DÂN</span><h1>Lịch hẹn và phản ánh, kiến nghị</h1><p>Đặt lịch làm việc tại cơ quan hoặc gửi phản ánh, kiến nghị. Nộp hồ sơ và tra cứu tiến độ hồ sơ đã gửi tại các trang riêng.</p></div>
@@ -325,12 +372,14 @@ function CitizenReceiptView({ receipt, onTrack }: { receipt: SubmissionReceipt; 
   return <section className="citizen-receipt-page">
     <span className="eyebrow">ĐÃ GHI NHẬN HỒ SƠ</span><h1>Hồ sơ đã được gửi</h1><p>Hồ sơ đã vào hàng đợi tiếp nhận. Hãy lưu mã hồ sơ bên dưới để liên hệ với cơ quan tiếp nhận.</p>
     <div className="receipt-credentials"><div><small>MÃ HỒ SƠ</small><b>{receipt.code}</b></div></div>
-    <div className="citizen-source-note"><b>Nhận khóa tra cứu</b><span>Cán bộ tiếp nhận hoặc trả kết quả quản lý mã hồ sơ và khóa tra cứu trong bàn làm việc. Liên hệ cơ quan tiếp nhận để được cung cấp khóa sau khi xác minh chủ hồ sơ. Chưa gửi SMS/email tự động.</span></div>
+    <div className="citizen-source-note"><b>Theo dõi bằng tài khoản</b><span>Hồ sơ đã gắn với tài khoản công dân của bạn. Chọn Theo dõi hồ sơ để xem tiến độ; không cần nhập khóa tra cứu cho hồ sơ của chính bạn.</span></div>
     <div className="citizen-receipt-actions"><button className="button secondary" onClick={copyReceipt}>{copied ? 'Đã sao chép' : 'Sao chép thông tin'}</button><button className="button primary" onClick={onTrack}>Theo dõi hồ sơ</button></div>
   </section>
 }
 
 function CitizenTrackingPage({ initialReceipt }: { initialReceipt: SubmissionReceipt | null }) {
+  const [ownedCases, setOwnedCases] = useState<any[]>([])
+  useEffect(() => { api<{ cases: any[] }>('/api/citizen/cases').then(result => setOwnedCases(result.cases)).catch(reason => setError(reason.message)) }, [])
   const [code, setCode] = useState(initialReceipt?.code || '')
   const [accessKey, setAccessKey] = useState(initialReceipt?.accessKey || '')
   const [item, setItem] = useState<any>(null)
@@ -340,7 +389,7 @@ function CitizenTrackingPage({ initialReceipt }: { initialReceipt: SubmissionRec
   async function lookup(event?: FormEvent<HTMLFormElement>, credentials?: { code: string; accessKey: string }) {
     event?.preventDefault(); setBusy(true); setError(''); setMessage('')
     const lookupCode = credentials?.code || code
-    const lookupKey = credentials?.accessKey || accessKey
+    const lookupKey = credentials ? credentials.accessKey : accessKey
     if (credentials) { setCode(lookupCode); setAccessKey(lookupKey) }
     try { const result = await api<{ case: any }>('/api/public/cases/lookup', { code: lookupCode, accessKey: lookupKey }); setItem(result.case) }
     catch (reason) { setItem(null); setError(reason instanceof Error ? reason.message : 'Không tìm thấy hồ sơ với thông tin đã nhập.') }
@@ -356,9 +405,9 @@ function CitizenTrackingPage({ initialReceipt }: { initialReceipt: SubmissionRec
     finally { setBusy(false) }
   }
   return <section className="citizen-track-page">
-    <div className="citizen-page-heading"><span className="eyebrow">TRA CỨU TIẾN ĐỘ</span><h1>Tra cứu hồ sơ đã gửi</h1><p>Nhập mã hồ sơ và khóa tra cứu do cán bộ tiếp nhận hoặc trả kết quả cung cấp. Không cần tài khoản công dân.</p></div>
-    <form className="citizen-track-form" onSubmit={lookup}><label className="citizen-field">Mã hồ sơ<input value={code} onChange={event => setCode(event.target.value.toUpperCase())} placeholder="HN-2026-XXXXXXXX" autoComplete="off" required /></label><label className="citizen-field">Khóa tra cứu<input value={accessKey} onChange={event => setAccessKey(event.target.value)} autoComplete="off" spellCheck={false} required /></label><button className="button primary" disabled={busy}>{busy ? 'Đang tra cứu…' : 'Tra cứu hồ sơ'}</button></form>
-    <aside className="sample-lookup-guidance" role="note"><div><b>Hồ sơ tình huống để xem thử</b><p>Dữ liệu dưới đây do ứng dụng tạo để minh họa thao tác tra cứu; không phải hồ sơ thật và không có giá trị pháp lý.</p></div><div className="sample-lookup-actions"><button type="button" className="button secondary" disabled={busy} onClick={() => lookup(undefined, { code: 'HN-2026-34374F1C', accessKey: 'A11BA24C2898477D98F06C4CAD2ED22336492DA922666720412C947DC14EAF52' })}>Xem tình huống chờ bổ sung</button><button type="button" className="button secondary" disabled={busy} onClick={() => lookup(undefined, { code: 'HN-2026-37F2572D', accessKey: '73D3F359300354E0CEEFE0F29ABAAEE879669A1CB946AC01E6844C5E7EDCBB21' })}>Xem tình huống đã phát hành</button></div></aside>
+    <div className="citizen-page-heading"><span className="eyebrow">TRA CỨU TIẾN ĐỘ</span><h1>Tra cứu hồ sơ đã gửi</h1><p>Hồ sơ gửi bằng tài khoản này được hiển thị bên dưới. Hồ sơ cũ cần mã hồ sơ và khóa tra cứu do cán bộ cung cấp.</p></div>
+    <section className="citizen-owned-cases" aria-label="Hồ sơ của tôi">{ownedCases.length ? ownedCases.map(record => <button type="button" className="citizen-owned-case" key={record.code} disabled={busy} onClick={() => lookup(undefined, { code: record.code, accessKey: '' })}><b>{record.code}</b><span>{record.procedure?.name || record.procedureCode}</span><small>{record.statusLabel || record.status}</small></button>) : <p className="muted">Bạn chưa gửi hồ sơ nào bằng tài khoản này.</p>}</section>
+    <form className="citizen-track-form" onSubmit={lookup}><label className="citizen-field">Mã hồ sơ<input value={code} onChange={event => setCode(event.target.value.toUpperCase())} placeholder="HN-2026-XXXXXXXX" autoComplete="off" required /></label><label className="citizen-field">Khóa tra cứu<input value={accessKey} onChange={event => setAccessKey(event.target.value)} autoComplete="off" spellCheck={false} /></label><button className="button primary" disabled={busy}>{busy ? 'Đang tra cứu…' : 'Tra cứu hồ sơ'}</button></form>
     {error && <div className="form-error" role="alert">{error}</div>}{message && <div className="citizen-success" role="status">{message}</div>}
     {item && <CitizenCaseStatus item={item} busy={busy} onAction={citizenAction} />}
   </section>
@@ -442,6 +491,19 @@ function CitizenCaseStatus({ item, busy, onAction }: { item: any; busy: boolean;
 }
 
 function App() {
+  const [citizen, setCitizen] = useState<User | null>(null)
+  const [citizenReady, setCitizenReady] = useState(false)
+  const [citizenError, setCitizenError] = useState('')
+  useEffect(() => {
+    let active = true
+    api<{ user: User | null; csrfToken: string | null }>('/api/citizen/auth/me').then(result => {
+      if (active) { setCitizen(result.user); citizenCsrfToken = result.csrfToken || '' }
+    }).catch(() => { if (active) setCitizenError('Chưa kiểm tra được phiên công dân. Hãy đăng nhập lại để tiếp tục.') })
+      .finally(() => { if (active) setCitizenReady(true) })
+    const expired = () => { setCitizen(null); citizenCsrfToken = ''; setCitizenError('Phiên công dân đã hết hạn. Vui lòng đăng nhập lại.') }
+    window.addEventListener('citizen-session-expired', expired)
+    return () => { active = false; window.removeEventListener('citizen-session-expired', expired) }
+  }, [])
   const [user, setUser] = useState<User | null>(null)
   const [data, setData] = useState<Bootstrap>({ procedures: [], procedureCategories: [], cases: [], stats: {}, statusLabels: {}, staff: [] })
   const [route, setRoute] = useState<PortalRoute>(routeFromPath)
@@ -472,7 +534,7 @@ function App() {
   }, [captureMode])
 
   function navigateRoute(next: PortalRoute, procedureCode = '', applicantType?: 'citizen' | 'organization') {
-    const path = next === 'staff' ? '/staff' : next === 'guide' ? '/huong-dan' : next === 'citizen-services' ? '/tien-ich' : next === 'submit' ? '/nop-ho-so' : next === 'track' ? '/tra-cuu-ho-so' : '/'
+    const path = next === 'citizen-login' ? '/dang-nhap' : next === 'staff' ? '/staff' : next === 'guide' ? '/huong-dan' : next === 'citizen-services' ? '/tien-ich' : next === 'submit' ? '/nop-ho-so' : next === 'track' ? '/tra-cuu-ho-so' : '/'
     const targetPath = next === 'catalog' ? `/thu-tuc${procedureCode ? '/' + encodeURIComponent(procedureCode) : ''}` : path
     const queryParams = new URLSearchParams()
     if (procedureCode && next !== 'catalog') queryParams.set('procedure', procedureCode)
@@ -611,11 +673,17 @@ function App() {
     } catch (e) { setError(e instanceof Error ? e.message : 'Không thể cập nhật hồ sơ.') } finally { setBusy(false) }
   }
 
+  const citizenServiceRoute = route === 'submit' || route === 'track' || route === 'citizen-services'
+  const citizenAccountBar = <div className="citizen-account-bar"><span>{citizen ? `Công dân: ${citizen.name}` : 'Dịch vụ trực tuyến dành cho công dân'}</span><div>{citizen ? <><button type="button" className="text-button" onClick={() => navigateRoute('track')}>Hồ sơ của tôi</button><button type="button" className="text-button" onClick={async () => { try { await api('/api/citizen/auth/logout', {}); citizenCsrfToken = ''; setCitizen(null); setCitizenReceipt(null); setCitizenError(''); navigateRoute('public') } catch (reason) { setCitizenError(reason instanceof Error ? reason.message : 'Chưa đăng xuất được.') } }}>Đăng xuất</button></> : <button type="button" className="text-button" onClick={() => navigateRoute('citizen-login')}>Đăng nhập / Đăng ký công dân</button>}</div>{citizenError && <span role="alert">{citizenError}</span>}</div>
+  if ((citizenServiceRoute || route === 'citizen-login') && !citizenReady) return <main className="auth-page"><p role="status">Đang kiểm tra phiên đăng nhập…</p></main>
+  if ((citizenServiceRoute || route === 'citizen-login') && !citizen) return <CitizenAuthScreen onBack={() => navigateRoute('public')} onAuthenticated={(account, csrf) => { citizenCsrfToken = csrf; setCitizen(account); setCitizenError(''); if (route === 'citizen-login') navigateRoute('submit') }} />
+  if (route === 'citizen-login') return <>{citizenAccountBar}<PublicPortal key="citizen-home" onStaff={() => navigateRoute('public')} onGuide={() => navigateRoute('guide')} onNavigate={navigateRoute} onReceipt={setCitizenReceipt} receipt={citizenReceipt} citizenSignedIn signedIn={false} initialView="public" initialProcedureCode="" /></>
+  if (route === 'staff' && citizen && !user) return <main className="auth-page"><AgencyMasthead /><section className="auth-card"><h1>Tài khoản công dân</h1><p>Bàn cán bộ chỉ dành cho tài khoản nội bộ được cấp quyền.</p><button className="button primary" onClick={() => navigateRoute('public')}>Về cổng dịch vụ công dân</button></section></main>
   if (user?.mustChangePassword) return <PasswordChangeScreen onChanged={passwordChanged} onSignOut={signOut} />
   if (route === 'guide') return <StandaloneGuide signedIn={!!user} onHome={() => navigateRoute(user ? 'staff' : 'public')} onStaff={() => navigateRoute('staff')} />
-  if (route === 'citizen-services') return <PublicCitizenServicesPage onHome={() => navigateRoute('public')} onStaff={() => navigateRoute('staff')} signedIn={!!user} />
+  if (route === 'citizen-services') return <>{citizenAccountBar}<PublicCitizenServicesPage onHome={() => navigateRoute('public')} onStaff={() => navigateRoute('staff')} signedIn={!!user} citizenSignedIn={!!citizen && !user} /></>
   if (!user && route === 'staff') return <AuthScreen onAuthenticated={authenticate} onBack={() => navigateRoute('public')} />
-  if (route === 'public' || route === 'catalog' || route === 'submit' || route === 'track') return <PublicPortal key={route} onStaff={() => navigateRoute('staff')} onGuide={() => navigateRoute('guide')} onNavigate={navigateRoute} onReceipt={setCitizenReceipt} receipt={citizenReceipt} signedIn={!!user} initialView={route} initialProcedureCode={citizenProcedureCode} />
+  if (route === 'public' || route === 'catalog' || route === 'submit' || route === 'track') return <>{citizenAccountBar}<PublicPortal key={route} onStaff={() => navigateRoute(citizen && !user ? 'public' : 'staff')} onGuide={() => navigateRoute('guide')} onNavigate={navigateRoute} onReceipt={setCitizenReceipt} receipt={citizenReceipt} citizenSignedIn={!!citizen && !user} signedIn={!!user} initialView={route} initialProcedureCode={citizenProcedureCode} /></>
   if (!user) return <AuthScreen onAuthenticated={authenticate} onBack={() => navigateRoute('public')} />
   const pageMeta: Record<string, { title: string; eyebrow: string; description: string }> = {
     overview: { title: 'Tổng quan quản trị', eyebrow: 'TÀI KHOẢN VÀ THẨM QUYỀN', description: 'Theo dõi đề nghị cấp quyền, thay đổi tài khoản, hiệu lực và phạm vi công tác.' },
@@ -805,7 +873,7 @@ function getActions(user: User, item: CaseFile) {
   if (item.withdrawal?.status === 'CHO_KY_PHAT_HANH') {
     return role === 'leader' && maySignStop ? [{ value: 'issue_stop_notice', label: 'Ghi nhận phát hành Thông báo dừng Mẫu 06' }] : []
   }
-  const permitted: Record<string, string[]> = { intake: ['accept', 'request_supplement', 'reject_intake', 'assign', 'prepare_stop_notice', 'set_fee', 'digitize_documents', 'deliver', 'submit_supplement'], specialist: ['save_draft', 'submit_review', 'request_supplement', 'verify_original_register', 'assess_data_request'], leader: ['approve', 'send_back', 'decline', 'waive_fee', 'sign_result'], registrar: ['issue', 'deliver'], finance: [] }
+  const permitted: Record<string, string[]> = { intake: ['accept', 'request_supplement', 'reject_intake', 'assign', 'prepare_stop_notice', 'set_fee', 'digitize_documents', 'deliver', 'submit_supplement'], specialist: ['save_draft', 'submit_review', 'request_supplement', 'verify_original_register', 'assess_data_request', 'verify_published_procedure'], leader: ['approve', 'send_back', 'decline', 'waive_fee', 'sign_result'], registrar: ['issue', 'deliver'], finance: [] }
   const options = [...(all[status] || [])]
   const finish = (values: { value: string; label: string }[]) => values.filter(option => permitted[role]?.includes(option.value) && (!item.workflowGuard || !Array.isArray(item.workflowGuard.allowedActions) || item.workflowGuard.allowedActions.includes(option.value)))
   if (role === 'specialist' && status === 'DANG_THU_LY' && item.workflowGuard?.verificationAction) options.unshift({ value: item.workflowGuard.verificationAction, label: item.workflowGuard.verificationLabel })
@@ -1378,7 +1446,7 @@ function GuideContent({ isStaff = false }: { isStaff?: boolean }) {
       <button className={audience === 'staff' ? 'active' : ''} aria-pressed={audience === 'staff'} onClick={() => setAudience('staff')}>Cán bộ</button>
     </section>
     {audience === 'citizen' ? <>
-      <section className="guide-lead"><span className="eyebrow">HƯỚNG DẪN NGƯỜI DÂN VÀ TỔ CHỨC</span><h2>Tra cứu, gửi và theo dõi hồ sơ</h2><p>Hệ thống chỉ mở lập hồ sơ khi tờ khai và quy trình đã được đối chiếu theo đúng thủ tục. Các thủ tục khác vẫn có trang chi tiết và mẫu giấy tờ để tra cứu.</p><p>Người dân không cần đăng ký tài khoản. Mã hồ sơ cùng khóa tra cứu được dùng để trở lại hồ sơ và phản hồi các yêu cầu của cơ quan.</p><div className="guide-links"><a className="button secondary" href="/thu-tuc">Tra cứu danh mục thủ tục </a><a className="button primary" href="/nop-ho-so">Mở trang nộp hồ sơ </a></div></section>
+      <section className="guide-lead"><span className="eyebrow">HƯỚNG DẪN NGƯỜI DÂN VÀ TỔ CHỨC</span><h2>Tra cứu, gửi và theo dõi hồ sơ</h2><p>Hệ thống chỉ mở lập hồ sơ khi tờ khai và quy trình đã được đối chiếu theo đúng thủ tục. Các thủ tục khác vẫn có trang chi tiết và mẫu giấy tờ để tra cứu.</p><p>Đăng ký hoặc đăng nhập tài khoản công dân trước khi nộp hồ sơ, đặt lịch hẹn và gửi phản ánh. Hồ sơ gửi bằng tài khoản được hiển thị trong Hồ sơ của tôi; hồ sơ cũ cần mã và khóa tra cứu. Tài khoản công dân không có quyền vào bàn cán bộ.</p><div className="guide-links"><a className="button secondary" href="/thu-tuc">Tra cứu danh mục thủ tục </a><a className="button primary" href="/nop-ho-so">Mở trang nộp hồ sơ </a></div></section>
       <ol className="guide-steps">
         <li><b>Tìm và xem thông tin thủ tục</b><p>Mở “Danh mục thủ tục”, lọc theo tên, mã hoặc lĩnh vực rồi chọn một kết quả. Trang chi tiết cho biết dữ liệu tham chiếu, cơ quan trong danh mục, mốc đối chiếu nếu có và đường dẫn nguồn. Chọn “Lập hồ sơ theo thủ tục này” để chuyển sang biểu mẫu trong ứng dụng.</p></li>
         <li><b>Chọn thủ tục, cơ quan và khai tờ khai</b><p>Trang nộp có 5 bước. Ở bước 1, xác nhận thủ tục và cơ quan Hà Nội; bước 2 khai cá nhân hoặc tổ chức cùng thông tin liên hệ; bước 3 điền tờ khai riêng của thủ tục. Lựa chọn đối tượng sẽ thay đổi trường và giấy tờ bắt buộc. Thủ tục chưa có biểu mẫu được cấu hình chỉ xem được thông tin.</p></li>
@@ -1965,6 +2033,7 @@ function CaseDetail({ item, isStaff, signingAuthorityRef, labels, actionOptions,
       {item.sandboxSignature && <div className={item.sandboxSignature.verified ? 'citizen-success' : 'form-error'}><b>{item.sandboxSignature.verified ? 'Chữ ký thử nghiệm hợp lệ' : 'Chữ ký thử nghiệm không hợp lệ'}</b><p>{item.sandboxSignature.signer} · {toDate(item.sandboxSignature.signedAt)} · SHA-256 {item.sandboxSignature.documentHash}</p><small>Chữ ký cục bộ chỉ kiểm tra toàn vẹn, không phải chữ ký số công vụ.</small></div>}
       {item.status === 'DA_PHE_DUYET' && !item.sandboxSignature && <div className="source-warning"><b>Kết quả đã được phê duyệt.</b> {item.approvedAt && item.approvedById && String(item.draftResult || '').trim().length >= 10 ? 'Lãnh đạo có quyền ký thử nghiệm có thể ký bản đã chốt; văn thư chỉ phát hành sau khi chữ ký và khoản thu (nếu có) được xác nhận trong ứng dụng.' : 'Hồ sơ chưa đủ thông tin dự thảo hoặc căn cứ phê duyệt để ký. Hãy kiểm tra lịch sử và bổ sung dữ liệu phê duyệt hợp lệ trước khi tiếp tục.'}</div>}
       {item.events?.length > 0 && <div className="timeline"><h3>Lịch sử xử lý</h3>{item.events.map((event, i) => <div className="timeline-item" key={`${event.at}-${i}`}><span className="timeline-dot" /><div><b>{event.title}</b><small>{toDate(event.at)}{isStaff && event.actor ? ` · ${event.actor}` : ''}{isStaff && event.audience === 'internal' ? ' · [Nội bộ]' : ''}</small>{(isStaff || event.audience !== 'internal') && event.detail && <p>{event.detail}</p>}</div></div>)}</div>}
+      {!!item.workflowGuard?.officialSteps?.length && <section className="panel"><h3>Trình tự giải quyết của thủ tục</h3><a className="text-link" href={item.workflowGuard.sourceUrl} target="_blank" rel="noreferrer">Xem công bố chính thức</a>{item.workflowGuard.officialSteps.map((step: { id: string; name: string; description: string }) => <details key={step.id}><summary>{step.name}</summary><p style={{ whiteSpace: 'pre-wrap' }}>{step.description}</p></details>)}{item.workflowGuard.conditions && <details><summary>Yêu cầu, điều kiện</summary><p style={{ whiteSpace: 'pre-wrap' }}>{item.workflowGuard.conditions}</p></details>}{Object.entries(item.documentExemptions || {}).length > 0 && <details><summary>Giải trình thành phần hồ sơ</summary>{Object.entries(item.documentExemptions).map(([id, reason]) => <p key={id}><b>{(item.procedure?.submission?.documents || []).find((doc: { id: string }) => doc.id === id)?.label || id}</b><br />{String(reason)}</p>)}</details>}</section>}
       {(isStaff || actionOptions.length > 0) && <div className="action-panel"><h3>{isStaff ? 'Thao tác theo vai trò' : 'Gửi bổ sung hồ sơ'}{pendingNotice && ' · yêu cầu dừng'}</h3>
         {actionOptions.length ? <form onSubmit={onSubmitAction}>
           <label>Thao tác<select value={action} onChange={e => { const next = e.target.value; setAction(next); setActionText(['save_draft', 'submit_review'].includes(next) ? (item.draftResult || '') : '') }} required><option value="">Chọn thao tác</option>{actionOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>

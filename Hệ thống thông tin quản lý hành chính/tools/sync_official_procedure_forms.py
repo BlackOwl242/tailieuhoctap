@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+from http.client import HTTPException
 import re
 import sys
 import time
@@ -53,7 +54,7 @@ def post_json(path: str, payload: dict, retries: int = 3) -> dict:
             if result.get("code") != "OK":
                 raise RuntimeError(f"Official API returned {result.get('code')}: {result.get('message')}")
             return result.get("data") or {}
-        except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, RuntimeError) as exc:
+        except (HTTPError, URLError, TimeoutError, HTTPException, json.JSONDecodeError, RuntimeError) as exc:
             last_error = exc
             if attempt + 1 < retries:
                 time.sleep(0.6 * (attempt + 1))

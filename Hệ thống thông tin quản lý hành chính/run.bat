@@ -24,6 +24,14 @@ if not exist "procedure_workflows.py" (
     echo Thieu procedure_workflows.py. Hay khoi phuc ma nguon day du cua du an.
     goto startup_error
 )
+if not exist "official_procedure_policy.py" (
+    echo Thieu official_procedure_policy.py. Hay cap nhat day du bo cai dat.
+    goto startup_error
+)
+if not exist "resources\official_catalog_reconciliation.json.gz" (
+    echo Thieu du lieu thu tuc chinh thuc. Hay cap nhat day du bo cai dat.
+    goto startup_error
+)
 if not exist "workflow_extensions.py" (
     echo Thieu workflow_extensions.py. Hay khoi phuc ma nguon day du cua du an.
     goto startup_error
@@ -36,6 +44,14 @@ if errorlevel 1 (
     python -m pip install -r requirements.txt
     if errorlevel 1 goto dependency_error
 )
+
+if not exist "scripts\provision_citizen_account.py" (
+    echo Thieu scripts\provision_citizen_account.py. Hay cap nhat day du bo cai dat.
+    goto startup_error
+)
+echo Preparing the citizen account...
+python -X utf8 scripts\provision_citizen_account.py
+if errorlevel 1 goto startup_error
 
 if not exist "frontend\package.json" (
     echo Khong tim thay frontend\package.json.
@@ -56,6 +72,14 @@ if not exist "node_modules\vite\bin\vite.js" (
 call npm run build
 if errorlevel 1 goto frontend_error
 popd
+
+python -c "import json,os,urllib.request; r=urllib.request.urlopen('http://127.0.0.1:'+os.environ['HANOI_SERVICES_PORT']+'/api/health',timeout=2); raise SystemExit(0 if json.load(r).get('status')=='ok' else 1)" >nul 2>&1
+if not errorlevel 1 (
+    echo Installation updated. The system is already running.
+    echo Citizen login: http://127.0.0.1:%HANOI_SERVICES_PORT%/dang-nhap
+    popd
+    exit /b 0
+)
 
 echo Starting the Hanoi administrative services system...
 echo Open http://127.0.0.1:%HANOI_SERVICES_PORT% in your browser.

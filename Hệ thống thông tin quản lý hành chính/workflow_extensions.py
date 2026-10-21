@@ -75,6 +75,7 @@ def get_records(service, handler, user):
 
 
 def create_public(service, handler, kind, body):
+    citizen = handler.require_citizen()
     service.check_public_rate_limit(handler.public_address(), kind, 8)
     name = service.clean_text(body.get('name'), 150)
     phone = service.clean_text(body.get('phone'), 40)
@@ -116,6 +117,7 @@ def create_public(service, handler, kind, body):
             code = 'LH-' + secrets.token_hex(6).upper()
             con.execute('INSERT INTO public_appointments(code,citizen_name,phone,agency,procedure_code,procedure_name,appointment_date,time_slot,queue_number,note,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
                         (code, name, phone, agency, procedure['code'], procedure['name'], day.isoformat(), slot, queue, service.clean_text(body.get('note'), 1000), 'BOOKED', now))
+            con.execute('INSERT INTO citizen_record_owners(record_code,user_id,created_at) VALUES(?,?,?)', (code, citizen['id'], now))
             return handler.send_json({'code': code, 'queueNumber': queue, 'message': 'Đã ghi nhận lịch hẹn trong hệ thống. Lịch hẹn không thay thế việc tiếp nhận hồ sơ.'}, 201)
         title = service.clean_text(body.get('title'), 180)
         content = service.clean_text(body.get('content'), 4000)
@@ -127,10 +129,12 @@ def create_public(service, handler, kind, body):
         code = 'PA-' + secrets.token_hex(6).upper()
         con.execute('INSERT INTO public_pakn(code,sender_name,phone,email,agency,topic,title,content,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)',
                     (code, name, phone, email, agency, service.clean_text(body.get('topic'), 120) or 'Phản ánh về phục vụ', title, content, 'RECEIVED', now))
+        con.execute('INSERT INTO citizen_record_owners(record_code,user_id,created_at) VALUES(?,?,?)', (code, citizen['id'], now))
         return handler.send_json({'code': code, 'message': 'Đã gửi phản ánh đến đơn vị trong hệ thống.'}, 201)
 
 
 def lookup_public(service, handler, body):
+    citizen = handler.require_citizen()
     service.check_public_rate_limit(handler.public_address(), 'service-lookup', 30)
     code = service.clean_text(body.get('code'), 40).upper()
     phone = service.clean_text(body.get('phone'), 40)
@@ -143,7 +147,8 @@ def lookup_public(service, handler, body):
             row = con.execute('SELECT code,sender_name,phone,agency,topic,title,content,status,reply,replied_by,replied_at,created_at FROM public_pakn WHERE code=?', (code,)).fetchone()
         else:
             row = None
-        if not row or not secrets.compare_digest(row['phone'], phone):
+        owner = con.execute('SELECT user_id FROM citizen_record_owners WHERE record_code=?', (code,)).fetchone()
+        if not row or (owner and owner['user_id'] != citizen['id']) or not secrets.compare_digest(row['phone'], phone):
             return handler.send_error_json('Không tìm thấy thông tin khớp mã và số điện thoại.', 404)
         result = dict(row)
         result.pop('phone')
@@ -196,7 +201,7 @@ def create_counter_case(service, handler, user, body):
     agency = service.clean_text(body.get('receivingAgency'), 180)
     if not procedure or not agency or not _agency_allowed(user, agency):
         raise ValueError('Chọn thủ tục và cơ quan thuộc phạm vi tiếp nhận.')
-    profile = workflows.require_submission(procedure)
+    profile = workflows.require_submission(procedure, "DIRECT")
     if not workflows.agency_matches(profile, agency):
         raise ValueError('Cơ quan không thuộc tuyến xử lý đã cấu hình cho thủ tục.')
     applicant_type = service.clean_text(body.get('applicantType'), 20)
@@ -227,7 +232,7 @@ def create_counter_case(service, handler, user, body):
         created = service.now_iso()
         deadline, deadline_note = service.compute_deadline(procedure_code, datetime.now(service.TZ), profile)
         payload = {'code': code, 'procedureCode': procedure_code, 'applicantType': applicant_type,
-                   'procedure': procedure, 'workflow': workflows.snapshot(procedure),
+                   'procedure': procedure, 'workflow': workflows.snapshot(procedure, 'DIRECT'),
                    'milestones': workflows.milestones(profile, datetime.now(service.TZ), service.is_workday),
                    'applicant': {'name': name, 'citizenId': citizen_id, 'phone': phone, 'email': email, 'address': address},
                    'subject': {'name': name, 'relation': 'Người nộp'}, 'requestSummary': summary,

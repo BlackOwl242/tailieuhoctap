@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 
 type Request = <T>(path: string, body?: unknown) => Promise<T>
 type Person = { role: string; agencyScope?: string }
-type Procedure = { code: string; name: string; submissionEnabled?: boolean }
+type Procedure = { code: string; name: string; submissionEnabled?: boolean; counterEnabled?: boolean }
 type DeskRecord = {
   code: string
   agency: string
@@ -129,7 +129,7 @@ export function AdministrativeServiceDesk({ user, procedures, request, onCaseCre
     {user.role === 'intake' && <section className="panel service-desk-intake"><details open><summary className="service-desk-summary"><b>Tiếp nhận hồ sơ trực tiếp tại quầy Một cửa</b></summary>
       <p className="muted" style={{ margin: '8px 0 16px' }}>Ghi nhận giấy tờ bản chính/bản sao đã đối chiếu với người nộp. Tệp quét số hóa được bổ sung trong chi tiết hồ sơ sau khi tiếp nhận.</p>
       <form className="form-grid account-form" onSubmit={create}>
-        <label className="span-two">Thủ tục<select name="procedureCode" required><option value="">Chọn thủ tục</option>{procedures.filter(procedure => procedure.submissionEnabled === true).map(p => <option key={p.code} value={p.code}>{p.code} · {p.name}</option>)}</select></label>
+        <label className="span-two">Thủ tục<select name="procedureCode" required><option value="">Chọn thủ tục</option>{procedures.filter(procedure => (procedure.counterEnabled ?? procedure.submissionEnabled) === true).map(p => <option key={p.code} value={p.code}>{p.code} · {p.name}</option>)}</select></label>
         <label>Cơ quan tiếp nhận<input name="receivingAgency" required maxLength={180} defaultValue={user.agencyScope === 'Toàn thành phố' ? '' : user.agencyScope} readOnly={!!user.agencyScope && user.agencyScope !== 'Toàn thành phố'} /></label>
         <label>Chủ thể<select name="applicantType"><option value="citizen">Cá nhân</option><option value="organization">Tổ chức</option></select></label>
         <label>Họ tên / tên tổ chức<input name="applicantName" required minLength={2} maxLength={150} /></label>

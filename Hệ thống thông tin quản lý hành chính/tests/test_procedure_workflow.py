@@ -66,7 +66,7 @@ class ProcedureWorkflowTests(unittest.TestCase):
 
     def test_service_classification_does_not_enable_unconfigured_forms(self):
         self.assertEqual(app.PROCEDURE_BY_CODE["1.004237"]["serviceMode"], "FULL")
-        partial = next(p for p in app.PROCEDURES if p["serviceMode"] == "PARTIAL")
+        partial = next(p for p in app.PROCEDURES if p["serviceMode"] == "PARTIAL" and not p.get("submissionEnabled"))
         info = next(p for p in app.PROCEDURES if p["serviceMode"] == "INFORMATION")
         for procedure in [partial, info]:
             with self.assertRaisesRegex(ValueError, "biểu mẫu"):

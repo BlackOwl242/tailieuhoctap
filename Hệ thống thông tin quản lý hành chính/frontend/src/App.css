@@ -3663,3 +3663,12 @@ html.capture-mode *::-webkit-scrollbar { display: none !important; width: 0 !imp
 
 
 
+
+/* Citizen identity reuses the portal form and button styles. */
+.citizen-account-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 20px; padding: 10px clamp(16px, 4vw, 64px); background: #fff; color: #233e58; border-bottom: 1px solid #e1e7ee; font-size: 13px; }
+.citizen-account-bar > div { display: flex; align-items: center; gap: 16px; }
+.citizen-auth-page .auth-card { max-height: none; }
+.citizen-owned-cases { display: grid; gap: 10px; margin: 20px 0; }
+.citizen-owned-case { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 16px; border: 1px solid #d9e2eb; border-radius: 8px; background: #fff; color: #233e58; text-align: left; font: inherit; cursor: pointer; }
+.citizen-owned-case:hover { background: #f0f5fa; }
+.citizen-owned-case span { flex: 1; min-width: 160px; }

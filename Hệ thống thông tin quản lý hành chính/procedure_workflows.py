@@ -6,6 +6,7 @@ forms. Other catalogue entries remain reference-only until their workflow is rev
 from __future__ import annotations
 
 import json
+import official_procedure_policy as official
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -58,6 +59,19 @@ PROFILES: dict[str, dict] = {
 }
 
 
+# Published document workflows use original official declarations as attachments.
+for _code in official.publication_bundle().get("entries", {}):
+    if _code not in PROFILES:
+        _compiled = official.compiled_policy(_code)
+        if _compiled:
+            PROFILES[_code] = _compiled["profile"]
+            _forms[_code] = _compiled["schema"]
+
+
+def form_for(code: str) -> dict | None:
+    return _forms.get(code)
+
+
 def concrete_agency(name: str) -> bool:
     value = " ".join(str(name or "").split()).strip()
     if len(value) < 3:
@@ -69,7 +83,9 @@ def concrete_agency(name: str) -> bool:
 def configured_profile(procedure: dict) -> dict | None:
     code = str(procedure.get("code") or procedure.get("procedureCode") or "")
     profile = PROFILES.get(code)
-    form = procedure.get("submission") or _forms.get(code)
+    form = _forms.get(code) if profile and profile.get("kind") == "PUBLISHED_DOSSIER" else procedure.get("submission") or _forms.get(code)
+    if profile and profile.get("kind") == "PUBLISHED_DOSSIER":
+        return profile if form and form.get("version") == profile["version"] else None
     if not profile or procedure.get("serviceMode") in {"INFORMATION", "UNKNOWN"}:
         return None
     if not isinstance(form, dict) or form.get("sourceStatus") != "reviewed-interactive":
@@ -79,20 +95,22 @@ def configured_profile(procedure: dict) -> dict | None:
     return profile
 
 
-def require_submission(procedure: dict) -> dict:
+def require_submission(procedure: dict, channel: str = "ONLINE") -> dict:
     profile = configured_profile(procedure)
-    if not profile:
+    if not profile or channel not in profile.get("channels", ["ONLINE", "DIRECT", "POSTAL"]):
         raise ValueError("Thủ tục chưa có biểu mẫu và quy trình đã được đối chiếu đầy đủ để tiếp nhận trực tuyến.")
     return profile
 
 
-def snapshot(procedure: dict) -> dict:
-    profile = require_submission(procedure)
-    return {key: value for key, value in profile.items() if key not in {"evidenceFields"}}
+def snapshot(procedure: dict, channel: str = "ONLINE") -> dict:
+    profile = require_submission(procedure, channel)
+    return dict(profile) if profile.get("kind") == "PUBLISHED_DOSSIER" else {key: value for key, value in profile.items() if key not in {"evidenceFields"}}
 
 
 def case_profile(case: dict) -> dict | None:
     saved = case.get("workflow")
+    if isinstance(saved, dict) and saved.get("kind") == "PUBLISHED_DOSSIER" and saved.get("version") and saved.get("evidenceFields"):
+        return saved
     if isinstance(saved, dict) and saved.get("procedureCode") in PROFILES:
         return {**PROFILES[saved["procedureCode"]], **saved}
     return PROFILES.get(str(case.get("procedureCode") or ""))
@@ -103,7 +121,7 @@ def guard_summary(case: dict) -> dict:
     allowed_actions = [
         "accept", "request_supplement", "reject_intake", "assign", "prepare_stop_notice",
         "set_fee", "digitize_documents", "deliver", "submit_supplement", "save_draft",
-        "submit_review", "verify_original_register", "verify_data_request", "assess_data_request",
+        "submit_review", "verify_original_register", "verify_data_request", "assess_data_request", "verify_published_procedure",
         "approve", "send_back", "decline", "waive_fee", "sign_result", "issue", "issue_stop_notice",
     ]
     if not profile:
@@ -113,7 +131,9 @@ def guard_summary(case: dict) -> dict:
         allowed_actions.remove("submit_review")
     if profile.get("procedureCode") == "1.004237" and not evidence.get("financialAssessment") and "submit_review" in allowed_actions:
         allowed_actions.remove("submit_review")
-    return {"verificationAction": profile["verificationAction"], "verificationLabel": profile["verificationLabel"], "evidenceFields": profile["evidenceFields"], "milestone": profile.get("milestone"), "allowedActions": allowed_actions}
+    if profile.get("kind") == "PUBLISHED_DOSSIER" and evidence.get("outcome") != "Đủ điều kiện trình xem xét":
+        allowed_actions.remove("submit_review")
+    return {"officialSteps": profile.get("officialSteps", []), "conditions": profile.get("conditions", ""), "sourceUrl": profile.get("sourceUrl", ""), "verificationAction": profile["verificationAction"], "verificationLabel": profile["verificationLabel"], "evidenceFields": profile["evidenceFields"], "milestone": profile.get("milestone"), "allowedActions": allowed_actions}
 
 
 def authorize_action(role: str, action: str) -> None:
@@ -147,6 +167,8 @@ def agency_matches(profile: dict, agency: str) -> bool:
         return False
     code = profile.get("procedureCode")
     folded = " ".join(str(agency).split()).casefold()
+    if profile.get("kind") == "PUBLISHED_DOSSIER":
+        return official.agency_matches(profile, agency)
     if code == "1.004237":
         return folded in {"sở nông nghiệp và môi trường hà nội", "sở nông nghiệp và môi trường"}
     if code == "2.000908":
