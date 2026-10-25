@@ -6,11 +6,13 @@ import Link from 'next/link';
 import { Save, ShieldCheck, KeyRound, ArrowRight, Banknote } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
-import { Button, Card, CardContent, Input, Label, Skeleton } from '@/components/ui/primitives';
+import { Button, Card, CardContent, Input, Label, Select, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState } from '@/components/common/states';
 
 // Các khóa cấu hình cho phép chỉnh sửa trên UI
 const EDITABLE = [
+  { key: 'ANNUAL_LEAVE_DAYS', label: 'Số ngày phép năm cơ bản' },
+  { key: 'LEAVE_ALLOCATION_MODE', label: 'Cách phân bổ phép năm' },
   { key: 'WORK_START', label: 'Giờ bắt đầu ca chuẩn' },
   { key: 'WORK_END', label: 'Giờ kết thúc ca chuẩn' },
   { key: 'FACE_THRESHOLD', label: 'Ngưỡng khớp khuôn mặt' },
@@ -107,8 +109,8 @@ export default function AdminSettingsPage() {
           {EDITABLE.map(({ key, label }) => (
             <div key={key} className="space-y-1.5">
               <Label htmlFor={`set-${key}`}>{label}</Label>
-              <Input id={`set-${key}`} value={values[key] ?? ''}
-                onChange={(e) => setValues({ ...values, [key]: e.target.value })} />
+              {key === 'LEAVE_ALLOCATION_MODE' ? <Select id={`set-${key}`} value={values[key] ?? 'PRORATED_YEAR'} onChange={e => setValues({ ...values, [key]: e.target.value })}><option value="PRORATED_YEAR">Theo thời gian dự kiến làm việc trong năm</option><option value="ACCRUED">Tích lũy đến hiện tại</option><option value="FULL_YEAR">Cấp trước cả năm</option></Select> : <Input id={`set-${key}`} value={values[key] ?? ''}
+                onChange={(e) => setValues({ ...values, [key]: e.target.value })} />}
               <p className="text-xs text-muted-foreground">Khóa: {key}</p>
             </div>
           ))}

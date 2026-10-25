@@ -7,6 +7,9 @@ describe('Attendance ledger regressions', () => {
   let service: AttendanceLedgerService;
   beforeEach(() => {
     db = { attendancePeriod: { findUnique: jest.fn().mockResolvedValue(null), upsert: jest.fn().mockResolvedValue({ id: 'period', version: 1 }) }, hrmsPayrollRun: { findFirst: jest.fn().mockResolvedValue(null) }, hrmsShiftAssignment: { findFirst: jest.fn().mockResolvedValue(null), findMany: jest.fn().mockResolvedValue([]) }, attendanceEvent: { findMany: jest.fn().mockResolvedValue([]) }, hrmsAttendanceRegularization: { findMany: jest.fn().mockResolvedValue([]), findFirst: jest.fn().mockResolvedValue({ requestedCheckIn: '09:00', requestedCheckOut: '10:00' }), count: jest.fn().mockResolvedValue(0) }, attendanceCorrection: { findMany: jest.fn().mockResolvedValue([]) }, leaveRequest: { findFirst: jest.fn().mockResolvedValue(null), findMany: jest.fn().mockResolvedValue([]) }, attendanceDay: { upsert: jest.fn().mockImplementation((arg: any) => arg.create), count: jest.fn().mockResolvedValue(0), findMany: jest.fn().mockResolvedValue([]) }, personnelAction: { findMany: jest.fn().mockResolvedValue([]) }, user: { findMany: jest.fn().mockResolvedValue([]) }, auditLog: { create: jest.fn().mockResolvedValue({}) }, $transaction: jest.fn(async (callback: any) => callback(db)), setting: { findUnique: jest.fn().mockResolvedValue(null) } };
+    db.hrmsTravelRequest = { findFirst: jest.fn().mockResolvedValue(null) };
+    db.overtimeRequest = { count: jest.fn().mockResolvedValue(0) };
+    db.leaveRequest.count = jest.fn().mockResolvedValue(0);
     service = new AttendanceLedgerService(db as PrismaService, new RuntimeSettingsService(db));
   });
   it('one approved hour remains sixty minutes after recomputation', async () => {
@@ -16,6 +19,21 @@ describe('Attendance ledger regressions', () => {
     const again = await service.recompute('employee', new Date('2026-09-01T00:00:00Z'));
     expect(again.workedMinutes).toBe(60);
     expect(again.firstInAt?.toISOString()).toBe('2026-09-01T02:00:00.000Z');
+  });
+  it('blocks finalization before snapshot writes when leave is pending', async () => {
+    db.leaveRequest.count.mockResolvedValue(1);
+    await expect(service.finalize(9, 2026, 'hr')).rejects.toThrow('1 đơn nghỉ phép');
+    expect(db.attendancePeriod.upsert).not.toHaveBeenCalled();
+  });
+  it('blocks finalization when overtime is still pending approval', async () => {
+    db.overtimeRequest.count.mockImplementation(async ({ where }: any) => where.status === 'PENDING' ? 1 : 0);
+    await expect(service.finalize(9, 2026, 'hr')).rejects.toThrow('1 đơn OT chờ duyệt');
+    expect(db.attendancePeriod.upsert).not.toHaveBeenCalled();
+  });
+  it('does not generate demonstration punches by default', async () => {
+    db.user.findMany.mockResolvedValue([{ id: 'employee' }]);
+    await service.ensureAutoAttendanceUpToDate(new Date('2026-10-24'), true);
+    expect(db.user.findMany).not.toHaveBeenCalled();
   });
   it('uses an overnight shift instead of the default office hours', async () => {
     db.hrmsShiftAssignment.findFirst.mockResolvedValue({ shiftType: { startTime: '22:00', endTime: '06:00', lateToleranceMinutes: 5, earlyExitToleranceMinutes: 5 } });
@@ -45,6 +63,12 @@ describe('Attendance ledger regressions', () => {
     db.setting.findUnique.mockImplementation(async({where}:any)=>where.key==='HOLIDAYS'?{value:['2026-09-02']}:null);
     const result=await service.recompute('employee',new Date('2026-09-02'));
     expect(result.status).toBe('HOLIDAY');expect(result.workedMinutes).toBe(0);
+  });
+  it('records confirmed travel as paid work without generating a punch pair', async () => {
+    db.hrmsAttendanceRegularization.findFirst.mockResolvedValue(null);
+    db.hrmsTravelRequest.findFirst.mockResolvedValue({ id: 'trip' });
+    const result = await service.recompute('employee', new Date('2026-09-01'));
+    expect(result.status).toBe('BUSINESS_TRIP'); expect(result.workedMinutes).toBe(0); expect(result.firstInAt).toBeNull();
   });
   it('finalizes assigned Saturday shifts and excludes the employee weekly rest day', async () => {
     db.user.findMany.mockResolvedValue([{ id: 'employee', hireDate: new Date('2020-01-01T00:00:00.000Z') }]);

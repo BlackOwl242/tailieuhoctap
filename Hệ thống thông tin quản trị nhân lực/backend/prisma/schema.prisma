@@ -675,6 +675,7 @@ enum DayStatus {
   MISSING_PAIR
   ON_LEAVE
   HOLIDAY
+  BUSINESS_TRIP
 }
 
 model AttendanceDay {
@@ -848,6 +849,7 @@ model LeaveRequest {
   startDate    DateTime      @db.Date
   endDate      DateTime      @db.Date
   days         Float
+  chargedDates String[]      @default([])
   reason       String
   status       RequestStatus @default(PENDING)
   approverId   String?
@@ -887,6 +889,12 @@ model OvertimeRequest {
   approverId   String?
   decidedAt    DateTime?
   decisionNote String?
+  actualHours Float?
+  actualNightHours Float?
+  actualConfirmedBy String?
+  actualConfirmedAt DateTime?
+  actualEvidenceUrl String?
+  actualNote String?
   createdAt    DateTime      @default(now())
 
   user     User  @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1089,6 +1097,7 @@ model TrainingEnrollment {
 // (thuyên chuyển / điều chỉnh lương / khen thưởng / kỷ luật / thôi việc),
 // đúng mẫu hình ApprovalEngine trong tài liệu thiết kế.
 enum PersonnelActionType {
+  PROBATION_FAIL
   PROBATION_PASS
   TRANSFER // thuyên chuyển
   SALARY_ADJUST // điều chỉnh lương
@@ -1618,6 +1627,7 @@ model HrmsSalaryStructureItem {
 }
 
 model HrmsSalaryStructureAssignment {
+  toDate DateTime? @db.Date
   id          String   @id @default(uuid())
   userId      String
   structureId String
@@ -1656,6 +1666,7 @@ model HrmsPayrollRun {
   processedAt        DateTime?
   legacyPeriodId     String?                @unique
   attendancePeriodId String?
+  attendanceVersion  Int?
   policySnapshot     Json                   @default("{}")
   reviewedBy         String?
   reviewedAt         DateTime?
@@ -1882,6 +1893,8 @@ model HrmsOnboardingTask {
 // ---------------------------------------------------------------------------
 
 model HrmsAppraisalCycle {
+  participantScope String @default("COMPANY")
+  participantIds String[] @default([])
   id                    String                        @id @default(uuid())
   name                  String // Chu kỳ đánh giá KPI hoặc chu kỳ đánh giá công vụ
   year                  Int
@@ -2089,6 +2102,10 @@ enum ClaimStatus {
 }
 
 model HrmsTravelRequest {
+  confirmedWorkDates String[] @default([])
+  attendanceConfirmedAt DateTime?
+  attendanceConfirmedBy String?
+  attendanceEvidenceUrl String?
   id                 String                @id @default(uuid())
   userId             String
   employeeName       String
@@ -2432,8 +2449,8 @@ model ProbationReview {
   recommendation  String
   status          String       @default("SUBMITTED")
   decisionNote    String?
-  contractSalary  Float
-  contractType    ContractType @default(FIXED_TERM)
+  contractSalary  Float?
+  contractType    ContractType?
   effectiveDate   DateTime     @db.Date
   contractEndDate DateTime?    @db.Date
   createdAt       DateTime     @default(now())

@@ -91,6 +91,7 @@ const DOMAINS: NavDomain[] = [
           { href: '/dashboard', label: 'Tổng quan' },
           { href: '/ess', label: 'Cổng nhân viên' },
           { href: '/hr-workflows', label: 'Quy trình & xác nhận' },
+          { href: '/workflow-guide', label: 'Hướng dẫn thao tác' },
           { href: '/knowledge', label: 'Tri thức & bài viết' },
           { href: '/org-chart', label: 'Sơ đồ tổ chức' },
           { href: '/notifications', label: 'Thông báo' },

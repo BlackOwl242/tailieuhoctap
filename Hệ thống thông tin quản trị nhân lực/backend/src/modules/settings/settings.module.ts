@@ -10,6 +10,8 @@ import { effectiveHolidayCalendar } from '../../common/services/holiday-calendar
 
 // Khóa cấu hình runtime và giá trị mặc định (tham số kiểu THAMSO của tài liệu)
 export const SETTING_DEFAULTS: Record<string, unknown> = {
+  ANNUAL_LEAVE_DAYS: 12,
+  LEAVE_ALLOCATION_MODE: 'PRORATED_YEAR',
   ORG_PROFILE: {
     parentOrgName: '', orgName: 'CÔNG TY CỔ PHẦN SAIGON TECHNOLOGY',
     deptName: 'BAN TỔ CHỨC - HÀNH CHÍNH - NHÂN SỰ', orgLevel: 'DV_DNTN',
@@ -54,7 +56,11 @@ export class SettingsService {
     const allowed = new Set(Object.keys(SETTING_DEFAULTS));
     for (const [key, value] of Object.entries(values)) {
       if (!allowed.has(key) && !/^INSURANCE_CAP_(?:BHXH_\d{4}_(?:[1-9]|1[0-2])|BHTN_\d{4})$/.test(key)) throw new BadRequestException(`Khóa cấu hình không được hỗ trợ: ${key}`);
-      if (key === 'PAYROLL_POLICIES') {
+      if (key === 'LEAVE_ALLOCATION_MODE') {
+        if (!['PRORATED_YEAR', 'ACCRUED', 'FULL_YEAR'].includes(String(value))) throw new BadRequestException('Cách phân bổ phép không hợp lệ');
+      } else if (key === 'ANNUAL_LEAVE_DAYS') {
+        if (typeof value !== 'number' || !Number.isInteger(value) || value < 12 || value > 60) throw new BadRequestException('Số ngày phép năm phải từ 12 đến 60');
+      } else if (key === 'PAYROLL_POLICIES') {
         if (!Array.isArray(value) || !value.length) throw new BadRequestException('Cần ít nhất một chính sách lương có ngày hiệu lực');
         for (const candidate of value as PayrollPolicy[]) {
           const rateValues = [candidate.employeeRates?.socialInsurance,candidate.employeeRates?.healthInsurance,candidate.employeeRates?.unemployment,candidate.employerRates?.socialInsurance,candidate.employerRates?.healthInsurance,candidate.employerRates?.unemployment,candidate.employerRates?.occupationalAccident,candidate.employerRates?.tradeUnionFund,candidate.nonResidentTaxRate,candidate.loanDeductionCapRate];

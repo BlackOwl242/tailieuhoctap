@@ -1,0 +1,101 @@
+{
+  "timestamp": "2026-10-24T15:16:57.358Z",
+  "method": "Actual methods extracted from TypeScript source; in-memory database doubles; no HTTP or real DB",
+  "total": 10,
+  "reproduced": 10,
+  "results": [
+    {
+      "id": "P01",
+      "title": "Paid payroll can be cancelled without reversing payment",
+      "reproduced": true,
+      "evidence": {
+        "status": "CANCELLED",
+        "paymentReference": "BANK-ALREADY-PAID"
+      }
+    },
+    {
+      "id": "P02",
+      "title": "A midmonth new hire blocks the payroll calculation before their hire date",
+      "reproduced": true,
+      "evidence": "Nhân sự New hire từ 2026-10-01 không có hợp đồng hoặc quyết định lương hiệu lực cho ngày này; chưa thể tính bảng lương."
+    },
+    {
+      "id": "P03",
+      "title": "Processed payroll can be reviewed while its attendance period is open",
+      "reproduced": true,
+      "evidence": {
+        "payrollStatus": "REVIEWED",
+        "attendanceReads": 0
+      }
+    },
+    {
+      "id": "P04",
+      "title": "Saturday leave is rejected without reading the employee shift",
+      "reproduced": true,
+      "evidence": {
+        "error": "Khoảng thời gian chọn không có ngày làm việc nào",
+        "shiftReads": 0
+      }
+    },
+    {
+      "id": "P05",
+      "title": "December new hire receives a full 12-day initial balance",
+      "reproduced": true,
+      "evidence": {
+        "userId": "employee",
+        "year": 2026,
+        "entitled": 12
+      }
+    },
+    {
+      "id": "P06",
+      "title": "Expense deletion does not check the owner or actor role",
+      "reproduced": true,
+      "evidence": {
+        "actor": "unrelated-user",
+        "owner": "victim",
+        "deleted": true
+      }
+    },
+    {
+      "id": "P07",
+      "title": "Asset awaiting acknowledgement cannot be returned",
+      "reproduced": true,
+      "evidence": "Chỉ tài sản đã được nhân viên xác nhận mới được thu hồi"
+    },
+    {
+      "id": "P08",
+      "title": "A line manager can approve expenses without any organizational scope check",
+      "reproduced": true,
+      "evidence": {
+        "authorized": true,
+        "userLookups": 0
+      }
+    },
+    {
+      "id": "P09",
+      "title": "Automatic sync overwrites absence despite disabled auto attendance on the shift",
+      "reproduced": true,
+      "evidence": {
+        "syncedDays": 1,
+        "createdEvents": 2,
+        "throughDate": "2026-10-01",
+        "enableAutoAttendance": false,
+        "before": "ABSENT",
+        "after": "PRESENT",
+        "firstIn": "2026-10-01T00:55:00.000Z",
+        "lastOut": "2026-10-01T10:39:00.000Z"
+      }
+    },
+    {
+      "id": "P10",
+      "title": "Read-only payroll permission prose does not prevent expense DELETE",
+      "reproduced": true,
+      "evidence": {
+        "method": "DELETE",
+        "permission": "Chỉ xem phiếu lương cá nhân",
+        "allowed": true
+      }
+    }
+  ]
+}

@@ -12,6 +12,7 @@ import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { ApplicantStage, InterviewRecommendation, OfferStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { assertApplicantTransition, syncLegacyCandidate } from '../../common/recruitment-sync';
 
 export class CreateJobOpeningDto {
   @ApiProperty() @IsString() requisitionId: string;
@@ -225,7 +226,10 @@ export class HrmsRecruitmentService {
       if (!opening.requisitionId || !await tx.jobRequisition.findFirst({ where: { id: opening.requisitionId, status: 'APPROVED' } })) {
         throw new ConflictException('Phiếu tuyển dụng đã đóng hoặc không còn hiệu lực; không nhận thêm hồ sơ');
       }
-      return tx.hrmsJobApplicant.create({ data: dto, include: { jobOpening: true } });
+      if (await tx.hrmsJobApplicant.findFirst({ where: { jobOpeningId: dto.jobOpeningId, email: { equals: dto.email.trim(), mode: 'insensitive' } } })) throw new ConflictException('Ứng viên đã có hồ sơ cho tin tuyển dụng này');
+      const app = await tx.hrmsJobApplicant.create({ data: { ...dto, email: dto.email.trim().toLowerCase() }, include: { jobOpening: true } });
+      await syncLegacyCandidate(tx, app.id);
+      return app;
     }, { isolationLevel: 'Serializable' });
 
     await this.audit.log({
@@ -242,18 +246,22 @@ export class HrmsRecruitmentService {
     const app = await this.prisma.hrmsJobApplicant.findUnique({ where: { id } });
     if (!app) throw new NotFoundException('Không tìm thấy ứng viên');
 
-    const graph: Record<string, string[]> = { APPLIED: ['SCREENING', 'REJECTED'], SCREENING: ['INTERVIEW_ROUND_1', 'REJECTED'], INTERVIEW_ROUND_1: ['INTERVIEW_ROUND_2', 'REJECTED'], INTERVIEW_ROUND_2: ['REJECTED'], OFFER_SENT: ['REJECTED'], HIRED: [], REJECTED: [] };
-    if (!graph[app.stage]?.includes(stage)) throw new ConflictException('Giai đoạn không hợp lệ; gửi offer và nhận việc qua luồng riêng');
+    assertApplicantTransition(app.stage, stage);
     if (stage === 'INTERVIEW_ROUND_2') {
       const opening = await this.prisma.hrmsJobOpening.findUniqueOrThrow({ where: { id: app.jobOpeningId } });
       const completed = await this.prisma.hrmsInterviewRound.findFirst({ where: { applicantId: id, status: 'COMPLETED', recommendation: { in: ['HIRE', 'STRONG_HIRE'] } } });
       if (opening.minimumInterviewRounds < 2 || !completed) throw new ConflictException('Chỉ chuyển sang vòng 2 nếu vị trí yêu cầu 2 vòng và ứng viên đã đạt vòng 1');
     }
-    const res = await this.prisma.hrmsJobApplicant.update({
+    const res = await this.prisma.$transaction(async tx => {
+    const result = await tx.hrmsJobApplicant.update({
       where: { id, stage: app.stage },
       data: { stage },
       include: { jobOpening: true, interviews: true, offers: true },
     });
+    if (stage === 'REJECTED') await tx.hrmsJobOffer.updateMany({ where: { applicantId: id, status: { in: ['SENT', 'ACCEPTED'] } }, data: { status: 'REJECTED', respondedAt: new Date() } });
+    await syncLegacyCandidate(tx, id);
+    return result;
+    }, { isolationLevel: 'Serializable' });
 
     await this.audit.log({
       actorId,
@@ -319,6 +327,7 @@ export class HrmsRecruitmentService {
       if (await tx.hrmsJobOffer.count({ where: { applicantId: app.id, status: { in: ['SENT','ACCEPTED'] } } })) throw new ConflictException('Đã có offer đang hiệu lực');
       const offer = await tx.hrmsJobOffer.create({ data: { ...dto, joiningDate, status: 'SENT' } });
       await tx.hrmsJobApplicant.update({ where: { id: app.id }, data: { stage: 'OFFER_SENT' } });
+      await syncLegacyCandidate(tx, app.id);
       await tx.auditLog.create({ data: { actorId, action: 'OFFER_PREPARED_FOR_DELIVERY', entityType: 'HrmsJobOffer', entityId: offer.id } });
       return offer;
     }, { isolationLevel: 'Serializable' });
@@ -331,6 +340,7 @@ export class HrmsRecruitmentService {
       if (offer.status !== 'SENT') throw new ConflictException('Offer đã được phản hồi');
       const result = await tx.hrmsJobOffer.update({ where: { id }, data: { status: accepted ? 'ACCEPTED' : 'REJECTED', acceptedEvidenceUrl: evidenceUrl, respondedAt: new Date() } });
       if (!accepted) await tx.hrmsJobApplicant.update({ where: { id: offer.applicantId, stage: 'OFFER_SENT' }, data: { stage: 'REJECTED' } });
+      await syncLegacyCandidate(tx, offer.applicantId);
       await tx.auditLog.create({ data: { actorId, action: accepted ? 'OFFER_ACCEPTED' : 'OFFER_REJECTED', entityType: 'HrmsJobOffer', entityId: id } });
       return result;
     }, { isolationLevel: 'Serializable' });
@@ -351,6 +361,7 @@ export class HrmsRecruitmentService {
       await tx.personnelComprehensiveProfile.create({ data: { userId: user.id, recruitDate: dateKey(offer.joiningDate), recruitOrg: app.jobOpening.department } });
       await tx.contract.create({ data: { userId: user.id, contractNo: `TV-${user.employeeCode}`, type: 'PROBATION', startDate: dateKey(offer.joiningDate), endDate: new Date(dateKey(offer.joiningDate).getTime() + (app.jobOpening.probationDays - 1) * 86400000), baseSalary: offer.offeredSalary, compensationBasis: 'MONTHLY', insuranceSalary: offer.offeredSalary, createdById: actorId } });
       await tx.hrmsJobApplicant.update({ where: { id: applicantId, stage: 'OFFER_SENT' }, data: { stage: 'HIRED' } });
+      await syncLegacyCandidate(tx, applicantId);
       const tasks = [{ title: 'Cấp tài khoản và đặt mật khẩu ban đầu', category: 'IT' }, { title: 'Xác minh hồ sơ và hợp đồng thử việc', category: 'HR' }, { title: 'Cấp tài sản và xác nhận giao nhận', category: 'ADMIN' }, { title: 'Hướng dẫn công việc và mục tiêu thử việc', category: 'DEPARTMENT' }];
       await tx.hrmsOnboardingTask.createMany({ data: tasks.map(task => ({ ...task, userId: user.id, assignee: user.fullName })) });
       await tx.hrmsLifecycleEvent.create({ data: { userId: user.id, employeeName: user.fullName, type: 'ONBOARDING', status: 'IN_PROGRESS', title: `Hội nhập ${user.fullName}`, effectiveDate: dateKey(offer.joiningDate), createdBy: actorId } });

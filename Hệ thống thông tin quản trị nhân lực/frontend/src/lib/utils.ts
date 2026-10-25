@@ -44,4 +44,5 @@ export const DAY_STATUS_LABEL: Record<string, string> = {
   MISSING_PAIR: 'Thiếu giờ vào/ra',
   ON_LEAVE: 'Nghỉ phép',
   HOLIDAY: 'Ngày lễ',
+  BUSINESS_TRIP: 'Công tác đã xác nhận',
 };

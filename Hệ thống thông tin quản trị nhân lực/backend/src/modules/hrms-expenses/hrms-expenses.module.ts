@@ -5,7 +5,10 @@ import {
   Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsDateString, IsEnum, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsIn, IsNumber, IsOptional, IsString, ArrayMinSize, ArrayUnique, MinLength } from 'class-validator';
+import { AttendanceLedgerService } from '../../common/services/attendance-ledger.service';
+import { HrAccessService } from '../../common/services/hr-access.service';
+import { dateKey, workDate } from '../../common/hr-time';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { ClaimStatus } from '@prisma/client';
@@ -48,6 +51,11 @@ export class CreateTravelRequestDto {
   @IsOptional()
   @IsString()
   notes?: string;
+}
+
+class ConfirmTravelAttendanceDto {
+  @IsArray() @ArrayMinSize(1) @ArrayUnique() @IsDateString({}, { each: true }) workDates!: string[];
+  @IsString() @MinLength(1) evidenceUrl!: string;
 }
 
 export class CreateExpenseClaimDto {
@@ -116,29 +124,89 @@ export class UpdateAdvanceStatusDto {
 
 @Injectable()
 export class HrmsExpensesService {
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly ledger: AttendanceLedgerService, private readonly access: HrAccessService) {}
 
-  private async resolveRecipient(actorId: string, userId?: string, employeeName?: string) {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (userId && uuidRegex.test(userId)) {
-      const byId = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
-      if (byId) return byId;
+  async travelAttendanceOptions(actor: AuthUser, id: string) {
+    const travel = await this.prisma.hrmsTravelRequest.findUniqueOrThrow({ where: { id } });
+    await this.access.assertReviewer(actor, travel.userId);
+    if (!['APPROVED', 'PAID'].includes(travel.status)) throw new ConflictException('Chỉ xác nhận công tác đã được duyệt');
+    if (travel.returnDate.getTime() - travel.departureDate.getTime() > 366 * 86_400_000) throw new ConflictException('Lịch trình quá dài; cần đối soát trước');
+    const scheduled = await this.ledger.scheduledDates(travel.userId, dateKey(travel.departureDate), dateKey(travel.returnDate));
+    const leaves = await this.prisma.leaveRequest.findMany({ where: { userId: travel.userId, status: 'APPROVED', startDate: { lte: travel.returnDate }, endDate: { gte: travel.departureDate } } });
+    const days = [];
+    for (const day of scheduled) {
+      const date = day.toISOString().slice(0, 10), confirmed = travel.confirmedWorkDates.includes(date);
+      let reason = confirmed ? 'Đã ghi công' : day >= workDate() ? 'Ngày chưa kết thúc' : leaves.some(leave => dateKey(leave.startDate) <= day && dateKey(leave.endDate) >= day) ? 'Trùng nghỉ phép đã duyệt' : '';
+      if (!reason) try { await this.ledger.assertMutable(day); } catch (error) { if (!(error instanceof ConflictException)) throw error; reason = 'Kỳ công/lương đã chốt'; }
+      days.push({ date, confirmed, canConfirm: !reason, reason });
     }
-    const nameCandidate = (employeeName || userId || '').trim();
-    if (nameCandidate && !uuidRegex.test(nameCandidate)) {
-      const byName = await this.prisma.user.findFirst({
-        where: { fullName: { equals: nameCandidate, mode: 'insensitive' }, deletedAt: null },
-      });
-      if (byName) return byName;
-    }
-    const byActor = await this.prisma.user.findFirst({ where: { id: actorId, deletedAt: null } });
-    if (byActor) return byActor;
-    throw new BadRequestException('Cần chọn nhân viên hiện có');
+    return { days };
   }
 
-  async listTravelRequests(userId?: string, status?: ClaimStatus) {
-    const where: Record<string, unknown> = {};
-    if (userId) where.userId = userId;
+  async confirmTravelAttendance(actor: AuthUser, id: string, dto: ConfirmTravelAttendanceDto) {
+    if (!dto.evidenceUrl.trim()) throw new BadRequestException('Cần minh chứng công tác thực hiện');
+    return this.prisma.$transaction(async tx => {
+      const travel = await tx.hrmsTravelRequest.findUniqueOrThrow({ where: { id } });
+      if (!['APPROVED', 'PAID'].includes(travel.status)) throw new ConflictException('Chỉ xác nhận công tác đã được duyệt');
+      if (travel.returnDate.getTime() - travel.departureDate.getTime() > 366 * 86_400_000) throw new ConflictException('Lịch trình quá dài; cần đối soát trước');
+      await this.access.assertReviewer(actor, travel.userId);
+      const dates = dto.workDates.map(dateKey);
+      const scheduled = new Set((await this.ledger.scheduledDates(travel.userId, dateKey(travel.departureDate), dateKey(travel.returnDate), tx)).map(day => day.toISOString().slice(0, 10)));
+      for (const day of dates) {
+        if (!scheduled.has(day.toISOString().slice(0, 10)) || day >= workDate()) throw new ConflictException('Chỉ xác nhận ngày làm việc trong chuyến đi đã kết thúc');
+        await this.ledger.assertMutable(day, tx);
+        if (await tx.leaveRequest.findFirst({ where: { userId: travel.userId, status: 'APPROVED', startDate: { lte: day }, endDate: { gte: day } } })) throw new ConflictException('Ngày công tác trùng nghỉ phép đã duyệt; cần đối soát trước');
+      }
+      const confirmedWorkDates = [...new Set([...travel.confirmedWorkDates, ...dates.map(day => day.toISOString().slice(0, 10))])].sort();
+      const result = await tx.hrmsTravelRequest.update({ where: { id }, data: { confirmedWorkDates, attendanceConfirmedAt: new Date(), attendanceConfirmedBy: actor.id, attendanceEvidenceUrl: dto.evidenceUrl.trim() } });
+      for (const day of dates) await this.ledger.recompute(travel.userId, day, tx);
+      await tx.auditLog.create({ data: { actorId: actor.id, action: 'TRAVEL_ATTENDANCE_CONFIRMED', entityType: 'HrmsTravelRequest', entityId: id, afterData: { workDates: dto.workDates, evidenceUrl: dto.evidenceUrl } } });
+      return result;
+    }, { isolationLevel: 'Serializable' });
+  }
+
+  private async expenseActor(actorId: string): Promise<AuthUser> {
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: actorId }, include: { roles: true } });
+    return { id: user.id, email: user.email, roles: user.roles.map(role => role.roleCode) };
+  }
+
+  private async expenseScope(actorId: string, userId?: string): Promise<Record<string, unknown>> {
+    const actor = await this.expenseActor(actorId);
+    if (actor.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD', 'AUDITOR'].includes(role))) return userId ? { userId } : {};
+    let ids = [actorId];
+    if (actor.roles.includes('LINE_MANAGER')) {
+      const scope = await this.access.reviewScope(actor);
+      if (!scope.orgUnitId) throw new ForbiddenException('Chưa xác định phạm vi quản lý');
+      ids = (await this.prisma.user.findMany({ where: { deletedAt: null, orgUnitId: scope.orgUnitId }, select: { id: true } })).map(user => user.id);
+      ids = [...new Set([actorId, ...ids])];
+    }
+    if (userId && !ids.includes(userId)) throw new ForbiddenException('Không có quyền xem công tác phí của nhân viên này');
+    return { userId: userId ?? { in: ids } };
+  }
+
+  private async assertExpenseWriter(actorId: string, userId: string) {
+    const actor = await this.expenseActor(actorId);
+    if (!actor.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER', 'USER', 'HR_RECRUITER', 'HR_TRAINER'].includes(role))) throw new ForbiddenException('Vai trò này chỉ có quyền xem công tác phí');
+    if (actorId === userId || actor.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD'].includes(role))) return;
+    await this.access.assertReviewer(actor, userId);
+  }
+
+  private async resolveRecipient(actorId: string, userId?: string, employeeName?: string) {
+    // Never silently reassign a request when an identity is invalid or ambiguous.
+    let recipient;
+    if (userId) recipient = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
+    else if (employeeName?.trim()) {
+      const matches = await this.prisma.user.findMany({ where: { fullName: { equals: employeeName.trim(), mode: 'insensitive' }, deletedAt: null }, take: 2 });
+      if (matches.length !== 1) throw new BadRequestException('Tên nhân viên không xác định duy nhất; hãy chọn nhân viên từ danh sách');
+      recipient = matches[0];
+    } else recipient = await this.prisma.user.findFirst({ where: { id: actorId, deletedAt: null } });
+    if (!recipient) throw new BadRequestException('Cần chọn nhân viên hiện có');
+    await this.assertExpenseWriter(actorId, recipient.id);
+    return recipient;
+  }
+
+  async listTravelRequests(actorId: string, userId?: string, status?: ClaimStatus) {
+    const where = await this.expenseScope(actorId, userId);
     if (status) where.status = status;
 
     return this.prisma.hrmsTravelRequest.findMany({
@@ -150,7 +218,8 @@ export class HrmsExpensesService {
 
   async createTravelRequest(actorId: string, dto: CreateTravelRequestDto) {
     const recipient = await this.resolveRecipient(actorId, dto.userId, dto.employeeName);
-    if (new Date(dto.returnDate) < new Date(dto.departureDate) || (dto.estimatedBudget ?? 0) < 0) throw new BadRequestException('Thời gian/ngân sách công tác không hợp lệ');
+    if (!dto.purpose.trim() || !dto.fromLocation.trim() || !dto.toLocation.trim()) throw new BadRequestException('Cần mục đích, nơi đi và nơi đến của chuyến công tác');
+    if (new Date(dto.returnDate) < new Date(dto.departureDate) || new Date(dto.returnDate).getTime() - new Date(dto.departureDate).getTime() > 366 * 86_400_000 || (dto.estimatedBudget ?? 0) < 0) throw new BadRequestException('Thời gian/ngân sách công tác không hợp lệ; chuyến đi tối đa một năm');
     const res = await this.prisma.hrmsTravelRequest.create({
       data: {
         userId: recipient.id,
@@ -177,9 +246,8 @@ export class HrmsExpensesService {
     return res;
   }
 
-  async listClaims(userId?: string, status?: ClaimStatus) {
-    const where: Record<string, unknown> = {};
-    if (userId) where.userId = userId;
+  async listClaims(actorId: string, userId?: string, status?: ClaimStatus) {
+    const where = await this.expenseScope(actorId, userId);
     if (status) where.status = status;
 
     return this.prisma.hrmsExpenseClaim.findMany({
@@ -191,7 +259,7 @@ export class HrmsExpensesService {
 
   async createClaim(actorId: string, dto: CreateExpenseClaimDto) {
     const recipient = await this.resolveRecipient(actorId, dto.userId, dto.employeeName);
-    if (!dto.items?.length || dto.items.some(item => !Number.isFinite(item.amount) || item.amount < 0) || Math.abs(dto.items.reduce((sum, item) => sum + item.amount, 0) - dto.totalAmount) > 0.01) throw new BadRequestException('Tổng bảng kê phải bằng tổng chi tiết hợp lệ');
+    if (!dto.title.trim() || !Number.isFinite(dto.totalAmount) || dto.totalAmount <= 0 || !dto.items?.length || dto.items.some(item => !item || typeof item.item !== 'string' || !item.item.trim() || !Number.isFinite(item.amount) || item.amount <= 0) || Math.abs(dto.items.reduce((sum, item) => sum + item.amount, 0) - dto.totalAmount) > 0.01) throw new BadRequestException('Bảng kê cần tiêu đề, nội dung từng khoản chi và tổng tiền dương khớp chi tiết');
     if (dto.travelRequestId) {
       const travel = await this.prisma.hrmsTravelRequest.findUniqueOrThrow({ where: { id: dto.travelRequestId } });
       if (travel.userId !== recipient.id || travel.status !== 'APPROVED') throw new ConflictException('Bảng kê phải thuộc chuyến công tác đã được duyệt của cùng nhân viên');
@@ -232,6 +300,7 @@ export class HrmsExpensesService {
     const roles = await this.prisma.userRole.findMany({ where: { userId: actorId }, select: { roleCode: true } });
     const allowed = status === 'PAID' ? ['ADMIN', 'ACCOUNTANT'] : ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD'];
     if (!roles.some(role => allowed.includes(role.roleCode))) throw new ForbiddenException('Không có quyền duyệt/chi trả bước này');
+    if (!roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD'].includes(role.roleCode))) await this.access.assertReviewer({ id: actorId, email: '', roles: roles.map(role => role.roleCode) }, userId);
   }
 
   async updateClaimStatus(actorId: string, id: string, status: ClaimStatus) {
@@ -295,9 +364,8 @@ export class HrmsExpensesService {
     }, { isolationLevel: 'Serializable' });
   }
 
-  async listAdvances(userId?: string) {
-    const where: Record<string, unknown> = {};
-    if (userId) where.userId = userId;
+  async listAdvances(actorId: string, userId?: string) {
+    const where = await this.expenseScope(actorId, userId);
 
     return this.prisma.hrmsEmployeeAdvance.findMany({
       where,
@@ -308,7 +376,7 @@ export class HrmsExpensesService {
 
   async createAdvance(actorId: string, dto: CreateAdvanceDto) {
     const recipient = await this.resolveRecipient(actorId, dto.userId, dto.employeeName);
-    if (!Number.isFinite(dto.amount) || dto.amount <= 0) throw new BadRequestException('Tiền tạm ứng phải dương');
+    if (!dto.purpose.trim() || !Number.isFinite(dto.amount) || dto.amount <= 0) throw new BadRequestException('Cần mục đích và tiền tạm ứng dương');
     if (dto.travelRequestId) { const travel=await this.prisma.hrmsTravelRequest.findUniqueOrThrow({where:{id:dto.travelRequestId}}); if(travel.userId!==recipient.id || travel.status!=='APPROVED') throw new ConflictException('Tạm ứng phải thuộc chuyến đã duyệt của cùng nhân viên'); if(travel.settlementClosedAt) throw new ConflictException('Đối soát tạm ứng chuyến đi đã khóa'); }
     const res = await this.prisma.hrmsEmployeeAdvance.create({
       data: {
@@ -336,6 +404,7 @@ export class HrmsExpensesService {
   async deleteClaim(actorId: string, id: string) {
     const claim = await this.prisma.hrmsExpenseClaim.findUnique({ where: { id } });
     if (!claim) throw new NotFoundException('Không tìm thấy bảng kê chi phí');
+    await this.assertExpenseWriter(actorId, claim.userId);
 
     if (!['DRAFT', 'SUBMITTED', 'REJECTED'].includes(claim.status)) throw new ConflictException('Không được xóa chứng từ đã duyệt/chi trả');
     const res = await this.prisma.hrmsExpenseClaim.delete({ where: { id, status: { in: ['DRAFT','SUBMITTED','REJECTED'] } } });
@@ -375,6 +444,7 @@ export class HrmsExpensesService {
   async deleteTravelRequest(actorId: string, id: string) {
     const travel = await this.prisma.hrmsTravelRequest.findUnique({ where: { id } });
     if (!travel) throw new NotFoundException('Không tìm thấy chuyến công tác');
+    await this.assertExpenseWriter(actorId, travel.userId);
 
     if (!['DRAFT', 'SUBMITTED', 'REJECTED'].includes(travel.status)) throw new ConflictException('Không được xóa chứng từ đã duyệt/chi trả');
     const res = await this.prisma.hrmsTravelRequest.delete({ where: { id, status: { in: ['DRAFT','SUBMITTED','REJECTED'] } } });
@@ -419,6 +489,7 @@ export class HrmsExpensesService {
   async deleteAdvance(actorId: string, id: string) {
     const adv = await this.prisma.hrmsEmployeeAdvance.findUnique({ where: { id } });
     if (!adv) throw new NotFoundException('Không tìm thấy đề xuất tạm ứng');
+    await this.assertExpenseWriter(actorId, adv.userId);
 
     if (!['DRAFT', 'SUBMITTED', 'REJECTED'].includes(adv.status)) throw new ConflictException('Không được xóa chứng từ đã duyệt/chi trả');
     const res = await this.prisma.hrmsEmployeeAdvance.delete({ where: { id, status: { in: ['DRAFT','SUBMITTED','REJECTED'] } } });
@@ -443,13 +514,25 @@ export class HrmsExpensesController {
   constructor(private readonly service: HrmsExpensesService) {}
 
   @Get('travel-requests')
-  listTravelRequests(@Query('userId') userId?: string, @Query('status') status?: ClaimStatus) {
-    return this.service.listTravelRequests(userId, status);
+  listTravelRequests(@CurrentUser() actor: AuthUser, @Query('userId') userId?: string, @Query('status') status?: ClaimStatus) {
+    return this.service.listTravelRequests(actor.id, userId, status);
   }
 
   @Post('travel-requests')
   createTravelRequest(@Body() dto: CreateTravelRequestDto, @CurrentUser() actor: AuthUser) {
     return this.service.createTravelRequest(actor.id, dto);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD')
+  @Get('travel-requests/:id/attendance-options')
+  attendanceOptions(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
+    return this.service.travelAttendanceOptions(actor, id);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD')
+  @Post('travel-requests/:id/confirm-attendance')
+  confirmAttendance(@Param('id') id: string, @Body() dto: ConfirmTravelAttendanceDto, @CurrentUser() actor: AuthUser) {
+    return this.service.confirmTravelAttendance(actor, id, dto);
   }
 
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD')
@@ -476,8 +559,8 @@ export class HrmsExpensesController {
   }
 
   @Get('claims')
-  listClaims(@Query('userId') userId?: string, @Query('status') status?: ClaimStatus) {
-    return this.service.listClaims(userId, status);
+  listClaims(@CurrentUser() actor: AuthUser, @Query('userId') userId?: string, @Query('status') status?: ClaimStatus) {
+    return this.service.listClaims(actor.id, userId, status);
   }
 
   @Post('claims')
@@ -497,8 +580,8 @@ export class HrmsExpensesController {
   }
 
   @Get('advances')
-  listAdvances(@Query('userId') userId?: string) {
-    return this.service.listAdvances(userId);
+  listAdvances(@CurrentUser() actor: AuthUser, @Query('userId') userId?: string) {
+    return this.service.listAdvances(actor.id, userId);
   }
 
   @Post('advances')

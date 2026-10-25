@@ -2,6 +2,8 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import bcrypt from 'bcryptjs';
 import request from 'supertest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/common/prisma.service';
 import { setupTestApp } from './setup-app';
@@ -22,7 +24,7 @@ const RUN = process.env.RUN_E2E === '1';
     prisma = app.get(PrismaService);
 
     const suffix = `${Date.now()}`;
-    const roles = ['ADMIN', 'USER', 'HR_CB', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD'];
+    const roles = ['ADMIN', 'USER', 'HR_CB', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER', 'AUDITOR'];
     for (const code of roles) await prisma.role.upsert({ where: { code }, create: { code, name: code }, update: {} });
     const org = await prisma.orgUnit.create({ data: { name: `E2E Unit ${suffix}`, code: `E2E-${suffix}` } });
     const passwordHash = await bcrypt.hash('E2e-Only-Password!2026', 4);
@@ -42,6 +44,8 @@ const RUN = process.env.RUN_E2E === '1';
       HR_RECRUITER_2: await makeUser('HR_RECRUITER', 'recruiter-2'),
       ACCOUNTANT: await makeUser('ACCOUNTANT', 'accountant'),
       BOD: await makeUser('BOD', 'bod'),
+      LINE_MANAGER: await makeUser('LINE_MANAGER', 'line-manager'),
+      AUDITOR: await makeUser('AUDITOR', 'auditor'),
     };
     employee = { id: users.USER.id, fullName: users.USER.fullName };
     await prisma.contract.create({ data: { userId: employee.id, contractNo: `E2E-BASE-${suffix}`, type: 'INDEFINITE', startDate: new Date('2020-01-01'), baseSalary: 30_000_000, createdById: users.HR_CB.id } });
@@ -55,6 +59,63 @@ const RUN = process.env.RUN_E2E === '1';
   }, 60_000);
 
   afterAll(async () => { await app?.close(); });
+
+  it('isolates expense ownership, delegated creation and line-manager scope', async () => {
+    const stamp = Date.now();
+    const org = await prisma.orgUnit.create({ data: { code: `OTHER-${stamp}`, name: 'Đơn vị khác' } });
+    const target = await prisma.user.create({ data: { email: `other-${stamp}@example.test`, passwordHash: 'fixture', fullName: 'Nhân viên ngoài đơn vị', orgUnitId: org.id, hireDate: new Date('2030-01-01'), employmentStatus: 'ACTIVE', roles: { create: { roleCode: 'USER' } } } });
+    const travelPayload = { userId: target.id, employeeName: target.fullName, purpose: 'Đề xuất ngoài đơn vị', fromLocation: 'Văn phòng', toLocation: 'Khách hàng', departureDate: '2026-10-20', returnDate: '2026-10-21', estimatedBudget: 100_000 };
+    const travel = await request(app.getHttpServer()).post('/api/v1/hrms/expenses/travel-requests').set('Authorization', `Bearer ${tokens.HR_CB}`).send(travelPayload).expect(201);
+    const claimPayload = { userId: target.id, employeeName: target.fullName, title: 'Chi phí ngoài đơn vị', totalAmount: 100, items: [{ item: 'Taxi', amount: 100 }] };
+    const claim = await request(app.getHttpServer()).post('/api/v1/hrms/expenses/claims').set('Authorization', `Bearer ${tokens.HR_CB}`).send(claimPayload).expect(201);
+    const advance = await request(app.getHttpServer()).post('/api/v1/hrms/expenses/advances').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ userId: target.id, employeeName: target.fullName, purpose: 'Đề xuất tạm ứng', amount: 100 }).expect(201);
+    for (const token of [tokens.USER, tokens.LINE_MANAGER]) {
+      for (const resource of ['claims', 'travel-requests', 'advances']) {
+        const response = await request(app.getHttpServer()).get(`/api/v1/hrms/expenses/${resource}`).set('Authorization', `Bearer ${token}`).expect(200);
+        expect(response.body.some((record: any) => record.userId === target.id)).toBe(false);
+        await request(app.getHttpServer()).get(`/api/v1/hrms/expenses/${resource}?userId=${target.id}`).set('Authorization', `Bearer ${token}`).expect(403);
+      }
+      await request(app.getHttpServer()).post('/api/v1/hrms/expenses/claims').set('Authorization', `Bearer ${token}`).send(claimPayload).expect(403);
+      await request(app.getHttpServer()).post('/api/v1/hrms/expenses/travel-requests').set('Authorization', `Bearer ${token}`).send(travelPayload).expect(403);
+      await request(app.getHttpServer()).delete(`/api/v1/hrms/expenses/claims/${claim.body.id}`).set('Authorization', `Bearer ${token}`).expect(403);
+      await request(app.getHttpServer()).delete(`/api/v1/hrms/expenses/travel-requests/${travel.body.id}`).set('Authorization', `Bearer ${token}`).expect(403);
+      await request(app.getHttpServer()).delete(`/api/v1/hrms/expenses/advances/${advance.body.id}`).set('Authorization', `Bearer ${token}`).expect(403);
+    }
+    await request(app.getHttpServer()).patch(`/api/v1/hrms/expenses/travel-requests/${travel.body.id}/status`).set('Authorization', `Bearer ${tokens.LINE_MANAGER}`).send({ status: 'APPROVED' }).expect(403);
+    await request(app.getHttpServer()).get('/api/v1/hrms/expenses/claims').set('Authorization', `Bearer ${tokens.AUDITOR}`).expect(200);
+    await request(app.getHttpServer()).post('/api/v1/hrms/expenses/travel-requests').set('Authorization', `Bearer ${tokens.AUDITOR}`).send(travelPayload).expect(403);
+  });
+
+  it('rejects payroll review after attendance is reopened and finalized at a new version', async () => {
+    const period = await prisma.attendancePeriod.create({ data: { month: 1, year: 2019, status: 'FINALIZED', version: 1, snapshot: [] } });
+    const run = await prisma.hrmsPayrollRun.create({ data: { periodName: 'Stale attendance fixture', fromDate: new Date('2019-01-01'), toDate: new Date('2019-01-31'), status: 'PROCESSED', processedBy: managerId, attendancePeriodId: period.id } });
+    await prisma.auditLog.create({ data: { actorId: managerId, action: 'PAYROLL_CALCULATED', entityType: 'HrmsPayrollRun', entityId: run.id, afterData: { attendancePeriodId: period.id, attendanceVersion: 1 } } });
+    const migration = readFileSync(join(__dirname, '../prisma/migrations/20261025000000_payroll_attendance_version/migration.sql'), 'utf8');
+    await prisma.$executeRawUnsafe(migration.slice(migration.indexOf('UPDATE')));
+    expect((await prisma.hrmsPayrollRun.findUniqueOrThrow({ where: { id: run.id } })).attendanceVersion).toBe(1);
+    await request(app.getHttpServer()).post(`/api/v1/attendance-periods/${period.id}/reopen`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({ reason: 'Đối chiếu dữ liệu công' }).expect(201);
+    await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.id}/review`).set('Authorization', `Bearer ${tokens.ACCOUNTANT}`).send({}).expect(409);
+    await request(app.getHttpServer()).post('/api/v1/attendance-periods/finalize').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ month: 1, year: 2019 }).expect(201);
+    await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.id}/review`).set('Authorization', `Bearer ${tokens.ACCOUNTANT}`).send({}).expect(409);
+    await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.id}/cancel-for-recalculation`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({}).expect(201);
+  });
+
+  it('backfills missing and stale legacy candidate mirrors idempotently', async () => {
+    const requisition = await prisma.jobRequisition.create({ data: { title: 'Backfill migration', position: 'Kỹ sư', requestedById: managerId } });
+    const opening = await prisma.hrmsJobOpening.create({ data: { requisitionId: requisition.id, title: requisition.title, description: 'Migration fixture' } });
+    await prisma.hrmsJobApplicant.createMany({ data: [
+      { jobOpeningId: opening.id, candidateName: 'Stale mirror', email: 'stale@example.test', stage: 'HIRED' },
+      { jobOpeningId: opening.id, candidateName: 'Missing mirror', email: 'missing@example.test', stage: 'SCREENING' },
+    ] });
+    await prisma.candidate.create({ data: { requisitionId: requisition.id, fullName: 'Stale mirror', email: 'STALE@example.test', stage: 'NEW' } });
+    const migration = readFileSync(join(__dirname, '../prisma/migrations/20261024000000_practical_hr_workflows/migration.sql'), 'utf8');
+    const statements = migration.slice(migration.indexOf('-- Reconcile existing mirrors')).split(';').map(sql => sql.trim()).filter(Boolean);
+    for (let repeat = 0; repeat < 2; repeat++) for (const sql of statements) await prisma.$executeRawUnsafe(sql);
+    const mirrors = await prisma.candidate.findMany({ where: { requisitionId: requisition.id } });
+    expect(mirrors).toHaveLength(2);
+    expect(mirrors.find(candidate => candidate.email?.toLowerCase() === 'stale@example.test')?.stage).toBe('HIRED');
+    expect(mirrors.find(candidate => candidate.email === 'missing@example.test')?.stage).toBe('SCREENING');
+  });
 
   it('settles attendance/payroll, assets/expenses, evidence-based KPI and recruitment', async () => {
     const now = new Date();
@@ -139,6 +200,8 @@ const RUN = process.env.RUN_E2E === '1';
     expect(paid.body.paymentReference).toBe('E2E-SETTLEMENT-001');
     expect(paid.body.paymentMethod).toBe('BANK_TRANSFER');
     expect(paid.body.paidAt).toBeTruthy();
+    await request(app.getHttpServer()).post(`/api/v1/hrms/payroll/runs/${run.body.id}/cancel-for-recalculation`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({}).expect(409);
+    expect((await prisma.hrmsPayrollRun.findUniqueOrThrow({ where: { id: run.body.id } })).status).toBe('PAID');
     const repaidLoan = await prisma.hrmsEmployeeLoan.findUniqueOrThrow({ where: { id: loan.body.id } });
     expect(repaidLoan.remainingAmount).toBe(loan.body.remainingAmount - loan.body.monthlyEmi);
     const payslips = await request(app.getHttpServer()).get('/api/v1/hrms/payroll/my-slips').set('Authorization', `Bearer ${tokens.USER}`).expect(200);
@@ -241,6 +304,7 @@ const RUN = process.env.RUN_E2E === '1';
     const hourlyEmployee = await prisma.user.create({ data: {
       email: `hourly-${Date.now()}@example.test`, passwordHash: await bcrypt.hash('E2e-Only-Password!2026', 4), fullName: 'E2E Nhân viên theo giờ',
       status: 'ACTIVE', employmentStatus: 'ACTIVE', jobTitle: 'Nhân viên hỗ trợ theo giờ', salaryBandId: hourlyBand.body.id, baseSalary: 150_000,
+      hireDate: new Date(effectiveFrom),
       orgUnitId: (await prisma.user.findUniqueOrThrow({ where: { id: managerId } })).orgUnitId, roles: { create: { roleCode: 'USER' } },
     } });
     await prisma.contract.create({ data: { userId: hourlyEmployee.id, contractNo: `E2E-HOURLY-${Date.now()}`, type: 'INDEFINITE', startDate: new Date(`${effectiveFrom}T00:00:00.000Z`), baseSalary: 150_000, compensationBasis: 'HOURLY', createdById: managerId } });
@@ -252,5 +316,81 @@ const RUN = process.env.RUN_E2E === '1';
     const hourlyProposal = await request(app.getHttpServer()).post('/api/v1/personnel-actions').set('Authorization', `Bearer ${tokens.HR_CB}`)
       .send({ type: 'SALARY_ADJUST', subjectId: hourlyEmployee.id, effectiveDate: hourlyEffectiveDate, payload: { newSalary: 180_000, salaryBandId: hourlyBand.body.id, reason: 'Điều chỉnh đơn giá theo phạm vi công việc được giao.', salaryReason: 'MARKET_ALIGNMENT' } }).expect(201);
     expect(hourlyProposal.body.payload.salaryBandId).toBe(hourlyBand.body.id);
+  }, 120_000);
+
+  it('handles midmonth payroll, actual OT, Saturday leave, travel, promotion, failed probation and KPI coverage', async () => {
+    await prisma.setting.upsert({ where: { key: 'AUTO_ATTENDANCE_ENABLED' }, create: { key: 'AUTO_ATTENDANCE_ENABLED', value: false }, update: { value: false } });
+    const stamp = Date.now();
+    const manager = await prisma.user.findUniqueOrThrow({ where: { id: managerId } });
+    const now = new Date();
+    const from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 2, 1));
+    const end = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth() + 1, 0));
+    const hire = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), 15));
+    const iso = (date: Date) => date.toISOString().slice(0, 10);
+    const saturday = new Date(hire); while (saturday.getUTCDay() !== 6) saturday.setUTCDate(saturday.getUTCDate() + 1);
+    const tripDate = new Date(hire); tripDate.setUTCDate(tripDate.getUTCDate() + 1); while ([0, 6].includes(tripDate.getUTCDay())) tripDate.setUTCDate(tripDate.getUTCDate() + 1);
+    const otDate = new Date(tripDate); otDate.setUTCDate(otDate.getUTCDate() + 1);
+    const passwordHash = await bcrypt.hash('E2e-Only-Password!2026', 4);
+    const mid = await prisma.user.create({ data: { email: `mid-${stamp}@example.test`, passwordHash, fullName: 'E2E Vào giữa tháng', status: 'ACTIVE', employmentStatus: 'ACTIVE', hireDate: hire, baseSalary: 30_000_000, orgUnitId: manager.orgUnitId, roles: { create: { roleCode: 'USER' } } } });
+    await prisma.contract.create({ data: { userId: mid.id, contractNo: `MID-${stamp}`, type: 'INDEFINITE', startDate: hire, baseSalary: 30_000_000, createdById: managerId } });
+    const login = await request(app.getHttpServer()).post('/api/v1/auth/login').send({ email: mid.email, password: 'E2e-Only-Password!2026' }).expect(200);
+    const midToken = login.body.accessToken;
+    const shift = await request(app.getHttpServer()).post('/api/v1/hrms/shifts/types').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ name: 'E2E Ca thứ Hai–thứ Bảy', startTime: '08:00', endTime: '17:30' }).expect(201);
+    await request(app.getHttpServer()).post('/api/v1/hrms/shifts/assignments').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ userId: mid.id, shiftTypeId: shift.body.id, startDate: iso(from), endDate: iso(end), workDays: [1, 2, 3, 4, 5, 6] }).expect(201);
+    const leave = await request(app.getHttpServer()).post('/api/v1/leave').set('Authorization', `Bearer ${midToken}`).send({ type: 'ANNUAL', startDate: iso(saturday), endDate: iso(saturday), reason: 'Nghỉ việc gia đình vào ngày ca thứ Bảy' }).expect(201);
+    expect(leave.body.days).toBe(1); expect(leave.body.chargedDates).toEqual([iso(saturday)]);
+    await request(app.getHttpServer()).post(`/api/v1/leave/${leave.body.id}/approve`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({}).expect(201);
+    const balance = await request(app.getHttpServer()).get(`/api/v1/leave/balance?year=${from.getUTCFullYear()}`).set('Authorization', `Bearer ${midToken}`).expect(200);
+    expect(balance.body.entitled).toBeLessThan(12);
+
+    const trip = await request(app.getHttpServer()).post('/api/v1/hrms/expenses/travel-requests').set('Authorization', `Bearer ${midToken}`).send({ userId: mid.id, employeeName: mid.fullName, purpose: 'Công tác có xác nhận thực hiện', fromLocation: 'Văn phòng', toLocation: 'Khách hàng', departureDate: iso(tripDate), returnDate: iso(tripDate), estimatedBudget: 100_000 }).expect(201);
+    await request(app.getHttpServer()).patch(`/api/v1/hrms/expenses/travel-requests/${trip.body.id}/status`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({ status: 'APPROVED' }).expect(200);
+    expect(await prisma.attendanceDay.findUnique({ where: { userId_workDate: { userId: mid.id, workDate: tripDate } } })).toBeNull();
+    const options = await request(app.getHttpServer()).get(`/api/v1/hrms/expenses/travel-requests/${trip.body.id}/attendance-options`).set('Authorization', `Bearer ${tokens.HR_CB}`).expect(200);
+    expect(options.body.days).toEqual([{ date: iso(tripDate), confirmed: false, canConfirm: true, reason: '' }]);
+    await request(app.getHttpServer()).post(`/api/v1/hrms/expenses/travel-requests/${trip.body.id}/confirm-attendance`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({ workDates: [iso(tripDate)], evidenceUrl: 'https://example.test/trip-report.pdf' }).expect(201);
+    expect((await prisma.attendanceDay.findUniqueOrThrow({ where: { userId_workDate: { userId: mid.id, workDate: tripDate } } })).status).toBe('BUSINESS_TRIP');
+
+    const ot = await request(app.getHttpServer()).post('/api/v1/overtime').set('Authorization', `Bearer ${midToken}`).send({ workDate: iso(otDate), hours: 4, nightHours: 0, dayCategory: 'PUBLIC_HOLIDAY', reason: 'Kế hoạch hoàn tất công việc khách hàng' }).expect(201);
+    expect(ot.body.dayCategory).toBe('WEEKDAY');
+    await request(app.getHttpServer()).post(`/api/v1/overtime/${ot.body.id}/approve`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({}).expect(201);
+    expect((await prisma.overtimeRequest.findUniqueOrThrow({ where: { id: ot.body.id } })).actualConfirmedAt).toBeNull();
+    await request(app.getHttpServer()).post('/api/v1/attendance-periods/finalize').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ month: from.getUTCMonth() + 1, year: from.getUTCFullYear() }).expect(409);
+    await request(app.getHttpServer()).post(`/api/v1/overtime/${ot.body.id}/confirm-actual`).set('Authorization', `Bearer ${midToken}`).send({ actualHours: 2, actualNightHours: 0, note: 'Đã hoàn thành công việc', evidenceUrl: 'https://example.test/ot.pdf' }).expect(403);
+    await request(app.getHttpServer()).post(`/api/v1/overtime/${ot.body.id}/confirm-actual`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({ actualHours: 2, actualNightHours: 0, note: 'Đối chiếu báo cáo chỉ thực hiện hai giờ', evidenceUrl: 'https://example.test/ot.pdf' }).expect(201);
+    await request(app.getHttpServer()).post('/api/v1/attendance-periods/finalize').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ month: from.getUTCMonth() + 1, year: from.getUTCFullYear() }).expect(201);
+    const run = await request(app.getHttpServer()).post('/api/v1/hrms/payroll/runs').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ periodName: 'E2E Giữa tháng', fromDate: iso(from), toDate: iso(end) }).expect(201);
+    const slip = run.body.slips.find((item: any) => item.userId === mid.id);
+    expect(slip.actualWorkDays).toBe(2); expect(slip.breakdown.calculation.approvedOvertime[0].hours).toBe(2); expect(slip.netPay).toBeGreaterThan(0);
+    const attendanceEvidence = await request(app.getHttpServer()).get(`/api/v1/hrms/payroll/slips/${slip.id}/attendance`).set('Authorization', `Bearer ${tokens.HR_CB}`).expect(200);
+    expect(attendanceEvidence.body.source).toBe('PAYROLL_SNAPSHOT');
+    expect(attendanceEvidence.body.days.find((day: any) => day.workDate.startsWith(iso(tripDate))).travelRequests[0].purpose).toBe('Công tác có xác nhận thực hiện');
+
+    const cycle = await request(app.getHttpServer()).post('/api/v1/hrms/performance/cycles').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ name: 'E2E Kiểm tra đủ đối tượng', year: now.getUTCFullYear(), startDate: `${now.getUTCFullYear()}-01-01`, endDate: `${now.getUTCFullYear()}-12-31`, participantIds: [employee.id, mid.id] }).expect(201);
+    await request(app.getHttpServer()).post('/api/v1/hrms/performance/goals').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ cycleId: cycle.body.id, userId: mid.id, kraTitle: 'Hoàn tất công việc', description: 'Đối chiếu toàn bộ biên bản nghiệm thu công việc', targetMetric: 'Đạt mục tiêu công việc', weightage: 100 }).expect(201);
+    const goal = await prisma.hrmsAppraisalGoal.findFirstOrThrow({ where: { cycleId: cycle.body.id, userId: mid.id } });
+    await request(app.getHttpServer()).post(`/api/v1/hrms/performance/goals/${goal.id}/evidence`).set('Authorization', `Bearer ${midToken}`).send({ description: 'Báo cáo công việc đã nghiệm thu đầy đủ', evidenceUrl: 'https://example.test/kpi.pdf' }).expect(201);
+    await request(app.getHttpServer()).patch(`/api/v1/hrms/performance/goals/${goal.id}/score`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({ managerScore: 90, scoreRationale: 'Đã đối chiếu mục tiêu và báo cáo nghiệm thu' }).expect(200);
+    await request(app.getHttpServer()).patch(`/api/v1/hrms/performance/cycles/${cycle.body.id}`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({ status: 'COMPLETED' }).expect(409);
+
+    const band = await request(app.getHttpServer()).post('/api/v1/salary-bands').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ code: `LEAD-${stamp}`, name: 'Trưởng nhóm E2E', levelTitle: 'Trưởng nhóm', minSalary: 30_000_000, midSalary: 35_000_000, maxSalary: 40_000_000, jobTitles: ['Trưởng nhóm E2E'], criteria: 'Đủ năng lực điều phối và hướng dẫn nhóm', benchmarkSource: 'Dữ liệu E2E kiểm tra quyết định bổ nhiệm', effectiveFrom: iso(new Date(now.getTime() - 86_400_000)) }).expect(201);
+    await request(app.getHttpServer()).post(`/api/v1/salary-bands/${band.body.id}/approve`).set('Authorization', `Bearer ${tokens.BOD}`).send({}).expect(201);
+    const promotion = await request(app.getHttpServer()).post('/api/v1/personnel-actions').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ type: 'SALARY_ADJUST', subjectId: employee.id, payload: { newSalary: 35_000_000, salaryReason: 'PROMOTION', newJobTitle: 'Trưởng nhóm E2E', salaryBandId: band.body.id, reason: 'Bổ nhiệm theo năng lực và nhu cầu tổ chức' } }).expect(201);
+    await request(app.getHttpServer()).post(`/api/v1/personnel-actions/${promotion.body.id}/approve`).set('Authorization', `Bearer ${tokens.BOD}`).send({}).expect(201);
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: employee.id } })).jobTitle).toBe('Trưởng nhóm E2E');
+    expect(await prisma.personnelAppointment.count({ where: { profile: { userId: employee.id }, isCurrent: true, positionTitle: 'Trưởng nhóm E2E' } })).toBe(1);
+
+    const failed = await prisma.user.create({ data: { email: `failed-${stamp}@example.test`, passwordHash, fullName: 'E2E Thử việc không đạt', employmentStatus: 'PROBATION', hireDate: new Date(now.getTime() - 30 * 86_400_000), orgUnitId: manager.orgUnitId, roles: { create: { roleCode: 'USER' } } } });
+    await prisma.contract.create({ data: { userId: failed.id, contractNo: `TV-FAIL-${stamp}`, type: 'PROBATION', startDate: failed.hireDate!, baseSalary: 10_000_000, createdById: managerId } });
+    const asset = await request(app.getHttpServer()).post('/api/v1/hrms/assets').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ assetCode: `PENDING-${stamp}`, name: 'Laptop chưa ký nhận' }).expect(201);
+    await request(app.getHttpServer()).patch(`/api/v1/hrms/assets/${asset.body.id}/allocate`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({ assignedUserId: failed.id, assignedEmployeeName: failed.fullName }).expect(200);
+    const review = await request(app.getHttpServer()).post('/api/v1/hr-workflows/probation').set('Authorization', `Bearer ${tokens.HR_CB}`).send({ userId: failed.id, score: 30, assessment: 'Không đáp ứng các mục tiêu thử việc được giao', evidenceUrl: 'https://example.test/probation.pdf', recommendation: 'FAIL', effectiveDate: iso(now) }).expect(201);
+    await request(app.getHttpServer()).patch(`/api/v1/hr-workflows/probation/${review.body.id}`).set('Authorization', `Bearer ${tokens.ADMIN}`).send({ status: 'HR_VERIFIED', note: 'Đã kiểm tra minh chứng đánh giá' }).expect(200);
+    await request(app.getHttpServer()).patch(`/api/v1/hr-workflows/probation/${review.body.id}`).set('Authorization', `Bearer ${tokens.BOD}`).send({ status: 'APPROVED', note: 'Phê duyệt kết luận không đạt' }).expect(200);
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: failed.id } })).status).toBe('DISABLED');
+    await request(app.getHttpServer()).patch(`/api/v1/hrms/assets/${asset.body.id}/return`).set('Authorization', `Bearer ${tokens.HR_CB}`).send({ notes: 'Biên bản thu hồi thiết bị chưa ký nhận E2E' }).expect(200);
+    expect((await prisma.hrmsAssetAllocation.findUniqueOrThrow({ where: { id: asset.body.id } })).status).toBe('AVAILABLE');
+    const candidate = await prisma.hrmsJobApplicant.findFirstOrThrow({ where: { stage: 'HIRED' }, include: { jobOpening: true } });
+    expect((await prisma.candidate.findFirstOrThrow({ where: { requisitionId: candidate.jobOpening.requisitionId, email: { equals: candidate.email, mode: 'insensitive' } } })).stage).toBe('HIRED');
   }, 120_000);
 });

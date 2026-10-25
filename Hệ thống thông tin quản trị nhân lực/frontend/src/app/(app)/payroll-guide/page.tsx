@@ -29,7 +29,7 @@ const enterpriseSteps = [
   {
     number: '3',
     title: 'Chốt dữ liệu làm căn cứ tính kỳ lương',
-    text: 'Nhân viên và quản lý kiểm tra ngày công, ca làm, nghỉ có lương hoặc không lương. Giờ làm thêm chỉ được đưa vào khi đơn đã được duyệt. HR xử lý sai lệch trước khi tạo bảng lương.',
+    text: 'Nhân viên và quản lý kiểm tra ngày công, ca làm, nghỉ phép và công tác. OT cần được duyệt kế hoạch rồi xác nhận giờ thực làm kèm minh chứng; duyệt kế hoạch chưa đủ để trả tiền. HR xử lý sai lệch và chốt công trước khi tạo bảng lương.',
     links: [
       { href: '/attendance', label: 'Bảng chấm công' },
       { href: '/leave', label: 'Nghỉ phép' },
@@ -158,7 +158,7 @@ export default function PayrollGuidePage() {
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
             <h3 className="font-semibold">5. Tính và duyệt kỳ lương</h3>
             <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6 text-muted-foreground">
-              <li>Đối soát chấm công, ca, nghỉ đã duyệt và đơn OT; sửa thiếu dữ liệu trước khi chốt công.</li>
+              <li>Xử lý hết đơn phép/OT chờ duyệt, xác nhận OT thực làm và công tác; đối soát ca và ngày thiếu cặp trước khi chốt công.</li>
               <li>Mở <b>Kỳ bảng lương</b> → <b>Tính bảng lương</b>, nhập tên kỳ và khoảng ngày rồi tạo kỳ.</li>
               <li>Mở từng phiếu, soát mức hợp đồng, ngày/giờ được trả, cấu trúc đang áp dụng, phụ cấp, OT, thuế, bảo hiểm và cảnh báo.</li>
               <li>Chuyển qua bước phê duyệt/khóa theo quyền của tài khoản; sau thanh toán ghi phương thức và mã tham chiếu/chứng từ.</li>
@@ -298,7 +298,7 @@ export default function PayrollGuidePage() {
             </tbody>
           </table>
         </div>
-        <p className="text-xs leading-5 text-muted-foreground">Số giờ làm thêm và hệ số trong ví dụ chỉ để minh họa. Kết quả thực tế lấy từ đơn làm thêm đã duyệt, lịch/loại ngày, đơn giá quy đổi và phiên bản chính sách của kỳ lương. Công thức giờ hiện hành cũng có thành phần phụ trội ca đêm. Hãy xem chi tiết từng phiếu và cảnh báo trước khi phê duyệt.</p>
+        <p className="text-xs leading-5 text-muted-foreground">Số giờ làm thêm và hệ số trong ví dụ chỉ để minh họa. Kết quả thực tế lấy từ số giờ làm thêm đã được duyệt kế hoạch và xác nhận thực làm, lịch/loại ngày, đơn giá quy đổi và phiên bản chính sách của kỳ lương. Công thức giờ hiện hành cũng có thành phần phụ trội ca đêm. Hãy xem chi tiết từng phiếu và cảnh báo trước khi phê duyệt.</p>
       </Card>
       <p className="flex items-start gap-2 text-xs leading-5 text-muted-foreground"><BookOpen className="mt-0.5 h-4 w-4 shrink-0" />Các công thức trên giúp hiểu nguyên tắc. Mức đóng, thuế suất và điều kiện cụ thể phải theo quy định đang có hiệu lực và hồ sơ thực tế của từng người lao động.</p>
     </div>

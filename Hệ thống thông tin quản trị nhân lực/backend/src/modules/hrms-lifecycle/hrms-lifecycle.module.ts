@@ -70,7 +70,7 @@ export class HrmsLifecycleService {
   async createEvent(actor: AuthUser, dto: CreateLifecycleEventDto) {
     if (dto.type === 'ONBOARDING') throw new BadRequestException('Hội nhập được sinh từ ứng viên đã chấp thuận offer');
     const types = { PROMOTION: 'SALARY_ADJUST', TRANSFER: 'TRANSFER', SEPARATION: 'RESIGNATION', DISCIPLINARY: 'DISCIPLINE' } as const;
-    const action = await this.actions.create({ subjectId: dto.userId, type: types[dto.type], effectiveDate: dto.effectiveDate, payload: { ...dto.details, title: dto.title, decisionNo: dto.decisionNo, notes: dto.notes } }, actor);
+    const action = await this.actions.create({ subjectId: dto.userId, type: types[dto.type], effectiveDate: dto.effectiveDate, payload: { ...dto.details, ...(dto.type === 'PROMOTION' ? { salaryReason: 'PROMOTION' } : {}), title: dto.title, decisionNo: dto.decisionNo, notes: dto.notes } }, actor);
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: dto.userId } });
     return this.prisma.hrmsLifecycleEvent.create({ data: { userId: dto.userId, employeeName: user.fullName, type: dto.type, title: dto.title, effectiveDate: dateKey(dto.effectiveDate), status: 'PENDING', personnelActionId: action.id, details: dto.details as any ?? {}, notes: dto.notes, createdBy: actor.id } });
   }

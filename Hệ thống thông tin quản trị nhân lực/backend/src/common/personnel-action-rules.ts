@@ -10,6 +10,7 @@ export const DISCIPLINE_LABELS: Record<string, string> = {
 export function validatePersonnelPayload(type: string, payload: Record<string, unknown>, approving = false): void {
   const reason = String(payload.reason ?? '').trim();
   if (reason.length < 10) throw new ConflictException('Cần lý do/căn cứ cụ thể, ít nhất 10 ký tự');
+  if (type === 'SALARY_ADJUST' && payload.salaryReason === 'PROMOTION' && !String(payload.newJobTitle || '').trim()) throw new ConflictException('Thăng chức cần chức danh mới theo quyết định');
   if (type === 'AWARD' && (payload.amount !== undefined && (typeof payload.amount !== 'number' || !Number.isFinite(payload.amount) || payload.amount < 0))) {
     throw new ConflictException('Mức thưởng phải là số không âm');
   }
@@ -36,5 +37,5 @@ export function validatePersonnelPayload(type: string, payload: Record<string, u
 }
 
 export function endsEmployment(type: string, payload: Record<string, unknown>): boolean {
-  return type === 'RESIGNATION' || (type === 'DISCIPLINE' && payload.subType === 'DISMISSAL');
+  return ['RESIGNATION', 'PROBATION_FAIL'].includes(type) || (type === 'DISCIPLINE' && payload.subType === 'DISMISSAL');
 }

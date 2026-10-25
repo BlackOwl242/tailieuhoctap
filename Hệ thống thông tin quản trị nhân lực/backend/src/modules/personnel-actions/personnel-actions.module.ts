@@ -111,6 +111,7 @@ export class PersonnelActionsService {
         const targetBandId = String(dto.payload.salaryBandId ?? subject.salaryBandId ?? '');
         if (!targetBandId) throw new ConflictException('Cần gắn khung lương đã duyệt cho vị trí trước khi đề xuất mức mới');
         const band = await this.prisma.hrmsSalaryBand.findUnique({ where: { id: targetBandId } });
+        if (salaryReason === 'PROMOTION' && band?.jobTitles.length && !band.jobTitles.some(title => title.trim().toLocaleLowerCase('vi') === String(dto.payload.newJobTitle).trim().toLocaleLowerCase('vi'))) throw new ConflictException('Khung lương không áp dụng cho chức danh mới');
         if (!band || band.status !== 'ACTIVE' || band.effectiveFrom > effectiveAt || (band.effectiveTo && band.effectiveTo < effectiveAt)) throw new ConflictException('Khung lương cần áp dụng chưa được duyệt hoặc không còn hiệu lực vào ngày điều chỉnh');
         if (band.compensationBasis !== activeContract.compensationBasis) throw new ConflictException('Đơn vị của khung lương phải khớp hợp đồng: theo tháng, ngày hoặc giờ');
         if (newSalary < band.minSalary || newSalary > band.maxSalary) {
@@ -146,7 +147,7 @@ export class PersonnelActionsService {
         payload: {
           ...dto.payload,
           oldSalary: subject.baseSalary,
-          ...(dto.type === 'TRANSFER' ? { oldOrgUnitId: subject.orgUnitId, oldJobTitle: subject.jobTitle } : {}),
+          ...(dto.type === 'TRANSFER' || dto.payload.salaryReason === 'PROMOTION' ? { oldOrgUnitId: subject.orgUnitId, oldJobTitle: subject.jobTitle } : {}),
           effectiveDate: dto.effectiveDate ?? null,
         },
       },
@@ -169,6 +170,7 @@ export class PersonnelActionsService {
       if (!payload.newOrgUnitId || !await this.prisma.orgUnit.findUnique({ where: { id: String(payload.newOrgUnitId) } })) throw new ConflictException('Đơn vị tiếp nhận không hợp lệ');
     }
     if (approve && action.type === 'SALARY_ADJUST') {
+      if (payload.salaryReason === 'PROMOTION' && payload.newOrgUnitId && !await this.prisma.orgUnit.findUnique({ where: { id: String(payload.newOrgUnitId) } })) throw new ConflictException('Đơn vị bổ nhiệm không hợp lệ');
       await this.assertPublicRankProgression(payload);
       await this.assertRaiseNotDeferred(action.subjectId, action.effectiveAt ?? workDate(), String(payload.salaryReason || 'OTHER'));
       const salary = Number(payload.newSalary);
@@ -184,6 +186,7 @@ export class PersonnelActionsService {
         const activeContract = await this.prisma.contract.findFirst({ where: { userId: action.subjectId, status: 'ACTIVE', startDate: { lte: effectiveAt }, OR: [{ endDate: null }, { endDate: { gte: effectiveAt } }] }, orderBy: { startDate: 'desc' } });
         if (!activeContract || !bandId) throw new ConflictException('Cần hợp đồng còn hiệu lực và khung lương trước khi duyệt');
         const band = await this.prisma.hrmsSalaryBand.findUnique({ where: { id: bandId } });
+        if (payload.salaryReason === 'PROMOTION' && band?.jobTitles.length && !band.jobTitles.some(title => title.trim().toLocaleLowerCase('vi') === String(payload.newJobTitle).trim().toLocaleLowerCase('vi'))) throw new ConflictException('Khung lương không áp dụng cho chức danh mới');
         if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== activeContract.compensationBasis || band.effectiveFrom > effectiveAt || (band.effectiveTo && band.effectiveTo < effectiveAt) || salary < band.minSalary || salary > band.maxSalary) throw new ConflictException('Mức lương phải nằm trong khung đã duyệt cùng đơn vị hợp đồng và có hiệu lực vào ngày áp dụng');
       }
     }

@@ -25,7 +25,7 @@ interface LeaveRow {
   user?: { id?: string; fullName: string; employeeCode: string | null; orgUnit?: { name: string } | null };
   approver?: { fullName: string } | null;
 }
-interface Balance { year: number; entitled: number; used: number; pendingDays: number; remaining: number }
+interface Balance { year: number; entitled: number; used: number; pendingDays: number; remaining: number; allocationMode?: string }
 
 /** UC20 — Đăng ký nghỉ phép: kiểm quỹ trước khi trình, trừ quỹ ngay khi duyệt. */
 export default function LeavePage() {
@@ -146,6 +146,8 @@ export default function LeavePage() {
           </>
         )}
       </div>
+
+      {balanceQ.data && <p className="text-sm text-muted-foreground">{balanceQ.data.allocationMode === 'PRORATED_YEAR' ? 'Phép năm phân bổ theo thời gian làm việc dự kiến trong năm; được tính lại khi có quyết định nghỉ việc.' : balanceQ.data.allocationMode === 'ACCRUED' ? 'Phép được tích lũy theo thời gian làm việc đến hiện tại.' : 'Phép được cấp trước cả năm theo chính sách tổ chức.'} Số ngày nghỉ tính theo lịch ca đã phân, không trừ ngày nghỉ tuần và ngày lễ.</p>}
 
       <div className="print-area">
         <PrintFrame title="DANH SÁCH ĐƠN NGHỈ PHÉP" subtitle={tab === 'all' ? 'Toàn công ty' : 'Cá nhân'} />

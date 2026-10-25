@@ -147,7 +147,6 @@ export class HrmsAssetsService {
   history(id: string) { return this.prisma.assetCustodyEvent.findMany({ where: { assetId: id }, orderBy: { at: 'desc' } }); }
 
   async acknowledgeReceipt(actor: AuthUser, id: string, dto: ConfirmAssetReceiptDto) {
-    if (!dto.accepted) throw new ConflictException('Cần xác nhận đã nhận tài sản trước khi ghi nhận bàn giao');
     const asset = await this.prisma.hrmsAssetAllocation.findUnique({ where: { id } });
     if (!asset) throw new NotFoundException('Không tìm thấy tài sản');
     if (asset.assignedUserId !== actor.id) throw new NotFoundException('Không tìm thấy bàn giao cần xác nhận');
@@ -155,12 +154,12 @@ export class HrmsAssetsService {
     return this.prisma.$transaction(async tx => {
       const changed = await tx.hrmsAssetAllocation.updateMany({
         where: { id, assignedUserId: actor.id, status: 'PENDING_ACK' },
-        data: { status: 'ALLOCATED', condition: dto.condition },
+        data: dto.accepted ? { status: 'ALLOCATED', condition: dto.condition } : { status: 'AVAILABLE', assignedUserId: null, assignedEmployeeName: null, returnedDate: new Date() },
       });
       if (changed.count !== 1) throw new ConflictException('Bàn giao vừa được xử lý');
       await tx.assetCustodyEvent.create({ data: {
-        assetId: id, userId: actor.id, actorId: actor.id, action: 'RECEIPT_ACK',
-        acknowledgedAt: new Date(), notes: `Nhân viên xác nhận đã nhận; tình trạng: ${dto.condition}${dto.notes?.trim() ? `; ${dto.notes.trim()}` : ''}`,
+        assetId: id, userId: actor.id, actorId: actor.id, action: dto.accepted ? 'RECEIPT_ACK' : 'RECEIPT_REJECTED',
+        acknowledgedAt: new Date(), notes: dto.accepted ? `Nhân viên xác nhận đã nhận; tình trạng: ${dto.condition}${dto.notes?.trim() ? `; ${dto.notes.trim()}` : ''}` : `Nhân viên từ chối nhận: ${dto.notes?.trim() || 'Chưa tiếp nhận tài sản'}`,
       } });
       await tx.auditLog.create({ data: { actorId: actor.id, action: 'HRMS_ASSET_RECEIPT_ACK', entityType: 'HrmsAssetAllocation', entityId: id } });
       return tx.hrmsAssetAllocation.findUniqueOrThrow({ where: { id } });
@@ -171,10 +170,11 @@ export class HrmsAssetsService {
     const asset = await this.prisma.hrmsAssetAllocation.findUnique({ where: { id } });
     if (!asset) throw new NotFoundException('Không tìm thấy tài sản');
 
-    if (asset.status !== 'ALLOCATED') throw new ConflictException('Chỉ tài sản đã được nhân viên xác nhận mới được thu hồi');
+    if (!['ALLOCATED', 'PENDING_ACK'].includes(asset.status)) throw new ConflictException('Tài sản không ở trạng thái có thể thu hồi');
+    if (asset.status === 'PENDING_ACK' && (!notes?.trim() || notes.trim().length < 10)) throw new ConflictException('Thu hồi bàn giao chưa ký nhận cần số biên bản hoặc lý do xác minh, ít nhất 10 ký tự');
     const updated = await this.prisma.$transaction(async tx => {
     const changed = await tx.hrmsAssetAllocation.updateMany({
-      where: { id, status: 'ALLOCATED' },
+      where: { id, status: asset.status },
       data: {
         assignedUserId: null,
         assignedEmployeeName: null,
@@ -185,7 +185,7 @@ export class HrmsAssetsService {
     });
 
       if (changed.count !== 1) throw new ConflictException('Tài sản vừa được cập nhật bởi người khác');
-      await tx.assetCustodyEvent.create({ data: { assetId: id, userId: asset.assignedUserId!, actorId, action: 'RETURN', notes: notes } });
+      await tx.assetCustodyEvent.create({ data: { assetId: id, userId: asset.assignedUserId!, actorId, action: asset.status === 'PENDING_ACK' ? 'UNACKNOWLEDGED_RETURN' : 'RETURN', notes: notes } });
       return tx.hrmsAssetAllocation.findUniqueOrThrow({ where: { id } });
     }, { isolationLevel: 'Serializable' });
 

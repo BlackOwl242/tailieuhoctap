@@ -115,7 +115,7 @@ export class AttendanceController {
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Post('auto-sync')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Đồng bộ & bù điểm danh tự động cho toàn bộ nhân sự đến ngày hiện tại' })
+  @ApiOperation({ summary: 'Tạo công mô phỏng trong môi trường demo được bật riêng' })
   autoSync(@CurrentUser() user: AuthUser, @Req() req: AuthedRequest) {
     return this.service.autoSyncNow(user, req.requestId);
   }

@@ -54,6 +54,8 @@ export const ACTION_TYPE_LABEL: Record<string, string> = {
   AWARD: 'Khen thưởng · Biểu dương',
   DISCIPLINE: 'Kỷ luật lao động',
   RESIGNATION: 'Chấm dứt hợp đồng · Thôi việc',
+  PROBATION_PASS: 'Thử việc đạt · Tiếp nhận chính thức',
+  PROBATION_FAIL: 'Thử việc không đạt · Kết thúc thử việc',
 };
 
 export const PERF_STATUS_LABEL: Record<string, string> = {

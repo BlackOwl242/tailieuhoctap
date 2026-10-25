@@ -59,12 +59,23 @@ export class PersonnelEffectsService implements OnModuleInit, OnModuleDestroy {
           const profile = await tx.personnelComprehensiveProfile.upsert({ where: { userId: user.id }, create: { userId: user.id, currentOrgDate: action.effectiveAt }, update: { currentOrgDate: action.effectiveAt } });
           await tx.personnelAppointment.updateMany({ where: { profileId: profile.id, isCurrent: true }, data: { isCurrent: false, expirationDate: new Date(action.effectiveAt.getTime() - DAY_MS) } });
           await tx.personnelAppointment.create({ data: { profileId: profile.id, orgUnitName: unit.name, positionTitle: jobTitle, effectiveDate: action.effectiveAt, isCurrent: true, decisionNo: String(payload.decisionNo ?? action.id), signer: actorId } });
+          await tx.hrmsSalaryStructureAssignment.updateMany({ where: { userId: user.id, isActive: true }, data: { isActive: false, toDate: new Date(action.effectiveAt.getTime() - DAY_MS) } });
         }
         if (action.type === 'SALARY_ADJUST') {
           const salary = Number(payload.newSalary);
           if (!Number.isFinite(salary) || salary < 0) throw new Error('Quyết định lương thiếu mức hợp lệ');
           const prior = await tx.contract.findFirst({ where: { userId: user.id, status: 'ACTIVE', startDate: { lte: action.effectiveAt }, OR: [{ endDate: null }, { endDate: { gte: action.effectiveAt } }] }, orderBy: { startDate: 'desc' } });
           await tx.user.update({ where: { id: user.id }, data: { baseSalary: salary, ...(typeof payload.salaryBandId === 'string' ? { salaryBandId: payload.salaryBandId } : {}) } });
+          if (payload.salaryReason === 'PROMOTION') {
+            const jobTitle = String(payload.newJobTitle || '').trim();
+            if (!jobTitle) throw new Error('Thăng chức thiếu chức danh mới');
+            const orgUnitId = typeof payload.newOrgUnitId === 'string' && payload.newOrgUnitId ? payload.newOrgUnitId : user.orgUnitId;
+            const unit = orgUnitId ? await tx.orgUnit.findUniqueOrThrow({ where: { id: orgUnitId } }) : null;
+            await tx.user.update({ where: { id: user.id }, data: { jobTitle, orgUnitId } });
+            const profile = await tx.personnelComprehensiveProfile.upsert({ where: { userId: user.id }, create: { userId: user.id, currentOrgDate: action.effectiveAt }, update: { currentOrgDate: action.effectiveAt } });
+            await tx.personnelAppointment.updateMany({ where: { profileId: profile.id, isCurrent: true }, data: { isCurrent: false, expirationDate: new Date(action.effectiveAt.getTime() - DAY_MS) } });
+            await tx.personnelAppointment.create({ data: { profileId: profile.id, orgUnitName: unit?.name || 'Chưa phân đơn vị', positionTitle: jobTitle, effectiveDate: action.effectiveAt, isCurrent: true, decisionNo: String(payload.decisionNo || action.id), signer: actorId } });
+          }
           if (prior) {
             const root = prior.type === 'AMENDMENT' ? await tx.contract.findFirst({ where: { userId: user.id, type: { not: 'AMENDMENT' }, status: 'ACTIVE', startDate: { lte: action.effectiveAt }, OR: [{ endDate: null }, { endDate: { gte: action.effectiveAt } }] }, orderBy: { startDate: 'desc' } }) : prior;
             if (!root) throw new Error('Phụ lục điều chỉnh lương cần hợp đồng gốc còn hiệu lực');
@@ -73,8 +84,8 @@ export class PersonnelEffectsService implements OnModuleInit, OnModuleDestroy {
           }
           const assignment = await tx.hrmsSalaryStructureAssignment.findFirst({ where: { userId: user.id, isActive: true }, orderBy: { fromDate: 'desc' } });
           if (assignment) {
-            await tx.hrmsSalaryStructureAssignment.updateMany({ where: { userId: user.id, isActive: true }, data: { isActive: false } });
-            await tx.hrmsSalaryStructureAssignment.create({ data: { userId: user.id, structureId: assignment.structureId, baseSalary: salary, fromDate: action.effectiveAt } });
+            await tx.hrmsSalaryStructureAssignment.updateMany({ where: { userId: user.id, isActive: true }, data: { isActive: false, toDate: new Date(action.effectiveAt.getTime() - DAY_MS) } });
+            if (payload.salaryReason !== 'PROMOTION') await tx.hrmsSalaryStructureAssignment.create({ data: { userId: user.id, structureId: assignment.structureId, baseSalary: salary, fromDate: action.effectiveAt } });
           }
           const profile = await tx.personnelComprehensiveProfile.upsert({ where: { userId: user.id }, create: { userId: user.id }, update: {} });
           await tx.personnelSalaryHistory.updateMany({ where: { profileId: profile.id, toDate: null }, data: { toDate: new Date(action.effectiveAt.getTime() - DAY_MS) } });

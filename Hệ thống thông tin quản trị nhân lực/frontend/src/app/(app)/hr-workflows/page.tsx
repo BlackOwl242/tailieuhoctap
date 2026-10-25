@@ -1,5 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { WorkflowGuide } from '@/components/common/workflow-guide';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, errorMessage } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
@@ -46,7 +48,13 @@ export default function HrWorkflowsPage() {
   const qc = useQueryClient();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState('');
   const [tab, setTab] = useState('loans');
+  useEffect(() => {
+    const selected = new URLSearchParams(window.location.search).get('tab');
+    if (selected && ['correction', 'bank', 'loans', 'probation', 'onboarding', 'requisition', 'attendance'].includes(selected)) setTab(selected);
+  }, []);
+  const [probationRecommendation, setProbationRecommendation] = useState('PASS');
   const [noteModal, setNoteModal] = useState<{
     title: string;
     label: string;
@@ -95,11 +103,13 @@ export default function HrWorkflowsPage() {
 
   async function act(url: string, body: Row = {}, method = 'post') {
     setBusy(true);
+    setActionError('');
     try {
       await api.request({ url, method, data: body, timeout: 180000 });
       await qc.invalidateQueries();
       toast('Đã cập nhật quy trình thành công', 'success');
     } catch (e) {
+      setActionError(errorMessage(e));
       toast(errorMessage(e), 'error');
     } finally {
       setBusy(false);
@@ -125,6 +135,7 @@ export default function HrWorkflowsPage() {
       <p className="text-sm text-muted-foreground">
         Mỗi bước ghi nhận người thực hiện. Phê duyệt phải độc lập với người đề xuất; quyết định nhân sự áp dụng theo ngày hiệu lực.
       </p>
+      <Link href="/workflow-guide" className="inline-block text-sm underline underline-offset-4">Tôi cần làm gì? Xem hướng dẫn theo công việc và vai trò</Link>
       <div className="flex flex-wrap gap-2">
         {[
           ['correction', 'Giải trình công'],
@@ -135,11 +146,14 @@ export default function HrWorkflowsPage() {
           ...(recruiter || finance || bod || manager ? [['requisition', 'Chỉ tiêu tuyển dụng']] : []),
           ...(hr || finance || bod ? [['attendance', 'Chốt công']] : []),
         ].map(([id, name]) => (
-          <Button key={id} variant={tab === id ? 'default' : 'outline'} onClick={() => setTab(id)}>
+          <Button key={id} variant={tab === id ? 'default' : 'outline'} onClick={() => { setTab(id); window.history.replaceState(null, '', `?tab=${id}`); }}>
             {name}
           </Button>
         ))}
       </div>
+      {tab === 'probation' && <WorkflowGuide workflow="probation" />}
+      {tab === 'attendance' && <WorkflowGuide workflow="payroll" />}
+      {actionError && <div role="alert" className="rounded-lg border border-destructive/30 p-4 text-sm text-destructive"><p>{actionError}</p><Button className="mt-2" size="sm" variant="outline" onClick={() => setActionError('')}>Đã hiểu</Button></div>}
 
       {tab === 'bank' && (
         <form
@@ -346,7 +360,8 @@ export default function HrWorkflowsPage() {
                 void act('/hr-workflows/probation', {
                   ...v,
                   score: Number(v.score),
-                  contractSalary: Number(v.contractSalary),
+                  contractSalary: v.recommendation === 'PASS' ? Number(v.contractSalary) : undefined,
+                  contractType: v.recommendation === 'PASS' ? v.contractType : undefined,
                   contractEndDate: v.contractEndDate || undefined,
                 });
               }}
@@ -372,29 +387,29 @@ export default function HrWorkflowsPage() {
                 </label>
                 <label className="block space-y-1">
                   <span>Kết luận</span>
-                  <Select name="recommendation">
+                  <Select name="recommendation" value={probationRecommendation} onChange={e => setProbationRecommendation(e.target.value)}>
                     <option value="PASS">Đạt</option>
                     <option value="FAIL">Không đạt</option>
                   </Select>
                 </label>
                 <label className="block space-y-1">
                   <span>Lương chính thức</span>
-                  <Input name="contractSalary" type="number" min={1} required />
+                  <Input name="contractSalary" type="number" min={1} required={probationRecommendation === 'PASS'} disabled={probationRecommendation === 'FAIL'} />
                 </label>
                 <label className="block space-y-1">
                   <span>Hợp đồng</span>
-                  <Select name="contractType">
+                  <Select name="contractType" disabled={probationRecommendation === 'FAIL'}>
                     <option value="FIXED_TERM">Có thời hạn</option>
                     <option value="INDEFINITE">Không thời hạn</option>
                   </Select>
                 </label>
                 <label className="block space-y-1">
-                  <span>Ngày hiệu lực</span>
+                  <span>{probationRecommendation === 'FAIL' ? 'Ngày kết thúc thử việc' : 'Ngày nhận chính thức'}</span>
                   <Input name="effectiveDate" type="date" required />
                 </label>
                 <label className="block space-y-1">
                   <span>Ngày kết thúc (nếu có thời hạn)</span>
-                  <Input name="contractEndDate" type="date" />
+                  <Input name="contractEndDate" type="date" disabled={probationRecommendation === 'FAIL'} />
                 </label>
                 <label className="block space-y-1">
                   <span>Minh chứng</span>
@@ -419,14 +434,15 @@ export default function HrWorkflowsPage() {
                   {p.score}/100 · {p.assessment}
                 </p>
                 <p className="text-sm">Hiệu lực: {p.effectiveDate?.slice(0, 10)}</p>
+                <p className="text-sm">Kết luận: {p.recommendation === 'FAIL' ? 'Không đạt — kết thúc thử việc sau khi được phê duyệt' : 'Đạt — tiếp nhận chính thức sau khi được phê duyệt'}</p>
                 {canReviewWorkflow && !isOwnProbation && (p.status === 'SUBMITTED' || p.status === 'HR_VERIFIED') && (
                   <div className="flex gap-2">
-                    {(p.status === 'SUBMITTED' || p.recommendation === 'PASS') && (
+                    {(
                       <Button
                         disabled={busy}
                         onClick={() =>
                           openNotePrompt(
-                            p.status === 'SUBMITTED' ? 'HR xác minh kết quả thử việc' : 'Phê duyệt ký hợp đồng chính thức',
+                            p.status === 'SUBMITTED' ? 'HR xác minh kết quả thử việc' : p.recommendation === 'PASS' ? 'Phê duyệt ký hợp đồng chính thức' : 'Phê duyệt kết luận không đạt và kết thúc thử việc',
                             'Ghi chú thẩm định / phê duyệt',
                             `/hr-workflows/probation/${p.id}`,
                             'patch',
@@ -434,7 +450,7 @@ export default function HrWorkflowsPage() {
                           )
                         }
                       >
-                        {p.status === 'SUBMITTED' ? 'HR xác minh' : 'Duyệt ký chính thức'}
+                        {p.status === 'SUBMITTED' ? 'HR xác minh' : p.recommendation === 'PASS' ? 'Duyệt ký chính thức' : 'Duyệt kết thúc thử việc không đạt'}
                       </Button>
                     )}
                     {p.status === 'HR_VERIFIED' && (
@@ -443,15 +459,15 @@ export default function HrWorkflowsPage() {
                         disabled={busy}
                         onClick={() =>
                           openNotePrompt(
-                            'Từ chối ký hợp đồng chính thức',
-                            'Lý do không ký chính thức',
+                            'Từ chối kết luận đánh giá thử việc',
+                            'Lý do yêu cầu đánh giá lại',
                             `/hr-workflows/probation/${p.id}`,
                             'patch',
                             (note) => ({ status: 'REJECTED', note })
                           )
                         }
                       >
-                        Không ký chính thức
+                        Yêu cầu đánh giá lại
                       </Button>
                     )}
                   </div>
@@ -600,15 +616,16 @@ export default function HrWorkflowsPage() {
             }}
           >
             <h2 className="font-medium">Chốt công tháng đã kết thúc</h2>
-            <p className="text-sm">Xử lý đơn giải trình và ngày thiếu cặp vào–ra trước khi chốt. Bảng lương lấy bản công đã chốt.</p>
+            <p className="text-sm">Duyệt/từ chối hết đơn phép, kế hoạch OT và giải trình; xác nhận OT thực làm, công tác; xử lý ngày thiếu cặp vào–ra. Bảng lương lấy bản công đã chốt.</p>
+            <div className="flex flex-wrap gap-3 text-sm"><Link className="underline" href="/leave">Kiểm tra phép</Link><Link className="underline" href="/overtime">Kiểm tra OT</Link><Link className="underline" href="/expense-claims">Xác nhận công tác</Link><Link className="underline" href="/attendance">Xem bảng công</Link></div>
             <div className="flex gap-3">
               <label className="block space-y-1">
                 <span>Tháng</span>
-                <Input name="month" type="number" min={1} max={12} required />
+                <Input name="month" type="number" min={1} max={12} defaultValue={new Date().getMonth() || 12} required />
               </label>
               <label className="block space-y-1">
                 <span>Năm</span>
-                <Input name="year" type="number" min={2000} max={2100} defaultValue={new Date().getFullYear()} required />
+                <Input name="year" type="number" min={2000} max={2100} defaultValue={new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear()} required />
               </label>
             </div>
             <Button disabled={busy}>Kiểm tra & chốt công</Button>

@@ -11,7 +11,7 @@ import { api, errorMessage } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
-import { Button, Input, Select } from '@/components/ui/primitives';
+import { Button, Input, Select, Label, Textarea } from '@/components/ui/primitives';
 import { Modal } from '@/components/ui/modal';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
@@ -81,6 +81,8 @@ export default function AssetsPage() {
   const [isAllocateModalOpen, setIsAllocateModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<AssetItem | null>(null);
   const [receiptAsset, setReceiptAsset] = useState<AssetItem | null>(null);
+  const [returnAsset, setReturnAsset] = useState<AssetItem | null>(null);
+  const [returnNote, setReturnNote] = useState('');
   const [receiptCondition, setReceiptCondition] = useState('GOOD');
 
   // Form State Tạo Mới
@@ -144,12 +146,13 @@ export default function AssetsPage() {
   });
 
   const returnMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return (await api.patch(`/hrms/assets/${id}/return`, {})).data;
+    mutationFn: async () => {
+      return (await api.patch(`/hrms/assets/${returnAsset!.id}/return`, { notes: returnNote })).data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hrms-assets'] });
       toast('Đã thu hồi tài sản về kho', 'success');
+      setReturnAsset(null);
     },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
@@ -372,9 +375,9 @@ export default function AssetsPage() {
                           <UserCheck className="h-3 w-3" />
                           Cấp phát
                         </button>
-                      ) : canManage && asset.status === 'ALLOCATED' ? (
+                      ) : canManage && ['ALLOCATED', 'PENDING_ACK'].includes(asset.status) ? (
                         <button
-                          onClick={() => returnMutation.mutate(asset.id)}
+                          onClick={() => { setReturnAsset(asset); setReturnNote(''); }}
                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-600 font-semibold hover:bg-rose-500/20 transition-colors text-xs"
                           title="Thu hồi về kho"
                         >
@@ -392,6 +395,14 @@ export default function AssetsPage() {
       )}
 
       {/* Modal Khai Báo Tài Sản Mới */}
+      <Modal open={!!returnAsset} onOpenChange={open => !open && setReturnAsset(null)} title="Thu hồi tài sản về kho">
+        <form className="space-y-4" onSubmit={event => { event.preventDefault(); returnMutation.mutate(); }}>
+          <p className="text-sm">{returnAsset?.assetCode} · {returnAsset?.name} · {returnAsset?.assignedEmployeeName}</p>
+          {returnAsset?.status === 'PENDING_ACK' && <p className="text-sm text-muted-foreground">Bàn giao chưa ký nhận. HR cần kiểm tra tài sản thực tế và lưu số biên bản hoặc lý do thu hồi.</p>}
+          <div className="space-y-1.5"><Label htmlFor="asset-return-note">Biên bản / lý do thu hồi {returnAsset?.status === 'PENDING_ACK' ? '*' : ''}</Label><Textarea id="asset-return-note" value={returnNote} minLength={returnAsset?.status === 'PENDING_ACK' ? 10 : undefined} required={returnAsset?.status === 'PENDING_ACK'} onChange={e => setReturnNote(e.target.value)} /></div>
+          <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setReturnAsset(null)}>Hủy</Button><Button disabled={returnMutation.isPending}>Xác nhận đã thu hồi</Button></div>
+        </form>
+      </Modal>
       <Modal
         open={isCreateModalOpen}
         onOpenChange={(open) => setIsCreateModalOpen(open)}

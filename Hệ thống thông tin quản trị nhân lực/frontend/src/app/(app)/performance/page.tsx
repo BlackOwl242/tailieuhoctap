@@ -26,6 +26,8 @@ import { Portal } from '@/components/ui/portal';
 import { isEnterpriseSector, useOrgConfig } from '@/lib/org-config';
 
 interface AppraisalCycle {
+  participantScope?: string;
+  participantIds?: string[];
   id: string;
   name: string;
   year: number;
@@ -456,6 +458,8 @@ export default function PerformanceKpiPage() {
   const [selectedGoal, setSelectedGoal] = useState<AppraisalGoal | null>(null);
 
   // Form Cycle
+  const [selectCycleParticipants, setSelectCycleParticipants] = useState(false);
+  const [cycleParticipantIds, setCycleParticipantIds] = useState<string[]>([]);
   const [cycleForm, setCycleForm] = useState<AppraisalCycleForm>(() => {
     const now = new Date();
     const year = now.getFullYear();
@@ -577,7 +581,9 @@ export default function PerformanceKpiPage() {
   // Mutations
   const createCycleMutation = useMutation({
     mutationFn: async (payload: typeof cycleForm) => {
+      if (isEnterprise && selectCycleParticipants && !cycleParticipantIds.length) throw new Error('Chọn ít nhất một người thuộc đối tượng đánh giá');
       return (await api.post('/hrms/performance/cycles', {
+        participantIds: isEnterprise && selectCycleParticipants ? cycleParticipantIds : undefined,
         name: payload.name,
         year: Number(payload.year),
         startDate: new Date(payload.startDate).toISOString(),
@@ -1547,13 +1553,15 @@ export default function PerformanceKpiPage() {
                   </span>
                 </div>
 
+                {c.organizationSector !== 'state' && <p className="text-sm text-muted-foreground">Phạm vi: {c.participantScope === 'SELECTED' ? 'Danh sách chọn (' + (c.participantIds?.length ?? 0) + ' người)' : 'Toàn bộ nhân sự thuộc thời gian của kỳ'}. Mỗi người cần đủ 100% trọng số, điểm và minh chứng.</p>}
+                {c.organizationSector !== 'state' && canManageCycles && (c.participantIds ?? []).some(id => !goals.some(goal => goal.cycleId === c.id && goal.userId === id)) && <p className="text-sm text-amber-700">Còn {(c.participantIds ?? []).filter(id => !goals.some(goal => goal.cycleId === c.id && goal.userId === id)).length} người trong danh sách kỳ chưa có mục tiêu. Cần giao mục tiêu trước khi đóng kỳ.</p>}
                 {c.description && (
                   <p className="text-sm text-muted-foreground leading-relaxed">{c.description}</p>
                 )}
 
                 <div className="grid grid-cols-2 gap-2 bg-muted/20 p-3 rounded-lg text-sm">
                   <div>{c.organizationSector === 'state' && c.periodType === 'ANNUAL' ? 'Nguồn dữ liệu' : 'Mục tiêu KRA'}: <b className="text-primary font-bold">{c.organizationSector === 'state' && c.periodType === 'ANNUAL' ? `${c.annualSourceFrequency === 'QUARTERLY' ? '4 quý' : '12 tháng'}` : c._count?.goals ?? 0}</b></div>
-                  <div>{c.organizationSector === 'state' ? 'Khung đánh giá' : 'Tổng trọng số mục tiêu'}: <b className="text-foreground font-bold">{c.organizationSector === 'state' ? `${c.generalCriteriaWeight ?? 30} điểm chung + ${c.taskCriteriaWeight ?? 70} điểm nhiệm vụ` : `${goals.filter(goal => goal.cycleId === c.id).reduce((sum, goal) => sum + goal.weightage, 0)}%`}</b></div>
+                  <div>{c.organizationSector === 'state' ? 'Khung đánh giá' : 'Nhân sự đã có mục tiêu'}: <b className="text-foreground font-bold">{c.organizationSector === 'state' ? `${c.generalCriteriaWeight ?? 30} điểm chung + ${c.taskCriteriaWeight ?? 70} điểm nhiệm vụ` : `${new Set(goals.filter(goal => goal.cycleId === c.id).map(goal => goal.userId)).size} người`}</b></div>
                   {c.organizationSector === 'state' && c.publicPersonnelType === 'PUBLIC_EMPLOYEE' && c.periodType !== 'ANNUAL' && <div className="col-span-2 text-xs text-muted-foreground">Kết quả nhiệm vụ: số lượng {formatAppraisalScore(c.quantityCriteriaWeight ?? 100 / 3)}% · chất lượng {formatAppraisalScore(c.qualityCriteriaWeight ?? 100 / 3)}% · tiến độ {formatAppraisalScore(c.progressCriteriaWeight ?? 100 / 3)}%</div>}
                 </div>
 
@@ -1612,6 +1620,12 @@ export default function PerformanceKpiPage() {
               </div>
 
               <div className="space-y-3 text-xs">
+                {isEnterprise && <div className="space-y-2">
+                  <label className="block font-medium" htmlFor="kpi-participant-mode">Đối tượng đánh giá</label>
+                  <Select id="kpi-participant-mode" value={selectCycleParticipants ? 'SELECTED' : 'COMPANY'} onChange={e => setSelectCycleParticipants(e.target.value === 'SELECTED')}><option value="COMPANY">Toàn bộ nhân sự thuộc thời gian của kỳ</option><option value="SELECTED">Chọn danh sách nhân sự cụ thể</option></Select>
+                  {selectCycleParticipants && <fieldset className="space-y-2"><legend>Nhân sự tham gia *</legend><div className="max-h-48 space-y-2 overflow-y-auto rounded-md border p-3">{employees.map(employee => <label key={employee.id} className="flex items-center gap-2"><input type="checkbox" checked={cycleParticipantIds.includes(employee.id)} onChange={event => setCycleParticipantIds(ids => event.target.checked ? [...ids, employee.id] : ids.filter(id => id !== employee.id))} /><span>{employee.fullName}</span></label>)}</div></fieldset>}
+                  <p className="text-muted-foreground">Chỉ đóng kỳ khi mọi người trong phạm vi đã có đủ mục tiêu, điểm và minh chứng.</p>
+                </div>}
                 <div>
                   <label className="font-medium text-foreground block mb-1">Tên kỳ đánh giá:</label>
                   <Input

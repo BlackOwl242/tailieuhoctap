@@ -480,6 +480,7 @@ export class HrmsPayrollService {
       const run = await tx.hrmsPayrollRun.findUnique({ where: { id } });
       if (!run) throw new NotFoundException('Không tìm thấy bảng lương');
       if (run.status === 'CANCELLED') throw new ConflictException('Kỳ lương này đã được hủy');
+      if (run.status === 'PAID' || run.paidAt || run.paymentReference) throw new ConflictException('Kỳ lương đã ghi nhận thanh toán; không thể hủy để tính lại. Cần lập điều chỉnh có đối soát ở kỳ sau.');
 
       const appliedLoanDeductions = await tx.payrollLoanDeduction.count({ where: { payrollRunId: id, appliedAt: { not: null } } });
       if (appliedLoanDeductions > 0) throw new ConflictException('Kỳ đã hạch toán hoàn trả khoản vay; không thể hủy để tính lại tự động. Cần đối soát khoản vay trước.');
@@ -564,7 +565,7 @@ export class HrmsPayrollService {
             { OR: [{ hireDate: null }, { hireDate: { lte: asOf ?? to } }] },
             { OR: [
               { status: 'ACTIVE', employmentStatus: { in: ['ACTIVE', 'PROBATION'] } },
-              { actionsOnMe: { some: { OR: [{ type: 'RESIGNATION' }, { type: 'DISCIPLINE', payload: { path: ['subType'], equals: 'DISMISSAL' } }], status: 'APPROVED', effectiveAt: { gte: from, lte: asOf ?? to } } } },
+              { actionsOnMe: { some: { OR: [{ type: { in: ['RESIGNATION', 'PROBATION_FAIL'] } }, { type: 'DISCIPLINE', payload: { path: ['subType'], equals: 'DISMISSAL' } }], status: 'APPROVED', effectiveAt: { gte: from, lte: asOf ?? to } } } },
             ] },
           ],
         } : { deletedAt: null, id: { in: [...new Set(rows.map(r => r.userId))] } },
@@ -592,7 +593,7 @@ export class HrmsPayrollService {
       const approvedBands = await tx.hrmsSalaryBand.findMany({
         where: { status: 'ACTIVE', approvedAt: { not: null }, effectiveFrom: { lte: to }, OR: [{ effectiveTo: null }, { effectiveTo: { gte: from } }] },
       });
-      const run = isPreview ? null : await tx.hrmsPayrollRun.create({ data: { periodName: dto.periodName, fromDate: from, toDate: to, attendancePeriodId: attendancePeriod!.id, policySnapshot: { ...policy, holidays, defaultOfficeDayCount: defaultDates.length, calendarDays: Math.round((to.getTime() - from.getTime()) / DAY_MS) + 1 }, legacyPeriodId, notes: dto.notes, status: 'PROCESSED', processedBy: actorId, processedAt: new Date() } });
+      const run = isPreview ? null : await tx.hrmsPayrollRun.create({ data: { periodName: dto.periodName, fromDate: from, toDate: to, attendancePeriodId: attendancePeriod!.id, attendanceVersion: attendancePeriod!.version, policySnapshot: { ...policy, holidays, defaultOfficeDayCount: defaultDates.length, calendarDays: Math.round((to.getTime() - from.getTime()) / DAY_MS) + 1 }, legacyPeriodId, notes: dto.notes, status: 'PROCESSED', processedBy: actorId, processedAt: new Date() } });
       let totalGrossPay = 0, totalDeduction = 0, totalNetPay = 0;
       const previewSlips: Array<Record<string, unknown>> = [];
       for (const user of users) {
@@ -624,14 +625,15 @@ export class HrmsPayrollService {
         // employee's current profile salary.
         const contracts = await tx.contract.findMany({ where: { userId: user.id, status: { not: 'DRAFT' }, startDate: { lte: to } }, orderBy: { startDate: 'desc' } });
         const actions = await tx.personnelAction.findMany({ where: { subjectId: user.id, status: 'APPROVED', effectiveAt: { lte: to } }, orderBy: { effectiveAt: 'asc' } });
-        const transfers = await tx.personnelAction.findMany({ where: { subjectId: user.id, type: 'TRANSFER', status: 'APPROVED', effectiveAt: { not: null } }, orderBy: { effectiveAt: 'asc' } });
+        const transfers = await tx.personnelAction.findMany({ where: { subjectId: user.id, OR: [{ type: 'TRANSFER' }, { type: 'SALARY_ADJUST', payload: { path: ['salaryReason'], equals: 'PROMOTION' } }], status: 'APPROVED', effectiveAt: { not: null } }, orderBy: { effectiveAt: 'asc' } });
         const resignation = actions.find(a => endsEmployment(a.type, a.payload as Record<string, unknown>)
           && (!asOf || !a.effectiveAt || dateKey(a.effectiveAt) <= asOf));
         const resignationDate = resignation?.effectiveAt ? dateKey(resignation.effectiveAt) : to;
         const rateCutoff = asOf && asOf < resignationDate ? asOf : resignationDate;
-        const eligible = dates.filter(day => (!asOf || day <= asOf)
+        const isEmploymentDate = (day: Date) => (!asOf || day <= asOf)
           && (!user.hireDate || dateKey(user.hireDate) <= day)
-          && (!resignation?.effectiveAt || day <= dateKey(resignation.effectiveAt)));
+          && (!resignation?.effectiveAt || day <= dateKey(resignation.effectiveAt));
+        const eligible = dates.filter(isEmploymentDate);
         const eligibleKeys = new Set(eligible.map(day => day.toISOString().slice(0, 10)));
         const missingAttendanceDays = asOf
           ? eligible.filter(day => day < asOf && !attendanceByDate.has(day.toISOString().slice(0, 10))).length
@@ -650,8 +652,9 @@ export class HrmsPayrollService {
         let daysWithoutApprovedBand = 0;
         const componentTotals = new Map<string, { code: string; name: string; type: 'EARNING' | 'DEDUCTION'; amount: number; taxable: boolean; periodAmount: true; basisReference: string | null }>();
         for (const day of dates) {
-          const rateDay = day > rateCutoff ? rateCutoff : day;
-          const assignment = assignments.find(a => dateKey(a.fromDate) <= rateDay);
+          // Keep the whole-month divisor, but never require salary evidence before hire.
+          const rateDay = new Date(Math.max((day > rateCutoff ? rateCutoff : day).getTime(), dateKey(user.hireDate ?? from).getTime()));
+          const assignment = assignments.find(a => dateKey(a.fromDate) <= rateDay && (!a.toDate || dateKey(a.toDate) >= rateDay));
           const transferBefore = transfers.filter((action) => dateKey(action.effectiveAt!) <= rateDay).at(-1);
           const transferAfter = transfers.find((action) => dateKey(action.effectiveAt!) > rateDay);
           const beforePayload = transferBefore?.payload as { newJobTitle?: string; newOrgUnitId?: string } | undefined;
@@ -739,7 +742,7 @@ export class HrmsPayrollService {
               : isStateOrganization
                 ? 'thiếu hồ sơ ngạch/bậc hoặc quyết định lương hiệu lực'
                 : 'chưa có hợp đồng, quyết định hoặc lương hồ sơ hợp lệ';
-            throw new ConflictException(`Nhân sự ${user.fullName} từ ${day.toISOString().slice(0, 10)} ${reason}; chưa thể tính bảng lương.`);
+            throw new ConflictException(`Nhân sự ${user.fullName} từ ${rateDay.toISOString().slice(0, 10)} ${reason}; chưa thể tính bảng lương.`);
           }
           const compensationBasis = isStateOrganization ? 'MONTHLY' : contract?.compensationBasis ?? 'MONTHLY';
           payRatesUsed.set(`${compensationBasis}:${dailyBase}`, { basis: compensationBasis, rate: dailyBase });
@@ -800,7 +803,7 @@ export class HrmsPayrollService {
           if (eligibleKeys.has(day.toISOString().slice(0, 10)) && row) {
             // PRESENT means the configured grace window has been honored. Do not
             // mark a day present in attendance and still prorate its pay by minutes.
-            actual = row.status === 'PRESENT' ? 1
+            actual = ['PRESENT', 'BUSINESS_TRIP'].includes(row.status) ? 1
               : ['LATE', 'EARLY_LEAVE'].includes(row.status) ? Math.min(1, row.workedMinutes / (row.scheduledMinutes ?? 480)) : 0;
             workedMinutesTotal += Number(row.workedMinutes ?? 0);
             if (row.status === 'LATE') lateDays++;
@@ -850,14 +853,15 @@ export class HrmsPayrollService {
         const items = [...componentTotals.values()];
         const overtimeRequests = await tx.overtimeRequest.findMany({ where: { userId: user.id, workDate: { gte: from, lte: asOf ?? to } }, orderBy: { workDate: 'asc' } });
         const hourly = monthlyHourlyRate(overtimeBase, standardHours);
-        const approvedOvertime = overtimeRequests.filter((ot) => ot.status === 'APPROVED');
+        const approvedOvertime = overtimeRequests.filter((ot) => ot.status === 'APPROVED' && ot.actualConfirmedAt && isEmploymentDate(dateKey(ot.workDate)));
         const overtimeDetails = approvedOvertime.map((ot) => {
           const workDate = ot.workDate.toISOString().slice(0, 10);
           const holiday = holidays.includes(workDate);
           const category = (holiday ? 'PUBLIC_HOLIDAY' : ot.dayCategory) as 'WEEKDAY' | 'WEEKLY_REST' | 'PUBLIC_HOLIDAY';
-          const nightHours = Math.min(ot.hours, Math.max(0, ot.nightHours));
+          const hours = ot.actualHours ?? 0;
+          const nightHours = Math.min(hours, Math.max(0, ot.actualNightHours ?? 0));
           const hourlyRate = overtimeHourlyRateByDate.get(workDate) ?? hourly;
-          return { workDate, hours: ot.hours, nightHours, category, hourlyRate, pay: calculateOvertimePay(ot.hours, nightHours, hourlyRate, category, policy) };
+          return { workDate, hours, nightHours, category, hourlyRate, pay: calculateOvertimePay(hours, nightHours, hourlyRate, category, policy) };
         });
         const otPay = overtimeDetails.reduce((sum, ot) => sum + ot.pay, 0);
         const bonus = actions.filter(a => a.type === 'AWARD' && a.effectiveAt && a.effectiveAt >= from && a.effectiveAt <= (asOf ?? to)).reduce((sum, a) => sum + Number((a.payload as { amount?: number }).amount ?? 0), 0);
@@ -873,6 +877,7 @@ export class HrmsPayrollService {
           ? dates.filter(day => day > dateKey(resignation.effectiveAt!)).length
           : 0;
         const region = ['I','II','III','IV'].includes(user.minimumWageRegion) ? user.minimumWageRegion : 'I';
+        const preEmploymentUnpaidDays = user.hireDate ? dates.filter(day => day < dateKey(user.hireDate!)).length : 0;
         const unemploymentCap = Number(await this.settings.get(`INSURANCE_CAP_BHTN_${region}_${year}`, policy.unemploymentCapByRegion[region]));
         const resident = user.taxResidency !== 'NON_RESIDENT';
         const taxContract = contracts.find(c => c.type !== 'AMENDMENT' && dateKey(c.startDate) <= to
@@ -881,7 +886,7 @@ export class HrmsPayrollService {
         const flatTenPercent = resident && (!taxContract || Boolean(taxContract.type !== 'INDEFINITE' && taxContract.endDate && isUnderThreeMonths(taxContract.startDate, taxContract.endDate)));
         let calculated: ReturnType<typeof calculatePayroll>;
         try {
-          calculated = calculatePayroll({ provisional: isPreview, year, earnedBase, overtimeTaxable, nightWorkBase, nightWorkPremium, insuranceRequired: unpaidFullDays + postEmploymentUnpaidDays < 14 || Boolean(firstMonthSick), baseSalary: base, standardDays: dates.length, paidDays, attendanceDays, insuranceSalary, insuranceCap, unemploymentCap, dependents: user.taxDependentCount, taxResidency: resident ? 'RESIDENT' : 'NON_RESIDENT', taxWithholdingMode: flatTenPercent ? 'FLAT_10' : 'PROGRESSIVE', policy, overtime: otPay, bonus, items, loans: loans.map(l => ({ id: l.id, emi: l.monthlyEmi, remaining: l.remainingAmount })), minimumWageAudit: { region, contractualMonthlyWage: overtimeBase, standardHours }, overtimeBasis: { contractualMonthlyWage: overtimeBase, standardHours, hourlyRate: hourly } });
+          calculated = calculatePayroll({ provisional: isPreview, year, earnedBase, overtimeTaxable, nightWorkBase, nightWorkPremium, insuranceRequired: unpaidFullDays + preEmploymentUnpaidDays + postEmploymentUnpaidDays < 14 || Boolean(firstMonthSick), baseSalary: base, standardDays: dates.length, paidDays, attendanceDays, insuranceSalary, insuranceCap, unemploymentCap, dependents: user.taxDependentCount, taxResidency: resident ? 'RESIDENT' : 'NON_RESIDENT', taxWithholdingMode: flatTenPercent ? 'FLAT_10' : 'PROGRESSIVE', policy, overtime: otPay, bonus, items, loans: loans.map(l => ({ id: l.id, emi: l.monthlyEmi, remaining: l.remainingAmount })), minimumWageAudit: { region, contractualMonthlyWage: overtimeBase, standardHours }, overtimeBasis: { contractualMonthlyWage: overtimeBase, standardHours, hourlyRate: hourly } });
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Dữ liệu lương không hợp lệ';
           throw new ConflictException(`Không thể tính lương cho ${user.fullName} (${user.employeeCode ?? 'chưa có mã'}): ${message}`);
@@ -956,7 +961,8 @@ export class HrmsPayrollService {
               })),
             overtimeRequests: overtimeRequests.map((ot) => ({
               workDate: ot.workDate.toISOString().slice(0, 10), status: ot.status, hours: ot.hours,
-              nightHours: ot.nightHours, dayCategory: ot.dayCategory, paid: ot.status === 'APPROVED',
+              nightHours: ot.nightHours, dayCategory: ot.dayCategory, actualHours: ot.actualHours, actualNightHours: ot.actualNightHours,
+              confirmedAt: ot.actualConfirmedAt, paid: ot.status === 'APPROVED' && Boolean(ot.actualConfirmedAt) && isEmploymentDate(dateKey(ot.workDate)),
             })),
             approvedOvertime: overtimeDetails,
           },
@@ -1017,6 +1023,8 @@ export class HrmsPayrollService {
       const run = await tx.hrmsPayrollRun.findUnique({ where: { id } });
       if (!run) throw new NotFoundException('Không tìm thấy kỳ lương');
       if (run.status !== expected[next]) throw new ConflictException(`Phải ở trạng thái ${expected[next]} trước khi chuyển ${next}`);
+      const period = run.attendancePeriodId ? await tx.attendancePeriod.findUnique({ where: { id: run.attendancePeriodId } }) : null;
+      if (!period || period.status !== 'FINALIZED' || run.attendanceVersion == null || period.version !== run.attendanceVersion) throw new ConflictException('Dữ liệu công đã mở lại/thay đổi hoặc kỳ lương thiếu phiên bản công. Hủy kỳ chưa thanh toán, chốt lại công và lập bảng lương mới trước khi tiếp tục.');
       if (next === 'REVIEWED' && actorId === run.processedBy) throw new ForbiddenException('Người tính lương không được tự đối soát');
       if ((next === 'APPROVED' || next === 'LOCKED') && actorId === run.processedBy) throw new ForbiddenException('Người tính lương không được tự duyệt hoặc khóa kỳ của mình');
       if (next === 'APPROVED' && run.reviewedBy === actorId) throw new ForbiddenException('Người đối soát không được tự phê duyệt');
@@ -1062,19 +1070,22 @@ export class HrmsPayrollService {
     const from = new Date(slip.payrollRun.fromDate);
     const to = new Date(slip.payrollRun.toDate);
     const period = slip.payrollRun.attendancePeriodId
-      ? await this.prisma.attendancePeriod.findUnique({ where: { id: slip.payrollRun.attendancePeriodId }, select: { snapshot: true } })
+      ? await this.prisma.attendancePeriod.findUnique({ where: { id: slip.payrollRun.attendancePeriodId }, select: { snapshot: true, version: true } })
       : null;
     const fromKey = from.toISOString().slice(0, 10);
     const toKey = to.toISOString().slice(0, 10);
-    const snapshotRows = Array.isArray(period?.snapshot)
+    const archived = (slip.breakdown as { calculation?: { attendanceDays?: Array<Record<string, unknown>> } } | null)?.calculation?.attendanceDays;
+    const usePeriodSnapshot = period && slip.payrollRun.attendanceVersion != null && period.version === slip.payrollRun.attendanceVersion;
+    const snapshotRows = Array.isArray(archived) ? archived : usePeriodSnapshot && Array.isArray(period?.snapshot)
       ? (period.snapshot as Array<Record<string, unknown>>).filter((row) => row.userId === slip.userId && typeof row.workDate === 'string' && String(row.workDate).slice(0, 10) >= fromKey && String(row.workDate).slice(0, 10) <= toKey)
       : await this.prisma.attendanceDay.findMany({ where: { userId: slip.userId, workDate: { gte: from, lte: to } }, orderBy: { workDate: 'asc' } });
-    const [events, corrections, leaves, overtime, evidence] = await Promise.all([
+    const [events, corrections, leaves, overtime, evidence, travel] = await Promise.all([
       this.prisma.attendanceEvent.findMany({ where: { userId: slip.userId, occurredAt: { gte: from, lt: new Date(to.getTime() + 86_400_000) } }, orderBy: { occurredAt: 'asc' }, select: { occurredAt: true, source: true, anomalyReason: true } }),
       this.prisma.attendanceCorrection.findMany({ where: { userId: slip.userId, workDate: { gte: from, lte: to } }, orderBy: { createdAt: 'asc' }, include: { correctedByUser: { select: { fullName: true } } } }),
       this.prisma.leaveRequest.findMany({ where: { userId: slip.userId, startDate: { lte: to }, endDate: { gte: from } }, orderBy: { startDate: 'asc' }, select: { id: true, type: true, startDate: true, endDate: true, days: true, reason: true, status: true, decisionNote: true } }),
-      this.prisma.overtimeRequest.findMany({ where: { userId: slip.userId, workDate: { gte: from, lte: to } }, orderBy: { workDate: 'asc' }, select: { id: true, workDate: true, hours: true, nightHours: true, reason: true, status: true, dayCategory: true, decisionNote: true } }),
+      this.prisma.overtimeRequest.findMany({ where: { userId: slip.userId, workDate: { gte: from, lte: to } }, orderBy: { workDate: 'asc' }, select: { id: true, workDate: true, hours: true, nightHours: true, reason: true, status: true, dayCategory: true, decisionNote: true, actualHours: true, actualNightHours: true, actualConfirmedAt: true, actualEvidenceUrl: true, actualNote: true } }),
       this.prisma.hrmsAttendanceEvidence.findMany({ where: { userId: slip.userId, workDate: { gte: from, lte: to } }, orderBy: { createdAt: 'desc' }, select: { id: true, workDate: true, kind: true, title: true, fileUrl: true, fileName: true, fileSize: true, createdAt: true } }),
+      this.prisma.hrmsTravelRequest.findMany({ where: { userId: slip.userId, attendanceConfirmedAt: { not: null }, departureDate: { lte: to }, returnDate: { gte: from } }, select: { id: true, purpose: true, confirmedWorkDates: true, attendanceEvidenceUrl: true } }),
     ]);
     const dayKey = (value: Date | string) => (value instanceof Date ? value.toISOString() : value).slice(0, 10);
     const days = snapshotRows.map((row) => {
@@ -1090,14 +1101,15 @@ export class HrmsPayrollService {
         events: events.filter((event) => dayKey(event.occurredAt) === key).map((event) => ({ occurredAt: event.occurredAt, source: event.source, anomalyReason: event.anomalyReason })),
         corrections: dayCorrections,
         leaveRequests: leaves.filter((item) => dayKey(item.startDate) <= key && dayKey(item.endDate) >= key).map((item) => ({ id: item.id, type: item.type, status: item.status, reason: item.reason, decisionNote: item.decisionNote })),
-        overtimeRequests: overtime.filter((item) => dayKey(item.workDate) === key).map((item) => ({ id: item.id, hours: item.hours, nightHours: item.nightHours, status: item.status, dayCategory: item.dayCategory, reason: item.reason, decisionNote: item.decisionNote })),
+        overtimeRequests: overtime.filter((item) => dayKey(item.workDate) === key).map((item) => ({ id: item.id, hours: item.hours, nightHours: item.nightHours, status: item.status, dayCategory: item.dayCategory, reason: item.reason, decisionNote: item.decisionNote, actualHours: item.actualHours, actualNightHours: item.actualNightHours, actualConfirmedAt: item.actualConfirmedAt, actualEvidenceUrl: item.actualEvidenceUrl })),
+        travelRequests: travel.filter(item => item.confirmedWorkDates.includes(key)).map(item => ({ id: item.id, purpose: item.purpose, evidenceUrl: item.attendanceEvidenceUrl })),
         evidence: dayEvidence,
         missingEvidence: ((dayCorrections.length > 0 || row.status === 'MISSING_PAIR') && !dayEvidence.some((item) => item.kind === 'ATTENDANCE_CORRECTION'))
           || (leaves.some((item) => dayKey(item.startDate) <= key && dayKey(item.endDate) >= key && item.status === 'APPROVED') && !dayEvidence.some((item) => item.kind === 'LEAVE'))
-          || (overtime.some((item) => dayKey(item.workDate) === key && item.status === 'APPROVED') && !dayEvidence.some((item) => item.kind === 'OVERTIME')),
+          || (overtime.some((item) => dayKey(item.workDate) === key && item.status === 'APPROVED' && item.actualConfirmedAt && !item.actualEvidenceUrl) && !dayEvidence.some((item) => item.kind === 'OVERTIME')),
       };
     });
-    return { employeeName: slip.employeeName, employeeCode: slip.employeeCode, fromDate: fromKey, toDate: toKey, source: period ? 'ATTENDANCE_SNAPSHOT' : 'CURRENT_ATTENDANCE', days };
+    return { employeeName: slip.employeeName, employeeCode: slip.employeeCode, fromDate: fromKey, toDate: toKey, source: Array.isArray(archived) ? 'PAYROLL_SNAPSHOT' : usePeriodSnapshot ? 'ATTENDANCE_SNAPSHOT' : 'CURRENT_ATTENDANCE', days };
   }
 
   async addSlipAttendanceEvidence(slipId: string, dto: AddAttendanceEvidenceDto, actor: AuthUser) {

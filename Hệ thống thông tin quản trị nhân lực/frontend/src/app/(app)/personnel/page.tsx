@@ -139,6 +139,10 @@ export default function PersonnelActionsPage() {
       if (form.newSalary) payload.newSalary = Number(form.newSalary);
       if (form.type === 'SALARY_ADJUST') {
         payload.salaryReason = form.salaryReason;
+        if (form.salaryReason === 'PROMOTION') {
+          payload.newJobTitle = form.newJobTitle.trim();
+          if (form.newOrgUnitId) payload.newOrgUnitId = form.newOrgUnitId;
+        }
         if (form.salaryBandId) payload.salaryBandId = form.salaryBandId;
       }
       if (form.type === 'AWARD' && form.amount) payload.amount = Number(form.amount);
@@ -673,6 +677,7 @@ export default function PersonnelActionsPage() {
                   <option value="OTHER">Lý do khác</option>
                 </Select>
               </div>
+              {form.salaryReason === 'PROMOTION' && <div className="space-y-1.5"><Label htmlFor="promotion-title">Chức danh sau thăng chức *</Label><Input id="promotion-title" required value={form.newJobTitle} onChange={e => setForm({ ...form, newJobTitle: e.target.value })} /></div>}
               <div className="space-y-1.5">
                 <Label>Mức lương mới (đ/{compensationUnit(compensationQ.data?.compensationBasis ?? null)}) *</Label>
                 <Input required type="number" min={1} value={form.newSalary} onChange={(e) => setForm({ ...form, newSalary: e.target.value })} />

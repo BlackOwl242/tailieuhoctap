@@ -1,7 +1,7 @@
 import { AttendanceLedgerService } from '../../common/services/attendance-ledger.service';
 import { RuntimeSettingsService } from '../../common/services/runtime-settings.service';
 import { atClock, dateKey, workDate, VN_OFFSET, DAY_MS } from '../../common/hr-time';
-import { HttpStatus, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConflictException, HttpStatus, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import * as crypto from 'node:crypto';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
@@ -395,6 +395,7 @@ export class AttendanceService implements OnModuleInit, OnModuleDestroy {
 
   /** Đồng bộ tự động bảng công của toàn bộ nhân viên đang làm việc tới ngày hiện tại. */
   async autoSyncNow(actor: AuthUser, requestId?: string) {
+    if (process.env.ALLOW_DEMO_ATTENDANCE !== 'true' || !await this.settings.get('AUTO_ATTENDANCE_ENABLED', false)) throw new ConflictException('Tạo công mô phỏng chỉ dùng trong môi trường demo được bật riêng. Hãy ghi nhận chấm công thực hoặc gửi giải trình.');
     const res = await this.ledger.ensureAutoAttendanceUpToDate(undefined, true);
     await this.audit.log({ actorId: actor.id, action: 'ATTENDANCE_AUTO_SYNCED', entityType: 'AttendanceDay', after: res, requestId });
     return res;

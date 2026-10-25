@@ -2,6 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { WorkflowGuide } from './workflow-guide';
+import { ROUTE_WORKFLOW } from '@/lib/workflow-guides';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -29,6 +32,7 @@ export function WorkspaceHeader({
   actions,
   className,
 }: WorkspaceHeaderProps) {
+  const workflow = ROUTE_WORKFLOW[usePathname()];
   return (
     <div className={cn('flex flex-col gap-2 pb-4 border-b border-border mb-6', className)}>
       {breadcrumbs && breadcrumbs.length > 0 && (
@@ -63,6 +67,7 @@ export function WorkspaceHeader({
       {description && (
         <p className="text-sm text-muted-foreground max-w-3xl leading-normal">{description}</p>
       )}
+      {workflow && <WorkflowGuide workflow={workflow} />}
     </div>
   );
 }

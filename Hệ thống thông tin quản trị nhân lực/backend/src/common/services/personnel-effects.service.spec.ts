@@ -24,4 +24,25 @@ describe('Effective personnel decisions',()=>{
   await service.applyDue(today);
   expect(tx.personnelRewardDiscipline.create).toHaveBeenCalledWith({ data: expect.objectContaining({ type: 'REWARD', decisionNo: 'QD-01', profileId: 'profile' }) });
  });
+ it('ends failed probation and revokes access on its approved effective date', async () => {
+  const { service, tx } = setup({ ...base, type: 'PROBATION_FAIL', payload: { probationReviewId: 'review' } });
+  await service.applyDue(today);
+  expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'employee' }, data: { employmentStatus: 'RESIGNED', status: 'DISABLED' } });
+  expect(tx.contract.updateMany).toHaveBeenCalled(); expect(tx.refreshToken.updateMany).toHaveBeenCalled();
+ });
+ it('applies promotion title, appointment and salary together and closes the prior allowance assignment', async () => {
+  const { service, tx } = setup({ ...base, type: 'SALARY_ADJUST', payload: { salaryReason: 'PROMOTION', newJobTitle: 'Trưởng nhóm', newSalary: 35_000_000, salaryBandId: 'lead-band' } });
+  tx.user.findUniqueOrThrow.mockResolvedValue({ id: 'employee', orgUnitId: 'unit' });
+  tx.orgUnit = { findUniqueOrThrow: jest.fn().mockResolvedValue({ name: 'Kỹ thuật' }) };
+  tx.contract.findFirst = jest.fn().mockResolvedValue({ id: 'contract', type: 'INDEFINITE', contractNo: 'CT', endDate: null }); tx.contract.create = jest.fn();
+  tx.personnelComprehensiveProfile = { upsert: jest.fn().mockResolvedValue({ id: 'profile' }) };
+  tx.personnelAppointment = { updateMany: jest.fn(), create: jest.fn() };
+  tx.personnelSalaryHistory = { updateMany: jest.fn(), create: jest.fn() };
+  tx.hrmsSalaryStructureAssignment = { findFirst: jest.fn().mockResolvedValue({ structureId: 'old' }), updateMany: jest.fn(), create: jest.fn() };
+  await service.applyDue(today);
+  expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'employee' }, data: { jobTitle: 'Trưởng nhóm', orgUnitId: 'unit' } });
+  expect(tx.personnelAppointment.create.mock.calls[0][0].data).toMatchObject({ positionTitle: 'Trưởng nhóm', isCurrent: true });
+  expect(tx.hrmsSalaryStructureAssignment.updateMany.mock.calls[0][0].data.toDate).toEqual(new Date('2026-10-03'));
+  expect(tx.hrmsSalaryStructureAssignment.create).not.toHaveBeenCalled();
+ });
 });

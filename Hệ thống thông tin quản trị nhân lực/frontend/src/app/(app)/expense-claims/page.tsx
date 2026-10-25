@@ -9,7 +9,7 @@ import {
   List, FileText, AlertCircle, Building2, ChevronRight,
   TrendingUp, MapPin, User, Tag, Sparkles
 } from 'lucide-react';
-import { api, errorMessage } from '@/lib/api';
+import { api, errorMessage, openProtectedFile } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
@@ -43,6 +43,8 @@ interface ExpenseClaim {
 }
 
 interface TravelRequest {
+  confirmedWorkDates?: string[];
+  attendanceEvidenceUrl?: string | null;
   id: string;
   userId: string;
   employeeName: string;
@@ -151,8 +153,15 @@ export default function ExpenseClaimsPage() {
   const user = useAuthStore((s) => s.user);
   const roles = user?.roles ?? [];
   const canSettleTravel = roles.some((role) => ['ADMIN', 'ACCOUNTANT'].includes(role));
+  const canConfirmTravel = roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD'].includes(role));
   const canViewAllEmployees = roles.some((role) => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER'].includes(role));
 
+  const canReviewExpense = roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD'].includes(role));
+  const canWriteExpense = roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'ACCOUNTANT', 'BOD', 'USER', 'HR_RECRUITER', 'HR_TRAINER'].includes(role));
+  const canApproveItem = (row: { userId?: string; status: string }) => canReviewExpense && row.userId !== user?.id && row.status === 'SUBMITTED';
+  const canPayItem = (row: { userId?: string; status: string }) => canSettleTravel && row.userId !== user?.id && row.status === 'APPROVED';
+  const canDeleteItem = (row: { userId?: string; status: string }) => canWriteExpense && (row.userId === user?.id || canReviewExpense) && ['DRAFT', 'SUBMITTED', 'REJECTED'].includes(row.status);
+  const todayKey = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   const [activeTab, setActiveTab] = useState<'claims' | 'travel' | 'advances'>('claims');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [searchTerm, setSearchTerm] = useState('');
@@ -167,6 +176,9 @@ export default function ExpenseClaimsPage() {
   // Modals for Detail / View
   const [detailClaim, setDetailClaim] = useState<ExpenseClaim | null>(null);
   const [detailTravel, setDetailTravel] = useState<TravelRequest | null>(null);
+  const [attendanceTravel, setAttendanceTravel] = useState<TravelRequest | null>(null);
+  const [travelWorkDates, setTravelWorkDates] = useState<string[]>([]);
+  const [travelEvidence, setTravelEvidence] = useState('');
   const [refundAmount, setRefundAmount] = useState('');
   const [detailAdvance, setDetailAdvance] = useState<EmployeeAdvance | null>(null);
   const [advancePayment, setAdvancePayment] = useState<EmployeeAdvance | null>(null);
@@ -180,40 +192,41 @@ export default function ExpenseClaimsPage() {
 
   // Form Claim State
   const [claimEmployee, setClaimEmployee] = useState('');
+  const [claimTravelId, setClaimTravelId] = useState('');
+  const [advTravelId, setAdvTravelId] = useState('');
   const [claimTitle, setClaimTitle] = useState('Thanh quyết toán chi phí công tác');
   const [claimCategory, setClaimCategory] = useState('TRAVEL');
   const [claimItems, setClaimItems] = useState<ExpenseItemDetail[]>([
-    { item: 'Vé máy bay khứ hồi (Vietnam Airlines)', amount: 3500000, date: '2026-09-10' },
-    { item: 'Phòng khách sạn (3 đêm)', amount: 2000000, date: '2026-09-13' },
+    { item: '', amount: 0, date: todayKey },
   ]);
 
   // Form Travel State
   const [travelEmployee, setTravelEmployee] = useState('');
-  const [travelPurpose, setTravelPurpose] = useState('Khảo sát và triển khai dự án chi nhánh');
-  const [fromLoc, setFromLoc] = useState('TP. Hồ Chí Minh');
-  const [toLoc, setToLoc] = useState('TP. Đà Nẵng');
-  const [depDate, setDepDate] = useState('2026-09-10');
-  const [retDate, setRetDate] = useState('2026-09-14');
-  const [estBudget, setEstBudget] = useState(12000000);
-  const [travelNotes, setTravelNotes] = useState('Lịch trình gặp gỡ đối tác và kiểm tra hạ tầng kỹ thuật');
+  const [travelPurpose, setTravelPurpose] = useState('');
+  const [fromLoc, setFromLoc] = useState('');
+  const [toLoc, setToLoc] = useState('');
+  const [depDate, setDepDate] = useState(todayKey);
+  const [retDate, setRetDate] = useState(todayKey);
+  const [estBudget, setEstBudget] = useState(0);
+  const [travelNotes, setTravelNotes] = useState('');
 
   // Form Advance State
   const [advEmployee, setAdvEmployee] = useState('');
-  const [advPurpose, setAdvPurpose] = useState('Tạm ứng vé máy bay và công tác phí TP. Đà Nẵng');
-  const [advAmount, setAdvAmount] = useState(8000000);
+  const [advPurpose, setAdvPurpose] = useState('');
+  const [advAmount, setAdvAmount] = useState(0);
 
   // Queries
-  const { data: claims = [], isLoading: isLoadingClaims } = useQuery<ExpenseClaim[]>({
+  const { data: claims = [], isLoading: isLoadingClaims, error: errorClaims } = useQuery<ExpenseClaim[]>({
     queryKey: ['hrms-expense-claims'],
     queryFn: async () => (await api.get('/hrms/expenses/claims')).data,
   });
 
-  const { data: travels = [], isLoading: isLoadingTravels } = useQuery<TravelRequest[]>({
+  const { data: travels = [], isLoading: isLoadingTravels, error: errorTravels } = useQuery<TravelRequest[]>({
     queryKey: ['hrms-travel-requests'],
     queryFn: async () => (await api.get('/hrms/expenses/travel-requests')).data,
   });
 
-  const { data: advances = [], isLoading: isLoadingAdvances } = useQuery<EmployeeAdvance[]>({
+  const { data: advances = [], isLoading: isLoadingAdvances, error: errorAdvances } = useQuery<EmployeeAdvance[]>({
     queryKey: ['hrms-advances'],
     queryFn: async () => (await api.get('/hrms/expenses/advances')).data,
   });
@@ -248,6 +261,12 @@ export default function ExpenseClaimsPage() {
     };
   };
 
+  const travelAttendanceOptions = useQuery<{ days: { date: string; confirmed: boolean; canConfirm: boolean; reason: string }[] }>({
+    queryKey: ['travel-attendance-options', attendanceTravel?.id],
+    queryFn: async () => (await api.get('/hrms/expenses/travel-requests/' + attendanceTravel!.id + '/attendance-options')).data,
+    enabled: Boolean(attendanceTravel),
+  });
+
   // Calculate sum of claim items
   const calculatedClaimTotal = useMemo(() => {
     return claimItems.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
@@ -262,6 +281,7 @@ export default function ExpenseClaimsPage() {
         employeeName,
         title: payload.title,
         category: payload.category,
+        travelRequestId: claimTravelId || undefined,
         totalAmount: payload.totalAmount,
         items: payload.items,
       })).data;
@@ -342,6 +362,12 @@ export default function ExpenseClaimsPage() {
     },
     onError: (err) => toast(errorMessage(err), 'error'),
   });
+  const confirmTravelAttendance = useMutation({
+    mutationFn: async () => api.post(`/hrms/expenses/travel-requests/${attendanceTravel!.id}/confirm-attendance`, { workDates: travelWorkDates, evidenceUrl: travelEvidence }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['hrms-travel-requests'] }); setAttendanceTravel(null); setDetailTravel(null); toast('Đã ghi công tác thực hiện vào bảng công', 'success'); },
+    onError: error => toast(errorMessage(error), 'error'),
+  });
+  const openTravelAttendance = (travel: TravelRequest) => { setDetailTravel(null); setAttendanceTravel(travel); setTravelWorkDates([]); setTravelEvidence(''); };
 
   const closeTravelSettlementMutation = useMutation({
     mutationFn: async (id: string) => (await api.post(`/hrms/expenses/travel-requests/${id}/close-settlement`, {})).data as TravelRequest,
@@ -385,6 +411,7 @@ export default function ExpenseClaimsPage() {
         employeeName,
         purpose: payload.purpose,
         amount: payload.amount,
+        travelRequestId: advTravelId || undefined,
       })).data;
     },
     onSuccess: () => {
@@ -437,6 +464,9 @@ export default function ExpenseClaimsPage() {
   if (isLoadingClaims || isLoadingTravels || isLoadingAdvances) {
     return <LoadingState text="Đang tải dữ liệu Công tác & Chi phí..." />;
   }
+
+  const loadError = errorClaims || errorTravels || errorAdvances;
+  if (loadError) return <ErrorState message={errorMessage(loadError)} onRetry={() => { queryClient.invalidateQueries({ queryKey: ['hrms-expense-claims'] }); queryClient.invalidateQueries({ queryKey: ['hrms-travel-requests'] }); queryClient.invalidateQueries({ queryKey: ['hrms-advances'] }); }} />;
 
   // Filtered data
   const filteredClaims = claims.filter((c) => {
@@ -681,11 +711,11 @@ export default function ExpenseClaimsPage() {
         description="Đề xuất chuyến công tác, tạm ứng kinh phí, lập bảng kê thanh quyết toán chi phí."
         breadcrumbs={[{ label: 'Tiền lương' }, { label: 'Công tác phí' }]}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsAdvanceModalOpen(true)}
+              disabled={!canWriteExpense} onClick={() => setIsAdvanceModalOpen(true)}
               className="gap-1.5"
             >
               <CreditCard className="h-3.5 w-3.5 text-blue-600" />
@@ -694,7 +724,7 @@ export default function ExpenseClaimsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsTravelModalOpen(true)}
+              disabled={!canWriteExpense} onClick={() => setIsTravelModalOpen(true)}
               className="gap-1.5"
             >
               <Plane className="h-3.5 w-3.5 text-purple-600" />
@@ -702,7 +732,7 @@ export default function ExpenseClaimsPage() {
             </Button>
             <Button
               size="sm"
-              onClick={() => setIsClaimModalOpen(true)}
+              disabled={!canWriteExpense} onClick={() => setIsClaimModalOpen(true)}
               className="gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -881,26 +911,27 @@ export default function ExpenseClaimsPage() {
               {
                 label: 'Phê duyệt thanh toán',
                 icon: Check,
-                hidden: r.status === 'APPROVED' || r.status === 'PAID',
+                hidden: !canApproveItem(r),
                 onSelect: () => updateClaimStatusMutation.mutate({ id: r.id, status: 'APPROVED' }),
               },
               {
                 label: 'Xác nhận giải ngân / Chi tiền',
                 icon: DollarSign,
-                hidden: r.status === 'PAID',
+                hidden: !canPayItem(r),
                 onSelect: () => updateClaimStatusMutation.mutate({ id: r.id, status: 'PAID' }),
               },
               {
                 label: 'Từ chối thanh toán',
                 icon: X,
                 danger: true,
-                hidden: r.status === 'REJECTED',
+                hidden: !canApproveItem(r),
                 onSelect: () => updateClaimStatusMutation.mutate({ id: r.id, status: 'REJECTED' }),
               },
               'separator',
               {
                 label: 'Xóa hồ sơ bảng kê',
                 icon: Trash2,
+                hidden: !canDeleteItem(r),
                 danger: true,
                 onSelect: () => {
                   if (window.confirm(`Bạn có chắc muốn xóa bảng kê "${r.title}"?`)) {
@@ -979,8 +1010,8 @@ export default function ExpenseClaimsPage() {
                     </div>
 
                     {/* Interactive Action Buttons */}
-                    <div className="pt-3 border-t border-border/60 flex items-center justify-between gap-1">
-                      <div className="flex items-center gap-1.5">
+                    <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1003,8 +1034,8 @@ export default function ExpenseClaimsPage() {
                         </Button>
                       </div>
 
-                      <div className="flex items-center gap-1.5">
-                        {c.status !== 'APPROVED' && c.status !== 'PAID' && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {canApproveItem(c) && (
                           <Button
                             size="sm"
                             onClick={() => updateClaimStatusMutation.mutate({ id: c.id, status: 'APPROVED' })}
@@ -1014,7 +1045,7 @@ export default function ExpenseClaimsPage() {
                             <span>Duyệt</span>
                           </Button>
                         )}
-                        {c.status === 'APPROVED' && (
+                        {canPayItem(c) && (
                           <Button
                             size="sm"
                             onClick={() => updateClaimStatusMutation.mutate({ id: c.id, status: 'PAID' })}
@@ -1024,7 +1055,7 @@ export default function ExpenseClaimsPage() {
                             <span>Chi tiền</span>
                           </Button>
                         )}
-                        {c.status === 'SUBMITTED' && (
+                        {canApproveItem(c) && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -1036,7 +1067,7 @@ export default function ExpenseClaimsPage() {
                           </Button>
                         )}
                         <Button
-                          variant="ghost"
+                          disabled={!canDeleteItem(c)} variant="ghost"
                           size="sm"
                           onClick={() => {
                             if (window.confirm(`Xóa bảng kê chi phí "${c.title}"?`)) {
@@ -1044,7 +1075,7 @@ export default function ExpenseClaimsPage() {
                             }
                           }}
                           className="h-7 w-7 p-0 text-muted-foreground hover:text-rose-600"
-                          title="Xóa hồ sơ"
+                          title={canDeleteItem(c) ? 'Xóa hồ sơ chưa duyệt' : 'Chỉ xóa được hồ sơ chưa duyệt trong quyền quản lý'}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -1078,11 +1109,12 @@ export default function ExpenseClaimsPage() {
                 icon: Printer,
                 onSelect: () => setPrintDocument({ type: 'TRAVEL', data: r }),
               },
+              { label: 'Xác nhận ngày công tác thực hiện', icon: CheckCircle2, hidden: !canConfirmTravel || !['APPROVED', 'PAID'].includes(r.status) || r.userId === user?.id, onSelect: () => openTravelAttendance(r) },
               'separator',
               {
                 label: 'Phê duyệt lịch trình',
                 icon: Check,
-                hidden: r.status === 'APPROVED' || r.status === 'COMPLETED',
+                hidden: !canApproveItem(r),
                 onSelect: () => updateTravelStatusMutation.mutate({ id: r.id, status: 'APPROVED' }),
               },
               {
@@ -1095,12 +1127,13 @@ export default function ExpenseClaimsPage() {
                 label: 'Từ chối đề xuất',
                 icon: X,
                 danger: true,
-                hidden: r.status === 'REJECTED',
+                hidden: !canApproveItem(r),
                 onSelect: () => updateTravelStatusMutation.mutate({ id: r.id, status: 'REJECTED' }),
               },
               'separator',
               {
                 label: 'Xóa đề xuất',
+                hidden: !canDeleteItem(r),
                 icon: Trash2,
                 danger: true,
                 onSelect: () => {
@@ -1176,8 +1209,8 @@ export default function ExpenseClaimsPage() {
                     </div>
 
                     {/* Interactive Action Buttons */}
-                    <div className="pt-3 border-t border-border/60 flex items-center justify-between gap-1">
-                      <div className="flex items-center gap-1.5">
+                    <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1200,8 +1233,8 @@ export default function ExpenseClaimsPage() {
                         </Button>
                       </div>
 
-                      <div className="flex items-center gap-1.5">
-                        {t.status !== 'APPROVED' && t.status !== 'COMPLETED' && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {canApproveItem(t) && (
                           <Button
                             size="sm"
                             onClick={() => updateTravelStatusMutation.mutate({ id: t.id, status: 'APPROVED' })}
@@ -1211,6 +1244,7 @@ export default function ExpenseClaimsPage() {
                             <span>Duyệt</span>
                           </Button>
                         )}
+                        {canConfirmTravel && ['APPROVED', 'PAID'].includes(t.status) && t.userId !== user?.id && <Button size="sm" variant="outline" onClick={() => openTravelAttendance(t)}>Xác nhận ngày thực hiện</Button>}
                         {t.status === 'APPROVED' && canSettleTravel && !t.settlementClosedAt && (
                           <Button
                             size="sm"
@@ -1222,7 +1256,7 @@ export default function ExpenseClaimsPage() {
                           </Button>
                         )}
                         <Button
-                          variant="ghost"
+                          disabled={!canDeleteItem(t)} variant="ghost"
                           size="sm"
                           onClick={() => {
                             if (window.confirm(`Xóa đề xuất công tác "${t.purpose}"?`)) {
@@ -1230,7 +1264,7 @@ export default function ExpenseClaimsPage() {
                             }
                           }}
                           className="h-7 w-7 p-0 text-muted-foreground hover:text-rose-600"
-                          title="Xóa đề xuất"
+                          title={canDeleteItem(t) ? 'Xóa hồ sơ chưa duyệt' : 'Chỉ xóa được hồ sơ chưa duyệt trong quyền quản lý'}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -1268,25 +1302,26 @@ export default function ExpenseClaimsPage() {
               {
                 label: 'Phê duyệt cấp tạm ứng',
                 icon: Check,
-                hidden: r.status === 'APPROVED' || r.status === 'PAID',
+                hidden: !canApproveItem(r),
                 onSelect: () => updateAdvanceStatusMutation.mutate({ id: r.id, status: 'APPROVED' }),
               },
               {
                 label: 'Giải ngân / Chi tiền mặt/CK',
                 icon: DollarSign,
-                hidden: r.status === 'PAID',
+                hidden: !canPayItem(r),
                 onSelect: () => openAdvancePayment(r),
               },
               {
                 label: 'Từ chối tạm ứng',
                 icon: X,
                 danger: true,
-                hidden: r.status === 'REJECTED',
+                hidden: !canApproveItem(r),
                 onSelect: () => updateAdvanceStatusMutation.mutate({ id: r.id, status: 'REJECTED' }),
               },
               'separator',
               {
                 label: 'Xóa đề xuất',
+                hidden: !canDeleteItem(r),
                 icon: Trash2,
                 danger: true,
                 onSelect: () => {
@@ -1359,8 +1394,8 @@ export default function ExpenseClaimsPage() {
                     </div>
 
                     {/* Interactive Action Buttons */}
-                    <div className="pt-3 border-t border-border/60 flex items-center justify-between gap-1">
-                      <div className="flex items-center gap-1.5">
+                    <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1383,8 +1418,8 @@ export default function ExpenseClaimsPage() {
                         </Button>
                       </div>
 
-                      <div className="flex items-center gap-1.5">
-                        {a.status !== 'APPROVED' && a.status !== 'PAID' && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {canApproveItem(a) && (
                           <Button
                             size="sm"
                             onClick={() => updateAdvanceStatusMutation.mutate({ id: a.id, status: 'APPROVED' })}
@@ -1394,7 +1429,7 @@ export default function ExpenseClaimsPage() {
                             <span>Duyệt</span>
                           </Button>
                         )}
-                        {a.status === 'APPROVED' && (
+                        {canPayItem(a) && (
                           <Button
                             size="sm"
                             onClick={() => openAdvancePayment(a)}
@@ -1405,7 +1440,7 @@ export default function ExpenseClaimsPage() {
                           </Button>
                         )}
                         <Button
-                          variant="ghost"
+                          disabled={!canDeleteItem(a)} variant="ghost"
                           size="sm"
                           onClick={() => {
                             if (window.confirm(`Xóa đề xuất tạm ứng "${a.purpose}"?`)) {
@@ -1413,7 +1448,7 @@ export default function ExpenseClaimsPage() {
                             }
                           }}
                           className="h-7 w-7 p-0 text-muted-foreground hover:text-rose-600"
-                          title="Xóa đề xuất"
+                          title={canDeleteItem(a) ? 'Xóa hồ sơ chưa duyệt' : 'Chỉ xóa được hồ sơ chưa duyệt trong quyền quản lý'}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -1436,12 +1471,13 @@ export default function ExpenseClaimsPage() {
         size="lg"
       >
         <div className="space-y-4 py-1">
+          <div className="space-y-1.5"><Label htmlFor="claim-travel">Chuyến công tác liên quan</Label><Select id="claim-travel" value={claimTravelId} onChange={event => setClaimTravelId(event.target.value)}><option value="">Chi phí độc lập, không thuộc chuyến đi</option>{travels.filter(travel => travel.userId === (claimEmployee || user?.id) && travel.status === 'APPROVED' && !travel.settlementClosedAt).map(travel => <option key={travel.id} value={travel.id}>{travel.purpose}</option>)}</Select><p className="text-xs text-muted-foreground">Chọn đúng chuyến để đối trừ tạm ứng; chỉ hiện chuyến đã duyệt của nhân viên đang chọn.</p></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label>Họ tên nhân sự đề nghị</Label>
               <Select
                 value={claimEmployee}
-                onChange={(e) => setClaimEmployee(e.target.value)}
+                onChange={(e) => { setClaimEmployee(e.target.value); setClaimTravelId(''); }}
                 className="mt-1 w-full text-xs"
               >
                 <option value="">Chọn nhân viên (mặc định: {user?.fullName || 'Bản thân'})</option>
@@ -1568,8 +1604,8 @@ export default function ExpenseClaimsPage() {
         <ModalFooterActions
           onCancel={() => setIsClaimModalOpen(false)}
           onConfirm={() => {
-            if (!claimTitle.trim()) {
-              toast('Vui lòng nhập tiêu đề bảng kê', 'error');
+            if (!claimTitle.trim() || !claimItems.length || claimItems.some(item => !item.item.trim() || !Number.isFinite(item.amount) || item.amount <= 0)) {
+              toast('Nhập tiêu đề và ít nhất một khoản chi có nội dung, số tiền dương', 'error');
               return;
             }
             createClaimMutation.mutate({
@@ -1717,11 +1753,12 @@ export default function ExpenseClaimsPage() {
         size="md"
       >
         <div className="space-y-3.5 py-1">
+          <div className="space-y-1.5"><Label htmlFor="advance-travel">Chuyến công tác liên quan</Label><Select id="advance-travel" value={advTravelId} onChange={event => setAdvTravelId(event.target.value)}><option value="">Tạm ứng độc lập</option>{travels.filter(travel => travel.userId === (advEmployee || user?.id) && travel.status === 'APPROVED' && !travel.settlementClosedAt).map(travel => <option key={travel.id} value={travel.id}>{travel.purpose}</option>)}</Select><p className="text-xs text-muted-foreground">Liên kết chuyến đi để theo dõi hoàn ứng và quyết toán.</p></div>
           <div>
             <Label>Nhân sự đề nghị tạm ứng</Label>
             <Select
               value={advEmployee}
-              onChange={(e) => setAdvEmployee(e.target.value)}
+              onChange={(e) => { setAdvEmployee(e.target.value); setAdvTravelId(''); }}
               className="mt-1 w-full text-xs"
             >
               <option value="">Chọn nhân viên (mặc định: {user?.fullName || 'Bản thân'})</option>
@@ -1871,8 +1908,8 @@ export default function ExpenseClaimsPage() {
                 <Printer className="h-3.5 w-3.5" /> In Giấy Đề Nghị Thanh Toán
               </Button>
 
-              <div className="flex items-center gap-2">
-                {detailClaim.status !== 'APPROVED' && detailClaim.status !== 'PAID' && (
+              <div className="flex flex-wrap items-center gap-2">
+                {canApproveItem(detailClaim) && (
                   <Button
                     size="sm"
                     onClick={() => updateClaimStatusMutation.mutate({ id: detailClaim.id, status: 'APPROVED' })}
@@ -1881,7 +1918,7 @@ export default function ExpenseClaimsPage() {
                     <Check className="h-3.5 w-3.5" /> Phê Duyệt
                   </Button>
                 )}
-                {detailClaim.status === 'APPROVED' && (
+                {canPayItem(detailClaim) && (
                   <Button
                     size="sm"
                     onClick={() => updateClaimStatusMutation.mutate({ id: detailClaim.id, status: 'PAID' })}
@@ -1890,7 +1927,7 @@ export default function ExpenseClaimsPage() {
                     <DollarSign className="h-3.5 w-3.5" /> Giải Ngân / Chi Tiền
                   </Button>
                 )}
-                {detailClaim.status === 'SUBMITTED' && (
+                {canApproveItem(detailClaim) && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -1901,7 +1938,7 @@ export default function ExpenseClaimsPage() {
                   </Button>
                 )}
                 <Button
-                  variant="outline"
+                  disabled={!canDeleteItem(detailClaim)} variant="outline"
                   size="sm"
                   onClick={() => {
                     if (window.confirm(`Xác nhận xóa bảng kê "${detailClaim.title}"?`)) {
@@ -1909,7 +1946,7 @@ export default function ExpenseClaimsPage() {
                     }
                   }}
                   className="text-rose-600 hover:bg-rose-50"
-                  title="Xóa hồ sơ"
+                  title={canDeleteItem(detailClaim) ? 'Xóa hồ sơ chưa duyệt' : 'Chỉ xóa được hồ sơ chưa duyệt trong quyền quản lý'}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -1956,6 +1993,8 @@ export default function ExpenseClaimsPage() {
                 <span className="text-muted-foreground">Dự toán kinh phí:</span>
                 <span className="font-extrabold text-foreground text-sm">{formatVND(detailTravel.estimatedBudget)}</span>
               </div>
+              <p className="text-sm">Ngày công tác đã ghi công: {detailTravel.confirmedWorkDates?.join(', ') || 'Chưa xác nhận thực hiện'}</p>
+              {detailTravel.attendanceEvidenceUrl && <Button size="sm" variant="outline" onClick={() => void openProtectedFile(detailTravel.attendanceEvidenceUrl!).catch(error => toast(errorMessage(error), 'error'))}>Mở minh chứng công tác</Button>}
               {detailTravel.notes && (
                 <div className="pt-2 border-t text-muted-foreground">
                   <span className="font-medium text-foreground block mb-0.5">Ghi chú:</span>
@@ -1978,8 +2017,9 @@ export default function ExpenseClaimsPage() {
                 <Printer className="h-3.5 w-3.5" /> In Giấy Đi Đường
               </Button>
 
-              <div className="flex items-center gap-2">
-                {detailTravel.status !== 'APPROVED' && detailTravel.status !== 'COMPLETED' && (
+              <div className="flex flex-wrap items-center gap-2">
+                {canConfirmTravel && ['APPROVED', 'PAID'].includes(detailTravel.status) && detailTravel.userId !== user?.id && <Button size="sm" variant="outline" onClick={() => openTravelAttendance(detailTravel)}>Xác nhận ngày thực hiện</Button>}
+                {canApproveItem(detailTravel) && (
                   <Button
                     size="sm"
                     onClick={() => updateTravelStatusMutation.mutate({ id: detailTravel.id, status: 'APPROVED' })}
@@ -1997,12 +2037,12 @@ export default function ExpenseClaimsPage() {
                     <CheckCircle2 className="h-3.5 w-3.5" /> Khóa đối soát
                   </Button>
                 )}
-                {detailTravel.settlementClosedAt && canSettleTravel && (detailTravel.advanceRefundDue ?? 0) > (detailTravel.advanceRefundPaid ?? 0) ? <div className="flex items-center gap-2">
+                {detailTravel.settlementClosedAt && canSettleTravel && (detailTravel.advanceRefundDue ?? 0) > (detailTravel.advanceRefundPaid ?? 0) ? <div className="flex flex-wrap items-center gap-2">
                   <Input type="number" min={1} max={(detailTravel.advanceRefundDue ?? 0) - (detailTravel.advanceRefundPaid ?? 0)} placeholder="Số tiền hoàn" value={refundAmount} onChange={(e) => setRefundAmount(e.target.value)} className="w-32" />
                   <Button size="sm" onClick={() => recordTravelRefundMutation.mutate()} disabled={!Number(refundAmount) || recordTravelRefundMutation.isPending}>Ghi nhận hoàn ứng</Button>
                 </div> : null}
                 <Button
-                  variant="outline"
+                  disabled={!canDeleteItem(detailTravel)} variant="outline"
                   size="sm"
                   onClick={() => {
                     if (window.confirm(`Xóa đề xuất chuyến công tác này?`)) {
@@ -2010,7 +2050,7 @@ export default function ExpenseClaimsPage() {
                     }
                   }}
                   className="text-rose-600 hover:bg-rose-50"
-                  title="Xóa đề xuất"
+                  title={canDeleteItem(detailTravel) ? 'Xóa hồ sơ chưa duyệt' : 'Chỉ xóa được hồ sơ chưa duyệt trong quyền quản lý'}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -2021,6 +2061,22 @@ export default function ExpenseClaimsPage() {
       )}
 
       {/* DETAIL MODAL: Tạm Ứng */}
+      <Modal open={!!attendanceTravel} onOpenChange={open => !open && setAttendanceTravel(null)} title="Xác nhận công tác đã thực hiện">
+        <form className="space-y-4" onSubmit={event => { event.preventDefault(); confirmTravelAttendance.mutate(); }}>
+          <p className="text-sm">{attendanceTravel?.employeeName} · {attendanceTravel?.purpose}</p>
+          <p className="text-sm text-muted-foreground">Chọn các ngày thực hiện trong lịch ca, từ {attendanceTravel?.departureDate.slice(0, 10)} đến {attendanceTravel?.returnDate.slice(0, 10)}. Chỉ xác nhận ngày đã kết thúc và chưa chốt công.</p>
+          <fieldset className="space-y-2"><legend className="font-medium">Ngày thực hiện *</legend>
+            <p className="text-xs text-muted-foreground">Chọn ngày thực tế đã làm việc. Danh sách theo lịch ca; ngày bị khóa có lý do bên cạnh.</p>
+            {travelAttendanceOptions.isLoading && <p role="status">Đang kiểm tra lịch ca và kỳ công…</p>}
+            {travelAttendanceOptions.isError && <ErrorState message={errorMessage(travelAttendanceOptions.error)} onRetry={() => travelAttendanceOptions.refetch()} />}
+            <div className="max-h-56 space-y-2 overflow-y-auto">{travelAttendanceOptions.data?.days.map(day => <label key={day.date} className="flex items-center gap-3 rounded-md border p-3"><input type="checkbox" disabled={!day.canConfirm} checked={travelWorkDates.includes(day.date)} onChange={event => setTravelWorkDates(current => event.target.checked ? [...current, day.date] : current.filter(date => date !== day.date))} /><span>{formatSafeDate(day.date)}{day.reason && <span className="ml-2 text-xs text-muted-foreground">{day.reason}</span>}</span></label>)}</div>
+            {travelAttendanceOptions.data?.days.length === 0 && <p>Chuyến đi không có ngày theo lịch ca. Nhờ HR kiểm tra phân ca trước.</p>}
+            <p className="text-xs text-muted-foreground">Đã chọn {travelWorkDates.length} ngày để ghi công.</p>
+          </fieldset>
+          <div className="space-y-1.5"><Label htmlFor="travel-proof">Đường dẫn báo cáo / minh chứng *</Label><Input id="travel-proof" required value={travelEvidence} onChange={e => setTravelEvidence(e.target.value)} /></div>
+          <ModalFooterActions onCancel={() => setAttendanceTravel(null)} pending={confirmTravelAttendance.isPending} disabled={!travelWorkDates.length || travelAttendanceOptions.isError || travelAttendanceOptions.isLoading} confirmLabel="Xác nhận và ghi công" />
+        </form>
+      </Modal>
       {advancePayment && (
         <Modal
           open={!!advancePayment}
@@ -2104,8 +2160,8 @@ export default function ExpenseClaimsPage() {
                 <Printer className="h-3.5 w-3.5" /> {detailAdvance.status === 'PAID' ? (detailAdvance.paymentMethod === 'BANK' ? 'In xác nhận chuyển khoản' : 'In Phiếu chi kế toán (02-TT)') : 'In đề nghị tạm ứng'}
               </Button>
 
-              <div className="flex items-center gap-2">
-                {detailAdvance.status !== 'APPROVED' && detailAdvance.status !== 'PAID' && (
+              <div className="flex flex-wrap items-center gap-2">
+                {canApproveItem(detailAdvance) && (
                   <Button
                     size="sm"
                     onClick={() => updateAdvanceStatusMutation.mutate({ id: detailAdvance.id, status: 'APPROVED' })}
@@ -2114,7 +2170,7 @@ export default function ExpenseClaimsPage() {
                     <Check className="h-3.5 w-3.5" /> Duyệt Cấp Tạm Ứng
                   </Button>
                 )}
-                {detailAdvance.status === 'APPROVED' && (
+                {canPayItem(detailAdvance) && (
                   <Button
                     size="sm"
                     onClick={() => openAdvancePayment(detailAdvance)}
@@ -2124,7 +2180,7 @@ export default function ExpenseClaimsPage() {
                   </Button>
                 )}
                 <Button
-                  variant="outline"
+                  disabled={!canDeleteItem(detailAdvance)} variant="outline"
                   size="sm"
                   onClick={() => {
                     if (window.confirm(`Xóa đề xuất tạm ứng này?`)) {
@@ -2132,7 +2188,7 @@ export default function ExpenseClaimsPage() {
                     }
                   }}
                   className="text-rose-600 hover:bg-rose-50"
-                  title="Xóa đề xuất"
+                  title={canDeleteItem(detailAdvance) ? 'Xóa hồ sơ chưa duyệt' : 'Chỉ xóa được hồ sơ chưa duyệt trong quyền quản lý'}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>

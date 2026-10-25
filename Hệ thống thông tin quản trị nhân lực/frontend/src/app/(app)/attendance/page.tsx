@@ -36,19 +36,6 @@ export default function AttendancePage() {
     onError: (e) => toast(errorMessage(e), 'error'),
   });
 
-  const autoSync = useMutation({
-    mutationFn: async () => api.post('/attendance/auto-sync', {}),
-    onSuccess: (res) => {
-      const d = res.data as { syncedUsers?: number; syncedDays?: number; targetDate?: string };
-      toast(
-        `Đã đồng bộ điểm danh tự động cho toàn bộ nhân sự đến ngày ${d.targetDate ?? 'hôm nay'} (${d.syncedDays ?? 0} bản ghi cập nhật)`,
-        'success',
-      );
-      qc.invalidateQueries({ queryKey: ['attendance-me'] });
-    },
-    onError: (e) => toast(errorMessage(e), 'error'),
-  });
-
   const todayEvents = q.data?.todayEvents ?? [];
   const nextPunch = todayEvents.length % 2 === 0 ? 'IN' : 'OUT';
 
@@ -56,7 +43,7 @@ export default function AttendancePage() {
     <div className="space-y-6 pb-12">
       <WorkspaceHeader
         title="Bảng chấm công"
-        description="Chấm công vào/ra ca trên web, nhận diện khuôn mặt qua camera và tự động đồng bộ công cho toàn bộ nhân sự."
+        description="Ghi giờ vào/ra ca, xem dữ liệu cá nhân và gửi giải trình nếu thiếu hoặc sai công."
         breadcrumbs={[{ label: 'Chấm công' }, { label: 'Bảng chấm công' }]}
         actions={
           <div className="flex flex-wrap items-center gap-2">
@@ -64,11 +51,11 @@ export default function AttendancePage() {
               <Button
                 variant="outline"
                 size="sm"
-                disabled={autoSync.isPending}
-                onClick={() => autoSync.mutate()}
+                disabled={q.isFetching}
+                onClick={() => qc.invalidateQueries({ queryKey: ['attendance-me'] })}
               >
-                <RefreshCw className={cn('h-4 w-4', autoSync.isPending && 'animate-spin')} />
-                Đồng bộ công tự động toàn công ty
+                <RefreshCw className={cn('h-4 w-4', q.isFetching && 'animate-spin')} />
+                Làm mới dữ liệu công
               </Button>
             )}
             <Link href="/check-in"><Button variant="outline" size="sm"><Camera className="h-4 w-4" /> Điểm danh khuôn mặt</Button></Link>
@@ -109,11 +96,12 @@ export default function AttendancePage() {
             </p>
           ) : null}
           <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
-            Hệ thống đã bật chế độ tự động ghi nhận đủ ngày công theo ca làm việc cho toàn bộ nhân viên đến ngày hiện tại.
+            Giờ vào/ra được ghi nhận từ chấm công thực. Nếu thiếu cặp hoặc sai giờ, gửi giải trình để người có quyền kiểm tra trước khi chốt công.
           </p>
         </CardContent>
       </Card>
 
+      <Link href="/hr-workflows?tab=correction" className="inline-block text-sm font-medium underline underline-offset-4">Thiếu hoặc sai công? Mở Giải trình công</Link>
       {/* Bảng công 14 ngày */}
       <div className="print-area">
         <PrintFrame title="BẢNG CHẤM CÔNG CÁ NHÂN" subtitle="Ghi nhận từ web, camera khuôn mặt và các nguồn chấm công đã cấu hình" />
@@ -125,7 +113,7 @@ export default function AttendancePage() {
             ) : q.isError ? (
               <ErrorState message={errorMessage(q.error)} onRetry={() => q.refetch()} />
             ) : (q.data!.days.length === 0) ? (
-              <p className="text-sm text-muted-foreground">Chưa có dữ liệu công. Hãy chạy bộ mô phỏng ở trang Quản trị → Thiết bị chấm công.</p>
+              <p className="text-sm text-muted-foreground">Chưa có dữ liệu công. Ghi nhận giờ vào/ra ca hoặc liên hệ HR để kiểm tra lịch làm việc.</p>
             ) : (
               <>
                 <ul className="divide-y divide-border sm:hidden">

@@ -17,6 +17,21 @@ export class AttendanceLedgerService {
 
   constructor(private readonly prisma: PrismaService, private readonly settings: RuntimeSettingsService) {}
 
+  /** One effective-dated work calendar for leave, travel and attendance. */
+  async scheduledDates(userId: string, from: Date, to: Date, db: Database = this.prisma, excludeHolidays = true): Promise<Date[]> {
+    const assignments = await db.hrmsShiftAssignment.findMany({
+      where: { userId, status: 'ACTIVE', startDate: { lte: to }, OR: [{ endDate: null }, { endDate: { gte: from } }] },
+      orderBy: { startDate: 'desc' },
+    });
+    const holidays = excludeHolidays ? await this.settings.get<string[]>('HOLIDAYS', []) : [];
+    const dates: Date[] = [];
+    for (let day = dateKey(from); day <= dateKey(to); day = new Date(day.getTime() + DAY_MS)) {
+      const assignment = assignments.find(a => dateKey(a.startDate) <= day && (!a.endDate || dateKey(a.endDate) >= day));
+      if (isScheduledWorkday(day, assignment?.workDays ?? DEFAULT_WORK_DAYS) && !holidays.includes(day.toISOString().slice(0, 10))) dates.push(day);
+    }
+    return dates;
+  }
+
   async assertMutable(day: Date, db: Database = this.prisma): Promise<void> {
     const key = dateKey(day);
     const period = await db.attendancePeriod.findUnique({ where: { month_year: { month: key.getUTCMonth() + 1, year: key.getUTCFullYear() } } });
@@ -117,8 +132,10 @@ export class AttendanceLedgerService {
     const earlyMinutes = lastOut ? Math.max(0, Math.round((schedule.endAt.getTime() - lastOut.getTime()) / 60_000)) : 0;
     const holidays = await this.settings.get<string[]>('HOLIDAYS', []);
     const leave = await db.leaveRequest.findFirst({ where: { userId, status: 'APPROVED', startDate: { lte: schedule.key }, endDate: { gte: schedule.key } } });
+    const travel = await db.hrmsTravelRequest.findFirst({ where: { userId, attendanceConfirmedAt: { not: null }, confirmedWorkDates: { has: schedule.key.toISOString().slice(0, 10) } } });
     let status: DayStatus = !firstIn && !lastOut ? 'ABSENT' : !firstIn || !lastOut || open ? 'MISSING_PAIR' : lateMinutes > schedule.lateTolerance ? 'LATE' : earlyMinutes > schedule.earlyTolerance ? 'EARLY_LEAVE' : 'PRESENT';
     if (leave) status = 'ON_LEAVE';
+    if (travel && !leave) status = 'BUSINESS_TRIP';
     if (holidays.includes(schedule.key.toISOString().slice(0, 10))) status = 'HOLIDAY';
     status = overrideStatus ?? status;
     let nightWorkedMinutes = 0;
@@ -166,8 +183,9 @@ export class AttendanceLedgerService {
       return { syncedDays: 0, createdEvents: 0, throughDate: todayIso };
     }
     try {
-      const enabled = await this.settings.get<boolean>('AUTO_ATTENDANCE_ENABLED', true);
-      if (enabled === false) {
+      // Synthetic punches are allowed only in an explicitly enabled demonstration runtime.
+      const enabled = process.env.ALLOW_DEMO_ATTENDANCE === 'true' && await this.settings.get<boolean>('AUTO_ATTENDANCE_ENABLED', false);
+      if (!enabled) {
         this.lastAutoSyncDateKey = todayIso;
         return { syncedDays: 0, createdEvents: 0, throughDate: todayIso };
       }
@@ -269,14 +287,15 @@ export class AttendanceLedgerService {
           if (protectedKeys.has(key)) continue;
 
           const assignment = userAssignments.find(c => dateKey(c.startDate) <= day && (!c.endDate || dateKey(c.endDate) >= day));
+          if (assignment?.shiftType.enableAutoAttendance === false) continue;
           const existing = dayByUserDate.get(key);
           const isWorkday = isScheduledWorkday(day, assignment?.workDays ?? DEFAULT_WORK_DAYS);
           if (!isWorkday && existing?.status !== 'MISSING_PAIR') continue;
 
           if (
             existing &&
-            ['PRESENT', 'LATE', 'EARLY_LEAVE', 'ON_LEAVE', 'HOLIDAY'].includes(existing.status) &&
-            (existing.workedMinutes > 0 || existing.status === 'ON_LEAVE' || existing.status === 'HOLIDAY')
+            ['PRESENT', 'LATE', 'EARLY_LEAVE', 'ON_LEAVE', 'HOLIDAY', 'BUSINESS_TRIP'].includes(existing.status) &&
+            (existing.workedMinutes > 0 || ['ON_LEAVE', 'HOLIDAY', 'BUSINESS_TRIP'].includes(existing.status))
           ) {
             continue;
           }
@@ -286,6 +305,7 @@ export class AttendanceLedgerService {
           const startAt = atClock(day, startClock);
           const endAt = atClock(day, endClock);
           if (endAt <= startAt) endAt.setTime(endAt.getTime() + DAY_MS);
+          if (endAt > new Date()) continue;
           const breakStart = atClock(day, breakStartClock);
           const breakEnd = atClock(day, breakEndClock);
           const scheduledMinutes = paidWorkMinutes(startAt, endAt, breakStart, breakEnd);
@@ -394,6 +414,8 @@ export class AttendanceLedgerService {
     if (current?.status === 'FINALIZED') throw new ConflictException('Kỳ công đã chốt');
     const pending = await this.prisma.hrmsAttendanceRegularization.count({ where: { workDate: { gte: from, lte: to }, status: 'PENDING' } });
     if (pending) throw new ConflictException(`Còn ${pending} đơn giải trình chưa xử lý`);
+    await this.assertPendingRequestsResolved(from, to);
+    await this.assertOvertimeConfirmed(from, to);
 
     // Recompute unresolved rows outside the snapshot transaction so valid source events
     // remain refreshed even if other days still need HR review.
@@ -413,6 +435,8 @@ export class AttendanceLedgerService {
       if (existing?.status === 'FINALIZED') throw new ConflictException('Kỳ công đã chốt');
       const pendingInside = await tx.hrmsAttendanceRegularization.count({ where: { workDate: { gte: from, lte: to }, status: 'PENDING' } });
       if (pendingInside) throw new ConflictException(`Còn ${pendingInside} đơn giải trình chưa xử lý`);
+      await this.assertPendingRequestsResolved(from, to, tx);
+      await this.assertOvertimeConfirmed(from, to, tx);
       const unresolved = await tx.attendanceDay.count({ where: { workDate: { gte: from, lte: to }, status: 'MISSING_PAIR' } });
       if (unresolved) throw new ConflictException(`Còn ${unresolved} ngày thiếu cặp vào/ra; cần giải trình trước khi chốt`);
       const rows = await tx.attendanceDay.findMany({ where: { workDate: { gte: from, lte: to } }, orderBy: [{ userId: 'asc' }, { workDate: 'asc' }] });
@@ -425,13 +449,26 @@ export class AttendanceLedgerService {
     }, { isolationLevel: 'Serializable', timeout: 120_000 });
   }
 
+  private async assertPendingRequestsResolved(from: Date, to: Date, db: Database = this.prisma) {
+    const [leave, overtime] = await Promise.all([
+      db.leaveRequest.count({ where: { status: 'PENDING', startDate: { lte: to }, endDate: { gte: from } } }),
+      db.overtimeRequest.count({ where: { status: 'PENDING', workDate: { gte: from, lte: to } } }),
+    ]);
+    if (leave || overtime) throw new ConflictException(`Còn ${leave} đơn nghỉ phép và ${overtime} đơn OT chờ duyệt. Xử lý tại Nghỉ phép / Làm thêm giờ trước khi chốt công.`);
+  }
+
+  private async assertOvertimeConfirmed(from: Date, to: Date, db: Database = this.prisma) {
+    const unconfirmed = await db.overtimeRequest.count({ where: { workDate: { gte: from, lte: to }, status: 'APPROVED', actualConfirmedAt: null } });
+    if (unconfirmed) throw new ConflictException(`Còn ${unconfirmed} kế hoạch OT chưa đối soát thực làm; xác nhận số giờ thực tế (hoặc 0 nếu không thực hiện) trước khi chốt công`);
+  }
+
   private async materializeScheduledDays(from: Date, to: Date) {
     const currentUsers = await this.prisma.user.findMany({
       where: { deletedAt: null, employmentStatus: { in: ['PROBATION', 'ACTIVE'] } },
       select: { id: true, hireDate: true },
     });
     const resignationActions = await this.prisma.personnelAction.findMany({
-      where: { OR: [{ type: 'RESIGNATION' }, { type: 'DISCIPLINE', payload: { path: ['subType'], equals: 'DISMISSAL' } }], status: 'APPROVED', effectiveAt: { lte: to } },
+      where: { OR: [{ type: { in: ['RESIGNATION', 'PROBATION_FAIL'] } }, { type: 'DISCIPLINE', payload: { path: ['subType'], equals: 'DISMISSAL' } }], status: 'APPROVED', effectiveAt: { lte: to } },
       select: { subjectId: true, effectiveAt: true },
       orderBy: { effectiveAt: 'asc' },
     });

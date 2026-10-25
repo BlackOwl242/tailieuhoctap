@@ -1,6 +1,6 @@
 import { ConflictException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { businessDates, dateKey } from '../../common/hr-time';
+import { businessDates, dateKey, workDate } from '../../common/hr-time';
 import { AttendanceLedgerService } from '../../common/services/attendance-ledger.service';
 import { HrAccessService } from '../../common/services/hr-access.service';
 import { RuntimeSettingsService } from '../../common/services/runtime-settings.service';
@@ -44,35 +44,30 @@ export class LeaveService {
     private readonly settings: RuntimeSettingsService,
   ) {}
 
-  /** Số ngày nghỉ làm việc (loại cuối tuần) giữa hai ngày, tính cả 2 đầu. */
-  private businessDays(from: Date, to: Date): number {
-    let days = 0;
-    const d = new Date(from);
-    const end = new Date(to);
-    // Chuẩn hóa cả hai đầu về giữa ngày để không lệch do múi giờ/00:00
-    d.setHours(12, 0, 0, 0);
-    end.setHours(12, 0, 0, 0);
-    while (d.getTime() <= end.getTime()) {
-      const wd = d.getDay();
-      if (wd !== 0 && wd !== 6) days += 1;
-      d.setDate(d.getDate() + 1);
-    }
-    return days;
-  }
-
   private async ensureBalance(userId: string, year: number, db: Prisma.TransactionClient | PrismaService = this.prisma) {
-    const existing = await db.leaveBalance.findUnique({
-      where: { userId_year: { userId, year } },
-    });
-    if (existing) return existing;
-    // Thâm niên: +1 ngày mỗi 5 năm công tác (Điều 65 BLĐ 2019)
+    if (!Number.isInteger(year) || year < 2000 || year > 2100) throw new ConflictException('Năm phép không hợp lệ');
     const user = await db.user.findUnique({ where: { id: userId }, select: { hireDate: true } });
-    let entitled = 12;
+    let annualDays = Number(await this.settings.get('ANNUAL_LEAVE_DAYS', 12));
+    if (!Number.isFinite(annualDays) || annualDays < 12) throw new ConflictException('Chính sách phép năm chưa hợp lệ');
+    const mode = await this.settings.get<string>('LEAVE_ALLOCATION_MODE', 'PRORATED_YEAR');
+    const yearEnd = new Date(Date.UTC(year, 11, 31));
     if (user?.hireDate) {
-      const years = (new Date(Date.UTC(year, 11, 31)).getTime() - user.hireDate.getTime()) / (365.25 * 86_400_000);
-      entitled += Math.max(0, Math.floor(years / 5));
+      const years = (yearEnd.getTime() - user.hireDate.getTime()) / (365.25 * 86_400_000);
+      annualDays += Math.max(0, Math.floor(years / 5));
     }
-    return db.leaveBalance.upsert({ where: { userId_year: { userId, year } }, create: { userId, year, entitled }, update: {} });
+    const termination = await db.personnelAction.findFirst({ where: { subjectId: userId, status: 'APPROVED', OR: [{ type: { in: ['RESIGNATION', 'PROBATION_FAIL'] } }, { type: 'DISCIPLINE', payload: { path: ['subType'], equals: 'DISMISSAL' } }] }, orderBy: { effectiveAt: 'asc' } });
+    const cutoff = mode === 'ACCRUED' && workDate() < yearEnd ? workDate() : yearEnd;
+    const end = termination?.effectiveAt && termination.effectiveAt < cutoff ? dateKey(termination.effectiveAt) : cutoff;
+    const start = user?.hireDate ? dateKey(user.hireDate) : new Date(Date.UTC(year, 0, 1));
+    let months = 0;
+    for (let month = 0; month < 12; month++) {
+      const from = new Date(Date.UTC(year, month, 1)), to = new Date(Date.UTC(year, month + 1, 0));
+      const scheduled = await this.ledger.scheduledDates(userId, from, to, db, false);
+      const eligible = scheduled.filter(day => day >= start && day <= end).length;
+      if (scheduled.length && eligible / scheduled.length >= .5) months++;
+    }
+    const entitled = mode === 'FULL_YEAR' && start <= yearEnd && end >= new Date(Date.UTC(year, 0, 1)) ? annualDays : Math.round(annualDays * months / 12 * 100) / 100;
+    return db.leaveBalance.upsert({ where: { userId_year: { userId, year } }, create: { userId, year, entitled }, update: { entitled } });
   }
 
   @Get('balance')
@@ -83,7 +78,7 @@ export class LeaveService {
       where: { userId: user.id, type: 'ANNUAL', status: 'PENDING', startDate: { gte: new Date(Date.UTC(year, 0, 1)), lt: new Date(Date.UTC(year + 1, 0, 1)) } },
       _sum: { days: true },
     });
-    return { ...balance, pendingDays: pending._sum.days ?? 0, remaining: balance.entitled - balance.used };
+    return { ...balance, allocationMode: await this.settings.get('LEAVE_ALLOCATION_MODE', 'PRORATED_YEAR'), pendingDays: pending._sum.days ?? 0, remaining: balance.entitled - balance.used };
   }
 
   @Get('mine')
@@ -115,9 +110,9 @@ export class LeaveService {
     const start = dateKey(dto.startDate);
     const end = dateKey(dto.endDate);
     if (end < start) throw new BusinessException(ErrorCodes.VALIDATION_ERROR, 'Ngày kết thúc phải sau ngày bắt đầu');
-    const selectedDates = businessDates(start, end, await this.settings.get('HOLIDAYS', []));
-    const days = selectedDates.length;
     if (end.getTime() - start.getTime() > 366 * 86400000) throw new ConflictException('Đơn nghỉ tối đa một năm');
+    const selectedDates = await this.ledger.scheduledDates(actor.id, start, end, tx);
+    const days = selectedDates.length;
     for (const day of selectedDates) await this.ledger.assertMutable(day, tx);
     const overlap = await tx.leaveRequest.findFirst({ where: { userId: actor.id, status: { in: ['PENDING', 'APPROVED'] }, startDate: { lte: end }, endDate: { gte: start } } });
     if (overlap) throw new ConflictException('Đã có đơn nghỉ trùng khoảng thời gian');
@@ -137,6 +132,7 @@ export class LeaveService {
         startDate: start,
         endDate: end,
         days,
+        chargedDates: selectedDates.map(day => day.toISOString().slice(0, 10)),
         reason: dto.reason,
       },
     });
@@ -157,9 +153,10 @@ export class LeaveService {
     }
 
     await this.access.assertReviewer(actor, request.userId);
-    const dates = businessDates(request.startDate, request.endDate, await this.settings.get('HOLIDAYS', []));
+    const dates = request.chargedDates.length ? request.chargedDates.map(dateKey) : businessDates(request.startDate, request.endDate, await this.settings.get('HOLIDAYS', []));
     const updated = await this.prisma.$transaction(async tx => {
       for (const day of dates) await this.ledger.assertMutable(day, tx);
+      if (approve && await tx.hrmsTravelRequest.findFirst({ where: { userId: request.userId, attendanceConfirmedAt: { not: null }, confirmedWorkDates: { hasSome: dates.map(day => day.toISOString().slice(0, 10)) } } })) throw new ConflictException('Ngày nghỉ trùng công tác đã xác nhận; cần đối soát trước');
       const changed = await tx.leaveRequest.updateMany({ where: { id, status: 'PENDING' }, data: { status: approve ? 'APPROVED' : 'REJECTED', approverId: actor.id, decidedAt: new Date(), decisionNote: note } });
       if (changed.count !== 1) throw new ConflictException('Đơn đã được xử lý');
       if (approve && request.type === 'ANNUAL') for (const year of [...new Set(dates.map(day => day.getUTCFullYear()))]) {
@@ -188,7 +185,7 @@ export class LeaveService {
     if (request.userId !== actor.id) throw new BusinessException(ErrorCodes.FORBIDDEN, 'Chỉ người tạo đơn mới được hủy', HttpStatus.FORBIDDEN);
     if (request.status === 'APPROVED' && request.startDate < new Date(new Date().toISOString().slice(0,10))) throw new ConflictException('Phép đã bắt đầu phải được HR điều chỉnh có minh chứng');
     if (!['PENDING','APPROVED'].includes(request.status)) throw new ConflictException('Đơn không ở trạng thái có thể hủy');
-    const dates = businessDates(request.startDate, request.endDate, await this.settings.get('HOLIDAYS', []));
+    const dates = request.chargedDates.length ? request.chargedDates.map(dateKey) : businessDates(request.startDate, request.endDate, await this.settings.get('HOLIDAYS', []));
     const updated = await this.prisma.$transaction(async tx => {
       for (const day of dates) await this.ledger.assertMutable(day, tx);
       const changed = await tx.leaveRequest.updateMany({ where: { id, status: request.status }, data: { status: 'CANCELLED', decidedAt: new Date() } });

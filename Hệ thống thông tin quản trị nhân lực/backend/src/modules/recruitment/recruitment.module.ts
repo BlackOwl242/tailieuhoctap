@@ -9,6 +9,8 @@ import { AuditService } from '../../common/services/audit.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { BusinessException, ErrorCodes } from '../../common/errors/business.exception';
 import type { AuthUser } from '../../common/types/auth-user';
+import { assertApplicantTransition, LEGACY_CANDIDATE_STAGE, syncLegacyCandidate } from '../../common/recruitment-sync';
+import { ApplicantStage } from '@prisma/client';
 
 // ---------------------------------------------------------------------------
 // DTOs
@@ -55,13 +57,18 @@ export class RecruitmentService {
   ) {}
 
   // ------------------------------------------------------------- phiếu đề xuất
-  requisitions() {
-    return this.prisma.jobRequisition.findMany({
+  async requisitions() {
+    const requisitions = await this.prisma.jobRequisition.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
         requester: { select: { fullName: true } },
         _count: { select: { candidates: true } },
       },
+    });
+    const openings = await this.prisma.hrmsJobOpening.findMany({ include: { _count: { select: { applicants: true } } } });
+    return requisitions.map(request => {
+      const opening = openings.find(opening => opening.requisitionId === request.id);
+      return opening ? { ...request, _count: { ...request._count, candidates: opening._count.applicants } } : request;
     });
   }
 
@@ -137,10 +144,15 @@ export class RecruitmentService {
   }
 
   // ---------------------------------------------------------------- ứng viên
-  candidates() {
-    return this.prisma.candidate.findMany({
+  async candidates() {
+    const candidates = await this.prisma.candidate.findMany({
       orderBy: { createdAt: 'desc' },
       include: { requisition: { select: { id: true, title: true } } },
+    });
+    const applicants = await this.prisma.hrmsJobApplicant.findMany({ include: { jobOpening: true }, orderBy: { createdAt: 'desc' } });
+    return candidates.map(candidate => {
+      const app = applicants.find(app => app.jobOpening.requisitionId === candidate.requisitionId && app.email.toLowerCase() === candidate.email?.toLowerCase());
+      return app ? { ...candidate, stage: LEGACY_CANDIDATE_STAGE[app.stage], atsApplicantId: app.id } : candidate;
     });
   }
 
@@ -149,26 +161,30 @@ export class RecruitmentService {
       const req = await this.prisma.jobRequisition.findUnique({ where: { id: dto.requisitionId } });
       if (!req) throw new NotFoundException('Không tìm thấy phiếu tuyển dụng liên quan');
     }
-    const candidate = await this.prisma.candidate.create({ data: dto });
+    const candidate = await this.prisma.$transaction(async tx => {
+    const candidate = await tx.candidate.create({ data: dto });
     if (dto.requisitionId && dto.email) {
-      const opening = await this.prisma.hrmsJobOpening.findUnique({ where: { requisitionId: dto.requisitionId } });
+      const opening = await tx.hrmsJobOpening.findUnique({ where: { requisitionId: dto.requisitionId } });
       if (opening) {
-        const existingApp = await this.prisma.hrmsJobApplicant.findFirst({
-          where: { jobOpeningId: opening.id, email: dto.email },
+        if (!['OPEN', 'IN_PROGRESS'].includes(opening.status) || !await tx.jobRequisition.findFirst({ where: { id: dto.requisitionId, status: 'APPROVED' } })) throw new ConflictException('Tin hoặc chỉ tiêu tuyển dụng đã đóng');
+        const existingApp = await tx.hrmsJobApplicant.findFirst({
+          where: { jobOpeningId: opening.id, email: { equals: dto.email, mode: 'insensitive' } },
         });
         if (!existingApp) {
-          await this.prisma.hrmsJobApplicant.create({
+          await tx.hrmsJobApplicant.create({
             data: {
               jobOpeningId: opening.id,
               candidateName: dto.fullName,
-              email: dto.email,
+              email: dto.email.trim().toLowerCase(),
               phone: dto.phone ?? '0900000000',
               stage: 'APPLIED',
             },
           });
-        }
+        } else { await syncLegacyCandidate(tx, existingApp.id); candidate.stage = LEGACY_CANDIDATE_STAGE[existingApp.stage]; }
       }
     }
+    return candidate;
+    }, { isolationLevel: 'Serializable' });
     await this.audit.log({
       actorId: actor.id, action: 'CANDIDATE_CREATED', entityType: 'Candidate', entityId: candidate.id,
       after: { fullName: dto.fullName }, requestId,
@@ -184,15 +200,26 @@ export class RecruitmentService {
     if (candidate.stage === 'HIRED' || candidate.stage === 'REJECTED') {
       throw new BusinessException(ErrorCodes.INVALID_STATE_TRANSITION, 'Ứng viên đã ở trạng thái kết thúc', HttpStatus.CONFLICT);
     }
-    const updated = await this.prisma.candidate.update({
+    const updated = await this.prisma.$transaction(async tx => {
+      const app = candidate.requisitionId && candidate.email ? await tx.hrmsJobApplicant.findFirst({ where: { email: { equals: candidate.email, mode: 'insensitive' }, jobOpening: { requisitionId: candidate.requisitionId } } }) : null;
+      if (app && dto.requisitionId && dto.requisitionId !== candidate.requisitionId) throw new ConflictException('Hồ sơ đã liên kết ATS; không chuyển phiếu tuyển trực tiếp');
+      if (app && dto.stage) {
+        const stage: ApplicantStage = dto.stage === 'INTERVIEW' && ['INTERVIEW_ROUND_1', 'INTERVIEW_ROUND_2'].includes(app.stage) ? app.stage : ({ NEW: 'APPLIED', SCREENING: 'SCREENING', INTERVIEW: 'INTERVIEW_ROUND_1', REJECTED: 'REJECTED' } as Record<string, ApplicantStage>)[dto.stage];
+        assertApplicantTransition(app.stage, stage);
+        await tx.hrmsJobApplicant.update({ where: { id: app.id, stage: app.stage }, data: { stage } });
+        if (stage === 'REJECTED') await tx.hrmsJobOffer.updateMany({ where: { applicantId: app.id, status: { in: ['SENT', 'ACCEPTED'] } }, data: { status: 'REJECTED', respondedAt: new Date() } });
+        await syncLegacyCandidate(tx, app.id);
+      }
+      return tx.candidate.update({
       where: { id },
       data: {
-        stage: dto.stage,
+        stage: app ? undefined : dto.stage,
         rating: dto.rating,
         notes: dto.notes,
         requisitionId: dto.requisitionId,
       },
     });
+    }, { isolationLevel: 'Serializable' });
     await this.audit.log({
       actorId: actor.id, action: 'CANDIDATE_STAGE_CHANGED', entityType: 'Candidate', entityId: id,
       before: { stage: candidate.stage }, after: { stage: updated.stage }, requestId,

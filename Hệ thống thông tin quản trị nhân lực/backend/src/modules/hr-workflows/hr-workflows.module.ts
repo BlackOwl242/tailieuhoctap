@@ -24,8 +24,8 @@ class ProbationDto {
   @IsString() @MinLength(10) assessment!: string;
   @IsString() @MinLength(1) evidenceUrl!: string;
   @IsIn(['PASS', 'FAIL']) recommendation!: string;
-  @IsNumber() @Min(1) contractSalary!: number;
-  @IsIn(['FIXED_TERM', 'INDEFINITE']) contractType!: 'FIXED_TERM' | 'INDEFINITE';
+  @IsOptional() @IsNumber() @Min(1) contractSalary?: number;
+  @IsOptional() @IsIn(['FIXED_TERM', 'INDEFINITE']) contractType?: 'FIXED_TERM' | 'INDEFINITE';
   @IsDateString() effectiveDate!: string;
   @IsOptional() @IsDateString() contractEndDate?: string;
 }
@@ -74,10 +74,13 @@ export class HrWorkflowsService {
     await this.access.assertReviewer(actor, dto.userId);
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: dto.userId } });
     if (user.employmentStatus !== 'PROBATION') throw new ConflictException('Nhân viên không ở trạng thái thử việc');
-    if (dto.recommendation === 'PASS') await this.assertProbationSalaryBand(this.prisma, user.id, dto.contractSalary, dateKey(dto.effectiveDate));
-    if (dto.contractType === 'FIXED_TERM' && (!dto.contractEndDate || dateKey(dto.contractEndDate) <= dateKey(dto.effectiveDate))) throw new BadRequestException('Hợp đồng có thời hạn phải có ngày kết thúc hợp lệ');
+    if (dto.recommendation === 'PASS') {
+      if (!dto.contractSalary || !dto.contractType) throw new BadRequestException('Kết luận đạt cần mức lương và loại hợp đồng chính thức');
+      await this.assertProbationSalaryBand(this.prisma, user.id, dto.contractSalary, dateKey(dto.effectiveDate));
+      if (dto.contractType === 'FIXED_TERM' && (!dto.contractEndDate || dateKey(dto.contractEndDate) <= dateKey(dto.effectiveDate))) throw new BadRequestException('Hợp đồng có thời hạn phải có ngày kết thúc hợp lệ');
+    }
     if (await this.prisma.probationReview.count({ where: { userId: dto.userId, status: { in: ['SUBMITTED', 'HR_VERIFIED', 'APPROVED'] } } })) throw new ConflictException('Đã có đánh giá thử việc đang xử lý/đã duyệt');
-    return this.prisma.probationReview.create({ data: { ...dto, managerId: actor.id, effectiveDate: dateKey(dto.effectiveDate), contractEndDate: dto.contractEndDate ? dateKey(dto.contractEndDate) : null } });
+    return this.prisma.probationReview.create({ data: { ...dto, ...(dto.recommendation === 'FAIL' ? { contractSalary: null, contractType: null } : {}), managerId: actor.id, effectiveDate: dateKey(dto.effectiveDate), contractEndDate: dto.recommendation === 'PASS' && dto.contractEndDate ? dateKey(dto.contractEndDate) : null } });
   }
   async decideProbation(actor: AuthUser, id: string, dto: ProbationTransitionDto) {
     const result = await this.prisma.$transaction(async tx => {
@@ -86,17 +89,33 @@ export class HrWorkflowsService {
       if (dto.status === 'HR_VERIFIED') {
         if (!isHr(actor) || review.status !== 'SUBMITTED') throw new ForbiddenException('Cần chuyên viên hồ sơ thẩm định sau quản lý');
       } else if (!actor.roles.some(role => ['ADMIN', 'BOD'].includes(role)) || review.status !== 'HR_VERIFIED' || actor.id === review.hrVerifiedBy) throw new ForbiddenException('Cần Giám đốc khác người thẩm định phê duyệt');
-      if (dto.status === 'APPROVED' && review.recommendation !== 'PASS') throw new ConflictException('Không ký chính thức khi đề nghị thử việc không đạt');
       const updated = await tx.probationReview.update({ where: { id, status: review.status }, data: { status: dto.status, decisionNote: dto.note, ...(dto.status === 'HR_VERIFIED' ? { hrVerifiedBy: actor.id } : { decidedBy: actor.id }) } });
       if (dto.status === 'APPROVED') {
-        await this.assertProbationSalaryBand(tx, review.userId, review.contractSalary, review.effectiveDate);
-        await tx.personnelAction.create({ data: { type: 'PROBATION_PASS', subjectId: review.userId, requestedById: review.managerId, decidedById: actor.id, decidedAt: new Date(), status: 'APPROVED', effectiveAt: review.effectiveDate, payload: { probationReviewId: id, newSalary: review.contractSalary, contractType: review.contractType, contractEndDate: review.contractEndDate?.toISOString() ?? null } } });
+        const user = await tx.user.findUniqueOrThrow({ where: { id: review.userId } });
+        if (user.employmentStatus !== 'PROBATION') throw new ConflictException('Nhân viên không còn trong thử việc');
+        await this.ledgerGuard(tx, review.effectiveDate);
+        if (review.recommendation === 'PASS') {
+          if (!review.contractSalary || !review.contractType) throw new ConflictException('Thiếu điều khoản hợp đồng chính thức');
+          await this.assertProbationSalaryBand(tx, review.userId, review.contractSalary, review.effectiveDate);
+        }
+        await tx.personnelAction.create({ data: { type: review.recommendation === 'PASS' ? 'PROBATION_PASS' : 'PROBATION_FAIL', subjectId: review.userId, requestedById: review.managerId, decidedById: actor.id, decidedAt: new Date(), status: 'APPROVED', effectiveAt: review.effectiveDate, payload: { probationReviewId: id, reason: review.assessment, evidenceUrl: review.evidenceUrl, newSalary: review.contractSalary, contractType: review.contractType, contractEndDate: review.contractEndDate?.toISOString() ?? null } } });
+        if (review.recommendation === 'FAIL') await tx.handoverChecklist.create({ data: { ownerUserId: review.userId, leavingDate: review.effectiveDate, items: { create: [
+          { title: 'Bàn giao công việc thử việc', responsibleRole: 'LINE_MANAGER' },
+          { title: 'Thu hồi tài sản làm việc', responsibleRole: 'HR_CB' },
+          { title: 'Thu hồi tài khoản và quyền truy cập', responsibleRole: 'ADMIN' },
+          { title: 'Quyết toán công, lương và công nợ', responsibleRole: 'ACCOUNTANT' },
+        ] } } });
       }
       await tx.auditLog.create({ data: { actorId: actor.id, action: `PROBATION_${dto.status}`, entityType: 'ProbationReview', entityId: id } });
       return updated;
     }, { isolationLevel: 'Serializable' });
     await this.effects.applyDue();
     return result;
+  }
+
+  private async ledgerGuard(db: Prisma.TransactionClient, day: Date) {
+    const closed = await db.hrmsPayrollRun.findFirst({ where: { fromDate: { lte: day }, toDate: { gte: day }, status: { in: ['REVIEWED', 'APPROVED', 'LOCKED', 'PAID'] } } });
+    if (closed) throw new ConflictException('Ngày hiệu lực thuộc kỳ lương đã đối soát; cần quy trình điều chỉnh');
   }
 }
 

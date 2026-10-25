@@ -11,8 +11,10 @@ import { ArrayMinSize, IsArray, IsBoolean, IsDateString, IsIn, IsNumber, IsOptio
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { calculateKpiScore, KpiMeasurementMode } from '../../common/kpi-calculator';
+import { Prisma } from '@prisma/client';
 
 export class CreateCycleDto {
+  @IsOptional() @IsArray() @ArrayMinSize(1) @IsString({ each: true }) participantIds?: string[];
   @ApiProperty({ example: 'Chu kỳ đánh giá KPI 2026' })
   @IsString()
   name: string;
@@ -183,6 +185,13 @@ export class CreateKraEvidenceDto {
 export class HrmsPerformanceService {
   constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly access: HrAccessService) {}
 
+  private async eligibleParticipants(startDate: Date, endDate: Date, db: PrismaService | Prisma.TransactionClient = this.prisma) {
+    return db.user.findMany({ where: { deletedAt: null, AND: [
+      { OR: [{ hireDate: null }, { hireDate: { lte: endDate } }] },
+      { OR: [{ employmentStatus: { in: ['ACTIVE', 'PROBATION'] } }, { actionsOnMe: { some: { status: 'APPROVED', effectiveAt: { gte: startDate }, OR: [{ type: { in: ['RESIGNATION', 'PROBATION_FAIL'] } }, { type: 'DISCIPLINE', payload: { path: ['subType'], equals: 'DISMISSAL' } }] } } }] },
+    ] }, select: { id: true, fullName: true } });
+  }
+
   private async assertActive(cycleId: string) {
     const cycle = await this.prisma.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id: cycleId } });
     if (cycle.status !== 'ACTIVE') throw new ConflictException('Kỳ đánh giá không còn mở');
@@ -246,9 +255,9 @@ export class HrmsPerformanceService {
     };
   }
 
-  async summary(cycleId: string, userId: string) {
-    const cycle = await this.prisma.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id: cycleId } });
-    const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId, userId }, include: { evidences: { select: { id: true } } } });
+  async summary(cycleId: string, userId: string, db: PrismaService | Prisma.TransactionClient = this.prisma) {
+    const cycle = await db.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id: cycleId } });
+    const goals = await db.hrmsAppraisalGoal.findMany({ where: { cycleId, userId }, include: { evidences: { select: { id: true } } } });
     if (cycle.organizationSector === 'state') {
       if (cycle.periodType === 'ANNUAL') {
         const expectedPeriods = cycle.annualSourceFrequency === 'QUARTERLY' ? 4 : 12;
@@ -265,7 +274,7 @@ export class HrmsPerformanceService {
         for (const key of expectedKeys) {
           const sourceCycle = keyed.get(key)!;
           if (sourceCycle.status !== 'COMPLETED') return this.incompleteAnnualSummary(expectedPeriods, periodSummaries.length);
-          const periodSummary = await this.summary(sourceCycle.id, userId);
+          const periodSummary = await this.summary(sourceCycle.id, userId, db);
           if (!periodSummary.complete || periodSummary.score === null || !('generalScore' in periodSummary) || periodSummary.generalScore == null || !('taskScore' in periodSummary) || periodSummary.taskScore == null) {
             return this.incompleteAnnualSummary(expectedPeriods, periodSummaries.length);
           }
@@ -371,6 +380,8 @@ export class HrmsPerformanceService {
     }
     const res = await this.prisma.hrmsAppraisalCycle.create({
       data: {
+        participantScope: dto.participantIds ? 'SELECTED' : 'COMPANY',
+        participantIds: await this.resolveParticipants(dto.participantIds, startDate, endDate),
         name: dto.name,
         year: dto.year,
         startDate,
@@ -406,6 +417,24 @@ export class HrmsPerformanceService {
     const cycle = await this.prisma.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id } });
     if (cycle.status === 'COMPLETED') throw new ConflictException('Kỳ đã khóa');
     if (dto.status && !['ACTIVE', 'COMPLETED'].includes(dto.status)) throw new BadRequestException('Trạng thái kỳ không hợp lệ');
+    if (dto.status === 'COMPLETED' && cycle.organizationSector === 'enterprise') {
+      return this.prisma.$transaction(async tx => {
+        const current = await tx.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id } });
+        if (current.status !== 'ACTIVE') throw new ConflictException('Kỳ không còn mở');
+        const eligible = current.participantScope === 'SELECTED' ? [] : await this.eligibleParticipants(current.startDate, current.endDate, tx);
+        const participantIds = [...new Set([...current.participantIds, ...eligible.map(user => user.id)])];
+        if (!participantIds.length) throw new ConflictException('Kỳ chưa xác định đối tượng đánh giá');
+        for (const userId of participantIds) {
+          if (!(await this.summary(id, userId, tx)).complete) {
+            const employee = await tx.user.findUnique({ where: { id: userId }, select: { fullName: true } });
+            throw new ConflictException(`Chưa thể đóng kỳ: ${employee?.fullName ?? userId} chưa được giao đủ KPI, chấm điểm hoặc nộp minh chứng`);
+          }
+        }
+        await tx.hrmsAppraisalCycle.update({ where: { id, status: 'ACTIVE' }, data: { ...dto, participantIds } });
+        await tx.auditLog.create({ data: { actorId, action: 'APPRAISAL_CYCLE_COMPLETED', entityType: 'HrmsAppraisalCycle', entityId: id, afterData: { participants: participantIds.length } } });
+        return tx.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id } });
+      }, { isolationLevel: 'Serializable', timeout: 120_000 });
+    }
     if (dto.status === 'COMPLETED') {
       const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId: id }, select: { userId: true } });
       const userIds = cycle.organizationSector === 'state' && cycle.periodType === 'ANNUAL'
@@ -431,6 +460,12 @@ export class HrmsPerformanceService {
       description: `Cập nhật kỳ đánh giá: ${res.name} (Trạng thái: ${res.status})`,
     });
     return res;
+  }
+
+  private async resolveParticipants(requested: string[] | undefined, start: Date, end: Date) {
+    const eligible = await this.eligibleParticipants(start, end);
+    if (requested && (new Set(requested).size !== requested.length || requested.some(id => !eligible.some(user => user.id === id)))) throw new BadRequestException('Danh sách đối tượng KPI có nhân sự trùng hoặc không thuộc thời gian đánh giá');
+    return requested ?? eligible.map(user => user.id);
   }
 
   private publicComparableGroup(orgUnitId: string | null, jobTitle: string | null) {
@@ -602,6 +637,10 @@ export class HrmsPerformanceService {
   async createGoal(actor: AuthUser, dto: CreateGoalDto) {
     if (Boolean(dto.userId) === Boolean(dto.orgUnitId)) throw new BadRequestException('Chọn đúng một phạm vi giao: cá nhân hoặc đơn vị tổ chức');
     const cycle = await this.assertActive(dto.cycleId);
+    const eligibleIds = cycle.organizationSector === 'enterprise'
+      ? [...new Set([...cycle.participantIds, ...(await this.eligibleParticipants(cycle.startDate, cycle.endDate)).map(user => user.id)])]
+      : null;
+    if (eligibleIds && dto.userId && !eligibleIds.includes(dto.userId)) throw new ConflictException('Nhân sự không thuộc thời gian đánh giá của kỳ');
     if (cycle.organizationSector === 'state' && cycle.periodType === 'ANNUAL') throw new BadRequestException('Kỳ tổng hợp năm nhận kết quả từ kỳ tháng/quý; hãy giao mục tiêu ở kỳ theo dõi định kỳ');
     const goalItems = dto.goals?.length
       ? dto.goals.map(item => ({
@@ -640,7 +679,7 @@ export class HrmsPerformanceService {
     if (dto.userId) {
       if (dto.userId === actor.id) throw new BadRequestException('Không thể tự giao KPI cho chính mình; mục tiêu cần được giao và chấm bởi người khác');
       const user = await this.prisma.user.findFirst({
-        where: { id: dto.userId, status: 'ACTIVE', deletedAt: null, employmentStatus: { in: ['ACTIVE', 'PROBATION'] } },
+        where: { id: dto.userId, deletedAt: null, ...(eligibleIds ? {} : { status: 'ACTIVE' as const, employmentStatus: { in: ['ACTIVE', 'PROBATION'] as ('ACTIVE' | 'PROBATION')[] } }) },
         select: { id: true, fullName: true },
       });
       if (!user) throw new NotFoundException('Nhân viên không còn làm việc hoặc không tồn tại trong hồ sơ HR');
@@ -666,8 +705,8 @@ export class HrmsPerformanceService {
       }
       recipients = await this.prisma.user.findMany({
         where: {
-          orgUnitId: { in: [...unitIds] }, status: 'ACTIVE', deletedAt: null,
-          employmentStatus: { in: ['ACTIVE', 'PROBATION'] },
+          orgUnitId: { in: [...unitIds] }, deletedAt: null,
+          ...(eligibleIds ? { id: { in: cycle.participantScope === 'SELECTED' ? cycle.participantIds : eligibleIds } } : { status: 'ACTIVE' as const, employmentStatus: { in: ['ACTIVE', 'PROBATION'] as ('ACTIVE' | 'PROBATION')[] } }),
         },
         select: { id: true, fullName: true },
         orderBy: [{ employeeCode: 'asc' }, { fullName: 'asc' }],
@@ -681,7 +720,10 @@ export class HrmsPerformanceService {
     }
 
     const recipientIds = recipients.map(user => user.id);
+    if (cycle.organizationSector === 'enterprise' && cycle.participantScope === 'SELECTED' && recipientIds.some(id => !cycle.participantIds.includes(id))) throw new ConflictException('Nhân sự không thuộc đối tượng đã chọn của kỳ KPI');
     const createdCount = await this.prisma.$transaction(async tx => {
+      const current = await tx.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id: cycle.id } });
+      if (current.status !== 'ACTIVE') throw new ConflictException('Kỳ đánh giá đã đóng');
       const existing = await tx.hrmsAppraisalGoal.findMany({
         where: { cycleId: dto.cycleId, userId: { in: recipientIds } },
         select: { userId: true, kraTitle: true, weightage: true, criteriaGroup: true },
