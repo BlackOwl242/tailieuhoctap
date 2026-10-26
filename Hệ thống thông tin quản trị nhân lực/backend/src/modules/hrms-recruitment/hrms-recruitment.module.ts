@@ -1,3 +1,4 @@
+import { salaryBandForDate } from '../../common/salary-band-version';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { dateKey, workDate } from '../../common/hr-time';
@@ -313,8 +314,8 @@ export class HrmsRecruitmentService {
       const rounds = await tx.hrmsInterviewRound.findMany({ where: { applicantId: app.id, status: 'COMPLETED' }, orderBy: { scheduledAt: 'asc' } });
       if (rounds.length < app.jobOpening.minimumInterviewRounds) throw new ConflictException(`Cần đủ ${app.jobOpening.minimumInterviewRounds} vòng phỏng vấn có kết quả`);
       if (rounds.some(round => round.recommendation === 'REJECT') || !['HIRE', 'STRONG_HIRE'].includes(rounds[rounds.length - 1]?.recommendation ?? 'HOLD')) throw new ConflictException('Chỉ lập đề nghị khi kết quả phỏng vấn gần nhất đề xuất nhận và không còn vòng nào đánh giá loại');
-      const band = app.jobOpening.salaryBandId ? await tx.hrmsSalaryBand.findUnique({ where: { id: app.jobOpening.salaryBandId } }) : null;
       const joiningDate = dateKey(dto.joiningDate);
+      const band = await salaryBandForDate(tx, app.jobOpening.salaryBandId, joiningDate);
       if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== 'MONTHLY' || band.effectiveFrom > joiningDate || (band.effectiveTo && band.effectiveTo < joiningDate)) throw new ConflictException('Khung lương tháng của vị trí không còn hiệu lực vào ngày nhận việc');
       if (dto.offeredSalary < band.minSalary || dto.offeredSalary > band.maxSalary) throw new ConflictException(`Mức đề nghị phải nằm trong khung ${band.minSalary.toLocaleString('vi-VN')}–${band.maxSalary.toLocaleString('vi-VN')} đồng/tháng`);
       const request = app.jobOpening.requisitionId ? await tx.jobRequisition.findUnique({ where: { id: app.jobOpening.requisitionId } }) : null;

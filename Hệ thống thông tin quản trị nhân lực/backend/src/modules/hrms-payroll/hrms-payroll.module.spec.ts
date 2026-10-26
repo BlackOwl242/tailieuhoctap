@@ -56,6 +56,15 @@ describe('Payroll employment dates and confirmed overtime', () => {
     db.contract.findMany.mockResolvedValue([{ type: 'INDEFINITE', status: 'ACTIVE', startDate: new Date('2026-10-20'), baseSalary: 30_000_000, endDate: null }]);
     await expect(service.createPayrollRun('hr', { periodName: 'October', fromDate: '2026-10-01', toDate: '2026-10-31' })).rejects.toThrow('2026-10-15');
   });
+  it('keeps the configured salary structure when an approved band version changes', async () => {
+    const { db, service } = setup();
+    const user = (await db.user.findMany())[0];
+    user.jobTitle = 'Chuyên viên'; user.salaryBandId = 'old-band';
+    db.hrmsSalaryBand.findMany.mockResolvedValue([{ id: 'new-band', code: 'ENG-02', effectiveFrom: new Date('2026-10-01'), effectiveTo: null, jobTitles: ['Chuyên viên'], compensationBasis: 'MONTHLY', minSalary: 20_000_000, midSalary: 30_000_000, maxSalary: 40_000_000 }]);
+    db.hrmsSalaryStructure.findMany.mockResolvedValue([{ id: 'structure', name: 'Phụ cấp chuyên viên', salaryBandId: 'old-band', salaryBand: { code: 'ENG-02', effectiveFrom: new Date('2026-09-01') }, items: [] }]);
+    await service.createPayrollRun('hr', { periodName: 'October', fromDate: '2026-10-01', toDate: '2026-10-31' });
+    expect(db.hrmsPayrollSlip.create.mock.calls[0][0].data.breakdown.calculation.salaryStructureName).toBe('Phụ cấp chuyên viên');
+  });
   it('does not pay approved plans without actual confirmation', async () => {
     const { db, service } = setup([{ workDate: new Date('2026-10-16'), status: 'APPROVED', hours: 4, nightHours: 0, dayCategory: 'WEEKDAY', actualConfirmedAt: null }]);
     await service.createPayrollRun('hr', { periodName: 'October', fromDate: '2026-10-01', toDate: '2026-10-31' });

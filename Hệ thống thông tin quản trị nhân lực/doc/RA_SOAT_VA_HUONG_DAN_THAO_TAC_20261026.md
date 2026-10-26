@@ -1,5 +1,7 @@
 # Rà soát bổ sung và làm rõ thao tác — 26/10/2026
 
+**Cập nhật triển khai:** đã áp dụng bản sửa và hai migration vào Docker local đang phục vụ `localhost:8080` ngày 26/10. Xem [biên bản triển khai](TRIEN_KHAI_DOCKER_20261026.md). Các ghi nhận “chưa áp dụng CSDL chính” bên dưới mô tả thời điểm hoàn tất kiểm thử trước triển khai.
+
 ## Kết quả
 
 Đợt rà soát tiếp nối bản sửa ngày 24/10, tập trung các luồng công, lương, OT, phép, công tác phí, tài sản, thử việc và KPI. Đã xử lý thêm các đường sai trạng thái/quyền và bổ sung hướng dẫn trực tiếp trên giao diện. Không kết luận hệ thống đã hết mọi lỗ hổng.

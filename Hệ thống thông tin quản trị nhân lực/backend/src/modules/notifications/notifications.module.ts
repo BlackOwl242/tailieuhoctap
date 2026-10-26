@@ -54,12 +54,12 @@ export class NotificationsController {
       add('overtime', 'Đề nghị làm thêm giờ chờ duyệt', 'Các đề nghị trong phạm vi bạn phụ trách.', overtime, '/overtime');
       add('attendance', 'Giải trình chấm công chờ duyệt', 'Yêu cầu bổ sung hoặc điều chỉnh công.', regularizations, '/attendance');
     }
+    if (isDirector || roles.has('KM_MANAGER')) {
+      const bands = await this.prisma.hrmsSalaryBand.count({ where: { status: 'DRAFT', createdById: { not: user.id } } });
+      add('salary-bands', 'Khung lương chờ phê duyệt', 'Phụ trách quản trị nhân sự duyệt bản nháp; người lập/sửa gần nhất không được tự duyệt.', bands, '/salary-bands');
+    }
     if (isDirector) {
-      const [bands, payroll] = await Promise.all([
-        this.prisma.hrmsSalaryBand.count({ where: { status: 'DRAFT', createdById: { not: user.id } } }),
-        this.prisma.hrmsPayrollRun.count({ where: { status: 'REVIEWED' } }),
-      ]);
-      add('salary-bands', 'Khung lương chờ phê duyệt', 'Bản nháp do nhân sự trình Ban Giám đốc.', bands, '/salary-bands');
+      const payroll = await this.prisma.hrmsPayrollRun.count({ where: { status: 'REVIEWED' } });
       add('payroll', 'Kỳ lương chờ duyệt', 'Kiểm tra bảng lương đã được nhân sự rà soát.', payroll, '/payroll-engine');
     }
     if (roles.has('ACCOUNTANT') || roles.has('ADMIN')) {

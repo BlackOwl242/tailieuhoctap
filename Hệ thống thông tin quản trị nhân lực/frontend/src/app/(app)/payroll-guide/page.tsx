@@ -13,7 +13,7 @@ const enterpriseSteps = [
   {
     number: '1',
     title: 'Xác định mức trả cho công việc',
-    text: 'Doanh nghiệp xem trách nhiệm của vị trí, yêu cầu kinh nghiệm và năng lực, mức trả trên thị trường, khả năng chi trả và sự công bằng giữa các vị trí. Từ đó HR đề xuất một khoảng lương thấp–tham chiếu–cao cho từng nhóm công việc; Ban Giám đốc duyệt khoảng này.',
+    text: 'Doanh nghiệp xem trách nhiệm của vị trí, yêu cầu kinh nghiệm và năng lực, mức trả trên thị trường, khả năng chi trả và sự công bằng giữa các vị trí. HR lập bản nháp khoảng lương thấp–tham chiếu–cao cho từng nhóm công việc. Phụ trách quản trị nhân sự (KM_MANAGER) duyệt thông thường cả khung mới và bản điều chỉnh, khác tài khoản lập/sửa gần nhất; không cần thêm bước duyệt của Giám đốc. Ban Giám đốc (BOD) hoặc Quản trị viên (ADMIN) vẫn có thể duyệt khi cần: mở Khung lương vị trí → lọc Chờ duyệt → menu ⋮ → Xem chi tiết → Duyệt khung lương → Xác nhận duyệt.',
     link: '/salary-bands',
     linkText: 'Mở khung lương theo vị trí',
     icon: Scale,

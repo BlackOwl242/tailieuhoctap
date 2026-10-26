@@ -1,3 +1,4 @@
+import { salaryBandForDate } from '../../common/salary-band-version';
 import { BadRequestException, Body, ConflictException, Controller, ForbiddenException, Get, Injectable, Module, Param, Patch, Post } from '@nestjs/common';
 import { IsDateString, IsIn, IsNumber, IsOptional, IsString, Max, Min, MinLength } from 'class-validator';
 import { CurrentUser, Roles } from '../../common/decorators';
@@ -39,8 +40,8 @@ export class HrWorkflowsService {
   constructor(private readonly prisma: PrismaService, private readonly access: HrAccessService, private readonly effects: PersonnelEffectsService) {}
   private async assertProbationSalaryBand(db: PrismaService | Prisma.TransactionClient, userId: string, salary: number, effectiveDate: Date) {
     const user = await db.user.findUnique({ where: { id: userId }, select: { salaryBandId: true, jobTitle: true } });
-    const band = user?.salaryBandId ? await db.hrmsSalaryBand.findUnique({ where: { id: user.salaryBandId } }) : null;
     const date = dateKey(effectiveDate);
+    const band = await salaryBandForDate(db, user?.salaryBandId, date);
     const titleMatches = !band?.jobTitles.length || band.jobTitles.some(title => title.trim().toLocaleLowerCase('vi') === (user?.jobTitle ?? '').trim().toLocaleLowerCase('vi'));
     if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== 'MONTHLY' || band.effectiveFrom > date || (band.effectiveTo && band.effectiveTo < date) || !titleMatches || salary < band.minSalary || salary > band.maxSalary) {
       throw new ConflictException('Mức lương chính thức phải nằm trong khung lương tháng đã duyệt, đúng chức danh và còn hiệu lực vào ngày nhận chính thức.');

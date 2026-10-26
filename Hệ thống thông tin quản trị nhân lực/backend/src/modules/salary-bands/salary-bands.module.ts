@@ -2,11 +2,12 @@ import { BadRequestException, ConflictException, Injectable, Module, NotFoundExc
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsDateString, IsIn, IsInt, IsNumber, IsOptional, IsString, MaxLength, Min, MinLength } from 'class-validator';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
-import { dateKey } from '../../common/hr-time';
+import { dateKey, DAY_MS, workDate } from '../../common/hr-time';
 
 export class UpsertSalaryBandDto {
   @ApiProperty({ example: 'ENG-02' }) @IsString() @MinLength(2) @MaxLength(40) code!: string;
@@ -61,6 +62,43 @@ export class SalaryBandsService {
     if (new Set(dto.jobTitles.map(title => title.trim().toLocaleLowerCase('vi'))).size !== dto.jobTitles.length) throw new BadRequestException('Chức danh áp dụng không được lặp');
   }
 
+  // Serialize changes to effective intervals, including approvals of different drafts.
+  private async locked<T>(operation: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+    return this.prisma.$transaction(async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(72410326)`;
+      return operation(tx);
+    });
+  }
+
+  private async validateAmendment(tx: Prisma.TransactionClient, sourceId: string, dto: Pick<UpsertSalaryBandDto, 'code' | 'effectiveFrom'>) {
+    const source = await tx.hrmsSalaryBand.findUnique({ where: { id: sourceId } });
+    if (!source) throw new NotFoundException('Không tìm thấy khung lương gốc');
+    if (source.status !== 'ACTIVE') throw new ConflictException('Chỉ điều chỉnh khung lương đã duyệt và chưa ngừng áp dụng');
+    const from = dateKey(dto.effectiveFrom);
+    if (dto.code !== source.code) throw new BadRequestException('Bản điều chỉnh phải giữ mã khung lương gốc');
+    if (from <= workDate() || from <= source.effectiveFrom) throw new BadRequestException('Bản điều chỉnh phải có hiệu lực từ ngày mai trở đi và sau ngày bắt đầu của bản gốc');
+    if (source.effectiveTo && from > source.effectiveTo) throw new ConflictException('Ngày điều chỉnh phải nằm trong thời gian hiệu lực của bản gốc');
+    return source;
+  }
+
+  private draftData(dto: UpsertSalaryBandDto) {
+    return { ...dto, compensationBasis: dto.compensationBasis ?? 'MONTHLY' as const,
+      jobTitles: dto.jobTitles.map(title => title.trim()).filter(Boolean),
+      effectiveFrom: dateKey(dto.effectiveFrom), effectiveTo: dto.effectiveTo ? dateKey(dto.effectiveTo) : null,
+      reviewCycleMonths: dto.reviewCycleMonths ?? 12 };
+  }
+
+  async amend(actor: AuthUser, id: string, dto: UpsertSalaryBandDto) {
+    this.validate(dto);
+    const result = await this.locked(async tx => {
+      await this.validateAmendment(tx, id, dto);
+      if (await tx.hrmsSalaryBand.findUnique({ where: { supersedesId: id } })) throw new ConflictException('Khung này đã có bản điều chỉnh. Hãy mở bản điều chỉnh hiện có để tiếp tục');
+      return tx.hrmsSalaryBand.create({ data: { ...this.draftData(dto), status: 'DRAFT', createdById: actor.id, supersedesId: id } });
+    });
+    await this.audit.log({ actorId: actor.id, action: 'SALARY_BAND_AMENDMENT_CREATED', entityType: 'HrmsSalaryBand', entityId: result.id, after: { ...dto, supersedesId: id } });
+    return result;
+  }
+
   async create(actor: AuthUser, dto: UpsertSalaryBandDto) {
     this.validate(dto);
     const result = await this.prisma.hrmsSalaryBand.create({ data: {
@@ -79,41 +117,45 @@ export class SalaryBandsService {
 
   async update(actor: AuthUser, id: string, dto: UpsertSalaryBandDto) {
     this.validate(dto);
-    const current = await this.prisma.hrmsSalaryBand.findUnique({ where: { id } });
-    if (!current) throw new NotFoundException('Không tìm thấy khung lương');
-    if (current.status !== 'DRAFT') throw new ConflictException('Khung đã được duyệt; hãy tạo phiên bản mới để giữ lịch sử');
-    const result = await this.prisma.hrmsSalaryBand.update({ where: { id }, data: {
-      ...dto,
-      compensationBasis: dto.compensationBasis ?? 'MONTHLY',
-      jobTitles: dto.jobTitles.map(title => title.trim()).filter(Boolean),
-      effectiveFrom: dateKey(dto.effectiveFrom),
-      effectiveTo: dto.effectiveTo ? dateKey(dto.effectiveTo) : null,
-      reviewCycleMonths: dto.reviewCycleMonths ?? 12,
-    } });
+    const { current, result } = await this.locked(async tx => {
+      const current = await tx.hrmsSalaryBand.findUnique({ where: { id } });
+      if (!current) throw new NotFoundException('Không tìm thấy khung lương');
+      if (current.status !== 'DRAFT') throw new ConflictException('Khung đã được duyệt; hãy chọn Điều chỉnh khung lương để giữ lịch sử');
+      if (current.supersedesId) await this.validateAmendment(tx, current.supersedesId, dto);
+      const result = await tx.hrmsSalaryBand.update({ where: { id }, data: { ...this.draftData(dto), createdById: actor.id } });
+      return { current, result };
+    });
     await this.audit.log({ actorId: actor.id, action: 'SALARY_BAND_UPDATED', entityType: 'HrmsSalaryBand', entityId: id, before: current, after: dto });
     return result;
   }
 
   async activate(actor: AuthUser, id: string) {
-    const band = await this.prisma.hrmsSalaryBand.findUnique({ where: { id } });
+    const result = await this.locked(async tx => {
+    const band = await tx.hrmsSalaryBand.findUnique({ where: { id } });
     if (!band) throw new NotFoundException('Không tìm thấy khung lương');
     if (band.status !== 'DRAFT') throw new ConflictException('Chỉ được duyệt khung đang ở trạng thái nháp');
     if (band.createdById === actor.id) throw new ConflictException('Người lập khung lương không được tự phê duyệt');
-    const overlap = await this.prisma.hrmsSalaryBand.findFirst({
-      where: { code: band.code, status: 'ACTIVE', effectiveFrom: { lte: band.effectiveTo ?? new Date('9999-12-31') }, OR: [{ effectiveTo: null }, { effectiveTo: { gte: band.effectiveFrom } }] },
+    if (band.supersedesId) await this.validateAmendment(tx, band.supersedesId, { code: band.code, effectiveFrom: band.effectiveFrom.toISOString() });
+    const overlap = await tx.hrmsSalaryBand.findFirst({
+      where: { id: { not: band.supersedesId ?? undefined }, code: band.code, status: 'ACTIVE', effectiveFrom: { lte: band.effectiveTo ?? new Date('9999-12-31') }, OR: [{ effectiveTo: null }, { effectiveTo: { gte: band.effectiveFrom } }] },
     });
     if (overlap) throw new ConflictException('Thời gian hiệu lực bị trùng với phiên bản khung lương đã duyệt');
-    const result = await this.prisma.hrmsSalaryBand.update({ where: { id }, data: { status: 'ACTIVE', approvedById: actor.id, approvedAt: new Date() } });
+    if (band.supersedesId) await tx.hrmsSalaryBand.update({ where: { id: band.supersedesId }, data: { effectiveTo: new Date(band.effectiveFrom.getTime() - DAY_MS) } });
+    return tx.hrmsSalaryBand.update({ where: { id }, data: { status: 'ACTIVE', approvedById: actor.id, approvedAt: new Date() } });
+    });
     await this.linkUnassignedProfilesToUniqueEffectiveBands();
-    await this.audit.log({ actorId: actor.id, action: 'SALARY_BAND_APPROVED', entityType: 'HrmsSalaryBand', entityId: id });
+    await this.audit.log({ actorId: actor.id, action: 'SALARY_BAND_APPROVED', entityType: 'HrmsSalaryBand', entityId: id, after: { supersedesId: result.supersedesId, effectiveFrom: result.effectiveFrom } });
     return result;
   }
 
   async deactivate(actor: AuthUser, id: string) {
-    const band = await this.prisma.hrmsSalaryBand.findUnique({ where: { id } });
+    const result = await this.locked(async tx => {
+    const band = await tx.hrmsSalaryBand.findUnique({ where: { id } });
     if (!band) throw new NotFoundException('Không tìm thấy khung lương');
     if (band.status !== 'ACTIVE') throw new ConflictException('Chỉ được ngừng áp dụng khung đang hiệu lực');
-    const result = await this.prisma.hrmsSalaryBand.update({ where: { id }, data: { status: 'INACTIVE' } });
+    if (await tx.hrmsSalaryBand.findFirst({ where: { supersedesId: id, status: 'DRAFT' } })) throw new ConflictException('Khung đang có bản điều chỉnh chờ duyệt; hãy xử lý bản điều chỉnh trước');
+    return tx.hrmsSalaryBand.update({ where: { id }, data: { status: 'INACTIVE' } });
+    });
     await this.audit.log({ actorId: actor.id, action: 'SALARY_BAND_DEACTIVATED', entityType: 'HrmsSalaryBand', entityId: id });
     return result;
   }
@@ -130,7 +172,9 @@ export class SalaryBandsController {
   @Post() create(@CurrentUser() actor: AuthUser, @Body() dto: UpsertSalaryBandDto) { return this.service.create(actor, dto); }
   @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
   @Patch(':id') update(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: UpsertSalaryBandDto) { return this.service.update(actor, id, dto); }
-  @Roles('ADMIN', 'BOD')
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
+  @Post(':id/amend') amend(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: UpsertSalaryBandDto) { return this.service.amend(actor, id, dto); }
+  @Roles('ADMIN', 'KM_MANAGER', 'BOD')
   @Post(':id/approve') approve(@CurrentUser() actor: AuthUser, @Param('id') id: string) { return this.service.activate(actor, id); }
   @Roles('ADMIN', 'BOD')
   @Post(':id/deactivate') deactivate(@CurrentUser() actor: AuthUser, @Param('id') id: string) { return this.service.deactivate(actor, id); }

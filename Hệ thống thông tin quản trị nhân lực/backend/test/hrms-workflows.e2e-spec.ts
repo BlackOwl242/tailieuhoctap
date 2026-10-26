@@ -24,7 +24,7 @@ const RUN = process.env.RUN_E2E === '1';
     prisma = app.get(PrismaService);
 
     const suffix = `${Date.now()}`;
-    const roles = ['ADMIN', 'USER', 'HR_CB', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER', 'AUDITOR'];
+    const roles = ['ADMIN', 'USER', 'KM_MANAGER', 'HR_CB', 'HR_RECRUITER', 'ACCOUNTANT', 'BOD', 'LINE_MANAGER', 'AUDITOR'];
     for (const code of roles) await prisma.role.upsert({ where: { code }, create: { code, name: code }, update: {} });
     const org = await prisma.orgUnit.create({ data: { name: `E2E Unit ${suffix}`, code: `E2E-${suffix}` } });
     const passwordHash = await bcrypt.hash('E2e-Only-Password!2026', 4);
@@ -40,6 +40,7 @@ const RUN = process.env.RUN_E2E === '1';
       ADMIN: await makeUser('ADMIN', 'admin'),
       USER: await makeUser('USER', 'employee', { employeeCode: `E2E-${suffix}`, baseSalary: 30_000_000, taxDependentCount: 1, minimumWageRegion: 'I', bankAccount: '990000000001', bankName: 'E2E Bank' }),
       HR_CB: await makeUser('HR_CB', 'manager'),
+      KM_MANAGER: await makeUser('KM_MANAGER', 'hr-lead'),
       HR_RECRUITER: await makeUser('HR_RECRUITER', 'recruiter'),
       HR_RECRUITER_2: await makeUser('HR_RECRUITER', 'recruiter-2'),
       ACCOUNTANT: await makeUser('ACCOUNTANT', 'accountant'),
@@ -59,6 +60,64 @@ const RUN = process.env.RUN_E2E === '1';
   }, 60_000);
 
   afterAll(async () => { await app?.close(); });
+
+  it('lets KM_MANAGER approve salary bands and amendments while enforcing separation of duties', async () => {
+    const payload = { code: `KM-${Date.now()}`, name: 'Khung phân quyền nhân sự', levelTitle: 'Chuyên viên', minSalary: 10_000_000, midSalary: 15_000_000, maxSalary: 20_000_000, jobTitles: ['Chuyên viên phân quyền'], criteria: 'Đáp ứng các tiêu chí chuyên môn đã công bố.', benchmarkSource: 'Căn cứ ngân sách nội bộ đã phê duyệt.', effectiveFrom: '2026-01-01' };
+    const post = (path: string, role: string, body = {}) => request(app.getHttpServer()).post(`/api/v1/salary-bands${path}`).set('Authorization', `Bearer ${tokens[role]}`).send(body);
+    const band = await post('', 'HR_CB', payload).expect(201);
+    for (const role of ['HR_CB', 'HR_RECRUITER', 'ACCOUNTANT', 'USER']) await post(`/${band.body.id}/approve`, role).expect(403);
+    const items = await request(app.getHttpServer()).get('/api/v1/notifications/action-items').set('Authorization', `Bearer ${tokens.KM_MANAGER}`).expect(200);
+    expect(items.body.items).toEqual(expect.arrayContaining([expect.objectContaining({ key: 'salary-bands', count: expect.any(Number) })]));
+    expect(items.body.items.some((item: { key: string }) => item.key === 'payroll')).toBe(false);
+    await post(`/${band.body.id}/approve`, 'KM_MANAGER').expect(201);
+    await post(`/${band.body.id}/deactivate`, 'KM_MANAGER').expect(403);
+    const from = new Date(Date.now() + 3 * 86_400_000).toISOString().slice(0, 10);
+    const amendment = await post(`/${band.body.id}/amend`, 'HR_CB', { ...payload, effectiveFrom: from }).expect(201);
+    await request(app.getHttpServer()).patch(`/api/v1/salary-bands/${amendment.body.id}`).set('Authorization', `Bearer ${tokens.KM_MANAGER}`).send({ ...payload, effectiveFrom: from, midSalary: 16_000_000 }).expect(200);
+    await post(`/${amendment.body.id}/approve`, 'KM_MANAGER').expect(409);
+    const selfCreated = await post('', 'KM_MANAGER', { ...payload, code: `SELF-${Date.now()}` }).expect(201);
+    await post(`/${selfCreated.body.id}/approve`, 'KM_MANAGER').expect(409);
+    // Another authorized reviewer can approve the edited amendment without a BOD-only step.
+    await post(`/${amendment.body.id}/approve`, 'ADMIN').expect(201);
+    const ownItems = await request(app.getHttpServer()).get('/api/v1/notifications/action-items').set('Authorization', `Bearer ${tokens.KM_MANAGER}`).expect(200);
+    expect(ownItems.body.items.some((item: { key: string }) => item.key === 'salary-bands')).toBe(false);
+  });
+
+  it('amends approved salary bands without rewriting history or overlapping effective versions', async () => {
+    const day = (offset: number) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10);
+    const payload = { code: `AMEND-${Date.now()}`, name: 'Khung kiểm thử điều chỉnh', levelTitle: 'Chuyên viên', minSalary: 10_000_000, midSalary: 15_000_000, maxSalary: 20_000_000, jobTitles: ['Chuyên viên kiểm thử điều chỉnh'], criteria: 'Đáp ứng các tiêu chí chuyên môn đã công bố.', benchmarkSource: 'Ngân sách và khảo sát nội bộ đã được phê duyệt.', effectiveFrom: day(-2) };
+    const post = (url: string, role: string, body = {}) => request(app.getHttpServer()).post(`/api/v1/salary-bands${url}`).set('Authorization', `Bearer ${tokens[role]}`).send(body);
+    const original = await post('', 'HR_CB', payload).expect(201);
+    const id = original.body.id;
+    await post(`/${id}/approve`, 'BOD').expect(201);
+    await request(app.getHttpServer()).patch(`/api/v1/salary-bands/${id}`).set('Authorization', `Bearer ${tokens.ADMIN}`).send(payload).expect(409);
+    const amendment = { ...payload, midSalary: 18_000_000, maxSalary: 25_000_000, effectiveFrom: day(3) };
+    await post(`/${id}/amend`, 'HR_RECRUITER', amendment).expect(403);
+    await post(`/${id}/amend`, 'ADMIN', { ...amendment, effectiveFrom: day(-1) }).expect(400);
+    await post(`/${id}/amend`, 'ADMIN', { ...amendment, code: 'DIFFERENT' }).expect(400);
+    const attempts = await Promise.all([post(`/${id}/amend`, 'ADMIN', amendment), post(`/${id}/amend`, 'ADMIN', amendment)]);
+    expect(attempts.map(response => response.status).sort()).toEqual([201, 409]);
+    const draft = attempts.find(response => response.status === 201)!.body;
+    expect(draft).toMatchObject({ supersedesId: id, status: 'DRAFT', midSalary: 18_000_000 });
+    expect(await prisma.hrmsSalaryBand.findUnique({ where: { id } })).toMatchObject({ effectiveTo: null, midSalary: 15_000_000 });
+    await post(`/${draft.id}/approve`, 'ADMIN').expect(409);
+    // A conflicting approved interval must roll the whole approval back.
+    const conflict = await prisma.hrmsSalaryBand.create({ data: { ...payload, effectiveFrom: new Date(day(4)), status: 'ACTIVE', createdById: managerId, approvedById: managerId, approvedAt: new Date() } });
+    await post(`/${draft.id}/approve`, 'BOD').expect(409);
+    expect((await prisma.hrmsSalaryBand.findUniqueOrThrow({ where: { id } })).effectiveTo).toBeNull();
+    expect((await prisma.hrmsSalaryBand.findUniqueOrThrow({ where: { id: draft.id } })).status).toBe('DRAFT');
+    await prisma.hrmsSalaryBand.delete({ where: { id: conflict.id } });
+    await post(`/${draft.id}/approve`, 'BOD').expect(201);
+    expect((await prisma.hrmsSalaryBand.findUniqueOrThrow({ where: { id } })).effectiveTo?.toISOString().slice(0, 10)).toBe(day(2));
+    await post(`/${draft.id}/approve`, 'BOD').expect(409);
+    // A profile retains its historical link while queries select the effective version.
+    const user = await prisma.user.create({ data: { email: `amend-${Date.now()}@example.test`, fullName: 'Kiểm thử phiên bản khung', passwordHash: 'fixture', salaryBandId: id, baseSalary: 15_000_000, jobTitle: payload.jobTitles[0] } });
+    const before = await request(app.getHttpServer()).get(`/api/v1/employees/${user.id}/compensation-basis?effectiveDate=${day(1)}`).set('Authorization', `Bearer ${tokens.HR_CB}`).expect(200);
+    const after = await request(app.getHttpServer()).get(`/api/v1/employees/${user.id}/compensation-basis?effectiveDate=${day(3)}`).set('Authorization', `Bearer ${tokens.HR_CB}`).expect(200);
+    expect(before.body.salaryBandId).toBe(id);
+    expect(after.body.salaryBandId).toBe(draft.id);
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: user.id } })).baseSalary).toBe(15_000_000);
+  });
 
   it('isolates expense ownership, delegated creation and line-manager scope', async () => {
     const stamp = Date.now();

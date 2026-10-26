@@ -189,33 +189,6 @@ export default function RolesManagementPage() {
     return map;
   }, [roles]);
 
-  const getRoleBadgeStyle = (code: string) => {
-    switch (code) {
-      case 'ADMIN':
-        return 'bg-foreground text-background border-foreground font-semibold';
-      case 'BOD':
-        return 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 font-semibold';
-      case 'SHAREHOLDER':
-        return 'border-violet-500/40 bg-violet-500/10 text-violet-700 dark:text-violet-300 font-semibold';
-      case 'KM_MANAGER':
-        return 'border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-300 font-medium';
-      case 'LINE_MANAGER':
-        return 'border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-medium';
-      case 'HR_CB':
-        return 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-medium';
-      case 'ACCOUNTANT':
-        return 'border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-300 font-medium';
-      case 'HR_RECRUITER':
-        return 'border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300 font-medium';
-      case 'HR_TRAINER':
-        return 'border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 font-medium';
-      case 'AUDITOR':
-        return 'border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-300 font-medium';
-      default:
-        return 'border-border text-muted-foreground bg-muted/20';
-    }
-  };
-
   // Mutation cập nhật vai trò người dùng
   const updateUserRoleMutation = useMutation({
     mutationFn: async (vars: { id: string; roleCodes: string[] }) => {
@@ -332,16 +305,20 @@ export default function RolesManagementPage() {
     {
       key: 'roles',
       header: 'Vai trò hiện tại',
+      minWidth: 240,
       sortable: true,
       sortValue: (u) => u.roles[0] ?? '',
+      exportValue: (u) => roleLabelMap[u.roles[0] ?? 'USER'] ?? u.roles[0] ?? 'USER',
       render: (u) => {
-        const r = u.roles[0] ?? 'USER';
+        const code = u.roles[0] ?? 'USER';
+        const label = roleLabelMap[code] ?? code;
+        const suffix = ' (' + code + ')';
+        const name = label.endsWith(suffix) ? label.slice(0, -suffix.length) : label;
         return (
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded text-xs border ${getRoleBadgeStyle(r)}`}
-          >
-            {roleLabelMap[r] ?? r}
-          </span>
+          <div className="space-y-1 py-0.5">
+            <p className="text-sm font-medium leading-5 text-foreground">{name}</p>
+            {name !== code && <p className="font-mono text-xs leading-4 text-muted-foreground">{code}</p>}
+          </div>
         );
       },
     },

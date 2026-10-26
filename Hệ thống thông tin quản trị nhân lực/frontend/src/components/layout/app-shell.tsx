@@ -127,7 +127,6 @@ const DOMAINS: NavDomain[] = [
         items: [
           { href: '/personnel', label: 'Biến động nhân sự' },
           { href: '/salary-ranks', label: 'Ngạch, bậc lương khu vực công' },
-          { href: '/salary-bands', label: 'Khung lương vị trí' },
         ],
       },
     ],
@@ -174,22 +173,23 @@ const DOMAINS: NavDomain[] = [
     label: 'Tiền lương',
     shortLabel: 'Tiền lương',
     icon: Wallet,
-    roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'],
+    roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT', 'HR_RECRUITER'],
     folders: [
       {
         id: 'comp-payroll',
         label: 'Tiền lương & Quy chế',
         items: [
           { href: '/payroll-guide', label: 'Cách tính lương' },
-          { href: '/payroll-engine', label: 'Bảng tính lương' },
-          { href: '/payroll-engine?tab=policy', label: 'Chính sách & quy tắc lương' },
+          { href: '/salary-bands', label: 'Khung lương vị trí', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'HR_RECRUITER'] },
+          { href: '/payroll-engine', label: 'Bảng tính lương', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
+          { href: '/payroll-engine?tab=policy', label: 'Chính sách & quy tắc lương', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
         ],
       },
       {
         id: 'comp-benefits',
         label: 'Phúc lợi & Chi phí',
         items: [
-          { href: '/loans', label: 'Tạm ứng & Vay' },
+          { href: '/loans', label: 'Tạm ứng & Vay', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
           { href: '/expense-claims', label: 'Công tác phí' },
         ],
       },

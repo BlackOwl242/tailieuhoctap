@@ -1,160 +1,145 @@
-# ÔN NHANH 20 CÂU VẤN ĐÁP
+# TÓM TẮT NỘI DUNG VẤN ĐÁP
 
-**Mốc cập nhật: 26/10/2026. Dùng để tự nhắc ý sau khi đã đọc bản đầy đủ.**
+*Cập nhật đến ngày 26/10/2026.*
 
-Che phần trả lời, nhìn câu hỏi và tự nói. Mỗi câu cố gắng có: **khái niệm → ý chính → ví dụ**. Các cụm từ nhớ dưới đây là cách học, không phải nguyên văn giáo trình hay điều luật.
+## Câu 1. Thông tin
 
-## 1. Thông tin
+Thông tin là tri thức về các đối tượng, sự kiện, sự vật, quá trình hoặc ý tưởng, có ý nghĩa xác định trong một bối cảnh cụ thể. Trong HTTT quản lý, thông tin thường được tạo bằng tổ chức, xử lý và diễn giải dữ liệu.
 
-**Có ý nghĩa – giảm chưa biết – giúp quyết định.**
+## Câu 2. HTTT và dịch vụ công Hà Nội
 
-Thông tin là hiểu biết về đối tượng, sự việc trong bối cảnh cụ thể. Trong HTTT, thường hiểu là dữ liệu được xử lý, tổ chức và diễn giải có ý nghĩa với người dùng. Ví dụ: “còn 20 hồ sơ chưa xử lý” giúp bố trí công việc; chưa biết hạn thì chưa kết luận trễ hạn.
+Các chức năng chính: công khai thông tin; giải quyết TTHC; quản lý văn bản, công việc; kết nối và khai thác dữ liệu; tương tác, tiếp nhận phản ánh. Các kênh tiêu biểu: Cổng thông tin thành phố, Cổng DVC quốc gia, HTTT giải quyết TTHC, HanoiWork và iHanoi.
 
-## 2. Hà Nội: hệ thống và dịch vụ công
+Từ 1/7/2025, đầu mối truy cập DVC trực tuyến của Hà Nội là Cổng DVC quốc gia. Quy trình: tra cứu → đăng nhập → nộp → xử lý/bổ sung → thanh toán nếu có → nhận kết quả, đánh giá.
 
-**Công khai – giải quyết – điều hành – kết nối – lắng nghe.**
+Lợi ích: giảm đi lại, minh bạch, hỗ trợ giám sát. Tiêu chí đánh giá: thời gian, chi phí, số lần bổ sung/đi lại, đúng hạn, hài lòng; cần hoàn thiện liên thông, dữ liệu, độ ổn định và hỗ trợ tiếp cận.
 
-Nhớ năm nhóm: cổng thông tin; giải quyết TTHC; văn bản/công việc và HanoiWork; chia sẻ dữ liệu; tương tác qua iHanoi và kênh phản ánh. Hành trình: **tìm → đăng nhập → nộp → theo dõi/bổ sung → trả phí nếu có → nhận, đánh giá**.
+## Câu 3. Mã hóa và chất lượng thông tin
 
-Từ 1/7/2025, đầu mối truy cập DVC trực tuyến là Cổng DVC quốc gia; hệ thống xử lý của Hà Nội/chuyên ngành vẫn vận hành theo phân công. Đánh giá: giảm đi lại, minh bạch; cần cải thiện khả năng sử dụng, liên thông, độ ổn định và hỗ trợ. Đo bằng thời gian, số lần đi lại, giấy tờ nộp lại và hài lòng. [Thông báo Hà Nội](https://ttpvhcc.hanoi.gov.vn/tien-ich-cong-dan/tu-ngay-01-07-2025-nguoi-dan-thuc-hien-thu-tuc-hanh-chinh-tren-dia-ban-thanh-pho-ha-noi-se-thuc-hien-tren-cong-dich-vu-cong-quoc-gia-2850250629165651829.htm).
+Mã hóa là chuyển thông tin/dữ liệu sang dạng biểu diễn theo hệ ký hiệu và quy tắc xác định. Mã hóa bảo mật biến bản rõ thành bản mã bằng thuật toán mật mã và khóa để bảo vệ tính bí mật.
 
-## 3. Mã hóa và chất lượng thông tin
+Mã quản lý: tuần tự, theo nhóm/khối, phân cấp, gợi nhớ, ghép nối. Mật mã: đối xứng và bất đối xứng. Hàm băm không phải mã hóa giải mã bằng khóa; QR không tự bảo mật.
 
-**Biểu diễn theo quy tắc; thông tin cần đúng – đủ – kịp – hợp – tin – rõ.**
+Tiêu chí thông tin: chính xác, đầy đủ, kịp thời, phù hợp, tin cậy/kiểm chứng được, rõ ràng/nhất quán, tiếp cận/bảo vệ phù hợp, tính kinh tế.
 
-Lập mã quản lý: tuần tự, theo khối/nhóm, phân cấp, gợi nhớ, ghép nhiều phần. Nếu hỏi bảo mật: đối xứng dùng cùng khóa bí mật; bất đối xứng dùng cặp khóa. **QR/Unicode không tự bảo mật; hàm băm không có thao tác giải mã bằng khóa.**
+## Câu 4. Hai yếu tố, sinh trắc học, QR
 
-## 4. Hai yếu tố, sinh trắc, QR
+2FA yêu cầu hai yếu tố thuộc hai nhóm khác nhau: tri thức, sở hữu, sinh trắc. Lợi ích là giảm nguy cơ chiếm tài khoản khi một yếu tố bị lộ.
 
-**Giữ tài khoản – kiểm tra người – nhập dữ liệu nhanh.**
+Sinh trắc học nhận dạng tự động dựa trên đặc điểm sinh học và hành vi. Xác minh thường 1:1; định danh thường 1:N. Thuận tiện, hỗ trợ chống mạo danh nhưng có sai số và cần bảo vệ dữ liệu.
 
-Hai yếu tố thuộc hai nhóm khác nhau: **biết – có – đặc điểm gắn với mình**. Lộ mật khẩu vẫn còn rào cản thứ hai; hai mật khẩu chưa phải hai yếu tố. Sinh trắc dùng khuôn mặt, vân tay… để nhận dạng/xác minh, thuận tiện nhưng có thể sai hoặc bị giả mạo. QR giảm gõ sai, quét thanh toán/tra cứu nhanh; luôn kiểm tra đích đến, người nhận, số tiền. [NIST](https://www.nist.gov/itl/smallbusinesscyber/guidance-topic/multi-factor-authentication).
+QR là mã hai chiều, hỗ trợ đọc nhanh, giảm nhập liệu, chứa nhiều loại dữ liệu và có khả năng sửa lỗi trong giới hạn. Cần kiểm tra nguồn mã, địa chỉ đích và thông tin thanh toán.
 
-## 5. An toàn giao dịch ngân hàng
+## Câu 5. An toàn giao dịch ngân hàng
 
-**Đúng người – đúng tiền – đúng nơi – có dấu vết – luôn hoạt động.**
+Mục tiêu: bảo vệ tài sản, dữ liệu, tính liên tục của thanh toán và niềm tin. Yêu cầu: xác thực, bảo mật, toàn vẹn, sẵn sàng, truy vết.
 
-Quan trọng vì liên quan tài sản, dữ liệu, tranh chấp và niềm tin. Yêu cầu: bí mật, toàn vẹn, sẵn sàng, xác thực và truy vết. Ngân hàng: xác thực, bảo vệ dữ liệu, phân quyền, cảnh báo, đối soát, dự phòng. Người dùng: ứng dụng chính thức, giữ OTP/PIN, kiểm tra trước xác nhận, báo ngay khi bất thường.
+Ngân hàng: nhận biết khách hàng, xác thực phù hợp, mã hóa, phân quyền, hạn mức, phát hiện bất thường, đối soát, dự phòng. Khách hàng: bảo vệ thông tin xác thực, kiểm tra giao dịch, sử dụng kênh chính thức.
 
-Luồng: **khởi tạo → kiểm tra/xác thực → xử lý → xác nhận → đối soát/lưu → tra soát**. Đã bị trừ tiền nhưng chưa rõ kết quả thì kiểm tra, không vội chuyển lặp. [Nguồn quy định an toàn ngân hàng](https://div.gov.vn/tang-cuong-an-toan-bao-mat-cho-dich-vu-truc-tuyen-trong-nganh-ngan-hang).
+Chu trình: khởi tạo → kiểm tra/xác thực → xử lý, hạch toán → xác nhận → đối soát/lưu trữ → tra soát.
 
-## 6. Dữ liệu và đặc tính
+## Câu 6. Dữ liệu và đặc tính
 
-**Được ghi – nhiều dạng – có ngữ cảnh – thay đổi – cần kiểm tra – cần bảo vệ.**
+Dữ liệu là sự biểu diễn thông tin theo một dạng quy ước, phù hợp cho truyền đạt, diễn giải hoặc xử lý.
 
-Dữ liệu biểu diễn sự kiện/thuộc tính bằng chữ, số, ảnh… Có thể lưu, sao chép, truyền và xử lý; có quan hệ, có thể sai/thiếu/trùng và có mức nhạy cảm. Dữ liệu tốt: chính xác, đủ, hợp lệ, nhất quán, kịp, hạn chế trùng. Ví dụ: chấm công là đầu vào; báo cáo tổng hợp làm thêm là thông tin quản lý.
+Đặc tính: đa dạng hình thức/cấu trúc; có ngữ cảnh, quan hệ; lưu trữ, sao chép, truyền, xử lý được; có thể thay đổi; có giá trị và mức nhạy cảm khác nhau.
 
-## 7. Mail Merge
+Chất lượng: chính xác, đầy đủ, hợp lệ, nhất quán, kịp thời, duy nhất.
 
-**Một mẫu + một danh sách → nhiều giấy mời.**
+## Câu 7. Mail Merge
 
-**Excel mỗi người một dòng → Word soạn mẫu → Mailings/Start Mail Merge/Letters → Select Recipients → Insert Merge Field → Preview Results → Finish & Merge.** Chọn Edit Individual Documents/All để kiểm tra trước in. Không tự gõ tên trường thay lệnh chèn; kiểm tra xưng hô, ngày và tên dài. [Microsoft](https://support.microsoft.com/en-us/word/use-mail-merge-to-personalize-letters).
+Mail Merge kết hợp tài liệu mẫu với nguồn dữ liệu để tạo hàng loạt tài liệu có thông tin riêng theo từng bản ghi.
 
-## 8. CSDL và mô hình
+Excel mỗi người một dòng → Word soạn mẫu → Mailings/Start Mail Merge/Letters → Select Recipients → Insert Merge Field → Preview Results → Finish & Merge. Kiểm tra dữ liệu, trường trộn và bố cục trước in.
 
-**Tập dữ liệu có tổ chức, có liên quan; hệ quản trị là phần mềm quản lý tập đó.**
+## Câu 8. CSDL
 
-Phân cấp = cây; mạng = bản ghi nhiều liên kết; quan hệ = bảng có khóa; đối tượng = đối tượng phức tạp; tài liệu = cấu trúc linh hoạt. Ví dụ PHONGBAN–NHANVIEN liên kết qua MaPhong; nhiều–nhiều giữa nhân viên–dự án cần bảng THAMGIA. **Tập trung/phân tán là cách bố trí, khác tiêu chí mô hình dữ liệu.** [IBM](https://www.ibm.com/think/topics/database).
+CSDL là tập dữ liệu được tổ chức theo cấu trúc xác định, thể hiện đặc điểm dữ liệu và quan hệ giữa các thực thể, phục vụ ứng dụng. Hệ quản trị CSDL hỗ trợ tạo lập, sử dụng, kiểm soát và duy trì CSDL.
 
-## 9. HTTT: khái niệm, vai trò, thành phần
+Mô hình: phân cấp, mạng, quan hệ, hướng đối tượng, tài liệu; ngoài ra có khóa–giá trị, cột rộng, đồ thị.
 
-**Người – quy trình – dữ liệu – cứng – mềm – mạng.**
+Ví dụ: PHONGBAN–NHANVIEN liên kết qua MaPhong; quan hệ nhân viên–dự án nhiều–nhiều dùng bảng THAMGIA.
 
-Các thành phần phối hợp thu thập, xử lý, lưu và cung cấp thông tin. Vai trò: **làm việc – phối hợp – kiểm soát – quyết định**. Phần mềm chỉ là một thành phần; có phần mềm mà quy trình không rõ, dữ liệu sai thì hệ thống vẫn kém. [OpenStax](https://openstax.org/books/foundations-information-systems/pages/1-1-introduction-to-information-systems).
+## Câu 9. HTTT
 
-## 10. Nội dung ứng dụng CNTT trong hành chính
+HTTT là các thành phần tương tác được tổ chức để thu thập, xử lý, lưu trữ và phân phối thông tin phục vụ hoạt động, phối hợp, kiểm soát và ra quyết định.
 
-**Xây nền – dữ liệu – đổi cách làm – phục vụ dân – an toàn – con người.**
+Thành phần: con người, quy trình, dữ liệu, phần cứng, phần mềm, mạng/truyền thông. Vai trò: hỗ trợ nghiệp vụ, liên kết bộ phận, kiểm soát hoạt động và hỗ trợ quyết định.
 
-Nêu: kế hoạch/kiến trúc và hạ tầng; CSDL, chia sẻ/tái sử dụng; chuẩn hóa quy trình, văn bản và điều hành số; công khai/DVC; an ninh và dự phòng; đào tạo, hỗ trợ, đo lường/cải tiến. Đây là cách gom ý học từ quy định hiện hành.
+## Câu 10. Ứng dụng CNTT trong hành chính
 
-**Căn cứ 2026:** Luật Chuyển đổi số **148/2025/QH15** và Nghị định **224/2026/NĐ-CP**, cùng hiệu lực **1/7/2026**. Không gọi Luật CNTT 2006 hay Nghị định 64/2007 là mới nhất; lưu ý điều khoản chuyển tiếp. [Luật](https://congbao.chinhphu.vn/van-ban/luat-so-148-2025-qh15-468708.htm), [Nghị định](https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-224-2026-nd-cp-469888.htm).
+Các nhóm: hạ tầng/hệ thống; dữ liệu; quy trình/điều hành; công khai thông tin/DVC; an ninh, liên tục, chất lượng; nhân lực và tổ chức triển khai.
 
-## 11. Nguyên tắc trong công vụ
+Chuẩn hóa quy trình trước số hóa; sử dụng dữ liệu phục vụ quyết định; tái sử dụng dữ liệu hợp lệ theo quy định. Căn cứ trọng tâm: Luật 148/2025/QH15 và NĐ 224/2026/NĐ-CP, cùng hiệu lực 1/7/2026, có quy định chuyển tiếp.
 
-**Người dùng – dùng lại dữ liệu – an toàn – linh hoạt – bao trùm – giải trình – đo hiệu quả.**
+## Câu 11. Nguyên tắc
 
-Bám bảy nguyên tắc nội dung ở **Điều 6 Luật Chuyển đổi số**; cơ quan nhà nước có trách nhiệm tuân thủ. Ví dụ: không bắt khai lại dữ liệu hợp lệ đã có theo quy định; hỗ trợ người cao tuổi; bảo vệ thông tin cá nhân. [Điều 6 của Luật](https://congbao.chinhphu.vn/van-ban/luat-so-148-2025-qh15-468708.htm).
+Điều 6 Luật Chuyển đổi số: lấy người dùng làm trung tâm; chia sẻ/tái sử dụng dữ liệu; an ninh và riêng tư; linh hoạt công nghệ; bao trùm; minh bạch/giải trình; đo lường và cải thiện liên tục.
 
-## 12. Quá trình và đặc trưng HTTT quản lý
+Điều 24 Luật CNTT 2006 (trước 1/7/2026): ưu tiên và phục vụ dân; cải cách hành chính; thông tin đúng/mục đích; công khai quy trình; tiêu chuẩn tương thích; an toàn/tiết kiệm/hiệu quả; trách nhiệm người đứng đầu.
 
-**Nhập – xử lý – xuất – lưu – phản hồi.**
+## Câu 12. Quá trình và đặc trưng HTTT quản lý
 
-Ví dụ tính lương: chấm công/hợp đồng → tính và kiểm tra → bảng lương → lưu lịch sử → sửa khi có phản hồi đúng căn cứ. Đặc trưng: hướng quyết định quản lý; tích hợp dữ liệu/bộ phận; thông tin theo cấp; cập nhật và phản hồi; có chất lượng, phân quyền, truy vết. Tác nghiệp ghi chi tiết, quản lý tổng hợp để điều hành.
+HTTT quản lý cung cấp thông tin cho lập kế hoạch, tổ chức, điều hành, kiểm soát và quyết định.
 
-## 13. Nội dung quản lý nhà nước
+Quá trình: thu thập/nhập → xử lý → đầu ra; kết hợp lưu trữ, phản hồi và kiểm soát. Đặc trưng: hướng mục tiêu quản lý, tích hợp, thông tin theo cấp, cập nhật, chất lượng, phân quyền và truy vết.
 
-**Luật, chuẩn – kế hoạch – phổ biến – giám sát – đo lường – kiểm tra – nhân lực – quốc tế.**
+## Câu 13. Quản lý nhà nước về CNTT
 
-Đây là tám nhóm ở **Điều 11 Luật Chuyển đổi số**. Câu 10 hỏi **ứng dụng làm gì**; câu 11 hỏi **theo nguyên tắc nào**; câu 13 hỏi **Nhà nước định hướng, tổ chức và kiểm soát ra sao**. Ví dụ ban hành chuẩn kết nối là quản lý; dùng phần mềm tiếp nhận hồ sơ là ứng dụng. [Điều 11 của Luật](https://congbao.chinhphu.vn/van-ban/luat-so-148-2025-qh15-468708.htm).
+Sử dụng pháp luật, chính sách và công cụ quản lý để định hướng, tổ chức, điều chỉnh, kiểm tra ứng dụng và phát triển CNTT; bao gồm hạ tầng, dữ liệu, nhân lực, sản phẩm/dịch vụ và các lĩnh vực liên quan.
 
-## 14. Thác nước
+Điều 11 Luật Chuyển đổi số: chính sách/pháp luật/chuẩn/chỉ số; chiến lược/chương trình/kế hoạch; phổ biến; quản lý/giám sát; thống kê/đánh giá; thanh tra/xử lý; nhân lực; quốc tế.
 
-**Yêu cầu → thiết kế → lập trình → kiểm thử → triển khai → bảo trì.**
+## Câu 14. Thác nước
 
-Làm theo giai đoạn nối tiếp. Ưu: rõ kế hoạch, tài liệu, trách nhiệm; hợp yêu cầu ổn định. Nhược: phần mềm để dùng/đánh giá đầy đủ xuất hiện muộn, đổi yêu cầu muộn tốn kém. Có thể quay lại sửa; không nói tuyệt đối cấm quay lại hoặc chỉ kiểm tra ở cuối.
+Tổ chức phát triển theo giai đoạn nối tiếp: yêu cầu → thiết kế → lập trình/kiểm thử đơn vị → tích hợp/kiểm thử hệ thống → triển khai → vận hành/bảo trì.
 
-## 15. Tăng trưởng/gia tăng
+Ưu điểm: rõ kế hoạch, sản phẩm, trách nhiệm; phù hợp yêu cầu ổn định. Nhược điểm: đánh giá sản phẩm muộn, thay đổi muộn tốn chi phí, có nguy cơ phát hiện sai sót muộn.
 
-**Chia phần – giao sớm – thêm dần.**
+## Câu 15. Gia tăng
 
-Có yêu cầu tổng thể, kiến trúc và ưu tiên; mỗi đợt phân tích–thiết kế–lập trình–kiểm thử tạo bản có thêm chức năng. Ví dụ hồ sơ → thêm chấm công → thêm lương. Ưu: dùng và phản hồi sớm. Nhược: khó chia phần, tích hợp, quản lý phạm vi; cần kiểm thử hồi quy. **Gia tăng thêm năng lực; lặp tinh chỉnh giải pháp.**
+Phát triển qua nhiều phiên bản; mỗi phiên bản bổ sung chức năng. Quy trình: yêu cầu tổng thể/kiến trúc/ưu tiên → phát triển, kiểm thử gia tăng → phản hồi → gia tăng tiếp.
 
-## 16. Xoắn ốc
+Ưu điểm: chức năng giá trị sớm, phản hồi sớm, dễ ưu tiên. Nhược điểm: đòi hỏi chia chức năng và kiến trúc hợp lý; chi phí tích hợp, hồi quy; nguy cơ suy giảm cấu trúc.
 
-**Mục tiêu → phân tích rủi ro → phát triển/kiểm chứng → đánh giá, kế hoạch vòng sau.**
+## Câu 16. Xoắn ốc
 
-Lặp nhiều vòng, lấy rủi ro chi phối. Ưu: xử lý bất định sớm, hợp dự án lớn/phức tạp. Nhược: tốn nguồn lực, quản lý khó, cần chuyên môn rủi ro. Ví dụ thử chống giả khuôn mặt trước khi triển khai giao dịch rộng. Không phải vòng nào cũng có bản dùng thật.
+Phát triển theo chu kỳ do rủi ro định hướng: mục tiêu/phương án/ràng buộc → phân tích, xử lý rủi ro → phát triển, kiểm chứng → đánh giá, kế hoạch vòng sau.
 
-Đối chiếu ba mô hình ở [IEEE Computer Society](https://www.computer.org/resources/software-engineering-process).
+Ưu điểm: giảm rủi ro sớm, thích ứng, phù hợp dự án lớn/phức tạp. Nhược điểm: quản lý khó, cần chuyên môn rủi ro, tốn nguồn lực.
 
-## 18. HTTT tài chính
+## Câu 18. HTTT tài chính
 
-**Kế hoạch – thu chi – vốn – tài sản/công nợ – báo cáo/kiểm soát.**
+Cung cấp thông tin tài chính để lập kế hoạch, huy động, phân bổ, sử dụng và kiểm soát nguồn lực.
 
-Quản lý thông tin tiền, tài sản, nguồn vốn/kinh phí để lập kế hoạch, sử dụng và kiểm soát tài chính. Chức năng: dự toán/ngân sách; thu chi/dòng tiền; nguồn vốn; tài sản, phải thu–phải trả; hạch toán, báo cáo, phân tích; kiểm soát và tuân thủ. Cơ quan hành chính chú trọng sử dụng kinh phí đúng, hiệu quả; không lấy tối đa lợi nhuận làm mục tiêu.
+Chức năng: ngân sách/dự toán; thu–chi/dòng tiền; tài trợ/vay–trả nợ; đầu tư; tài sản/công nợ; báo cáo/phân tích/dự báo; kiểm soát/tuân thủ. Theo cấp: tác nghiệp từng giao dịch; chiến thuật ngân sách và vốn lưu động; chiến lược đầu tư, cơ cấu vốn dài hạn.
 
-Ví dụ thực tế: **TABMIS** phục vụ quản lý ngân sách và nghiệp vụ kho bạc. [Nguồn Chính phủ năm 2026](https://baochinhphu.vn/kho-bac-nha-nuoc-ho-tro-cap-xa-lam-chu-giao-dich-ngan-sach-tren-nen-tang-so-102260630160303086.htm).
+Trong cơ quan hành chính, hệ thống chú trọng sử dụng ngân sách đúng quy định và hiệu quả.
 
-## 20. HTTT nhân lực
+## Câu 20. HTTT nhân lực
 
-**Tuyển – hồ sơ – bố trí – đánh giá – đãi ngộ – đào tạo – thôi việc.**
+Thu thập, lưu, cập nhật, xử lý và cung cấp thông tin về con người, công việc, chính sách để quản lý, sử dụng và phát triển nhân lực.
 
-Mô hình: người dùng/các bộ phận ↔ CSDL nhân lực ↔ các phân hệ ↔ báo cáo và hệ thống tài chính.
+Ba cấp: tác nghiệp (hồ sơ/công/lương); chiến thuật (tuyển/đào tạo/đãi ngộ); chiến lược (cung–cầu/kỹ năng/kế cận).
 
-Nếu hỏi theo cấp: **tác nghiệp – quản lý – chiến lược**; nếu hỏi quá trình: **nhập dữ liệu nhân sự → xử lý, cập nhật, phê duyệt → hồ sơ, bảng lương, báo cáo**.
+Tuyển dụng: đơn vị cần người đề xuất; nhân sự tổng hợp, tham mưu và tổ chức; người có thẩm quyền quyết định. Xác định nhu cầu → kế hoạch → tuyển mộ → sàng lọc/đánh giá → tuyển chọn → quyết định/tiếp nhận. Tuyển dụng công chức, viên chức tuân thủ quy định riêng về chỉ tiêu, điều kiện, thẩm quyền và trình tự.
 
-Tuyển dụng: **đơn vị cần người đề xuất → nhân sự tổng hợp/thẩm định → đúng thẩm quyền phê duyệt → thông báo, nhận hồ sơ → đánh giá/thi/phỏng vấn → quyết định, tiếp nhận, lập hồ sơ**. Công chức/viên chức theo quy định riêng.
+Hồ sơ: thông tin cá nhân, trình độ, hợp đồng/quyết định, quá trình công tác và biến động; giữ ngày hiệu lực, lịch sử. Khen thưởng/kỷ luật: đề xuất → xem xét/xác minh → quyết định đúng thẩm quyền → cập nhật. Nội dung khác: công, lương, bảo hiểm, đào tạo, báo cáo, hoạch định.
 
-Hồ sơ: lưu lịch sử chuyển đơn vị, bổ nhiệm, lương, hợp đồng và ngày hiệu lực; không xóa quá khứ. Khen thưởng/kỷ luật: đề xuất → xem xét đúng căn cứ/trình tự → quyết định → cập nhật. Nhân sự tham mưu không mặc định có quyền tự quyết tuyển/kỷ luật.
+## Câu 21. Tự động hóa văn phòng
 
-## 21. Tự động hóa văn phòng
+OAS hỗ trợ tạo lập, xử lý, trao đổi, phối hợp và lưu trữ thông tin văn phòng. Chức năng: tài liệu; giao tiếp; lịch/giao việc; văn bản/hồ sơ; lưu trữ/tra cứu.
 
-**Soạn – trao đổi – phối hợp – quản lý – lưu trữ.**
+Chu trình tài liệu: tạo/nhận → kiểm tra/phân loại → luân chuyển/xử lý → duyệt/phát hành nếu cần → lưu/khai thác → xử lý theo thời hạn bảo quản.
 
-Chức năng: tài liệu, bảng tính, thư/họp, lịch/giao việc, văn bản–hồ sơ, ký số, tìm kiếm, phân quyền.
+Xử lý thông tin: nhu cầu → thu thập → kiểm tra → tổng hợp/phân tích → cung cấp → lưu → phản hồi.
 
-**Vòng đời tài liệu:** tạo/nhận → kiểm tra, đăng ký, phân loại → chuyển/xử lý → duyệt/ký/phát hành nếu cần → lập hồ sơ/lưu → xử lý theo thời hạn bảo quản.
+## Câu 22. Trục liên thông văn bản quốc gia
 
-**Xử lý thông tin:** xác định nhu cầu → thu thập → kiểm tra → tổng hợp/phân tích → cung cấp → lưu → phản hồi. Ví dụ họp: thu báo cáo → tổng hợp → mời họp → biên bản → theo dõi nhiệm vụ.
+Hạ tầng kết nối các hệ thống quản lý văn bản, điều hành để gửi–nhận văn bản điện tử, phục vụ chỉ đạo và phối hợp.
 
-## 22. Trục liên thông văn bản quốc gia
+Sơ đồ logic: xã/phường ↔ hệ thống văn bản/đầu mối thành phố ↔ Trục quốc gia ↔ đầu mối/hệ thống cơ quan nhận.
 
-**Xã/phường ↔ hệ thống văn bản dùng chung/đầu mối thành phố ↔ trục quốc gia ↔ đầu mối, hệ thống nơi nhận.**
+Thành phần: hệ thống nghiệp vụ; kết nối; dịch vụ dùng chung; bảo đảm an toàn, ký số, lưu vết, dự phòng. VPCP là đầu mối trung ương; bộ/địa phương quản lý phạm vi mình; cơ quan chịu trách nhiệm nội dung, ký, giải quyết và lưu hồ sơ.
 
-Đây là sơ đồ logic; đường đi kỹ thuật theo phương án kết nối. Văn bản nội bộ có thể không đi qua trục; không phải văn bản nào cũng trình lần lượt mọi cấp. Nơi nhận được xác định theo mã cơ quan và thẩm quyền.
-
-**Vai trò:** chuyên viên soạn, lãnh đạo ký đúng thẩm quyền, văn thư đăng ký/phát hành, hệ thống chuyển và ghi vết, cơ quan nhận xử lý. Văn phòng Chính phủ là đầu mối trung ương; bộ/địa phương quản lý hệ thống, đầu mối thuộc phạm vi mình. [Nguồn về Trục](https://vpcp.chinhphu.vn/cong-pha-manh-me-vao-tu-duy-giay-to-11524597.htm).
-
-**Hai mốc dễ bị hỏi xoáy:** chính quyền địa phương hai cấp từ **1/7/2025**, không vẽ huyện/quận là tầng chính quyền hiện hành; Quyết định **43/2026/QĐ-TTg** ban hành 16/9 nhưng **1/11/2026 mới hiệu lực**, nên ngày 26/10 vẫn là quy chế sắp áp dụng. [Nguồn về hai cấp](https://baochinhphu.vn/chuyen-doi-so-lien-thong-dong-bo-toi-tat-ca-cac-co-quan-de-chinh-quyen-dia-phuong-02-cap-khong-gian-doan-102250630173036528.htm), [hiệu lực Quyết định 43](https://chinhphu.vn/?docid=219522&pageid=27160).
-
-## Tự kiểm tra trong 10 phút
-
-1. Nêu khác nhau giữa dữ liệu, thông tin, CSDL và HTTT.
-2. Kể sáu thành phần HTTT, năm quá trình xử lý.
-3. Vì sao QR không tự bảo mật? Hai mật khẩu có phải hai yếu tố?
-4. Nói mỗi mô hình phần mềm bằng một câu, một ưu, một nhược.
-5. Phân biệt câu 10, 11, 13 bằng ba động từ: **làm – tuân thủ – quản lý**.
-6. Tuyển dụng ai đề xuất, ai tổ chức, ai quyết định?
-7. Vẽ luồng văn bản từ xã đến cơ quan khác, không thêm huyện/quận.
-8. Nhớ mốc **1/7/2026** và **1/11/2026**, phân biệt ban hành với có hiệu lực.
+Chính quyền địa phương hai cấp từ 1/7/2025. Quyết định 43/2026/QĐ-TTg có hiệu lực từ 1/11/2026.

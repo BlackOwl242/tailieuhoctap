@@ -1,3 +1,4 @@
+import { salaryBandForDate } from '../../common/salary-band-version';
 import {
   BadRequestException, Body, ConflictException, Controller, Delete, ForbiddenException, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
@@ -204,8 +205,9 @@ export class EmployeesService {
     });
     if (!user) throw new NotFoundException('Không tìm thấy nhân viên');
     const activeContract = user.contracts[0];
+    const band = await salaryBandForDate(this.prisma, user.salaryBandId, today);
     return {
-      salaryBandId: user.salaryBandId,
+      salaryBandId: band?.id ?? user.salaryBandId,
       compensationBasis: activeContract?.compensationBasis ?? null,
       contractNo: activeContract?.contractNo ?? null,
       hasActiveContract: Boolean(activeContract),

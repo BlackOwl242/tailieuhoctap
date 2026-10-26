@@ -1,5 +1,7 @@
 # Sửa các mâu thuẫn quy trình thực tế — 24/10/2026
 
+**Cập nhật ngày 26/10:** đã triển khai bản sửa vào Docker local đang phục vụ `localhost:8080`, sau khi sao lưu dữ liệu. Xem [biên bản triển khai](TRIEN_KHAI_DOCKER_20261026.md). Phần trạng thái chưa triển khai bên dưới là ghi nhận tại thời điểm lập báo cáo ngày 24/10.
+
 Đã sửa 10 nhóm vấn đề được chọn từ đợt rà soát. Mục “nhân viên vào giữa tháng” xuất hiện hai lần trong yêu cầu và được xử lý chung. Thay đổi gồm backend, dữ liệu, giao diện và kiểm thử hồi quy.
 
 ## Hành vi sau sửa

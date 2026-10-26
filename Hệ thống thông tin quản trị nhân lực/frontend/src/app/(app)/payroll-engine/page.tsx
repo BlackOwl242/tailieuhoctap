@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth-store';
 import { api, errorMessage, openProtectedFile } from '@/lib/api';
+import { formatWorkDays, payslipPeriodTitle } from '@/lib/payroll-display';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { EmptyState, LoadingState } from '@/components/common/states';
 import { Button, Select } from '@/components/ui/primitives';
@@ -654,12 +655,12 @@ export default function PayrollEnginePage() {
         return (
           <div className="text-xs">
             <span className={`font-mono font-medium ${isFull ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
-              {actual}/{standard} công
+              {formatWorkDays(actual)}/{formatWorkDays(standard)} công
             </span>
-            {s.missingAttendanceDays ? <span className="block text-[10px] text-muted-foreground">Chờ ghi nhận: {s.missingAttendanceDays} ngày</span> : null}
+            {s.missingAttendanceDays ? <span className="block text-[10px] text-muted-foreground">Chờ ghi nhận: {formatWorkDays(s.missingAttendanceDays)} ngày</span> : null}
             {!isFull && (
               <span className="block text-[10px] text-rose-500 font-mono">
-                {s.status === 'PROVISIONAL' ? `Còn ${Math.max(0, standard - actual - (s.missingAttendanceDays ?? 0))} ngày chưa hưởng` : `Thiếu ${standard - actual} ngày`}
+                {s.status === 'PROVISIONAL' ? `Còn ${formatWorkDays(Math.max(0, standard - actual - (s.missingAttendanceDays ?? 0)))} ngày chưa hưởng` : `Thiếu ${formatWorkDays(standard - actual)} ngày`}
               </span>
             )}
           </div>
@@ -1718,16 +1719,16 @@ export default function PayrollEnginePage() {
                       {selectedSlip.breakdown!.calculation!.payRatesUsed?.length ? <p>Mức căn cứ: {selectedSlip.breakdown!.calculation!.payRatesUsed!.map((item) => `${item.rate.toLocaleString('vi-VN')} đ/${item.basis === 'DAILY' ? 'ngày' : item.basis === 'HOURLY' ? 'giờ' : 'tháng'}`).join(' · ')}. Số ở cột lương cơ bản là giá trị quy đổi theo kỳ để đối soát.</p> : null}
                       {selectedSlip.breakdown!.calculation!.publicSectorSalary ? <div className="rounded border border-border bg-muted/30 p-2"><b>Căn cứ lương khu vực công</b>{selectedSlip.breakdown!.calculation!.publicSectorSalary.effectiveRates.map((rate, index) => <p key={`${rate.effectiveFrom}-${rate.decisionNo}-${index}`}>Từ {rate.effectiveFrom || 'ngày hiệu lực trong hồ sơ'} · {rate.rankCode}, bậc {rate.step}, hệ số {rate.coefficient}: lương ngạch/bậc {rate.rankSalary.toLocaleString('vi-VN')} đ + phụ cấp chức vụ {rate.positionCoefficient} ({rate.positionAllowance.toLocaleString('vi-VN')} đ) + vượt khung {rate.overGradePercent}% ({rate.overGradeAllowance.toLocaleString('vi-VN')} đ) + phụ cấp khác {rate.otherAllowanceCoefficient} ({rate.otherAllowance.toLocaleString('vi-VN')} đ), tính theo mức cơ sở {rate.stateBaseSalary.toLocaleString('vi-VN')} đ/tháng. {rate.decisionNo ? `Quyết định: ${rate.decisionNo}.` : ''}</p>)}<small className="text-muted-foreground">Căn cứ phiên bản: {selectedSlip.breakdown!.calculation!.publicSectorSalary.basisReference}</small></div> : null}
                       {(selectedSlip.breakdown!.calculation!.salaryBandReview?.bands ?? []).map((band) => <p key={band.code}>Khung {band.code} – {band.name}: {band.minSalary.toLocaleString('vi-VN')}–{band.maxSalary.toLocaleString('vi-VN')} đ/{band.compensationBasis === 'DAILY' ? 'ngày' : band.compensationBasis === 'HOURLY' ? 'giờ' : 'tháng'}; {band.status === 'IN_RANGE' ? 'lương căn cứ trong khoảng' : band.status === 'BELOW_RANGE' ? 'lương căn cứ dưới sàn, cần rà soát hợp đồng/quyết định' : band.status === 'ABOVE_RANGE' ? 'lương căn cứ trên trần, cần rà soát' : band.status === 'BASIS_MISMATCH' ? 'khác cơ sở trả lương, cần đối chiếu' : 'có thay đổi khung trong kỳ'} ({band.days} ngày).</p>)}
-                      <p>Lịch chuẩn {attendance.standardDays} ngày / {attendance.scheduledHours} giờ; công hưởng lương {attendance.paidDays}; thời gian ghi nhận {attendance.workedHours} giờ; thiếu giờ {attendance.shortHours} giờ.</p>
+                      <p>Lịch chuẩn {formatWorkDays(attendance.standardDays)} ngày / {attendance.scheduledHours} giờ; công hưởng lương {formatWorkDays(attendance.paidDays)}; thời gian ghi nhận {attendance.workedHours} giờ; thiếu giờ {attendance.shortHours} giờ.</p>
                       {selectedSlip.breakdown!.calculation!.attendanceWageReduction !== undefined ? <p className="font-semibold">Thu nhập theo đủ lịch − thu nhập được hưởng theo công = giảm do thiếu công: {selectedSlip.breakdown!.calculation!.expectedCompensation?.toLocaleString('vi-VN')} đ − {selectedSlip.breakdown!.calculation!.earnedCompensation?.toLocaleString('vi-VN')} đ = <span className="text-rose-700">{selectedSlip.breakdown!.calculation!.attendanceWageReduction!.toLocaleString('vi-VN')} đ</span>. Con số này gồm lương căn cứ và các khoản thu nhập trong cấu trúc bị tính theo tỷ lệ công; thuế, bảo hiểm, OT và khấu trừ khác được tính riêng.</p> : null}
-                      <p>Đi muộn {attendance.lateDays} ngày / {attendance.lateMinutes} phút; về sớm {attendance.earlyLeaveDays} ngày / {attendance.earlyLeaveMinutes} phút; vắng {attendance.absenceDays} ngày; phép năm hưởng lương {attendance.paidLeaveDays} ngày; nghỉ không lương {attendance.unpaidLeaveDays} ngày; nghỉ ốm/thai sản ghi nhận theo chế độ BHXH {attendance.socialInsuranceLeaveDays} ngày.</p>
-                      {attendance.missingPairDays > 0 ? <p className="font-semibold text-rose-700">Có {attendance.missingPairDays} ngày thiếu cặp vào/ra cần đối soát.</p> : null}
+                      <p>Đi muộn {formatWorkDays(attendance.lateDays)} ngày / {attendance.lateMinutes} phút; về sớm {formatWorkDays(attendance.earlyLeaveDays)} ngày / {attendance.earlyLeaveMinutes} phút; vắng {formatWorkDays(attendance.absenceDays)} ngày; phép năm hưởng lương {formatWorkDays(attendance.paidLeaveDays)} ngày; nghỉ không lương {formatWorkDays(attendance.unpaidLeaveDays)} ngày; nghỉ ốm/thai sản ghi nhận theo chế độ BHXH {formatWorkDays(attendance.socialInsuranceLeaveDays)} ngày.</p>
+                      {attendance.missingPairDays > 0 ? <p className="font-semibold text-rose-700">Có {formatWorkDays(attendance.missingPairDays)} ngày thiếu cặp vào/ra cần đối soát.</p> : null}
                       {(selectedSlip.breakdown!.calculation!.attendanceDays ?? []).length > 0 ? <div className="max-h-64 overflow-auto"><table className="w-full text-left"><thead><tr><th>Ngày</th><th>Trạng thái</th><th>Giờ chuẩn</th><th>Giờ ghi nhận</th><th>Muộn / sớm</th></tr></thead><tbody>{selectedSlip.breakdown!.calculation!.attendanceDays!.map((day) => <tr key={day.workDate}><td>{day.workDate}</td><td>{day.status === 'UNRECORDED' ? 'Chưa ghi nhận' : day.status === 'ON_LEAVE' ? (day.leaveType === 'ANNUAL' ? 'Phép năm hưởng lương' : day.leaveType === 'UNPAID' ? 'Nghỉ không lương' : `${day.leaveType === 'SICK' ? 'Nghỉ ốm' : 'Thai sản'} · BHXH`) : day.status === 'BUSINESS_TRIP' ? 'Công tác đã xác nhận' : day.status === 'HOLIDAY' ? 'Ngày lễ' : day.status === 'ABSENT' ? 'Vắng' : day.status === 'LATE' ? 'Đi muộn' : day.status === 'EARLY_LEAVE' ? 'Về sớm' : day.status === 'MISSING_PAIR' ? 'Thiếu cặp công' : 'Đủ công'}</td><td>{(day.scheduledMinutes / 60).toFixed(2)}</td><td>{(day.workedMinutes / 60).toFixed(2)}</td><td>{day.lateMinutes} / {day.earlyMinutes} phút</td></tr>)}</tbody></table></div> : null}
                       <p>OT thực làm đã xác nhận: {overtime.reduce((sum, item) => sum + item.hours, 0)} giờ · Tiền OT {overtime.reduce((sum, item) => sum + item.pay, 0).toLocaleString('vi-VN')} đ. Yêu cầu OT đang chờ duyệt: {requests.filter((item) => item.status === 'PENDING').reduce((sum, item) => sum + item.hours, 0)} giờ; chưa được tính vào lương.</p>
                       {overtime.length > 0 ? <div className="overflow-x-auto"><table className="w-full text-left"><thead><tr><th>Ngày</th><th>Loại ngày</th><th>Giờ</th><th>Giờ đêm</th><th>Đơn giá giờ</th><th className="text-right">Tiền OT</th></tr></thead><tbody>{overtime.map((item) => <tr key={`${item.workDate}-${item.category}`}><td>{item.workDate}</td><td>{item.category === 'PUBLIC_HOLIDAY' ? 'Lễ' : item.category === 'WEEKLY_REST' ? 'Nghỉ tuần' : 'Ngày thường'}</td><td>{item.hours}</td><td>{item.nightHours}</td><td>{item.hourlyRate.toLocaleString('vi-VN')} đ</td><td className="text-right">{item.pay.toLocaleString('vi-VN')} đ</td></tr>)}</tbody></table></div> : null}
                     </section>;
                   })() : null}
-                  <p>Công được hưởng: {selectedSlip.actualWorkDays ?? 0}/{selectedSlip.workingDays ?? 0} ngày</p>
+                  <p>Công được hưởng: {formatWorkDays(selectedSlip.actualWorkDays ?? 0)}/{formatWorkDays(selectedSlip.workingDays ?? 0)} ngày</p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div><b>Các khoản thu nhập</b>{(selectedSlip.breakdown?.earnings ?? []).map((line, i) => <div className="flex justify-between gap-3 border-b border-border/60 py-1" key={i}><span>{line.name}<small className="block text-muted-foreground">{line.basisReference || 'Phiếu cũ chưa lưu căn cứ'}</small></span><span className="shrink-0">{line.amount.toLocaleString('vi-VN')} đ</span></div>)}</div>
                     <div><b>Các khoản khấu trừ</b>{(selectedSlip.breakdown?.deductions ?? []).map((line, i) => <div className="flex justify-between gap-3 border-b border-border/60 py-1" key={i}><span>{line.name}<small className="block text-muted-foreground">{line.basisReference || 'Phiếu cũ chưa lưu căn cứ'}</small></span><span className="shrink-0">{line.amount.toLocaleString('vi-VN')} đ</span></div>)}</div>
@@ -1914,7 +1915,7 @@ export default function PayrollEnginePage() {
                 <header className="text-center pb-3">
                   <p className="font-bold uppercase tracking-wide">{orgConfig.orgName || 'Tên doanh nghiệp / đơn vị'}</p>
                   <h2 className="mt-1 text-lg font-bold uppercase">{selectedSlip.status === 'PROVISIONAL' ? 'PHIẾU LƯƠNG TẠM TÍNH' : 'PHIẾU LƯƠNG NHÂN VIÊN'}</h2>
-                  <p className="mt-1">{selectedSlip.status === 'PROVISIONAL' && payrollPreviewQuery.data ? `Tạm tính đến ${new Date(`${payrollPreviewQuery.data.asOfDate}T00:00:00`).toLocaleDateString('vi-VN')}` : currentRun?.periodName || 'Kỳ lương hiện hành'}</p>
+                  <p className="mt-1">{selectedSlip.status === 'PROVISIONAL' && payrollPreviewQuery.data ? `Tạm tính đến ${new Date(`${payrollPreviewQuery.data.asOfDate}T00:00:00`).toLocaleDateString('vi-VN')}` : payslipPeriodTitle(currentRun?.periodName || 'Kỳ lương hiện hành')}</p>
                   <p className="mt-1 text-xs">{selectedSlip.status === 'PROVISIONAL' ? 'Bản xem trước · Chưa phải chứng từ thanh toán' : <>Mã phiếu: <b className="font-mono">{selectedSlip.id.slice(0, 8).toUpperCase()}</b></>} · Ngày lập: {new Date().toLocaleDateString('vi-VN')}</p>
                 </header>
 
@@ -1927,7 +1928,7 @@ export default function PayrollEnginePage() {
                       <tr><th>Phòng ban / đơn vị</th><td>{selectedSlip.department || 'Chưa cập nhật'}</td></tr>
                       <tr><th>Chức danh công việc</th><td>{selectedSlip.jobTitle || 'Chưa cập nhật'}</td></tr>
                     <tr><th>Mức căn cứ hợp đồng</th><td>{(selectedSlip.breakdown?.calculation?.payRatesUsed ?? []).map((item) => `${item.rate.toLocaleString('vi-VN')} VND/${item.basis === 'DAILY' ? 'ngày' : item.basis === 'HOURLY' ? 'giờ' : 'tháng'}`).join('; ') || `${selectedSlip.baseSalary.toLocaleString('vi-VN')} VND`}</td></tr>
-                      <tr><th>Ngày công hưởng lương</th><td>{selectedSlip.actualWorkDays ?? 0}/{selectedSlip.workingDays ?? 0} công</td></tr>
+                      <tr><th>Ngày công hưởng lương</th><td>{formatWorkDays(selectedSlip.actualWorkDays ?? 0)}/{formatWorkDays(selectedSlip.workingDays ?? 0)} công</td></tr>
                     {selectedSlip.breakdown?.calculation?.attendanceWageReduction !== undefined ? <tr><th>Giảm thu nhập do thiếu công</th><td>{selectedSlip.breakdown.calculation.attendanceWageReduction.toLocaleString('vi-VN')} VND</td></tr> : null}
                     </tbody>
                   </table>
@@ -1936,11 +1937,11 @@ export default function PayrollEnginePage() {
                 {selectedSlip.breakdown?.calculation?.attendance ? <section className="payslip-section">
                   <h3 className="font-bold uppercase">Đối soát thời gian và làm thêm</h3>
                   <table><tbody>
-                    <tr><th>Lịch chuẩn / giờ chuẩn</th><td>{selectedSlip.breakdown.calculation.attendance.standardDays} ngày / {selectedSlip.breakdown.calculation.attendance.scheduledHours} giờ</td></tr>
+                    <tr><th>Lịch chuẩn / giờ chuẩn</th><td>{formatWorkDays(selectedSlip.breakdown.calculation.attendance.standardDays)} ngày / {selectedSlip.breakdown.calculation.attendance.scheduledHours} giờ</td></tr>
                     <tr><th>Giờ đã ghi nhận / thiếu giờ</th><td>{selectedSlip.breakdown.calculation.attendance.workedHours} giờ / {selectedSlip.breakdown.calculation.attendance.shortHours} giờ</td></tr>
-                    <tr><th>Đi muộn / về sớm</th><td>{selectedSlip.breakdown.calculation.attendance.lateDays} ngày ({selectedSlip.breakdown.calculation.attendance.lateMinutes} phút) / {selectedSlip.breakdown.calculation.attendance.earlyLeaveDays} ngày ({selectedSlip.breakdown.calculation.attendance.earlyLeaveMinutes} phút)</td></tr>
-                    <tr><th>Vắng / phép năm hưởng lương / nghỉ không lương</th><td>{selectedSlip.breakdown.calculation.attendance.absenceDays} / {selectedSlip.breakdown.calculation.attendance.paidLeaveDays} / {selectedSlip.breakdown.calculation.attendance.unpaidLeaveDays} ngày</td></tr>
-                    <tr><th>Nghỉ ốm / thai sản</th><td>{selectedSlip.breakdown.calculation.attendance.socialInsuranceLeaveDays} ngày; đối soát theo hồ sơ chế độ BHXH</td></tr>
+                    <tr><th>Đi muộn / về sớm</th><td>{formatWorkDays(selectedSlip.breakdown.calculation.attendance.lateDays)} ngày ({selectedSlip.breakdown.calculation.attendance.lateMinutes} phút) / {formatWorkDays(selectedSlip.breakdown.calculation.attendance.earlyLeaveDays)} ngày ({selectedSlip.breakdown.calculation.attendance.earlyLeaveMinutes} phút)</td></tr>
+                    <tr><th>Vắng / phép năm hưởng lương / nghỉ không lương</th><td>{formatWorkDays(selectedSlip.breakdown.calculation.attendance.absenceDays)} / {formatWorkDays(selectedSlip.breakdown.calculation.attendance.paidLeaveDays)} / {formatWorkDays(selectedSlip.breakdown.calculation.attendance.unpaidLeaveDays)} ngày</td></tr>
+                    <tr><th>Nghỉ ốm / thai sản</th><td>{formatWorkDays(selectedSlip.breakdown.calculation.attendance.socialInsuranceLeaveDays)} ngày; đối soát theo hồ sơ chế độ BHXH</td></tr>
                     <tr><th>Làm thêm đã xác nhận thực làm</th><td>{(selectedSlip.breakdown.calculation.approvedOvertime ?? []).map((ot) => `${ot.workDate}: ${ot.hours} giờ (${ot.category === 'PUBLIC_HOLIDAY' ? 'ngày lễ' : ot.category === 'WEEKLY_REST' ? 'nghỉ tuần' : 'ngày thường'})`).join('; ') || 'Không có'}</td></tr>
                   </tbody></table>
                 </section> : null}
@@ -1970,7 +1971,7 @@ export default function PayrollEnginePage() {
                 <section className="payslip-section border-y border-black py-3">
                   <p className="font-bold uppercase">{selectedSlip.status === 'PROVISIONAL' ? 'Số dư tạm tính' : 'Số tiền thực lĩnh'}</p>
                   <p className="mt-1 text-lg font-bold">{selectedSlip.netPay.toLocaleString('vi-VN')} VND</p>
-                  <p className="mt-1 text-xs">{selectedSlip.status === 'PROVISIONAL' ? 'Số dư tạm tính' : 'Thực lĩnh'} = tổng thu nhập − tổng khấu trừ.{selectedSlip.deductionReviewNote ? ' Số dư âm cần đối soát, không dùng để chi trả.' : ''}</p>
+                  {selectedSlip.deductionReviewNote && <p className="mt-1 text-xs">Số dư âm cần đối soát, không dùng để chi trả.</p>}
                 </section>
 
                 <footer className="grid grid-cols-3 gap-3 pt-5 text-center">

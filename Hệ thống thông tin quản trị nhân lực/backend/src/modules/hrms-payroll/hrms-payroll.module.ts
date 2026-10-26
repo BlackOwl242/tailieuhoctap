@@ -588,7 +588,7 @@ export class HrmsPayrollService {
       });
       const positionStructures = await tx.hrmsSalaryStructure.findMany({
         where: { isActive: true, OR: [{ salaryBandId: { not: null } }, { jobTitle: { not: null } }, { orgUnitId: { not: null } }] },
-        include: { items: { include: { component: true } } },
+        include: { salaryBand: { select: { code: true, effectiveFrom: true } }, items: { include: { component: true } } },
       });
       const approvedBands = await tx.hrmsSalaryBand.findMany({
         where: { status: 'ACTIVE', approvedAt: { not: null }, effectiveFrom: { lte: to }, OR: [{ effectiveTo: null }, { effectiveTo: { gte: from } }] },
@@ -752,7 +752,8 @@ export class HrmsPayrollService {
           const dayBandMatches = approvedBands.filter((band) => dateKey(band.effectiveFrom) <= rateDay && (!band.effectiveTo || dateKey(band.effectiveTo) >= rateDay) && band.jobTitles.includes(effectiveJobTitle ?? ''));
           const salaryBand = dayBandMatches.find((band) => band.id === user.salaryBandId) ?? (dayBandMatches.length === 1 ? dayBandMatches[0] : null);
           const salaryBandStructure = salaryBand
-            ? positionStructures.find((structure) => structure.salaryBandId === salaryBand.id) ?? null
+            ? positionStructures.find((structure) => structure.salaryBandId === salaryBand.id)
+              ?? positionStructures.filter(structure => structure.salaryBand?.code === salaryBand.code && structure.salaryBand.effectiveFrom <= salaryBand.effectiveFrom).sort((a, b) => b.salaryBand!.effectiveFrom.getTime() - a.salaryBand!.effectiveFrom.getTime())[0] ?? null
             : null;
           const positionStructure = salaryBandStructure ?? selectedPositionMatches[0] ?? null;
           const appliedStructure = assignment?.structure ?? positionStructure;

@@ -1561,6 +1561,9 @@ model HrmsSalaryBand {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   employees         User[]            @relation("EmployeeSalaryBand")
+  supersedesId      String?           @unique
+  supersedes        HrmsSalaryBand?   @relation("SalaryBandVersions", fields: [supersedesId], references: [id], onDelete: Restrict)
+  successor         HrmsSalaryBand?   @relation("SalaryBandVersions")
   openings          HrmsJobOpening[]
   salaryStructures  HrmsSalaryStructure[] @relation("SalaryBandStructure")
 
