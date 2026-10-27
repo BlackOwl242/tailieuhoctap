@@ -1,5 +1,5 @@
 function saveBlob(blob: Blob, filename: string) {
- const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60_000);
 }
 export async function downloadWordFromHtml(title:string,bodyHtml:string):Promise<void>{
  const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,HeadingLevel,WidthType}=await import('docx');
@@ -15,9 +15,10 @@ export async function downloadWordFromHtml(title:string,bodyHtml:string):Promise
  saveBlob(await Packer.toBlob(doc),`${title}.docx`);
 }
 export async function exportRowsToExcel(filename:string,headers:string[],rows:(string|number)[][]):Promise<void>{
- const ExcelJS=await import('exceljs');const wb=new ExcelJS.Workbook();const ws=wb.addWorksheet('Dữ liệu');
+ if(!headers.length)throw new Error('Bảng chưa có cột dữ liệu để xuất.');
+ const excelModule=await import('exceljs');const Workbook=excelModule.Workbook??(excelModule as unknown as {default:typeof excelModule}).default.Workbook;const wb=new Workbook();const ws=wb.addWorksheet('Dữ liệu');
  ws.addRow(headers);for(const row of rows)ws.addRow(row.map(v=>typeof v==='number'&&Number.isFinite(v)?v:String(v??'')));
  ws.getRow(1).font={bold:true};ws.getRow(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDCE6F1'}};
- headers.forEach((h,i)=>{ws.getColumn(i+1).width=Math.min(55,Math.max(15,h.length+3));});ws.views=[{state:'frozen',ySplit:1}];ws.autoFilter={from:{row:1,column:1},to:{row:Math.max(1,rows.length+1),column:headers.length}};
- const buf=await wb.xlsx.writeBuffer();saveBlob(new Blob([new Uint8Array(buf)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),`${filename}.xlsx`);
+ headers.forEach((h,i)=>{ws.getColumn(i+1).width=Math.min(55,Math.max(15,h.length+3,...rows.slice(0,200).map(row=>String(row[i]??'').split('\n').reduce((max,line)=>Math.max(max,line.length),0)+2)));ws.getColumn(i+1).alignment={vertical:'top',wrapText:true};});ws.views=[{state:'frozen',ySplit:1}];ws.autoFilter={from:{row:1,column:1},to:{row:Math.max(1,rows.length+1),column:headers.length}};
+ const buf=await wb.xlsx.writeBuffer();const safeName=filename.replace(/[<>:"/\\|?*\u0000-\u001f]/g,'-').replace(/\.(xlsx|csv)$/i,'').trim()||'du-lieu';saveBlob(new Blob([new Uint8Array(buf)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),`${safeName}.xlsx`);
 }

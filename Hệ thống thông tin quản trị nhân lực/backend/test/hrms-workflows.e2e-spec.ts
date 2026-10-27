@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/common/prisma.service';
 import { setupTestApp } from './setup-app';
+import { HrmsPerformanceService } from '../src/modules/hrms-performance/hrms-performance.module';
 
 const RUN = process.env.RUN_E2E === '1';
 (RUN ? describe : describe.skip)('HRMS database-backed workflows (e2e)', () => {
@@ -60,6 +61,53 @@ const RUN = process.env.RUN_E2E === '1';
   }, 60_000);
 
   afterAll(async () => { await app?.close(); });
+
+  it('keeps KPI goals, evidence, cycle participants and counts inside the viewer scope', async () => {
+    const owner = await prisma.user.findUniqueOrThrow({ where: { id: employee.id } });
+    const otherOrg = await prisma.orgUnit.create({ data: { code: `KPI-OTHER-${Date.now()}`, name: 'Đơn vị KPI riêng' } });
+    const peer = await prisma.user.create({ data: { email: `kpi-peer-${Date.now()}@example.test`, passwordHash: 'fixture', fullName: 'KPI đồng nghiệp', orgUnitId: owner.orgUnitId, hireDate: new Date('2030-01-01') } });
+    const outsider = await prisma.user.create({ data: { email: `kpi-private-${Date.now()}@example.test`, passwordHash: 'fixture', fullName: 'KPI ngoài đơn vị', orgUnitId: otherOrg.id, hireDate: new Date('2030-01-01') } });
+    const ids = [employee.id, peer.id, outsider.id];
+    const cycle = await prisma.hrmsAppraisalCycle.create({ data: { name: 'KPI kiểm tra riêng tư', year: 2026, startDate: new Date('2026-01-01'), endDate: new Date('2026-12-31'), organizationSector: 'enterprise', participantScope: 'SELECTED', participantIds: ids } });
+    const goals = await Promise.all(ids.map((userId, index) => prisma.hrmsAppraisalGoal.create({ data: { cycleId: cycle.id, userId, employeeName: `Nhân sự riêng tư ${index}`, kraTitle: `Mục tiêu riêng tư ${index}`, description: 'Chỉ người có quyền được xem kết quả', targetMetric: 'Hoàn tất nhiệm vụ', weightage: 100, managerScore: index ? 99 : 0, finalScore: index ? 99 : 0, evidences: { create: { submittedBy: userId, description: `Minh chứng riêng tư ${index}` } } } })));
+    const get = (path: string, role: string) => request(app.getHttpServer()).get(`/api/v1/hrms/performance/${path}`).set('Authorization', `Bearer ${tokens[role]}`);
+    const own = await get(`goals?cycleId=${cycle.id}`, 'USER').expect(200);
+    expect(own.body.map((goal: { id: string }) => goal.id)).toEqual([goals[0].id]);
+    expect(own.body[0].cycle.participantIds).toEqual([employee.id]);
+    expect(own.body[0].evidences[0].description).toBe('Minh chứng riêng tư 0');
+    await get(`goals?userId=${peer.id}`, 'USER').expect(403);
+    const ownCycles = await get('cycles', 'USER').expect(200);
+    expect(ownCycles.body.find((item: { id: string }) => item.id === cycle.id)).toMatchObject({ participantIds: [employee.id], _count: { goals: 1 } });
+    const team = await get(`goals?cycleId=${cycle.id}`, 'LINE_MANAGER').expect(200);
+    expect(team.body.map((goal: { userId: string }) => goal.userId).sort()).toEqual([employee.id, peer.id].sort());
+    expect(team.body.every((goal: { cycle: { participantIds: string[] } }) => !goal.cycle.participantIds.includes(outsider.id))).toBe(true);
+    await get(`goals?userId=${outsider.id}`, 'LINE_MANAGER').expect(403);
+    const all = await get(`goals?cycleId=${cycle.id}`, 'HR_CB').expect(200);
+    expect(all.body).toHaveLength(3);
+    await request(app.getHttpServer()).post(`/api/v1/hrms/performance/goals/${goals[1].id}/evidence`).set('Authorization', `Bearer ${tokens.USER}`).send({ description: 'Không được cập nhật hồ sơ người khác' }).expect(403);
+    await request(app.getHttpServer()).patch(`/api/v1/hrms/performance/goals/${goals[0].id}/score`).set('Authorization', `Bearer ${tokens.USER}`).send({ managerScore: 100, scoreRationale: 'Tự nâng điểm trái quyền' }).expect(403);
+    // A zero score is a completed, unsuccessful assessment, not a missing assessment.
+    expect(await app.get(HrmsPerformanceService).summary(cycle.id, employee.id)).toMatchObject({ complete: true, score: 0, classification: 'UNSATISFACTORY' });
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: employee.id } })).baseSalary).toBe(owner.baseSalary);
+    const noGoal = await prisma.user.create({ data: { email: `kpi-unassigned-${Date.now()}@example.test`, passwordHash: 'fixture', fullName: 'Nhân viên chưa được giao KPI', orgUnitId: owner.orgUnitId, hireDate: new Date('2030-01-01') } });
+    await prisma.hrmsAppraisalCycle.update({ where: { id: cycle.id }, data: { participantIds: [...ids, noGoal.id] } });
+    await get(`overview?cycleId=${cycle.id}`, 'USER').expect(403);
+    const overview = await get(`overview?cycleId=${cycle.id}`, 'LINE_MANAGER').expect(200);
+    expect(overview.body.rows.map((row: { userId: string }) => row.userId).sort()).toEqual([employee.id, peer.id, noGoal.id].sort());
+    expect(overview.body.rows.find((row: { userId: string }) => row.userId === employee.id)).toMatchObject({ stage: 'NEEDS_SUPPORT', score: 0, goalCount: 1, evidenceCount: 1, scoredCount: 1 });
+    expect(overview.body.rows.find((row: { userId: string }) => row.userId === peer.id)).toMatchObject({ stage: 'COMPLETE', score: 99 });
+    expect(overview.body.rows.find((row: { userId: string }) => row.userId === noGoal.id)).toMatchObject({ stage: 'NO_GOALS', score: null, goalCount: 0 });
+    const pending = await prisma.hrmsAppraisalGoal.create({ data: { cycleId: cycle.id, userId: noGoal.id, employeeName: noGoal.fullName, kraTitle: 'Chưa đủ căn cứ', targetMetric: 'Hoàn thành công việc', description: 'Kiểm thử điều kiện tổng hợp', weightage: 50 } });
+    const stageForPending = async () => (await get(`overview?cycleId=${cycle.id}`, 'HR_CB').expect(200)).body.rows.find((row: { userId: string }) => row.userId === noGoal.id);
+    expect(await stageForPending()).toMatchObject({ stage: 'INVALID_WEIGHT', score: null });
+    await prisma.hrmsAppraisalGoal.update({ where: { id: pending.id }, data: { weightage: 100 } });
+    expect(await stageForPending()).toMatchObject({ stage: 'MISSING_EVIDENCE', score: null });
+    await prisma.hrmsKraEvidence.create({ data: { goalId: pending.id, submittedBy: noGoal.id, description: 'Đã ghi kết quả và minh chứng' } });
+    expect(await stageForPending()).toMatchObject({ stage: 'WAITING_SCORE', score: null });
+    await prisma.hrmsAppraisalGoal.update({ where: { id: pending.id }, data: { finalScore: 50, managerScore: 50 } });
+    expect(await stageForPending()).toMatchObject({ stage: 'COMPLETE', score: 50 });
+    await prisma.hrmsAppraisalCycle.delete({ where: { id: cycle.id } });
+  });
 
   it('lets KM_MANAGER approve salary bands and amendments while enforcing separation of duties', async () => {
     const payload = { code: `KM-${Date.now()}`, name: 'Khung phân quyền nhân sự', levelTitle: 'Chuyên viên', minSalary: 10_000_000, midSalary: 15_000_000, maxSalary: 20_000_000, jobTitles: ['Chuyên viên phân quyền'], criteria: 'Đáp ứng các tiêu chí chuyên môn đã công bố.', benchmarkSource: 'Căn cứ ngân sách nội bộ đã phê duyệt.', effectiveFrom: '2026-01-01' };

@@ -1,0 +1,17 @@
+.citizen-profile-page { width: min(100% - 40px, 1000px); margin: 0 auto; padding: 24px 0 48px; }
+.profile-navigation { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid #dce3ed; padding-bottom: 16px; margin-bottom: 28px; }
+.profile-form { display: grid; gap: 20px; }
+.profile-form .citizen-form-section { margin: 0; }
+.profile-form .citizen-form-section h2 { margin-top: 0; }
+.profile-form .citizen-form-section > p, .profile-source, .profile-completion { font-size: 14px; line-height: 1.7; color: #52657a; }
+.profile-source { margin: 0 0 12px; }
+.profile-completion { margin-bottom: 24px; }
+.profile-wide { grid-column: 1 / -1; min-width: 0; }
+.profile-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; }
+.profile-actions span { font-size: 13px; color: #52657a; }
+.citizen-profile-page .form-error .text-button { display: block; margin-top: 10px; }
+.profile-reuse { display: flex; gap: 12px 24px; flex-wrap: wrap; align-items: center; padding: 16px 0; border-bottom: 1px solid #dce3ed; margin-bottom: 16px; }
+.profile-reuse p { margin: 0; font-size: 14px; }
+.profile-reuse label { display: flex; align-items: center; gap: 8px; }
+.profile-reuse input[type=checkbox] { width: 17px; height: 17px; }
+@media (max-width: 600px) { .citizen-profile-page { width: calc(100% - 28px); } .profile-form .citizen-form-grid { grid-template-columns: minmax(0, 1fr); } .citizen-account-bar > div { flex-wrap: wrap; gap: 8px 16px; } }

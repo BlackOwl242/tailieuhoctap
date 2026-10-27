@@ -1,6 +1,8 @@
 import { Fragment, useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import './App.css'
 import { CitizenApplicationForm, type SubmissionSchema } from './CitizenSubmission'
+import { CitizenProfilePage } from './CitizenProfile'
+import { CitizenWorkspace } from './CitizenWorkspace'
 import { serviceModeLabel } from './procedureLabels'
 import { InformationHome } from './InformationHome'
 import { AdministrativeServiceDesk, PublicAdministrativeServices } from './AdministrativeServices'
@@ -106,8 +108,8 @@ function validateCitizenFiles(files: File[]) {
   if (files.reduce((sum, file) => sum + file.size, 0) > 9 * 1024 * 1024) return 'Tổng dung lượng tệp một lần gửi không được vượt quá 9 MB.'
   return ''
 }
-type PortalRoute = 'citizen-login' | 'public' | 'staff' | 'guide' | 'catalog' | 'submit' | 'track' | 'citizen-services'
-const routeFromPath = (): PortalRoute => window.location.pathname.startsWith('/dang-nhap') ? 'citizen-login' : window.location.pathname.startsWith('/staff') ? 'staff' : window.location.pathname.startsWith('/huong-dan') ? 'guide' : window.location.pathname.startsWith('/tien-ich') ? 'citizen-services' : window.location.pathname.startsWith('/thu-tuc') ? 'catalog' : window.location.pathname.startsWith('/nop-ho-so') ? 'submit' : window.location.pathname.startsWith('/tra-cuu-ho-so') ? 'track' : 'public'
+type PortalRoute = 'citizen-profile' | 'citizen-login' | 'public' | 'staff' | 'guide' | 'catalog' | 'submit' | 'track' | 'citizen-services'
+const routeFromPath = (): PortalRoute => window.location.pathname.startsWith('/tai-khoan') ? 'citizen-profile' : window.location.pathname.startsWith('/dang-nhap') ? 'citizen-login' : window.location.pathname.startsWith('/staff') ? 'staff' : window.location.pathname.startsWith('/huong-dan') ? 'guide' : window.location.pathname.startsWith('/tien-ich') ? 'citizen-services' : window.location.pathname.startsWith('/thu-tuc') ? 'catalog' : window.location.pathname.startsWith('/nop-ho-so') ? 'submit' : window.location.pathname.startsWith('/tra-cuu-ho-so') ? 'track' : 'public'
 
 function AuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user: User, csrf: string) => void; onBack: () => void }) {
   const [busy, setBusy] = useState(false)
@@ -148,7 +150,7 @@ function AuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user: User,
   </main>
 }
 
-function CitizenAuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user: User, csrf: string) => void; onBack: () => void }) {
+function CitizenAuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user: User, csrf: string, registered: boolean) => void; onBack: () => void }) {
   const [register, setRegister] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -157,7 +159,7 @@ function CitizenAuthScreen({ onAuthenticated, onBack }: { onAuthenticated: (user
     const values = Object.fromEntries(new FormData(event.currentTarget).entries())
     try {
       const result = await api<{ user: User; csrfToken: string }>(`/api/citizen/auth/${register ? 'register' : 'login'}`, values)
-      onAuthenticated(result.user, result.csrfToken)
+      onAuthenticated(result.user, result.csrfToken, register)
     } catch (reason) { setError(reason instanceof Error ? reason.message : 'Không thể xác thực tài khoản.') }
     finally { setBusy(false) }
   }
@@ -377,10 +379,10 @@ function CitizenReceiptView({ receipt, onTrack }: { receipt: SubmissionReceipt; 
   </section>
 }
 
-function CitizenTrackingPage({ initialReceipt }: { initialReceipt: SubmissionReceipt | null }) {
+function CitizenTrackingPage({ initialReceipt, initialCode = '', embedded = false, onUpdated }: { initialReceipt: SubmissionReceipt | null; initialCode?: string; embedded?: boolean; onUpdated?: () => void }) {
   const [ownedCases, setOwnedCases] = useState<any[]>([])
-  useEffect(() => { api<{ cases: any[] }>('/api/citizen/cases').then(result => setOwnedCases(result.cases)).catch(reason => setError(reason.message)) }, [])
-  const [code, setCode] = useState(initialReceipt?.code || '')
+  useEffect(() => { api<{ cases: any[] }>('/api/citizen/cases').then(result => setOwnedCases(embedded ? [] : result.cases)).catch(reason => setError(reason.message)) }, [])
+  const [code, setCode] = useState(initialCode || initialReceipt?.code || '')
   const [accessKey, setAccessKey] = useState(initialReceipt?.accessKey || '')
   const [item, setItem] = useState<any>(null)
   const [busy, setBusy] = useState(false)
@@ -395,19 +397,20 @@ function CitizenTrackingPage({ initialReceipt }: { initialReceipt: SubmissionRec
     catch (reason) { setItem(null); setError(reason instanceof Error ? reason.message : 'Không tìm thấy hồ sơ với thông tin đã nhập.') }
     finally { setBusy(false) }
   }
+  useEffect(() => { if (initialCode) void lookup(undefined, { code: initialCode, accessKey: '' }) }, [initialCode])
   async function citizenAction(action: 'submit_supplement' | 'feedback' | 'create_payment' | 'confirm_payment', payload: Record<string, any>) {
     if (!item) return
     setBusy(true); setError(''); setMessage('')
     try {
       const result = await api<{ case: any }>(`/api/public/cases/${encodeURIComponent(item.code)}/actions`, { accessKey, action, expectedVersion: item.version, payload })
-      setItem(result.case); setMessage(action === 'submit_supplement' ? 'Đã gửi nội dung bổ sung.' : action === 'feedback' ? 'Đã ghi nhận đánh giá của bạn.' : action === 'create_payment' ? 'Đã tạo mã theo dõi khoản thu trong hồ sơ.' : 'Đã ghi nhận chứng từ người nộp khai; hồ sơ chờ cán bộ tài chính đối chiếu.')
+      setItem(result.case); onUpdated?.(); setMessage(action === 'submit_supplement' ? 'Đã gửi nội dung bổ sung.' : action === 'feedback' ? 'Đã ghi nhận đánh giá của bạn.' : action === 'create_payment' ? 'Đã tạo mã theo dõi khoản thu trong hồ sơ.' : 'Đã ghi nhận chứng từ người nộp khai; hồ sơ chờ cán bộ tài chính đối chiếu.')
     } catch (reason) { setError(reason instanceof Error ? reason.message : 'Không thể ghi nhận thao tác.') }
     finally { setBusy(false) }
   }
   return <section className="citizen-track-page">
-    <div className="citizen-page-heading"><span className="eyebrow">TRA CỨU TIẾN ĐỘ</span><h1>Tra cứu hồ sơ đã gửi</h1><p>Hồ sơ gửi bằng tài khoản này được hiển thị bên dưới. Hồ sơ cũ cần mã hồ sơ và khóa tra cứu do cán bộ cung cấp.</p></div>
-    <section className="citizen-owned-cases" aria-label="Hồ sơ của tôi">{ownedCases.length ? ownedCases.map(record => <button type="button" className="citizen-owned-case" key={record.code} disabled={busy} onClick={() => lookup(undefined, { code: record.code, accessKey: '' })}><b>{record.code}</b><span>{record.procedure?.name || record.procedureCode}</span><small>{record.statusLabel || record.status}</small></button>) : <p className="muted">Bạn chưa gửi hồ sơ nào bằng tài khoản này.</p>}</section>
-    <form className="citizen-track-form" onSubmit={lookup}><label className="citizen-field">Mã hồ sơ<input value={code} onChange={event => setCode(event.target.value.toUpperCase())} placeholder="HN-2026-XXXXXXXX" autoComplete="off" required /></label><label className="citizen-field">Khóa tra cứu<input value={accessKey} onChange={event => setAccessKey(event.target.value)} autoComplete="off" spellCheck={false} /></label><button className="button primary" disabled={busy}>{busy ? 'Đang tra cứu…' : 'Tra cứu hồ sơ'}</button></form>
+    {!embedded && <div className="citizen-page-heading"><span className="eyebrow">TRA CỨU TIẾN ĐỘ</span><h1>Tra cứu hồ sơ đã gửi</h1><p>Hồ sơ gửi bằng tài khoản này được hiển thị bên dưới. Hồ sơ cũ cần mã hồ sơ và khóa tra cứu do cán bộ cung cấp.</p></div>}
+    {!embedded && <section className="citizen-owned-cases" aria-label="Hồ sơ của tôi">{ownedCases.length ? ownedCases.map(record => <button type="button" className="citizen-owned-case" key={record.code} disabled={busy} onClick={() => lookup(undefined, { code: record.code, accessKey: '' })}><b>{record.code}</b><span>{record.procedure?.name || record.procedureCode}</span><small>{record.statusLabel || record.status}</small></button>) : <p className="muted">Bạn chưa gửi hồ sơ nào bằng tài khoản này.</p>}</section>}
+    {!embedded && <form className="citizen-track-form" onSubmit={lookup}><label className="citizen-field">Mã hồ sơ<input value={code} onChange={event => setCode(event.target.value.toUpperCase())} placeholder="HN-2026-XXXXXXXX" autoComplete="off" required /></label><label className="citizen-field">Khóa tra cứu<input value={accessKey} onChange={event => setAccessKey(event.target.value)} autoComplete="off" spellCheck={false} /></label><button className="button primary" disabled={busy}>{busy ? 'Đang tra cứu…' : 'Tra cứu hồ sơ'}</button></form>}
     {error && <div className="form-error" role="alert">{error}</div>}{message && <div className="citizen-success" role="status">{message}</div>}
     {item && <CitizenCaseStatus item={item} busy={busy} onAction={citizenAction} />}
   </section>
@@ -477,11 +480,41 @@ function CitizenCaseStatus({ item, busy, onAction }: { item: any; busy: boolean;
     {item.publicNote && <div className="citizen-request-warning"><b>Thông tin từ cơ quan</b><p>{item.publicNote}</p></div>}
     <div className="citizen-case-summary"><div><small>Ngày gửi</small><b>{toDate(item.createdAt)}</b></div><div><small>Thời hạn</small><b>{item.deadline ? toDate(item.deadline) : item.deadlineNote || 'Chưa xác định'}</b></div><div><small>Người nộp</small><b>{item.applicant?.name}</b></div></div>
     <CaseDeclaration item={item} />
-    {item.fee?.amount && <section className="citizen-case-section citizen-payment-section"><h3>Khoản thu phí, lệ phí theo hồ sơ</h3><dl className="case-declaration"><div><dt>Số tiền</dt><dd><b>{Number(item.fee.amount).toLocaleString('vi-VN')} đồng</b></dd></div><div><dt>Căn cứ pháp lý thu phí</dt><dd>{item.fee.basis}</dd></div><div><dt>Trạng thái khoản thu</dt><dd>{feeStatusLabels[item.fee.status] || item.fee.status}</dd></div></dl><p className="field-help" style={{ margin: '6px 0 10px' }}>Mã khoản thu được lưu trong hồ sơ. Sau khi nộp theo hướng dẫn của cơ quan, nhập mã giao dịch hoặc số biên lai để kế toán đối chiếu.</p><div className="form-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>{item.fee.status === 'DUE' && (pendingPayment ? <form className="citizen-action-form" onSubmit={confirmPayment}><p>Mã khoản thu <b>{pendingPayment.transactionRef}</b></p><label className="citizen-field">Hình thức đã nộp<select value={paymentMethod} onChange={event => setPaymentMethod(event.target.value)}><option value="BANK_TRANSFER">Chuyển khoản</option><option value="COUNTER_RECEIPT">Nộp tại quầy có biên lai</option><option value="POSTAL_RECEIPT">Nộp qua bưu chính có chứng từ</option><option value="OTHER">Hình thức khác có chứng từ</option></select></label><label className="citizen-field">Mã giao dịch / số biên lai<input name="paymentEvidence" required minLength={4} maxLength={160} /></label><button className="button primary" disabled={busy}>Gửi thông tin thanh toán để đối chiếu</button></form> : <button type="button" className="button primary" disabled={busy} onClick={() => onAction('create_payment', {})}>Tạo mã theo dõi khoản thu</button>)}{['PAID', 'RECONCILED', 'REFUNDED'].includes(item.fee.status) && <button type="button" className="button secondary" onClick={() => printInternalTable('Phiếu theo dõi khoản thu', `Hồ sơ ${item.code}`, ['Số tiền', 'Trạng thái', 'Căn cứ'], [[`${Number(item.fee.amount).toLocaleString('vi-VN')} đồng`, feeStatusLabels[item.fee.status] || String(item.fee.status), String(item.fee.basis)]])}>In phiếu theo dõi khoản thu</button>}</div></section>}
+    {typeof item.fee?.amount === 'number' && <section className="citizen-case-section citizen-payment-section">
+      <h3>Khoản thu phí, lệ phí theo hồ sơ</h3>
+      <dl className="case-declaration">
+        <div><dt>Số tiền</dt><dd><b>{Number(item.fee.amount).toLocaleString('vi-VN')} đồng</b></dd></div>
+        <div><dt>Căn cứ pháp lý thu phí</dt><dd>{item.fee.basis}</dd></div>
+        <div><dt>Trạng thái khoản thu</dt><dd>{feeStatusLabels[item.fee.status] || item.fee.status}</dd></div>
+      </dl>
+      <p className="field-help">Sau khi nộp theo hướng dẫn của cơ quan, gửi mã giao dịch hoặc số biên lai để kế toán đối chiếu.</p>
+      <div className="citizen-payment-actions">
+        {item.fee.status === 'DUE' && (pendingPayment ? <form className="citizen-action-form citizen-payment-form" onSubmit={confirmPayment} aria-busy={busy}>
+          <h4>Thông tin chứng từ đã nộp</h4>
+          <p className="citizen-payment-reference">Mã khoản thu: <b>{pendingPayment.transactionRef}</b></p>
+          <div className="citizen-payment-fields">
+            <label className="citizen-field">Hình thức đã nộp
+              <select value={paymentMethod} onChange={event => setPaymentMethod(event.target.value)} disabled={busy}>
+                <option value="BANK_TRANSFER">Chuyển khoản</option>
+                <option value="COUNTER_RECEIPT">Nộp tại quầy có biên lai</option>
+                <option value="POSTAL_RECEIPT">Nộp qua bưu chính có chứng từ</option>
+                <option value="OTHER">Hình thức khác có chứng từ</option>
+              </select>
+            </label>
+            <label className="citizen-field">Mã giao dịch / số biên lai
+              <input name="paymentEvidence" required minLength={4} maxLength={160} disabled={busy} autoComplete="off" />
+              <small>Nhập đúng mã trên chứng từ bạn đã nộp.</small>
+            </label>
+          </div>
+          <button className="button primary" disabled={busy}>{busy ? 'Đang gửi…' : 'Gửi chứng từ để đối chiếu'}</button>
+        </form> : <button type="button" className="button primary" disabled={busy} onClick={() => onAction('create_payment', {})}>Tạo mã theo dõi khoản thu</button>)}
+        {['PAID', 'RECONCILED', 'REFUNDED'].includes(item.fee.status) && <button type="button" className="button secondary" onClick={() => printInternalTable('Phiếu theo dõi khoản thu', `Hồ sơ ${item.code}`, ['Số tiền', 'Trạng thái', 'Căn cứ'], [[`${Number(item.fee.amount).toLocaleString('vi-VN')} đồng`, feeStatusLabels[item.fee.status] || String(item.fee.status), String(item.fee.basis)]])}>In phiếu theo dõi khoản thu</button>}
+      </div>
+    </section>}
     <section className="citizen-case-section"><h3>Nội dung đề nghị</h3><p>{item.requestSummary}</p>{item.attachments?.length > 0 && <div className="citizen-file-list"><b>Tài liệu đã gửi</b>{item.attachments.map((file: any, index: number) => <span key={`${file.name}-${index}`}>{file.name}</span>)}</div>}</section>
     {item.status === 'CHO_BO_SUNG' && <form className="citizen-action-form" onSubmit={submitSupplement}><h3>Gửi nội dung bổ sung</h3><label className="citizen-field">Nội dung trả lời<textarea name="note" rows={4} maxLength={1200} placeholder="Trả lời từng yêu cầu của cơ quan." /></label><label className="citizen-field">Tài liệu bổ sung<input name="supplementFiles" type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" multiple /><small>Tối đa 8 tệp, 8 MB mỗi tệp; tổng dung lượng không quá 9 MB.</small></label>{localError && <div className="form-error" role="alert">{localError}</div>}<button className="button primary" disabled={busy}>Gửi bổ sung</button></form>}
     {item.result && <section className="citizen-case-section"><h3>Kết quả giải quyết</h3><p>{item.result.content || 'Cơ quan đã ghi nhận kết quả.'}</p>{item.result.number && <p>Số văn bản: <b>{item.result.number}</b></p>}</section>}
-    {item.delivery && <section className="citizen-case-section"><h3>Thông tin trả kết quả</h3><p><b>Người nhận:</b> {item.delivery.receiver} · <b>Hình thức nhận:</b> {channelNames[item.delivery.channel] || item.delivery.channel}</p><p><b>Mã biên nhận / bưu gửi:</b> {item.delivery.evidence} · <b>Thời gian:</b> {toDate(item.delivery.at)}</p></section>}
+    {item.delivery && <section className="citizen-case-section"><h3>Thông tin trả kết quả</h3><p><b>Người nhận:</b> {item.delivery.receiver} · <b>Hình thức nhận:</b> {channelNames[item.delivery.channel] || item.delivery.channel}</p><p><b>Mã biên nhận / bưu gửi:</b> {item.delivery.evidence} · <b>Thời gian:</b> {toDate(item.delivery.deliveredAt || item.delivery.at)}</p></section>}
     <section className="citizen-case-section"><h3>Lịch sử xử lý</h3>{item.events?.length ? <div className="citizen-timeline">{item.events.map((event: any, index: number) => <article key={`${event.at}-${index}`}><i /><div><b>{event.title}</b><time>{toDate(event.at)}</time>{event.detail && <p>{event.detail}</p>}</div></article>)}</div> : <p>Chưa có cập nhật.</p>}</section>
     {['HOAN_THANH', 'TU_CHOI', 'KHONG_GIAI_QUYET', 'DUNG'].includes(item.status) && !item.feedbackSubmitted && <form className="citizen-action-form" onSubmit={submitFeedback}><h3>Đánh giá quá trình xử lý</h3><label className="citizen-field">Mức đánh giá<select value={score} onChange={event => setScore(event.target.value)}>{[5, 4, 3, 2, 1].map(value => <option key={value} value={value}>{value} / 5</option>)}</select></label><label className="citizen-field">Ý kiến<textarea value={feedback} onChange={event => setFeedback(event.target.value)} rows={3} maxLength={1000} /></label><button className="button secondary" disabled={busy}>Gửi đánh giá</button></form>}
     {item.feedbackSubmitted && <p className="citizen-success">Ứng dụng đã ghi nhận đánh giá của hồ sơ này.</p>}
@@ -534,7 +567,7 @@ function App() {
   }, [captureMode])
 
   function navigateRoute(next: PortalRoute, procedureCode = '', applicantType?: 'citizen' | 'organization') {
-    const path = next === 'citizen-login' ? '/dang-nhap' : next === 'staff' ? '/staff' : next === 'guide' ? '/huong-dan' : next === 'citizen-services' ? '/tien-ich' : next === 'submit' ? '/nop-ho-so' : next === 'track' ? '/tra-cuu-ho-so' : '/'
+    const path = next === 'citizen-profile' ? '/tai-khoan' : next === 'citizen-login' ? '/dang-nhap' : next === 'staff' ? '/staff' : next === 'guide' ? '/huong-dan' : next === 'citizen-services' ? '/tien-ich' : next === 'submit' ? '/nop-ho-so' : next === 'track' ? '/tra-cuu-ho-so' : '/'
     const targetPath = next === 'catalog' ? `/thu-tuc${procedureCode ? '/' + encodeURIComponent(procedureCode) : ''}` : path
     const queryParams = new URLSearchParams()
     if (procedureCode && next !== 'catalog') queryParams.set('procedure', procedureCode)
@@ -673,10 +706,11 @@ function App() {
     } catch (e) { setError(e instanceof Error ? e.message : 'Không thể cập nhật hồ sơ.') } finally { setBusy(false) }
   }
 
-  const citizenServiceRoute = route === 'submit' || route === 'track' || route === 'citizen-services'
-  const citizenAccountBar = <div className="citizen-account-bar"><span>{citizen ? `Công dân: ${citizen.name}` : 'Dịch vụ trực tuyến dành cho công dân'}</span><div>{citizen ? <><button type="button" className="text-button" onClick={() => navigateRoute('track')}>Hồ sơ của tôi</button><button type="button" className="text-button" onClick={async () => { try { await api('/api/citizen/auth/logout', {}); citizenCsrfToken = ''; setCitizen(null); setCitizenReceipt(null); setCitizenError(''); navigateRoute('public') } catch (reason) { setCitizenError(reason instanceof Error ? reason.message : 'Chưa đăng xuất được.') } }}>Đăng xuất</button></> : <button type="button" className="text-button" onClick={() => navigateRoute('citizen-login')}>Đăng nhập / Đăng ký công dân</button>}</div>{citizenError && <span role="alert">{citizenError}</span>}</div>
+  const citizenServiceRoute = route === 'citizen-profile' || route === 'submit' || route === 'track' || route === 'citizen-services'
+  const citizenAccountBar = <div className="citizen-account-bar"><span>{citizen ? `Công dân: ${citizen.name}` : 'Dịch vụ trực tuyến dành cho công dân'}</span><div>{citizen ? <><a className="text-button" href="/tai-khoan" aria-current={route === 'citizen-profile' ? 'page' : undefined}>Tài khoản của tôi</a><a className="text-button" href="/tai-khoan/ho-so">Dịch vụ công của tôi</a><button type="button" className="text-button" onClick={async () => { try { await api('/api/citizen/auth/logout', {}); citizenCsrfToken = ''; setCitizen(null); setCitizenReceipt(null); setCitizenError(''); navigateRoute('public') } catch (reason) { setCitizenError(reason instanceof Error ? reason.message : 'Chưa đăng xuất được.') } }}>Đăng xuất</button></> : <button type="button" className="text-button" onClick={() => navigateRoute('citizen-login')}>Đăng nhập / Đăng ký công dân</button>}</div>{citizenError && <span role="alert">{citizenError}</span>}</div>
   if ((citizenServiceRoute || route === 'citizen-login') && !citizenReady) return <main className="auth-page"><p role="status">Đang kiểm tra phiên đăng nhập…</p></main>
-  if ((citizenServiceRoute || route === 'citizen-login') && !citizen) return <CitizenAuthScreen onBack={() => navigateRoute('public')} onAuthenticated={(account, csrf) => { citizenCsrfToken = csrf; setCitizen(account); setCitizenError(''); if (route === 'citizen-login') navigateRoute('submit') }} />
+  if ((citizenServiceRoute || route === 'citizen-login') && !citizen) return <CitizenAuthScreen onBack={() => navigateRoute('public')} onAuthenticated={(account, csrf, registered) => { citizenCsrfToken = csrf; setCitizen(account); setCitizenError(''); if (registered || route === 'citizen-login') navigateRoute('citizen-profile') }} />
+  if (route === 'citizen-profile') return <CitizenWorkspace<User> name={citizen?.name || ''} request={api} onChanged={setCitizen} onSignOut={async () => { await api('/api/citizen/auth/logout', {}); citizenCsrfToken = ''; setCitizen(null); setCitizenReceipt(null); setCitizenError(''); navigateRoute('public') }} renderProfile={onDirtyChange => <CitizenProfilePage<User> onDirtyChange={onDirtyChange} request={api} onChanged={setCitizen} onHome={() => navigateRoute('public')} onSubmit={() => navigateRoute('submit')} />} renderCase={(code, onUpdated) => <CitizenTrackingPage key={code} initialReceipt={null} initialCode={code} embedded onUpdated={onUpdated} />} />
   if (route === 'citizen-login') return <>{citizenAccountBar}<PublicPortal key="citizen-home" onStaff={() => navigateRoute('public')} onGuide={() => navigateRoute('guide')} onNavigate={navigateRoute} onReceipt={setCitizenReceipt} receipt={citizenReceipt} citizenSignedIn signedIn={false} initialView="public" initialProcedureCode="" /></>
   if (route === 'staff' && citizen && !user) return <main className="auth-page"><AgencyMasthead /><section className="auth-card"><h1>Tài khoản công dân</h1><p>Bàn cán bộ chỉ dành cho tài khoản nội bộ được cấp quyền.</p><button className="button primary" onClick={() => navigateRoute('public')}>Về cổng dịch vụ công dân</button></section></main>
   if (user?.mustChangePassword) return <PasswordChangeScreen onChanged={passwordChanged} onSignOut={signOut} />
@@ -1557,6 +1591,7 @@ function GuideContent({ isStaff = false }: { isStaff?: boolean }) {
       <button className={audience === 'staff' ? 'active' : ''} aria-pressed={audience === 'staff'} onClick={() => setAudience('staff')}>Cán bộ</button>
     </section>
     {audience === 'citizen' ? <>
+      <p>Trước khi lập hồ sơ, đăng nhập và mở <a href="/tai-khoan/thong-tin-ca-nhan">Thông tin cá nhân</a> để lưu họ tên, liên hệ, giấy tờ nhận dạng và địa chỉ. Khi tự nộp, thông tin đã lưu được điền sẵn; khi nộp thay, khai riêng người yêu cầu và người thực hiện việc nộp. Thay đổi thông tin cá nhân không sửa hồ sơ đã gửi.</p>
       <section className="guide-lead"><h2>Tra cứu, gửi và theo dõi hồ sơ trực tuyến</h2><p>Hệ thống cung cấp đầy đủ thông tin thủ tục hành chính, biểu mẫu tờ khai điện tử và tra cứu tiến độ giải quyết hồ sơ trực tuyến.</p><div className="guide-links"><a className="button secondary" href="/thu-tuc">Tra cứu danh mục thủ tục</a><a className="button primary" href="/nop-ho-so">Mở trang nộp hồ sơ</a></div></section>
       <ol className="guide-steps">
         <li><b>Tìm và xem thông tin thủ tục</b><p>Mở “Danh mục thủ tục”, lọc theo tên, mã hoặc lĩnh vực rồi chọn một kết quả để xem trình tự, thành phần hồ sơ và cơ quan thực hiện.</p></li>
@@ -3259,7 +3294,7 @@ function CaseDetail({ item, isStaff, signingAuthorityRef, labels, actionOptions,
                     </p>
                     <p>
                       <b>Biên nhận / Chứng cứ giao:</b> {item.delivery.evidence} · <b>Thời gian:</b>{' '}
-                      {toDate(item.delivery.at)}
+                      {toDate(item.delivery.deliveredAt || item.delivery.at)}
                     </p>
                   </div>
                 )}

@@ -71,8 +71,8 @@ export default function AttendancePage() {
                   d.workedMinutes,
                   DAY_STATUS_LABEL[d.status] ?? d.status,
                 ]);
-                import('@/lib/export').then(({ exportRowsToExcel }) => {
-                  exportRowsToExcel('bang-cham-cong-ca-nhan', cols, rows);
+                return import('@/lib/export').then(({ exportRowsToExcel }) => {
+                  return exportRowsToExcel('bang-cham-cong-ca-nhan', cols, rows);
                 });
               }}
             />

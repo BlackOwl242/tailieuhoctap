@@ -640,7 +640,13 @@ export function AdministrativeServiceDesk({
 }
 
 export function PublicAdministrativeServices({ request }: { request: Request }) {
-  const [kind, setKind] = useState('appointments')
+  const [profile, setProfile] = useState<{ name: string; phone: string; email: string } | null>(null)
+  useEffect(() => {
+    let active = true
+    request<{ profile: { name: string; phone: string; email: string } }>('/api/citizen/profile').then(result => { if (active) setProfile(result.profile) }).catch(() => {})
+    return () => { active = false }
+  }, [request])
+  const [kind, setKind] = useState(() => new URLSearchParams(location.search).get('tab') === 'phan-anh' ? 'pakn' : 'appointments')
   const [agencies, setAgencies] = useState<string[]>([])
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
@@ -698,7 +704,7 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
           <>
             <label className="citizen-field">
               Họ và tên
-              <input name="name" required minLength={2} maxLength={150} />
+              <input name="name" defaultValue={profile?.name || ''} autoComplete="name" required minLength={2} maxLength={150} />
             </label>
             <label className="citizen-field">
               Cơ quan
@@ -712,7 +718,7 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
           </>
           <label className="citizen-field">
             Số điện thoại
-            <input name="phone" type="tel" required minLength={8} maxLength={40} />
+            <input name="phone" type="tel" defaultValue={profile?.phone || ''} autoComplete="tel" required minLength={8} maxLength={40} />
           </label>
           {kind === 'appointments' && (
             <>
@@ -747,7 +753,7 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
             <>
               <label className="citizen-field">
                 Email
-                <input name="email" type="email" maxLength={254} />
+                <input name="email" defaultValue={profile?.email || ''} autoComplete="email" type="email" maxLength={254} />
               </label>
               <label className="citizen-field">
                 Tiêu đề

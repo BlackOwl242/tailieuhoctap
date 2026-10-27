@@ -292,9 +292,7 @@ export default function MasterCatalogsPage() {
       ]);
     }
 
-    import('@/lib/export').then(({ exportRowsToExcel }) => {
-      exportRowsToExcel(`DanhMuc_${currentCatalog.catalog.id}`, headers, rows);
-    });
+    return import('@/lib/export').then(({ exportRowsToExcel }) => exportRowsToExcel(`DanhMuc_${currentCatalog.catalog.id}`, headers, rows)).catch(error => toast(error instanceof Error ? error.message : errorMessage(error), 'error'));
   };
 
   const totalAllRecords = useMemo(() => {

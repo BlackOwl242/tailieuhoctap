@@ -20,6 +20,8 @@ import sys
 import threading
 import traceback
 import workflow_extensions
+import citizen_profiles
+import citizen_workspace
 import procedure_workflows as workflows
 from procedure_details import published_procedure_detail, published_template, download_published_template
 import uuid
@@ -685,6 +687,8 @@ def init_db() -> None:
                 if name not in columns:
                     con.execute(f"ALTER TABLE {table} ADD COLUMN {name} {declaration}")
         workflow_extensions.init_schema(con)
+        citizen_profiles.init_schema(con)
+        citizen_workspace.init_schema(con)
         catalog_edit_cols = {row["name"] for row in con.execute("PRAGMA table_info(procedure_catalog_edits)")}
         if "category_key" not in catalog_edit_cols:
             con.execute("ALTER TABLE procedure_catalog_edits ADD COLUMN category_key TEXT NOT NULL DEFAULT ''")
@@ -2115,11 +2119,16 @@ class AppHandler(BaseHTTPRequestHandler):
             return self.send_error_json("Vai trò tài chính không có quyền tải tài liệu hồ sơ.", 404)
         with DB_LOCK, connect() as con:
             row = con.execute("SELECT * FROM cases WHERE code=?", (code,)).fetchone()
-            if not row or not visible_to_user(user, row):
+            owned_by_citizen = bool(row and user["role"] == "citizen" and con.execute("SELECT 1 FROM citizen_record_owners WHERE record_code=? AND user_id=?", (code, user["id"])).fetchone())
+            if not row or (not owned_by_citizen if user["role"] == "citizen" else not visible_to_user(user, row)):
                 return self.send_error_json("Không tìm thấy hồ sơ trong phạm vi được phép tra cứu.", 404)
             data = json.loads(row["payload_json"])
             withdrawal = data.get("withdrawal") or {}
-            candidates = list(data.get("attachments") or []) + list((withdrawal.get("requestDocuments") or []))
+            candidates = list(data.get("attachments") or [])
+            if row["status"] in {"DA_PHAT_HANH", "HOAN_THANH"}:
+                candidates += [item for item in (data.get("result") or {}).get("files", []) if isinstance(item, dict)]
+            if user["role"] != "citizen":
+                candidates += list(withdrawal.get("requestDocuments") or [])
             if isinstance(withdrawal.get("noticeFile"), dict) and withdrawal.get("status") == "DA_PHAT_HANH":
                 candidates.append(withdrawal["noticeFile"])
             record = next((entry for entry in candidates if isinstance(entry, dict) and entry.get("stored") == stored), None)
@@ -2221,6 +2230,25 @@ class AppHandler(BaseHTTPRequestHandler):
             token, csrf, expires = new_session(con, uid)
         return self.send_json({"user": public_user(user), "csrfToken": csrf}, 201,
                               {"Set-Cookie": self.session_cookie(token, expires - int(datetime.now(TZ).timestamp()), CITIZEN_SESSION_COOKIE)})
+
+    def citizen_profile(self, body=None):
+        user = self.require_citizen(csrf=body is not None)
+        with DB_LOCK, connect() as con:
+            current = con.execute("SELECT * FROM users WHERE id=?", (user["id"],)).fetchone()
+            if body is not None:
+                details, expected = citizen_profiles.validate(body, datetime.now(TZ).date())
+                prior = con.execute("SELECT version FROM citizen_profiles WHERE user_id=?", (user["id"],)).fetchone()
+                if expected != (prior["version"] if prior else 0):
+                    raise RuntimeError("Thông tin đã được cập nhật ở phiên khác. Tải lại thông tin trước khi lưu.")
+                updated_at = now_iso()
+                name, phone = details.pop("name"), details.pop("phone")
+                con.execute("UPDATE users SET full_name=?,phone=?,updated_at=? WHERE id=?", (name, phone, updated_at, user["id"]))
+                con.execute("""INSERT INTO citizen_profiles(user_id,details_json,version,updated_at) VALUES(?,?,?,?)
+                    ON CONFLICT(user_id) DO UPDATE SET details_json=excluded.details_json,version=excluded.version,updated_at=excluded.updated_at""",
+                    (user["id"], json.dumps(details, ensure_ascii=False), expected + 1, updated_at))
+                current = con.execute("SELECT * FROM users WHERE id=?", (user["id"],)).fetchone()
+            profile = citizen_profiles.read(con, current)
+        return self.send_json({"profile": profile, "user": public_user(current)})
 
     @staticmethod
     def citizen_owns_case(con, row, user, access_key: str) -> bool:
@@ -2485,6 +2513,8 @@ class AppHandler(BaseHTTPRequestHandler):
                 )
                 case_id = con.execute("SELECT id FROM cases WHERE code=?", (code,)).fetchone()["id"]
                 con.execute("INSERT INTO citizen_record_owners(record_code,user_id,created_at) VALUES(?,?,?)", (code, citizen["id"], created))
+                if isinstance(body.get("draftId"), str) and isinstance(body.get("draftVersion"), int) and not isinstance(body.get("draftVersion"), bool):
+                    con.execute("DELETE FROM citizen_drafts WHERE id=? AND user_id=? AND version=?", (body["draftId"], citizen["id"], body["draftVersion"]))
                 con.execute("INSERT INTO case_lookup_secrets(case_id,encrypted_key,submission_hash,updated_at) VALUES(?,?,?,?)", (case_id, lookup_cipher().encrypt(lookup_key.encode("ascii")), submission_hash, created))
                 add_event(con, case_id, "citizen", "Người nộp", "submit", "Đã gửi hồ sơ", "Hồ sơ đã được lưu và đang chờ cơ quan tiếp nhận kiểm tra.", "public", created)
             except Exception:
@@ -2599,7 +2629,7 @@ class AppHandler(BaseHTTPRequestHandler):
         salt = secrets.token_bytes(16)
         jar = SimpleCookie()
         jar.load(self.headers.get("Cookie", ""))
-        morsel = jar.get(SESSION_COOKIE)
+        morsel = jar.get(CITIZEN_SESSION_COOKIE if user["role"] == "citizen" else SESSION_COOKIE)
         token = morsel.value if morsel else ""
         token_hash = hashlib.sha256(token.encode("ascii", errors="ignore")).hexdigest()
         with DB_LOCK, connect() as con:
@@ -3122,6 +3152,24 @@ class AppHandler(BaseHTTPRequestHandler):
         if path == "/api/citizen/auth/me":
             user = self.current_user(CITIZEN_SESSION_COOKIE, {"citizen"})
             return self.send_json({"user": public_user(user) if user else None, "csrfToken": user["csrf_token"] if user else None})
+        if path == "/api/citizen/workspace" or path.startswith("/api/citizen/drafts/") or path.startswith("/api/citizen/documents/"):
+            try:
+                if path.startswith("/api/citizen/documents/"):
+                    user = self.require_citizen(csrf=False)
+                    parts = path.split("/")
+                    if len(parts) != 6:
+                        return self.send_error_json("Đường dẫn tài liệu không hợp lệ.", 404)
+                    return self.serve_case_file(parts[4], parts[5], user)
+                return citizen_workspace.handle(sys.modules[__name__], self, path)
+            except AuthenticationError as exc:
+                return self.send_error_json(str(exc), 401)
+            except (ValueError, RuntimeError) as exc:
+                return self.send_error_json(str(exc), 400)
+        if path == "/api/citizen/profile":
+            try:
+                return self.citizen_profile()
+            except AuthenticationError as exc:
+                return self.send_error_json(str(exc), 401)
         if path == "/api/citizen/cases":
             user = self.current_user(CITIZEN_SESSION_COOKIE, {"citizen"})
             if not user:
@@ -3528,6 +3576,17 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.register_citizen(body)
             if path == "/api/citizen/auth/login":
                 return self.login_account(body, citizen=True)
+            if path in {"/api/citizen/drafts", "/api/citizen/notifications/read"}:
+                return citizen_workspace.handle(sys.modules[__name__], self, path, body)
+            if path == "/api/citizen/change-password":
+                user = self.require_citizen()
+                if body.get("newPassword") != body.get("confirmPassword"):
+                    raise ValueError("Mật khẩu xác nhận chưa khớp.")
+                return self.change_password(body, user)
+            if path == "/api/citizen/revoke-other-sessions":
+                return self.revoke_other_sessions(self.require_citizen())
+            if path == "/api/citizen/profile":
+                return self.citizen_profile(body)
             if path == "/api/citizen/auth/logout":
                 user = self.require_citizen()
                 with DB_LOCK, connect() as con:

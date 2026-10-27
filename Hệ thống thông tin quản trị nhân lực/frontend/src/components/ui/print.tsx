@@ -4,12 +4,14 @@ import * as React from 'react';
 import { ChevronDown, FileSpreadsheet, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/primitives';
 import { useOrgConfig } from '@/lib/org-config';
+import { useToast } from '@/components/ui/toaster';
 
 export interface PrintExportDropdownProps {
   printLabel?: string;
   exportLabel?: string;
-  onPrint?: () => void;
-  onExportExcel?: () => void;
+  onPrint?: () => void | Promise<void>;
+  onExportExcel?: () => void | Promise<void>;
+  disabled?: boolean;
   className?: string;
 }
 
@@ -22,11 +24,20 @@ export interface PrintExportDropdownProps {
 export function PrintExportDropdown({
   printLabel = 'In danh mục',
   exportLabel = 'Xuất file Excel',
-  onPrint = () => window.print(),
+  onPrint = printCurrentArea,
   onExportExcel,
   className,
+  disabled,
 }: PrintExportDropdownProps) {
   const [open, setOpen] = React.useState(false);
+  const [busy, setBusy] = React.useState(false);
+  const toast = useToast();
+  async function runAction(action: () => void | Promise<void>, label: string) {
+    setOpen(false); setBusy(true);
+    try { await action(); }
+    catch (error) { toast(error instanceof Error && !/chunk|loading.*failed|failed to fetch/i.test(error.message) ? error.message : `Không thể ${label}. Vui lòng tải lại trang và thử lại.`, 'error'); }
+    finally { setBusy(false); }
+  }
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -56,9 +67,10 @@ export function PrintExportDropdown({
         className="gap-1.5 font-medium"
         aria-expanded={open}
         aria-haspopup="menu"
+        disabled={disabled || busy}
       >
         <Printer className="h-4 w-4" />
-        <span>{printLabel}</span>
+        <span>{busy ? 'Đang chuẩn bị…' : printLabel}</span>
         <ChevronDown className={`h-3.5 w-3.5 opacity-70 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </Button>
 
@@ -71,8 +83,7 @@ export function PrintExportDropdown({
             type="button"
             role="menuitem"
             onClick={() => {
-              setOpen(false);
-              onPrint();
+              void runAction(onPrint, 'in danh sách');
             }}
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs font-medium text-foreground hover:bg-accent transition-colors"
           >
@@ -85,8 +96,7 @@ export function PrintExportDropdown({
               type="button"
               role="menuitem"
               onClick={() => {
-                setOpen(false);
-                onExportExcel();
+                void runAction(onExportExcel, 'xuất Excel');
               }}
               className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs font-medium text-foreground hover:bg-accent transition-colors border-t mt-1 pt-2"
             >
@@ -94,10 +104,19 @@ export function PrintExportDropdown({
               <span>{exportLabel}</span>
             </button>
           ) : null}
+          <p className="px-3 py-2 text-[11px] leading-4 text-muted-foreground">Để in đúng mẫu, chọn A4, tỷ lệ 100% và tắt “Đầu trang và chân trang” trong Tùy chọn khác của trình duyệt.</p>
         </div>
       ) : null}
     </div>
   );
+}
+
+/** Legacy report pages already define their own visible print area. */
+function printCurrentArea() {
+  const area = Array.from(document.querySelectorAll<HTMLElement>('.print-area, .a4-sheet, .huha-canvas')).find(element => element.getClientRects().length > 0);
+  if (!area) throw new Error('Không tìm thấy nội dung để in. Hãy mở bảng hoặc báo cáo trước.');
+  if (!area.id) area.id = `print-area-${Date.now()}`;
+  printDocumentElement(area.id);
 }
 
 /** Nút in đơn giản cho các trang chi tiết không có bảng dữ liệu xuất Excel */

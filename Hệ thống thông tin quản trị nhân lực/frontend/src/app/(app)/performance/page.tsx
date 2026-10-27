@@ -1,5 +1,7 @@
 'use client';
 
+import { KpiOverview } from '@/components/performance/kpi-overview';
+
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -17,7 +19,6 @@ import { useAuthStore } from '@/lib/auth-store';
 import { api, errorMessage } from '@/lib/api';
 import { formatDateTime } from '@/lib/utils';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
-import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
 import { Button, Badge, Input, Select, Textarea } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toaster';
@@ -403,14 +404,16 @@ export default function PerformanceKpiPage() {
   const canManageCycles = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(role)));
   const canDeleteCycles = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER'].includes(role)));
   const canAdministerGoals = Boolean(currentUser?.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(role)));
+  const canViewTeamKpi = canManageGoals;
+  const kpiAccessKey = [currentUser?.id ?? 'anonymous', [...(currentUser?.roles ?? [])].sort().join(',')];
   const canManageKpiLibrary = Boolean(currentUser?.roles.includes('ADMIN'));
 
   const searchParams = useSearchParams();
-  const validTabs = useMemo(() => canCalibrate && !isEnterprise ? ['goals', 'templates', 'rubrics', 'calibration', 'cycles'] : ['goals', 'templates', 'rubrics', 'cycles'], [isEnterprise, canCalibrate]);
+  const validTabs = useMemo(() => [...(isEnterprise && canViewTeamKpi ? ['overview'] : []), ...(canCalibrate && !isEnterprise ? ['goals', 'templates', 'rubrics', 'calibration', 'cycles'] : ['goals', 'templates', 'rubrics', 'cycles'])], [isEnterprise, canCalibrate, canViewTeamKpi]);
   type TabType = typeof validTabs[number];
 
   const paramTab = searchParams.get('tab');
-  const initialTab = (paramTab && (validTabs as readonly string[]).includes(paramTab)) ? (paramTab as TabType) : 'goals';
+  const initialTab = (paramTab && (validTabs as readonly string[]).includes(paramTab)) ? (paramTab as TabType) : validTabs[0];
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
 
   // Lắng nghe URL searchParams để chuyển tab tức thì khi bấm từ Sidebar menu (?tab=templates hoặc ?tab=rubrics)
@@ -419,14 +422,14 @@ export default function PerformanceKpiPage() {
     if (currentTab && (validTabs as readonly string[]).includes(currentTab)) {
       setActiveTab(currentTab as TabType);
     } else {
-      setActiveTab('goals');
+      setActiveTab(validTabs[0]);
     }
   }, [searchParams, validTabs]);
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
     if (tab === 'goals') {
-      router.replace('/performance', { scroll: false });
+      router.replace('/performance?tab=goals', { scroll: false });
     } else {
       router.replace(`/performance?tab=${tab}`, { scroll: false });
     }
@@ -512,21 +515,26 @@ export default function PerformanceKpiPage() {
 
   // Queries
   const { data: cycles = [], isLoading: isLoadingCycles } = useQuery<AppraisalCycle[]>({
-    queryKey: ['hrms-performance-cycles'],
+    queryKey: ['hrms-performance-cycles', ...kpiAccessKey],
     queryFn: async () => (await api.get('/hrms/performance/cycles')).data,
+    enabled: Boolean(currentUser?.id),
   });
   const stateCycles = cycles.filter(cycle => cycle.organizationSector === 'state');
   const calibrationCycles = stateCycles.filter(cycle => cycle.periodType === 'ANNUAL' || cycle.periodType === 'CUSTOM');
   const effectiveCalibrationCycleId = calibrationCycleId || calibrationCycles.find(cycle => cycle.periodType === 'ANNUAL')?.id || calibrationCycles[0]?.id || '';
 
-  const { data: goals = [], isLoading: isLoadingGoals } = useQuery<AppraisalGoal[]>({
-    queryKey: ['hrms-performance-goals'],
-    queryFn: async () => (await api.get('/hrms/performance/goals')).data,
+  const { data: fetchedGoals = [], isLoading: isLoadingGoals } = useQuery<AppraisalGoal[]>({
+    queryKey: ['hrms-performance-goals', ...kpiAccessKey],
+    queryFn: async () => (await api.get('/hrms/performance/goals', { params: canViewTeamKpi ? undefined : { userId: currentUser?.id } })).data,
+    enabled: Boolean(currentUser?.id),
   });
 
+  const goals = canViewTeamKpi ? fetchedGoals : fetchedGoals.filter(goal => goal.userId === currentUser?.id);
+
   const { data: employees = [] } = useQuery<EmployeeItem[]>({
-    queryKey: ['employees-simple-list'],
+    queryKey: ['employees-simple-list', ...kpiAccessKey],
     queryFn: async () => (await api.get('/employees')).data,
+    enabled: Boolean(currentUser?.id) && canViewTeamKpi,
   });
 
   const { data: orgUnits = [] } = useQuery<OrgUnitItem[]>({
@@ -551,16 +559,16 @@ export default function PerformanceKpiPage() {
   }, [searchParams, cycles]);
 
   const { data: publicDecisions = [], isLoading: isLoadingPublicDecisions } = useQuery<PublicDecisionRow[]>({
-    queryKey: ['hrms-performance-public-decisions', effectiveCalibrationCycleId],
+    queryKey: ['hrms-performance-public-decisions', ...kpiAccessKey, effectiveCalibrationCycleId],
     queryFn: async () => (await api.get('/hrms/performance/public-decisions', { params: { cycleId: effectiveCalibrationCycleId } })).data,
-    enabled: Boolean(effectiveCalibrationCycleId),
+    enabled: canCalibrate && Boolean(currentUser?.id) && Boolean(effectiveCalibrationCycleId),
   });
 
   const savePublicDecisionMutation = useMutation({
     mutationFn: async (draft: PublicDecisionDraft) => (await api.post('/hrms/performance/public-decisions', { cycleId: effectiveCalibrationCycleId, ...draft })).data,
     onSuccess: () => {
       toast('Đã lưu kết luận hiệu chuẩn công vụ.', 'success');
-      queryClient.invalidateQueries({ queryKey: ['hrms-performance-public-decisions', effectiveCalibrationCycleId] });
+      queryClient.invalidateQueries({ queryKey: ['hrms-performance-public-decisions'] });
     },
     onError: (err) => toast('Không lưu được kết luận: ' + errorMessage(err), 'error'),
   });
@@ -633,6 +641,7 @@ export default function PerformanceKpiPage() {
       toast('Đã xóa kỳ đánh giá!', 'success');
       queryClient.invalidateQueries({ queryKey: ['hrms-performance-cycles'] });
       queryClient.invalidateQueries({ queryKey: ['hrms-performance-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['hrms-performance-overview'] });
     },
     onError: (err) => toast('Lỗi: ' + errorMessage(err), 'error'),
   });
@@ -661,6 +670,7 @@ export default function PerformanceKpiPage() {
         ? `Đã giao KPI cho ${result.createdCount} nhân sự trong ${result.assignmentOrgUnit?.name ?? 'đơn vị'} và gửi thông báo đến từng người.`
         : 'Đã giao KPI và gửi thông báo cho nhân viên.', 'success');
       queryClient.invalidateQueries({ queryKey: ['hrms-performance-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['hrms-performance-overview'] });
       queryClient.invalidateQueries({ queryKey: ['hrms-performance-cycles'] });
       setIsGoalModalOpen(false);
       setGoalForm({
@@ -696,6 +706,7 @@ export default function PerformanceKpiPage() {
     onSuccess: () => {
       toast('Đã cập nhật điểm đánh giá KRA!', 'success');
       queryClient.invalidateQueries({ queryKey: ['hrms-performance-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['hrms-performance-overview'] });
       setIsScoreModalOpen(false);
     },
     onError: (err) => toast('Lỗi: ' + errorMessage(err), 'error'),
@@ -708,6 +719,7 @@ export default function PerformanceKpiPage() {
     onSuccess: () => {
       toast('Đã xóa mục tiêu KRA!', 'success');
       queryClient.invalidateQueries({ queryKey: ['hrms-performance-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['hrms-performance-overview'] });
     },
     onError: (err) => toast('Lỗi: ' + errorMessage(err), 'error'),
   });
@@ -725,6 +737,7 @@ export default function PerformanceKpiPage() {
     onSuccess: () => {
       toast('Đã lưu kết quả và minh chứng.', 'success');
       queryClient.invalidateQueries({ queryKey: ['hrms-performance-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['hrms-performance-overview'] });
       setEvidenceGoal(null);
       setEvidenceForm({ description: '', metricValue: '', evidenceUrl: '' });
     },
@@ -748,7 +761,7 @@ export default function PerformanceKpiPage() {
     return <LoadingState text="Đang tải dữ liệu KPI..." />;
   }
 
-  const activeCycle = cycles.find((c) => c.status === 'ACTIVE') || cycles[0];
+  const activeCycle = cycles.find(cycle => cycle.status === 'ACTIVE') || cycles[0];
   const goalSetupCycles = cycles.filter((cycle) => cycle.status === 'ACTIVE' && cycle.organizationSector === (isEnterprise ? 'enterprise' : 'state') && (isEnterprise || cycle.periodType !== 'ANNUAL'));
   const goalWeightTotal = (goal: AppraisalGoal) => goals
     .filter((item) => item.userId === goal.userId && item.cycleId === goal.cycleId)
@@ -847,6 +860,15 @@ export default function PerformanceKpiPage() {
       orgUnitName: employee?.orgUnit?.name,
     }] as const;
   })).values()).sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+  if (selectedEmployeeFilter !== 'ALL' && !employeeFilterOptions.some(item => item.id === selectedEmployeeFilter)) {
+    const selectedEmployee = canViewTeamKpi ? employees.find(item => item.id === selectedEmployeeFilter) : undefined;
+    employeeFilterOptions.push({
+      id: selectedEmployeeFilter,
+      name: selectedEmployee?.fullName ?? (selectedEmployeeFilter === currentUser?.id ? currentUser.fullName : undefined) ?? 'Nhân sự đang chọn',
+      code: selectedEmployee?.employeeCode,
+      orgUnitName: 'Chưa có KPI trong bộ lọc',
+    });
+  }
   const employeeFilteredGoals = selectedEmployeeFilter === 'ALL'
     ? unitFilteredGoals
     : unitFilteredGoals.filter(goal => goal.userId === selectedEmployeeFilter);
@@ -907,7 +929,9 @@ export default function PerformanceKpiPage() {
 
   return (
     <div className="space-y-6 pb-12">
+      {!canViewTeamKpi && <p className="rounded-lg border border-border p-3 text-sm text-muted-foreground">Bạn chỉ được xem KPI, điểm và minh chứng của chính mình. Thư viện KPI là mục tiêu mẫu dùng chung, không phải kết quả của nhân viên khác.</p>}
       <WorkspaceHeader
+        className="mb-0 border-0 pb-0"
         title="Đánh giá KPI"
         description={isEnterprise
           ? 'Giao mục tiêu, ghi nhận kết quả và minh chứng, rồi chấm điểm theo từng KPI và trọng số đã thống nhất.'
@@ -942,31 +966,16 @@ export default function PerformanceKpiPage() {
         }
       />
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <NumberCard
-          title="Kỳ Đánh Giá Hiện Tại"
-          value={activeCycle?.name ?? 'Chưa có kỳ'}
-          subtitle={activeCycle?.status === 'ACTIVE' ? 'Đang trong kỳ đánh giá' : 'Đã đóng kỳ'}
-          icon={Calendar}
-        />
-        <NumberCard
-          title="Mục Tiêu KRA/KPI"
-          value={goals.length}
-          subtitle={`Đã giao cho nhân sự (${goals.filter(g => g.managerScore != null).length} đã chấm)`}
-          icon={Target}
-        />
-      </div>
-
       {/* Navigation Tabs (Đồng bộ chuẩn hệ thống) */}
-      <div className="flex flex-wrap items-center justify-between border-b border-border gap-4">
-        <div className="flex border-b border-border -mb-px space-x-1 overflow-x-auto">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 max-w-full items-center gap-1 overflow-x-auto">
+          {isEnterprise && canViewTeamKpi && <button onClick={() => handleTabChange('overview')} className={`flex items-center gap-2 rounded-md px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap ${activeTab === 'overview' ? 'bg-muted text-foreground font-medium' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}><BarChart3 className="h-4 w-4" />Tổng quan quản lý</button>}
           <button
             onClick={() => handleTabChange('goals')}
-            className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-2 rounded-md px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'goals'
-                ? 'border-foreground text-foreground font-semibold'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                ? 'bg-muted text-foreground font-medium'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             }`}
           >
             <Target className="h-4 w-4" />
@@ -974,10 +983,10 @@ export default function PerformanceKpiPage() {
           </button>
           <button
             onClick={() => handleTabChange('templates')}
-            className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-2 rounded-md px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'templates'
-                ? 'border-foreground text-foreground font-semibold'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                ? 'bg-muted text-foreground font-medium'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             }`}
           >
             <FileText className="h-4 w-4" />
@@ -985,10 +994,10 @@ export default function PerformanceKpiPage() {
           </button>
           <button
             onClick={() => handleTabChange('rubrics')}
-            className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-2 rounded-md px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'rubrics'
-                ? 'border-foreground text-foreground font-semibold'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                ? 'bg-muted text-foreground font-medium'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             }`}
           >
             <Sliders className="h-4 w-4" />
@@ -996,10 +1005,10 @@ export default function PerformanceKpiPage() {
           </button>
           {!isEnterprise && canCalibrate && <button
             onClick={() => handleTabChange('calibration')}
-            className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-2 rounded-md px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'calibration'
-                ? 'border-foreground text-foreground font-semibold'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                ? 'bg-muted text-foreground font-medium'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             }`}
           >
             <Scale className="h-4 w-4" />
@@ -1007,10 +1016,10 @@ export default function PerformanceKpiPage() {
           </button>}
           <button
             onClick={() => handleTabChange('cycles')}
-            className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-2 rounded-md px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'cycles'
-                ? 'border-foreground text-foreground font-semibold'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                ? 'bg-muted text-foreground font-medium'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             }`}
           >
             <Calendar className="h-4 w-4" />
@@ -1019,18 +1028,19 @@ export default function PerformanceKpiPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2 text-xs">
+        <div className="flex w-full flex-wrap items-center gap-2 text-xs xl:w-auto">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
           <Select
+            aria-label="Chọn kỳ đánh giá"
             value={selectedCycleFilter}
             onChange={(e) => {
               setSelectedCycleFilter(e.target.value);
               setSelectedEmployeeFilter('ALL');
             }}
-            className="w-[180px] text-xs font-medium"
+            className="w-full text-xs font-medium sm:w-[220px]"
           >
-            <option value="ALL">Tất cả chu kỳ</option>
-            {cycles.map((c) => (
+            <option value="ALL">{activeTab === 'overview' ? 'Tự chọn kỳ đang mở / gần nhất' : 'Tất cả chu kỳ'}</option>
+            {cycles.filter(c => activeTab !== 'overview' || c.organizationSector === 'enterprise').map((c) => (
               <option key={c.id} value={c.id}>{c.name} ({c.year})</option>
             ))}
           </Select>
@@ -1042,7 +1052,7 @@ export default function PerformanceKpiPage() {
             }}
             searchable
             searchPlaceholder="Tìm phòng ban, khối..."
-            className="w-[220px] text-xs font-medium"
+            className="w-full text-xs font-medium sm:w-[220px]"
           >
             <option value="ALL">Tất cả phòng ban</option>
             {orgUnits.map(unit => <option key={unit.id} value={unit.id}>{unit.code} · {unit.name}</option>)}
@@ -1052,7 +1062,7 @@ export default function PerformanceKpiPage() {
             onChange={(e) => setSelectedEmployeeFilter(e.target.value)}
             searchable
             searchPlaceholder="Tìm nhân viên..."
-            className="w-[240px] text-xs font-medium"
+            className="w-full text-xs font-medium sm:w-[260px]"
             aria-label="Lọc mục tiêu theo nhân viên"
           >
             <option value="ALL">Tất cả nhân viên ({employeeFilterOptions.length})</option>
@@ -1063,7 +1073,7 @@ export default function PerformanceKpiPage() {
           {activeTab === 'goals' && <Select
             value={selectedEvaluationFilter}
             onChange={(e) => setSelectedEvaluationFilter(e.target.value as GoalEvaluationFilter)}
-            className="w-[200px] text-xs font-medium"
+            className="w-full text-xs font-medium sm:w-[220px]"
             aria-label="Lọc mục tiêu theo trạng thái đánh giá"
           >
             <option value="ALL">Mọi trạng thái ({employeeFilteredGoals.length})</option>
@@ -1071,8 +1081,15 @@ export default function PerformanceKpiPage() {
             <option value="WAITING_SCORE">Chờ quản lý chấm ({evaluationStatusCounts.WAITING_SCORE})</option>
             <option value="SCORED">Đã chấm ({evaluationStatusCounts.SCORED})</option>
           </Select>}
+          {activeTab === 'goals' && selectedEmployeeFilter !== 'ALL' && <Button variant="ghost" size="sm" onClick={() => setSelectedEmployeeFilter('ALL')}>Bỏ lọc nhân viên</Button>}
         </div>
       </div>
+
+      {activeTab === 'overview' && isEnterprise && canViewTeamKpi && <KpiOverview cycleId={selectedCycleFilter !== 'ALL' ? cycles.find(cycle => cycle.id === selectedCycleFilter && cycle.organizationSector === 'enterprise')?.id ?? '' : cycles.find(cycle => cycle.organizationSector === 'enterprise' && cycle.status === 'ACTIVE')?.id ?? cycles.find(cycle => cycle.organizationSector === 'enterprise')?.id ?? ''} accessKey={kpiAccessKey} currentUserId={currentUser?.id} onOpenGoals={(userId, cycleId, hasGoals) => {
+        setSelectedCycleFilter(cycleId); setSelectedUnitFilter('ALL'); setSelectedEmployeeFilter(userId); setSelectedEvaluationFilter('ALL');
+        if (!hasGoals) { setGoalForm(form => ({ ...form, cycleId, userId, orgUnitId: '', assignmentScope: 'INDIVIDUAL' })); setIsGoalModalOpen(true); }
+        else handleTabChange('goals');
+      }} />}
 
       {/* TAB 1: KRA GOALS */}
       {activeTab === 'goals' && (
@@ -1152,9 +1169,9 @@ export default function PerformanceKpiPage() {
                   {isEnterprise && <p className="text-xs text-muted-foreground">Tổng trọng số mục tiêu của nhân sự trong kỳ: <b className="text-foreground">{goalWeightTotal(g)}% / 100%</b>{goalWeightTotal(g) < 100 ? ` · Còn ${100 - goalWeightTotal(g)}% chưa phân bổ` : goalWeightTotal(g) > 100 ? ' · Vượt 100%, cần điều chỉnh' : ''}</p>}
                   {g.cycle?.organizationSector === 'state' && <p className="text-xs text-muted-foreground">Tổng trọng số nhóm {g.criteriaGroup === 'GENERAL' ? 'tiêu chí chung' : 'kết quả nhiệm vụ'}: <b className="text-foreground">{formatAppraisalScore(goalGroupWeightTotal(goals, g))}% / 100%</b></p>}
 
-                  {g.evidences?.length ? <div className="border-t pt-2 text-xs text-muted-foreground">
+                  {g.evidences?.length ? <div className="pt-2 text-xs text-muted-foreground">
                     Đã ghi {g.evidences.length} kết quả / minh chứng. Bấm “Xem” để đọc nội dung và mở tài liệu đính kèm.
-                  </div> : g.cycle?.organizationSector === 'state' && g.criteriaGroup === 'GENERAL' ? <p className="border-t pt-2 text-xs text-muted-foreground">Tiêu chí chung được quản lý chấm theo quy chế cơ quan; không bắt buộc tệp minh chứng cho từng tiêu chí.</p> : <p className="border-t pt-2 text-xs text-muted-foreground">Chưa có kết quả thực tế hoặc minh chứng. Quản lý chỉ có thể chấm sau khi nhân viên cập nhật căn cứ.</p>}
+                  </div> : g.cycle?.organizationSector === 'state' && g.criteriaGroup === 'GENERAL' ? <p className="pt-2 text-xs text-muted-foreground">Tiêu chí chung được quản lý chấm theo quy chế cơ quan; không bắt buộc tệp minh chứng cho từng tiêu chí.</p> : <p className="pt-2 text-xs text-muted-foreground">Chưa có kết quả thực tế hoặc minh chứng. Quản lý chỉ có thể chấm sau khi nhân viên cập nhật căn cứ.</p>}
 
                   <div className="rounded-md border border-border bg-muted/20 px-3 py-2.5">
                     <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -1166,7 +1183,7 @@ export default function PerformanceKpiPage() {
                       : <p className="mt-1 text-xs text-muted-foreground">Chưa tính vì chưa có điểm chấm · {goalContributionRule(g)}</p>}
                   </div>
 
-                  <div className="pt-3 border-t flex flex-col gap-3 text-sm lg:flex-row lg:items-center lg:justify-between">
+                  <div className="pt-3 flex flex-col gap-3 text-sm lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex items-center justify-between gap-2 lg:justify-start">
                       <span>{g.cycle?.organizationSector === 'state' ? (g.criteriaGroup === 'GENERAL' ? 'Điểm tiêu chí chung' : 'Điểm nhiệm vụ') : 'Điểm KPI'}: <b className="font-bold text-foreground">{g.finalScore != null ? `${g.finalScore}/100` : 'Chưa chấm'}</b></span>
                     </div>
@@ -1273,11 +1290,11 @@ export default function PerformanceKpiPage() {
 
                 {/* Bảng xem trước tiêu chí */}
                 <div className="border border-border/70 rounded-lg overflow-hidden text-sm">
-                  <div className="bg-muted/40 px-3.5 py-2.5 font-semibold text-foreground border-b border-border/70 flex justify-between items-center text-xs">
+                  <div className="bg-muted/40 px-3.5 py-2.5 font-semibold text-foreground border-border/70 flex justify-between items-center text-xs">
                     <span>Cấu trúc bảng mục tiêu mẫu (Tổng 100%)</span>
                   <span className="text-muted-foreground">Công thức: Σ(Điểm × Trọng số)</span>
                   </div>
-                {!isEnterprise && <p className="border-b border-border/70 bg-muted/20 px-3.5 py-2 text-xs leading-5 text-muted-foreground">Khung kỳ: tiêu chí chung 30 điểm + kết quả nhiệm vụ 70 điểm. Các tiêu chí trong từng nhóm phải có tổng trọng số riêng bằng 100%. Đây là minh họa nhập liệu, không phải biểu mẫu pháp quy.</p>}
+                {!isEnterprise && <p className="border-border/70 bg-muted/20 px-3.5 py-2 text-xs leading-5 text-muted-foreground">Khung kỳ: tiêu chí chung 30 điểm + kết quả nhiệm vụ 70 điểm. Các tiêu chí trong từng nhóm phải có tổng trọng số riêng bằng 100%. Đây là minh họa nhập liệu, không phải biểu mẫu pháp quy.</p>}
                   <div className="divide-y divide-border/50 bg-card">
                     <div className="px-3.5 py-2.5 flex items-center justify-between text-sm">
                       <div>
@@ -1311,7 +1328,7 @@ export default function PerformanceKpiPage() {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-border flex items-center justify-between gap-2">
+              <div className="pt-3 border-border flex items-center justify-between gap-2">
                 <button
                   type="button"
                   onClick={() => setSelectedTemplateForPrint('kra')}
@@ -1341,7 +1358,7 @@ export default function PerformanceKpiPage() {
       {/* TAB 4: BẢNG QUY ƯỚC & THANG ĐIỂM ĐÁNH GIÁ (RUBRICS) */}
       {activeTab === 'rubrics' && (
         <div className="space-y-6">
-          {isEnterprise && incompleteEvaluationCount > 0 && <p className="border-l-2 border-border pl-3 text-sm leading-5 text-muted-foreground">Chưa thể hoàn tất kỳ: {incompleteEvaluationCount} hồ sơ nhân sự còn thiếu trọng số, điểm hoặc minh chứng.</p>}
+          {isEnterprise && incompleteEvaluationCount > 0 && <p className="border-border pl-3 text-sm leading-5 text-muted-foreground">Chưa thể hoàn tất kỳ: {incompleteEvaluationCount} hồ sơ nhân sự còn thiếu trọng số, điểm hoặc minh chứng.</p>}
           <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-5">
             <div className="flex items-center gap-3">
               <span className="p-2 rounded-lg bg-muted text-foreground border border-border">
@@ -1357,8 +1374,8 @@ export default function PerformanceKpiPage() {
               </div>
             </div>
 
-          <div className="space-y-4 border-t border-border/70 pt-5">
-            <div className="border-b border-border/70 pb-3">
+          <div className="space-y-4 border-border/70 pt-5">
+            <div className="border-border/70 pb-3">
               <h4 className="font-bold text-foreground text-base">1. Ngưỡng điểm đang được hệ thống tính</h4>
               <p className="mt-1 text-xs text-muted-foreground">{isEnterprise ? 'Ngưỡng xếp loại nội bộ của HRMS; doanh nghiệp cần ban hành quy chế riêng. Không áp dụng hạn ngạch công vụ.' : `Ngưỡng điểm tham chiếu theo ${publicEmployee ? 'Nghị định 233/2026/NĐ-CP (viên chức)' : 'Nghị định 335/2025/NĐ-CP (công chức)'}. Kết luận vẫn cần điều kiện và thẩm quyền theo quy định.`}</p>
             </div>
@@ -1376,8 +1393,8 @@ export default function PerformanceKpiPage() {
             <p className="text-sm text-muted-foreground">{isEnterprise ? 'Không áp dụng hạn ngạch công vụ. Thưởng, điều chỉnh lương hoặc PIP cần quy chế và phê duyệt riêng của doanh nghiệp.' : 'Trong khu vực công, tỷ lệ xuất sắc được kiểm tra theo cùng đơn vị và nhóm nhiệm vụ theo quy định áp dụng; tỷ lệ này không áp dụng cho doanh nghiệp tư nhân.'}</p>
           </div>
 
-          <div className="space-y-4 border-t border-border/70 pt-5">
-            <div className="border-b border-border/70 pb-3">
+          <div className="space-y-4 border-border/70 pt-5">
+            <div className="border-border/70 pb-3">
               <h4 className="font-bold text-foreground text-base">2. Cách giao mục tiêu và công thức tính điểm</h4>
               <p className="mt-1 text-xs text-muted-foreground">{isEnterprise ? 'Có hai phạm vi giao KPI; cả hai đều được tính vào điểm riêng của từng nhân viên.' : 'Hai phạm vi giao mục tiêu giống nhau; cách tính điểm khu vực công được tách theo nhóm tiêu chí và kết quả nhiệm vụ.'}</p>
             </div>
@@ -1419,7 +1436,7 @@ export default function PerformanceKpiPage() {
 
           {/* QUY ƯỚC 5: QUY TRÌNH ĐÁNH GIÁ HIỆU SUẤT 4 BƯỚC KHÉP KÍN */}
           <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-3">
-            <div className="flex items-center justify-between border-b border-border/70 pb-3">
+            <div className="flex items-center justify-between border-border/70 pb-3">
               <h4 className="font-bold text-foreground text-base flex items-center gap-2">
                 <RefreshCw className="w-5 h-5 text-primary" />
                 {isEnterprise ? 'Chu trình quản lý KPI' : 'Chu trình đánh giá công vụ'}
@@ -1504,7 +1521,7 @@ export default function PerformanceKpiPage() {
                     {draft.quotaExceptionApproved && <Input value={draft.exceptionDecisionNo} onChange={event => updatePublicDecisionDraft(row, { exceptionDecisionNo: event.target.value })} placeholder="Số quyết định ngoại lệ" />}
                   </div>}
                   <label className="block space-y-1 text-xs"><span className="font-medium">{draft.finalClassification === 'EXCELLENT' ? 'Căn cứ và minh chứng xếp loại xuất sắc (bắt buộc)' : 'Căn cứ kết luận hoặc thay đổi mức điểm'}</span><textarea value={draft.decisionNote} onChange={event => updatePublicDecisionDraft(row, { decisionNote: event.target.value })} rows={2} maxLength={2000} className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" placeholder={draft.finalClassification === 'EXCELLENT' ? 'Ghi rõ minh chứng về nhiệm vụ hoàn thành vượt mức, đúng hạn và các điều kiện áp dụng.' : 'Ghi căn cứ đánh giá, quyết định của người có thẩm quyền hoặc lý do kết luận thấp hơn mức điểm.'} /></label>
-                  <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
+                  <div className="flex items-center justify-between gap-2 border-border pt-3">
                     <span className="text-xs text-muted-foreground">{row.decided ? 'Đã có kết luận lưu; có thể cập nhật trước khi khóa kỳ.' : 'Chưa có kết luận cuối cùng.'}</span>
                     <Button size="sm" disabled={!row.complete || !draft.comparableGroup.trim() || (draft.finalClassification === 'EXCELLENT' && !draft.decisionNote.trim()) || savePublicDecisionMutation.isPending} onClick={() => savePublicDecisionMutation.mutate(draft)}><Check className="h-4 w-4" />Lưu kết luận</Button>
                   </div>
@@ -1565,7 +1582,7 @@ export default function PerformanceKpiPage() {
                   {c.organizationSector === 'state' && c.publicPersonnelType === 'PUBLIC_EMPLOYEE' && c.periodType !== 'ANNUAL' && <div className="col-span-2 text-xs text-muted-foreground">Kết quả nhiệm vụ: số lượng {formatAppraisalScore(c.quantityCriteriaWeight ?? 100 / 3)}% · chất lượng {formatAppraisalScore(c.qualityCriteriaWeight ?? 100 / 3)}% · tiến độ {formatAppraisalScore(c.progressCriteriaWeight ?? 100 / 3)}%</div>}
                 </div>
 
-                <div className="pt-3 border-t flex items-center justify-between text-sm">
+                <div className="pt-3 flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
                     {canManageCycles && <button
                       onClick={() => {

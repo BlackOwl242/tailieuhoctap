@@ -1,5 +1,6 @@
 import { BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { HrAccessService } from '../../common/services/hr-access.service';
+import { dateKey, workDate } from '../../common/hr-time';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 import {
@@ -320,13 +321,61 @@ export class HrmsPerformanceService {
     return { complete: true, weight, score, classification, missingEvidence: false, framework: 'ENTERPRISE_KPI' };
   }
 
-  async listCycles() {
-    return this.prisma.hrmsAppraisalCycle.findMany({
+  private async visibleUserIds(actor: AuthUser): Promise<string[] | null> {
+    if (!actor?.id) throw new ForbiddenException('Cần đăng nhập để xem đánh giá');
+    if (actor.roles.some(role => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(role))) return null;
+    if (!actor.roles.includes('LINE_MANAGER')) return [actor.id];
+    const scope = await this.access.reviewScope(actor);
+    const users = await this.prisma.user.findMany({ where: { ...scope, deletedAt: null }, select: { id: true } });
+    return [...new Set([actor.id, ...users.map(user => user.id)])];
+  }
+
+  async listCycles(actor: AuthUser) {
+    const visibleIds = await this.visibleUserIds(actor);
+    const cycles = await this.prisma.hrmsAppraisalCycle.findMany({
+      where: visibleIds ? { OR: [{ participantScope: 'COMPANY' }, { participantIds: { hasSome: visibleIds } }, { goals: { some: { userId: { in: visibleIds } } } }] } : {},
       include: {
-        _count: { select: { goals: true } },
+        _count: { select: { goals: visibleIds ? { where: { userId: { in: visibleIds } } } : true } },
       },
       orderBy: [{ year: 'desc' }, { startDate: 'desc' }],
     });
+    return cycles.map(cycle => ({ ...cycle, participantIds: visibleIds ? cycle.participantIds.filter(id => visibleIds.includes(id)) : cycle.participantIds }));
+  }
+
+  async managementOverview(actor: AuthUser, cycleId: string) {
+    if (!cycleId) throw new BadRequestException('Chọn kỳ KPI cần theo dõi');
+    const cycle = await this.prisma.hrmsAppraisalCycle.findUnique({ where: { id: cycleId } });
+    if (!cycle) throw new NotFoundException('Không tìm thấy kỳ KPI');
+    if (cycle.organizationSector !== 'enterprise') throw new BadRequestException('Tổng quan này dành cho KPI doanh nghiệp');
+    const visibleIds = await this.visibleUserIds(actor);
+    const participantIds = cycle.participantScope === 'COMPANY'
+      ? [...new Set([...cycle.participantIds, ...(await this.eligibleParticipants(cycle.startDate, cycle.endDate)).map(user => user.id)])]
+      : cycle.participantIds;
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: participantIds.filter(id => !visibleIds || visibleIds.includes(id)) }, deletedAt: null },
+      select: { id: true, fullName: true, employeeCode: true, orgUnit: { select: { id: true, name: true } } },
+    });
+    const goals = await this.prisma.hrmsAppraisalGoal.findMany({ where: { cycleId, userId: { in: users.map(user => user.id) } }, include: { evidences: { select: { id: true } } } });
+    const byUser = new Map<string, typeof goals>();
+    for (const goal of goals) {
+      const assigned = byUser.get(goal.userId) ?? [];
+      assigned.push(goal);
+      byUser.set(goal.userId, assigned);
+    }
+    const rows = users.map(user => {
+      const assigned = byUser.get(user.id) ?? [];
+      const total = assigned.length;
+      const scored = assigned.filter(goal => goal.finalScore !== null).length;
+      const withEvidence = assigned.filter(goal => goal.evidences.length > 0).length;
+      const weight = assigned.reduce((sum, goal) => sum + goal.weightage, 0);
+      const complete = total > 0 && scored === total && withEvidence === total && Math.abs(weight - 100) < .001;
+      const score = complete ? Math.round(assigned.reduce((sum, goal) => sum + goal.finalScore! * goal.weightage / 100, 0) * 100) / 100 : null;
+      const stage = !total ? 'NO_GOALS' : Math.abs(weight - 100) >= .001 ? 'INVALID_WEIGHT' : withEvidence < total ? 'MISSING_EVIDENCE' : scored < total ? 'WAITING_SCORE' : score! < 50 ? 'NEEDS_SUPPORT' : 'COMPLETE';
+      return { userId: user.id, employeeName: user.fullName, employeeCode: user.employeeCode, orgUnit: user.orgUnit, goalCount: total, scoredCount: scored, evidenceCount: withEvidence, weight, score, stage, overdue: cycle.status === 'ACTIVE' && dateKey(cycle.endDate) < workDate() && !complete };
+    });
+    const priority = ['NO_GOALS', 'INVALID_WEIGHT', 'MISSING_EVIDENCE', 'WAITING_SCORE', 'NEEDS_SUPPORT', 'COMPLETE'];
+    rows.sort((a, b) => priority.indexOf(a.stage) - priority.indexOf(b.stage) || a.employeeName.localeCompare(b.employeeName, 'vi'));
+    return { cycle: { id: cycle.id, name: cycle.name, endDate: cycle.endDate, status: cycle.status }, rows };
   }
 
   async createCycle(actorId: string, dto: CreateCycleDto) {
@@ -602,19 +651,13 @@ export class HrmsPerformanceService {
     return { success: true };
   }
 
-  async listGoals(cycleId?: string, userId?: string, actor?: AuthUser) {
-    const where: Record<string, unknown> = {};
+  async listGoals(actor: AuthUser, cycleId?: string, userId?: string) {
+    const visibleIds = await this.visibleUserIds(actor);
+    if (visibleIds && userId && !visibleIds.includes(userId)) throw new ForbiddenException('Không được xem KPI của nhân sự ngoài phạm vi phụ trách');
+    const where: Prisma.HrmsAppraisalGoalWhereInput = {};
     if (cycleId) where.cycleId = cycleId;
-    if (userId) where.userId = userId;
-
-    if (actor && !actor.roles.some(role=>['ADMIN','KM_MANAGER','HR_TRAINER','HR_CB','BOD'].includes(role))) {
-      if (actor.roles.includes('LINE_MANAGER')) {
-        const scope = await this.access.reviewScope(actor);
-        const users = await this.prisma.user.findMany({where:scope,select:{id:true}});
-        where.userId = userId && users.some(u=>u.id===userId) ? userId : {in:users.map(u=>u.id)};
-      } else where.userId = actor.id;
-    }
-    return this.prisma.hrmsAppraisalGoal.findMany({
+    where.userId = userId ?? (visibleIds ? { in: visibleIds } : undefined);
+    const goals = await this.prisma.hrmsAppraisalGoal.findMany({
       where,
       include: {
         cycle: true,
@@ -623,6 +666,7 @@ export class HrmsPerformanceService {
       },
       orderBy: { createdAt: 'desc' },
     });
+    return goals.map(goal => ({ ...goal, cycle: { ...goal.cycle, participantIds: visibleIds ? goal.cycle.participantIds.filter(id => visibleIds.includes(id)) : goal.cycle.participantIds } }));
   }
 
   async addGoalEvidence(actor: AuthUser, goalId: string, dto: CreateKraEvidenceDto) {
@@ -885,10 +929,16 @@ export class HrmsPerformanceService {
 export class HrmsPerformanceController {
   constructor(private readonly service: HrmsPerformanceService) {}
 
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD')
+  @Get('overview')
+  managementOverview(@CurrentUser() actor: AuthUser, @Query('cycleId') cycleId: string) {
+    return this.service.managementOverview(actor, cycleId);
+  }
+
   @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER', 'ACCOUNTANT', 'HR_RECRUITER')
   @Get('cycles')
-  listCycles() {
-    return this.service.listCycles();
+  listCycles(@CurrentUser() actor: AuthUser) {
+    return this.service.listCycles(actor);
   }
 
   @Post('cycles')
@@ -914,7 +964,7 @@ export class HrmsPerformanceController {
   @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER', 'ACCOUNTANT', 'HR_RECRUITER')
   @Get('goals')
   listGoals(@CurrentUser() actor: AuthUser, @Query('cycleId') cycleId?: string, @Query('userId') userId?: string) {
-    return this.service.listGoals(cycleId,userId,actor);
+    return this.service.listGoals(actor,cycleId,userId);
   }
 
   @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER')

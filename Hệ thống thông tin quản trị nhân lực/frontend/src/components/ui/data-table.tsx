@@ -1,13 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { createPortal } from 'react-dom';
+import { createPortal, flushSync } from 'react-dom';
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, FileSpreadsheet, MoreVertical, Search, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { exportRowsToExcel } from '@/lib/export';
 import { Button, Input, Select, Skeleton } from '@/components/ui/primitives';
 import { EmptyState } from '@/components/common/states';
 import { PrintExportDropdown } from '@/components/ui/print';
+import { cellOutputText, printTableOutput } from '@/lib/table-output';
 
 /* ============================================================================
  * DataTable dùng chung (Mục 6 + Mục 8) — bảng quản lý đầy đủ tính năng:
@@ -82,8 +83,10 @@ interface DataTableProps<T> {
   exportLabel?: string;
   /** Nhãn nút in trong menu dropdown (mặc định: 'In danh sách'). */
   printLabel?: string;
+  printTitle?: string;
+  printSubtitle?: string;
   /** Hàm in tùy chỉnh (mặc định: window.print()). */
-  onPrint?: () => void;
+  onPrint?: () => void | Promise<void>;
   /** Hiện nút in ngay cả khi không có exportFilename. */
   showPrint?: boolean;
 }
@@ -208,9 +211,14 @@ export function DataTable<T>({
   exportFilename,
   exportLabel,
   printLabel,
+  printTitle,
+  printSubtitle,
   onPrint,
   showPrint,
 }: DataTableProps<T>) {
+  const [snapshotOpen, setSnapshotOpen] = React.useState(false);
+  const snapshotRef = React.useRef<HTMLTableElement>(null);
+  const rootRef = React.useRef<HTMLDivElement>(null);
   const [search, setSearch] = React.useState('');
   const [filterValues, setFilterValues] = React.useState<Record<string, string>>({});
   const [sort, setSort] = React.useState<SortState>(null);
@@ -265,9 +273,36 @@ export function DataTable<T>({
     const text = normalizeColumnText(`${column.key} ${column.header}`);
     return /(^|\W)(name|fullname|employee|personnel|staff|title|subject)(\W|$)|ho va ten|ho ten|nhan su|nhan vien|can bo|nguoi lao dong|ten nhan vien|chuc danh/.test(text);
   }) ?? columns[0];
+  const outputColumns = columns.filter(column => !column.noPrint && !/^(actions?|open|operations?)$/i.test(column.key));
+  function outputData(format: 'excel' | 'print' = 'excel') {
+    flushSync(() => setSnapshotOpen(true));
+    try {
+      const rows = sorted.map((row, rowIndex) => outputColumns.map((column, columnIndex) => {
+        if (column.exportValue) {
+          const value = column.exportValue(row);
+          return format === 'print' && typeof value === 'number' ? new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(value) : value;
+        }
+        const raw = (row as Record<string, unknown>)[column.key];
+        if (format === 'excel' && typeof raw === 'number' && Number.isFinite(raw)) return raw;
+        const cell = snapshotRef.current?.rows[rowIndex]?.cells[columnIndex];
+        const rendered = cell ? cellOutputText(cell).replace(/[ \t]+/g, ' ').replace(/\n\s*\n/g, '\n').trim() : '';
+        if (rendered) return rendered;
+        return raw == null ? '' : Array.isArray(raw) ? raw.join(', ') : typeof raw === 'object' ? '' : String(raw);
+      }));
+      return { headers: outputColumns.map(column => column.header), rows };
+    } finally { setSnapshotOpen(false); }
+  }
+  async function printRows() {
+    const section = rootRef.current?.closest('section');
+    const title = printTitle ?? section?.querySelector('h2')?.textContent ?? document.querySelector('main h1')?.textContent ?? printLabel ?? 'Danh sách dữ liệu';
+    const subtitle = printSubtitle ?? section?.querySelector('h2 + p')?.textContent ?? undefined;
+    const scope = [search.trim() ? `Từ khóa: ${search.trim()}` : '', ...filters.filter(filter => filterValues[filter.key]).map(filter => `${filter.label}: ${filter.options.find(option => option.value === filterValues[filter.key])?.label ?? filterValues[filter.key]}`)].filter(Boolean).join('; ');
+    await printTableOutput({ title, subtitle, scope, ...outputData('print') });
+  }
 
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
+    <div ref={rootRef} className={cn('flex flex-col gap-3', className)}>
+      {snapshotOpen && <div aria-hidden="true" className="no-print" style={{ position: 'fixed', left: '-100000px', top: 0, width: 1200, pointerEvents: 'none', visibility: 'hidden' }}><table ref={snapshotRef}><tbody>{sorted.map(row => <tr key={rowKey(row)}>{outputColumns.map(column => <td key={column.key}>{column.render ? column.render(row) : String((row as Record<string, unknown>)[column.key] ?? '')}</td>)}</tr>)}</tbody></table></div>}
       {/* ------------------------- Thanh công cụ ------------------------- */}
       {hasToolbar ? (
         <div className="no-print flex flex-col gap-2 lg:flex-row lg:items-center">
@@ -308,22 +343,13 @@ export function DataTable<T>({
               <PrintExportDropdown
                 printLabel={printLabel ?? 'In danh sách'}
                 exportLabel={exportLabel ?? 'Xuất bảng tính Excel'}
-                onPrint={onPrint ?? (() => window.print())}
+                onPrint={onPrint ?? printRows}
+                disabled={loading}
                 onExportExcel={
                   exportFilename
                     ? () => {
-                        const printableCols = columns.filter((c) => !c.noPrint);
-                        exportRowsToExcel(
-                          exportFilename,
-                          printableCols.map((c) => c.header),
-                          sorted.map((r) =>
-                            printableCols.map((c) => {
-                              if (c.exportValue) return c.exportValue(r);
-                              const raw = (r as Record<string, unknown>)[c.key];
-                              return raw == null ? '' : (raw as string | number);
-                            }),
-                          ),
-                        );
+                        const data = outputData();
+                        return exportRowsToExcel(exportFilename, data.headers, data.rows);
                       }
                     : undefined
                 }

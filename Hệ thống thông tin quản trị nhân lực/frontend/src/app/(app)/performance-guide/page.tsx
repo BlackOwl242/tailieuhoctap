@@ -166,6 +166,16 @@ export default function PerformanceGuidePage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="space-y-2 p-5">
+          <h2 className="font-semibold">Ai được xem KPI cá nhân?</h2>
+          <p className="text-sm leading-6 text-muted-foreground">Nhân viên chỉ xem mục tiêu, điểm và minh chứng của chính mình. Quản lý bộ phận xem trong phạm vi đơn vị phụ trách; HR và các vai trò quản trị đánh giá xem theo quyền được cấp. Thư viện mục tiêu mẫu dùng chung không chứa kết quả KPI cá nhân.</p>
+        </Card>
+        {isEnterprise && <Card className="space-y-2 p-5">
+          <h2 className="font-semibold">Nếu nhân viên không đạt KPI thì sao?</h2>
+          <p className="text-sm leading-6 text-muted-foreground">Một mục tiêu chưa đạt chỉ tiêu vẫn được ghi nhận theo kết quả thực tế; mục tiêu đạt/không đạt nhận 100 hoặc 0 điểm. Điểm kỳ được cộng theo trọng số: từ 90 là xuất sắc, 75–dưới 90 là tốt, 50–dưới 75 là hoàn thành, dưới 50 là không hoàn thành. Không đạt một mục tiêu không đồng nghĩa không hoàn thành cả kỳ.</p>
+          <p className="text-sm leading-6 text-muted-foreground">Quản lý đối chiếu minh chứng, ghi rõ nguyên nhân và phản hồi; thống nhất việc cần cải thiện, người hỗ trợ và hạn rà soát với nhân viên, rồi giao mục tiêu theo dõi ở kỳ tiếp theo. Hệ thống hiện lưu điểm, minh chứng và giải trình; chưa có luồng kế hoạch cải thiện riêng.</p>
+          <p className="text-sm leading-6 text-muted-foreground">Thiếu điểm hoặc minh chứng được coi là chưa đủ dữ liệu đánh giá, không tự tính là không đạt. KPI thấp không tự trừ lương, kỷ luật hoặc cho nghỉ việc; các quyết định này cần quy trình và phê duyệt riêng.</p>
+        </Card>}
+        <Card className="space-y-2 p-5">
           <h2 className="font-semibold">Điểm tổng hợp có tự động thay đổi tiền lương không?</h2>
           <p className="text-sm leading-6 text-muted-foreground">Không. Kết quả đánh giá là căn cứ quản trị. Việc thưởng, điều chỉnh lương hoặc quyết định nhân sự phải theo quy chế, hồ sơ và phê duyệt riêng của tổ chức. Hệ thống hiện không tự nối kết quả KPI sang P3 hoặc tự phát sinh khoản lương.</p>
         </Card>

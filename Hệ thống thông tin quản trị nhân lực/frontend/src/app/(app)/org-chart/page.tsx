@@ -262,7 +262,7 @@ export default function OrgChartPage() {
                 const rowsData = tableRows.map((r) =>
                   exportableCols.map((c) => (c.exportValue ? c.exportValue(r) : String((r as any)[c.key] ?? '')))
                 );
-                exportRowsToExcel('co-cau-to-chuc', headers, rowsData);
+                return exportRowsToExcel('co-cau-to-chuc', headers, rowsData);
               }}
             />
             {canManageOrgUnits && (

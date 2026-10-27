@@ -1651,15 +1651,28 @@ html.capture-mode *::-webkit-scrollbar { display: none !important; width: 0 !imp
 .citizen-case-section > p { margin: 0; color: #40556a; font-size: 14px; line-height: 1.7; white-space: pre-line; }
 .citizen-file-list { margin-top: 14px; display: grid; gap: 6px; color: #40556a; font-size: 13px; }
 .citizen-timeline { display: grid; }
+.citizen-timeline article > div { display: grid; gap: 4px; min-width: 0; }
 .citizen-timeline article { position: relative; padding: 0 0 18px 24px; display: grid; grid-template-columns: 1fr; gap: 2px; }
 .citizen-timeline article::before { content: ''; position: absolute; top: 9px; bottom: -2px; left: 5px; width: 1px; background: #d9e0e7; }
 .citizen-timeline article:last-child::before { display: none; }
 .citizen-timeline article > i { position: absolute; top: 4px; left: 0; width: 11px; height: 11px; border: 2px solid #24427f; border-radius: 50%; background: #fff; }
 .citizen-timeline article b { color: #20394f; font-size: 14px; }
-.citizen-timeline time { color: #637384; font-size: 12px; }
+.citizen-timeline time { color: #637384; font-size: 12px; line-height: 1.5; }
 .citizen-timeline p { margin: 5px 0 0; color: #536476; font-size: 13px; line-height: 1.6; white-space: pre-line; }
 .citizen-action-form { display: grid; gap: 13px; background: #f9fafb; }
 .citizen-action-form .button { justify-self: start; }
+.citizen-case-view > .citizen-action-form { width: 100%; min-width: 0; }
+.citizen-payment-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 16px; justify-items: start; }
+.citizen-payment-actions > .citizen-payment-form { width: 100%; min-width: 0; margin: 0; padding: clamp(16px, 2vw, 24px); justify-self: stretch; }
+.citizen-payment-form h4 { margin: 0; font-size: 16px; color: #20394f; }
+.citizen-payment-reference { margin: 0; color: #40556a; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+.citizen-payment-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.citizen-payment-form .citizen-field small { font-weight: 400; }
+.citizen-payment-form .button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.citizen-case-view code { overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .citizen-payment-fields { grid-template-columns: minmax(0, 1fr); }
+}
 .citizen-boundary-note { margin: 0; padding-top: 12px; border-top: 1px solid #e3e8ed; color: #637384; font-size: 12px; line-height: 1.6; }
 .citizen-success { margin: 12px 0; color: #246b53; font-size: 14px; font-weight: 700; }
 .citizen-receipt-page { max-width: 760px; margin: 28px auto; }

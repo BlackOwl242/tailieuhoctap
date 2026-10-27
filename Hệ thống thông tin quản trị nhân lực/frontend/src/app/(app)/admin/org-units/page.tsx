@@ -558,8 +558,8 @@ export default function AdminOrgUnitsPage() {
                   f.node.memberCount,
                   flat.find((p) => p.node.id === f.node.parentId)?.node.name ?? 'Gốc',
                 ]);
-                import('@/lib/export').then(({ exportRowsToExcel }) => {
-                  exportRowsToExcel('co-cau-to-chuc', cols, rows);
+                return import('@/lib/export').then(({ exportRowsToExcel }) => {
+                  return exportRowsToExcel('co-cau-to-chuc', cols, rows);
                 });
               }}
             />
