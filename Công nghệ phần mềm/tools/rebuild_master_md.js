@@ -9,9 +9,8 @@ const docs = [
   path.join(rootDir, 'docs', '04_KiemThu_BaoTri_KetLuan.md')
 ];
 
-const pageBreak = '<div style="page-break-after: always;"></div>';
 const contents = docs.map(f => fs.readFileSync(f, 'utf8').trim());
-const masterContent = contents.join('\n\n' + pageBreak + '\n\n') + '\n';
+const masterContent = contents.join('\n\n') + '\n';
 
 const masterPath = path.join(rootDir, 'Bao_Cao_Bai_Tap_Lon_CNPM.md');
 fs.writeFileSync(masterPath, masterContent, 'utf8');

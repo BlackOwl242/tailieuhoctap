@@ -42,25 +42,27 @@ Hà Nội - 2026
 
 LỜI CẢM ƠN
 
-Lời đầu tiên, với tất cả sự kính trọng và lòng biết ơn sâu sắc nhất, nhóm chúng em xin được gửi lời tri ân đến cô Bùi Thị Thanh. Cô không chỉ là một người giảng viên truyền thụ kiến thức, mà còn là người trực tiếp hướng dẫn, dìu dắt chúng em từ những bước đi chập chững đầu tiên khi tiếp cận đề tài này. Trong suốt quá trình thực hiện, có những lúc chúng em gặp khó khăn trong việc định hướng, hay bế tắc trước những vấn đề kỹ thuật phức tạp, chính sự chỉ bảo tận tình, những lời khuyên chuyên môn xác đáng và sự khắt khe cần thiết của cô đã giúp chúng em nhận ra vấn đề và tìm được hướng giải quyết tối ưu nhất. Sự nhiệt huyết của cô chính là nguồn động lực to lớn giúp chúng em không nản chí và nỗ lực hoàn thiện đề tài của mình đến cùng.
+Lời đầu tiên, với tất cả sự kính trọng và lòng biết ơn sâu sắc nhất, tập thể nhóm sinh viên chúng em xin gửi lời cảm ơn chân thành tới cô Bùi Thị Thanh – Giảng viên trực tiếp giảng dạy và hướng dẫn học phần Công nghệ phần mềm. Trong suốt 12 tuần học tập và triển khai đề tài bài tập lớn “Quy trình xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect”, cô đã luôn tận tâm truyền đạt những kiến thức lý thuyết nền tảng về quy trình phát triển phần mềm, các mô hình vòng đời phần mềm cũng như phương pháp phân tích, thiết kế có cấu trúc. Không chỉ định hướng cách tiếp cận bài toán thực tế một cách bài bản, cô còn dành nhiều thời gian trực tiếp rà soát, chỉ ra những điểm chưa hợp lý trong sơ đồ luồng dữ liệu, thiết kế cơ sở dữ liệu và giao diện màn hình của nhóm qua từng vòng đánh giá. Sự chỉ bảo tận tình, nghiêm túc và những góp ý chuyên môn quý báu của cô chính là kim chỉ nam giúp tập thể 6 thành viên trong nhóm từng bước tháo gỡ các vướng mắc kỹ thuật và hoàn thiện báo cáo này đúng tiến độ.
 
-Bên cạnh đó, nhóm chúng em xin gửi lời cảm ơn chân thành đến Ban Giám hiệu nhà trường cùng toàn thể quý Thầy/Cô đang công tác tại Khoa Khoa học Liên ngành - Ngoại ngữ - Tin học. Chúng em cảm thấy vô cùng may mắn khi được học tập và rèn luyện dưới mái trường này – nơi đã tạo mọi điều kiện thuận lợi nhất về cơ sở vật chất, trang thiết bị thực hành cũng như nguồn tài liệu tham khảo phong phú. Đặc biệt, nhóm em xin tri ân công lao giảng dạy của quý Thầy/Cô trong Khoa. Những bài giảng tâm huyết, những kiến thức nền tảng vững chắc và tư duy logic mà quý Thầy/Cô đã dày công vun đắp chính là hành trang quý giá, là cơ sở khoa học quan trọng giúp em có đủ năng lực và sự tự tin để thực hiện công tác nghiên cứu, phát triển ứng dụng và hoàn thành tốt bài báo cáo này.
+Bên cạnh đó, nhóm chúng em xin gửi lời cảm ơn chân thành đến Ban Giám hiệu Học viện Hành chính và Quản trị công cùng toàn thể quý Thầy, Cô giáo đang công tác và giảng dạy tại Khoa Khoa học Liên ngành – Ngoại ngữ – Tin học. Trong suốt quá trình học tập tại Học viện, Nhà trường và Khoa đã luôn quan tâm, tạo điều kiện thuận lợi về môi trường học tập, hệ thống phòng máy thực hành cũng như nguồn giáo trình, tài liệu tham khảo phong phú. Đặc biệt, những kiến thức chuyên ngành về cơ sở dữ liệu, phân tích thiết kế hệ thống thông tin và lập trình ứng dụng web mà quý Thầy, Cô trong Khoa đã trang bị qua các học phần trước là nền tảng vững chắc để nhóm chúng em có thể phối hợp khảo sát, phân tích, thiết kế 28 bảng dữ liệu và xây dựng hoàn chỉnh hệ thống phần mềm trong bài tập lớn này.
 
-Mặc dù đã dành rất nhiều tâm huyết, thời gian và nỗ lực hết mình để nghiên cứu, tìm hiểu, song do vốn kiến thức và kinh nghiệm thực tiễn của bản thân còn những hạn chế nhất định, nên bài báo cáo này chắc chắn khó tránh khỏi những thiếu sót ngoài ý muốn. Nhóm chúng em rất mong nhận được sự lượng thứ cùng những ý kiến đóng góp, chỉ bảo quý báu từ quý Thầy/Cô và các bạn để đề tài của nhóm chúng em được hoàn thiện hơn.
+Mặc dù cả sáu thành viên trong nhóm đã dành rất nhiều tâm huyết, thời gian trao đổi và nỗ lực thực hiện đề tài một cách nghiêm túc nhất, song do kiến thức chuyên môn và kinh nghiệm triển khai dự án thực tế của sinh viên còn những hạn chế nhất định nên bài báo cáo và sản phẩm phần mềm của nhóm khó tránh khỏi những thiếu sót. Tập thể nhóm chúng em rất mong nhận được sự lượng thứ cùng những ý kiến nhận xét, đóng góp và chỉ bảo từ cô Bùi Thị Thanh cùng quý Thầy, Cô trong Khoa để nhóm rút kinh nghiệm và hoàn thiện tốt hơn trong các đồ án chuyên ngành cũng như công việc thực tế sau này.
 
-Chúng em xin trân thành cảm ơn!
+Chúng em xin chân thành cảm ơn!
 
 <div style="page-break-after: always;"></div>
 
 LỜI CAM ĐOAN
 
-Nhóm chúng em xin cam đoan rằng bài báo cáo bài tập lớn với đề tài “Quy trình xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect” là công trình nghiên cứu độc lập và là sản phẩm trí tuệ của tập thể nhóm dưới sự hướng dẫn khoa học của cô Bùi Thị Thanh.
+Tập thể nhóm sinh viên chúng em gồm Lê Quốc Huy, Nguyễn Như Hạ, Đỗ Minh Hiếu, Nguyễn Trần Quang Duy, Mai Hoàng Anh và Nguyễn Thị Ngân Hà xin cam đoan báo cáo bài tập lớn kết thúc học phần Công nghệ phần mềm với đề tài “Quy trình xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect” là công trình nghiên cứu, phân tích, thiết kế và xây dựng phần mềm do chính các thành viên trong nhóm trực tiếp phân công nhau thực hiện dưới sự hướng dẫn khoa học của giảng viên ThS. Bùi Thị Thanh.
 
-Các số liệu, kết quả phân tích và hệ thống được trình bày trong báo cáo là trung thực, xuất phát từ quá trình khảo sát thực tế và nghiên cứu lý thuyết nghiêm túc, chưa từng được công bố trong bất kỳ công trình nào khác. Mọi nguồn tài liệu tham khảo, các quan điểm kế thừa đều được trích dẫn đầy đủ và tuân thủ nghiêm ngặt các quy định về quyền sở hữu trí tuệ cũng như liêm chính học thuật của Nhà trường.
+Toàn bộ nội dung xác định yêu cầu, phân tích đối chuẩn, sơ đồ luồng dữ liệu các mức, sơ đồ phân rã chức năng, thiết kế cơ sở dữ liệu quan hệ 28 bảng đạt dạng chuẩn 3, hệ thống giao diện màn hình cùng kịch bản kiểm thử và phương án bảo trì trình bày trong báo cáo đều là kết quả làm việc tập thể nghiêm túc của nhóm, hoàn toàn không sao chép từ bất kỳ bài tập lớn, khóa luận hay công trình nào khác đã được công bố.
 
-Nhóm chúng em xin chịu hoàn toàn trách nhiệm trước Bộ môn, Khoa và Nhà trường về tính trung thực của bài báo cáo này. Nếu có bất kỳ sự gian lận hay sao chép trái phép nào, chúng em xin chấp nhận mọi hình thức kỷ luật theo quy định.
+Trong quá trình thực hiện đề tài, mọi nguồn giáo trình, bài giảng, văn bản pháp lý và tài liệu chuyên khảo mà nhóm tham khảo, kế thừa đều được chọn lọc kỹ lưỡng và trích dẫn đầy đủ, rõ ràng tại danh mục Tài liệu tham khảo theo đúng quy định về liêm chính học thuật của Học viện Hành chính và Quản trị công.
 
-Em xin trân trọng cam đoan!
+Tập thể nhóm chúng em xin cùng chịu hoàn toàn trách nhiệm trước Bộ môn, Khoa Khoa học Liên ngành – Ngoại ngữ – Tin học và Nhà trường về tính trung thực, minh bạch của toàn bộ nội dung và kết quả trong bài báo cáo này. Nếu phát hiện có bất kỳ sự gian lận hay sao chép trái quy định nào, nhóm chúng em xin hoàn toàn chịu mọi hình thức kỷ luật theo quy chế của Học viện.
+
+Nhóm chúng em xin trân trọng cam đoan!
 
 <div style="page-break-after: always;"></div>
 
@@ -68,25 +70,25 @@ MỤC LỤC
 
 | Mục | Tên đề mục | Trang |
 | :--- | :--- | :---: |
-| | **LỜI CẢM ƠN** | **1** |
-| | **LỜI CAM ĐOAN** | **2** |
-| **I** | **MỞ ĐẦU** | **8** |
+| | LỜI CẢM ƠN | 1 |
+| | LỜI CAM ĐOAN | 2 |
+| I | MỞ ĐẦU | 8 |
 | 1.1 | Lý do chọn đề tài | 8 |
 | 1.2 | Mục tiêu bài tập lớn | 10 |
 | 1.2.1 | Hiểu tổng quan quy trình phát triển phần mềm | 11 |
-| 1.2.2 | Phân tích và so sánh và lựa chọn mô hình phù hợp | 11 |
+| 1.2.2 | Phân tích, so sánh và lựa chọn mô hình phát triển phù hợp | 11 |
 | 1.2.3 | Áp dụng quy trình vào một dự án thực tế | 11 |
 | 1.3 | Đối tượng và phạm vi nghiên cứu | 12 |
 | 1.3.1 | Đối tượng nghiên cứu | 12 |
 | 1.3.2 | Phạm vi nghiên cứu | 12 |
-| **II** | **TỔNG QUAN VỀ QUY TRÌNH XÂY DỰNG PHẦN MỀM** | **14** |
+| II | TỔNG QUAN VỀ QUY TRÌNH XÂY DỰNG PHẦN MỀM | 14 |
 | 2.1 | Định nghĩa và vai trò của quy trình phần mềm | 14 |
 | 2.1.1 | Quy trình xây dựng phần mềm là gì? | 14 |
 | 2.1.2 | Vì sao cần phải có quy trình xây dựng phần mềm? | 15 |
 | 2.2 | Mô hình phát triển phổ biến | 16 |
 | 2.2.1 | Một số mô hình phát triển phổ biến | 17 |
 | 2.2.2 | Mô hình áp dụng vào đề tài được lựa chọn: Mô hình Xoắn ốc | 26 |
-| **III** | **QUY TRÌNH XÂY DỰNG PHẦN MỀM** | **28** |
+| III | QUY TRÌNH XÂY DỰNG PHẦN MỀM | 28 |
 | 3.1 | Xác định yêu cầu hệ thống | 28 |
 | 3.1.1 | Cơ sở lý thuyết và Quy trình thực hiện | 28 |
 | 3.1.2 | Phương pháp xác định yêu cầu: Phương pháp phân tích đối chuẩn các hệ thống hiện hữu | 29 |
@@ -102,8 +104,9 @@ MỤC LỤC
 | 3.3.3 | Thiết kế cơ sở dữ liệu | 72 |
 | 3.3.4 | Thiết kế giao diện người dùng | 98 |
 | 3.4 | Lập trình và cài đặt | 104 |
-| 3.4.1 | Mục tiêu của giai đoạn | 104 |
-| 3.4.2 | Công việc chi tiết trong giai đoạn Lập trình | 104 |
+| 3.4.1 | Lý do lựa chọn ngôn ngữ lập trình và nền tảng công nghệ | 104 |
+| 3.4.2 | Một số ưu điểm nổi trội của ngôn ngữ lập trình được lựa chọn | 104 |
+| 3.4.3 | Tổ chức mã nguồn và một số đoạn mã lệnh cho các chức năng quan trọng | 105 |
 | 3.5 | Kiểm thử và triển khai phần mềm | 109 |
 | 3.5.1 | Tổng quan về Kiểm thử | 109 |
 | 3.5.2 | Quá trình kiểm thử | 109 |
@@ -113,11 +116,11 @@ MỤC LỤC
 | 3.6.2 | Các loại hình bảo trì áp dụng | 117 |
 | 3.6.3 | Phân tích lỗi và Phương án bảo trì cụ thể | 117 |
 | 3.6.4 | Quy trình thực hiện bảo trì | 118 |
-| **IV** | **KẾT LUẬN** | **119** |
+| IV | KẾT LUẬN | 119 |
 | 4.1 | Tóm tắt nội dung | 119 |
 | 4.2 | Bài học rút ra | 119 |
 | 4.3 | Hạn chế và hướng phát triển | 119 |
-| **V** | **TÀI LIỆU THAM KHẢO** | **120** |
+| V | TÀI LIỆU THAM KHẢO | 120 |
 
 <div style="page-break-after: always;"></div>
 
@@ -128,47 +131,40 @@ DANH MỤC TỪ/ THUẬT NGỮ VIẾT TẮT
 | 1 | 3NF | Third Normal Form (Dạng chuẩn 3 trong thiết kế cơ sở dữ liệu quan hệ) |
 | 2 | AI | Artificial Intelligence (Trí tuệ nhân tạo) |
 | 3 | API | Application Programming Interface (Giao diện lập trình ứng dụng) |
-| 4 | ATS | Applicant Tracking System (Hệ thống quản lý và theo dõi hồ sơ ứng viên tuyển dụng) |
-| 5 | CCCD | Căn cước công dân |
-| 6 | CNTT | Công nghệ thông tin |
-| 7 | CRUD | Create, Read, Update, Delete (Bốn thao tác dữ liệu cơ bản: Tạo mới, Đọc, Cập nhật, Xóa) |
-| 8 | CSDL | Cơ sở dữ liệu |
-| 9 | CSS | Cascading Style Sheets (Ngôn ngữ định dạng bảng kiểu giao diện web) |
-| 10 | CV | Curriculum Vitae (Bản tóm tắt lý lịch năng lực và kinh nghiệm của ứng viên) |
-| 11 | DFD | Data Flow Diagram (Sơ đồ luồng dữ liệu) |
-| 12 | ĐKKD | Đăng ký kinh doanh (Giấy chứng nhận đăng ký doanh nghiệp) |
-| 13 | ERD | Entity-Relationship Diagram (Sơ đồ quan hệ thực thể cơ sở dữ liệu) |
-| 14 | FDD | Functional Decomposition Diagram (Sơ đồ phân rã chức năng hệ thống) |
-| 15 | FK | Foreign Key (Khóa ngoại trong bảng cơ sở dữ liệu quan hệ) |
-| 16 | FTS | Full-Text Search (Công nghệ tìm kiếm toàn văn theo chỉ mục từ khóa) |
-| 17 | GVHD | Giảng viên hướng dẫn |
-| 18 | HTML | HyperText Markup Language (Ngôn ngữ đánh dấu siêu văn bản) |
-| 19 | HTTP / HTTPS | HyperText Transfer Protocol / Secure (Giao thức truyền tải siêu văn bản an toàn) |
-| 20 | IT | Information Technology (Công nghệ thông tin) |
-| 21 | JD | Job Description (Bản mô tả vị trí và tiêu chuẩn công việc tuyển dụng) |
-| 22 | JSON | JavaScript Object Notation (Định dạng trao đổi và lưu trữ dữ liệu tiêu chuẩn) |
-| 23 | JWT | JSON Web Token (Chuỗi mã thông báo xác thực phiên làm việc an toàn) |
-| 24 | Kanban | Phương pháp quản trị luồng trực quan hóa trạng thái ứng viên theo dạng thẻ kéo thả |
-| 25 | KPI | Key Performance Indicator (Chỉ số đo lường hiệu suất công việc cốt lõi) |
-| 26 | MST | Mã số thuế (Mã số định danh nghĩa vụ thuế của doanh nghiệp) |
-| 27 | NĐ-CP | Nghị định của Chính phủ (Nghị định số 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân) |
-| 28 | PK | Primary Key (Khóa chính định danh duy nhất bản ghi trong bảng cơ sở dữ liệu) |
-| 29 | RACI | Responsible, Accountable, Consulted, Informed (Ma trận phân định trách nhiệm và quyền hạn) |
-| 30 | RAM | Random Access Memory (Bộ nhớ truy xuất ngẫu nhiên của máy chủ và máy trạm) |
-| 31 | RDBMS | Relational Database Management System (Hệ quản trị cơ sở dữ liệu quan hệ) |
-| 32 | RESTful API | Representational State Transfer API (Giao diện lập trình ứng dụng tuân thủ kiến trúc REST) |
-| 33 | SĐT | Số điện thoại |
-| 34 | SQL | Structured Query Language (Ngôn ngữ truy vấn dữ liệu có cấu trúc) |
-| 35 | SSD | Solid State Drive (Ổ cứng lưu trữ thể rắn hiệu năng cao) |
-| 36 | SSO | Single Sign-On (Cơ chế xác thực đăng nhập một lần) |
-| 37 | STT | Số thứ tự |
-| 38 | Ths | Thạc sĩ |
-| 39 | UC | Use Case (Ca sử dụng / Trường hợp sử dụng chức năng nghiệp vụ) |
-| 40 | UI / UX | User Interface / User Experience (Giao diện người dùng / Trải nghiệm người dùng) |
-| 41 | UML | Unified Modeling Language (Ngôn ngữ mô hình hóa thống nhất) |
-| 42 | USD | United States Dollar (Đồng Đô la Mỹ, đơn vị tiền tệ giao dịch quốc tế) |
-| 43 | VNĐ | Việt Nam Đồng (Đơn vị tiền tệ chính thức của nước Cộng hòa Xã hội Chủ nghĩa Việt Nam) |
-| 44 | VS Code | Visual Studio Code (Môi trường soạn thảo và phát triển mã nguồn) |
+| 4 | ATS | Applicant Tracking System (Hệ thống quản lý và theo dõi hồ sơ ứng viên) |
+| 5 | CNTT | Công nghệ thông tin |
+| 6 | CRUD | Create, Read, Update, Delete (Bốn thao tác dữ liệu: Tạo mới, Đọc, Cập nhật, Xóa) |
+| 7 | CSDL | Cơ sở dữ liệu |
+| 8 | CSS | Cascading Style Sheets (Ngôn ngữ định dạng giao diện trang web) |
+| 9 | CV | Curriculum Vitae (Bản tóm tắt thông tin học vấn, kỹ năng và kinh nghiệm của ứng viên) |
+| 10 | DFD | Data Flow Diagram (Sơ đồ luồng dữ liệu) |
+| 11 | ĐKKD | Đăng ký kinh doanh (Giấy chứng nhận đăng ký doanh nghiệp) |
+| 12 | ERD | Entity-Relationship Diagram (Sơ đồ quan hệ thực thể) |
+| 13 | FDD | Functional Decomposition Diagram (Sơ đồ phân rã chức năng) |
+| 14 | FK | Foreign Key (Khóa ngoại trong bảng cơ sở dữ liệu quan hệ) |
+| 15 | GVHD | Giảng viên hướng dẫn |
+| 16 | HTML | HyperText Markup Language (Ngôn ngữ đánh dấu siêu văn bản) |
+| 17 | HTTP / HTTPS | HyperText Transfer Protocol / Secure (Giao thức truyền tải siêu văn bản / có bảo mật) |
+| 18 | IT | Information Technology (Công nghệ thông tin) |
+| 19 | JD | Job Description (Bản mô tả công việc tuyển dụng) |
+| 20 | JSON | JavaScript Object Notation (Định dạng trao đổi dữ liệu dạng văn bản) |
+| 21 | JWT | JSON Web Token (Mã thông báo xác thực phiên làm việc định dạng JSON) |
+| 22 | MST | Mã số thuế (Mã số định danh người nộp thuế của doanh nghiệp) |
+| 23 | NĐ-CP | Nghị định của Chính phủ (Nghị định số 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân) |
+| 24 | PK | Primary Key (Khóa chính định danh bản ghi trong bảng cơ sở dữ liệu) |
+| 25 | RAM | Random Access Memory (Bộ nhớ truy xuất ngẫu nhiên) |
+| 26 | RDBMS | Relational Database Management System (Hệ quản trị cơ sở dữ liệu quan hệ) |
+| 27 | RESTful API | Representational State Transfer API (Giao diện lập trình ứng dụng theo kiến trúc REST) |
+| 28 | SĐT | Số điện thoại |
+| 29 | SQL | Structured Query Language (Ngôn ngữ truy vấn có cấu trúc) |
+| 30 | SSD | Solid State Drive (Ổ cứng thể rắn) |
+| 31 | STT | Số thứ tự |
+| 32 | Ths | Thạc sĩ |
+| 33 | UC | Use Case (Ca sử dụng chức năng hệ thống) |
+| 34 | UI / UX | User Interface / User Experience (Giao diện người dùng / Trải nghiệm người dùng) |
+| 35 | UML | Unified Modeling Language (Ngôn ngữ mô hình hóa thống nhất) |
+| 36 | VNĐ | Việt Nam Đồng (Đơn vị tiền tệ của Việt Nam) |
+| 37 | VS Code | Visual Studio Code (Công cụ soạn thảo mã nguồn) |
 
 <div style="page-break-after: always;"></div>
 
@@ -176,184 +172,226 @@ I. MỞ ĐẦU
 
 1.1. Lý do chọn đề tài
 
-Trong bối cảnh nền kinh tế số và làn sóng chuyển đổi số quốc gia giai đoạn 2024 – 2026 đang diễn ra với tốc độ chưa từng có, thị trường lao động tại Việt Nam đang trải qua những biến chuyển mang tính bước ngoặt sâu sắc về cả cơ cấu, tính chất lẫn phương thức kết nối cung cầu. Sự phổ cập của hạ tầng viễn thông băng rộng, các giải pháp điện toán đám mây và sự trỗi dậy của các mô hình làm việc linh hoạt như làm việc từ xa hay làm việc kết hợp đã tái định hình vĩnh viễn thói quen tìm kiếm việc làm và tuyển dụng nhân sự. Tuyển dụng nhân sự trong thời đại số không còn đơn thuần là một hoạt động hành chính mang tính sự vụ định kỳ, mà đã trở thành bài toán chiến lược sống còn quyết định năng lực cạnh tranh của mọi tổ chức, đồng thời là nhân tố then chốt bảo đảm hiệu quả phân bổ nguồn lực lao động của toàn xã hội.
+Hoạt động tìm kiếm việc làm và tuyển dụng nhân sự hiện nay diễn ra chủ yếu qua môi trường trực tuyến. Người tìm việc cần tiếp cận các thông tin tuyển dụng rõ ràng để đối chiếu với năng lực cá nhân và nộp hồ sơ, trong khi doanh nghiệp cần kênh công bố nhu cầu tuyển người, tiếp nhận đơn ứng tuyển và phản hồi kết quả tuyển chọn. Tuy nhiên, quá trình kết nối giữa người tìm việc và đơn vị tuyển dụng trên thực tế vẫn tồn tại nhiều bất cập từ cả hai phía.
 
-Tuy nhiên, bức tranh thực tế của thị trường tuyển dụng hiện nay vẫn bộc lộ những nghịch lý và điểm nghẽn nghiêm trọng, xuất phát từ cả phía người lao động lẫn đơn vị tuyển dụng. Đối với thế hệ người tìm việc trẻ, đặc biệt là sinh viên mới tốt nghiệp từ các trường đại học và cao đẳng, áp lực cạnh tranh nghề nghiệp đang ở mức khốc liệt hơn bao giờ hết. Phần lớn các bạn trẻ khi bước chân vào thị trường lao động đều rơi vào nghịch lý kinh điển: nhà tuyển dụng đòi hỏi kinh nghiệm thực tế, nhưng ứng viên lại không thể có kinh nghiệm nếu không được trao cơ hội làm việc ban đầu. Nghiêm trọng hơn, sinh viên thường rất lúng túng trong việc chuẩn hóa và trình bày hồ sơ năng lực cá nhân; các bạn thiếu hụt các công cụ biên soạn lý lịch trực quan, chuyên nghiệp để làm nổi bật các kỹ năng mềm, đồ án học tập và tiềm năng phát triển bản thân. Nhiều hồ sơ năng lực sáng giá đã bị loại bỏ một cách đáng tiếc ngay từ vòng sơ tuyển chỉ vì hình thức trình bày rời rạc, thiếu thẩm mỹ hoặc không tuân thủ các quy chuẩn công nghiệp hiện đại.
+Đối với người tìm việc, đặc biệt là sinh viên sắp tốt nghiệp và người lao động trẻ, khó khăn đầu tiên nằm ở khâu chuẩn bị hồ sơ ứng tuyển. Nhiều ứng viên chưa quen cách sắp xếp thông tin học vấn, kỹ năng chuyên môn, kinh nghiệm làm việc và dự án đã tham gia theo bố cục rõ ràng, dẫn đến hồ sơ thiếu thông tin quan trọng hoặc trình bày chưa thống nhất khi xuất sang tệp tài liệu. Bên cạnh đó, khi tìm kiếm việc làm, người dùng thường phải đọc qua nhiều tin đăng mà khó xác định ngay vị trí nào phù hợp với các kỹ năng mình đã có.
 
-Ở chiều ngược lại, một vấn nạn tâm lý nhức nhối đang gây bức xúc sâu sắc trong cộng đồng người tìm việc chính là hội chứng hố đen tuyển dụng dẫn đến sự kiệt sức vì ứng tuyển. Thực tế chỉ ra rằng, phần lớn ứng viên khi gửi hồ sơ qua các hòm thư điện tử hoặc các cổng tuyển dụng truyền thống đều rơi vào tình trạng "bặt vô âm tín". Hồ sơ được gửi đi nhưng ứng viên hoàn toàn không biết liệu nhà tuyển dụng đã mở xem hay chưa, hồ sơ có đạt yêu cầu hay không, hoặc lý do bị từ chối là gì. Trạng thái chờ đợi mòn mỏi trong sự im lặng không chỉ làm lãng phí thời gian, bỏ lỡ nhiều cơ hội nghề nghiệp khác mà còn bào mòn nghiêm trọng niềm tin, sự tự tin và nhiệt huyết cống hiến của người lao động trẻ. Thị trường đang đòi hỏi cấp thiết một cơ chế tương tác minh bạch, có khả năng phản hồi trạng thái xét duyệt hồ sơ theo thời gian thực để ứng viên luôn chủ động nắm bắt hành trình ứng tuyển của chính mình.
+Một hạn chế phổ biến khác là tình trạng thiếu phản hồi trạng thái sau khi nộp đơn. Khi ứng viên gửi hồ sơ qua thư điện tử hoặc qua các kênh tiếp nhận rời rạc, họ thường không biết doanh nghiệp đã nhận được đơn hay chưa, hồ sơ đang ở bước sơ loại, phỏng vấn hay đã bị từ chối. Khi không nhận được phản hồi, ứng viên rơi vào thế bị động trong suốt thời gian chờ đợi và phải tự liên hệ riêng để hỏi kết quả.
 
-Xét từ góc độ các đơn vị sử dụng lao động, rào cản công nghệ và gánh nặng tài chính đang đè nặng lên khối doanh nghiệp vừa và nhỏ cùng các doanh nghiệp khởi nghiệp – bộ phận chiếm hơn 97% tổng số doanh nghiệp và đóng góp hơn 50% cơ cấu việc làm tại Việt Nam. Để tối ưu hóa quy trình tuyển dụng, các doanh nghiệp quy mô lớn sẵn sàng chi trả từ hàng nghìn đến hàng chục nghìn đô la mỗi năm để trang bị các hệ thống quản trị tuyển dụng chuyên nghiệp như Workable, Greenhouse, Taleo hay các gói doanh nghiệp đắt đỏ của các sàn việc làm thương mại lớn. Ngược lại, đối với các doanh nghiệp vừa và nhỏ với nguồn ngân sách eo hẹp, mức chi phí bản quyền khổng lồ này là một rào cản hoàn toàn không thể vượt qua. Hậu quả trực tiếp là phòng nhân sự tại các doanh nghiệp vừa và nhỏ buộc phải duy trì quy trình thủ công lạc hậu: tiếp nhận hồ sơ qua hòm thư cá nhân, theo dõi danh sách ứng viên bằng các bảng tính Excel phân tán, và liên lạc rời rạc qua điện thoại. Cách làm thiếu tính đồng bộ này dẫn đến tỷ lệ thất lạc ứng viên tài năng rất cao, kéo dài thời gian phản hồi, gây chồng chéo lịch phỏng vấn và hoàn toàn thiếu vắng các công cụ phân tích dữ liệu để đánh giá hiệu quả tuyển dụng.
+Từ phía đơn vị sử dụng lao động, các doanh nghiệp vừa và nhỏ thường gặp rào cản về chi phí khi tiếp cận các phần mềm quản lý tuyển dụng chuyên biệt hoặc các gói dịch vụ trả phí trên những sàn việc làm lớn. Do hạn chế về ngân sách, nhiều đơn vị vẫn tiếp nhận hồ sơ qua hòm thư điện tử và theo dõi danh sách ứng viên bằng bảng tính rời rạc. Cách quản lý thủ công này dễ dẫn đến thất lạc hồ sơ, trùng lặp đơn ứng tuyển của cùng một người, khó tổng hợp nhận xét nội bộ giữa những người tham gia tuyển chọn và mất nhiều thời gian khi lập lịch phỏng vấn hoặc gửi thư phản hồi cho từng ứng viên.
 
-Bên cạnh những điểm nghẽn về mặt vận hành, sự bùng nổ của không gian mạng cũng kéo theo vấn nạn lừa đảo tuyển dụng diễn biến vô cùng phức tạp và tinh vi. Lợi dụng tâm lý nôn nóng tìm việc của sinh viên và người lao động phổ thông, nhiều đối tượng xấu đã mạo danh các thương hiệu uy tín để đăng tải các tin bài tuyển dụng giả mạo với chiêu bài "việc nhẹ lương cao", kinh doanh đa cấp biến tướng, dụ dỗ nộp tiền đặt cọc giữ chỗ hoặc lừa đảo chuyển tiền chiếm đoạt tài sản. Những hành vi phi pháp này không chỉ gây thiệt hại nặng nề về mặt tài chính và tổn thương tinh thần cho người tìm việc, mà còn làm suy giảm nghiêm trọng lòng tin của cộng đồng đối với các kênh tuyển dụng trực tuyến. Thực trạng này đặt ra yêu cầu cấp bách là một nền tảng tuyển dụng hiện đại bắt buộc phải xây dựng một hàng rào kỹ thuật phòng vệ vững chắc, với quy trình kiểm duyệt định danh doanh nghiệp nghiêm ngặt dựa trên mã số thuế và giấy phép đăng ký kinh doanh hợp pháp trước khi cấp phép đăng tin ra xã hội.
+Ngoài ra, môi trường tuyển dụng trực tuyến cũng đặt ra yêu cầu chặt chẽ về xác thực thông tin doanh nghiệp và bảo vệ dữ liệu cá nhân. Nếu hệ thống cho phép đăng tin tự do mà không kiểm tra thông tin pháp lý như mã số thuế và giấy chứng nhận đăng ký doanh nghiệp, các tin tuyển dụng thiếu tin cậy hoặc sai sự thật rất dễ xuất hiện, gây ảnh hưởng trực tiếp đến người tìm việc. Đồng thời, theo quy định tại Nghị định số 13/2023/NĐ-CP của Chính phủ về bảo vệ dữ liệu cá nhân, bản hồ sơ ứng tuyển chứa nhiều thông tin riêng tư như họ tên, ngày sinh, số điện thoại, địa chỉ và lịch sử công tác. Vì vậy, hệ thống phải kiểm soát quyền truy cập theo đúng vai trò và chỉ chia sẻ hồ sơ cho doanh nghiệp tuyển dụng khi ứng viên chủ động kiểm tra, xác nhận nộp đơn vào một vị trí cụ thể.
 
-Mặt khác, dưới góc độ pháp lý và an toàn dữ liệu, sự ra đời của Nghị định số 13/2023/NĐ-CP của Chính phủ về bảo vệ dữ liệu cá nhân đã đánh dấu một bước ngoặt lớn, đặt ra các tiêu chuẩn pháp lý khắt khe đối với mọi hệ thống công nghệ thông tin xử lý dữ liệu con người. Bản lý lịch nghề nghiệp của ứng viên chứa đựng toàn bộ các dữ liệu cá nhân nhạy cảm như họ tên, ngày sinh, số điện thoại, địa chỉ cư trú, học vấn, lịch sử công tác và thông tin định danh. Tình trạng rò rỉ hoặc mua bán trái phép dữ liệu ứng viên cho các mục đích tiếp thị, quảng cáo hay lừa đảo đang bị pháp luật nghiêm trị. Do đó, một hệ thống tuyển dụng đạt chuẩn kỹ nghệ phần mềm bắt buộc phải được thiết kế dựa trên nguyên tắc bảo mật mặc định, thiết lập cơ chế đồng thuận chia sẻ dữ liệu minh bạch và bảo đảm rằng hồ sơ cá nhân chỉ được chia sẻ cho nhà tuyển dụng khi có sự đồng ý trực tiếp của chính ứng viên thông qua hành động nộp đơn.
-
-Xuất phát từ những trăn trở thực tiễn và đòi hỏi cấp bách trên, nhóm nghiên cứu đã quyết định lựa chọn đề tài xây dựng Website tuyển dụng và tìm kiếm việc làm trực tuyến mang tên TalentConnect. Hệ thống được định vị là một giải pháp công nghệ toàn diện, nhân văn và mang tính đột phá: cung cấp công cụ biên soạn hồ sơ năng lực trực quan hoàn toàn miễn phí cho người tìm việc; trang bị cho các doanh nghiệp vừa và nhỏ một phân hệ quản trị phễu tuyển dụng ứng viên tinh gọn, hiện đại theo mô hình Kanban mà không phát sinh bất kỳ chi phí bản quyền nào; thiết lập cơ chế kiểm duyệt định danh doanh nghiệp qua mã số thuế để ngăn chặn triệt để tin rác lừa đảo; và duy trì luồng thông báo trạng thái hai chiều tự động nhằm xóa bỏ hoàn toàn hiện tượng "hố đen tuyển dụng". Việc hiện thực hóa đề tài theo đúng phương pháp luận Công nghệ phần mềm chuẩn tắc không chỉ giải quyết trọn vẹn một bài toán xã hội thiết thực mà còn là cơ hội quý báu để nhóm sinh viên tôi luyện tư duy hệ thống và kỹ năng kỹ thuật vững vàng cho tương lai.
+Từ những yêu cầu thực tế trên, nhóm lựa chọn đề tài “Quy trình xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect”. Hệ thống hướng tới việc kết nối người tìm việc với nhu cầu tuyển dụng của doanh nghiệp thông qua các chức năng chính: hỗ trợ ứng viên tạo và quản lý hồ sơ trực tuyến; xác thực pháp lý doanh nghiệp và kiểm duyệt tin tuyển dụng trước khi công bố; tìm kiếm đa tiêu chí kết hợp gợi ý việc làm có giải thích mức khớp kỹ năng; đồng thời cung cấp bảng quản lý ứng viên theo từng giai đoạn xét tuyển và gửi thông báo phản hồi cho hai bên. Qua đề tài này, nhóm trực tiếp vận dụng quy trình Công nghệ phần mềm từ khảo sát yêu cầu, phân tích có cấu trúc, thiết kế cơ sở dữ liệu và giao diện cho đến lập trình và kiểm thử.
 
 1.2. Mục tiêu bài tập lớn
 
-Mục tiêu tối thượng của môn học Công nghệ phần mềm là trang bị phương pháp luận khoa học để tạo ra các sản phẩm phần mềm chất lượng cao, hạn chế tối đa sai sót, bảo đảm tiến độ thực hiện trong phạm vi ngân sách cho phép và đáp ứng chính xác nhu cầu của người sử dụng. Bên cạnh đó, phần mềm cần được thiết kế với cấu trúc module linh hoạt, thuận tiện cho công tác kiểm thử, bảo trì và nâng cấp trong tương lai. Bài tập lớn được xây dựng nhằm hiện thực hóa các mục tiêu cốt lõi sau:
+Mục tiêu của học phần Công nghệ phần mềm là trang bị phương pháp làm việc có hệ thống để xây dựng phần mềm đáp ứng đúng yêu cầu người dùng, hạn chế sai sót kỹ thuật và bảo đảm tiến độ trong phạm vi nguồn lực cho phép. Bên cạnh đó, phần mềm cần có cấu trúc rõ ràng để thuận tiện khi kiểm thử, bảo trì và mở rộng về sau. Bài tập lớn của nhóm hướng tới ba mục tiêu cụ thể sau:
 
 1.2.1. Hiểu tổng quan quy trình phát triển phần mềm
 
-Mục tiêu đầu tiên của bài tập lớn là giúp sinh viên nắm vững và hệ thống hóa toàn bộ các giai đoạn trong một vòng đời phát triển phần mềm tiêu chuẩn. Quy trình này bao gồm các giai đoạn kế thừa và liên kết chặt chẽ: từ khảo sát và xác định yêu cầu, phân tích và đặc tả hệ thống, thiết kế kiến trúc và cơ sở dữ liệu, lập trình cài đặt, kiểm thử bảo đảm chất lượng đến triển khai và bảo trì. Việc thấu hiểu bản chất kỹ thuật của từng mắt xích giúp nhóm hình thành tư duy hệ thống chuyên nghiệp, tránh lối làm việc cảm tính hoặc chỉ chú trọng viết mã nguồn mà xem nhẹ công tác phân tích và thiết kế nền tảng.
+Mục tiêu đầu tiên của bài tập lớn là giúp các thành viên trong nhóm nắm vững và hệ thống hóa các giai đoạn trong vòng đời phát triển phần mềm. Quy trình này gồm các bước liên kết chặt chẽ từ khảo sát và xác định yêu cầu, phân tích và đặc tả hệ thống, thiết kế kiến trúc và cơ sở dữ liệu, lập trình cài đặt, kiểm thử chất lượng đến triển khai và bảo trì. Nắm rõ vai trò và sản phẩm đầu ra của từng giai đoạn giúp nhóm làm việc có kế hoạch, tránh viết mã nguồn ngay khi chưa thống nhất cấu trúc dữ liệu và quy tắc nghiệp vụ.
 
-1.2.2. Phân tích và so sánh và lựa chọn mô hình phù hợp
+1.2.2. Phân tích, so sánh và lựa chọn mô hình phát triển phù hợp
 
-Mỗi dự án phần mềm có đặc thù riêng biệt về quy mô, mức độ ổn định của yêu cầu nghiệp vụ và năng lực của đội ngũ phát triển. Thông qua việc nghiên cứu, so sánh các mô hình kinh điển như mô hình thác nước, mô hình bản mẫu, mô hình tăng dần và mô hình xoắn ốc, sinh viên nhận thức sâu sắc lý do cần lựa chọn mô hình dựa trên bối cảnh thực tế thay vì áp dụng máy móc. 
+Mỗi dự án phần mềm có đặc điểm riêng về quy mô dữ liệu, mức độ ổn định của yêu cầu và nguồn lực thực hiện. Thông qua việc tìm hiểu và so sánh các mô hình phát triển phổ biến như mô hình thác nước, mô hình bản mẫu, mô hình tăng dần và mô hình xoắn ốc, nhóm xác định được căn cứ lựa chọn mô hình phù hợp với điều kiện thực tế của đề tài.
 
-Đối với đề tài xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect, hệ thống có cấu trúc phân quyền đa tác nhân phức tạp, yêu cầu quản trị luồng dữ liệu lớn và cần thường xuyên hiệu chỉnh giao diện tương tác dựa trên đánh giá của người dùng. Do đó, nhóm quyết định lựa chọn Mô hình Xoắn ốc làm phương pháp luận xuyên suốt. Mô hình này kết hợp hài hòa tính hệ thống của mô hình thác nước và tính linh hoạt của mô hình bản mẫu, cho phép nhóm phân tích và kiểm soát rủi ro kỹ thuật liên tục sau mỗi vòng lặp, đồng thời tạo ra các bản mẫu thử nghiệm để tiếp thu kịp thời ý kiến định hướng từ giảng viên hướng dẫn.
+Đối với đề tài xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect, hệ thống phục vụ ba nhóm người dùng với cơ sở dữ liệu quan hệ gồm 28 bảng và cần điều chỉnh giao diện, quy tắc xử lý dựa trên góp ý của giảng viên hướng dẫn. Từ đặc điểm đó, nhóm lựa chọn Mô hình Xoắn ốc để phát triển dự án. Mô hình này kết hợp tính tuần tự của mô hình thác nước với việc làm bản mẫu và phân tích rủi ro ở mỗi vòng lặp, giúp nhóm kiểm chứng thiết kế dữ liệu, cơ chế phân quyền và hiệu năng truy vấn trước khi mở rộng toàn bộ chức năng.
 
 1.2.3. Áp dụng quy trình vào một dự án thực tế
 
-Mục tiêu cuối cùng và quan trọng nhất là vận dụng toàn bộ cơ sở lý thuyết và các công cụ công nghệ phần mềm vào một dự án thực tế cụ thể. Nhóm sinh viên trực tiếp tham gia khảo sát nhu cầu thị trường, sử dụng các công cụ mô hình hóa chuyên dụng để trực quan hóa luồng dữ liệu và ca sử dụng, thiết kế hệ cơ sở dữ liệu quan hệ chuẩn mực trên Microsoft SQL Server, xây dựng ứng dụng web hiện đại và tiến hành các kịch bản kiểm thử nghiêm ngặt. Qua đó, các thành viên nâng cao năng lực làm việc nhóm, tôi luyện kỹ năng giải quyết vấn đề kỹ thuật và tích lũy kinh nghiệm thực tế quý báu cho công việc chuyên môn sau này.
+Mục tiêu thứ ba là vận dụng lý thuyết và các công cụ của học phần vào bài toán xây dựng hệ thống TalentConnect. Nhóm khảo sát và đối chiếu các hệ thống hiện có, mô hình hóa luồng dữ liệu và các ca sử dụng, thiết kế cơ sở dữ liệu quan hệ trên Microsoft SQL Server, xây dựng giao diện cùng tầng xử lý máy chủ và kiểm thử theo các kịch bản cụ thể. Qua quá trình này, các thành viên rèn luyện kỹ năng phối hợp nhóm, phân tích nghiệp vụ và giải quyết các vấn đề kỹ thuật phát sinh trong thực tế.
 
 1.3. Đối tượng và phạm vi nghiên cứu
 
 1.3.1. Đối tượng nghiên cứu
 
-Để xây dựng thành công nền tảng TalentConnect đáp ứng đúng kỳ vọng thực tế, nhóm xác định các đối tượng nghiên cứu trọng tâm bao gồm:
+Để xây dựng hệ thống TalentConnect đáp ứng yêu cầu nghiệp vụ, nhóm tập trung vào ba đối tượng nghiên cứu sau:
 
-a. Các quy trình nghiệp vụ tuyển dụng và tìm kiếm việc làm: Nghiên cứu phương thức khởi tạo và chuẩn hóa hồ sơ năng lực của người tìm việc; quy trình tiếp nhận thông tin tuyển dụng, kiểm tra tính pháp lý của doanh nghiệp và kiểm duyệt nội dung tin bài của ban quản trị; quy trình nộp hồ sơ, tiếp nhận, đánh giá và luân chuyển trạng thái ứng viên qua các giai đoạn của phễu tuyển dụng tại phòng nhân sự của các tổ chức tuyển dụng.
+a. Các quy trình nghiệp vụ tuyển dụng và tìm kiếm việc làm: Nghiên cứu cách tạo và quản lý hồ sơ của người tìm việc; quy trình xác thực thông tin pháp lý doanh nghiệp, soạn thảo và kiểm duyệt tin tuyển dụng trước khi công bố; quy trình tìm kiếm, gợi ý việc làm theo mức khớp kỹ năng; cùng quy trình nộp đơn, tiếp nhận, đánh giá ứng viên qua các giai đoạn xét tuyển và gửi thông báo phản hồi giữa doanh nghiệp với ứng viên.
 
-b. Các thực thể dữ liệu và mối liên kết nghiệp vụ: Nghiên cứu cấu trúc thông tin tài khoản, hồ sơ định danh doanh nghiệp, dữ liệu chi tiết của tin tuyển dụng, các trường thông tin trong hồ sơ lý lịch điện tử, lịch sử nộp hồ sơ ứng tuyển, các tiêu chí đánh giá nội bộ và hệ thống bản ghi nhật ký vận hành.
+b. Các thực thể dữ liệu và mối liên kết nghiệp vụ: Nghiên cứu cấu trúc lưu trữ tài khoản và phân quyền, thông tin doanh nghiệp, tin tuyển dụng, hồ sơ ứng viên, đơn ứng tuyển, lịch sử xử lý đơn, lịch phỏng vấn, thông báo và nhật ký hệ thống, bảo đảm tính nhất quán dữ liệu giữa các chức năng.
 
-c. Công nghệ và môi trường kỹ thuật phát triển: Nghiên cứu các phương pháp lập trình hiện đại trên nền tảng ứng dụng web; kiến trúc phân tách giữa tầng giao diện hiển thị và tầng dịch vụ xử lý dữ liệu qua giao diện lập trình ứng dụng tiêu chuẩn; cơ chế tối ưu hóa chỉ mục tìm kiếm và lưu trữ trên hệ quản trị cơ sở dữ liệu quan hệ; các giải pháp bảo mật phiên làm việc và bảo vệ dữ liệu cá nhân theo quy định pháp luật hiện hành.
+c. Công nghệ và môi trường kỹ thuật phát triển: Nghiên cứu phương pháp xây dựng ứng dụng web theo kiến trúc phân tách giữa giao diện phía máy khách và dịch vụ phía máy chủ thông qua RESTful API; cách thiết kế chỉ mục tìm kiếm và ràng buộc toàn vẹn trên hệ quản trị cơ sở dữ liệu quan hệ; cơ chế xác thực phiên làm việc và bảo vệ dữ liệu cá nhân theo quy định hiện hành.
 
 1.3.2. Phạm vi nghiên cứu
 
-Phạm vi nghiên cứu của đề tài được xác định và phân định ranh giới rõ ràng dựa trên mục tiêu đào tạo của học phần và nguồn lực thực tế của nhóm sinh viên:
+Phạm vi nghiên cứu của đề tài được xác định dựa trên mục tiêu của học phần và nguồn lực thực hiện của nhóm sinh viên:
 
-a. Phạm vi đối tượng tác động: Đề tài tập trung phục vụ ba nhóm đối tượng người dùng cụ thể gồm người tìm việc với trọng tâm hướng tới sinh viên chuẩn bị tốt nghiệp và người lao động trẻ, các doanh nghiệp vừa và nhỏ có nhu cầu tuyển dụng thường xuyên nhưng chưa có hệ thống quản lý ứng viên chuyên nghiệp, và đội ngũ quản trị viên chịu trách nhiệm kiểm duyệt, điều hành hệ sinh thái tuyển dụng.
+a. Phạm vi đối tượng sử dụng: Đề tài phục vụ ba nhóm người dùng chính gồm người tìm việc (tập trung vào sinh viên sắp tốt nghiệp và người lao động trẻ), các doanh nghiệp vừa và nhỏ có nhu cầu đăng tin và quản lý hồ sơ ứng tuyển, cùng ban quản trị phụ trách kiểm duyệt và vận hành hệ thống.
 
-b. Phạm vi không gian và môi trường triển khai: Đề tài tiến hành khảo sát thực tiễn tại các cơ sở đào tạo đại học và một số doanh nghiệp công nghệ trên địa bàn thành phố Hà Nội; hệ thống phần mềm được đóng gói và thử nghiệm trên môi trường mạng Internet thông qua giao thức truyền thông tiêu chuẩn.
+b. Phạm vi không gian và môi trường triển khai: Nhóm khảo sát nhu cầu sử dụng và tham khảo các nền tảng tuyển dụng phổ biến tại Việt Nam; phần mềm vận hành dưới dạng ứng dụng web qua giao thức HTTP/HTTPS trên môi trường mạng.
 
-c. Phạm vi thời gian thực hiện: Nghiên cứu và hoàn thiện toàn bộ sản phẩm cùng hồ sơ báo cáo kỹ thuật trong khung thời gian mười hai tuần của học kỳ môn học Công nghệ phần mềm.
+c. Phạm vi thời gian thực hiện: Nhóm triển khai toàn bộ quá trình khảo sát, phân tích, thiết kế, lập trình, kiểm thử và hoàn thiện báo cáo trong 12 tuần của học phần Công nghệ phần mềm.
 
-d. Phạm vi hệ thống và quy mô chức năng: Đề tài tập trung vào việc nghiên cứu, mô hình hóa, thiết kế và cài đặt các chức năng nghiệp vụ then chốt gồm quản lý hồ sơ trực tuyến, đăng tin và kiểm duyệt việc làm, tìm kiếm việc làm đa tiêu chí, quản lý hồ sơ ứng viên theo mô hình phễu trực quan và báo cáo thống kê vận hành. Đề tài không đi sâu vào các khía cạnh mở rộng ngoài phạm vi học phần như thanh toán phí dịch vụ trực tuyến qua cổng ngân hàng thương mại, tích hợp truyền hình hội nghị để phỏng vấn từ xa hoặc sử dụng các mô hình học máy chuyên sâu để trích xuất văn bản phi cấu trúc.
+d. Phạm vi hệ thống và quy mô chức năng: Đề tài tập trung phân tích, thiết kế và cài đặt các chức năng gồm quản lý tài khoản và phân quyền, tạo và quản lý hồ sơ trực tuyến, đăng tin và kiểm duyệt việc làm, tìm kiếm và gợi ý việc làm theo kỹ năng, ứng tuyển và quản lý ứng viên theo giai đoạn xét tuyển, cùng thống kê vận hành hệ thống. Các phần như thanh toán trực tuyến qua cổng ngân hàng, tích hợp hội nghị truyền hình để phỏng vấn trực tiếp trên trình duyệt hoặc sử dụng mô hình học máy chuyên sâu để bóc tách văn bản phi cấu trúc được giữ ngoài phạm vi học phần.
 
 <div style="page-break-after: always;"></div>
 II. TỔNG QUAN VỀ QUY TRÌNH XÂY DỰNG PHẦN MỀM
 
 2.1. Định nghĩa và vai trò của quy trình phần mềm
 
-Trong lịch sử ngành công nghệ thông tin, vào những năm cuối thập niên 1960, sự phát triển bùng nổ của phần cứng máy tính đã kéo theo sự gia tăng đột biến về quy mô và độ phức tạp của các ứng dụng phần mềm. Tuy nhiên, việc thiếu vắng một phương pháp luận khoa học và một quy trình quản lý bài bản đã dẫn đến hiện tượng khủng hoảng phần mềm nổi tiếng: các dự án liên tục vượt quá ngân sách dự toán, trễ hạn bàn giao nghiêm trọng, chất lượng sản phẩm không đảm bảo, chứa nhiều lỗi nghiêm trọng và phần lớn không đáp ứng được kỳ vọng của người dùng. Xuất phát từ thực tế cấp bách đó, ngành Công nghệ phần mềm đã chính thức ra đời, đặt trọng tâm hàng đầu vào việc xây dựng và chuẩn hóa các quy trình kỹ thuật nhằm biến hoạt động phát triển phần mềm từ một công việc mang tính cá nhân, tự phát thành một quy trình sản xuất mang tính công nghiệp, có kỷ luật và có thể kiểm soát được.
+Vào cuối thập niên 1960, sự phát triển nhanh của phần cứng máy tính đã kéo theo yêu cầu xây dựng những hệ thống phần mềm có quy mô và độ phức tạp ngày càng lớn. Tuy nhiên, cách phát triển tự phát, thiếu phương pháp phân tích và quản lý thống nhất khiến nhiều dự án vượt ngân sách, chậm tiến độ, phát sinh nhiều lỗi khi vận hành và không đáp ứng đúng nhu cầu sử dụng. Từ thực tế đó, ngành Công nghệ phần mềm đã hình thành và phát triển, đặt trọng tâm vào việc chuẩn hóa các quy trình kỹ thuật nhằm đưa hoạt động xây dựng phần mềm vào khuôn khổ có kế hoạch, có kiểm tra và đánh giá chất lượng ở từng giai đoạn.
 
 2.1.1. Quy trình xây dựng phần mềm là gì?
 
-Quy trình xây dựng phần mềm là tập hợp có cấu trúc của các hoạt động kỹ thuật, phương pháp luận, nguyên tắc quản lý và các công cụ bổ trợ được áp dụng xuyên suốt nhằm định hình, phát triển, kiểm nghiệm, chuyển giao và bảo trì một sản phẩm phần mềm. Nói một cách toàn diện dưới góc độ kỹ thuật hệ thống, một quy trình công nghệ phần mềm hoàn chỉnh được cấu thành từ bốn yếu tố nền tảng hữu cơ không thể tách rời.
+Quy trình xây dựng phần mềm là tập hợp có cấu trúc các hoạt động kỹ thuật, phương pháp, nguyên tắc quản lý và công cụ hỗ trợ nhằm xác định yêu cầu, thiết kế, lập trình, kiểm thử, triển khai và bảo trì một sản phẩm phần mềm. Dưới góc độ tổ chức thực hiện, một quy trình phần mềm gồm bốn thành phần chính liên kết với nhau.
 
-Thứ nhất là vòng đời phần mềm, phản ánh tiến trình biến đổi trạng thái của hệ thống qua từng giai đoạn kế tiếp nhau, bắt đầu từ việc tiếp nhận ý tưởng sơ khởi, khảo sát hiện trạng và xác định yêu cầu nghiệp vụ, tiến hành phân tích đặc tả chi tiết, thiết kế kiến trúc phân tầng cùng cơ sở dữ liệu quan hệ, hiện thực hóa mã nguồn qua lập trình, kiểm thử thẩm định chất lượng, đóng gói cài đặt cho đến công tác bảo trì, nâng cấp tính năng và dừng vận hành khi sản phẩm kết thúc chu kỳ phục vụ.
+Thành phần nền tảng đầu tiên là vòng đời phần mềm, thể hiện các giai đoạn phát triển kế tiếp nhau của hệ thống: từ khảo sát hiện trạng và xác định yêu cầu nghiệp vụ, phân tích và đặc tả chi tiết, thiết kế kiến trúc và cơ sở dữ liệu, lập trình mã nguồn, kiểm thử chất lượng, cài đặt triển khai cho đến bảo trì, nâng cấp trong quá trình sử dụng.
 
-Thứ hai là đội ngũ nhân sự tham gia phát triển, quy tụ các chuyên gia công nghệ với những vai trò chuyên môn hóa cao và được phân định trách nhiệm minh bạch, bao gồm quản trị dự án phần mềm chịu trách nhiệm tiến độ tổng thể, chuyên viên phân tích nghiệp vụ phụ trách chuyển dịch nhu cầu người dùng, kiến trúc sư hệ thống định hình mô hình kỹ thuật, lập trình viên trực tiếp cài đặt thuật toán và chức năng, kỹ sư kiểm thử bảo đảm tính toàn vẹn không sai sót, cùng chuyên viên triển khai vận hành quản trị hạ tầng máy chủ.
+Thành phần tiếp theo là đội ngũ nhân sự tham gia dự án với nhiệm vụ phân công rõ ràng, bao gồm người quản lý dự án theo dõi tiến độ chung, người phân tích nghiệp vụ làm rõ yêu cầu người dùng, người thiết kế hệ thống xác định kiến trúc và cấu trúc dữ liệu, lập trình viên xây dựng các chức năng, người kiểm thử đối chiếu sản phẩm với đặc tả và người phụ trách triển khai, vận hành.
 
-Thứ ba là phương pháp và nguyên lý kỹ thuật, cung cấp hệ thống quy tắc khoa học định hướng cho mọi thao tác chuyên môn, tiêu biểu như phương pháp phân tích thiết kế hướng cấu trúc dựa trên luồng dữ liệu, phương pháp phân tích thiết kế hướng đối tượng dựa trên hành vi và trạng thái, các nguyên lý chuẩn hóa cơ sở dữ liệu quan hệ đạt chuẩn ba dạng chuẩn nhằm triệt tiêu dư thừa dữ liệu, cùng các chiến lược kiểm thử hộp đen và hộp trắng có hệ thống.
+Về phương pháp và nguyên tắc kỹ thuật, quy trình cung cấp quy tắc làm việc cho từng giai đoạn như phương pháp phân tích thiết kế hướng cấu trúc dựa trên luồng dữ liệu, phương pháp hướng đối tượng, nguyên tắc chuẩn hóa cơ sở dữ liệu quan hệ đến dạng chuẩn 3 nhằm giảm dư thừa dữ liệu, cùng các phương pháp kiểm thử hộp đen và hộp trắng.
 
-Thứ tư là các công cụ công nghệ hỗ trợ tự động hóa, đóng vai trò gia tăng năng suất lao động kỹ thuật và hạn chế tối đa sai sót thủ công, chẳng hạn như phần mềm vẽ sơ đồ mô hình hóa trực quan, hệ quản trị cơ sở dữ liệu quan hệ chuyên dụng, môi trường phát triển tích hợp hiện đại và hệ thống quản lý phiên bản mã nguồn phân tán.
+Sau cùng là hệ thống công cụ phần mềm hỗ trợ giúp tăng năng suất làm việc và giảm sai sót thủ công, chẳng hạn như công cụ vẽ sơ đồ mô hình hóa, hệ quản trị cơ sở dữ liệu quan hệ, môi trường lập trình tích hợp và hệ thống quản lý phiên bản mã nguồn.
 
 2.1.2. Vì sao cần phải có quy trình xây dựng phần mềm?
 
-Trong thực tiễn kỹ thuật công nghệ phần mềm hiện đại, việc phát triển một hệ thống thông tin quy mô phục vụ cộng đồng tuyệt đối không thể dựa trên trực giác cá nhân, thói quen lập trình tự do hay các quyết định tùy tiện thiếu kế hoạch. Việc áp dụng một quy trình phần mềm chuẩn mực mang lại những giá trị cốt lõi mang tính sống còn đối với sự thành công của dự án.
+Khi xây dựng một hệ thống thông tin phục vụ nhiều nhóm người dùng, việc phát triển không thể chỉ dựa vào thói quen lập trình cá nhân hay làm đến đâu sửa đến đó. Áp dụng quy trình xây dựng phần mềm rõ ràng mang lại năm lợi ích thiết thực cho dự án.
 
-Trước hết, quy trình đóng vai trò tiên quyết trong việc bảo đảm chất lượng toàn diện của sản phẩm phần mềm. Thông qua việc thiết lập các mốc thẩm định trung gian và chốt chặn kiểm soát nghiêm ngặt tại từng pha, đội ngũ kỹ thuật có thể phát hiện và triệt tiêu các sai lệch logic ngay từ khâu phân tích yêu cầu sơ khởi. Nhiều công trình nghiên cứu kinh điển trong ngành công nghệ phần mềm đã chỉ ra rằng, chi phí và nguồn lực cần thiết để hiệu chỉnh một sai sót ở pha khảo sát yêu cầu thấp hơn từ 50 đến 100 lần so với việc phải đập bỏ và tái cấu trúc khi phần mềm đã hoàn tất mã nguồn và triển khai trên môi trường vận hành thực tế.
+Trước hết, quy trình giúp bảo đảm chất lượng sản phẩm thông qua việc kiểm tra kết quả ở từng giai đoạn. Nhờ rà soát ngay từ bước xác định yêu cầu và thiết kế dữ liệu, nhóm phát triển có thể phát hiện sớm các điểm thiếu nhất quán về nghiệp vụ. Thực tế trong công nghệ phần mềm cho thấy chi phí và thời gian để sửa một sai sót ở giai đoạn phân tích, thiết kế thấp hơn rất nhiều so với việc phải sửa lại cấu trúc cơ sở dữ liệu và mã nguồn khi phần mềm đã lập trình xong.
 
-Bên cạnh đó, quy trình là công cụ then chốt giúp kiểm soát hiệu quả tiến độ thời gian và ngân sách dự toán. Bằng việc phân chia dự án thành các giai đoạn tuần tự với các sản phẩm bàn giao cụ thể, người quản trị có cơ sở khoa học để ước lượng khối lượng công việc, phân bổ tài nguyên nhân lực phù hợp, dự báo chi phí tài chính và chủ động nhận diện độ trễ phát sinh để có biện pháp can thiệp kỹ thuật kịp thời, loại trừ triệt để nguy cơ vỡ tiến độ hoặc bội chi ngân sách.
+Bên cạnh đó, quy trình giúp kiểm soát tiến độ và nguồn lực thực hiện. Khi dự án được chia thành các giai đoạn với sản phẩm bàn giao cụ thể, nhóm có cơ sở ước lượng khối lượng công việc, phân công nhiệm vụ phù hợp cho từng thành viên và nhận biết sớm các phần việc đang chậm so với kế hoạch để kịp thời điều chỉnh.
 
-Mặt khác, quy trình kiến tạo một môi trường cộng tác làm việc nhóm chuyên nghiệp và thông suốt. Đối với một dự án phần mềm có sự tham gia của nhiều thành viên với các chuyên môn khác nhau như thiết kế giao diện, lập trình giao diện người dùng, xây dựng dịch vụ máy chủ, tối ưu cơ sở dữ liệu và kiểm thử chất lượng, quy trình đóng vai trò như một bộ ngôn ngữ chung. Quy trình quy định rõ ràng dữ liệu đầu ra của mắt xích này là dữ liệu đầu vào của mắt xích kế tiếp, xác định tường minh trách nhiệm của từng cá nhân và thiết lập các tiêu chuẩn nghiệm thu thống nhất, triệt tiêu hoàn toàn sự xung đột nghiệp vụ hay gián đoạn thông tin trong nội bộ nhóm.
+Mặt khác, quy trình tạo sự thống nhất trong phối hợp làm việc nhóm. Trong dự án có nhiều thành viên cùng phụ trách giao diện, xử lý máy chủ, cơ sở dữ liệu và kiểm thử, quy trình xác định rõ kết quả đầu ra của bước trước là căn cứ đầu vào cho bước sau. Nhờ thống nhất tài liệu đặc tả và tiêu chí kiểm tra, các thành viên giảm được việc hiểu lệch yêu cầu hoặc chồng chéo công việc khi ghép nối các phần của hệ thống.
 
-Hơn thế nữa, quy trình chuẩn hóa mang lại lợi ích lâu dài cho công tác bảo trì, chuyển giao và nâng cấp hệ thống trong tương lai. Một sản phẩm được xây dựng bài bản theo quy trình luôn đi kèm với bộ hồ sơ kỹ thuật đồng bộ, từ tài liệu đặc tả yêu cầu nghiệp vụ, sơ đồ luồng dữ liệu, mô hình cơ sở dữ liệu quan hệ cho đến các hướng dẫn cài đặt và vận hành. Nhờ đó, khi có sự biến động về nhân sự hoặc khi doanh nghiệp có nhu cầu mở rộng quy mô kinh doanh sau nhiều năm, đội ngũ kỹ sư kế thừa có thể nhanh chóng nắm bắt trọn vẹn kiến trúc mà không cần phải tốn công sức dịch ngược lại từng dòng lệnh mã nguồn.
+Ngoài ra, việc tuân thủ quy trình tạo thuận lợi cho công tác bảo trì và nâng cấp về sau. Một phần mềm được phát triển theo quy trình luôn đi kèm tài liệu yêu cầu, sơ đồ luồng dữ liệu, lược đồ cơ sở dữ liệu và hướng dẫn cài đặt. Khi cần sửa lỗi hoặc bổ sung chức năng mới, người tiếp nhận có thể dựa vào hồ sơ thiết kế để nắm bắt cấu trúc hệ thống thay vì phải đọc dò lại toàn bộ mã nguồn.
 
-Cuối cùng, quy trình cho phép nhận diện, phân tích định lượng và chủ động giảm thiểu các rủi ro kỹ thuật lẫn nghiệp vụ ngay từ giai đoạn ban đầu. Các nguy cơ như yêu cầu khách hàng biến đổi thất thường, rào cản công nghệ mới chưa được kiểm chứng hay nguy cơ nghẽn cổ chai khi truy vấn cơ sở dữ liệu đều được phân tích thấu đáo, từ đó nhóm phát triển chủ động xây dựng các bản mẫu thử nghiệm để đánh giá thực nghiệm và vô hiệu hóa rủi ro trước khi bước vào giai đoạn sản xuất diện rộng. Tóm lại, quy trình xây dựng phần mềm chính là nền tảng khoa học và kỹ thuật vững chắc để chuyển đổi hoạt động phát triển phần mềm từ một thao tác thủ công, cá nhân thành một quy trình sản xuất công nghiệp chuẩn mực, tạo ra sản phẩm chất lượng cao, vận hành tin cậy và đáp ứng trọn vẹn kỳ vọng của người dùng.
+Hơn nữa, quy trình hỗ trợ nhóm nhận diện và xử lý sớm các rủi ro kỹ thuật cũng như nghiệp vụ. Những vấn đề như yêu cầu người dùng chưa rõ, thiết kế thiếu ràng buộc dữ liệu hoặc truy vấn tìm kiếm bị chậm đều được kiểm chứng qua bản mẫu và dữ liệu thử nghiệm trước khi triển khai rộng, giúp quá trình phát triển diễn ra chủ động và ổn định.
 
 2.2. Mô hình phát triển phổ biến
 
-Mô hình phát triển phần mềm là sự cụ thể hóa mang tính trừu tượng của một quy trình phần mềm. Mỗi mô hình đại diện cho một triết lý tiếp cận và phương thức tổ chức chuỗi các hoạt động phát triển khác nhau, từ cách tiếp cận tuyến tính tuần tự nghiêm ngặt đến các cách tiếp cận lặp, tiến hóa và thích ứng linh hoạt. Không có một mô hình vạn năng duy nhất phù hợp cho mọi dự án; việc lựa chọn mô hình phụ thuộc mật thiết vào tính chất yêu cầu nghiệp vụ, quy mô bài toán, độ phức tạp của dữ liệu, năng lực đội ngũ kỹ thuật và mức độ tham gia của người dùng.
+Mô hình phát triển phần mềm là cách tổ chức và sắp xếp các hoạt động trong quy trình phần mềm theo một trình tự xác định, từ cách tiếp cận tuần tự qua từng pha đến cách tiếp cận lặp và hoàn thiện dần sản phẩm. Mỗi mô hình có ưu điểm và hạn chế riêng; việc lựa chọn mô hình cần dựa vào đặc điểm yêu cầu nghiệp vụ, quy mô dữ liệu, thời gian thực hiện, năng lực của nhóm phát triển và mức độ cần thu thập phản hồi trong quá trình làm dự án.
 
-2.2.1. Một số mô hình phát triển phổ biến:
+2.2.1. Một số mô hình phát triển phổ biến
 
-Trong lịch sử phát triển của công nghệ phần mềm, nhiều mô hình vòng đời đã được đề xuất, hoàn thiện và áp dụng rộng rãi. Dưới đây là các mô hình kinh điển tiêu biểu nhất, đóng vai trò nền tảng lý thuyết quan trọng cho mọi kỹ sư phần mềm:
+Trong công nghệ phần mềm, nhiều mô hình phát triển đã được đề xuất và áp dụng vào thực tế. Dưới đây là sáu mô hình tiêu biểu làm cơ sở đối chiếu khi lựa chọn phương pháp triển khai cho đề tài:
 
 a. Mô hình thác nước:
-Mô hình thác nước là mô hình phát triển phần mềm cổ điển, được phát minh bởi W.W. Royce năm 1970. Trong mô hình này, quá trình phát triển phần mềm được coi là dòng chảy tuần tự qua các pha yêu cầu, phân tích, thiết kế, cài đặt, tích hợp và bảo trì. W.W. Royce có mô tả tính lặp của từng pha, nghĩa là nếu trong một pha người ta phát hiện ra điều gì đó sai sót hoặc không phù hợp thì sẽ quay lại hiệu chỉnh ở pha trước.
+Mô hình thác nước là mô hình phát triển phần mềm cổ điển do W.W. Royce giới thiệu năm 1970. Trong mô hình này, quá trình phát triển phần mềm diễn ra tuần tự qua các pha: xác định yêu cầu, phân tích, thiết kế, cài đặt, tích hợp và bảo trì. W.W. Royce cũng mô tả mối liên hệ quay lui giữa các pha liền kề, nghĩa là khi phát hiện sai sót hoặc điểm chưa phù hợp ở pha hiện tại thì nhóm phát triển có thể quay lại hiệu chỉnh ở pha trước đó.
 
 [[IMAGE: assets/diagrams/hinh_2_1_waterfall.png | Caption: Hình ảnh 2.2.1.a. Sơ đồ quy trình mô hình thác nước.]]
 
-Về ưu điểm, mô hình thác nước sở hữu cấu trúc dễ sử dụng, dễ tiếp cận và thuận tiện cho công tác quản lý. Tiến trình phát triển phần mềm được phân định thành các giai đoạn tường minh, giúp đội ngũ kỹ sư phát hiện sớm các sai sót phát sinh trong từng pha nghiệp vụ. Đây là mô hình kinh điển có bề dày nghiên cứu và được ứng dụng rộng rãi nhất trong lịch sử công nghệ phần mềm.
+Mô hình thác nước có cấu trúc rõ ràng, dễ tiếp cận và thuận tiện cho việc theo dõi các mốc công việc. Do từng giai đoạn được phân định rạch ròi kèm tài liệu đầu ra cụ thể, nhóm phát triển dễ kiểm tra tiến độ của từng pha nghiệp vụ.
 
-Về nhược điểm, những biến động về yêu cầu nghiệp vụ trong quá trình thực hiện dễ dẫn tới sự lúng túng cho nhóm phát triển. Bên cạnh đó, khách hàng thường gặp khó khăn trong việc phát biểu đầy đủ mọi yêu cầu kỹ thuật ngay từ thời điểm ban đầu. Hơn thế nữa, bản chất tuyến tính khép kín của vòng đời thác nước dễ gây ra hiện tượng tắc nghẽn cục bộ, khiến các nhóm kỹ sư ở các pha sau phải rơi vào trạng thái chờ đợi sự chuyển giao từ pha trước.
+Tuy nhiên, hạn chế lớn của mô hình này là khó thích ứng khi yêu cầu thay đổi trong quá trình thực hiện. Trên thực tế, người dùng thường khó nêu đầy đủ và chi tiết mọi yêu cầu ngay từ đầu; nếu sau khi đã thiết kế xong mới phát hiện cần điều chỉnh nghiệp vụ thì khối lượng công việc phải làm lại sẽ rất lớn. Bên cạnh đó, cách làm tuần tự khiến các pha sau phải chờ pha trước hoàn tất mới có thể bắt đầu, làm chậm thời điểm có sản phẩm chạy thử để kiểm tra.
 
-Về phạm vi ứng dụng, mô hình thác nước thích hợp cho các dự án phần mềm quy mô nhỏ, có thời gian thực hiện ngắn và yêu cầu nghiệp vụ có tính ổn định cao, ít phát sinh biến động. Mô hình thác nước có một vị trí quan trọng vì nó đưa ra một hình mẫu chuẩn tắc về các bước mà một phần mềm cần phải trải qua. Nhiều mô hình phát triển hiện đại ngày nay là sự cải tiến từ mô hình này nhưng vẫn giữ lại những điểm cốt lõi.
+Mô hình thác nước phù hợp với các dự án quy mô nhỏ, thời gian thực hiện ngắn và có yêu cầu nghiệp vụ đã ổn định, rõ ràng ngay từ đầu. Đây cũng là mô hình nền tảng xác lập các bước cơ bản mà nhiều mô hình phát triển sau này kế thừa và cải tiến.
 
 b. Mô hình bản mẫu:
-Về khái niệm và sự ra đời, trong mô hình thác đổ, mục đích của pha xác định yêu cầu là làm sao nắm bắt được những yêu cầu của khách hàng. Tuy nhiên, việc này thường gặp khó khăn do khách hàng đôi khi không diễn đạt được chính xác yêu cầu của mình và người phát triển có thể hiểu sai ý khách hàng. Việc sử dụng bản mẫu trong pha xác định yêu cầu sẽ giải quyết hiệu quả tình trạng này. Mô hình bản mẫu thực chất là mô hình thác đổ nhưng pha xác định yêu cầu được thay bằng việc xây dựng bản mẫu thử nghiệm.
+Trong thực tế, khách hàng đôi khi chưa hình dung hoặc diễn đạt được đầy đủ yêu cầu chi tiết của mình trên văn bản, dẫn đến nguy cơ người phát triển hiểu chưa đúng mong muốn sử dụng. Mô hình bản mẫu khắc phục hạn chế này bằng cách xây dựng sớm một bản mẫu thử nghiệm trong giai đoạn xác định yêu cầu để hai bên cùng quan sát và trao đổi.
 
-Về quy trình làm bản mẫu, đầu tiên nhóm phát triển thu thập yêu cầu sơ bộ từ khách hàng. Tiếp theo là việc thiết kế nhanh, tập trung vào việc biểu diễn các khía cạnh trực quan của phần mềm mà người dùng nhìn thấy được trên màn hình.
+Quy trình làm việc bắt đầu từ việc thu thập các yêu cầu sơ bộ, sau đó nhóm phát triển thiết kế nhanh bản mẫu tập trung vào giao diện màn hình và các luồng thao tác trực quan mà người dùng sẽ trực tiếp sử dụng.
 
 [[IMAGE: assets/diagrams/hinh_2_2_prototyping_loop.png | Caption: Hình ảnh 2.2.1.b. Sơ đồ vòng lặp mô hình bản mẫu.]]
 
-Về lợi ích và cách thức hoạt động, bản mẫu được giới thiệu với khách hàng để họ dùng thử, đánh giá và góp ý kiến trực tiếp. Căn cứ vào bản mẫu, người phát triển hiểu rõ hơn mong muốn của khách hàng, những yêu cầu về cấu hình, thuật toán và cấu trúc dữ liệu cần thiết.
+Bản mẫu này được đưa cho khách hàng dùng thử, đánh giá và góp ý trực tiếp. Qua quá trình tương tác trên bản mẫu, nhóm phát triển làm rõ hơn yêu cầu về biểu mẫu, quy tắc xử lý và cấu trúc dữ liệu cần thiết trước khi thiết kế và lập trình hệ thống hoàn chỉnh.
 
 [[IMAGE: assets/diagrams/hinh_2_2_prototyping_flow.png | Caption: Hình ảnh 2.2.1.c. Cách thức hoạt động của mô hình bản mẫu.]]
 
-Về ứng dụng, mô hình bản mẫu thích hợp với các hệ thống vừa và nhỏ, đặc biệt là khi yêu cầu người dùng chưa thực sự rõ ràng, và mang lại hiệu quả cao khi kết hợp với các mô hình phát triển khác.
+Mô hình bản mẫu mang lại hiệu quả tốt đối với các hệ thống có nhiều tương tác giao diện hoặc khi yêu cầu ban đầu chưa rõ ràng, đồng thời thường được kết hợp vào các mô hình phát triển khác để kiểm chứng yêu cầu. Nhờ có giao diện trực quan từ sớm, người dùng và nhóm phát triển dễ thống nhất cách hoạt động của chức năng và phát hiện kịp thời những điểm cần bổ sung.
 
-Về ưu điểm, mô hình bản mẫu mang lại cơ hội tương tác sớm cho khách hàng thông qua giao diện trực quan, giúp người phát triển xác định nhanh chóng và chuẩn xác các yêu cầu kỹ thuật, đồng thời phát hiện kịp thời các mong muốn mới ngay từ đầu.
-
-Về nhược điểm, việc xây dựng vội vã bản mẫu thử nghiệm có thể dẫn tới cấu trúc mã nguồn nghèo nàn, chất lượng không đồng đều và khó khăn cho công tác bảo trì lâu dài nếu không được thiết kế lại bài bản. Mặt khác, khách hàng dễ nảy sinh tâm lý hối thúc bàn giao sản phẩm ngay sau khi quan sát thấy bản mẫu hoạt động.
+Hạn chế cần lưu ý là nếu tận dụng luôn mã nguồn làm vội của bản mẫu để phát triển thành sản phẩm cuối mà không thiết kế lại kiến trúc và cơ sở dữ liệu bài bản, phần mềm sẽ có cấu trúc kém ổn định và khó bảo trì. Mặt khác, khi nhìn thấy giao diện bản mẫu chạy được, khách hàng có thể hiểu nhầm rằng phần mềm đã gần hoàn thành và muốn rút ngắn thời gian bàn giao.
 
 c. Mô hình xây dựng và hiệu chỉnh:
-Về đặc điểm và khái niệm, trong mô hình xây dựng và hiệu chỉnh, không có các pha phân tích và thiết kế bài bản trước khi viết mã nguồn.
+Mô hình xây dựng và hiệu chỉnh là cách làm đơn giản nhất, trong đó nhóm phát triển không thực hiện các bước phân tích yêu cầu chi tiết và thiết kế kiến trúc trước khi viết mã nguồn. Sau khi trao đổi sơ bộ về mong muốn của người dùng, người lập trình bắt đầu viết mã ngay cho phiên bản đầu tiên, sau đó cho chạy thử và liên tục sửa đổi chương trình cho đến khi người dùng chấp nhận mới đưa vào vận hành.
 
-Về quy trình thực hiện, người phát triển sau khi trao đổi sơ bộ với khách hàng sẽ lập tức tiến hành viết mã cho phiên bản đầu tiên. Tiếp theo, phần mềm được chạy thử với sự quan sát của khách hàng và liên tục được hiệu chỉnh sửa lỗi cho đến khi khách hàng vừa ý mới đưa vào sử dụng và bảo trì.
-
-Về so sánh với mô hình bản mẫu, khi làm bản mẫu người ta chỉ tập trung mô tả giao diện yêu cầu của khách hàng rồi mới thiết kế chuẩn mực; còn trong mô hình xây dựng và hiệu chỉnh, toàn bộ phần mềm thực tế được lập trình và hiệu chỉnh trực tiếp mà không tuân theo một thiết kế kiến trúc chuẩn mực.
-
-Về nhược điểm, nhược điểm thể hiện trầm trọng trong giai đoạn bảo trì. Khi phần mềm đã sử dụng lâu năm hoặc việc bảo trì chuyển giao cho người khác tiếp quản, việc không có tài liệu thiết kế chuẩn mực sẽ khiến chi phí bảo trì trở nên khổng lồ. Mô hình này chỉ thích hợp cho các bài toán thử nghiệm cực nhỏ của cá nhân một lập trình viên và hoàn toàn không phù hợp với các dự án kỹ nghệ phần mềm chuyên nghiệp.
+Khác với mô hình bản mẫu chỉ dùng bản thử nghiệm để làm rõ yêu cầu rồi mới thiết kế hệ thống chuẩn tắc, mô hình xây dựng và hiệu chỉnh viết và sửa trực tiếp trên sản phẩm cuối cùng mà không có thiết kế tổng thể. Cách làm này bộc lộ hạn chế lớn về chất lượng và khả năng bảo trì: sau nhiều lần chắp vá, cấu trúc chương trình và dữ liệu dễ trở nên chồng chéo, thiếu tài liệu thiết kế nên rất khó sửa lỗi hoặc bàn giao cho người khác phát triển tiếp. Vì thế, mô hình này chỉ phù hợp với các bài tập lập trình rất nhỏ của cá nhân và không đáp ứng được dự án có nhiều phân hệ liên kết.
 
 d. Mô hình tăng dần:
-Về khái niệm và đặc điểm, trong mô hình tăng dần, hệ thống phần mềm được chia thành nhiều thành phần tương đối độc lập nhau. Mỗi thành phần được xem như một phần mềm nhỏ, được thiết kế, lập trình, kiểm thử và chuyển giao cho khách hàng sử dụng theo từng đợt, rồi tích hợp dần thành phần mềm hoàn chỉnh thỏa mãn toàn bộ yêu cầu.
+Trong mô hình tăng dần, nhóm phát triển chia hệ thống phần mềm thành nhiều phần chức năng tương đối độc lập, thiết kế, lập trình, kiểm thử và bàn giao theo từng đợt rồi ghép nối dần thành hệ thống hoàn chỉnh.
 
-Về quy trình thực hiện, ban đầu người ta phân tích các nét đặc trưng quan trọng nhất để xây dựng phiên bản đầu tiên chuyển giao cho khách hàng. Tiếp theo, các nhóm kỹ sư tiến hành xây dựng các thành phần tiếp theo và tích hợp dần vào hệ thống đang vận hành.
+Khi triển khai, nhóm phát triển ưu tiên phân tích và xây dựng trước các chức năng nền tảng quan trọng nhất để tạo ra phiên bản đầu tiên có thể vận hành. Ở các đợt tiếp theo, những phân hệ nghiệp vụ còn lại tiếp tục được phát triển và tích hợp thêm vào phần mềm đã có.
 
 [[IMAGE: assets/diagrams/hinh_2_3_incremental.png | Caption: Hình ảnh 2.2.1.d. Sơ đồ mô hình tăng dần.]]
 
-Về ưu điểm, mô hình tăng dần giúp rút ngắn đáng kể thời gian chờ đợi của khách hàng nhờ việc sớm đưa phân hệ cốt lõi vào vận hành thực tế. Cách tiếp cận này nâng cao tính linh hoạt, giảm thiểu chi phí khi cần hiệu chỉnh phạm vi nghiệp vụ và giúp đội ngũ kỹ thuật dễ dàng kiểm tra, cô lập lỗi trong từng phân hệ nhỏ.
+Cách tiếp cận này giúp sớm có sản phẩm chạy được cho các chức năng chính, tạo điều kiện kiểm tra thực tế và cô lập lỗi trong phạm vi từng phân hệ nhỏ trước khi mở rộng. Chia hệ thống thành từng phần nhỏ cũng giúp nhóm linh hoạt hơn khi cần điều chỉnh chi tiết ở các đợt phát triển sau.
 
-Về nhược điểm, mô hình đòi hỏi độ phức tạp kỹ thuật rất cao ở khâu tích hợp các thành phần mới vào hệ thống hiện hữu, yêu cầu phải có một kiến trúc tổng thể vững chắc ngay từ đầu và phát sinh chi phí quản trị dự án lớn hơn so với mô hình truyền thống.
+Tuy vậy, mô hình tăng dần đòi hỏi phải xác định được kiến trúc tổng thể và cấu trúc dữ liệu dùng chung ngay từ đầu để các phần phát triển sau có thể tích hợp thuận lợi với phần đã làm trước, tránh xung đột khi ghép nối các phân hệ.
 
 e. Mô hình tăng dần đồng thời:
-Về mô tả quy trình, người ta tìm hiểu nhu cầu của khách hàng rồi phân chia thành các nhóm đặc trưng tương ứng với từng pha của phần mềm. Sau đó, các nhóm kỹ sư độc lập tiến hành đặc tả, thiết kế và phát triển song song các phân hệ cùng một thời điểm, sử dụng các giao tiếp dữ liệu đã được thống nhất từ trước.
+Mô hình tăng dần đồng thời mở rộng cách tiếp cận tăng dần bằng việc phân chia hệ thống thành các nhóm chức năng và giao cho nhiều nhóm nhỏ thực hiện song song trong cùng khoảng thời gian. Các nhóm cùng đặc tả, thiết kế và lập trình phần việc của mình dựa trên quy ước giao tiếp dữ liệu đã thống nhất từ trước.
 
 [[IMAGE: assets/diagrams/hinh_2_3_concurrent_incremental.png | Caption: Hình ảnh 2.2.1.e. Sơ đồ mô hình tăng dần đồng thời.]]
 
-Về rủi ro và lưu ý, cách tiếp cận này tiềm ẩn rủi ro các phân hệ có thể không tương thích với nhau khi ghép nối. Do đó, việc thiết kế giao diện lập trình và kiến trúc chuẩn mực phải được hoàn thành trước khi triển khai song song. Mô hình mang lại hiệu quả cao khi yêu cầu dự án cần rút ngắn tối đa thời gian phát hành ra thị trường và có đội ngũ nhân lực dồi dào, chuyên biệt hóa.
+Cách tổ chức song song giúp rút ngắn thời gian hoàn thành khi dự án có nhân sự đông và phân chia được ranh giới công việc rõ ràng. Tuy nhiên, rủi ro lớn nhất của mô hình này là các phần phát triển độc lập có thể không khớp nhau khi tích hợp nếu chuẩn trao đổi dữ liệu và cơ sở dữ liệu nền tảng chưa được thống nhất kỹ trước khi tách nhánh làm việc.
 
 f. Mô hình xoắn ốc:
-Về khái niệm và định nghĩa, mô hình xoắn ốc là sự kết hợp các ưu điểm của các mô hình trên: kết hợp tính lặp của mô hình bản mẫu với tính hệ thống, kỷ luật của mô hình thác nước. Về bản chất, mô hình mô tả sự phát triển của phần mềm qua các giai đoạn tiến hóa kế tiếp nhau, trong đó mỗi chu kỳ xoắn ốc đều đặt trọng tâm hàng đầu vào việc phân tích và giải quyết rủi ro kỹ thuật.
-
-Về lịch sử và sự ra đời, mô hình xoắn ốc được nhà khoa học máy tính Barry Boehm đề xuất vào năm 1986. Trước đó, các mô hình phát triển tuyến tính gặp rất nhiều bế tắc khi xử lý rủi ro và thích ứng với thay đổi yêu cầu trong các dự án quy mô lớn. Barry Boehm đã thiết kế mô hình xoắn ốc như một phương pháp luận linh hoạt giúp kiểm soát rủi ro bài bản và gia tăng mức độ thành công của các hệ thống phức tạp.
+Mô hình xoắn ốc do Barry Boehm đề xuất năm 1986 nhằm khắc phục hạn chế của các mô hình tuyến tính khi phát triển các hệ thống có nhiều rủi ro kỹ thuật và yêu cầu cần làm rõ dần. Mô hình này kết hợp tính lặp của mô hình bản mẫu với trình tự có kỷ luật của mô hình thác nước; phần mềm được phát triển qua các vòng xoắn ốc kế tiếp nhau, trong đó mỗi vòng đều đưa việc phân tích và kiểm chứng rủi ro lên trước khi mở rộng thực thi.
 
 [[IMAGE: assets/diagrams/hinh_2_4_spiral.png | Caption: Hình ảnh 2.2.1.f. Sơ đồ mô hình xoắn ốc.]]
 
-Về bốn giai đoạn chính trong mỗi vòng lặp xoắn ốc, trong mỗi vòng xoắn ốc, quy trình phát triển được phân định thành bốn giai đoạn cốt lõi kế tiếp nhau. Giai đoạn thứ nhất là lập kế hoạch, tập trung xác định mục tiêu phát triển, các giải pháp thay thế khả dĩ cùng các ràng buộc về tài nguyên và thời gian của vòng lặp hiện tại. Giai đoạn thứ hai là phân tích rủi ro, tiến hành đánh giá định lượng và định tính các yếu tố rủi ro tiềm ẩn, từ đó xây dựng bản mẫu thử nghiệm để kiểm chứng và tháo gỡ rủi ro kỹ thuật. Giai đoạn thứ ba là thực thi kỹ thuật, triển khai công tác thiết kế chi tiết, lập trình mã nguồn, thực hiện kiểm thử đơn vị và tích hợp các module theo tiêu chuẩn chất lượng. Giai đoạn thứ tư là đánh giá nghiệm thu, nơi khách hàng và các bên liên quan trực tiếp thẩm định sản phẩm chạy được của vòng lặp, phản hồi ý kiến đóng góp để đội ngũ kỹ thuật rút kinh nghiệm và lập kế hoạch cho vòng lặp kế tiếp.
+Mỗi vòng xoắn ốc diễn ra qua bốn giai đoạn chính: lập kế hoạch để xác định mục tiêu, phạm vi công việc và ràng buộc thời gian của vòng; phân tích rủi ro để nhận diện các vấn đề có thể làm giải pháp không đạt yêu cầu và dùng bản mẫu hoặc thử nghiệm kỹ thuật để kiểm chứng; thực thi kỹ thuật để thiết kế chi tiết, lập trình và kiểm thử các chức năng thuộc phạm vi vòng; và đánh giá kết quả để đối chiếu sản phẩm với mục tiêu, thu nhận góp ý rồi lập kế hoạch cho vòng tiếp theo.
 
-Về đánh giá ưu điểm và nhược điểm, ưu điểm vượt trội của mô hình xoắn ốc thể hiện ở năng lực kiểm soát rủi ro kỹ thuật toàn diện, sự tham gia liên tục của người dùng vào quá trình hoàn thiện, tính thích ứng cao trước những thay đổi nghiệp vụ và chất lượng phần mềm đạt độ tin cậy rất cao. Ngược lại, nhược điểm của mô hình nằm ở quy trình thực hiện tương đối phức tạp, đòi hỏi chuyên môn cao về đánh giá rủi ro, chi phí vận hành mô hình lớn và khó xác định thời điểm kết thúc chính xác nếu phạm vi yêu cầu liên tục biến động. Đây là lựa chọn tối ưu cho các dự án quy mô vừa và lớn, nơi mà việc quản lý rủi ro và đảm bảo tính thích nghi là ưu tiên sống còn của sản phẩm.
+Ưu điểm nổi bật của mô hình xoắn ốc là giúp phát hiện và xử lý sớm các rủi ro về kiến trúc, dữ liệu và giao diện thông qua sản phẩm kiểm chứng ở từng vòng, đồng thời cho phép tiếp nhận phản hồi để điều chỉnh yêu cầu có kiểm soát. Điểm cần lưu ý là mô hình đòi hỏi nhóm phải dành thời gian phân tích rủi ro, đánh giá kết quả sau mỗi vòng và quản lý phạm vi chặt chẽ để không kéo dài số vòng lặp vượt quá thời gian dự án.
 
 2.2.2. Mô hình áp dụng vào đề tài được lựa chọn: Mô hình Xoắn ốc
 
-Đối với đề tài xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect, sau khi phân tích toàn diện các đặc thù về quy mô hệ thống, mức độ phức tạp của dữ liệu và năng lực nhân sự thực tế của nhóm sinh viên, nhóm đã thống nhất lựa chọn Mô hình Xoắn ốc làm phương pháp luận phát triển xuyên suốt cho dự án.
+Đối với đề tài xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect, nhóm lựa chọn mô hình Xoắn ốc dựa trên phạm vi hệ thống, quy mô dữ liệu, năng lực và nguồn lực thực hiện, cùng mức độ cần điều chỉnh yêu cầu trong quá trình làm bài tập lớn.
 
-a. Lý do lựa chọn mô hình xoắn ốc cho đề tài TalentConnect:
-Việc lựa chọn mô hình xoắn ốc cho đề tài TalentConnect xuất phát từ bốn căn cứ khoa học vững chắc. Thứ nhất là tính chất phức tạp và quy mô dữ liệu của hệ sinh thái, bao gồm cơ sở dữ liệu quan hệ gồm hai mươi tám bảng thực thể chuẩn hóa phục vụ đồng thời ba nhóm người dùng độc lập là ứng viên, nhà tuyển dụng và ban quản trị. Việc chia nhỏ bài toán theo từng chu kỳ giúp phát triển từng tầng nghiệp vụ một cách chắc chắn. Thứ hai là yêu cầu giảm thiểu rủi ro kỹ thuật đối với nhóm sinh viên, giúp cô lập và xử lý sớm các nguy cơ về sai lệch mô hình dữ liệu, lỗ hổng phân quyền hay nghẽn cổ chai truy vấn trước khi bước sang giai đoạn lập trình diện rộng. Thứ ba là tính linh hoạt tiếp nhận các ý kiến định hướng từ giảng viên hướng dẫn trong suốt quá trình triển khai mà không làm xáo trộn kiến trúc toàn cục. Thứ tư là sự thuận tiện cho công tác báo cáo và nghiệm thu nhờ việc liên tục tạo ra các bản mẫu chạy được qua từng chu kỳ phát triển.
+a. Căn cứ lựa chọn mô hình Xoắn ốc cho đề tài TalentConnect:
 
-b. Kế hoạch triển khai ba vòng lặp xoắn ốc cụ thể của dự án TalentConnect:
-Kế hoạch triển khai dự án TalentConnect được cấu trúc thành ba vòng lặp xoắn ốc tuần tự. 
+Bốn căn cứ lựa chọn mô hình Xoắn ốc cho dự án được phân tích cụ thể như sau:
 
-Ở vòng xoắn ốc thứ nhất về nền tảng kiến trúc và cơ sở dữ liệu cốt lõi, công tác lập kế hoạch tập trung xác định phạm vi dự án, khảo sát yêu cầu nền tảng và phân bổ trách nhiệm trong nhóm; công tác phân tích rủi ro tập trung đánh giá nguy cơ sai lệch lược đồ cơ sở dữ liệu và an toàn phân quyền; công tác thực thi kỹ thuật tiến hành thiết kế mô hình dữ liệu thực thể quan hệ, khởi tạo toàn bộ các bảng trên hệ quản trị và xây dựng khung giao diện cơ sở; công tác đánh giá tiến hành thẩm duyệt sự tương thích của cấu trúc lưu trữ và thử nghiệm cơ chế xác thực quyền truy cập trước khi chuyển bước.
+Về phạm vi và quy mô hệ thống, TalentConnect phục vụ ứng viên, nhà tuyển dụng và ban quản trị, sử dụng cơ sở dữ liệu quan hệ gồm 28 bảng. Phạm vi trải từ hồ sơ trực tuyến, tin tuyển dụng, tìm kiếm đến xử lý ứng viên và thống kê vận hành. Các phần cùng sử dụng thông tin tài khoản, doanh nghiệp, hồ sơ và đơn ứng tuyển nên phải thống nhất về dữ liệu và quyền truy cập. Một sai lệch trong thiết kế nền tảng có thể ảnh hưởng đến nhiều phần khi tích hợp. Mô hình Xoắn ốc cho phép nhóm kiểm tra kiến trúc và các quan hệ dữ liệu trước, sau đó mở rộng nghiệp vụ trên nền tảng đã được đánh giá.
 
-Ở vòng xoắn ốc thứ hai về nghiệp vụ tuyển dụng và công cụ tạo lập hồ sơ trực tuyến, công tác lập kế hoạch xác định yêu cầu chi tiết cho chức năng đăng tin, quản lý hồ sơ doanh nghiệp, bộ lọc tìm kiếm đa chiều và công cụ tạo lý lịch trực quan; công tác phân tích rủi ro đánh giá độ trễ truy vấn và tính phức tạp của dữ liệu hồ sơ động; công tác thực thi kỹ thuật hoàn thiện giao diện tìm kiếm việc làm kèm bộ lọc thông minh, xây dựng công cụ biên soạn hồ sơ trực quan và phát triển phân hệ quản trị tin tuyển dụng; công tác đánh giá vận hành thử nghiệm các tác vụ chính để tối ưu hóa tính công thái học của giao diện.
+Về năng lực và nguồn lực thực hiện, sáu sinh viên trong nhóm triển khai dự án trong 12 tuần, không có kinh phí mua bản quyền thương mại hoặc thuê máy chủ chuyên dụng mà sử dụng công cụ miễn phí và máy chủ phát triển nội bộ. Quá trình phối hợp giữa giao diện, xử lý máy chủ và cơ sở dữ liệu cần được kiểm chứng bằng sản phẩm chạy được ở từng chặng. Qua từng vòng, nhóm có thể thử giải pháp trên phạm vi nhỏ, nhận biết phần nào đã làm được và phần nào cần điều chỉnh trước khi triển khai rộng. Cách tổ chức này giúp phân công theo khối lượng thực tế và xử lý sớm rủi ro kỹ thuật ảnh hưởng đến tiến độ.
 
-Ở vòng xoắn ốc thứ ba về phễu tuyển dụng, bảng điều khiển quản trị và bảo đảm chất lượng, công tác lập kế hoạch thiết lập mục tiêu hoàn thiện quy trình ứng tuyển, bảng phễu quản lý ứng viên theo mô hình Kanban và trung tâm kiểm duyệt tin bài; công tác phân tích rủi ro kiểm soát nguy cơ xung đột dữ liệu giao dịch và an toàn thông tin cá nhân; công tác thực thi kỹ thuật lập trình bảng phễu theo dõi ứng viên, xây dựng bảng điều khiển quản trị, thiết lập kịch bản kiểm thử tự động và thực hiện kiểm thử chấp nhận người dùng; công tác đánh giá tiến hành tổng duyệt toàn diện mọi luồng dữ liệu, nghiệm thu sản phẩm dựa trên đặc tả kỹ thuật và đóng gói hồ sơ báo cáo hoàn chỉnh.
+Về khả năng điều chỉnh yêu cầu, giao diện và cách xử lý nghiệp vụ cần tiếp nhận góp ý từ giảng viên hướng dẫn và đánh giá qua thao tác thực tế. Những điểm chưa rõ về biểu mẫu, cách quản lý hồ sơ hay quyền sử dụng dữ liệu sẽ bộc lộ rõ khi chạy bản mẫu. Sau mỗi vòng, nhóm rà soát phản hồi, xác định phần cần sửa và cập nhật kế hoạch để tránh làm xong nhiều phần rồi mới phát hiện thiết kế lệch yêu cầu.
+
+Về báo cáo và nghiệm thu theo chặng, Mỗi vòng tạo ra tài liệu thiết kế cập nhật và bản mẫu hoặc phần mềm có thể kiểm tra. Nhóm báo cáo kết quả thực tế, các rủi ro đã xử lý và công việc còn lại. Giảng viên có căn cứ đánh giá từng phần trước khi nghiệm thu toàn bộ; chất lượng sản phẩm và kết quả kiểm tra là căn cứ xác định vòng đã hoàn thành.
+
+Khi cân nhắc các phương án, mô hình thác nước thuận tiện để quản lý các mốc công việc nhưng thay đổi yêu cầu sau thiết kế có thể gây nhiều việc làm lại. Mô hình bản mẫu giúp làm rõ yêu cầu và giao diện; mô hình tăng dần giúp hoàn thành từng phần sản phẩm. Mô hình Xoắn ốc được lựa chọn vì đưa phân tích rủi ro và đánh giá giải pháp vào mỗi vòng, giúp nhóm kiểm chứng trước khi mở rộng dự án.
+
+b. Cách vận hành bốn giai đoạn trong mỗi vòng xoắn ốc:
+
+Mô hình Xoắn ốc kết hợp phát triển có hệ thống với việc lặp để hoàn thiện sản phẩm, trong đó kết quả đánh giá vòng trước là căn cứ lập kế hoạch vòng sau. Các vòng xoắn mở rộng biểu diễn sản phẩm hoàn thiện dần và công sức tích lũy tăng lên; các hướng trong mỗi vòng tương ứng với xác định mục tiêu, đánh giá giải pháp và rủi ro, phát triển, rồi đánh giá để lập kế hoạch tiếp. Nhóm chuyển vòng dựa trên kết quả kiểm chứng và rủi ro còn lại qua bốn giai đoạn:
+
+Lập kế hoạch: Nhóm xác định mục tiêu, yêu cầu cần làm rõ, công việc, người phụ trách và thời gian. Phạm vi phải đủ cụ thể để biết sản phẩm nào cần tạo ra và kiểm tra; công việc chưa thực hiện được ghi nhận cho vòng tiếp theo.
+
+Phân tích rủi ro: Nhóm xem xét điều gì có thể làm giải pháp không đáp ứng yêu cầu, đánh giá ảnh hưởng và chọn cách kiểm chứng. Với TalentConnect, rủi ro gồm sai quan hệ dữ liệu, cấp quyền quá rộng, truy vấn chậm và xung đột cập nhật. Bản mẫu hoặc thử nghiệm kỹ thuật cần trả lời vấn đề đang nghi ngờ trước khi nhóm đầu tư nhiều công sức vào giải pháp.
+
+Thực thi kỹ thuật: Dựa trên giải pháp đã được xem xét, nhóm thiết kế chi tiết, lập trình và kiểm thử phần thuộc phạm vi vòng. Giao diện, quy tắc xử lý và dữ liệu phải được kiểm tra cùng nhau. Các thay đổi trong quá trình thực hiện cần cập nhật vào thiết kế để sản phẩm và tài liệu thống nhất.
+
+Đánh giá kết quả: Nhóm đối chiếu sản phẩm với mục tiêu, cho dùng thử và nhận góp ý từ giảng viên. Kết quả cần chỉ rõ phần đạt yêu cầu, lỗi phải sửa và rủi ro chưa giải quyết. Nhóm quyết định tiếp tục, điều chỉnh giải pháp hoặc thu hẹp công việc; vòng tiếp theo bắt đầu từ kết quả này.
+
+c. Kế hoạch triển khai ba vòng phát triển của dự án:
+
+Ba vòng phát triển của dự án xác định rõ phần việc, rủi ro trọng tâm và sản phẩm bàn giao; điều kiện chuyển vòng làm căn cứ kiểm tra kết quả:
+
+Ở vòng thứ nhất – xây dựng kiến trúc và cơ sở dữ liệu:
+Mục tiêu của vòng là thống nhất phạm vi, cấu trúc lưu trữ và quyền truy cập. Nhóm khảo sát yêu cầu, phân công trách nhiệm, thiết kế sơ đồ thực thể và quan hệ, khởi tạo các bảng, xây dựng khung giao diện và cơ chế xác thực. Thiết kế cần xác định rõ dữ liệu thuộc ứng viên hoặc doanh nghiệp và phạm vi quyền quản trị.
+Rủi ro trọng tâm là thiết kế thiếu quan hệ hoặc sai ràng buộc khiến dữ liệu không nhất quán; bên cạnh đó là cấp quyền không đúng phạm vi. Nhóm dùng dữ liệu thử để kiểm tra việc liên kết tài khoản với ứng viên hoặc doanh nghiệp, liên kết tin với doanh nghiệp và hồ sơ với người sở hữu. Các trường hợp truy cập dữ liệu của tài khoản khác phải được xem xét cùng trường hợp truy cập hợp lệ. Kết quả thử giúp quyết định có cần sửa thiết kế trước khi lập trình thêm hay không.
+Sản phẩm cần hoàn thành gồm thiết kế kiến trúc, sơ đồ dữ liệu, cơ sở dữ liệu đã khởi tạo và bản chạy thử cơ chế truy cập. Điều kiện chuyển vòng là các quan hệ chính được kiểm tra, dữ liệu thử lưu đúng ràng buộc và quyền truy cập được giới hạn theo từng nhóm người dùng; những lỗi nền tảng còn ảnh hưởng đến phần khác cần được xử lý hoặc có phương án cụ thể trước khi mở rộng.
+
+Ở vòng thứ hai – hoàn thiện nghiệp vụ tuyển dụng và hồ sơ:
+Mục tiêu của vòng là tạo được nguồn tin tuyển dụng và hồ sơ ứng viên trên nền tảng đã thống nhất. Nhóm xác định yêu cầu chi tiết cho hồ sơ doanh nghiệp, đăng và quản lý tin, tìm kiếm đa tiêu chí và công cụ tạo hồ sơ trực tuyến. Sau đó, nhóm xây dựng các giao diện, xử lý lưu dữ liệu và kết nối các phần này với cơ chế truy cập của vòng trước.
+Rủi ro cần kiểm chứng là truy vấn có nhiều điều kiện bị chậm, dữ liệu hồ sơ gồm nhiều phần khó lưu và khó hiển thị nhất quán. Nhóm thử tìm kiếm bằng dữ liệu có ngành nghề, địa điểm và mức lương khác nhau, đối chiếu kết quả với điều kiện đã nhập. Công cụ tạo hồ sơ được kiểm tra từ nhập thông tin đến lưu, mở lại và xuất tài liệu. Người dùng thử bản mẫu để phát hiện biểu mẫu khó hiểu hoặc thao tác thiếu bước, giúp nhóm điều chỉnh ngay trong vòng.
+Sản phẩm gồm phần quản lý hồ sơ doanh nghiệp, tin tuyển dụng, giao diện tìm kiếm và công cụ tạo hồ sơ. Điều kiện chuyển vòng là tin hiển thị đúng trạng thái, kết quả tìm kiếm phù hợp bộ lọc, hồ sơ lưu và mở lại đúng nội dung; các góp ý quan trọng về giao diện cần được xử lý trước khi tích hợp ứng tuyển.
+
+Ở vòng thứ ba – hoàn thiện quản lý ứng viên và chất lượng:
+Mục tiêu của vòng là hoàn thiện quá trình nộp và xử lý hồ sơ, bảng quản lý ứng viên theo giai đoạn, trung tâm kiểm duyệt và bảng điều khiển quản trị. Nhóm phát triển các phần này, tích hợp với tin tuyển dụng và hồ sơ đã có, đồng thời xây dựng kịch bản kiểm thử tự động và kiểm thử chấp nhận với người dùng.
+Rủi ro trọng tâm là xung đột cập nhật và an toàn thông tin cá nhân. Nhóm kiểm tra trường hợp gửi đơn lặp, hai yêu cầu cập nhật cùng lúc, xem hồ sơ không thuộc phạm vi tuyển dụng và thay đổi trạng thái chưa được ghi lịch sử. Mỗi thay đổi hợp lệ phải được lưu đúng đơn, có thời điểm và người thao tác; thông báo phải đến đúng người nhận. Kiểm chứng các tình huống này giúp xác nhận những phần riêng lẻ đã hoạt động thống nhất khi ghép thành hệ thống.
+Sản phẩm cần có là quy trình ứng tuyển và tuyển chọn đã tích hợp, công cụ kiểm duyệt, phần quản trị cùng kết quả kiểm thử và tài liệu cập nhật. Điều kiện nghiệm thu là các luồng chính được đối chiếu với đặc tả, lỗi ảnh hưởng đến dữ liệu và quyền truy cập đã được xử lý, người dùng thực hiện được thao tác cần thiết và nhận đúng phản hồi. Nhóm rà soát toàn bộ sản phẩm, đóng gói mã nguồn và hoàn thiện hồ sơ báo cáo trước khi bàn giao.
+
+d. Kiểm soát tiến độ 12 tuần, phân công nhiệm vụ trong nhóm và hạn chế của mô hình:
+
+Mô hình Xoắn ốc đòi hỏi thời gian phân tích rủi ro, làm bản mẫu và đánh giá sau từng vòng. Với nhóm sáu sinh viên, việc mở quá nhiều vòng hoặc liên tục bổ sung yêu cầu sẽ làm tăng khối lượng quản lý và giảm thời gian hoàn thiện sản phẩm. Vì vậy, nhóm giới hạn đúng ba vòng theo kế hoạch, tập trung vào các rủi ro có thể làm sai dữ liệu, lộ hồ sơ hoặc chậm tiến độ; mỗi vấn đề đều gắn với người phụ trách, cách kiểm chứng và kết quả xử lý cụ thể.
+
+Lịch thực hiện 12 tuần đặt sáu mốc kiểm soát cụ thể: tuần 1 và 2 khảo sát, xác định yêu cầu; tuần 3 và 4 phân tích, mô hình hóa; tuần 5 và 6 thiết kế kiến trúc, dữ liệu và giao diện; tuần 7 đến 9 lập trình; tuần 10 và 11 kiểm thử, sửa lỗi; tuần 12 đóng gói và nghiệm thu. Khi áp dụng ba vòng xoắn ốc, nhóm dành các bản mẫu để kiểm chứng sớm, đồng thời đối chiếu kết quả từng vòng với sáu mốc tiến độ này nhằm giữ đủ thời gian tích hợp và kiểm thử cuối kỳ. Để phối hợp nhịp nhàng giữa các giai đoạn, nhóm phân công nhiệm vụ cụ thể cho từng thành viên tại Bảng 2.1:
+
+Bảng 2.1: Bảng phân công nhiệm vụ và kế hoạch thực hiện của các thành viên trong nhóm
+
+| STT | Họ và tên sinh viên | Mã sinh viên | Vai trò | Nhiệm vụ phụ trách chính trong dự án |
+| :---: | :--- | :---: | :--- | :--- |
+| 1 | Lê Quốc Huy | 2305HTTB011 | Trưởng nhóm | Phụ trách chung và bao quát toàn bộ vòng đời phát triển hệ thống; lập kế hoạch từng giai đoạn, trực tiếp làm việc, đối chiếu và kiểm tra liên tục kết quả của từng thành viên; chủ trì phân tích đối tượng dữ liệu, thiết kế sơ đồ luồng dữ liệu (DFD), mô hình hóa ca sử dụng (Use Case) và nghiệm thu tổng thể dự án. |
+| 2 | Nguyễn Như Hạ | 2305HTTA008 | Thành viên | Xây dựng kế hoạch và kịch bản kiểm thử hộp trắng, hộp đen; trực tiếp thực thi kiểm thử giao diện và dịch vụ API, đóng gói triển khai hệ thống và lập phương án bảo trì phần mềm theo bốn loại hình (hiệu chỉnh, thích nghi, hoàn thiện, phòng ngừa). |
+| 3 | Đỗ Minh Hiếu | 2305HTTA009 | Thành viên | Khảo sát bài toán thực tiễn trên thị trường tuyển dụng trực tuyến, xác lập mục tiêu nghiệp vụ và mục tiêu kỹ thuật, định hình đối tượng sử dụng, giới hạn phạm vi các phân hệ cốt lõi và tổng hợp đánh giá kết quả, định hướng phát triển mở rộng của dự án. |
+| 4 | Nguyễn Trần Quang Duy | 2405HTTB013 | Thành viên | Nghiên cứu và thiết lập quy trình công nghệ phần mềm cho dự án; phân tích đối chiếu các mô hình phát triển, xây dựng kế hoạch vận hành ba vòng xoắn ốc, phân tích rủi ro kỹ thuật và thiết lập các mốc kiểm soát tiến độ 12 tuần. |
+| 5 | Mai Hoàng Anh | 2305HTTB001 | Thành viên | Thiết kế kiến trúc hệ thống ba tầng, thiết kế sơ đồ thực thể quan hệ ERD và chuẩn hóa 28 bảng cơ sở dữ liệu đạt dạng chuẩn 3 trên SQL Server; thiết kế hệ thống 22 màn hình giao diện (MH01 – MH22) và lập trình tích hợp dịch vụ máy chủ Node.js/Express.js với giao diện ReactJS. |
+| 6 | Nguyễn Thị Ngân Hà | 2205HTTA019 | Thành viên | Thực hiện khảo sát hiện trạng và phân tích đối chuẩn các hệ thống tuyển dụng hiện hữu; thu thập, phân loại và đặc tả chi tiết các yêu cầu người dùng, yêu cầu chức năng và yêu cầu phi chức năng cho ba nhóm tác nhân trên toàn hệ thống. |
+
+Mọi góp ý phát sinh trong quá trình thực hiện được xem xét theo mức độ ảnh hưởng đến mục tiêu và khả năng hoàn thành trong thời gian còn lại. Nhóm tập trung sửa lỗi và hoàn thiện yêu cầu trong phạm vi đã thống nhất; các phần thanh toán trực tuyến, hội nghị truyền hình hoặc học máy chuyên sâu được giữ ngoài phạm vi học phần. Như vậy, mô hình Xoắn ốc phát huy hiệu quả khi nhóm thực hiện nghiêm việc phân tích rủi ro, nghiệm thu từng vòng và kiểm soát thay đổi; khả năng lặp lại giúp giải quyết các vấn đề kỹ thuật cụ thể và đưa sản phẩm đến mốc hoàn thành đúng hạn.
 
 <div style="page-break-after: always;"></div>
 
@@ -363,131 +401,133 @@ III. QUY TRÌNH XÂY DỰNG PHẦN MỀM
 
 3.1.1. Cơ sở lý thuyết và Quy trình thực hiện
 
-Trong công nghệ phần mềm, xác định yêu cầu là giai đoạn mở đầu mang ý nghĩa quyết định sự thành bại của toàn bộ dự án. Đây là quá trình khám phá, phân tích, thu thập và ghi nhận lại các dịch vụ mong đợi mà hệ thống cần cung cấp cùng những ràng buộc vận hành mà hệ thống phải tuân thủ trong môi trường thực tế. Mục tiêu cốt lõi của giai đoạn này là giúp các kỹ sư phần mềm thấu hiểu thấu đáo bài toán nghiệp vụ, từ đó chuyển dịch những mong muốn ban đầu của các bên liên quan thành nền tảng kỹ thuật vững chắc, loại bỏ hoàn toàn các giả định thiếu căn cứ trước khi tiến hành thiết kế và lập trình.
+Trong công nghệ phần mềm, xác định yêu cầu là giai đoạn mở đầu nhằm thu thập, phân tích và ghi nhận các chức năng mà hệ thống cần cung cấp cùng những ràng buộc vận hành trong môi trường thực tế. Mục tiêu của giai đoạn này là làm rõ bài toán nghiệp vụ, chuyển các nhu cầu sử dụng của các bên liên quan thành danh mục yêu cầu cụ thể và có thể kiểm tra được trước khi bước sang giai đoạn phân tích, thiết kế và lập trình.
 
-Trong quá trình tiếp cận bài toán xây dựng nền tảng kết nối việc làm TalentConnect, nhóm nhận thấy một số thách thức đặc thù:
-Thứ nhất, tính đa dạng và mâu thuẫn về lợi ích giữa các nhóm người dùng: Người tìm việc luôn kỳ vọng sự tiện lợi, nhanh chóng, có công cụ hỗ trợ tạo lập hồ sơ đẹp mắt và nhận được phản hồi kết quả minh bạch. Trong khi đó, nhà tuyển dụng lại đặt nặng yêu cầu sàng lọc hồ sơ chuẩn xác, quản trị ứng viên theo luồng nghiệp vụ tập trung và hạn chế tối đa các hồ sơ ảo. Ban quản trị hệ thống lại quan tâm hàng đầu đến an toàn thông tin, kiểm soát tính xác thực của doanh nghiệp và tuân thủ các quy định pháp luật.
-Thứ hai, tính bất định của các tiêu chí tuyển dụng: Yêu cầu về chuyên môn, kỹ năng và mức đãi ngộ biến đổi nhanh chóng theo từng nhóm ngành nghề và quy mô tổ chức, đòi hỏi cấu trúc dữ liệu phải có tính mở và bộ lọc tìm kiếm phải có độ linh hoạt cao.
-Thứ ba, nguy cơ về thông tin sai lệch: Tình trạng tin đăng tuyển dụng lừa đảo, đa cấp hoặc thu phí trái phép trên Internet gây tâm lý bất an cho người lao động, đòi hỏi hệ thống phải thiết lập cơ chế kiểm duyệt chặt chẽ ngay từ khâu tiếp nhận thông tin ban đầu.
+Khi tiếp cận bài toán xây dựng website tuyển dụng và tìm kiếm việc làm TalentConnect, nhóm nhận thấy ba đặc điểm nghiệp vụ trực tiếp chi phối thiết kế hệ thống:
+Trước hết là sự khác biệt về mục đích sử dụng giữa các nhóm tác nhân: người tìm việc cần công cụ chuẩn bị hồ sơ rõ ràng, tìm đúng vị trí phù hợp và nhận được phản hồi sau khi nộp đơn; nhà tuyển dụng cần công bố nhu cầu tuyển người, tiếp nhận hồ sơ theo từng vị trí và sàng lọc ứng viên tập trung; còn ban quản trị cần kiểm soát thông tin pháp lý của doanh nghiệp, duyệt nội dung tin đăng và bảo vệ dữ liệu.
+Điểm đặc thù tiếp theo là sự đa dạng của điều kiện tuyển dụng: yêu cầu về ngành nghề, kỹ năng, mức lương, địa điểm và hình thức làm việc thay đổi theo từng vị trí, đòi hỏi cấu trúc lưu trữ và bộ lọc tìm kiếm phải biểu diễn được cả các khoảng lương cụ thể lẫn trường hợp lương thỏa thuận.
+Ngoài ra, bài toán đặt ra yêu cầu cao về độ tin cậy của nguồn tin và an toàn thông tin cá nhân: hệ thống phải xác thực doanh nghiệp trước khi cho phép công bố tin tuyển dụng, đồng thời chỉ chia sẻ bản hồ sơ của ứng viên cho doanh nghiệp khi ứng viên chủ động xác nhận nộp đơn.
 
-Để vượt qua các thách thức trên, nhóm đã thiết lập quy trình xác định yêu cầu gồm bốn bước tuần tự:
-Bước một, lập kế hoạch khảo sát: Xác định các nhóm đối tượng mục tiêu cần tiếp cận, phân chia câu hỏi khảo sát và xây dựng các biểu mẫu phỏng vấn phù hợp với từng chủ thể.
-Bước hai, thu thập và phân tích thông tin thực chứng: Áp dụng duy nhất và chuyên sâu Phương pháp phân tích đối chuẩn đối với các hệ thống tuyển dụng và quản trị ứng viên tiêu chuẩn đang vận hành trên thị trường trong nước và quốc tế.
-Bước ba, phân loại và tổng hợp yêu cầu: Tập hợp toàn bộ dữ liệu thô, loại bỏ các ý kiến trùng lặp hoặc không khả thi, phân loại thông tin thành các nhóm yêu cầu phần mềm, yêu cầu dữ liệu, yêu cầu phần cứng và yêu cầu con người.
-Bước bốn, thẩm định và thống nhất phạm vi: Trao đổi kỹ thuật trong nội bộ nhóm và tham vấn ý kiến giảng viên hướng dẫn để chính thức chốt danh mục phạm vi thực hiện của bài tập lớn.
+Để xác định đầy đủ các yêu cầu trên, nhóm triển khai quy trình khảo sát qua bốn bước:
+Bước một, xác định nhóm người dùng và tiêu chí đối chiếu: Xác định các tác nhân tham gia hệ thống (khách vãng lai, người tìm việc, nhà tuyển dụng, người kiểm duyệt, quản trị viên) và lập khung tiêu chí nghiệp vụ cần khảo sát.
+Bước hai, khảo sát và phân tích đối chuẩn các hệ thống tuyển dụng hiện có: Tìm hiểu quy trình hoạt động, giao diện và cách xử lý dữ liệu của các nền tảng tuyển dụng phổ biến ở trong nước và quốc tế để rút ra các chức năng cần thiết cho đề tài.
+Bước ba, phân loại và tổng hợp yêu cầu: Tập hợp kết quả khảo sát, loại bỏ các tính năng vượt ngoài nguồn lực học phần, sau đó phân nhóm thành yêu cầu chức năng, yêu cầu phi chức năng, dữ liệu đầu vào, dữ liệu đầu ra và các ràng buộc hệ thống.
+Bước bốn, rà soát và thống nhất phạm vi: Thảo luận trong nhóm và tiếp nhận góp ý của giảng viên hướng dẫn để chốt phạm vi chức năng thực hiện của bài tập lớn.
+
+Theo đúng yêu cầu nội dung của học phần Công nghệ phần mềm, việc xác định yêu cầu cho hệ thống quản lý tuyển dụng và tìm kiếm việc làm TalentConnect phải làm rõ đầy đủ bốn nhóm yêu cầu nền tảng: (1) Yêu cầu phần cứng: Máy chủ ứng dụng và cơ sở dữ liệu trang bị bộ vi xử lý tối thiểu 4 nhân từ 2,4 GHz, bộ nhớ RAM tối thiểu 8 GB (khuyến nghị 16 GB), ổ cứng SSD tối thiểu 100 GB lưu trữ 28 bảng dữ liệu và kho tệp PDF; máy trạm của người tìm việc, nhà tuyển dụng và quản trị viên là máy tính cá nhân hoặc thiết bị di động có kết nối mạng Internet. (2) Yêu cầu phần mềm: Phía máy chủ vận hành trên hệ điều hành Windows Server hoặc Ubuntu Linux, môi trường thực thi Node.js kết hợp Express.js và hệ quản trị cơ sở dữ liệu quan hệ Microsoft SQL Server 2022; phía máy khách sử dụng trình duyệt web thông dụng như Google Chrome, Microsoft Edge, Firefox hoặc Safari. (3) Yêu cầu về dữ liệu: Hệ thống quản lý chặt chẽ các luồng dữ liệu đầu vào (thông tin tài khoản, hồ sơ pháp lý doanh nghiệp kèm mã số thuế, dữ liệu bài đăng tuyển dụng và trọng số kỹ năng, hồ sơ trực tuyến và tệp PDF tối đa 5 MB, đơn ứng tuyển) và dữ liệu đầu ra (tệp hồ sơ PDF khổ A4, danh sách việc làm kèm tỷ lệ khớp kỹ năng có giải thích, mã đơn tra cứu, bảng quản lý ứng viên 5 giai đoạn và báo cáo thống kê) đảm bảo toàn vẹn tham chiếu và bảo vệ dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP. (4) Yêu cầu về con người: Phân định rõ vai trò, trình độ sử dụng và trách nhiệm của Người tìm việc, Nhà tuyển dụng và Ban quản trị hệ thống.
 
 3.1.2. Phương pháp xác định yêu cầu: Phương pháp phân tích đối chuẩn các hệ thống hiện hữu
 
-Trong kỹ nghệ phần mềm hiện đại, đối với việc xây dựng một hệ thống nghiệp vụ đã có bề dày phát triển và độ trưởng thành cao như nền tảng tuyển dụng trực tuyến và quản trị ứng viên, việc áp dụng Phương pháp phân tích đối chuẩn là phương pháp luận mang lại độ chuẩn xác kỹ thuật và giá trị thực tiễn cao nhất. Thay vì phân tán nguồn lực vào các cuộc khảo sát ý kiến mang tính cảm tính hoặc phỏng vấn quy mô nhỏ dễ bị thiên lệch thông tin, phương pháp đối chuẩn cho phép đội ngũ kỹ sư phần mềm trực tiếp giải phẫu cấu trúc, phân tích quy trình nghiệp vụ và đánh giá mô hình tương tác của các nền tảng công nghiệp tiêu chuẩn đã được kiểm chứng qua hàng triệu người dùng thực tế. Thông qua phương pháp này, nhóm nghiên cứu có thể chắt lọc các chuẩn mực thiết kế tối ưu, thấu hiểu lý do đằng sau các quyết định kiến trúc, nhận diện chính xác các điểm nghẽn trải nghiệm người dùng của các hệ thống đi trước, đồng thời phát hiện những khoảng trống thị trường để định hình lợi thế cạnh tranh riêng biệt cho hệ sinh thái TalentConnect.
+Đối với bài toán đã có nhiều sản phẩm vận hành thực tế như website tuyển dụng và quản lý hồ sơ ứng tuyển, việc kết hợp khảo sát nhu cầu sử dụng với phương pháp phân tích đối chuẩn các hệ thống hiện hữu giúp nhóm nắm bắt nhanh quy trình nghiệp vụ chuẩn. Qua việc quan sát trực tiếp cách thức tạo hồ sơ, đăng tin, tìm kiếm việc làm và tiếp nhận đơn trên những nền tảng phổ biến, nhóm xác định được các thành phần thông tin bắt buộc, cách tổ chức bộ lọc tra cứu cũng như những điểm còn bất cập đối với người tìm việc và doanh nghiệp vừa và nhỏ.
 
-Để tiến hành phân tích đối chuẩn một cách khoa học và toàn diện, nhóm nghiên cứu đã thiết lập một Khung tiêu chuẩn đối chuẩn đa chiều bao gồm sáu chiều cạnh kỹ thuật và nghiệp vụ then chốt:
+Nhóm đối chiếu các nền tảng dựa trên sáu tiêu chí nghiệp vụ và kỹ thuật:
 
-Thứ nhất là Khởi tạo và quản trị hồ sơ năng lực trực tuyến, đánh giá năng lực hỗ trợ người dùng biên soạn lý lịch nghề nghiệp trực quan, khả năng tùy biến mẫu mã thẩm mỹ, tính năng xem trước trực tiếp và độ chuẩn xác khi xuất bản tài liệu số định dạng PDF.
+Về công cụ tạo và quản lý hồ sơ trực tuyến, nhóm xem xét khả năng hỗ trợ người tìm việc nhập thông tin theo cấu trúc, xem trước nội dung và xuất tệp hồ sơ định dạng PDF.
 
-Thứ hai là Đăng tin, thẩm định pháp lý và phòng chống gian lận tuyển dụng, đánh giá quy trình khởi tạo tin bài, các trường dữ liệu tiêu chuẩn hóa, cơ chế đối soát giấy phép kinh doanh, mã số thuế doanh nghiệp và năng lực rà soát, ngăn chặn các bài đăng rác hoặc lừa đảo.
+Về quy trình đăng tin, xác thực doanh nghiệp và kiểm duyệt nội dung, nhóm xem xét biểu mẫu soạn tin tuyển dụng, bước kiểm tra mã số thuế, giấy chứng nhận đăng ký doanh nghiệp và cơ chế duyệt tin trước khi công bố.
 
-Thứ ba là Cơ chế tìm kiếm, lọc đa chiều và đối khớp thông minh, đánh giá tốc độ truy vấn cơ sở dữ liệu, tính linh hoạt của các bộ lọc tìm kiếm kết hợp và thuật toán đối khớp từ khóa kỹ năng giữa hồ sơ ứng viên với yêu cầu công việc.
+Về tìm kiếm đa tiêu chí và gợi ý việc làm, nhóm xem xét khả năng kết hợp các điều kiện lọc theo từ khóa, ngành nghề, địa điểm, mức lương, hình thức làm việc cùng cách đối chiếu kỹ năng giữa hồ sơ ứng viên với yêu cầu của tin tuyển dụng.
 
-Thứ tư là Quản trị phễu tuyển dụng khép kín, đánh giá mô hình quản lý ứng viên nộp về theo các giai đoạn tuyển chọn, giao diện tương tác trực quan như bảng quản lý tiến trình kéo thả trực quan, tính năng chấm điểm, ghi chú đánh giá nội bộ và cơ chế thông báo trạng thái hai chiều giữa nhà tuyển dụng và người tìm việc.
+Về ứng tuyển và quản lý ứng viên theo giai đoạn, nhóm xem xét cách ghi nhận đơn ứng tuyển, bảng theo dõi ứng viên qua từng bước xét tuyển, tính năng ghi chú nội bộ và gửi thông báo phản hồi kết quả cho ứng viên.
 
-Thứ năm là Bảo vệ dữ liệu cá nhân, quyền riêng tư và tuân thủ pháp lý, đánh giá mức độ bảo mật dữ liệu nhạy cảm của ứng viên, cơ chế phân quyền kiểm soát truy cập dựa trên vai trò và việc thiết lập sự đồng thuận minh bạch khi chia sẻ thông tin lý lịch cho bên thứ ba.
+Về bảo vệ dữ liệu cá nhân và phân quyền truy cập, nhóm xem xét cơ chế kiểm soát quyền đọc hồ sơ theo vai trò và bước xác nhận đồng ý chia sẻ thông tin khi ứng viên gửi đơn theo Nghị định số 13/2023/NĐ-CP.
 
-Thứ sáu là Mô hình chi phí và tính khả dụng đối với doanh nghiệp vừa và nhỏ, đánh giá mức độ thuận tiện trong việc tiếp cận hệ thống, chính sách chi phí dịch vụ, sự hiện diện của các gói tính năng miễn phí hỗ trợ các tổ chức tuyển dụng có nguồn lực tài chính hạn chế.
+Về khả năng tiếp cận đối với doanh nghiệp vừa và nhỏ, nhóm xem xét mức độ thuận tiện khi đăng ký sử dụng, chi phí đăng tin và việc tích hợp sẵn công cụ quản lý ứng viên ngay trong tài khoản doanh nghiệp.
 
-Dưới đây là bảng ma trận đối chuẩn chi tiết giữa bốn hệ thống tuyển dụng hàng đầu trong nước và quốc tế gồm TopCV, VietnamWorks, LinkedIn và Indeed với hệ sinh thái giải pháp được đề xuất của TalentConnect:
+Bảng 3.1 dưới đây tổng hợp kết quả đối chiếu giữa bốn nền tảng tuyển dụng phổ biến gồm TopCV, VietnamWorks, LinkedIn và Indeed với định hướng xây dựng của hệ thống TalentConnect:
 
-Bảng 3.1: Ma trận phân tích đối chuẩn các hệ thống tuyển dụng tiêu chuẩn
+Bảng 3.1: Ma trận phân tích đối chuẩn các hệ thống tuyển dụng
 
 | Tiêu chí đối chuẩn | TopCV | VietnamWorks | LinkedIn | Indeed | TalentConnect |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Công cụ biên soạn hồ sơ năng lực trực quan | Rất mạnh, nhiều mẫu thiết kế hiện đại, xuất tệp tài liệu số chuẩn | Cơ bản, nhập biểu mẫu truyền thống, thiếu tùy biến mẫu | Tự động sinh từ thông tin cá nhân, xuất tệp tài liệu số đơn giản | Tự động sinh hồ sơ dạng văn bản thô, thiếu tính thẩm mỹ | Trực quan, xem trước thời gian thực, xuất tệp tài liệu số chuẩn mực |
-| Thẩm định doanh nghiệp | Kiểm duyệt bán tự động, vẫn lọt tin tuyển dụng rác | Thẩm định chặt chẽ, yêu cầu giấy tờ pháp lý đầy đủ | Xác thực qua email công ty và trang tổ chức liên kết | Kiểm tra tự động qua thuật toán, dễ phát sinh tin ảo | Bắt buộc đối soát mã số thuế và giấy phép kinh doanh |
-| Tìm kiếm và đối khớp | Tìm kiếm từ khóa, gợi ý việc làm cơ bản theo địa điểm | Tìm kiếm đa tiêu chí truyền thống, lọc theo mức lương | Thuật toán đồ thị nghề nghiệp và gợi ý bằng trí tuệ nhân tạo rất mạnh | Bộ máy tìm kiếm toàn văn cực nhanh, tối giản bộ lọc | Tìm kiếm đa tiêu chí tối ưu chỉ mục, gợi ý theo kỹ năng |
-| Quản trị phễu tuyển dụng ứng viên | Có hệ thống quản trị tuyển dụng riêng nhưng tính phí bản quyền cao | Quản trị ứng viên theo danh sách phân trang cơ bản | Hệ thống quản lý ứng viên chuyên sâu nhưng chi phí rất đắt đỏ | Bảng quản lý đơn giản, chưa tối ưu hóa luồng thẻ công việc | Tích hợp sẵn phễu tuyển dụng kéo thả trực quan, miễn phí |
-| Bảo vệ dữ liệu theo Nghị định 13 | Chế độ bật tìm việc có thể bị xem hồ sơ ngoài ý muốn | Bảo vệ dữ liệu theo tiêu chuẩn doanh nghiệp lớn | Cài đặt quyền riêng tư chi tiết, bảo mật toàn cầu | Hồ sơ công khai có thể bị thu thập tự động | Bảo mật theo thiết kế, chỉ chia sẻ khi nộp đơn trực tiếp |
-| Khả năng tiếp cận của doanh nghiệp vừa và nhỏ | Giới hạn số tin đăng miễn phí, phụ phí đẩy tin cao | Chi phí rất cao, không phù hợp với doanh nghiệp nhỏ | Chi phí bản quyền tài khoản tuyển dụng chuyên nghiệp cực kỳ đắt đỏ | Cho phép đăng tin miễn phí nhưng dễ bị trôi bài | Tối ưu hóa cho doanh nghiệp vừa và nhỏ: đăng tin và quản trị phễu miễn phí |
+| Công cụ tạo hồ sơ trực tuyến | Nhiều mẫu thiết kế, chia rõ các mục thông tin, hỗ trợ xuất tệp PDF | Nhập biểu mẫu cơ bản, ít tùy chọn trình bày | Sinh hồ sơ từ trang cá nhân, bố cục đơn giản | Hồ sơ dạng văn bản đơn giản, ít tùy chỉnh giao diện | Tạo hồ sơ theo cấu trúc, xem trước trực tiếp và xuất tệp PDF |
+| Xác thực doanh nghiệp và duyệt tin | Kiểm duyệt kết hợp tự động và thủ công | Yêu cầu thông tin pháp lý doanh nghiệp rõ ràng | Xác thực qua tên miền email và trang tổ chức | Kiểm tra tự động là chính, ít đối soát giấy tờ pháp lý tại Việt Nam | Xác thực mã số thuế, giấy phép kinh doanh và duyệt tin trước khi công bố |
+| Tìm kiếm và gợi ý việc làm | Tìm theo từ khóa, địa điểm, ngành nghề và gợi ý việc làm | Tìm kiếm đa tiêu chí, lọc theo mức lương và cấp bậc | Gợi ý theo mạng lưới nghề nghiệp và kỹ năng khai báo | Tìm kiếm từ khóa nhanh, bộ lọc ngắn gọn | Tìm kiếm đa tiêu chí, gợi ý theo trọng số kỹ năng kèm giải thích |
+| Quản lý ứng viên theo giai đoạn | Có phân hệ quản lý riêng nhưng giới hạn theo gói dịch vụ | Quản lý danh sách ứng viên theo bảng phân trang | Công cụ quản lý chuyên sâu nhưng chi phí bản quyền cao | Danh sách ứng viên cơ bản theo từng tin đăng | Tích hợp bảng quản lý ứng viên qua 5 giai đoạn ngay trong hệ thống |
+| Bảo vệ dữ liệu theo Nghị định 13/2023/NĐ-CP | Có tùy chọn bật/tắt cho phép nhà tuyển dụng tìm hồ sơ | Quản lý quyền riêng tư theo tài khoản ứng viên | Cài đặt quyền hiển thị hồ sơ chi tiết | Cho phép ẩn hoặc hiện hồ sơ trên hệ thống | Chỉ chia sẻ hồ sơ cho doanh nghiệp khi ứng viên xác nhận gửi đơn |
+| Phù hợp với doanh nghiệp vừa và nhỏ | Giới hạn số tin miễn phí, tính phí các tính năng nâng cao | Chi phí đăng tin và mở hồ sơ cao so với doanh nghiệp nhỏ | Chi phí tài khoản tuyển dụng cao | Hỗ trợ đăng tin cơ bản nhưng ít công cụ theo dõi chi tiết | Hỗ trợ đăng tin và quản lý ứng viên theo vị trí trong phạm vi hệ thống |
 
-Đối với hệ thống TopCV, ưu điểm lớn nhất là sự thành công vang dội trong việc phát triển công cụ tạo lập hồ sơ cá nhân trực tuyến. TopCV cung cấp hàng chục mẫu thiết kế lý lịch bắt mắt, phân chia rõ ràng các khối thông tin học vấn, kinh nghiệm và kỹ năng, giúp giải tỏa hoàn toàn áp lực soạn thảo hồ sơ của các bạn sinh viên trẻ. Tuy nhiên, hệ thống này bộc lộ ba điểm nghẽn nghiêm trọng. Thứ nhất là giao diện hiển thị xuất hiện mật độ quảng cáo và biểu ngữ tài trợ quá dày đặc, làm suy giảm đáng kể tính chuyên nghiệp và gây phân tâm người dùng. Thứ hai là quy trình quản trị ứng viên chuyên nghiệp bị tách thành phân hệ riêng biệt với chi phí thuê bao đắt đỏ, khiến phần lớn doanh nghiệp vừa và nhỏ không thể tiếp cận mà chỉ sử dụng bảng tiếp nhận ứng viên thô sơ. Thứ ba là khâu kiểm duyệt tin bài bán tự động vẫn để lọt nhiều tin tuyển dụng lừa đảo, đa cấp trá hình hoặc thu phí người tìm việc, gây bức xúc lớn trên các diễn đàn lao động.
+Qua khảo sát hệ thống TopCV, điểm mạnh nổi bật là công cụ tạo hồ sơ trực tuyến giúp sinh viên và người mới đi làm dễ dàng sắp xếp thông tin học vấn, kinh nghiệm, kỹ năng và xuất ra tệp PDF. Cách bố trí danh sách việc làm và bộ lọc của TopCV cũng quen thuộc với người dùng tại Việt Nam. Tuy nhiên, trên giao diện tìm việc đôi khi có nhiều khối quảng cáo làm phân tán sự chú ý; đồng thời các tính năng quản lý ứng viên chi tiết thường tách riêng hoặc giới hạn theo gói trả phí đối với doanh nghiệp.
 
-Đối với hệ thống VietnamWorks, thế mạnh cốt lõi nằm ở bề dày hoạt động lâu năm, sở hữu nguồn dữ liệu việc làm chất lượng cao từ các tập đoàn đa quốc gia và thương hiệu lớn, kèm theo đó là tính minh bạch về thu nhập tương đối chuẩn xác. Tuy nhiên, nền tảng này lại tồn tại những hạn chế rất lớn đối với phân khúc người dùng trẻ và doanh nghiệp nhỏ. Trải nghiệm tạo hồ sơ cá nhân của VietnamWorks mang nặng tính biểu mẫu hành chính cổ điển, thiếu các công cụ trực quan và không hỗ trợ tính năng tùy biến bố cục linh hoạt cho sinh viên mới tốt nghiệp. Về phía nhà tuyển dụng, chính sách định giá dịch vụ của VietnamWorks ở mức rất đắt đỏ, thường tính bằng hàng triệu đồng cho một tin đăng duy nhất kéo dài 30 ngày, hoàn toàn nằm ngoài ngân sách của các doanh nghiệp vừa và nhỏ. Ngoài ra, do chủ yếu phục vụ các doanh nghiệp lớn với quy trình sàng lọc nhiều bước, chu kỳ tuyển dụng trên VietnamWorks thường kéo dài và tỷ lệ phản hồi ứng viên ở mức rất thấp, làm gia tăng tâm lý kiệt sức vì chờ đợi của người lao động.
+Đối với VietnamWorks, ưu thế nằm ở nguồn tin tuyển dụng từ các doanh nghiệp lớn và quy trình kiểm tra thông tin đơn vị tuyển dụng chặt chẽ. Dù vậy, biểu mẫu tạo hồ sơ trên nền tảng này thiên về nhập liệu hành chính, ít hỗ trợ tùy chỉnh bố cục cho sinh viên mới ra trường. Bên cạnh đó, mức phí đăng tin và tra cứu hồ sơ khá cao nên chưa thuận tiện cho các doanh nghiệp quy mô nhỏ có nhu cầu tuyển dụng số lượng ít.
 
-Đối với hệ thống LinkedIn, đây là hình mẫu lý tưởng về việc xây dựng mạng xã hội nghề nghiệp kết hợp đồ thị kỹ năng cá nhân. Điểm mạnh vượt trội của LinkedIn là khả năng chứng thực năng lực qua mạng lưới kết nối và tính năng gợi ý việc làm chính xác. Tuy nhiên, rào cản lớn nhất của LinkedIn tại thị trường Việt Nam là tính cục bộ và chi phí. Nền tảng được thiết kế bằng ngôn ngữ và tư duy phương Tây, tạo cảm giác xa lạ và ngưỡng tiếp cận cao đối với sinh viên mới ra trường và người lao động phổ thông. Đặc biệt, chi phí sử dụng gói công cụ tuyển dụng chuyên nghiệp LinkedIn Recruiter dao động từ 1.000 đến hơn 8.000 đô la Mỹ mỗi năm, một mức phí hoàn toàn bất khả thi đối với các doanh nghiệp vừa và nhỏ tại Việt Nam. Hơn thế nữa, tính năng tìm kiếm của LinkedIn chưa được tối ưu hóa cho các đơn vị hành chính cấp quận, huyện tại các tỉnh thành Việt Nam.
+Đối với LinkedIn, hệ thống có thế mạnh về mạng lưới nghề nghiệp và khả năng đối chiếu kỹ năng khai báo với yêu cầu công việc. Hạn chế khi áp dụng cho nhóm đối tượng sinh viên và doanh nghiệp nhỏ trong nước là giao diện thiên về mạng xã hội, chi phí gói tuyển dụng chuyên nghiệp cao và bộ lọc địa điểm chưa chi tiết theo từng khu vực tại Việt Nam.
 
-Đối với hệ thống Indeed, ưu điểm nổi bật là triết lý thiết kế tối giản, tốc độ tải trang cực nhanh và khả năng tổng hợp tin tuyển dụng từ nhiều nguồn phong phú. Tuy nhiên, việc tối giản hóa quá mức dẫn đến công cụ tạo lập hồ sơ của Indeed vô cùng đơn điệu, không phản ánh được cá tính và năng lực đa chiều của ứng viên. Phân hệ quản trị ứng viên của Indeed chỉ dừng lại ở mức danh sách tĩnh, thiếu vắng phễu Kanban trực quan. Điểm yếu chí tử của Indeed tại Việt Nam là việc không áp dụng bất kỳ quy trình kiểm định pháp lý nào đối với doanh nghiệp đăng tin, biến nền tảng này thành mảnh đất màu mỡ cho các tin tuyển dụng ảo và hành vi lừa đảo không thể kiểm soát.
+Đối với Indeed, ưu điểm là giao diện tìm kiếm gọn nhẹ, tốc độ tải nhanh và thao tác nộp hồ sơ qua từng bước rõ ràng. Tuy nhiên, công cụ tạo hồ sơ của Indeed khá đơn giản, phần quản lý ứng viên chủ yếu hiển thị theo danh sách cơ bản và khâu đối soát giấy tờ pháp lý doanh nghiệp tại thị trường địa phương chưa chặt chẽ bằng các nền tảng trong nước.
 
-Từ việc phân tích đối chuẩn sâu sắc bốn hệ thống trên, nhóm nghiên cứu đã đúc rút được những bài học kỹ thuật mang tính sống còn và định vị chính xác hướng đi cho hệ thống TalentConnect:
-
-Về mặt kế thừa, TalentConnect tiếp thu triệt để thế mạnh công nghệ tạo lập hồ sơ trực quan của TopCV, xây dựng công cụ biên soạn hồ sơ trực tuyến hỗ trợ xem trước trực tiếp và kết xuất PDF chuẩn hóa; đồng thời học hỏi tính chuẩn mực, nghiêm túc trong phân loại ngành nghề và quản lý doanh nghiệp của VietnamWorks.
-
-Về mặt cải tiến và khắc phục khoảng trống thị trường, TalentConnect tập trung giải quyết dứt điểm bốn bài toán lớn: Thứ nhất, xóa bỏ hoàn toàn rào cản chi phí cho các doanh nghiệp vừa và nhỏ bằng cách tích hợp sẵn phân hệ quản lý phễu tuyển dụng trực quan theo mô hình Kanban kéo thả hoàn toàn miễn phí ngay trong tài khoản doanh nghiệp. Thứ hai, triệt tiêu hội chứng "hố đen tuyển dụng" bằng việc thiết lập luồng thông báo trạng thái hai chiều tự động qua giao diện và email mỗi khi hồ sơ được mở xem hoặc luân chuyển giai đoạn. Thứ ba, chặn đứng nguy cơ lừa đảo tuyển dụng bằng quy trình thẩm định bắt buộc hai bước đối soát mã số thuế và giấy phép kinh doanh trước khi cho phép doanh nghiệp xuất bản tin bài. Thứ tư, tuân thủ nghiêm ngặt Nghị định 13/2023/NĐ-CP bằng chính sách bảo vệ dữ liệu mặc định: chỉ cung cấp thông tin liên hệ và hồ sơ chi tiết của ứng viên cho nhà tuyển dụng khi có hành động nộp đơn ứng tuyển trực tiếp từ phía người tìm việc.
+Từ kết quả phân tích trên, nhóm xác định hướng thiết kế cho TalentConnect như sau:
+Về mặt kế thừa, hệ thống tham khảo cách bố trí tìm kiếm việc làm của TopCV và quy trình chuẩn bị, kiểm tra hồ sơ nhiều bước của Indeed để người tìm việc dễ so sánh các vị trí, chọn đúng bản hồ sơ và kiểm tra thông tin trước khi xác nhận gửi.
+Về mặt hoàn thiện nghiệp vụ trong phạm vi đề tài, hệ thống yêu cầu doanh nghiệp phải xác thực thông tin pháp lý gồm mã số thuế và giấy phép đăng ký doanh nghiệp trước khi gửi duyệt tin tuyển dụng để bảo đảm nguồn tin có đơn vị chịu trách nhiệm rõ ràng. Bên cạnh bộ lọc tìm kiếm, hệ thống bổ sung tính năng gợi ý việc làm dựa trên trọng số kỹ năng và chỉ rõ kỹ năng nào đã khớp, kỹ năng nào chưa khai báo để ứng viên hiểu căn cứ đề xuất. Phía nhà tuyển dụng được tích hợp sẵn bảng quản lý ứng viên theo năm giai đoạn gồm Hồ sơ mới nộp, Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc và Chưa phù hợp gắn liền với lịch sử thao tác và thông báo tự động. Đồng thời, hệ thống giữ chặt nguyên tắc bảo vệ dữ liệu cá nhân: thao tác lưu tin hoặc mở biểu mẫu chưa tạo đơn và chưa chia sẻ dữ liệu; chỉ khi ứng viên chủ động đánh dấu đồng ý và xác nhận gửi thì bản hồ sơ được chọn mới gắn với đơn ứng tuyển gửi tới doanh nghiệp sở hữu tin đó.
 
 3.1.3. Xác định phạm vi đề tài "Quy trình xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect"
 
-Về phạm vi đối tượng tác động, hệ thống tập trung phục vụ ba nhóm đối tượng người dùng cụ thể trong xã hội. Nhóm thứ nhất là các ứng viên tìm việc, chủ yếu hướng tới đối tượng sinh viên chuẩn bị tốt nghiệp từ các trường đại học, cao đẳng và người lao động trẻ có nhu cầu tiếp cận việc làm chuyên nghiệp. Nhóm thứ hai là các doanh nghiệp vừa và nhỏ cùng các tổ chức tuyển dụng có nhu cầu tìm kiếm nhân sự thường xuyên nhưng chưa có điều kiện đầu tư các hệ thống quản trị tuyển dụng nội bộ đắt tiền. Nhóm thứ ba là đội ngũ quản trị viên và cán bộ kiểm duyệt chịu trách nhiệm điều hành, bảo đảm tính xác thực và an toàn thông tin cho toàn bộ nền tảng.
+Về phạm vi đối tượng sử dụng, hệ thống phục vụ ba nhóm người dùng chính: ứng viên tìm việc (hướng tới sinh viên sắp tốt nghiệp và người lao động trẻ), doanh nghiệp tuyển dụng (đặc biệt là các doanh nghiệp vừa và nhỏ cần công cụ đăng tin và theo dõi hồ sơ ứng tuyển tập trung) và ban quản trị (gồm người kiểm duyệt nội dung và quản trị viên hệ thống).
 
-Về phạm vi hệ thống và môi trường triển khai kỹ thuật, nền tảng TalentConnect được xây dựng dưới dạng một ứng dụng web đa nền tảng hoạt động trên môi trường mạng Internet. Ứng dụng tuân thủ nghiêm ngặt nguyên tắc thiết kế thích ứng, bảo đảm khả năng hiển thị tối ưu và tương tác mượt mà trên cả trình duyệt máy tính để bàn, máy tính xách tay, máy tính bảng và các thiết bị điện thoại di động thông minh thông qua các giao thức truyền thông tiêu chuẩn HTTP và HTTPS.
+Về phạm vi môi trường kỹ thuật, TalentConnect vận hành dưới dạng ứng dụng web qua giao thức HTTP/HTTPS, hiển thị thích ứng trên máy tính để bàn, máy tính xách tay và thiết bị di động.
 
-Về quy mô chức năng thực hiện, nhóm xác định rõ ràng ranh giới giữa các chức năng bắt buộc hoàn thiện trong khuôn khổ học phần và các chức năng mở rộng tạm thời chưa triển khai. Các chức năng nằm trong phạm vi bài tập lớn bao gồm: phân hệ quản lý định danh tài khoản và phân quyền người dùng theo vai trò; công cụ biên soạn hồ sơ năng lực trực tuyến trực quan kèm khả năng xuất bản tệp tài liệu số PDF; phân hệ đăng tải, quản lý vòng đời tin tuyển dụng và kiểm duyệt bài đăng phòng chống tin rác; bộ lọc tìm kiếm việc làm đa tiêu chí kết hợp cơ chế đối khớp từ khóa kỹ năng để gợi ý cơ hội nghề nghiệp phù hợp; phân hệ quản lý hồ sơ ứng viên nộp về theo mô hình phễu tuyển dụng Kanban trực quan dành cho nhà tuyển dụng; và trung tâm điều hành quản trị với các báo cáo thống kê vận hành thời gian thực. Ngược lại, những tính năng nằm ngoài phạm vi học phần gồm có: việc tích hợp cổng thanh toán trực tuyến liên ngân hàng có thu phí dịch vụ do hệ thống vận hành theo chính sách hỗ trợ kết nối miễn phí; tính năng phòng họp truyền hình trực tuyến để phỏng vấn từ xa tích hợp trong trình duyệt do người dùng có thể linh hoạt sử dụng các công cụ chuyên dụng bên ngoài; và việc áp dụng các mô hình học sâu phức tạp để bóc tách văn bản phi cấu trúc từ hình ảnh chụp hồ sơ giấy.
+Về quy mô chức năng, TalentConnect cung cấp dịch vụ kết nối người tìm việc với nhu cầu tuyển dụng của doanh nghiệp. Giá trị cốt lõi là giúp ứng viên tìm được vị trí phù hợp và gửi hồ sơ, đồng thời giúp doanh nghiệp tiếp nhận, lựa chọn ứng viên và phản hồi kết quả trên cùng hệ thống. Dịch vụ này được thực hiện qua ba chức năng nghiệp vụ chính gồm: công bố và quản lý nhu cầu tuyển dụng; tìm kiếm và gợi ý việc làm phù hợp; ứng tuyển và xử lý hồ sơ; cùng các chức năng hỗ trợ gồm tạo và quản lý hồ sơ trực tuyến, quản lý tài khoản và phân quyền, xác thực doanh nghiệp và kiểm duyệt, thông báo và thống kê vận hành. Các tính năng như cổng thanh toán trực tuyến, hội nghị truyền hình tích hợp sẵn trên trình duyệt hoặc mô hình học máy chuyên sâu trích xuất văn bản từ ảnh chụp không thuộc phạm vi thực hiện của bài tập lớn.
 
 3.1.4. Xác định yêu cầu đề tài "Quy trình xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect"
 
 a. Đối tượng đề tài sử dụng đến:
 
-Hệ sinh thái TalentConnect được xây dựng nhằm phục vụ đa dạng các chủ thể tham gia vào thị trường lao động số, trong đó phân định ranh giới và thẩm quyền rõ rệt giữa hai nhóm: những người trực tiếp sử dụng các tiện ích nghiệp vụ và những người chịu trách nhiệm quản trị, điều hành hệ thống.
+Hệ thống TalentConnect phân định rõ quyền hạn giữa nhóm người dùng nghiệp vụ và nhóm quản trị, điều hành hệ thống.
 
-Đối với nhóm người sử dụng nghiệp vụ, hệ thống phân tách thành ba đối tượng tương tác chính. Thứ nhất là Khách vãng lai, đại diện cho những cá nhân truy cập tự do vào website mà chưa thực hiện đăng ký tài khoản. Nhóm đối tượng này được quyền tra cứu bảng tin tuyển dụng công khai, tìm kiếm việc làm theo các bộ lọc cơ bản, xem hồ sơ giới thiệu công ty và tham khảo các bài viết cẩm nang nghề nghiệp. Tuy nhiên, khách vãng lai bị giới hạn không thể thực hiện các thao tác chuyên sâu như nộp hồ sơ ứng tuyển, tạo hồ sơ trực tuyến hay lưu việc làm yêu thích nhằm bảo đảm an toàn dữ liệu.
+Nhóm người sử dụng nghiệp vụ gồm ba đối tượng:
 
-Thứ hai là Người tìm việc, đối tượng trọng tâm mà nền tảng hướng tới phục vụ, chủ yếu là sinh viên chuẩn bị tốt nghiệp và người lao động trẻ. Sau khi đăng ký tài khoản và xác thực email thành công, người tìm việc được toàn quyền sử dụng bộ công cụ xây dựng hồ sơ năng lực trực tuyến với nhiều mẫu thiết kế chuyên nghiệp, tải lên các tệp lý lịch cá nhân có sẵn, sử dụng bộ lọc tìm kiếm đa chiều để tiếp cận cơ hội nghề nghiệp, nộp hồ sơ ứng tuyển trực tiếp kèm thư giới thiệu cá nhân hóa, và chủ động theo dõi tiến trình phản hồi của nhà tuyển dụng theo thời gian thực.
+Khách vãng lai là người dùng truy cập website khi chưa đăng nhập tài khoản. Khách chưa đăng nhập được phép tìm kiếm và đọc các tin tuyển dụng công khai, xem thông tin giới thiệu doanh nghiệp, nhưng cần đăng nhập tài khoản người tìm việc khi muốn tạo hồ sơ trực tuyến, nhận gợi ý theo kỹ năng hoặc gửi đơn ứng tuyển.
 
-Thứ ba là Nhà tuyển dụng, đại diện cho các doanh nghiệp, tổ chức hoặc chuyên viên tuyển dụng nhân sự. Nhà tuyển dụng có nhu cầu hoàn thiện trang thương hiệu công ty, nộp hồ sơ pháp lý gồm mã số thuế và giấy phép kinh doanh để được xác thực chính danh, tạo lập và quản lý các bài đăng tuyển dụng, tiếp nhận hồ sơ ứng tuyển tập trung, quản trị ứng viên qua phễu tuyển dụng Kanban trực quan, chấm điểm đánh giá nội bộ và gửi thư phản hồi tự động cho ứng viên.
+Người tìm việc bao gồm sinh viên và người lao động đã đăng ký tài khoản ứng viên. Người tìm việc sử dụng hệ thống để tạo và lưu các bản hồ sơ trực tuyến hoặc tải tệp hồ sơ PDF, khai báo danh mục kỹ năng chuyên môn, tìm kiếm và lọc việc làm, xem mức khớp kỹ năng trên từng vị trí, chọn bản hồ sơ và gửi đơn ứng tuyển kèm thư giới thiệu, cũng như theo dõi trạng thái xử lý đơn và lịch phỏng vấn từ doanh nghiệp.
 
-Đối với nhóm quản trị và điều hành hệ thống, thẩm quyền được phân cấp thành hai vai trò độc lập. Thứ nhất là Cán bộ kiểm duyệt nội dung, nhân sự thuộc ban quản trị chịu trách nhiệm thẩm định tính hợp pháp của doanh nghiệp thông qua việc đối soát mã số thuế trên Cổng thông tin quốc gia về đăng ký doanh nghiệp, rà soát nội dung các bài đăng tuyển dụng nhằm phát hiện và ngăn chặn triệt để các hành vi lừa đảo, đa cấp bất hợp pháp hoặc thu phí người lao động, đồng thời tiếp nhận và xử lý các báo cáo vi phạm từ cộng đồng người dùng. Thứ hai là Quản trị viên hệ thống, người nắm giữ quyền hạn kỹ thuật cao nhất, chịu trách nhiệm quản trị danh mục toàn bộ tài khoản người dùng, phân quyền truy cập theo mô hình phân quyền dựa trên vai trò, cấu hình các tham số kỹ thuật toàn cục, quản lý danh mục dữ liệu dùng chung, giám sát an toàn thông tin qua nhật ký hệ thống và trích xuất các báo cáo thống kê phân tích chỉ số hiệu suất vận hành.
+Nhà tuyển dụng đại diện cho doanh nghiệp có nhu cầu tuyển nhân sự. Nhà tuyển dụng cập nhật thông tin đơn vị, cung cấp mã số thuế và giấy chứng nhận đăng ký doanh nghiệp để xác thực pháp lý, soạn thảo và quản lý vòng đời các tin tuyển dụng, tiếp nhận danh sách đơn ứng tuyển theo từng vị trí, đánh giá và chuyển trạng thái ứng viên qua các giai đoạn xét tuyển, lập lịch phỏng vấn và gửi thông báo phản hồi cho ứng viên.
+
+Nhóm quản trị và điều hành hệ thống gồm hai vai trò: Cán bộ kiểm duyệt nội dung phụ trách đối soát thông tin pháp lý của doanh nghiệp mới đăng ký, kiểm duyệt nội dung các tin tuyển dụng đang chờ duyệt để chấp thuận công bố hoặc từ chối kèm lý do chỉnh sửa, đồng thời xử lý các phản ánh vi phạm; Quản trị viên hệ thống phụ trách quản lý tài khoản và phân quyền theo vai trò, cập nhật các danh mục ngành nghề, kỹ năng, địa điểm dùng chung, theo dõi nhật ký hệ thống và xem báo cáo thống kê toàn nền tảng.
 
 Bảng 3.2: Ma trận phân định trách nhiệm và quyền hạn
 
 | Nghiệp vụ hệ thống | Khách vãng lai | Người tìm việc | Nhà tuyển dụng | Cán bộ kiểm duyệt | Quản trị viên hệ thống |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Tra cứu việc làm công khai | Trực tiếp thực hiện | Trực tiếp thực hiện | Trực tiếp thực hiện | Giám sát phê duyệt | Toàn quyền phê duyệt |
-| Tạo lập hồ sơ năng lực trực tuyến | Không áp dụng | Trực tiếp thực hiện | Không áp dụng | Không áp dụng | Giám sát vận hành |
-| Đăng tải tin tuyển dụng mới | Không áp dụng | Không áp dụng | Trực tiếp thực hiện | Thẩm định phê duyệt | Giám sát vận hành |
-| Quản lý phễu ứng viên | Không áp dụng | Nhận thông báo | Trực tiếp thực hiện | Không áp dụng | Giám sát vận hành |
-| Thẩm định hồ sơ doanh nghiệp | Không áp dụng | Không áp dụng | Nộp hồ sơ thẩm định | Trực tiếp thẩm định | Toàn quyền phê duyệt |
-| Kiểm duyệt tin tuyển dụng | Không áp dụng | Báo cáo tham vấn | Chỉnh sửa cập nhật | Trực tiếp thẩm định | Toàn quyền phê duyệt |
-| Cấu hình hệ thống và Báo cáo chỉ số hiệu suất | Không áp dụng | Không áp dụng | Nhận thông báo | Nhận thông báo | Toàn quyền điều hành |
+| Tìm kiếm và đọc tin công khai | Trực tiếp thực hiện | Trực tiếp thực hiện | Trực tiếp thực hiện | Giám sát nội dung | Toàn quyền quản lý |
+| Tạo và quản lý hồ sơ ứng viên | Không áp dụng | Trực tiếp thực hiện | Không áp dụng | Không áp dụng | Giám sát vận hành |
+| Soạn và gửi duyệt tin tuyển dụng | Không áp dụng | Không áp dụng | Trực tiếp thực hiện | Kiểm duyệt nội dung | Giám sát vận hành |
+| Ứng tuyển và xử lý hồ sơ theo giai đoạn | Không áp dụng | Nộp đơn và xem trạng thái | Tiếp nhận và xử lý đơn | Không áp dụng | Giám sát vận hành |
+| Xác thực thông tin pháp lý doanh nghiệp | Không áp dụng | Không áp dụng | Cung cấp hồ sơ pháp lý | Trực tiếp đối soát | Toàn quyền phê duyệt |
+| Kiểm duyệt tin tuyển dụng | Không áp dụng | Báo cáo tin vi phạm | Chỉnh sửa theo phản hồi | Trực tiếp phê duyệt | Toàn quyền phê duyệt |
+| Quản lý danh mục và thống kê hệ thống | Không áp dụng | Không áp dụng | Xem thống kê của đơn vị | Xem thống kê kiểm duyệt | Toàn quyền điều hành |
 
 b. Phạm vi chức năng:
 
-Phân hệ thứ nhất là Quản lý tài khoản, định danh và phân quyền. Phân hệ này chịu trách nhiệm về toàn bộ quy trình xác thực người dùng, bao gồm đăng ký tài khoản mới, xác thực địa chỉ thư điện tử bằng mã bảo mật, cơ chế đăng nhập an toàn, quản lý phiên làm việc thông qua chuỗi khóa định danh, chức năng cấp lại mật khẩu quên, và phân quyền kiểm soát truy cập dựa trên vai trò nhằm bảo vệ an toàn cho toàn bộ tài nguyên hệ thống.
+Hệ thống bao gồm ba nhóm chức năng nghiệp vụ chính kết hợp với các chức năng hỗ trợ vận hành xuyên suốt từ nhu cầu tuyển người đến kết quả xét tuyển:
 
-Phân hệ thứ hai là Tạo lập và biên tập hồ sơ năng lực trực tuyến. Phân hệ này cung cấp bộ công cụ trực quan hỗ trợ ứng viên xây dựng bản lý lịch nghề nghiệp chuẩn mực với các khối thông tin cấu trúc gồm thông tin cá nhân, mục tiêu nghề nghiệp, quá trình đào tạo học vấn, kinh nghiệm làm việc thực tế, kỹ năng chuyên môn, chứng chỉ nghề nghiệp và các dự án cá nhân; đồng thời hỗ trợ tính năng xem trước giao diện trực tiếp và kết xuất bản ghi sang tệp tài liệu số định dạng PDF tiêu chuẩn.
+Nhóm chức năng chính thứ nhất là Công bố và quản lý nhu cầu tuyển dụng. Chức năng này chuyển nhu cầu tuyển người của doanh nghiệp thành tin tuyển dụng có đủ thông tin để ứng viên lựa chọn. Nhà tuyển dụng soạn chức danh, ngành nghề, số lượng cần tuyển, nhiệm vụ, yêu cầu kỹ năng, quyền lợi, mức lương, địa điểm và hạn nhận hồ sơ; những dữ liệu này vừa mô tả vị trí, vừa là căn cứ cho bộ lọc tìm kiếm và việc đối chiếu kỹ năng. Quy trình xử lý gồm soạn tin, lưu nháp, gửi duyệt và công bố. Doanh nghiệp cần được xác thực thông tin pháp lý trước khi gửi tin tuyển dụng. Khi gửi, hệ thống kiểm tra trường bắt buộc, thời hạn và khoảng lương; mức lương tối đa không được nhỏ hơn mức tối thiểu. Tin hợp lệ được chuyển sang Chờ duyệt; người kiểm duyệt xem nội dung và quyết định chấp thuận hoặc từ chối kèm lý do để doanh nghiệp chỉnh sửa. Chỉ tin được duyệt, đang hoạt động và còn hạn mới được đưa đến người tìm việc. Sau khi công bố, nhà tuyển dụng theo dõi và quản lý tin theo từng vị trí, có thể cập nhật nội dung, gia hạn hoặc đóng tin khi đã tuyển đủ; hệ thống kiểm tra hạn nhận hồ sơ để chuyển tin hết hạn và ngừng nhận đơn mới.
 
-Phân hệ thứ ba là Đăng tin, kiểm duyệt và quản lý tin tuyển dụng. Phân hệ này cung cấp môi trường soạn thảo thông tin tuyển dụng chuẩn hóa dành cho doanh nghiệp với đầy đủ các trường thông tin về mô hình việc làm, chế độ đãi ngộ và yêu cầu năng lực; thiết lập chu trình quản lý vòng đời tin bài qua các trạng thái Bản nháp, Chờ kiểm duyệt, Đã xuất bản và Đã đóng; đồng thời cung cấp bảng điều khiển kiểm duyệt chuyên biệt giúp cán bộ kiểm duyệt thẩm định nội dung trước khi phát hành ra cộng đồng.
+Nhóm chức năng chính thứ hai là Tìm kiếm và gợi ý việc làm phù hợp. Chức năng này giúp người tìm việc thu hẹp danh sách cơ hội theo nhu cầu và năng lực của mình. Người dùng nhập từ khóa rồi chọn các điều kiện như ngành nghề, địa điểm, mức lương và hình thức làm việc; hệ thống kết hợp những điều kiện đã chọn để tìm trong các tin đang hoạt động và còn hạn nhận hồ sơ. Khách chưa đăng nhập cũng được tìm và đọc tin công khai; việc khai báo hồ sơ, kỹ năng giúp người đã có tài khoản nhận thêm gợi ý phù hợp với bản thân. Quy trình tìm kiếm đi từ nhập điều kiện đến xem danh sách, đọc chi tiết và lựa chọn tin. Danh sách thể hiện tên vị trí, doanh nghiệp, lương và địa điểm để người dùng so sánh trước khi mở từng tin, kèm tổng số kết quả và phân trang. Gợi ý việc làm bổ sung căn cứ lựa chọn bằng cách đối chiếu kỹ năng ứng viên đã khai báo với kỹ năng mà tin tuyển dụng yêu cầu theo danh mục kỹ năng chung và trọng số ưu tiên của từng kỹ năng trong tin, đồng thời chỉ rõ kỹ năng nào đã khớp và kỹ năng nào chưa được khai báo để ứng viên hiểu vì sao một tin được đề xuất.
 
-Phân hệ thứ tư là Tìm kiếm, lọc đa chiều và gợi ý việc làm thông minh. Phân hệ này trang bị bộ máy tìm kiếm mạnh mẽ cho phép người dùng truy vấn việc làm đa tiêu chí kết hợp giữa từ khóa kỹ năng, ngành nghề chuyên môn, địa bàn địa lý, mức lương kỳ vọng và hình thức làm việc; đồng thời tích hợp thuật toán phân tích đối khớp từ khóa để tự động gợi ý các cơ hội nghề nghiệp phù hợp nhất với hồ sơ năng lực của ứng viên trên trang chủ cá nhân.
+Nhóm chức năng chính thứ ba là Ứng tuyển và xử lý hồ sơ. Chức năng này ghi nhận hồ sơ gửi đến một vị trí cụ thể và hỗ trợ doanh nghiệp xử lý hồ sơ đó đến khi có phản hồi. Từ tin đã chọn, ứng viên nhấn Ứng tuyển ngay, chọn bản hồ sơ đã lưu hoặc tải tệp mới, bổ sung thư giới thiệu nếu cần rồi kiểm tra và xác nhận gửi. Hệ thống kiểm tra người gửi đã đăng nhập, hồ sơ đã lưu thuộc người đó, tin còn nhận đơn và không có đơn trùng đang xử lý. Đơn ứng tuyển gắn đúng người nộp, vị trí tuyển dụng và bản hồ sơ được chọn; việc lưu tin hoặc chỉ mở biểu mẫu chưa tạo đơn. Về phía doanh nghiệp, nhà tuyển dụng tiếp nhận các đơn theo từng vị trí trên bảng quản lý gồm năm giai đoạn: Hồ sơ mới nộp, Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc và Chưa phù hợp. Khi mở thẻ ứng viên, người tuyển dụng xem hồ sơ, thư giới thiệu, ghi nhận xét hoặc chấm điểm nội bộ rồi chuyển sang giai đoạn phù hợp, lập lịch phỏng vấn hoặc gửi thư phản hồi kết quả.
 
-Phân hệ thứ năm là Quản trị quy trình ứng tuyển và phễu tuyển dụng. Phân hệ này là trung tâm điều phối nghiệp vụ tuyển dụng của doanh nghiệp, cho phép tiếp nhận hồ sơ ứng tuyển tập trung, phân loại và luân chuyển trạng thái ứng viên qua các giai đoạn phễu theo mô hình Kanban kéo thả trực quan từ giai đoạn hồ sơ mới, đạt sơ loại, mời phỏng vấn cho đến giai đoạn đề xuất tuyển dụng hoặc từ chối; hỗ trợ ghi chú đánh giá nội bộ giữa các chuyên viên nhân sự và tự động kích hoạt hệ thống gửi email thông báo trạng thái tức thời cho ứng viên.
+Nhóm các chức năng hỗ trợ dịch vụ tuyển dụng bao gồm: Tạo và quản lý hồ sơ cung cấp tài liệu cấu trúc và tệp PDF để ứng tuyển; Quản lý tài khoản và phân quyền xác định danh tính và giới hạn quyền thao tác trên dữ liệu; Xác thực doanh nghiệp và kiểm duyệt bảo đảm điều kiện công bố tin hợp lệ; Thông báo và thống kê giúp hai bên nhận biết kịp thời tiến trình xử lý đơn và hỗ trợ ban quản trị theo dõi hoạt động hệ thống.
 
 c. Yêu cầu chức năng:
 
-Đối với nhóm chức năng dành cho Người tìm việc, hệ thống cung cấp đầy đủ các tiện ích khép kín. Người tìm việc có thể khởi tạo tài khoản cá nhân, xác thực qua email, quản lý thông tin bảo mật và thay đổi mật khẩu định kỳ. Trong phân hệ hồ sơ, ứng viên được cung cấp công cụ soạn thảo trực quan để điền đầy đủ các khối thông tin học vấn, kinh nghiệm, kỹ năng và dự án; hệ thống liên tục cập nhật khung hiển thị trước thời gian thực và cho phép kết xuất tệp tài liệu số định dạng PDF với chất lượng in ấn chuẩn mực. Về nghiệp vụ tìm kiếm, người tìm việc có thể áp dụng các bộ lọc đa tiêu chí linh hoạt, lưu lại các bài đăng tuyển dụng quan tâm vào danh mục việc làm yêu thích để theo dõi sau. Khi quyết định ứng tuyển, người tìm việc có thể chọn sử dụng hồ sơ trực tuyến sẵn có hoặc tải lên tệp hồ sơ đính kèm từ máy tính, soạn thảo thư giới thiệu bản thân và nhấn nút nộp đơn; hệ thống lập tức cập nhật trạng thái đơn ứng tuyển và cho phép người tìm việc theo dõi tiến trình phản hồi của nhà tuyển dụng theo thời gian thực qua các mốc: Đã gửi hồ sơ, Đã được xem, Đạt yêu cầu sơ loại, Mời phỏng vấn, Đề xuất nhận việc hoặc Chưa phù hợp.
+Đối với Người tìm việc, hệ thống đáp ứng các yêu cầu chức năng từ chuẩn bị hồ sơ đến tra cứu và nộp đơn. Người tìm việc đăng ký tài khoản, đăng nhập, cập nhật thông tin liên hệ và khai báo học vấn, kinh nghiệm, kỹ năng, chứng chỉ, dự án để tạo các bản hồ sơ trực tuyến, xem trước và xuất tệp PDF hoặc tải lên tệp hồ sơ PDF từ máy tính. Khi tìm việc, ứng viên nhập từ khóa kết hợp bộ lọc ngành nghề, địa điểm, kinh nghiệm, mức lương và hình thức làm việc; xem danh sách kết quả, lưu tin để xem lại hoặc mở trang chi tiết công việc. Hệ thống hiển thị tỷ lệ khớp kỹ năng cùng danh sách các kỹ năng đã khớp và kỹ năng chưa khai báo; mức khớp kỹ năng là thông tin hỗ trợ lựa chọn, không bảo đảm ứng viên đáp ứng toàn bộ yêu cầu hay sẽ được tuyển, do ứng viên còn phải cân nhắc kinh nghiệm, địa điểm, thu nhập và nội dung công việc. Khi nhấn Ứng tuyển ngay, vị trí được chọn chuyển sang biểu mẫu nộp hồ sơ cùng thông tin doanh nghiệp và hạn nhận đơn; ứng viên chọn bản hồ sơ, nhập thư giới thiệu (tối đa 2.000 ký tự), xem trước tài liệu nếu cần, kiểm tra lại thông tin người gửi – người nhận, chủ động đánh dấu đồng ý chia sẻ dữ liệu và xác nhận gửi. Sau khi lưu đơn thành công, hệ thống cấp mã đơn tra cứu, đặt trạng thái ban đầu là Đã gửi hồ sơ và cập nhật lịch sử khi doanh nghiệp xử lý đơn qua các giai đoạn tiếp theo.
 
-Đối với nhóm chức năng dành cho Nhà tuyển dụng, hệ thống thiết lập quy trình quản lý chuyên nghiệp và tập trung. Nhà tuyển dụng tiến hành khởi tạo tài khoản doanh nghiệp, hoàn thiện trang giới thiệu thương hiệu công ty bao gồm logo, hình ảnh môi trường làm việc, địa chỉ trụ sở, quy mô nhân sự và tải lên giấy phép đăng ký kinh doanh hoặc mã số thuế để xác thực pháp lý. Nhà tuyển dụng được cung cấp trình soạn thảo bài đăng tuyển dụng chuẩn mực, hỗ trợ lưu bản nháp, gửi yêu cầu kiểm duyệt, chỉnh sửa nội dung hoặc chủ động đóng tin khi đã tuyển đủ chỉ tiêu. Về quản trị ứng viên, nhà tuyển dụng sử dụng bảng phễu Kanban trực quan để theo dõi toàn bộ hồ sơ nộp về theo từng vị trí; hỗ trợ thao tác kéo thả linh hoạt để chuyển đổi trạng thái ứng viên giữa các cột trong phễu tuyển dụng; cho phép ghi chú nhận xét và chấm điểm năng lực nội bộ giữa các chuyên viên nhân sự; đồng thời tích hợp tính năng lên lịch phỏng vấn và gửi thư điện tử phản hồi tự động theo các mẫu thư thiết lập sẵn tương ứng với từng giai đoạn.
+Đối với Nhà tuyển dụng, hệ thống cung cấp các chức năng quản lý nhu cầu tuyển người và xử lý ứng viên theo từng vị trí. Doanh nghiệp đăng ký tài khoản, cập nhật hồ sơ đơn vị, địa điểm làm việc và gửi mã số thuế cùng giấy chứng nhận đăng ký doanh nghiệp để xác thực pháp lý. Khi soạn tin tuyển dụng, nhà tuyển dụng nhập đầy đủ thông tin công việc, khoảng lương, hạn nhận đơn và chọn các kỹ năng yêu cầu kèm mức độ ưu tiên; có thể lưu nháp, gửi duyệt, cập nhật nội dung, gia hạn hoặc đóng tin khi đã tuyển đủ. Trong phần quản lý ứng viên, nhà tuyển dụng theo dõi các đơn nộp về theo năm giai đoạn (Hồ sơ mới nộp, Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc, Chưa phù hợp). Khi mở từng đơn, nhà tuyển dụng đọc đúng bản hồ sơ ứng viên đã gửi kèm thư giới thiệu, ghi nhận xét hoặc chấm điểm đánh giá nội bộ và chuyển đơn sang giai đoạn phù hợp. Với hồ sơ được chọn phỏng vấn, nhà tuyển dụng lập lịch gắn với đơn (gồm thời gian, hình thức, người phỏng vấn và địa chỉ hoặc liên kết cuộc họp) để hệ thống gửi thư mời cho ứng viên. Sau phỏng vấn hoặc ngay từ bước sơ loại, nhà tuyển dụng ghi nhận kết quả đề xuất nhận việc hoặc từ chối kèm thư phản hồi mà không bắt buộc ứng viên phải đi qua tất cả các giai đoạn.
 
-Đối với nhóm chức năng dành cho Quản trị viên và Cán bộ kiểm duyệt, hệ thống cung cấp trung tâm điều hành toàn diện. Quản trị viên có toàn quyền quản lý danh sách tài khoản người dùng, xem chi tiết lý lịch hoạt động và thực hiện khóa hoặc mở khóa tài khoản khi có dấu hiệu vi phạm điều khoản sử dụng. Cán bộ kiểm duyệt thực hiện đối soát mã số thuế và giấy phép đăng ký kinh doanh của các doanh nghiệp mới đăng ký trước khi phê duyệt quyền đăng tin; tiến hành rà soát nội dung các bài tuyển dụng trong hàng đợi kiểm duyệt để từ chối và phản hồi lý do nếu tin bài chứa thông tin sai sự thật hoặc lừa đảo. Ngoài ra, quản trị viên chịu trách nhiệm quản lý danh mục dữ liệu dùng chung toàn hệ thống bao gồm danh mục ngành nghề, bộ kỹ năng chuyên môn và đơn vị hành chính; đồng thời trích xuất các báo cáo thống kê trực quan về số lượng người dùng mới, số tin đăng, số lượt nộp đơn và tỷ lệ tuyển dụng thành công.
+Đối với Quản trị viên và Cán bộ kiểm duyệt, hệ thống cung cấp chức năng kiểm soát điều kiện công bố tin và quản trị dữ liệu nền tảng. Cán bộ kiểm duyệt xem danh sách doanh nghiệp chờ xác thực pháp lý, kiểm tra mã số thuế và giấy phép kinh doanh để phê duyệt hoặc từ chối; xem hàng đợi các tin tuyển dụng ở trạng thái Chờ duyệt để chấp thuận công bố hoặc từ chối kèm lý do cụ thể. Quản trị viên quản lý danh sách tài khoản, phân quyền vai trò, khóa hoặc mở khóa tài khoản vi phạm, cập nhật danh mục ngành nghề và danh mục kỹ năng dùng chung, đồng thời xem báo cáo thống kê số lượng người dùng, tin tuyển dụng và đơn ứng tuyển trên hệ thống.
 
-Đối với nhóm tiến trình xử lý tự động ngầm của hệ thống, hệ thống thiết lập bốn tiến trình vận hành liên tục. Tiến trình thứ nhất là thuật toán quét và đối khớp từ khóa kỹ năng giữa hồ sơ ứng viên và yêu cầu của các tin tuyển dụng đang hoạt động nhằm tự động sinh danh sách việc làm gợi ý phù hợp trên trang cá nhân của người tìm việc. Tiến trình thứ hai là dịch vụ gửi thư điện tử thông báo tự động qua hàng đợi dịch vụ gửi thư điện tử tự động, bảo đảm gửi email thông báo cho ứng viên ngay khi hồ sơ được mở xem hoặc thay đổi trạng thái xét duyệt trong phễu tuyển dụng. Tiến trình thứ ba là tiến trình kiểm tra định kỳ quét tự động mỗi ngày để chuyển trạng thái tin tuyển dụng từ đang hiển thị sang hết hạn khi vượt quá ngày hết hạn nộp đơn đã thiết lập. Tiến trình thứ tư là tác vụ tự động dọn dẹp các mã token xác thực đã hết hạn và các tệp tài liệu tạm trên máy chủ định kỳ nhằm tối ưu hóa tài nguyên lưu trữ.
+Đối với các tác vụ xử lý tự động, hệ thống tính toán mức khớp kỹ năng giữa hồ sơ ứng viên đã khai báo với danh sách kỹ năng yêu cầu và trọng số của từng tin tuyển dụng đang mở; tự động tạo thông báo trên hệ thống và gửi thư điện tử cho người nhận khi phát sinh đơn ứng tuyển mới, khi đơn chuyển giai đoạn xét tuyển hoặc khi có lịch phỏng vấn; rà soát hạn nhận hồ sơ hàng ngày để chuyển các tin quá hạn sang trạng thái hết hạn và ngừng tiếp nhận đơn mới; đồng thời dọn dẹp các phiên đăng nhập hoặc mã xác thực đã hết hiệu lực.
 
 d. Yêu cầu phi chức năng:
 
-Về an toàn và bảo mật thông tin, toàn bộ mật khẩu người dùng khi lưu trữ vào cơ sở dữ liệu bắt buộc phải được mã hóa một chiều bằng thuật toán băm bcrypt kết hợp chuỗi muối ngẫu nhiên với hệ số chi phí tối thiểu là 10, tuyệt đối không lưu mật khẩu dưới dạng văn bản thô. Cơ chế xác thực phiên làm việc được quản lý chặt chẽ thông qua chuỗi khóa định danh JSON Web Token có chữ ký số bí mật, kết hợp cơ chế Access Token ngắn hạn và Refresh Token dài hạn. Hệ thống áp dụng nghiêm ngặt nguyên lý phân quyền kiểm soát truy cập dựa trên vai trò ở mọi tầng xử lý giao diện lập trình ứng dụng, ngăn chặn triệt để lỗ hổng truy cập tài nguyên trái phép. Đặc biệt, hệ thống tuân thủ đầy đủ các quy định về bảo vệ dữ liệu cá nhân theo Nghị định số 13/2023/NĐ-CP của Chính phủ: thông tin cá nhân và lý lịch của người tìm việc chỉ được chia sẻ cho nhà tuyển dụng khi có sự đồng thuận nộp đơn trực tiếp từ ứng viên. Toàn bộ dữ liệu đầu vào đều phải được kiểm tra tính hợp lệ và lọc khử mã độc phía máy chủ nhằm phòng ngừa các nguy cơ tấn công SQL Injection và Cross-Site Scripting.
+Về an toàn và bảo mật thông tin, mật khẩu tài khoản phải được băm một chiều bằng thuật toán bcrypt trước khi lưu vào cơ sở dữ liệu, không lưu mật khẩu dạng văn bản thuần. Phiên đăng nhập được quản lý thông qua mã xác thực JWT và bảng quản lý phiên làm việc; danh tính người thao tác luôn được lấy từ phiên đăng nhập hợp lệ ở tầng máy chủ để ngăn việc sửa mã ứng viên hoặc mã doanh nghiệp trong yêu cầu gửi lên. Hệ thống kiểm soát quyền truy cập theo vai trò ở từng API: bản hồ sơ trong đơn ứng tuyển phải thuộc đúng ứng viên nộp đơn, và chỉ doanh nghiệp sở hữu tin tuyển dụng nhận đơn đó mới có quyền mở xem. Theo Nghị định số 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân, ô đồng ý chia sẻ hồ sơ ở bước xác nhận không được đánh dấu sẵn mà phải do ứng viên chủ động chọn trước khi gửi. Nội dung bản hồ sơ đã nộp gắn với đơn được giữ nguyên để hai bên đối chiếu thống nhất ngay cả khi ứng viên chỉnh sửa hồ sơ cho những lần ứng tuyển sau.
 
-Về hiệu năng và khả năng chịu tải, thời gian phản hồi của hệ thống đối với các thao tác người dùng thông thường như tải trang, lọc danh mục hay chuyển trang không được vượt quá 2.0 giây trong điều kiện kết nối mạng tiêu chuẩn. Thời gian thực thi truy vấn tìm kiếm việc làm tại tầng cơ sở dữ liệu phải đạt dưới 500 mili-giây nhờ việc xây dựng cấu trúc chỉ mục tối ưu trên các trường dữ liệu khóa ngoại, ngành nghề và khu vực địa lý. Hệ thống có khả năng chịu tải đồng thời tối thiểu 1.000 người dùng trực tuyến trong cùng một thời điểm mà không xảy ra hiện tượng treo nghẽn máy chủ hay sai lệch dữ liệu giao dịch. Dung lượng tải trang ban đầu của ứng dụng web được tối ưu hóa dưới 2MB thông qua kỹ thuật phân tách mã nguồn và nén hình ảnh tự động.
+Về hiệu năng xử lý, trong phạm vi thử nghiệm của dự án học phần, các thao tác tải trang danh sách, lọc việc làm và mở chi tiết tin cần phản hồi trong khoảng 2 giây ở điều kiện mạng thông thường. Nhóm tạo chỉ mục cho các truy vấn tìm kiếm đa tiêu chí trên cơ sở dữ liệu Microsoft SQL Server tại các cột trạng thái tin, hạn nộp, ngành nghề, địa điểm và mức lương để thời gian truy vấn đạt dưới 500 mili-giây với tập dữ liệu thử nghiệm của đề tài. Khi người dùng nhấn gửi đơn ứng tuyển, giao diện phải hiển thị trạng thái đang xử lý và tạm khóa nút xác nhận nhằm ngăn thao tác nhấn lặp tạo ra hai yêu cầu trùng nhau.
 
-Về độ tin cậy và tính sẵn sàng, hệ thống duy trì thời gian hoạt động ổn định đạt tỷ lệ tối thiểu 99,9%, bảo đảm người dùng có thể tra cứu và ứng tuyển việc làm thông suốt 24/7. Chính sách sao lưu cơ sở dữ liệu tự động được thiết lập định kỳ mỗi ngày một lần vào khung giờ thấp điểm lúc 02:00 sáng và lưu trữ phân tán để phòng ngừa rủi ro thảm họa dữ liệu. Mục tiêu thời gian phục hồi hệ thống sau sự cố gián đoạn không vượt quá 30 phút, và mục tiêu điểm phục hồi dữ liệu bảo đảm dưới 24 giờ.
+Về độ tin cậy và xử lý tình huống phát sinh, hệ thống phải phân biệt rõ trường hợp tìm kiếm không có kết quả phù hợp với trường hợp lỗi kết nối không tải được dữ liệu để thông báo đúng nguyên nhân cho người dùng. Trong quá trình ứng viên đang chuẩn bị hồ sơ, nếu tin tuyển dụng vừa chuyển sang trạng thái đóng hoặc hết hạn, hệ thống phải chặn việc tạo đơn mới nhưng vẫn giữ nguyên thông tin liên hệ, bản hồ sơ đã chọn và nội dung thư giới thiệu trên biểu mẫu để ứng viên không bị mất dữ liệu đã nhập. Nếu mất kết nối mạng ngay sau khi nhấn gửi, hệ thống cần kiểm tra xác minh đơn đã được ghi nhận trong cơ sở dữ liệu hay chưa trước khi cho phép gửi lại.
 
-Về tính khả dụng và trải nghiệm người dùng, giao diện website được thiết kế theo phong cách phẳng hiện đại, tuân thủ nguyên lý tương phản thị giác và khoảng cách công thái học, giúp người dùng dễ dàng định hướng thông tin mà không bị rối mắt. Ứng dụng tương thích hoàn toàn trên tất cả các trình duyệt web phổ biến hiện nay như Google Chrome, Microsoft Edge, Mozilla Firefox và Apple Safari. Hệ thống bảo đảm tính thích ứng Responsive mượt mà trên mọi độ phân giải màn hình từ máy tính để bàn đến điện thoại thông minh, đồng thời tối ưu hóa quy trình nộp đơn ứng tuyển theo quy tắc tối đa ba thao tác nhấp chuột.
+Về khả năng sử dụng và giao diện, các màn hình giữ bố cục, màu sắc và nhãn tiếng Việt thống nhất; mọi trạng thái quan trọng đều có nhãn chữ đi kèm thay vì chỉ phân biệt bằng màu sắc. Khi người dùng mở xem chi tiết một tin tuyển dụng rồi quay lại danh sách, hệ thống giữ nguyên từ khóa, các điều kiện lọc và vị trí trang đang tra cứu. Trên các biểu mẫu nhập liệu, thông báo lỗi được đặt ngay tại trường dữ liệu chưa hợp lệ và giữ lại các nội dung người dùng đã nhập đúng.
 
-Về khả năng mở rộng và bảo trì, kiến trúc phần mềm được thiết kế phân tầng chuẩn mực theo mô hình máy khách - máy chủ theo chuẩn dịch vụ web REST, tách biệt hoàn toàn giữa tầng giao diện hiển thị phía máy khách và tầng xử lý dịch vụ phía máy chủ, cho phép đội ngũ kỹ thuật nâng cấp hoặc sửa lỗi độc lập từng thành phần. Mã nguồn được tổ chức module hóa cao, tuân thủ quy ước đặt tên chuẩn tắc và đi kèm tài liệu giao diện lập trình ứng dụng đầy đủ, tạo tiền đề thuận lợi cho việc tích hợp thêm các phân hệ thanh toán trực tuyến hoặc các mô hình học máy gợi ý việc làm chuyên sâu trong tương lai.
+Về khả năng bảo trì và mở rộng, phần mềm phân tách rõ giữa giao diện phía máy khách dùng ReactJS và dịch vụ phía máy chủ dùng Node.js, Express giao tiếp qua RESTful API, kết nối với cơ sở dữ liệu quan hệ Microsoft SQL Server đạt dạng chuẩn 3. Cách tổ chức tách lớp giúp nhóm dễ kiểm tra riêng từng phần giao diện, quy tắc nghiệp vụ và câu lệnh truy vấn, đồng thời thuận tiện khi cần bổ sung chức năng mới.
 
 e. Dữ liệu đầu vào:
 
@@ -495,15 +535,15 @@ Bảng 3.3: Đặc tả các luồng dữ liệu đầu vào của hệ thống
 
 | Số thứ tự | Luồng dữ liệu đầu vào | Nguồn phát sinh | Cấu trúc và Định dạng dữ liệu | Quy tắc kiểm tra và Ràng buộc hợp lệ |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | Thông tin đăng ký tài khoản | Người tìm việc, Nhà tuyển dụng | Chuỗi ký tự: Họ tên, Email, Mật khẩu, Số điện thoại, Vai trò | Email đúng tiêu chuẩn thư điện tử quốc tế, chưa từng tồn tại trên hệ thống; Mật khẩu tối thiểu 8 ký tự gồm chữ hoa, chữ thường và chữ số; Số điện thoại đúng 10 chữ số |
-| 2 | Dữ liệu hồ sơ năng lực | Người tìm việc | Chuỗi ký tự và ngày tháng: Thông tin liên hệ, Mục tiêu, Học vấn, Kinh nghiệm, Kỹ năng | Ngày tốt nghiệp phải lớn hơn ngày nhập học; các trường bắt buộc không được để trống |
-| 3 | Tệp tài liệu hồ sơ đính kèm | Người tìm việc | Tệp tài liệu số định dạng .pdf, .docx, .doc | Kích thước tệp không vượt quá 5 megabyte; tệp phải được quét kiểm tra phần mở rộng và mã độc định dạng tệp tin |
-| 4 | Hồ sơ định danh doanh nghiệp | Nhà tuyển dụng | Tên doanh nghiệp, Mã số thuế, Giấy phép kinh doanh, Địa chỉ, Logo | Mã số thuế chuẩn 10 hoặc 13 chữ số; tệp giấy phép kinh doanh định dạng hình ảnh/PDF rõ nét, hợp pháp |
-| 5 | Dữ liệu bài đăng tuyển dụng | Nhà tuyển dụng | Tiêu đề, Vị trí, Ngành nghề, Mức lương, Mô tả công việc, Yêu cầu, Hạn nộp | Mức lương tối đa phải lớn hơn hoặc bằng mức lương tối thiểu; hạn nộp hồ sơ phải sau ngày hiện tại tối thiểu 7 ngày |
-| 6 | Dữ liệu tương tác ứng tuyển | Người tìm việc | Mã tin tuyển dụng, Mã hồ sơ, Thư giới thiệu bản thân | Mỗi ứng viên chỉ được phép nộp đơn một lần duy nhất vào một tin tuyển dụng đang còn hạn tiếp nhận |
-| 7 | Tiêu chí truy vấn tìm kiếm | Khách vãng lai, Người tìm việc | Chuỗi từ khóa, Mã ngành nghề, Mã địa phương, Khoảng lương, Kinh nghiệm | Loại bỏ các ký tự đặc biệt nguy hiểm phòng chống SQL Injection; khoảng lương hợp lệ |
+| 1 | Thông tin đăng ký tài khoản | Người tìm việc, Nhà tuyển dụng | Chuỗi ký tự: Họ tên, Email, Mật khẩu, Số điện thoại, Vai trò | Email đúng định dạng và chưa tồn tại trong bảng Users; Mật khẩu tối thiểu 8 ký tự gồm chữ hoa, chữ thường và chữ số; Số điện thoại gồm 10 chữ số |
+| 2 | Dữ liệu hồ sơ trực tuyến | Người tìm việc | Chuỗi ký tự và ngày tháng: Thông tin liên hệ, Mục tiêu nghề nghiệp, Học vấn, Kinh nghiệm, Kỹ năng, Dự án | Các trường bắt buộc không được để trống; thời gian kết thúc phải lớn hơn hoặc bằng thời gian bắt đầu |
+| 3 | Tệp tài liệu hồ sơ đính kèm | Người tìm việc | Tệp tài liệu định dạng .pdf | Chỉ chấp nhận định dạng .pdf, dung lượng tệp tối đa 5 MB; tệp phải tải lên hoàn tất và đọc được thông tin dung lượng, số trang trước khi chuyển sang bước kiểm tra |
+| 4 | Hồ sơ pháp lý doanh nghiệp | Nhà tuyển dụng | Tên doanh nghiệp, Quy mô nhân sự, Mã số thuế, Giấy chứng nhận đăng ký doanh nghiệp, Địa chỉ, Logo | Mã số thuế gồm 10 hoặc 13 chữ số và duy nhất trên hệ thống; quy mô nhân sự thuộc các mức: dưới 50, từ 50 đến 200 hoặc trên 500 nhân sự |
+| 5 | Dữ liệu bài đăng tuyển dụng | Nhà tuyển dụng | Tiêu đề, Ngành nghề, Số lượng tuyển, Mức lương, Địa điểm, Hình thức làm việc, Mô tả, Kỹ năng yêu cầu và trọng số, Hạn nộp | Doanh nghiệp phải ở trạng thái đã xác thực; mức lương tối đa lớn hơn hoặc bằng mức lương tối thiểu (hoặc đánh dấu lương thỏa thuận); hạn nộp hồ sơ phải lớn hơn ngày hiện tại (tối thiểu 3 ngày khi gửi duyệt tin mới) |
+| 6 | Dữ liệu tương tác ứng tuyển | Người tìm việc | Mã tin tuyển dụng (JobID), Mã bản hồ sơ (ResumeID), Thông tin liên hệ, Thư giới thiệu (CoverLetter), Xác nhận đồng ý chia sẻ dữ liệu | Ứng viên đã đăng nhập; bản hồ sơ thuộc chính ứng viên đó; tin tuyển dụng đang hoạt động và còn hạn; chưa có đơn đang xử lý của cùng ứng viên cho cùng tin; thư giới thiệu không bắt buộc, tối đa 2.000 ký tự |
+| 7 | Tiêu chí truy vấn tìm kiếm | Khách vãng lai, Người tìm việc | Từ khóa, Mã ngành nghề, Địa điểm làm việc, Mức lương tối thiểu, Kinh nghiệm, Hình thức làm việc | Làm sạch chuỗi ký tự tìm kiếm; kết hợp đồng thời các bộ lọc trên tập tin tuyển dụng đang hoạt động (Active) và còn hạn nhận hồ sơ |
 
-Toàn bộ các luồng dữ liệu đầu vào nói trên đều bắt buộc phải trải qua cơ chế xác thực hai lớp: lớp thứ nhất kiểm tra định dạng và tính bắt buộc tại giao diện người dùng bằng JavaScript để phản hồi tức thì cho người dùng, và lớp thứ hai kiểm tra tính toàn vẹn, xác thực kiểu dữ liệu và khử nhiễm mã độc tại tầng máy chủ trước khi ghi nhận vào cơ sở dữ liệu.
+Các luồng dữ liệu đầu vào đều được kiểm tra ở hai bước: kiểm tra định dạng, giới hạn ký tự và các trường bắt buộc ngay trên biểu mẫu giao diện để báo lỗi kịp thời cho người dùng; sau đó kiểm tra lại quyền sở hữu dữ liệu, trạng thái nghiệp vụ và ràng buộc toàn vẹn tại tầng máy chủ trước khi ghi vào cơ sở dữ liệu.
 
 f. Dữ liệu đầu ra:
 
@@ -511,24 +551,24 @@ Bảng 3.4: Đặc tả các luồng dữ liệu đầu ra của hệ thống
 
 | Số thứ tự | Luồng dữ liệu đầu ra | Hình thức thể hiện | Đối tượng tiếp nhận | Nội dung thông tin cung cấp | Ý nghĩa nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| 1 | Hồ sơ năng lực chuẩn hóa | Tệp tài liệu số định dạng PDF | Người tìm việc, Nhà tuyển dụng | Bản lý lịch cá nhân hoàn chỉnh với bố cục đồ họa chuyên nghiệp, thông tin năng lực chuẩn | Cung cấp tài liệu ứng tuyển chuẩn mực, sẵn sàng phỏng vấn |
-| 2 | Danh sách kết quả việc làm | Giao diện danh sách có phân trang | Khách vãng lai, Người tìm việc | Danh sách tin bài phù hợp kèm thông tin tóm tắt: Tên vị trí, Tên công ty, Mức lương, Địa điểm | Giúp ứng viên tiếp cận nhanh chóng cơ hội nghề nghiệp phù hợp |
-| 3 | Bảng phễu ứng viên | Bảng giao diện dạng cột Kanban | Nhà tuyển dụng | Danh sách ứng viên phân loại theo các cột: Mới nộp, Phù hợp, Phỏng vấn, Nhận việc, Từ chối | Tối ưu hóa năng suất sàng lọc và điều phối quy trình tuyển dụng |
-| 4 | Thư điện tử thông báo tự động | Email gửi trực tiếp tới hộp thư cá nhân | Người tìm việc, Nhà tuyển dụng | Thông báo xác nhận ứng tuyển, thư mời phỏng vấn, thông báo trạng thái hồ sơ thay đổi | Đảm bảo tính tương tác hai chiều và sự minh bạch thông tin |
-| 5 | Bảng điều khiển kiểm duyệt | Giao diện danh sách kiểm duyệt tin bài | Cán bộ kiểm duyệt, Quản trị viên | Danh sách bài đăng chờ duyệt, thông tin giấy phép doanh nghiệp kèm nút duyệt/hạ tin | Bảo đảm môi trường thông tin tuyển dụng an toàn, tin cậy, không lừa đảo |
-| 6 | Báo cáo thống kê hiệu suất | Biểu đồ trực quan và bảng số liệu | Quản trị viên hệ thống, Doanh nghiệp | Thống kê số lượng truy cập, tin tuyển dụng, số lượt nộp đơn và tỷ lệ tuyển dụng thành công | Hỗ trợ cấp quản lý đánh giá hiệu quả vận hành và đưa ra quyết định chiến lược |
+| 1 | Bản hồ sơ ứng tuyển | Tệp tài liệu định dạng .pdf và giao diện xem trước | Người tìm việc, Nhà tuyển dụng | Hồ sơ hoàn chỉnh trình bày thông tin liên hệ, học vấn, kinh nghiệm, kỹ năng, dự án của ứng viên | Cung cấp tài liệu thống nhất để ứng viên kiểm tra trước khi gửi và doanh nghiệp đọc khi xét tuyển |
+| 2 | Danh sách việc làm và gợi ý kỹ năng | Giao diện danh sách có phân trang và thẻ gợi ý | Khách vãng lai, Người tìm việc | Chức danh, doanh nghiệp, mức lương, địa điểm, tổng số kết quả; tỷ lệ khớp kỹ năng kèm danh sách kỹ năng đã khớp và chưa khai báo | Giúp ứng viên so sánh các vị trí, hiểu căn cứ gợi ý và chọn đúng công việc muốn ứng tuyển |
+| 3 | Bảng quản lý ứng viên | Bảng giao diện phân theo 5 giai đoạn xét tuyển | Nhà tuyển dụng | Danh sách đơn ứng tuyển theo vị trí gồm 5 giai đoạn: Hồ sơ mới nộp, Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc, Chưa phù hợp | Giúp doanh nghiệp theo dõi, chấm điểm, ghi chú nội bộ và xử lý hồ sơ tập trung theo từng vị trí |
+| 4 | Xác nhận đơn và thông báo phản hồi | Màn hình xác nhận, thông báo hệ thống và email | Người tìm việc, Nhà tuyển dụng | Mã đơn ứng tuyển, thời điểm gửi, bản hồ sơ đã nộp, trạng thái xử lý đơn, thư mời phỏng vấn hoặc thư phản hồi kết quả | Giúp hai bên tra cứu cùng một đơn ứng tuyển và nắm bắt kịp thời tiến trình xét tuyển |
+| 5 | Hàng đợi kiểm duyệt | Giao diện danh sách đối soát và phê duyệt | Cán bộ kiểm duyệt, Quản trị viên | Hồ sơ pháp lý doanh nghiệp chờ xác thực và danh sách tin tuyển dụng ở trạng thái Chờ duyệt | Bảo đảm chỉ doanh nghiệp hợp lệ và tin tuyển dụng đạt yêu cầu mới được công bố |
+| 6 | Báo cáo thống kê vận hành | Biểu đồ và bảng số liệu tổng hợp | Quản trị viên hệ thống, Nhà tuyển dụng | Số lượng tài khoản, số tin đang hoạt động, tổng số đơn ứng tuyển và kết quả xử lý theo từng giai đoạn | Hỗ trợ nhà tuyển dụng và ban quản trị theo dõi tình hình hoạt động của hệ thống |
 
-Dữ liệu đầu ra của hệ thống luôn được định dạng chuẩn hóa tùy theo ngữ cảnh tiêu thụ, từ giao diện trực quan thân thiện với người dùng cuối, tệp tài liệu số PDF có thể in ấn độc lập, cho đến các bản ghi dữ liệu có cấu trúc JSON phục vụ truyền thông tin qua mạng Internet.
+Dữ liệu đầu ra được trình bày phù hợp với từng mục đích sử dụng: giao diện danh sách và bảng quản lý phục vụ thao tác trực tiếp trên trình duyệt, tệp PDF phục vụ xem trước và lưu trữ hồ sơ, cùng dữ liệu định dạng JSON trao đổi giữa máy chủ và máy khách.
 
 g. Ràng buộc hệ thống:
 
-Về ràng buộc thời gian thực hiện, toàn bộ quy trình phát triển phần mềm bao gồm các pha xác định yêu cầu, phân tích và đặc tả, thiết kế kiến trúc và cơ sở dữ liệu, lập trình cài đặt các phân hệ, kiểm thử bảo đảm chất lượng và đóng gói hồ sơ báo cáo phải được hoàn thành trong khung thời gian quy định mười hai tuần của học kỳ môn học Công nghệ phần mềm. Lịch trình được phân bổ cụ thể qua sáu mốc tiến độ then chốt: tuần 1 và 2 dành cho khảo sát thực tế và xác định yêu cầu; tuần 3 và 4 dành cho phân tích nghiệp vụ và mô hình hóa hệ thống; tuần 5 và 6 dành cho thiết kế kiến trúc, thiết kế cơ sở dữ liệu đạt chuẩn ba dạng chuẩn và thiết kế giao diện và trải nghiệm người dùng; tuần 7 đến tuần 9 dành cho lập trình cài đặt mã nguồn các phân hệ; tuần 10 và 11 dành cho kiểm thử chức năng, tích hợp và sửa lỗi; và tuần 12 dành cho công tác đóng gói mã nguồn, hoàn thiện báo cáo học thuật và nghiệm thu đề tài.
+Về thời gian thực hiện, dự án được triển khai trong 12 tuần của học phần Công nghệ phần mềm với sáu mốc kiểm soát: tuần 1 và 2 khảo sát, xác định yêu cầu; tuần 3 và 4 phân tích, mô hình hóa; tuần 5 và 6 thiết kế kiến trúc, dữ liệu và giao diện; tuần 7 đến 9 lập trình; tuần 10 và 11 kiểm thử, sửa lỗi; tuần 12 đóng gói và nghiệm thu.
 
-Về ràng buộc công nghệ và nền tảng kỹ thuật, tầng giao diện phía máy khách được xây dựng bằng thư viện ReactJS kết hợp ngôn ngữ lập trình JavaScript/TypeScript và tiêu chuẩn định dạng CSS hiện đại. Tầng dịch vụ nghiệp vụ phía máy chủ được xây dựng trên môi trường thực thi NodeJS sử dụng bộ khung ứng dụng ExpressJS, cung cấp hệ thống giao diện lập trình ứng dụng theo chuẩn dịch vụ web REST. Hệ quản trị cơ sở dữ liệu quan hệ trung tâm sử dụng Microsoft SQL Server phiên bản 2022, bảo đảm các quy chuẩn toàn vẹn dữ liệu từ khóa chính, khóa ngoại đến các ràng buộc kiểm tra nghiệp vụ. Môi trường thử nghiệm được thiết lập trên máy chủ phát triển nội bộ kết hợp hạ tầng đám mây dùng thử miễn phí phục vụ mục đích nghiên cứu học thuật.
+Về công nghệ sử dụng, giao diện phía máy khách dùng thư viện ReactJS kết hợp JavaScript, TypeScript và CSS; phần xử lý phía máy chủ dùng Node.js và Express cung cấp các RESTful API; cơ sở dữ liệu quan hệ dùng Microsoft SQL Server với đầy đủ các ràng buộc khóa chính, khóa ngoại, kiểm tra giá trị và chỉ mục truy vấn.
 
-Về ràng buộc kinh phí và nguồn lực triển khai, dự án được thực hiện hoàn toàn trong khuôn khổ học phần sinh viên bởi nhóm sáu thành viên, sử dụng toàn bộ các công cụ phát triển mã nguồn mở hoặc phiên bản cộng đồng miễn phí, ngân sách tài chính học phần không đồng, không phát sinh chi phí đầu tư mua sắm bản quyền phần mềm thương mại đắt tiền hay thuê bao máy chủ chuyên dụng quy mô lớn.
+Về nguồn lực và kinh phí, dự án do nhóm sáu sinh viên thực hiện, không có kinh phí mua bản quyền thương mại hoặc thuê máy chủ chuyên dụng. Nhóm sử dụng các công cụ phát triển miễn phí, máy chủ phát triển nội bộ và dịch vụ dùng thử để xây dựng và kiểm chứng sản phẩm.
 
-Về ràng buộc pháp lý và đạo đức nghề nghiệp, hệ thống bắt buộc phải tuân thủ nghiêm ngặt Luật An toàn thông tin mạng, Luật Công nghệ thông tin và Nghị định số 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân của người lao động. Đề tài cam kết tuyệt đối không thương mại hóa trái phép hoặc chia sẻ dữ liệu liên hệ của ứng viên cho bất kỳ bên thứ ba nào khi chưa có sự đồng thuận trực tiếp từ chủ thể dữ liệu; đồng thời mọi thông tin tin bài tuyển dụng hiển thị trên hệ thống đều phải trải qua quy trình kiểm duyệt chặt chẽ nhằm bảo vệ quyền và lợi ích hợp pháp của người tìm việc.
+Về pháp lý và quyền riêng tư dữ liệu, hệ thống tuân thủ các quy định của Nghị định số 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân: phân quyền chặt chẽ theo vai trò tài khoản, không công khai trái phép thông tin liên hệ của ứng viên và chỉ chia sẻ bản hồ sơ cho doanh nghiệp khi ứng viên chủ động xác nhận nộp đơn ứng tuyển; đồng thời yêu cầu xác thực thông tin pháp lý doanh nghiệp và kiểm duyệt nội dung trước khi công bố tin tuyển dụng.
 
 ---
 
@@ -536,134 +576,159 @@ Về ràng buộc pháp lý và đạo đức nghề nghiệp, hệ thống bắ
 
 3.2.1. Cơ sở lý thuyết của phương pháp phân tích có cấu trúc
 
-Trong kỹ nghệ phần mềm, phân tích và đặc tả yêu cầu là giai đoạn bản lề quyết định sự thành bại của một dự án công nghệ, đóng vai trò chuyển dịch những mong muốn nghiệp vụ trừu tượng của người sử dụng thành một bản thiết kế kỹ thuật chuẩn mực, mạch lạc và phi mơ hồ. Để tiếp cận bài toán xây dựng nền tảng TalentConnect một cách khoa học, nhóm nghiên cứu áp dụng Phương pháp phân tích có cấu trúc – một phương pháp luận kinh điển và vững chắc đã được tiêu chuẩn hóa trong ngành phần mềm.
+Trong công nghệ phần mềm, phân tích và đặc tả yêu cầu là bước chuyển các yêu cầu người dùng đã thu thập ở giai đoạn khảo sát thành mô hình kỹ thuật rõ ràng, nhất quán để làm căn cứ cho thiết kế cơ sở dữ liệu và giao diện. Đối với đề tài xây dựng hệ thống TalentConnect, nhóm áp dụng phương pháp phân tích có cấu trúc nhằm làm rõ cả dữ liệu cần lưu trữ lẫn các bước xử lý nghiệp vụ.
 
-Bản chất của phương pháp phân tích có cấu trúc là việc tiếp cận hệ thống dựa trên nguyên lý phân rã chức năng từ trên xuống và lấy luồng dữ liệu làm kim chỉ nam. Thay vì nhìn nhận hệ thống như một khối mã nguồn hỗn tạp, phương pháp này mô hình hóa toàn bộ phần mềm như một mạng lưới các tiến trình xử lý liên kết chặt chẽ, nơi các luồng thông tin liên tục được tiếp nhận, chuyển hóa, lưu trữ tại các kho dữ liệu và phát xuất ra môi trường bên ngoài cho các tác nhân tương tác.
+Phương pháp phân tích có cấu trúc tiếp cận hệ thống theo nguyên tắc phân rã chức năng từ tổng quát đến chi tiết và theo dõi sự di chuyển, biến đổi của các luồng dữ liệu. Hệ thống được mô hình hóa thông qua mối liên hệ giữa các tác nhân bên ngoài, các tiến trình xử lý nghiệp vụ và các kho lưu trữ dữ liệu.
 
-Điểm mấu chốt trong phương pháp luận phân tích có cấu trúc hiện đại là nguyên lý mô hình hóa thực thể - chức năng. Theo nguyên lý này, mọi đối tượng trong hệ thống phần mềm không bao giờ tồn tại đơn lập hay tĩnh tại, mà luôn được định nghĩa toàn diện thông qua hai mặt biện chứng không thể tách rời:
+Để các sơ đồ luồng dữ liệu phản ánh đúng bài toán thực tế, quá trình phân tích kết hợp chặt chẽ giữa đặc tả thực thể dữ liệu và đặc tả quy tắc xử lý nghiệp vụ:
 
-Mặt thứ nhất là Đặc tả cấu trúc dữ liệu và thuộc tính: Đây là việc định hình khuôn mẫu lưu trữ thông tin của đối tượng trong không gian dữ liệu, bao gồm danh mục các trường thuộc tính, kiểu dữ liệu kỹ thuật, các giá trị mặc định, quy tắc hợp lệ và các ràng buộc toàn vẹn thực thể như khóa chính, khóa ngoại và tính duy nhất. Cấu trúc dữ liệu đóng vai trò là bộ khung xương tĩnh, xác lập ranh giới và khả năng chứa đựng thông tin của từng đối tượng.
+Ở phần đặc tả thực thể dữ liệu, nhóm xác định từng đối tượng thông tin cần quản lý, danh sách thuộc tính, kiểu dữ liệu, khóa chính, khóa ngoại và các ràng buộc toàn vẹn. Đây là cơ sở trực tiếp để tổ chức bốn kho dữ liệu từ D1 đến D4 trong sơ đồ luồng dữ liệu và thiết kế các bảng quan hệ ở giai đoạn sau.
 
-Mặt thứ hai là Đặc tả hành vi và chức năng: Đây là tập hợp các phương thức, năng lực xử lý nghiệp vụ và chu trình biến đổi trạng thái mà đối tượng có thể thực thi hoặc tiếp nhận trong suốt vòng đời hoạt động. Chức năng không thể vận hành trong hư không mà luôn đòi hỏi cấu trúc dữ liệu làm nguyên liệu đầu vào và kết quả đầu ra; ngược lại, cấu trúc dữ liệu chỉ thực sự sống động và phát huy giá trị khi được các tiến trình chức năng truy cập, kiểm tra, biến đổi và đồng bộ hóa trạng thái theo đúng các quy tắc nghiệp vụ thực tiễn.
+Ở phần đặc tả quy tắc xử lý, nhóm làm rõ sự thay đổi trạng thái của dữ liệu qua từng chức năng. Mỗi tiến trình nhận dữ liệu đầu vào từ tác nhân hoặc đọc từ kho lưu trữ, kiểm tra điều kiện nghiệp vụ như quyền sở hữu hồ sơ, hạn nhận đơn, điều kiện chống nộp trùng rồi ghi kết quả mới vào kho dữ liệu và trả phản hồi cho người dùng. Mô tả rõ cấu trúc thuộc tính gắn liền với quy tắc xử lý giúp mọi luồng dữ liệu trên sơ đồ đều có nguồn gốc và đích đến xác định.
 
 3.2.2. Đặc tả đối tượng của hệ thống
 
 a. Đối tượng Người tìm việc:
 
-Về cấu trúc dữ liệu và thuộc tính, đối tượng Người tìm việc được quản lý thông qua thực thể thông tin ứng viên liên kết trực tiếp với tài khoản người dùng. Cấu trúc lưu trữ bao gồm: mã ứng viên là khóa chính kiểu số nguyên tăng tự động; mã tài khoản là khóa ngoại liên kết bảng người dùng với ràng buộc duy nhất một - một; họ và tên đầy đủ là chuỗi ký tự bắt buộc tối đa 100 ký tự; ngày sinh kiểu ngày tháng với ràng buộc độ tuổi từ 18 trở lên; giới tính gồm các giá trị Nam, Nữ hoặc Khác; địa chỉ thường trú tối đa 255 ký tự; tỉnh thành phố tối đa 100 ký tự; số điện thoại liên lạc gồm 10 chữ số chuẩn hóa; ảnh đại diện lưu trữ đường dẫn tệp ảnh; chức danh chuyên môn mục tiêu tối đa 150 ký tự; số năm kinh nghiệm làm việc là số nguyên không âm; trạng thái tìm việc gồm các giá trị đang tích cực tìm việc, đang cân nhắc cơ hội mới hoặc đã có việc; thời điểm khởi tạo và thời điểm cập nhật cuối cùng ghi nhận theo thời gian thực.
+Thông tin người tìm việc lưu trong bảng hồ sơ ứng viên, liên kết một - một với bảng tài khoản người dùng qua mã tài khoản duy nhất. Mỗi bản ghi ứng viên có mã định danh tự tăng, lưu họ và tên, ngày sinh, giới tính, số điện thoại liên hệ, địa chỉ, đường dẫn ảnh đại diện, mục tiêu nghề nghiệp và trạng thái sẵn sàng tìm việc. Cách tách bảng tài khoản và bảng ứng viên giúp hệ thống lấy danh tính người dùng trực tiếp từ phiên đăng nhập mà không yêu cầu ứng viên tự nhập mã nội bộ khi thao tác.
 
-Về đặc tả chức năng và hành vi nghiệp vụ, đối tượng Người tìm việc có năng lực tương tác và kích hoạt các nghiệp vụ cốt lõi: Khởi tạo và cập nhật hồ sơ định danh cá nhân; Cấu hình trạng thái tìm kiếm việc làm và quyền riêng tư theo quy định tại Nghị định 13/2023/NĐ-CP; Khởi tạo, chỉnh sửa và quản lý nhiều phiên bản hồ sơ năng lực trực tuyến; Tìm kiếm việc làm đa tiêu chí và lưu các bài đăng quan tâm vào danh mục việc làm yêu thích; Nộp đơn ứng tuyển vào các vị trí công việc đang mở kèm theo thư giới thiệu cá nhân hóa; Theo dõi tiến trình xử lý hồ sơ theo thời gian thực qua phễu phản hồi; và Tiếp nhận thông báo, phản hồi xác nhận tham gia lịch phỏng vấn từ nhà tuyển dụng.
+Trong quá trình sử dụng, người tìm việc cập nhật thông tin cá nhân và mục tiêu nghề nghiệp; khai báo học vấn, kinh nghiệm, kỹ năng, chứng chỉ và dự án; chuẩn bị các bản hồ sơ trực tuyến hoặc tải tệp PDF; tìm kiếm việc làm, xem gợi ý theo mức khớp kỹ năng và lưu tin quan tâm; chọn bản hồ sơ để nộp đơn ứng tuyển vào vị trí đang mở và theo dõi trạng thái xử lý đơn cùng lịch phỏng vấn từ doanh nghiệp.
 
 b. Đối tượng Doanh nghiệp và Nhà tuyển dụng:
 
-Về cấu trúc dữ liệu và thuộc tính, đối tượng Doanh nghiệp được quản lý thông qua thực thể hồ sơ doanh nghiệp liên kết với tài khoản đại diện. Cấu trúc lưu trữ bao gồm: mã doanh nghiệp là khóa chính kiểu số nguyên; mã tài khoản đại diện là khóa ngoại liên kết bảng người dùng với ràng buộc duy nhất một - một; tên pháp nhân doanh nghiệp là chuỗi ký tự bắt buộc tối đa 200 ký tự; mã số thuế doanh nghiệp gồm 10 hoặc 13 chữ số với ràng buộc duy nhất trên toàn hệ thống; đường dẫn tài liệu số của giấy phép đăng ký kinh doanh; biểu trưng thương hiệu lưu trữ đường dẫn ảnh đại diện; địa chỉ trụ sở chính tối đa 255 ký tự; trang thông tin điện tử là địa chỉ web hợp lệ; quy mô nhân sự phân theo các thang giá trị dưới 20 nhân viên, từ 20 đến 50 nhân viên, từ 50 đến 200 nhân viên hoặc trên 200 nhân viên; bản mô tả chi tiết thông tin doanh nghiệp; tình trạng thẩm định pháp lý gồm các trạng thái chờ thẩm định, đã xác thực hoặc bị từ chối; họ tên người đại diện tuyển dụng tối đa 100 ký tự; cùng chức vụ của người đại diện trong doanh nghiệp.
+Đơn vị tuyển dụng được quản lý qua bảng thông tin doanh nghiệp, liên kết với tài khoản đại diện của nhà tuyển dụng và bảng địa điểm làm việc. Mỗi doanh nghiệp có mã định danh riêng cùng các thuộc tính gồm tên pháp nhân đầy đủ, mã số thuế 10 hoặc 13 chữ số duy nhất trên toàn hệ thống, lĩnh vực hoạt động, quy mô nhân sự, địa chỉ trang thông tin điện tử, mô tả giới thiệu đơn vị, đường dẫn biểu trưng, tệp giấy phép kinh doanh và trạng thái xác thực pháp lý gồm chờ xác thực, đã xác thực hoặc từ chối.
 
-Về đặc tả chức năng và hành vi nghiệp vụ, đối tượng Doanh nghiệp thực hiện các chuỗi tác vụ nghiệp vụ quan trọng: Cung cấp thông tin pháp lý doanh nghiệp và tải lên tài liệu xác thực để ban quản trị đối soát; Hoàn thiện trang giới thiệu thương hiệu tuyển dụng phục vụ quảng bá hình ảnh doanh nghiệp; Soạn thảo, lưu bản nháp và gửi yêu cầu phê duyệt các bài đăng tuyển dụng mới; Quản lý vòng đời tin bài như gia hạn thời hạn nhận đơn, tạm đóng tin bài hoặc cập nhật yêu cầu tuyển dụng; Tiếp nhận danh sách ứng viên nộp đơn tập trung theo từng vị trí việc làm; Thao tác trên bảng phễu Kanban trực quan để luân chuyển trạng thái ứng viên qua từng vòng sơ tuyển; Nhập điểm số và ghi chú đánh giá nội bộ giữa các chuyên viên nhân sự; Thiết lập lịch phỏng vấn; và Kích hoạt hệ thống tự động phát thư điện tử thông báo tới ứng viên.
+Doanh nghiệp cung cấp thông tin đơn vị và mã số thuế để ban quản trị đối soát pháp lý; thiết lập danh sách trụ sở và chi nhánh làm việc; soạn thảo, lưu nháp, gửi duyệt và quản lý vòng đời các tin tuyển dụng; tiếp nhận đơn ứng tuyển theo đúng vị trí thuộc quyền sở hữu của đơn vị; đánh giá hồ sơ, chuyển giai đoạn xét tuyển, lập lịch phỏng vấn và gửi phản hồi kết quả cho ứng viên.
 
 c. Đối tượng Bài đăng tuyển dụng:
 
-Về cấu trúc dữ liệu và thuộc tính, đối tượng Bài đăng tuyển dụng được quản lý thông qua thực thể tin tuyển dụng với cấu trúc chặt chẽ. Cấu trúc lưu trữ bao gồm: mã định danh tin tuyển dụng là khóa chính kiểu số nguyên; mã doanh nghiệp sở hữu là khóa ngoại liên kết bảng doanh nghiệp; tiêu đề vị trí tuyển dụng bắt buộc; mã danh mục ngành nghề; hình thức làm việc gồm toàn thời gian, bán thời gian, thực tập, làm việc từ xa hoặc làm việc kết hợp; địa điểm làm việc chi tiết; mức thu nhập tối thiểu và mức thu nhập tối đa với ràng buộc mức tối đa phải lớn hơn hoặc bằng mức tối thiểu hoặc để trống nếu hưởng lương thỏa thuận; đơn vị tiền tệ giao dịch; văn bản mô tả chi tiết công việc, yêu cầu năng lực chuyên môn và chế độ quyền lợi đãi ngộ; số lượng chỉ tiêu cần tuyển dụng; thời điểm phát hành bài đăng; hạn chót nhận hồ sơ với ràng buộc phải sau ngày đăng bài tối thiểu ba ngày; trạng thái vòng đời tin bài gồm bản nháp, chờ kiểm duyệt, đã xuất bản, đã hết hạn hoặc bị khóa do vi phạm; cùng số lượt xem tích lũy của bài đăng.
+Mỗi nhu cầu tuyển người của doanh nghiệp biểu diễn thành một bản ghi trong bảng tin tuyển dụng, gắn với doanh nghiệp đăng tin, nhóm ngành nghề và địa điểm làm việc. Các thuộc tính chi tiết gồm chức danh công việc, mô tả nhiệm vụ, yêu cầu chuyên môn, quyền lợi, mức lương tối thiểu, mức lương tối đa, cờ đánh dấu lương thỏa thuận, yêu cầu kinh nghiệm, hình thức làm việc, số lượng cần tuyển, hạn nhận hồ sơ, trạng thái tin gồm năm giá trị nháp, chờ duyệt, đang hoạt động, hết hạn hoặc đã đóng, cùng số lượt xem và thời điểm tạo. Đi kèm với bảng tin tuyển dụng là bảng kỹ năng yêu cầu của tin, lưu danh sách mã kỹ năng, cờ bắt buộc và trọng số ưu tiên từ 1 đến 5 làm căn cứ tính mức khớp kỹ năng.
 
-Về đặc tả chức năng và hành vi nghiệp vụ, đối tượng Bài đăng tuyển dụng sở hữu các hành vi và khả năng biến đổi trạng thái: Tự động kiểm tra tính hợp lệ về logic ngày tháng và dải thu nhập trước khi lưu trữ; Luân chuyển trạng thái nghiệp vụ theo quy trình kiểm duyệt nội dung của ban quản trị; Trích xuất tập hợp từ khóa kỹ năng thông qua bảng liên kết kỹ năng tin tuyển dụng để lập chỉ mục phục vụ bộ máy tìm kiếm toàn văn; Tự động kích hoạt tác vụ ngầm chuyển trạng thái sang Đã hết hạn khi thời điểm hiện tại vượt quá mốc thời hạn; Cung cấp dữ liệu yêu cầu cho thuật toán tính toán độ tương đồng để tự động sinh việc làm gợi ý cho ứng viên; và Tích lũy số lượt truy cập xem tin cùng số lượng hồ sơ nộp về để phục vụ phân tích hiệu suất tuyển dụng.
+Theo quy tắc nghiệp vụ, nhà tuyển dụng chỉ gửi duyệt được tin khi doanh nghiệp đã xác thực pháp lý, mức lương tối đa không nhỏ hơn mức lương tối thiểu và hạn nhận hồ sơ lớn hơn ngày hiện tại tối thiểu 3 ngày. Khi được cán bộ kiểm duyệt chấp thuận, tin chuyển sang trạng thái đang hoạt động để hiển thị cho người tìm việc; khi quá hạn nhận đơn hoặc đã tuyển đủ người, tin chuyển sang trạng thái hết hạn hoặc đã đóng và ngừng nhận đơn ứng tuyển mới.
 
 d. Đối tượng Hồ sơ năng lực trực tuyến:
 
-Về cấu trúc dữ liệu và thuộc tính, đối tượng Hồ sơ năng lực trực tuyến được quản lý thông qua thực thể hồ sơ lý lịch và các bảng liên kết thành phần. Cấu trúc lưu trữ bao gồm: mã định danh hồ sơ là khóa chính kiểu số nguyên; mã ứng viên sở hữu là khóa ngoại liên kết bảng người tìm việc; tiêu đề hồ sơ lý lịch; bản tóm tắt mục tiêu nghề nghiệp; mã mẫu giao diện trình bày lựa chọn; mã màu sắc chủ đạo; kiểu phông chữ hiển thị; cờ đánh dấu hồ sơ mặc định; và đường dẫn tệp tài liệu số đã kết xuất định dạng tệp chuẩn lưu trữ trên máy chủ. Gắn liền hữu cơ với đối tượng này là các tập dữ liệu thành phần gồm lịch sử đào tạo học vấn, quá trình kinh nghiệm làm việc thực tế, danh mục kỹ năng chuyên môn, chứng chỉ nghề nghiệp và các đồ án dự án thực tế đã tham gia.
+Dữ liệu hồ sơ của ứng viên gồm bảng quản lý phiên bản hồ sơ và năm bảng thành phần gắn với mã ứng viên: quá trình học vấn, kinh nghiệm làm việc, kỹ năng chuyên môn liên kết với từ điển kỹ năng dùng chung, chứng chỉ chuyên môn và dự án đã thực hiện. Trong bảng quản lý phiên bản hồ sơ, mỗi bản ghi có mã hồ sơ, mã ứng viên sở hữu, tên bản hồ sơ, mã mẫu trình bày, đường dẫn tệp PDF, cờ đánh dấu bản mặc định cùng thời điểm tạo và cập nhật.
 
-Về đặc tả chức năng và hành vi nghiệp vụ, đối tượng Hồ sơ năng lực có các năng lực xử lý chuyên sâu: Cung cấp giao diện biên soạn trực quan hỗ trợ tính năng xem trước thời gian thực tương ứng với từng thay đổi nhỏ của người dùng; Kiểm tra tính hợp lệ và thứ tự thời gian logic của các mốc học vấn và quá trình làm việc với ràng buộc ngày kết thúc phải sau ngày bắt đầu; Tự động kết xuất cấu trúc dữ liệu thành tệp tài liệu số định dạng PDF đạt chuẩn in ấn vector sắc nét; Cho phép đính kèm linh hoạt vào các đơn ứng tuyển; và Trích xuất danh mục kỹ năng để đối khớp với yêu cầu tin tuyển dụng.
+Một ứng viên có thể chuẩn bị và lưu nhiều bản hồ sơ khác nhau để sử dụng cho từng vị trí công việc. Hệ thống giữ nguyên nội dung hồ sơ đã nộp: khi một bản hồ sơ đã gắn vào đơn ứng tuyển, nếu sau đó ứng viên chỉnh sửa hồ sơ cho những lần ứng tuyển tiếp theo thì phần mềm lưu thành bản mới, còn đơn cũ vẫn giữ nguyên bản tài liệu đã gửi để nhà tuyển dụng và ứng viên đối chiếu thống nhất.
 
-e. Đối tượng Đơn ứng tuyển:
+e. Đối tượng Đơn ứng tuyển và Lịch sử xử lý:
 
-Về cấu trúc dữ liệu và thuộc tính, đối tượng Đơn ứng tuyển được quản lý thông qua thực thể đơn ứng tuyển, là cầu nối nghiệp vụ cốt lõi giữa Người tìm việc và Nhà tuyển dụng. Cấu trúc lưu trữ bao gồm: mã đơn ứng tuyển là khóa chính kiểu số nguyên; mã tin tuyển dụng là khóa ngoại liên kết bảng tin tuyển dụng; mã ứng viên nộp đơn là khóa ngoại liên kết bảng người tìm việc; mã hồ sơ năng lực lựa chọn là khóa ngoại liên kết bảng hồ sơ lý lịch; thư giới thiệu bản thân là văn bản cá nhân hóa; thời điểm nộp đơn được hệ thống ghi nhận tức thời; trạng thái hiện tại trong phễu tuyển dụng gồm các mốc đã nộp hồ sơ, đã tiếp nhận xem xét, đạt yêu cầu sơ loại, mời phỏng vấn, đề xuất nhận việc hoặc chưa phù hợp; điểm số đánh giá năng lực nội bộ theo thang điểm từ 1 đến 5; ghi chú đánh giá nội bộ của bộ phận nhân sự bảo đảm tính bảo mật; cùng thời điểm cập nhật trạng thái gần nhất.
+Bảng đơn ứng tuyển ghi nhận mỗi lần ứng viên gửi hồ sơ vào một vị trí tuyển dụng cụ thể. Cấu trúc bảng gồm 10 trường dữ liệu: mã đơn ứng tuyển làm khóa chính, mã tin tuyển dụng được chọn, mã ứng viên gửi đơn, mã bản hồ sơ đã gửi, nội dung thư giới thiệu tối đa 2.000 ký tự, trạng thái xử lý đơn, mức khớp kỹ năng tại thời điểm ứng tuyển, điểm đánh giá nội bộ của doanh nghiệp từ 1 đến 5, thời điểm gửi và thời điểm cập nhật.
 
-Về đặc tả chức năng và hành vi nghiệp vụ, đối tượng Đơn ứng tuyển thực thi các nghiệp vụ chặt chẽ: Kiểm tra điều kiện duy nhất trước khi ghi nhận nhằm ngăn chặn tuyệt đối tình trạng ứng viên nộp đơn trùng lặp vào cùng một vị trí tuyển dụng; Tự động ghi vết và lưu trữ lịch sử chuyển trạng thái vào thực thể lịch sử ứng tuyển mỗi khi thẻ ứng viên được luân chuyển trên bảng phễu Kanban; Tự động kích hoạt dịch vụ gửi thông báo thời gian thực và email phản hồi tới ứng viên ngay khi nhà tuyển dụng mở xem hồ sơ hoặc chuyển đổi bước xét duyệt; Hỗ trợ bộ phận nhân sự ghi nhận biên bản chấm điểm và nhận xét chuyên môn; và Đóng vai trò là bằng chứng đồng thuận chia sẻ dữ liệu cá nhân theo quy định bảo mật pháp lý.
+Khi ứng viên gửi đơn hợp lệ, hệ thống kiểm tra bản hồ sơ thuộc đúng ứng viên đó và chưa có đơn đang xử lý cho cùng vị trí. Trạng thái ban đầu của đơn là Đã gửi hồ sơ; những bước xử lý sau của doanh nghiệp gồm Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc, Nhận việc hoặc Chưa phù hợp. Thao tác nộp đơn của ứng viên không tự gán kết quả tuyển chọn hay điểm đánh giá nội bộ. Mọi lần chuyển trạng thái trên bảng quản lý ứng viên đều ghi vết vào bảng lịch sử xử lý đơn gồm mã lịch sử, mã đơn, trạng thái cũ, trạng thái mới, người thao tác, ghi chú và thời điểm thay đổi, đồng thời gửi thông báo cho ứng viên.
 
 f. Đối tượng Lịch phỏng vấn và Đánh giá:
 
-Về cấu trúc dữ liệu và thuộc tính, đối tượng Lịch phỏng vấn và Đánh giá được quản lý thông qua thực thể phỏng vấn liên kết chặt chẽ với từng đơn ứng tuyển. Cấu trúc lưu trữ bao gồm: mã định danh buổi phỏng vấn là khóa chính; mã đơn ứng tuyển liên kết; hình thức phỏng vấn gồm gặp mặt trực tiếp tại trụ sở hoặc trao đổi trực tuyến qua phòng họp từ xa; thời điểm bắt đầu và thời điểm kết thúc dự kiến; địa điểm tổ chức hoặc liên kết phòng họp trực tuyến; danh sách thành viên hội đồng phỏng vấn; trạng thái buổi phỏng vấn gồm đã lên lịch, ứng viên đã xác nhận, hoàn thành hoặc đã hủy lịch; cùng điểm số và nhận xét đánh giá chuyên môn chi tiết được ghi nhận sau khi phỏng vấn kết thúc.
+Khi nhà tuyển dụng chuyển một đơn ứng tuyển sang bước phỏng vấn, thông tin tổ chức phỏng vấn được lưu vào bảng lịch phỏng vấn liên kết trực tiếp với mã đơn ứng tuyển. Các thuộc tính của bảng gồm mã lịch phỏng vấn, vòng phỏng vấn, thời điểm diễn ra, thời lượng dự kiến tính bằng phút, hình thức phỏng vấn trực tuyến hoặc trực tiếp, liên kết phòng họp hoặc địa chỉ văn phòng, tên người phỏng vấn, nhận xét đánh giá sau buổi phỏng vấn và kết quả phỏng vấn.
 
-Về đặc tả chức năng và hành vi nghiệp vụ, đối tượng Lịch phỏng vấn chịu trách nhiệm: Kiểm tra tính khả dụng và xung đột thời gian trong lịch trình của bộ phận nhân sự; Tự động sinh nội dung thư mời phỏng vấn chuẩn mực gửi tới hòm thư cá nhân của ứng viên kèm theo liên kết phòng họp hoặc chỉ dẫn địa lý; Tiếp nhận phản hồi đồng ý hoặc đề xuất đổi lịch từ ứng viên; Lưu trữ biên bản nhận xét chuyên môn của hội đồng tuyển dụng sau khi phỏng vấn kết thúc; và Tự động đề xuất cập nhật trạng thái của đơn ứng tuyển sang giai đoạn tuyển chọn tiếp theo.
+Dựa trên bản ghi lịch phỏng vấn vừa tạo, hệ thống gửi thông báo và thư mời chứa đầy đủ thời gian, hình thức và địa điểm hoặc liên kết phòng họp để ứng viên tham dự. Sau buổi phỏng vấn, nhà tuyển dụng ghi nhận kết quả đánh giá làm căn cứ chuyển đơn sang giai đoạn đề xuất nhận việc hoặc từ chối.
 
-g. Đối tượng Thông báo và Nhật ký kiểm toán:
+g. Đối tượng Thông báo và Nhật ký hệ thống:
 
-Về cấu trúc dữ liệu và thuộc tính, đối tượng Thông báo và Nhật ký kiểm toán được phân tách thành hai thực thể chuyên trách. Thực thể thông báo phục vụ người dùng cuối gồm mã định danh thông báo, mã người nhận, loại biến cố nghiệp vụ như xem hồ sơ, đổi trạng thái xét duyệt, lịch phỏng vấn hay phê duyệt tin tuyển dụng, tiêu đề tóm tắt, nội dung thông báo chi tiết, đường dẫn điều hướng tương tác, cờ đánh dấu trạng thái đã đọc và thời điểm phát sinh. Thực thể nhật ký kiểm toán phục vụ an ninh hệ thống gồm mã bản ghi nhật ký, mã tài khoản thực hiện, tên hành vi hệ thống như đăng nhập, đổi mật khẩu hay duyệt tin bài, tên bảng dữ liệu bị tác động, địa chỉ mạng máy khách, thông tin trình duyệt, dữ liệu trước và sau biến đổi, cùng dấu thời gian thực thi chính xác.
+Hệ thống quản lý thông báo người dùng và giám sát truy cập qua hai bảng độc lập. Bảng thông báo lưu các bản tin gửi tới từng tài khoản gồm mã thông báo, mã tài khoản nhận, tiêu đề, nội dung, phân loại thông báo, mã dữ liệu tham chiếu, trạng thái đã đọc và thời điểm tạo. Mã dữ liệu tham chiếu giúp người nhận mở đúng đơn ứng tuyển, tin tuyển dụng hoặc lịch phỏng vấn khi nhấn vào thông báo; do có thể trỏ đến nhiều loại dữ liệu khác nhau nên trường này không thiết lập thành khóa ngoại cứng chỉ dành cho bảng đơn ứng tuyển.
 
-Về đặc tả chức năng và hành vi nghiệp vụ, các đối tượng này đảm nhiệm các chức năng tự động nền: Lắng nghe các sự kiện nghiệp vụ phát sinh trên toàn hệ thống để lập tức sinh bản ghi thông báo tương ứng; Đẩy thông báo hiển thị theo thời gian thực lên giao diện người dùng; Đẩy thông điệp vào hàng đợi thư điện tử để kích hoạt máy chủ gửi thư tự động; Ghi nhận độc lập mọi biến động dữ liệu nhạy cảm vào kho lưu trữ nhật ký kiểm toán với cơ chế chỉ ghi thêm không cho phép chỉnh sửa hay xóa bỏ; và Cung cấp dữ liệu phục vụ quản trị viên trích xuất báo cáo giám sát an toàn thông tin và truy vết sự cố kỹ thuật.
+Bên cạnh đó, bảng nhật ký hệ thống ghi nhận các thao tác quản trị và bảo mật quan trọng gồm mã nhật ký, tài khoản thực hiện, hành động, bảng dữ liệu tác động, mã bản ghi tác động, địa chỉ mạng và thời điểm thực hiện, hỗ trợ quản trị viên tra cứu và kiểm tra an toàn vận hành.
 
 3.2.3. Phân tích yêu cầu hệ thống bằng Sơ đồ ngữ cảnh và Sơ đồ mức không
 
-Để phân tích một cách thấu đáo và khoa học toàn bộ các yêu cầu của phần mềm TalentConnect, nhóm nghiên cứu sử dụng Sơ đồ ngữ cảnh và Sơ đồ luồng dữ liệu mức không làm công cụ mô hình hóa chủ đạo. Sơ đồ ngữ cảnh xác lập ranh giới phân định giữa phần mềm với môi trường tương tác bên ngoài, trong khi Sơ đồ luồng dữ liệu mức không phân rã ranh giới đó thành một cấu trúc logic gồm các kho dữ liệu trung tâm và các tiến trình xử lý cốt lõi.
+Để mô hình hóa ranh giới hệ thống và sự luân chuyển thông tin giữa các chức năng của TalentConnect, nhóm sử dụng Sơ đồ ngữ cảnh (DFD mức ngữ cảnh) và Sơ đồ luồng dữ liệu mức 0, mức 1 theo phương pháp phân tích có cấu trúc.
 
 a. Phân tích yêu cầu hệ thống qua Sơ đồ ngữ cảnh:
 
 [[IMAGE: assets/diagrams/hinh_3_1_dfd_context.png | Caption: Hình ảnh 3.2.3.a. Sơ đồ ngữ cảnh.]]
 
-Thứ nhất là Tác nhân Người tìm việc:
-Các luồng dữ liệu vào hệ thống gồm có: Thông tin đăng ký và xác thực tài khoản gồm họ tên, email, mật khẩu định dạng an toàn; Dữ liệu cấu trúc hồ sơ năng lực cá nhân gồm tiểu sử, quá trình học vấn, kinh nghiệm làm việc, kỹ năng chuyên môn, dự án và mẫu giao diện lựa chọn; Các tham số truy vấn tìm kiếm việc làm gồm chuỗi từ khóa, bộ lọc ngành nghề, địa điểm làm việc và khoảng lương mong muốn; Hồ sơ ứng tuyển kèm thư giới thiệu bản thân gửi tới một bài đăng tuyển dụng cụ thể; và Các phản ánh, báo cáo vi phạm khi phát hiện bài đăng có dấu hiệu lừa đảo hoặc sai lệch thông tin.
-Các luồng dữ liệu nhận lại từ hệ thống gồm có: Mã khóa định danh phiên làm việc sau khi xác thực thành công; Tệp tài liệu hồ sơ năng lực hoàn chỉnh định dạng PDF đạt chuẩn in ấn; Danh sách kết quả việc làm phù hợp với điều kiện tìm kiếm kèm theo danh mục việc làm gợi ý thông minh; Các thông báo cập trạng thái xét duyệt hồ sơ theo thời gian thực như trạng thái đã mở xem, đạt sơ loại, mời phỏng vấn, đề xuất nhận việc hoặc từ chối nhằm giải quyết triệt để bài toán hố đen tuyển dụng; và Chi tiết thư mời phỏng vấn trực tiếp hoặc liên kết phòng họp trực tuyến từ nhà tuyển dụng.
+Đối với tác nhân Người tìm việc:
+Các luồng dữ liệu gửi vào hệ thống gồm: thông tin đăng ký và đăng nhập tài khoản; dữ liệu hồ sơ trực tuyến (học vấn, kinh nghiệm, kỹ năng, chứng chỉ, dự án) hoặc tệp hồ sơ PDF tải lên; từ khóa và các điều kiện lọc tìm kiếm việc làm (ngành nghề, địa điểm, mức lương, kinh nghiệm, hình thức làm việc); thông tin nộp đơn ứng tuyển (vị trí chọn ứng tuyển, bản hồ sơ sử dụng, thư giới thiệu, xác nhận đồng ý chia sẻ dữ liệu); và các báo cáo phản ánh tin đăng vi phạm.
+Các luồng dữ liệu nhận từ hệ thống gồm: thông tin phiên làm việc sau khi xác thực; bản xem trước và tệp hồ sơ PDF đã xuất; danh sách việc làm thỏa mãn bộ lọc kèm các vị trí gợi ý và giải thích mức khớp kỹ năng; mã đơn ứng tuyển, trạng thái xử lý đơn cập nhật qua từng giai đoạn xét tuyển và thông tin chi tiết lịch phỏng vấn từ doanh nghiệp.
 
-Thứ hai là Tác nhân Nhà tuyển dụng:
-Các luồng dữ liệu vào hệ thống gồm có: Hồ sơ định danh pháp lý doanh nghiệp bao gồm tên pháp nhân, mã số thuế, bản sao giấy phép đăng ký kinh doanh hợp pháp, địa chỉ trụ sở và logo thương hiệu; Nội dung thông tin bài đăng tuyển dụng mới hoặc các yêu cầu chỉnh sửa, gia hạn tin tuyển dụng; Thao tác luân chuyển thẻ ứng viên giữa các cột trạng thái trong phễu tuyển dụng Kanban; Điểm số và các ghi chú đánh giá năng lực nội bộ dành cho từng ứng viên; và Kế hoạch thiết lập lịch phỏng vấn chi tiết.
-Các luồng dữ liệu nhận lại từ hệ thống gồm có: Thông báo kết quả thẩm định định danh doanh nghiệp từ ban quản trị; Kết quả kiểm duyệt nội dung tin bài tuyển dụng như chấp thuận xuất bản hoặc thông báo từ chối kèm theo lý do vi phạm; Danh sách hồ sơ ứng viên nộp về tập trung theo từng vị trí tuyển dụng với đầy đủ bản lý lịch và thư giới thiệu; và Báo cáo thống kê hiệu suất bài đăng gồm số lượt xem tin, số đơn nộp, tỷ lệ chuyển đổi ứng viên qua các vòng phễu.
+Đối với tác nhân Nhà tuyển dụng:
+Các luồng dữ liệu gửi vào hệ thống gồm: thông tin hồ sơ doanh nghiệp, địa điểm làm việc, mã số thuế và giấy chứng nhận đăng ký doanh nghiệp; nội dung tin tuyển dụng, kỹ năng yêu cầu cùng trọng số ưu tiên; thao tác đánh giá, ghi chú nội bộ và chuyển giai đoạn ứng viên trên bảng quản lý; thông tin lập lịch phỏng vấn và nội dung phản hồi kết quả xét tuyển.
+Các luồng dữ liệu nhận từ hệ thống gồm: kết quả xác thực pháp lý doanh nghiệp; kết quả kiểm duyệt tin tuyển dụng (được công bố hoặc cần chỉnh sửa kèm lý do); thông báo có đơn ứng tuyển mới cùng danh sách hồ sơ, thư giới thiệu và mức khớp kỹ năng của ứng viên theo từng vị trí; và số liệu thống kê tình hình tiếp nhận, xử lý hồ sơ của đơn vị.
 
-Thứ ba là Tác nhân Ban quản trị hệ thống:
-Các luồng dữ liệu vào hệ thống gồm có: Quyết định phê duyệt hoặc từ chối hồ sơ pháp lý doanh nghiệp sau khi tiến hành đối soát mã số thuế trên hệ thống đăng ký doanh nghiệp quốc gia; Quyết định phê duyệt xuất bản hoặc hạ gỡ các bài đăng tuyển dụng vi phạm quy chế thông tin; Lệnh khóa hoặc mở khóa tài khoản người dùng có hành vi gian lận hoặc vi phạm tiêu chuẩn cộng đồng; và Các thiết lập cấu hình tham số toàn cục như danh mục ngành nghề, bộ từ điển kỹ năng dùng chung, danh mục tỉnh thành.
-Các luồng dữ liệu nhận lại từ hệ thống gồm có: Hàng đợi các hồ sơ doanh nghiệp mới đăng ký đang chờ thẩm định pháp lý; Hàng đợi các bài tuyển dụng mới gửi duyệt cần rà soát nội dung phòng chống lừa đảo; Danh sách các báo cáo khiếu nại vi phạm được gửi về từ người tìm việc; và Báo cáo tổng hợp toàn diện các chỉ số vận hành nền tảng như lượng người dùng hoạt động, số tin tuyển dụng phát hành, tổng lượt nộp hồ sơ và thời gian phản hồi ứng viên trung bình.
+Đối với tác nhân Ban quản trị hệ thống:
+Các luồng dữ liệu gửi vào hệ thống gồm: quyết định phê duyệt hoặc từ chối xác thực doanh nghiệp sau khi đối soát thông tin pháp lý; quyết định chấp thuận công bố hoặc từ chối tin tuyển dụng chờ duyệt; thao tác phân quyền, khóa hoặc mở khóa tài khoản; và dữ liệu cập nhật danh mục ngành nghề, danh mục kỹ năng dùng chung.
+Các luồng dữ liệu nhận từ hệ thống gồm: danh sách doanh nghiệp chờ xác thực pháp lý; hàng đợi các tin tuyển dụng chờ kiểm duyệt; danh sách phản ánh vi phạm từ người dùng; nhật ký thao tác hệ thống và báo cáo thống kê tổng hợp về tài khoản, tin đăng và đơn ứng tuyển.
 
 b. Phân tích yêu cầu và phân rã chức năng qua Sơ đồ luồng dữ liệu mức 0:
 
 [[IMAGE: assets/diagrams/hinh_3_2_dfd_level0.png | Caption: Hình ảnh 3.2.3.b. Sơ đồ luồng dữ liệu mức 0.]]
 
-A. Phân tích cấu trúc bốn kho dữ liệu trung tâm:
+A. Phân tích cấu trúc bốn kho dữ liệu trung tâm (tổng cộng 28 bảng dữ liệu):
 
-Kho dữ liệu D1 - Tài khoản và Phân quyền: Đóng vai trò là trung tâm lưu trữ thông tin định danh toàn bộ người dùng trong hệ thống, bao gồm các bảng Người dùng, Vai trò, Vai trò người dùng, Quyền hạn và Quyền hạn của vai trò. Kho dữ liệu này lưu trữ định danh tài khoản, địa chỉ email, chuỗi mật khẩu đã được băm một chiều an toàn bằng thuật toán bcrypt, trạng thái kích hoạt tài khoản và ma trận phân quyền dựa trên vai trò. Kho D1 chịu trách nhiệm cung cấp dữ liệu xác thực cho mọi yêu cầu truy cập và bảo đảm an toàn dữ liệu định danh theo các quy chuẩn bảo mật cao nhất.
+Kho dữ liệu D1 - Tài khoản và Phân quyền gồm 7 bảng Roles, Permissions, RolePermissions, Users, UserRoles, UserSessions, AuditLogs: lưu trữ thông tin định danh tài khoản, mật khẩu đã băm bằng bcrypt, trạng thái tài khoản, cấu trúc phân quyền theo vai trò, thông tin phiên đăng nhập và nhật ký hệ thống. Hệ thống truy xuất kho D1 để xác nhận danh tính người đang thao tác và kiểm tra quyền hạn trước khi chạy các chức năng nghiệp vụ.
 
-Kho dữ liệu D2 - Hồ sơ và Ứng viên: Lưu trữ toàn bộ dữ liệu năng lực và lý lịch nghề nghiệp của người tìm việc, bao gồm các bảng Ứng viên, Hồ sơ lý lịch, Học vấn, Kinh nghiệm, Kỹ năng, Chứng chỉ, Dự án và Lưu bài đăng việc làm. Dữ liệu trong kho D2 được tổ chức dưới dạng cấu trúc đa tầng, cho phép lưu trữ nhiều phiên bản hồ sơ của một ứng viên, hỗ trợ xuất bản tài liệu số và chia sẻ an toàn sang các tiến trình ứng tuyển.
+Kho dữ liệu D2 - Hồ sơ và Ứng viên gồm 8 bảng Candidates, CandidateEducations, CandidateExperiences, CandidateSkills, CandidateCertificates, CandidateProjects, Resumes, SavedJobs: lưu trữ thông tin cá nhân của người tìm việc, các mục học vấn, kinh nghiệm, kỹ năng đã khai báo, chứng chỉ, dự án, các bản hồ sơ ứng tuyển và danh sách việc làm đã lưu. Kho D2 cung cấp dữ liệu kỹ năng cho bước tính mức khớp và cung cấp bản hồ sơ cho quá trình nộp đơn.
 
-Kho dữ liệu D3 - Doanh nghiệp và Tin tuyển dụng: Lưu trữ hồ sơ định danh pháp lý của các tổ chức tuyển dụng và toàn bộ các bài đăng tuyển dụng trong hệ thống, bao gồm các bảng Doanh nghiệp, Địa điểm doanh nghiệp, Ngành nghề, Kỹ năng, Tin tuyển dụng và Kỹ năng yêu cầu. Kho D3 quản lý trạng thái xác thực mã số thuế của doanh nghiệp, danh mục ngành nghề, bộ kỹ năng và chu trình vòng đời của từng tin tuyển dụng từ bản nháp, chờ duyệt đến xuất bản hiển thị.
+Kho dữ liệu D3 - Doanh nghiệp và Tin tuyển dụng gồm 6 bảng Employers, CompanyLocations, Categories, Skills, Jobs, JobSkills: lưu trữ thông tin pháp lý và trạng thái xác thực của doanh nghiệp, địa điểm làm việc, danh mục ngành nghề, danh mục kỹ năng dùng chung, thông tin chi tiết của các tin tuyển dụng và danh sách kỹ năng yêu cầu kèm trọng số của từng tin. Kho D3 phục vụ quản lý tin đăng, tra cứu tìm kiếm, đối chiếu kỹ năng và kiểm tra tình trạng nhận hồ sơ.
 
-Kho dữ liệu D4 - Ứng tuyển và Vận hành: Là kho dữ liệu động lưu trữ các tương tác giao dịch và nghiệp vụ vận hành của nền tảng, bao gồm các bảng Đơn ứng tuyển, Lịch sử ứng tuyển, Lịch phỏng vấn, Thông báo, Nhật ký kiểm toán và Cấu hình hệ thống. Kho D4 chịu trách nhiệm ghi nhận luồng nộp đơn, lịch sử luân chuyển ứng viên trong phễu tuyển dụng Kanban, biên bản nhận xét phỏng vấn, các vết kiểm toán bảo mật và danh sách thông báo phát sinh thời gian thực.
+Kho dữ liệu D4 - Ứng tuyển và Vận hành gồm 7 bảng Applications, ApplicationHistories, Interviews, FollowedCompanies, CompanyReviews, JobAlerts, Notifications: lưu trữ các đơn ứng tuyển đã gửi, lịch sử chuyển trạng thái và ghi chú xử lý đơn, lịch phỏng vấn, thông tin theo dõi và đánh giá doanh nghiệp, cấu hình nhận gợi ý việc làm và danh sách thông báo gửi tới người dùng.
 
-B. Phân tích năm tiến trình chức năng cốt lõi từ Tiến trình 1.0 đến Tiến trình 5.0:
+B. Phân tích năm tiến trình chức năng từ Tiến trình 1.0 đến Tiến trình 5.0:
 
 Tiến trình 1.0 - Quản lý tài khoản, định danh và phân quyền:
-Yêu cầu nghiệp vụ của tiến trình là đảm bảo an toàn truy cập tuyệt đối cho toàn bộ hệ thống. Tiến trình tiếp nhận thông tin đăng ký từ Người tìm việc và Nhà tuyển dụng, thực hiện kiểm tra tính hợp lệ của cú pháp email và độ phức tạp của mật khẩu. Tiến trình đối soát với kho D1 để ngăn chặn email trùng lặp, tiến hành tạo muối ngẫu nhiên và băm mật khẩu bằng thuật toán bcrypt trước khi ghi nhận bản ghi mới vào kho D1. Khi người dùng đăng nhập, tiến trình kiểm tra thông tin đối chiếu với kho D1, khởi tạo chuỗi khóa bảo mật JSON Web Token có chữ ký số bí mật, phân tách rõ vai trò và quyền hạn để trả về cho máy khách. Đồng thời, mọi biến cố đăng nhập bất thường đều được tiến trình chuyển tiếp tới kho D4 để lưu vết kiểm toán an ninh.
+Tiến trình tiếp nhận yêu cầu đăng ký, đăng nhập và quản lý phiên làm việc từ các tác nhân. Khi đăng ký, tiến trình kiểm tra định dạng email, số điện thoại và kiểm tra trùng lặp trên kho D1, sau đó băm mật khẩu bằng bcrypt và ghi bản ghi tài khoản cùng vai trò tương ứng vào D1. Khi đăng nhập, tiến trình đối chiếu thông tin xác thực với D1, khởi tạo phiên làm việc trong bảng UserSessions, cấp mã JWT và ghi nhận sự kiện vào bảng AuditLogs thuộc kho D1.
 
 Tiến trình 2.0 - Quản lý hồ sơ năng lực trực tuyến:
-Tiến trình này giải quyết bài toán cốt lõi giúp người tìm việc chuẩn hóa hồ sơ cá nhân. Tiến trình tiếp nhận các khối dữ liệu rời rạc do ứng viên nhập vào từ giao diện gồm học vấn, kinh nghiệm, kỹ năng và dự án, tiến hành kiểm tra tính toàn vẹn và thứ tự logic thời gian giữa các mốc sự kiện. Sau khi hợp lệ hóa, tiến trình ghi nhận và đồng bộ dữ liệu vào kho D2. Khi ứng viên yêu cầu xuất bản hoặc tải tài liệu, tiến trình truy xuất cấu trúc dữ liệu từ kho D2, kết hợp với các tham số mẫu mã và bảng màu để render thành tệp tài liệu số định dạng PDF chất lượng cao gửi trả về cho người dùng. Bên cạnh đó, tiến trình sẵn sàng cung cấp dữ liệu hồ sơ cấu trúc từ kho D2 cho Tiến trình 4.0 khi ứng viên thực hiện thao tác nộp đơn xin việc.
+Tiến trình tiếp nhận thông tin cá nhân, học vấn, kinh nghiệm, kỹ năng, chứng chỉ và dự án do người tìm việc nhập hoặc tệp PDF tải lên. Sau khi kiểm tra các trường bắt buộc và thứ tự thời gian hợp lệ, tiến trình cập nhật dữ liệu vào các bảng tương ứng trong kho D2. Khi ứng viên yêu cầu xem trước hoặc xuất tệp PDF, tiến trình đọc dữ liệu từ D2, kết xuất thành bản hồ sơ hoàn chỉnh và lưu đường dẫn tệp vào bảng Resumes để sẵn sàng sử dụng khi ứng tuyển.
 
 Tiến trình 3.0 - Quản lý tin tuyển dụng và kiểm duyệt:
-Tiến trình này đóng vai trò là người gác cổng kiểm soát chất lượng thị trường việc làm và phòng chống gian lận. Khi Nhà tuyển dụng khởi tạo tin bài, tiến trình kiểm tra điều kiện tiên quyết: doanh nghiệp phải ở trạng thái Đã xác thực trong kho D3 thì mới được gửi bài. Tiến trình tiếp nhận thông tin mô tả công việc, mức đãi ngộ và thời hạn nộp đơn, lưu trữ bản ghi vào kho D3 với trạng thái Chờ kiểm duyệt. Cán bộ kiểm duyệt tiếp nhận tin bài từ hàng đợi, thực hiện đối soát nội dung; nếu tin bài hợp lệ, cán bộ kiểm duyệt gửi lệnh phê duyệt, tiến trình lập tức cập nhật trạng thái tin tuyển dụng sang Đã xuất bản trong kho D3 và phát sinh thông báo thành công cho nhà tuyển dụng thông qua kho D4. Ngược lại, nếu phát hiện dấu hiệu lừa đảo, tin bài sẽ bị từ chối kèm theo lý do giải trình. Ngoài ra, tiến trình tích hợp một tác vụ chạy ngầm định kỳ hàng ngày để quét kho D3 và tự động chuyển các tin bài có hạn chót nhỏ hơn ngày hiện tại sang trạng thái Đã hết hạn.
+Tiến trình xử lý quy trình công bố và quản lý vòng đời tin tuyển dụng. Khi nhà tuyển dụng gửi duyệt tin, tiến trình đọc kho D3 để xác nhận doanh nghiệp đã xác thực pháp lý, kiểm tra khoảng lương và hạn nhận hồ sơ hợp lệ rồi lưu tin ở trạng thái chờ duyệt. Khi cán bộ kiểm duyệt xem hàng đợi và phê duyệt, tiến trình chuyển trạng thái tin trong D3 sang đang hoạt động và ghi thông báo vào kho D4 để báo cho doanh nghiệp; nếu từ chối thì lưu lý do để doanh nghiệp chỉnh sửa. Định kỳ hàng ngày, tiến trình kiểm tra hạn nhận hồ sơ trong D3 để chuyển các tin quá hạn sang trạng thái hết hạn.
 
 Tiến trình 4.0 - Tìm kiếm, gợi ý và nộp đơn ứng tuyển:
-Tiến trình 4.0 là trái tim kết nối cung cầu của nền tảng TalentConnect. Khi người tìm việc gửi các tiêu chí tìm kiếm, tiến trình phân tích cú pháp truy vấn, thực hiện tìm kiếm tối ưu trên các trường chỉ mục của kho D3 và trả về danh sách các bài đăng đang hoạt động phù hợp nhất. Đồng thời, tiến trình thực hiện thuật toán đối khớp từ khóa kỹ năng: bóc tách danh mục kỹ năng từ hồ sơ ứng viên trong kho D2, so sánh đối chiếu với các kỹ năng yêu cầu trong kho D3 để tính toán trọng số tương đồng và tự động xuất ra danh mục việc làm gợi ý thông minh trên trang cá nhân của ứng viên. Khi ứng viên nhấn nút nộp đơn, tiến trình thực hiện kiểm tra ràng buộc duy nhất trong kho D4; nếu ứng viên chưa từng nộp đơn vào vị trí này, tiến trình đọc thông tin hồ sơ từ D2, tạo lập bản ghi đơn ứng tuyển mới với trạng thái Đã nộp vào kho D4, đồng thời gửi thông báo tức thời cho nhà tuyển dụng.
+Tiến trình kết nối người tìm việc với các cơ hội việc làm đang mở và tiếp nhận hồ sơ ứng tuyển. Khi người dùng tìm việc, tiến trình lọc các tin đang hoạt động và còn hạn trong kho D3 theo các điều kiện đã chọn, đồng thời đối chiếu kỹ năng ứng viên trong D2 với kỹ năng yêu cầu của tin trong D3 để tính tỷ lệ khớp kỹ năng. Khi ứng viên xác nhận gửi hồ sơ cho một vị trí, tiến trình xác nhận danh tính từ D1, kiểm tra quyền sở hữu bản hồ sơ trong D2, kiểm tra tình trạng nhận đơn của tin trong D3 và kiểm tra chống nộp trùng trong D4, sau đó ghi đơn mới vào bảng Applications thuộc kho D4 với trạng thái Đã gửi hồ sơ và tạo thông báo cho doanh nghiệp.
 
-Tiến trình 5.0 - Quản lý phễu tuyển dụng và báo cáo điều hành:
-Tiến trình này cung cấp công cụ làm việc năng suất cao cho nhà tuyển dụng và công cụ giám sát toàn diện cho ban quản trị. Đối với Nhà tuyển dụng, tiến trình truy vấn toàn bộ danh sách đơn ứng tuyển thuộc quyền sở hữu từ kho D4, kết xuất thành bảng phễu Kanban trực quan phân theo các cột trạng thái. Khi nhà tuyển dụng thao tác kéo thả thẻ ứng viên sang cột mới như hẹn phỏng vấn hoặc từ chối, tiến trình cập nhật trạng thái bản ghi trong kho D4, lưu vết thời gian và người thao tác vào bảng lịch sử, đồng thời tự động kích hoạt tiến trình con gửi thông báo trạng thái và email phản hồi tới ứng viên, xóa bỏ hoàn toàn hiện tượng hố đen tuyển dụng. Đối với Quản trị viên, tiến trình tiếp nhận yêu cầu kết xuất dữ liệu thống kê, thực hiện các truy vấn tổng hợp trên cả bốn kho dữ liệu D1, D2, D3, D4 để trả về các biểu đồ và báo cáo chỉ số vận hành trực quan, giúp ban quản trị nắm bắt chính xác nhịp độ phát triển của toàn bộ nền tảng.
+Tiến trình 5.0 - Quản lý ứng viên theo giai đoạn và thống kê vận hành:
+Đối với nhà tuyển dụng, tiến trình đọc danh sách đơn ứng tuyển của từng vị trí từ kho D4 kết hợp thông tin hồ sơ từ kho D2 để hiển thị lên bảng quản lý gồm năm giai đoạn: Hồ sơ mới nộp, Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc và Chưa phù hợp. Khi nhà tuyển dụng chấm điểm nội bộ, chuyển giai đoạn hoặc lập lịch phỏng vấn, tiến trình cập nhật bảng Applications, ghi lịch sử vào ApplicationHistories, lưu lịch phỏng vấn vào Interviews và tạo thông báo trong bảng Notifications thuộc kho D4 gửi tới ứng viên. Đối với ban quản trị, tiến trình tổng hợp dữ liệu từ cả bốn kho D1, D2, D3, D4 để xuất các báo cáo thống kê vận hành hệ thống.
 
 c. Sơ đồ luồng dữ liệu mức 1 cho các tiến trình trọng tâm:
 
 [[IMAGE: assets/diagrams/hinh_3_3_dfd_level1_jobs.png | Caption: Hình ảnh 3.2.3.c. Sơ đồ luồng dữ liệu mức 1 - Tiến trình Đăng và duyệt tin tuyển dụng.]]
 
-Ở Tiến trình 3.0, luồng xử lý được phân rã thành ba tiểu tiến trình tuần tự: Tiểu tiến trình 3.1 tiếp nhận dữ liệu soạn thảo từ nhà tuyển dụng, kiểm tra tính đầy đủ của các trường bắt buộc và lưu bản ghi vào kho tin tuyển dụng ở trạng thái chờ duyệt; Tiểu tiến trình 3.2 cung cấp giao diện hàng đợi cho cán bộ kiểm duyệt, tiếp nhận lệnh phê duyệt hoặc yêu cầu hiệu chỉnh để cập nhật trạng thái xuất bản trong cơ sở dữ liệu; Tiểu tiến trình 3.3 là tác vụ ngầm định kỳ tự động quét thời hạn bài đăng để đóng các tin tuyển dụng đã quá hạn.
+Ở Tiến trình 3.0 về công bố và quản lý tin tuyển dụng, luồng xử lý phân rã thành ba bước liên tiếp: Tiểu tiến trình 3.1 tiếp nhận thông tin vị trí tuyển dụng và danh sách kỹ năng yêu cầu từ nhà tuyển dụng, kiểm tra trạng thái xác thực của doanh nghiệp cùng các ràng buộc về khoảng lương, hạn nhận đơn rồi ghi vào kho D3 ở trạng thái chờ duyệt; Tiểu tiến trình 3.2 cung cấp danh sách tin chờ duyệt cho cán bộ kiểm duyệt, tiếp nhận quyết định chấp thuận hoặc từ chối để cập nhật trạng thái tin trong D3 và tạo thông báo phản hồi qua kho D4; Tiểu tiến trình 3.3 kiểm tra hạn nhận hồ sơ định kỳ để chuyển các tin đã quá hạn sang trạng thái hết hạn và ngừng nhận đơn mới.
 
-[[IMAGE: assets/diagrams/hinh_3_4_dfd_level1_apply.png | Caption: Hình ảnh 3.2.3.d. Sơ đồ luồng dữ liệu mức 1 - Tiến trình Tìm kiếm và ứng tuyển việc làm.]]
+Đối với Tiến trình 4.0 (Tìm kiếm, gợi ý và nộp đơn ứng tuyển), nhóm đi sâu phân tích chi tiết vì đây là nơi người tìm việc trực tiếp tiếp cận nhu cầu tuyển dụng và gửi hồ sơ đến doanh nghiệp. Một lần sử dụng thành công phải giúp ứng viên hiểu công việc, chọn đúng bản hồ sơ, xác nhận đúng người nhận và nhận được mã đơn có thể tra cứu. Tình huống thiết kế xuyên suốt sử dụng ứng viên Nguyễn Minh Anh tìm vị trí Frontend Developer tại Hà Nội, mức lương từ 14 triệu đồng và hình thức toàn thời gian; ứng viên chọn tin của FPT Software, kiểm tra hồ sơ rồi xác nhận gửi.
 
-Ở Tiến trình 4.0, luồng tương tác ứng tuyển được phân rã thành ba tiểu tiến trình: Tiểu tiến trình 4.1 tiếp nhận các điều kiện lọc từ ứng viên, thực hiện truy vấn tối ưu và trả về danh sách công việc; Tiểu tiến trình 4.2 bóc tách bộ kỹ năng từ hồ sơ ứng viên và yêu cầu tin tuyển dụng để tính toán độ tương đồng và sinh danh mục việc làm gợi ý; Tiểu tiến trình 4.3 tiếp nhận lệnh nộp đơn, kiểm tra điều kiện chống nộp trùng lặp, ghi nhận đơn ứng tuyển vào kho dữ liệu và kích hoạt thông báo gửi tới nhà tuyển dụng.
+[[IMAGE: assets/diagrams/hinh_3_4_a_dfd_apply_overview.png | Caption: Hình ảnh 3.2.3.d. Sơ đồ luồng dữ liệu tổng quát chức năng tìm kiếm, gợi ý và tiếp nhận đơn (Tiến trình 4.0).]]
+
+Trên sơ đồ tổng quát của Tiến trình 4.0, hình chữ nhật biểu diễn người hoặc tổ chức trao đổi với phần mềm; khối bo góc biểu diễn xử lý; khối mở cạnh biểu diễn nơi lưu dữ liệu; mũi tên chỉ dữ liệu được gửi hoặc đọc theo hướng nào. Số 4.0 là mã của chức năng đang thiết kế và tên chức năng cho biết ý nghĩa nghiệp vụ.
+
+Cụ thể, người tìm việc cung cấp tiêu chí để tìm tin, yêu cầu xem gợi ý hoặc gửi hồ sơ cho tin đã chọn; phần mềm trả danh sách việc làm, mức khớp kỹ năng hoặc kết quả tiếp nhận đơn. Với một lần nộp hồ sơ, dữ liệu cần có là tin được chọn, bản hồ sơ và thư giới thiệu nếu ứng viên muốn gửi kèm. Dữ liệu tài khoản và quyền truy cập được đọc từ kho Tài khoản và Phân quyền (D1) để xác nhận ai đang gửi; danh tính được lấy từ phiên đăng nhập, giúp ngăn việc đổi mã ứng viên rồi gửi thay người khác.
+
+Kho Hồ sơ và Ứng viên (D2) cung cấp kỹ năng và bản hồ sơ đã chọn; khi ứng viên tải tệp mới, phần mềm kiểm tra và lưu bản hồ sơ vào kho này. Kho Doanh nghiệp và Tin tuyển dụng (D3) cung cấp công việc, lương, địa điểm, kỹ năng yêu cầu và tình trạng nhận đơn; dữ liệu này được dùng cả khi tìm kiếm và khi kiểm tra lần cuối trước lúc gửi. Kho Ứng tuyển và Vận hành (D4) lưu các đơn đã gửi để phát hiện nộp trùng; khi đủ điều kiện, phần mềm ghi đơn mới và thông báo cho doanh nghiệp sở hữu tin. Ứng viên nhận mã đơn, còn doanh nghiệp nhận thông báo có hồ sơ mới để mở đơn trong phần quản lý tuyển dụng.
+
+Ví dụ cụ thể trên dữ liệu của đề tài: bản hồ sơ mã số 41 thuộc ứng viên mã số 17 được chọn để ứng tuyển vào tin tuyển dụng mã số 241. Phần mềm xác nhận hồ sơ thuộc người gửi, tin còn nhận đơn và chưa có đơn đang xử lý của ứng viên này cho cùng tin. Sau khi lưu đơn mã số 381, ứng viên nhận mã tra cứu TC-000381; doanh nghiệp đăng tin 241 nhận thông báo về đơn đó. Đây là kết quả cụ thể của các luồng ghi dữ liệu trên sơ đồ.
+
+[[IMAGE: assets/diagrams/hinh_3_4_dfd_level1_apply.png | Caption: Hình ảnh 3.2.3.e. Sơ đồ luồng dữ liệu mức 1 - Ba bước xử lý tìm kiếm, gợi ý và tiếp nhận đơn (Tiến trình 4.1, 4.2, 4.3).]]
+
+Khi phân rã chi tiết Tiến trình 4.0 ở mức 1, chức năng chia thành ba bước xử lý: tìm kiếm và lọc việc làm ở bước 4.1, đối chiếu kỹ năng để gợi ý ở bước 4.2, kiểm tra và ghi nhận đơn ở bước 4.3. Các kho dữ liệu và dữ liệu trao đổi với hai bên giữ thống nhất với sơ đồ tổng quát:
+
+Về xử lý tìm kiếm và gợi ý việc làm tại Tiến trình 4.1 và 4.2:
+Khi nhận từ khóa và điều kiện lọc, phần mềm lấy các tin đang hoạt động, còn hạn nhận hồ sơ rồi áp dụng đồng thời ngành nghề, địa điểm, kinh nghiệm, lương và hình thức làm việc. Địa điểm được xét theo nơi làm việc của tin. Nếu người dùng chọn mức lương tối thiểu 14 triệu đồng, khoảng lương của tin phải có phần đáp ứng ngưỡng này; các tin lương thỏa thuận được nhận biết riêng, không tự coi là đạt mức lương cụ thể.
+Danh sách trả về gồm chức danh, doanh nghiệp, lương, địa điểm, thời điểm cập nhật và tổng số kết quả. Khi mở xem chi tiết một tin rồi quay lại, bộ lọc và vị trí danh sách được giữ nguyên. Trường hợp không có kết quả phù hợp thì giao diện cho phép bỏ từng điều kiện lọc để tìm lại; trường hợp lỗi tải dữ liệu thì báo lỗi kết nối và cho thử lại, vì hai tình huống này có bản chất khác nhau và cần cách xử lý khác nhau.
+Để gợi ý việc làm, phần mềm đối chiếu các mã kỹ năng ứng viên đã khai báo trong D2 với kỹ năng yêu cầu của tin trong D3. Trong thiết kế này, mức khớp bằng tổng trọng số kỹ năng đã khớp chia cho tổng trọng số kỹ năng yêu cầu, sau đó nhân 100. Chẳng hạn, nếu tin tuyển dụng yêu cầu ReactJS có trọng số 3, TypeScript có trọng số 2, HTML/CSS có trọng số 1 và Git có trọng số 2 (tổng trọng số bằng 8), khi ứng viên đã khai báo ReactJS, TypeScript và Git thì tổng trọng số đạt được là 7/8, tương đương 87,5%, làm tròn hiển thị 88%. Giao diện giải thích rõ cả ba kỹ năng đã khớp và kỹ năng HTML/CSS chưa được khai báo. Thiếu khai báo một kỹ năng trên hồ sơ không đồng nghĩa ứng viên không có kỹ năng đó, và điểm khớp kỹ năng cũng không phải xác suất được tuyển. Nếu hồ sơ hoặc tin thiếu dữ liệu kỹ năng, phần mềm không đưa ra tỷ lệ phần trăm thiếu căn cứ; việc gợi ý vẫn tuân theo tình trạng nhận hồ sơ của tin và các điều kiện lọc mà người dùng đã chọn.
+
+Về xử lý kiểm tra và tiếp nhận hồ sơ (Tiến trình 4.3):
+Trước khi ghi đơn, phần mềm kiểm tra tài khoản người tìm việc từ phiên đăng nhập, kiểm tra tin tuyển dụng còn nhận hồ sơ và bản hồ sơ được chọn thuộc đúng người gửi. Nếu ứng viên tải tệp hồ sơ mới, tệp được kiểm tra định dạng .pdf, dung lượng tối đa 5 MB rồi lưu thành một bản hồ sơ trong D2 trước khi gắn mã vào đơn. Tiếp theo, phần mềm kiểm tra đơn trùng của cùng ứng viên và cùng tin trong D4; nếu đã có đơn đang xử lý, hệ thống không tạo đơn mới mà cho phép ứng viên mở lại đơn cũ đã ghi nhận.
+Một lần gửi hợp lệ tạo bản ghi đơn ứng tuyển có trạng thái Đã gửi hồ sơ, lưu mã tin tuyển dụng, mã ứng viên, mã bản hồ sơ, thư giới thiệu, mức khớp kỹ năng và thời điểm gửi. Hệ thống chỉ hiển thị thông báo thành công sau khi thao tác lưu hoàn tất vào cơ sở dữ liệu. Hai yêu cầu gửi đến gần như đồng thời phải được kiểm soát để tạo đúng một đơn duy nhất. Nếu tin tuyển dụng vừa chuyển sang trạng thái đóng trong lúc ứng viên đang chuẩn bị, bản hồ sơ đã chọn và nội dung thư giới thiệu vẫn được giữ trên biểu mẫu để ứng viên chọn lại công việc khác; nếu mất kết nối mạng sau khi nhấn gửi, phần mềm xác minh đơn đã được lưu hay chưa trước khi cho phép gửi lại.
 
 d. Mô hình hóa Use Case và Đặc tả ca sử dụng chi tiết:
 
-Song song với việc phân tích luồng dữ liệu, nhóm nghiên cứu áp dụng kỹ thuật mô hình hóa ca sử dụng theo chuẩn ngôn ngữ mô hình hóa thống nhất nhằm đặc tả yêu cầu dưới góc nhìn tương tác của người sử dụng:
+Song song với sơ đồ luồng dữ liệu, nhóm sử dụng biểu đồ Use Case theo ngôn ngữ mô hình hóa thống nhất UML để biểu diễn sự tham gia của các tác nhân vào từng chức năng của hệ thống:
 
-[[IMAGE: assets/diagrams/hinh_3_5_usecase_general.png | Caption: Hình ảnh 3.2.3.e. Biểu đồ Use Case tổng thể hệ thống.]]
+[[IMAGE: assets/diagrams/hinh_3_5_usecase_general.png | Caption: Hình ảnh 3.2.3.f. Biểu đồ Use Case tổng thể hệ thống.]]
 
-[[IMAGE: assets/diagrams/hinh_3_6_usecase_candidate.png | Caption: Hình ảnh 3.2.3.f. Biểu đồ Use Case phân hệ Người tìm việc.]]
+Trên sơ đồ tổng quát, khung chữ nhật thể hiện phạm vi hệ thống TalentConnect; hình người biểu diễn tác nhân và hình elip biểu diễn chức năng (ca sử dụng). Đường nối cho biết tác nhân tham gia chức năng nào, không biểu diễn thứ tự xử lý. Nhà tuyển dụng công bố tin và xử lý hồ sơ; người tìm việc tìm tin, chuẩn bị hồ sơ và ứng tuyển; ban quản trị tham gia kiểm duyệt và quản lý hoạt động hệ thống. Ba nhóm chức năng chính được liên kết chặt chẽ qua tin tuyển dụng, đơn ứng tuyển và kết quả xét tuyển.
 
-[[IMAGE: assets/diagrams/hinh_3_7_usecase_employer.png | Caption: Hình ảnh 3.2.3.g. Biểu đồ Use Case phân hệ Nhà tuyển dụng.]]
+Ví dụ, doanh nghiệp đăng một vị trí lập trình viên giao diện; sau khi tin được duyệt, ứng viên tìm thấy tin và gửi một bản hồ sơ. Doanh nghiệp nhận đơn tại đúng vị trí đó, mở hồ sơ, đánh giá rồi lập lịch nếu chọn phỏng vấn. Hệ thống gửi thư mời cho đúng ứng viên và cập nhật trạng thái của chính đơn đó. Nếu hồ sơ chưa phù hợp, doanh nghiệp gửi phản hồi từ chối; ứng viên xem kết quả ngay trên hệ thống mà không cần liên hệ riêng để hỏi đơn đã được xử lý hay chưa. Trong toàn bộ quá trình này, chức năng tài khoản và phân quyền bảo đảm từng người chỉ thao tác trên dữ liệu được phép; hồ sơ trực tuyến cung cấp tài liệu để nộp; kiểm duyệt tạo nguồn tin hợp lệ; và thông báo nối các bước xử lý giữa hai bên.
 
-[[IMAGE: assets/diagrams/hinh_3_8_usecase_admin.png | Caption: Hình ảnh 3.2.3.h. Biểu đồ Use Case phân hệ Quản trị viên.]]
+[[IMAGE: assets/diagrams/hinh_3_6_usecase_candidate.png | Caption: Hình ảnh 3.2.3.g. Biểu đồ Use Case phân hệ Người tìm việc.]]
 
-Dưới đây là các bảng đặc tả ca sử dụng chi tiết cho năm nghiệp vụ cốt lõi của đề tài:
+[[IMAGE: assets/diagrams/hinh_3_7_usecase_employer.png | Caption: Hình ảnh 3.2.3.h. Biểu đồ Use Case phân hệ Nhà tuyển dụng.]]
+
+[[IMAGE: assets/diagrams/hinh_3_8_usecase_admin.png | Caption: Hình ảnh 3.2.3.i. Biểu đồ Use Case phân hệ Quản trị viên.]]
+
+Dưới đây là các bảng đặc tả chi tiết cho năm ca sử dụng đại diện của hệ thống:
 
 Bảng 3.5: Đặc tả ca sử dụng UC01 – Tạo hồ sơ năng lực trực tuyến
 
@@ -672,11 +737,11 @@ Bảng 3.5: Đặc tả ca sử dụng UC01 – Tạo hồ sơ năng lực trự
 | Mã ca sử dụng | UC01 |
 | Tên ca sử dụng | Tạo và chỉnh sửa hồ sơ năng lực trực tuyến |
 | Tác nhân thực hiện | Người tìm việc đã đăng nhập hệ thống |
-| Mô tả tóm tắt | Cho phép người tìm việc sử dụng công cụ biên soạn trực quan để điền thông tin học vấn, kinh nghiệm, kỹ năng, tùy biến màu sắc và kết xuất tệp tài liệu hoàn chỉnh |
-| Tiền điều kiện | Người tìm việc đã đăng nhập thành công vào tài khoản cá nhân |
-| Hậu điều kiện | Dữ liệu hồ sơ có cấu trúc được lưu trữ an toàn trong cơ sở dữ liệu và tệp tài liệu định dạng chuẩn được tạo sẵn sàng cho việc ứng tuyển |
-| Luồng sự kiện chính | 1. Người dùng chọn chức năng Quản lý hồ sơ trên thanh điều hướng.<br>2. Hệ thống hiển thị giao diện soạn thảo trực quan với các khối thông tin tiêu chuẩn.<br>3. Người dùng nhập thông tin cá nhân, mục tiêu nghề nghiệp, học vấn, kinh nghiệm và kỹ năng.<br>4. Người dùng lựa chọn bảng màu chủ đạo và kiểu phông chữ phù hợp từ bảng điều khiển.<br>5. Hệ thống liên tục cập nhật khung hiển thị trực tiếp để người dùng quan sát diện mạo hồ sơ.<br>6. Người dùng nhấn nút Lưu hồ sơ.<br>7. Hệ thống kiểm tra tính hợp lệ của dữ liệu và lưu cấu trúc hồ sơ vào cơ sở dữ liệu.<br>8. Người dùng nhấn nút Tải tệp tài liệu; hệ thống kết xuất hồ sơ sang tệp định dạng chuẩn và gửi về máy tính của người dùng. |
-| Luồng sự kiện thay thế | 7a. Nếu các trường thông tin bắt buộc như họ tên hoặc thông tin liên lạc bị bỏ trống, hệ thống hiển thị thông báo nhắc nhở tại trường dữ liệu tương ứng và yêu cầu người dùng hoàn thiện trước khi lưu. |
+| Mô tả tóm tắt | Cho phép người tìm việc nhập thông tin học vấn, kinh nghiệm, kỹ năng, dự án theo cấu trúc, xem trước bố cục và xuất tệp hồ sơ định dạng .pdf |
+| Tiền điều kiện | Người tìm việc đã đăng nhập hợp lệ vào tài khoản ứng viên |
+| Hậu điều kiện | Dữ liệu hồ sơ được lưu vào kho D2 (Candidates, Resumes và các bảng thành phần) và tệp .pdf sẵn sàng để chọn khi ứng tuyển |
+| Luồng sự kiện chính | 1. Người tìm việc chọn chức năng Quản lý hồ sơ trên thanh điều hướng.<br>2. Hệ thống hiển thị biểu mẫu nhập thông tin hồ sơ cùng vùng xem trước trực tiếp.<br>3. Người tìm việc nhập thông tin liên hệ, mục tiêu nghề nghiệp, học vấn, kinh nghiệm làm việc, kỹ năng chuyên môn và dự án.<br>4. Người tìm việc chọn mẫu trình bày (TemplateID) và đặt tên cho bản hồ sơ (ResumeTitle).<br>5. Hệ thống cập nhật nội dung trên khung xem trước để ứng viên kiểm tra bố cục.<br>6. Người tìm việc nhấn nút Lưu hồ sơ.<br>7. Hệ thống kiểm tra các trường bắt buộc, thứ tự thời gian và lưu dữ liệu vào cơ sở dữ liệu.<br>8. Người tìm việc chọn Xuất tệp PDF; hệ thống kết xuất tệp .pdf và lưu đường dẫn vào bản ghi Resumes. |
+| Luồng sự kiện thay thế | 7a. Nếu trường bắt buộc (như họ tên, email liên hệ) bị bỏ trống hoặc ngày kết thúc nhỏ hơn ngày bắt đầu, hệ thống hiển thị thông báo lỗi ngay tại trường tương ứng và giữ nguyên các nội dung đã nhập để người dùng sửa lại. |
 
 Bảng 3.6: Đặc tả ca sử dụng UC02 – Đăng tin tuyển dụng mới
 
@@ -684,12 +749,12 @@ Bảng 3.6: Đặc tả ca sử dụng UC02 – Đăng tin tuyển dụng mới
 | :--- | :--- |
 | Mã ca sử dụng | UC02 |
 | Tên ca sử dụng | Đăng tin tuyển dụng mới |
-| Tác nhân thực hiện | Nhà tuyển dụng đã được kích hoạt tài khoản doanh nghiệp |
-| Mô tả tóm tắt | Nhà tuyển dụng nhập các thông tin mô tả công việc, yêu cầu chuyên môn, quyền lợi đãi ngộ và thời hạn tuyển để gửi duyệt lên hệ thống |
-| Tiền điều kiện | Nhà tuyển dụng đã đăng nhập và hồ sơ pháp lý của doanh nghiệp đã được quản trị viên phê duyệt |
-| Hậu điều kiện | Bài đăng tuyển dụng mới được ghi nhận vào cơ sở dữ liệu ở trạng thái chờ duyệt và xuất hiện trong hàng đợi kiểm tra của ban quản trị |
-| Luồng sự kiện chính | 1. Nhà tuyển dụng chọn chức năng Đăng bài tuyển dụng trên bảng điều khiển doanh nghiệp.<br>2. Hệ thống hiển thị biểu mẫu khởi tạo tin tuyển dụng chuẩn hóa.<br>3. Nhà tuyển dụng nhập tiêu đề công việc, chọn ngành nghề, nhập số lượng cần tuyển, mô tả công việc, yêu cầu kỹ năng, khoảng lương đãi ngộ, địa điểm làm việc và hạn chót nhận đơn.<br>4. Nhà tuyển dụng nhấn nút Gửi bài duyệt.<br>5. Hệ thống kiểm tra tính đầy đủ và hợp lệ của các trường dữ liệu.<br>6. Hệ thống lưu bản ghi bài đăng với trạng thái Chờ duyệt, ghi nhận thời điểm tạo và hiển thị thông báo gửi duyệt thành công cho nhà tuyển dụng. |
-| Luồng sự kiện thay thế | 5a. Nếu ngày hết hạn nộp hồ sơ được chọn trước hoặc trùng với ngày hiện tại, hệ thống đưa ra cảnh báo yêu cầu chọn thời hạn tối thiểu sau ngày đăng bài ba ngày.<br>5b. Nếu mức lương tối đa được nhập nhỏ hơn mức lương tối thiểu, hệ thống yêu cầu nhà tuyển dụng điều chỉnh lại khoảng lương cho logic. |
+| Tác nhân thực hiện | Nhà tuyển dụng |
+| Mô tả tóm tắt | Nhà tuyển dụng soạn thông tin vị trí cần tuyển, yêu cầu kỹ năng kèm trọng số, mức lương và hạn nhận hồ sơ để gửi kiểm duyệt |
+| Tiền điều kiện | Nhà tuyển dụng đã đăng nhập và doanh nghiệp đã được xác thực pháp lý (VerificationStatus = Verified) |
+| Hậu điều kiện | Tin tuyển dụng mới được lưu vào bảng Jobs và JobSkills ở trạng thái chờ duyệt (Pending) và chuyển vào hàng đợi của người kiểm duyệt |
+| Luồng sự kiện chính | 1. Nhà tuyển dụng chọn chức năng Đăng tin tuyển dụng trên trang quản lý doanh nghiệp.<br>2. Hệ thống kiểm tra trạng thái xác thực doanh nghiệp và hiển thị biểu mẫu soạn tin.<br>3. Nhà tuyển dụng nhập chức danh, ngành nghề, số lượng cần tuyển, mô tả nhiệm vụ, yêu cầu, quyền lợi, khoảng lương, địa điểm làm việc, hạn nhận hồ sơ và chọn các kỹ năng yêu cầu kèm trọng số ưu tiên.<br>4. Nhà tuyển dụng nhấn nút Gửi duyệt.<br>5. Hệ thống kiểm tra các trường bắt buộc, khoảng lương và hạn nhận hồ sơ.<br>6. Hệ thống lưu bản ghi tin tuyển dụng với trạng thái Pending (Chờ duyệt), ghi thời điểm tạo và thông báo đã gửi duyệt thành công. |
+| Luồng sự kiện thay thế | 4a. Nếu nhà tuyển dụng chọn Lưu nháp, hệ thống lưu tin ở trạng thái Draft để chỉnh sửa tiếp mà chưa chuyển sang hàng đợi kiểm duyệt.<br>5a. Nếu hạn nhận hồ sơ nhỏ hơn hoặc cách ngày hiện tại dưới 3 ngày, hệ thống báo lỗi tại trường hạn nộp và yêu cầu chọn lại.<br>5b. Nếu mức lương tối đa nhỏ hơn mức lương tối thiểu, hệ thống yêu cầu điều chỉnh lại khoảng lương hợp lệ. |
 
 Bảng 3.7: Đặc tả ca sử dụng UC03 – Tìm kiếm và lọc việc làm đa tiêu chí
 
@@ -698,11 +763,11 @@ Bảng 3.7: Đặc tả ca sử dụng UC03 – Tìm kiếm và lọc việc là
 | Mã ca sử dụng | UC03 |
 | Tên ca sử dụng | Tìm kiếm và lọc việc làm đa tiêu chí |
 | Tác nhân thực hiện | Khách vãng lai hoặc Người tìm việc |
-| Mô tả tóm tắt | Người dùng tra cứu các cơ hội việc làm theo chuỗi từ khóa kết hợp các bộ lọc chuyên sâu để tìm ra các vị trí phù hợp nhất với năng lực bản thân |
-| Tiền điều kiện | Người dùng truy cập vào trang chủ hoặc chuyên trang tìm việc của hệ thống |
-| Hậu điều kiện | Hệ thống hiển thị danh sách các bài đăng tuyển dụng thỏa mãn đồng thời tất cả các điều kiện tra cứu |
-| Luồng sự kiện chính | 1. Người dùng nhập chuỗi từ khóa cần tìm vào ô tìm kiếm chính.<br>2. Người dùng mở rộng bảng lọc nâng cao và chọn các tiêu chí: Danh mục ngành nghề, Tỉnh thành làm việc, Khoảng lương mong muốn và Hình thức hợp đồng.<br>3. Người dùng nhấn nút Tìm kiếm.<br>4. Hệ thống tiếp nhận các tham số, thực hiện truy vấn cơ sở dữ liệu đối với các bài đăng đang ở trạng thái hoạt động và còn thời hạn nhận đơn.<br>5. Hệ thống trả về danh sách kết quả dưới dạng thẻ thông tin công việc có phân trang rõ ràng kèm tổng số lượng việc làm tìm thấy.<br>6. Người dùng nhấn vào một thẻ công việc để chuyển hướng tới trang xem chi tiết. |
-| Luồng sự kiện thay thế | 5a. Nếu không có bài đăng nào thỏa mãn tất cả các điều kiện lọc, hệ thống hiển thị thông báo Không tìm thấy công việc phù hợp và đưa ra các gợi ý nới lỏng bớt tiêu chí lọc. |
+| Mô tả tóm tắt | Người dùng nhập từ khóa kết hợp bộ lọc ngành nghề, địa điểm, mức lương, kinh nghiệm, hình thức làm việc và xem gợi ý theo mức khớp kỹ năng |
+| Tiền điều kiện | Người dùng truy cập màn hình tìm kiếm việc làm của hệ thống |
+| Hậu điều kiện | Hệ thống hiển thị danh sách tin tuyển dụng đang hoạt động (Active) và còn hạn đáp ứng đồng thời các điều kiện đã chọn, giữ nguyên bộ lọc khi xem chi tiết rồi quay lại |
+| Luồng sự kiện chính | 1. Người dùng nhập từ khóa công việc hoặc kỹ năng và chọn địa điểm làm việc.<br>2. Người dùng chọn thêm các điều kiện lọc gồm ngành nghề, mức lương tối thiểu, kinh nghiệm, hình thức làm việc và nhấn Áp dụng bộ lọc.<br>3. Hệ thống truy vấn các tin đang Active và còn hạn trong kho D3 thỏa mãn đồng thời các điều kiện lọc.<br>4. Nếu người dùng đã đăng nhập tài khoản ứng viên và có khai báo kỹ năng, hệ thống đối chiếu với JobSkills để tính tỷ lệ khớp kỹ năng và hiển thị kèm giải thích các kỹ năng đã khớp / chưa khai báo.<br>5. Hệ thống hiển thị tổng số kết quả, các nhãn điều kiện đang áp dụng và danh sách việc làm có phân trang.<br>6. Người dùng nhấn vào tên vị trí hoặc Xem chi tiết để mở trang chi tiết tin tuyển dụng. |
+| Luồng sự kiện thay thế | 5a. Nếu không có tin nào thỏa mãn đồng thời các điều kiện lọc, hệ thống giữ nguyên các nhãn điều kiện trên màn hình và hỗ trợ nút bỏ từng điều kiện (như bỏ điều kiện mức lương) để mở rộng kết quả.<br>5b. Nếu xảy ra lỗi kết nối không tải được dữ liệu, hệ thống thông báo lỗi tải dữ liệu và hiển thị nút Thử lại, không hiển thị 0 kết quả như một lần tìm kiếm hợp lệ. |
 
 Bảng 3.8: Đặc tả ca sử dụng UC04 – Nộp hồ sơ ứng tuyển trực tuyến
 
@@ -711,52 +776,50 @@ Bảng 3.8: Đặc tả ca sử dụng UC04 – Nộp hồ sơ ứng tuyển tr�
 | Mã ca sử dụng | UC04 |
 | Tên ca sử dụng | Nộp hồ sơ ứng tuyển trực tuyến |
 | Tác nhân thực hiện | Người tìm việc đã đăng nhập hệ thống |
-| Mô tả tóm tắt | Người tìm việc sử dụng hồ sơ trực tuyến đã tạo hoặc tải tệp đính kèm để nộp đơn xin việc vào một bài tuyển dụng cụ thể |
-| Tiền điều kiện | Người tìm việc đã đăng nhập và bài tuyển dụng đang ở trạng thái hoạt động công khai, chưa hết hạn nhận đơn |
-| Hậu điều kiện | Hồ sơ ứng tuyển được ghi nhận vào danh sách tiếp nhận của nhà tuyển dụng và lịch sử nộp đơn của người dùng được cập nhật trạng thái Đã nộp |
-| Luồng sự kiện chính | 1. Người tìm việc xem trang chi tiết của một bài tuyển dụng và nhấn nút Ứng tuyển ngay.<br>2. Hệ thống hiển thị cửa sổ nộp đơn ứng tuyển.<br>3. Người dùng lựa chọn bản hồ sơ trực tuyến đã lưu trên hệ thống hoặc chọn tải lên một tệp lý lịch mới từ máy tính.<br>4. Người dùng soạn thảo nội dung thư giới thiệu bản thân ngắn gọn gửi tới nhà tuyển dụng.<br>5. Người dùng nhấn nút Xác nhận nộp hồ sơ.<br>6. Hệ thống kiểm tra điều kiện ứng tuyển, lưu bản ghi nộp đơn vào kho dữ liệu với trạng thái Đã nộp.<br>7. Hệ thống hiển thị thông báo ứng tuyển thành công và cập nhật bài đăng này vào danh sách lịch sử nộp đơn của người dùng. |
-| Luồng sự kiện thay thế | 6a. Nếu người dùng đã từng nộp hồ sơ vào chính bài đăng này trước đó và đơn cũ vẫn đang trong tiến trình xử lý, hệ thống đưa ra cảnh báo Bạn đã ứng tuyển vị trí này và ngăn chặn việc nộp đơn trùng lặp. |
+| Mô tả tóm tắt | Người tìm việc chọn bản hồ sơ đã lưu hoặc tải tệp .pdf mới, nhập thư giới thiệu, kiểm tra thông tin người nhận và xác nhận gửi đơn ứng tuyển |
+| Tiền điều kiện | Người tìm việc đã đăng nhập; tin tuyển dụng đang ở trạng thái Active và còn hạn nhận hồ sơ |
+| Hậu điều kiện | Bản ghi đơn ứng tuyển mới được lưu vào bảng Applications với trạng thái ban đầu là Đã gửi hồ sơ (Submitted), cấp mã đơn tra cứu và gửi thông báo cho doanh nghiệp sở hữu tin |
+| Luồng sự kiện chính | 1. Tại trang chi tiết tin tuyển dụng, người tìm việc nhấn nút Ứng tuyển ngay.<br>2. Hệ thống mở biểu mẫu chuẩn bị hồ sơ gắn với vị trí và doanh nghiệp của tin đã chọn, điền sẵn thông tin liên hệ từ tài khoản.<br>3. Người tìm việc chọn một bản hồ sơ đã lưu hoặc tải lên tệp .pdf mới (tối đa 5 MB), nhập thư giới thiệu (không bắt buộc, tối đa 2.000 ký tự) và có thể mở xem trước tài liệu.<br>4. Người tìm việc nhấn Kiểm tra hồ sơ để chuyển sang màn hình kiểm tra thông tin người gửi, bản hồ sơ, thư giới thiệu và doanh nghiệp nhận.<br>5. Người tìm việc chủ động đánh dấu vào ô đồng ý chia sẻ thông tin hồ sơ cho doanh nghiệp và nhấn Xác nhận gửi hồ sơ.<br>6. Hệ thống kiểm tra lại tình trạng tin, quyền sở hữu bản hồ sơ và điều kiện chống nộp trùng, sau đó lưu đơn vào bảng Applications với trạng thái Đã gửi hồ sơ (Submitted).<br>7. Hệ thống hiển thị màn hình xác nhận thành công kèm mã đơn tra cứu, thời điểm gửi, tên bản hồ sơ đã nộp và gửi thông báo cho doanh nghiệp. |
+| Luồng sự kiện thay thế | 6a. Nếu ứng viên đã có đơn đang xử lý cho cùng tin tuyển dụng này, hệ thống không tạo đơn mới mà hiển thị thông báo nộp trùng kèm thông tin đơn cũ và nút Mở đơn đã gửi.<br>6b. Nếu tin tuyển dụng vừa chuyển sang trạng thái đóng hoặc hết hạn trong lúc ứng viên đang chuẩn bị, hệ thống thông báo tin đã ngừng nhận hồ sơ, không tạo đơn nhưng vẫn giữ nguyên thông tin liên hệ, tệp hồ sơ và thư giới thiệu trên biểu mẫu để ứng viên chọn vị trí khác. |
 
-Bảng 3.9: Đặc tả ca sử dụng UC05 – Quản lý ứng viên theo phễu tuyển dụng
+Bảng 3.9: Đặc tả ca sử dụng UC05 – Quản lý ứng viên theo giai đoạn xét tuyển
 
 | Thuộc tính ca sử dụng | Nội dung chi tiết |
 | :--- | :--- |
 | Mã ca sử dụng | UC05 |
-| Tên ca sử dụng | Quản lý ứng viên theo phễu tuyển dụng |
-| Tác nhân thực hiện | Nhà tuyển dụng sở hữu bài đăng |
-| Mô tả tóm tắt | Nhà tuyển dụng theo dõi danh sách ứng viên nộp đơn dưới dạng các cột trạng thái phễu, xem hồ sơ, ghi chú và chuyển đổi trạng thái đánh giá |
-| Tiền điều kiện | Nhà tuyển dụng đã đăng nhập và có bài đăng tuyển dụng đã phát sinh hồ sơ nộp về |
-| Hậu điều kiện | Trạng thái của ứng viên trong cơ sở dữ liệu được cập nhật sang giai đoạn mới và hệ thống tự động gửi thông báo kết quả tới ứng viên |
-| Luồng sự kiện chính | 1. Nhà tuyển dụng truy cập vào trang Quản lý ứng viên của một vị trí công việc cụ thể.<br>2. Hệ thống kết xuất giao diện bảng phễu gồm các cột trạng thái: Tiếp nhận mới, Đang xem xét, Hẹn phỏng vấn, Tiếp nhận chính thức và Từ chối.<br>3. Nhà tuyển dụng nhấp vào thẻ của một ứng viên để xem toàn bộ nội dung lý lịch và thư giới thiệu trực tiếp trên màn hình.<br>4. Nhà tuyển dụng nhập ghi chú đánh giá nội bộ của buổi sơ loại.<br>5. Nhà tuyển dụng thực hiện thao tác chuyển thẻ ứng viên sang cột trạng thái mới, ví dụ Hẹn phỏng vấn.<br>6. Hệ thống cập nhật trạng thái bản ghi trong cơ sở dữ liệu, ghi nhận thời điểm thay đổi và tự động tạo thông báo gửi tới tài khoản của ứng viên. |
-| Luồng sự kiện thay thế | 5a. Khi nhà tuyển dụng chọn chuyển ứng viên sang cột Từ chối, hệ thống hiển thị biểu mẫu soạn thảo thư cảm ơn chuẩn mực để nhà tuyển dụng tùy chỉnh nội dung trước khi hệ thống phát đi thông báo chính thức. |
-
-<div style="page-break-after: always;"></div>
+| Tên ca sử dụng | Quản lý ứng viên theo giai đoạn xét tuyển |
+| Tác nhân thực hiện | Nhà tuyển dụng sở hữu tin tuyển dụng |
+| Mô tả tóm tắt | Nhà tuyển dụng tiếp nhận và xử lý các đơn ứng tuyển của một vị trí qua 5 giai đoạn xét tuyển, xem hồ sơ, chấm điểm nội bộ, lập lịch phỏng vấn và phản hồi kết quả |
+| Tiền điều kiện | Nhà tuyển dụng đã đăng nhập và truy cập đúng tin tuyển dụng thuộc quyền sở hữu của doanh nghiệp mình |
+| Hậu điều kiện | Trạng thái đơn ứng tuyển trong bảng Applications được cập nhật, lịch sử thao tác được ghi vào ApplicationHistories và thông báo phản hồi được gửi tới ứng viên |
+| Luồng sự kiện chính | 1. Nhà tuyển dụng mở bảng quản lý ứng viên của một vị trí tuyển dụng.<br>2. Hệ thống hiển thị danh sách đơn ứng tuyển phân theo 5 giai đoạn: Hồ sơ mới nộp, Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc và Chưa phù hợp.<br>3. Nhà tuyển dụng mở thẻ ứng viên để xem bản hồ sơ đã gắn với đơn, thư giới thiệu và mức khớp kỹ năng.<br>4. Nhà tuyển dụng nhập nhận xét hoặc chấm điểm đánh giá nội bộ (InternalRating).<br>5. Nhà tuyển dụng chuyển đơn ứng tuyển sang giai đoạn phù hợp (ví dụ chuyển sang Đạt sơ loại hoặc Mời phỏng vấn kèm thông tin lịch phỏng vấn).<br>6. Hệ thống cập nhật trạng thái đơn trong bảng Applications, ghi người thao tác và thời điểm vào bảng ApplicationHistories, đồng thời gửi thông báo và thư điện tử cho ứng viên. |
+| Luồng sự kiện thay thế | 5a. Nếu hồ sơ chưa đáp ứng yêu cầu ngay từ bước sơ loại hoặc sau phỏng vấn, nhà tuyển dụng chuyển đơn sang giai đoạn Chưa phù hợp mà không bắt buộc phải đi qua tất cả các giai đoạn trung gian; hệ thống hỗ trợ nhập nội dung phản hồi từ chối trước khi gửi thông báo cho ứng viên. |
 
 3.3. Thiết kế hệ thống
 
 3.3.1. Mục tiêu của thiết kế
 
-Thiết kế hệ thống là giai đoạn mang tính bản lề trong quy trình xây dựng phần mềm, giữ vai trò chuyển dịch toàn bộ các đặc tả yêu cầu nghiệp vụ thu được ở giai đoạn trước thành một đồ án kỹ thuật chi tiết làm cơ sở trực tiếp cho công tác lập trình. Khi các yêu cầu phần mềm được phân tích và đặc tả hoàn chỉnh, hoạt động thiết kế là một trong ba hoạt động cốt lõi không thể tách rời nhằm xây dựng và kiểm chứng phần mềm bao gồm: Thiết kế – Lập trình – Kiểm thử.
+Thiết kế hệ thống là giai đoạn chuyển các đặc tả yêu cầu nghiệp vụ đã xác định ở giai đoạn phân tích thành bản thiết kế kỹ thuật chi tiết làm căn cứ trực tiếp cho việc lập trình. Sau khi yêu cầu phần mềm được phân tích và mô hình hóa, thiết kế kết nối chặt chẽ trong chuỗi ba hoạt động kỹ thuật chính của dự án gồm: Thiết kế – Lập trình – Kiểm thử.
 
 [[IMAGE: assets/diagrams/hinh_3_3_1_a_giai_doan_phan_mem.png | Caption: Hình ảnh 3.3.1.a. Các giai đoạn của phần mềm.]]
 
-Dưới góc độ kỹ thuật công nghệ phần mềm, công đoạn thiết kế được phân rã thành các giai đoạn tuần tự nhằm bảo đảm tính toàn vẹn và khả năng kiểm soát chất lượng kỹ thuật cao nhất.
+Trong quy trình công nghệ phần mềm, công đoạn thiết kế được triển khai tuần tự từ kiến trúc tổng thể, cơ sở dữ liệu đến giao diện người dùng nhằm bảo đảm tính nhất quán giữa dữ liệu, quy tắc xử lý và màn hình thao tác.
 
 [[IMAGE: assets/diagrams/hinh_3_3_1_b_quy_trinh_thiet_ke.png | Caption: Hình ảnh 3.3.1.b. Quy trình thiết kế phần mềm.]]
 
-Mục tiêu cụ thể của thiết kế hệ thống bao gồm ba định hướng trọng tâm. Thứ nhất là thiết lập một kiến trúc tổng thể vững chắc theo mô hình ba tầng kết hợp phong cách dịch vụ web chuẩn, bảo đảm sự độc lập hoàn toàn giữa giao diện người dùng, logic nghiệp vụ máy chủ và cơ sở dữ liệu. Thứ hai là xây dựng một cơ sở dữ liệu quan hệ hoàn chỉnh, chuyên nghiệp và đạt chuẩn ba dạng chuẩn với hai mươi tám bảng thực thể nhằm quản lý toàn diện mọi mặt hoạt động của nền tảng tuyển dụng hiện đại, loại bỏ hoàn toàn hiện tượng dư thừa và dị thường dữ liệu. Thứ ba là định hình cấu trúc giao diện người dùng công thái học, trực quan, thân thiện và đáp ứng tối ưu trên đa dạng kích thước màn hình thiết bị.
+Thiết kế hệ thống hướng tới ba mục tiêu cụ thể: thiết lập kiến trúc ba tầng kết hợp giao diện lập trình ứng dụng RESTful API nhằm phân tách rõ tầng giao diện người dùng, tầng xử lý nghiệp vụ máy chủ và tầng cơ sở dữ liệu; xây dựng cơ sở dữ liệu quan hệ đạt dạng chuẩn 3 với 28 bảng dữ liệu để lưu trữ thống nhất thông tin tài khoản, hồ sơ ứng viên, doanh nghiệp, tin tuyển dụng và đơn ứng tuyển, hạn chế dư thừa dữ liệu và sai lệch khi cập nhật; đồng thời thiết kế giao diện người dùng rõ ràng, nhất quán về bố cục và phản hồi để hỗ trợ người tìm việc, nhà tuyển dụng và quản trị viên thao tác chính xác.
 
 3.3.2. Thiết kế kiến trúc
 
-Hệ thống TalentConnect được xây dựng dựa trên hai bản thiết kế kiến trúc cốt lõi:
+Kiến trúc hệ thống TalentConnect thể hiện qua hai sơ đồ cốt lõi:
 
 a. Sơ đồ phân rã chức năng:
-Sơ đồ phân rã toàn bộ hệ thống TalentConnect thành 4 nhánh chức năng nghiệp vụ độc lập: Phân hệ tài khoản và phân quyền; Phân hệ quản lý tin tuyển dụng và tìm kiếm; Phân hệ quản lý hồ sơ năng lực trực tuyến; và Phân hệ quản lý tuyển dụng theo phễu, kiểm duyệt và báo cáo.
+Sơ đồ phân rã chức năng chia hệ thống TalentConnect thành 5 nhánh chức năng nghiệp vụ tương ứng với 5 tiến trình xử lý chính trên sơ đồ luồng dữ liệu mức 0: (1) Quản lý tài khoản và phân quyền; (2) Quản lý hồ sơ trực tuyến; (3) Quản lý tin tuyển dụng và kiểm duyệt; (4) Tìm kiếm, gợi ý và ứng tuyển; (5) Xử lý ứng viên và điều hành hệ thống.
 
 [[IMAGE: assets/diagrams/hinh_3_9_fdd.png | Caption: Hình ảnh 3.3.2.a. Sơ đồ phân rã chức năng.]]
 
 b. Sơ đồ Kiến trúc Tổng thể:
-Hệ thống tuân thủ mô hình kiến trúc ba tầng kết hợp giao thức truyền tải dữ liệu JSON qua giao thức bảo mật HTTPS. Cụ thể, tầng trình diễn được xây dựng bằng ReactJS kết hợp Tailwind CSS, thực hiện giao tiếp bất đồng bộ thông qua thư viện Axios để mang lại trải nghiệm tương tác mượt mà cho người dùng. Tầng nghiệp vụ được phát triển trên nền tảng Node.js và Express.js, đảm nhiệm vai trò định tuyến các giao diện lập trình ứng dụng, xác thực bảo mật bằng mã định danh bảo mật JSON Web Token, đồng thời xử lý logic nghiệp vụ tìm kiếm, bộ lọc đa chiều và quy trình quản lý phễu ứng viên. Tầng dữ liệu sử dụng hệ quản trị cơ sở dữ liệu quan hệ mạnh mẽ kết hợp cùng kho lưu trữ tệp tài liệu số nhằm đảm bảo tính toàn vẹn và khả năng truy xuất dữ liệu an toàn, hiệu quả.
+Hệ thống vận hành theo mô hình kiến trúc ba tầng, trao đổi dữ liệu định dạng JSON qua giao thức HTTPS. Tầng trình diễn sử dụng thư viện ReactJS kết hợp Tailwind CSS, gửi và nhận dữ liệu bất đồng bộ qua thư viện Axios để cập nhật danh sách việc làm, bộ lọc và biểu mẫu mà không phải tải lại toàn bộ trang. Tầng nghiệp vụ chạy trên nền tảng Node.js và Express.js, đảm nhận định tuyến các điểm cuối RESTful API, xác thực phiên đăng nhập bằng mã JWT, kiểm tra phân quyền theo vai trò và thực thi các quy tắc nghiệp vụ như tìm kiếm đa điều kiện, đối chiếu kỹ năng gợi ý, kiểm tra điều kiện nộp đơn và quản lý trạng thái ứng viên. Tầng dữ liệu sử dụng hệ quản trị cơ sở dữ liệu quan hệ Microsoft SQL Server 2022 kết hợp thư mục lưu trữ tệp PDF hồ sơ trên máy chủ nhằm bảo đảm toàn vẹn dữ liệu và kiểm soát quyền truy xuất tài liệu.
 
 [[IMAGE: assets/diagrams/hinh_3_10_architecture.png | Caption: Hình ảnh 3.3.2.b. Sơ đồ kiến trúc tổng thể.]]
 
@@ -766,7 +829,7 @@ Hệ thống tuân thủ mô hình kiến trúc ba tầng kết hợp giao thứ
 
 a. Phân tích thực thể và mối quan hệ:
 
-Để xây dựng một hệ thống tuyển dụng và tìm kiếm việc làm đạt chuẩn doanh nghiệp tương tự như các nền tảng lớn trên thị trường, hệ thống TalentConnect được thiết kế với 28 thực thể phân chia thành sáu phân vùng nghiệp vụ liên kết chặt chẽ. Phân vùng thứ nhất là Quản trị tài khoản và phân quyền bảo mật gồm bảy bảng Roles, Permissions, RolePermissions, Users, UserRoles, UserSessions, AuditLogs. Phân vùng thứ hai là Hồ sơ ứng viên và danh mục năng lực gồm bảy bảng Candidates, CandidateEducations, CandidateExperiences, CandidateSkills, CandidateCertificates, CandidateProjects, Resumes. Phân vùng thứ ba là Đơn vị tuyển dụng và danh mục dùng chung gồm bốn bảng Employers, CompanyLocations, Categories, Skills. Phân vùng thứ tư là Tin tuyển dụng và yêu cầu công việc gồm hai bảng Jobs, JobSkills. Phân vùng thứ năm là Quy trình tuyển dụng và quản lý phễu ứng viên gồm ba bảng Applications, ApplicationHistories, Interviews. Phân vùng thứ sáu là Tương tác, giữ chân người dùng và đánh giá gồm năm bảng SavedJobs, FollowedCompanies, CompanyReviews, JobAlerts, Notifications.
+Cơ sở dữ liệu của TalentConnect gồm 28 bảng quan hệ đạt dạng chuẩn 3, chia thành sáu nhóm nghiệp vụ: Nhóm thứ nhất là Quản trị tài khoản và phân quyền gồm bảy bảng Roles, Permissions, RolePermissions, Users, UserRoles, UserSessions, AuditLogs. Nhóm thứ hai là Hồ sơ ứng viên và danh mục năng lực gồm bảy bảng Candidates, CandidateEducations, CandidateExperiences, CandidateSkills, CandidateCertificates, CandidateProjects, Resumes. Nhóm thứ ba là Đơn vị tuyển dụng và danh mục dùng chung gồm bốn bảng Employers, CompanyLocations, Categories, Skills. Nhóm thứ tư là Tin tuyển dụng và yêu cầu công việc gồm hai bảng Jobs, JobSkills. Nhóm thứ năm là Ứng tuyển và xử lý hồ sơ gồm ba bảng Applications, ApplicationHistories, Interviews. Nhóm thứ sáu là Tương tác, lưu trữ và thông báo gồm năm bảng SavedJobs, FollowedCompanies, CompanyReviews, JobAlerts, Notifications.
 
 b. Thiết kế biểu đồ thực thể quan hệ:
 
@@ -839,7 +902,7 @@ Bảng 3.16: Bảng Nhật ký thao tác hệ thống
 
 | Tên cột dữ liệu | Kiểu dữ liệu | Khóa | Cho phép rỗng | Diễn giải chi tiết |
 | :--- | :--- | :---: | :---: | :--- |
-| LogID | BIGINT | Khóa chính | Không | Mã số nhật ký kiểm toán, tự động tăng |
+| LogID | BIGINT | Khóa chính | Không | Mã nhật ký thao tác, tự động tăng |
 | UserID | INT | Khóa ngoại | Có | Khóa ngoại tham chiếu tài khoản thực hiện thao tác |
 | ActionType | VARCHAR(50) | | Không | Loại hành động gồm LOGIN, CREATE_JOB, APPROVE_EMPLOYER, DELETE_USER |
 | EntityName | VARCHAR(50) | | Không | Tên bảng dữ liệu bị tác động |
@@ -862,7 +925,7 @@ Bảng 3.17: Bảng Hồ sơ người tìm việc
 | CurrentPosition | NVARCHAR(100) | | Có | Chức danh công việc hiện tại |
 | DesiredSalaryMin | DECIMAL(12,2)| | Có | Mức lương mong muốn tối thiểu |
 | DesiredSalaryMax | DECIMAL(12,2)| | Có | Mức lương mong muốn tối đa |
-| IsOpenForWork | BIT | | Không | Trạng thái bật chế độ tìm việc để nhà tuyển dụng săn đón |
+| IsOpenForWork | BIT | | Không | Trạng thái nhận gợi ý việc làm phù hợp trên hệ thống |
 | BioSummary | NVARCHAR(MAX) | | Có | Tóm tắt mục tiêu và thế mạnh bản thân |
 
 Bảng 3.18: Bảng Lịch sử học vấn ứng viên 
@@ -1025,28 +1088,28 @@ Bảng 3.29: Bảng Kỹ năng yêu cầu của tin tuyển dụng
 | JobID | INT | Khóa ngoại | Không | Khóa ngoại tham chiếu bảng Jobs |
 | SkillID | INT | Khóa ngoại | Không | Khóa ngoại tham chiếu bảng Skills |
 | IsRequired | BIT | | Không | Cờ xác định kỹ năng bắt buộc hay ưu tiên |
-| PriorityWeight | INT | | Không | Trọng số ưu tiên phục vụ thuật toán so khớp độ phù hợp |
+| PriorityWeight | INT | | Không | Trọng số ưu tiên của kỹ năng dùng để tính mức khớp |
 
 Bảng 3.30: Bảng Đơn ứng tuyển 
 
 | Tên cột dữ liệu | Kiểu dữ liệu | Khóa | Cho phép rỗng | Diễn giải chi tiết |
 | :--- | :--- | :---: | :---: | :--- |
-| ApplicationID | INT | Khóa chính | Không | Mã định danh đơn ứng tuyển, tự động tăng |
-| JobID | INT | Khóa ngoại | Không | Khóa ngoại tham chiếu bài đăng tuyển dụng |
-| CandidateID | INT | Khóa ngoại | Không | Khóa ngoại tham chiếu người tìm việc nộp đơn |
-| ResumeID | INT | Khóa ngoại | Không | Khóa ngoại tham chiếu bản lý lịch được sử dụng |
-| CoverLetter | NVARCHAR(MAX) | | Có | Thư giới thiệu bản thân gửi nhà tuyển dụng |
-| ApplicationStatus| VARCHAR(20) | | Không | Trạng thái phễu gồm Submitted, Viewed, Interview, Offered, Accepted, Rejected |
-| MatchScore | DECIMAL(5,2) | | Có | Điểm tương thích hồ sơ theo thang từ 0 đến 100% |
-| InternalRating | INT | | Có | Đánh giá xếp hạng nội bộ theo thang từ 1 đến 5 sao |
+| ApplicationID | INT | Khóa chính | Không | Mã đơn ứng tuyển, tự động tăng |
+| JobID | INT | Khóa ngoại | Không | Mã tin được chọn (tham chiếu bảng Jobs) |
+| CandidateID | INT | Khóa ngoại | Không | Mã ứng viên gửi (tham chiếu bảng Candidates) |
+| ResumeID | INT | Khóa ngoại | Không | Mã bản hồ sơ đã gửi (tham chiếu bảng Resumes) |
+| CoverLetter | NVARCHAR(MAX) | | Có | Thư giới thiệu gửi kèm đơn ứng tuyển |
+| ApplicationStatus| VARCHAR(20) | | Không | Trạng thái xử lý đơn: Submitted (Đã gửi hồ sơ), Viewed, Interview, Offered, Accepted, Rejected |
+| MatchScore | DECIMAL(5,2) | | Có | Mức khớp kỹ năng (từ 0 đến 100%) |
+| InternalRating | INT | | Có | Điểm đánh giá nội bộ của doanh nghiệp (từ 1 đến 5) |
 | AppliedAt | DATETIME | | Không | Thời điểm gửi đơn ứng tuyển |
-| UpdatedAt | DATETIME | | Không | Thời điểm cập nhật trạng thái mới nhất |
+| UpdatedAt | DATETIME | | Không | Thời điểm cập nhật trạng thái gần nhất |
 
 Bảng 3.31: Bảng Lịch sử chuyển trạng thái hồ sơ 
 
 | Tên cột dữ liệu | Kiểu dữ liệu | Khóa | Cho phép rỗng | Diễn giải chi tiết |
 | :--- | :--- | :---: | :---: | :--- |
-| HistoryID | INT | Khóa chính | Không | Mã định danh lịch sử phễu, tự động tăng |
+| HistoryID | INT | Khóa chính | Không | Mã định danh lịch sử chuyển trạng thái, tự động tăng |
 | ApplicationID | INT | Khóa ngoại | Không | Khóa ngoại tham chiếu bảng Applications |
 | FromStatus | VARCHAR(20) | | Không | Trạng thái trước khi chuyển đổi |
 | ToStatus | VARCHAR(20) | | Không | Trạng thái mới sau khi chuyển đổi |
@@ -1130,171 +1193,335 @@ Bảng 3.37: Bảng Thông báo hệ thống
 | IsRead | BIT | | Không | Cờ xác định đã đọc hay chưa |
 | CreatedAt | DATETIME | | Không | Thời điểm phát đi thông báo |
 
+d. Thiết kế dữ liệu chuyên sâu phục vụ tìm kiếm, gợi ý kỹ năng và nộp hồ sơ ứng tuyển:
+
+Trên nền tảng 28 bảng dữ liệu của toàn hệ thống, nhóm các bảng trực tiếp tham gia vào luồng tìm kiếm, gợi ý kỹ năng và tiếp nhận đơn ứng tuyển liên kết chặt chẽ với nhau về mối quan hệ và ràng buộc toàn vẹn như sau:
+
+[[IMAGE: assets/diagrams/hinh_3_11_b_erd_apply.png | Caption: Hình ảnh 3.3.3.b. Quan hệ dữ liệu phục vụ ứng tuyển.]]
+
+Sơ đồ dùng ký hiệu chân quạ: hai vạch là đúng một; vòng tròn và một vạch là không hoặc một; vòng tròn và chân quạ là không hoặc nhiều. PK chỉ khóa chính, FK chỉ khóa ngoại. Các tên trường trong sơ đồ là tên dùng trong cơ sở dữ liệu. Một ứng viên có thể lưu nhiều hồ sơ và nộp nhiều đơn. Mỗi đơn gắn với đúng một ứng viên, một tin và một bản hồ sơ. Một doanh nghiệp có thể đăng nhiều tin; doanh nghiệp nhận đơn được xác định từ tin mà ứng viên đã chọn. Một tài khoản có thể nhận nhiều thông báo.
+
+Trên sơ đồ quan hệ của luồng tiếp nhận đơn, bảng tài khoản Users lưu địa chỉ thư điện tử, số điện thoại và tình trạng truy cập; bảng Candidates lưu thông tin người tìm việc; bảng Employers lưu thông tin đơn vị tuyển dụng. Mỗi ứng viên hoặc doanh nghiệp gắn với một tài khoản qua khóa ngoại UserID, giúp phần mềm xác định chính xác người gửi hồ sơ và người nhận thông báo từ phiên đăng nhập mà không yêu cầu người dùng tự nhập mã nội bộ.
+
+Bảng Resumes lưu từng bản hồ sơ mà ứng viên chuẩn bị, còn bảng Applications ghi nhận mã bản hồ sơ được dùng cho một lần nộp đơn cụ thể. Bản hồ sơ được chọn phải thuộc đúng ứng viên đang nộp đơn, và doanh nghiệp chỉ có quyền đọc đơn khi sở hữu tin tuyển dụng nhận đơn đó; việc biết mã đơn của doanh nghiệp khác không đủ điều kiện để truy cập tệp hồ sơ.
+
+Nội dung hồ sơ đã nộp luôn được giữ nguyên theo từng đơn ứng tuyển. Khi ứng viên chỉnh sửa hồ sơ cho lần ứng tuyển sau, phần mềm tạo bản ghi mới, còn đơn cũ tiếp tục tham chiếu về bản đã gửi để nhà tuyển dụng và ứng viên luôn xem cùng một tài liệu.
+
+Bảng Notifications lưu mã tài khoản nhận, tiêu đề, nội dung, loại thông báo và mã tham chiếu ReferenceID. Mã tham chiếu này giúp mở đúng đơn ứng tuyển hoặc lịch phỏng vấn khi người nhận nhấn vào thông báo; vì có thể trỏ đến nhiều bảng nghiệp vụ khác nhau nên trường này không vẽ thành khóa ngoại cứng chỉ nối vào bảng đơn ứng tuyển.
+
+[[IMAGE: assets/diagrams/hinh_3_11_c_erd_skills.png | Caption: Hình ảnh 3.3.3.c. Đối chiếu kỹ năng ứng viên với kỹ năng yêu cầu.]]
+
+Danh mục kỹ năng dùng chung Skills giúp hai bên đối chiếu trên cùng một hệ mã kỹ năng SkillID. Bảng CandidateSkills lưu các kỹ năng ứng viên đã khai báo, còn bảng JobSkills lưu các kỹ năng mà tin tuyển dụng yêu cầu kèm trọng số ưu tiên PriorityWeight. Mỗi dòng dữ liệu gắn với một kỹ năng xác định; một kỹ năng có thể xuất hiện ở nhiều hồ sơ ứng viên và nhiều tin tuyển dụng. Cấu trúc này cho phép hệ thống tính tỷ lệ khớp theo trọng số và chỉ rõ kỹ năng nào đã khớp, kỹ năng nào chưa khai báo thay vì chỉ đưa ra một con số tổng hợp.
+
+Tại bảng đơn ứng tuyển Applications (Bảng 3.30), trạng thái ban đầu khi nộp đơn là Đã gửi hồ sơ. Các trạng thái tiếp theo do doanh nghiệp cập nhật gồm Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc, Nhận việc hoặc Chưa phù hợp; thao tác nhấn gửi của ứng viên không tự gán kết quả tuyển chọn hay điểm đánh giá nội bộ.
+
+Về nguồn dữ liệu phục vụ giao diện, bảng Jobs cung cấp tiêu đề, số lượng cần tuyển, mô tả nhiệm vụ, yêu cầu, quyền lợi, khoảng lương, hình thức làm việc, kinh nghiệm, hạn nhận đơn và trạng thái tin; địa điểm làm việc, ngành nghề và tên pháp nhân được nối từ các bảng CompanyLocations, Categories và Employers. Khi ứng viên nhấn lưu tin để xem lại, bảng SavedJobs ghi nhận cặp mã ứng viên và mã tin cùng thời điểm lưu mà chưa tạo đơn ứng tuyển. Bản hồ sơ trong bảng Resumes cung cấp tên tệp, đường dẫn lưu trữ và ngày cập nhật; dung lượng và số trang được đọc trực tiếp từ tệp PDF để hiển thị trên màn hình kiểm tra. Khi ứng viên tải tệp PDF mới, tệp phải được lưu vào bảng Resumes trước khi gắn mã hồ sơ vào đơn ứng tuyển.
+
 ---
 
 3.3.4. Thiết kế giao diện người dùng
 
-Thiết kế giao diện hệ thống TalentConnect tuân thủ nghiêm ngặt chuẩn mực trực quan, nhất quán, tiện dụng và tối ưu hóa thao tác người dùng. Toàn bộ các màn hình chức năng được phân tích và thiết kế chi tiết như sau:
+Giao diện hệ thống TalentConnect giữ logo TalentConnect, nền trắng, nút cam đỏ, thẻ vàng, tím, xanh nhạt và khối xanh đen. Từng màn hình được phân tích theo mục tiêu, thao tác, phản hồi, cách xử lý lỗi và lý do thiết kế để phục vụ đúng quá trình tìm việc, ứng tuyển và quản lý tuyển dụng.
+
+Thiết kế tham khảo cách tìm việc của TopCV và quy trình ứng tuyển của Indeed; đồng thời vận dụng nguyên tắc phản hồi trạng thái, quyền chủ động kiểm soát của người dùng, phòng tránh lỗi nhập liệu của Nielsen và hướng dẫn thiết kế biểu mẫu nhiều bước của W3C WAI. Các tiêu chí ở từng màn hình dùng để đánh giá bản thiết kế theo quy trình TalentConnect, chưa phải kết quả thử nghiệm với người dùng.
+
+Trong luồng tìm kiếm, gợi ý và nộp hồ sơ ứng tuyển, tình huống dữ liệu minh họa xuyên suốt sử dụng ứng viên Nguyễn Minh Anh có mã ứng viên 17, tìm vị trí Frontend Developer tại Hà Nội, lương tối thiểu 14 triệu đồng, hình thức toàn thời gian, chọn tin của FPT Software có mã tin 241, sử dụng bản hồ sơ CV_MinhAnh_Frontend_2026.pdf có mã hồ sơ 41, đạt mức khớp kỹ năng 88% và nhận mã đơn TC-000381. Ứng viên tìm tin, đọc chi tiết, chọn hồ sơ đã lưu hoặc tải mới, kiểm tra rồi xác nhận gửi. Xem trước là tùy chọn; MH03 và MH04 thuộc cùng bước chuẩn bị. Tình huống phát sinh được xử lý tại bước tương ứng. Nếu cần đăng nhập, hệ thống giữ tin đang chọn để tiếp tục ứng tuyển.
+
+Bảng 3.38: Bảng tổng hợp 22 màn hình giao diện người dùng của hệ thống TalentConnect
+
+| Ký hiệu | Tên màn hình giao diện | Nhóm tác nhân sử dụng | Mục đích và chức năng nghiệp vụ chính |
+| :---: | :--- | :--- | :--- |
+| 3.3.4.a | Màn hình Trang chủ | Khách vãng lai, Người tìm việc | Tra cứu nhanh việc làm theo từ khóa, ngành nghề, địa điểm và xem tin nổi bật |
+| 3.3.4.b | Màn hình Đăng nhập và Đăng ký | Toàn bộ người dùng | Xác thực định danh, đăng ký tài khoản theo vai trò và khôi phục phiên làm việc |
+| 3.3.4.c | Màn hình Tạo hồ sơ trực tuyến | Người tìm việc | Biên soạn hồ sơ năng lực cấu trúc, khai báo kỹ năng và kết xuất tệp PDF khổ A4 |
+| 3.3.4.d | Tìm kiếm và kết quả phù hợp (MH01) | Người tìm việc | Lọc đa tiêu chí, xem gợi ý mức khớp kỹ năng (MatchScore) và lưu tin tuyển dụng |
+| 3.3.4.e | Chi tiết tin tuyển dụng - Phần đầu (MH02) | Người tìm việc | Xem thông tin công việc, pháp lý doanh nghiệp và bảng đối chiếu kỹ năng chi tiết |
+| 3.3.4.f | Chi tiết tin tuyển dụng - Khi cuộn (MH02) | Người tìm việc | Đọc yêu cầu, quyền lợi, địa điểm làm việc và kích hoạt biểu mẫu ứng tuyển |
+| 3.3.4.g | Chọn hồ sơ đã lưu và nhập thư (MH03) | Người tìm việc | Chọn bản hồ sơ PDF đã lưu, kiểm tra thông tin liên hệ và soạn thư giới thiệu |
+| 3.3.4.h | Tải hồ sơ mới từ máy tính (MH04) | Người tìm việc | Tải tệp PDF mới tối đa 5 MB, kiểm tra định dạng và thao tác xem, thay, xóa tệp |
+| 3.3.4.i | Xem trước bản hồ sơ sẽ gửi (MH05) | Người tìm việc | Đọc trực tiếp nội dung tệp PDF trong trình xem tài liệu trước khi xác nhận nộp |
+| 3.3.4.k | Kiểm tra và xác nhận gửi hồ sơ (MH06) | Người tìm việc | Đối chiếu lần cuối người gửi, bản hồ sơ, thư giới thiệu và xác nhận chia sẻ dữ liệu |
+| 3.3.4.l | Xác nhận ứng tuyển thành công (MH07) | Người tìm việc | Nhận mã đơn ứng tuyển (TC-000381), thời điểm gửi và trạng thái tiếp nhận ban đầu |
+| 3.3.4.m | Không có việc làm phù hợp (MH08) | Người tìm việc | Giữ nguyên điều kiện lọc hiện tại và hỗ trợ nới lỏng từng tiêu chí để tìm lại |
+| 3.3.4.n | Thông báo đơn ứng tuyển bị trùng (MH09) | Người tìm việc | Cảnh báo đã có đơn đang xử lý cho cùng vị trí và dẫn tới đơn đã ghi nhận |
+| 3.3.4.o | Tin đóng trong lúc chuẩn bị hồ sơ (MH10) | Người tìm việc | Thông báo tin ngừng nhận đơn, bảo toàn nội dung đã nhập và gợi ý việc tương tự |
+| 3.3.4.p | Quản lý đơn đã ứng tuyển và Lịch phỏng vấn | Người tìm việc | Theo dõi tiến trình xét duyệt 5 giai đoạn và xác nhận lịch hẹn phỏng vấn |
+| 3.3.4.q | Quản lý hồ sơ pháp lý và Địa điểm công ty | Nhà tuyển dụng | Cập nhật mã số thuế, giấy phép kinh doanh PDF và danh sách chi nhánh làm việc |
+| 3.3.4.r | Soạn thảo và gửi duyệt tin tuyển dụng mới | Nhà tuyển dụng | Nhập nội dung tin tuyển dụng và thiết lập kỹ năng bắt buộc, ưu tiên kèm trọng số |
+| 3.3.4.s | Bảng quản lý ứng viên theo 5 giai đoạn | Nhà tuyển dụng | Sàng lọc hồ sơ ứng viên trực quan theo 5 cột trạng thái và ghi vết chuyển bước |
+| 3.3.4.t | Chi tiết đơn, Chấm điểm và Đặt lịch phỏng vấn | Nhà tuyển dụng | Đọc CV ứng viên, chấm điểm nội bộ (InternalRating) và tạo lịch hẹn phỏng vấn |
+| 3.3.4.u | Hàng đợi đối soát pháp lý và Duyệt tin đăng | Cán bộ kiểm duyệt | Kiểm tra pháp lý doanh nghiệp, rà soát nội dung tin chờ duyệt và phê duyệt/từ chối |
+| 3.3.4.v | Bảng điều khiển Quản trị và Thống kê hệ thống | Quản trị viên hệ thống | Giám sát số liệu vận hành, quản lý tài khoản, danh mục dùng chung và nhật ký hệ thống |
+
+Toàn bộ các màn hình chức năng của hệ thống được phân tích và thiết kế chi tiết như sau:
 
 a. Màn hình Trang chủ:
 
-Màn hình chính là trung tâm điều khiển tiếp nhận người dùng với thanh tìm kiếm việc làm nổi bật ngay tại vị trí trung tâm, tích hợp các bộ lọc nhanh theo từ khóa, ngành nghề và khu vực địa lý. Phía dưới là danh mục các nhóm ngành nghề trọng điểm được minh họa bằng các biểu tượng trực quan, cùng danh sách các vị trí việc làm hấp dẫn mới nhất được tự động cập nhật, giúp người tìm việc dễ dàng tiếp cận cơ hội nghề nghiệp ngay từ lần đầu truy cập mà không cần đăng nhập.
+[[IMAGE: assets/diagrams/hinh_3_12_ui_home.png | Caption: Hình ảnh 3.3.4.a. Màn hình Trang chủ hệ thống TalentConnect.]]
 
-[[IMAGE: assets/diagrams/hinh_3_12_ui_home.png | Caption: Hình ảnh 3.3.4.a. Màn hình chính.]]
+Màn hình Trang chủ cung cấp thanh tìm kiếm việc làm tại vị trí đầu trang, cho phép nhập từ khóa chức danh hoặc kỹ năng kết hợp chọn ngành nghề và địa điểm làm việc. Phía dưới trình bày danh mục các nhóm ngành nghề phổ biến và danh sách các tin tuyển dụng đang hoạt động, còn hạn nhận hồ sơ để khách chưa đăng nhập cũng có thể tra cứu và đọc tin công khai trước khi quyết định đăng nhập để lưu tin hoặc ứng tuyển.
 
 b. Màn hình Đăng nhập và Đăng ký:
 
-Giao diện định danh và xác thực người dùng cho phép chuyển đổi vai trò linh hoạt giữa Người tìm việc và Nhà tuyển dụng trên cùng một biểu mẫu hiện đại. Hệ thống tích hợp đầy đủ các cơ chế xác thực an toàn bao gồm mã hóa mật khẩu một chiều bcrypt, cấp phát chuỗi khóa định danh bảo mật phiên làm việc, tính năng gửi liên kết xác thực thư điện tử kích hoạt tài khoản và quy trình cấp lại mật khẩu quên thông qua mã xác thực một lần.
+[[IMAGE: assets/diagrams/hinh_3_16_ui_auth.png | Caption: Hình ảnh 3.3.4.b. Màn hình Đăng nhập và Đăng ký tài khoản.]]
 
-[[IMAGE: assets/diagrams/hinh_3_16_ui_auth.png | Caption: Hình ảnh 3.3.4.b. Màn hình Đăng nhập và Đăng ký.]]
+Giao diện xác thực người dùng cho phép chọn vai trò Người tìm việc hoặc Nhà tuyển dụng khi đăng ký tài khoản mới và đăng nhập vào hệ thống. Biểu mẫu kiểm tra định dạng thư điện tử, độ dài mật khẩu và hiển thị thông báo lỗi ngay tại trường nhập liệu khi thông tin chưa hợp lệ. Sau khi đăng nhập thành công, hệ thống cấp phiên làm việc và đưa người dùng về đúng trang hoặc vị trí tuyển dụng đang xem trước đó.
 
-c. Màn hình Tạo hồ sơ trực tuyến:
+c. Màn hình Tạo và quản lý hồ sơ trực tuyến:
 
-Giao diện biên soạn hồ sơ trực quan được thiết kế theo bố cục chia đôi màn hình độc đáo. Cột bên trái cung cấp các khối biểu mẫu nhập liệu có cấu trúc gồm thông tin cá nhân, mục tiêu nghề nghiệp, quá trình học vấn, kinh nghiệm làm việc, kỹ năng chuyên môn và chứng chỉ; trong khi cột bên phải liên tục cập nhật và hiển thị trực tiếp tệp tài liệu A4 theo thời gian thực. Người dùng có thể linh hoạt chuyển đổi giữa nhiều mẫu giao diện chuyên nghiệp và kết xuất tệp tài liệu số định dạng PDF đạt chuẩn in ấn.
+[[IMAGE: assets/diagrams/hinh_3_13_ui_cv_builder.png | Caption: Hình ảnh 3.3.4.c. Màn hình Tạo hồ sơ trực tuyến và xuất tệp PDF.]]
 
-[[IMAGE: assets/diagrams/hinh_3_13_ui_cv_builder.png | Caption: Hình ảnh 3.3.4.c. Màn hình Tạo hồ sơ trực tuyến.]]
+Giao diện biên soạn hồ sơ chia thành hai phần: bên trái là các biểu mẫu nhập thông tin cá nhân, mục tiêu nghề nghiệp, học vấn, kinh nghiệm làm việc, kỹ năng chuyên môn và dự án; bên phải là khung xem trước bản trình bày khổ A4. Ứng viên Nguyễn Minh Anh có thể cập nhật thông tin, chọn mẫu trình bày và xuất thành bản hồ sơ PDF như tệp CV_MinhAnh_Frontend_2026.pdf lưu trong kho hồ sơ cá nhân để sử dụng khi ứng tuyển.
 
-d. Màn hình Tìm kiếm và Bộ lọc việc làm đa chiều:
+d. Màn hình Tìm kiếm và kết quả phù hợp (MH01):
 
-Giao diện tìm kiếm việc làm chuyên sâu được tổ chức hai cột công thái học. Cột bên trái trang bị bộ công cụ lọc tiêu chí đa chiều cho phép người dùng sàng lọc việc làm chính xác theo mức lương kỳ vọng, cấp bậc chuyên môn, loại hình hợp đồng, ngành nghề và tỉnh thành; cột bên phải hiển thị danh sách các thẻ việc làm kèm thông tin tóm tắt và cơ chế phân trang tối ưu. Người dùng có thể nhấn lưu việc làm yêu thích hoặc bấm nộp đơn ứng tuyển nhanh chóng.
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh01_tim_kiem.png | Caption: Hình ảnh 3.3.4.d. Danh sách việc làm, bộ lọc và gợi ý kỹ năng (MH01).]]
 
-[[IMAGE: assets/diagrams/hinh_3_14_ui_search_jobs.png | Caption: Hình ảnh 3.3.4.d. Màn hình Tìm kiếm và Bộ lọc việc làm đa chiều.]]
+Màn hình giúp ứng viên thu hẹp danh sách và so sánh các vị trí trước khi đọc chi tiết. Người dùng nhập từ khóa, chọn địa điểm rồi nhấn Tìm kiếm; các điều kiện bên phải được thực hiện khi nhấn Áp dụng bộ lọc. Sau mỗi lần tìm, tổng số kết quả, nhãn điều kiện và danh sách phải cùng phản ánh lựa chọn đã áp dụng. Thay đổi điều kiện đưa kết quả về trang đầu để tránh bỏ sót tin; chuyển trang hoặc đổi thứ tự vẫn giữ bộ lọc. Các dòng tin đặt tên vị trí, doanh nghiệp, lương và kinh nghiệm ở vị trí nhất quán, giảm việc mở nhiều trang chỉ để so sánh. Ba thẻ phía trên gợi ý các tin có mức khớp kỹ năng cao trong kết quả hiện tại. Tỷ lệ 88% thể hiện đối chiếu kỹ năng, không phải xác suất được tuyển. Nhấn Lưu tin đổi trạng thái thành Đã lưu; nhấn tên vị trí hoặc Xem chi tiết mở MH02. Khi quay lại, từ khóa và điều kiện được giữ. Dấu x chỉ bỏ điều kiện tương ứng.
 
-e. Màn hình Bảng phễu quản lý ứng viên:
+e. Màn hình Xem chi tiết tin tuyển dụng - Phần đầu trang và thông tin doanh nghiệp (MH02):
 
-Trung tâm điều phối quy trình tuyển dụng dành riêng cho nhà tuyển dụng, được tổ chức trực quan theo mô hình bảng Kanban gồm 5 cột trạng thái nằm ngang: Hồ sơ mới nộp, Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc và Chưa phù hợp. Chuyên viên nhân sự có thể thực hiện thao tác kéo thả thẻ ứng viên linh hoạt giữa các giai đoạn phễu, xem trước nhanh hồ sơ lý lịch, chấm điểm đánh giá năng lực nội bộ và kích hoạt hệ thống tự động gửi thư điện tử thông báo trạng thái tới ứng viên.
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh02_chi_tiet_dau.png | Caption: Hình ảnh 3.3.4.e. Phần đầu trang công việc và thông tin doanh nghiệp (MH02).]]
 
-[[IMAGE: assets/diagrams/hinh_3_15_ui_kanban_ats.png | Caption: Hình ảnh 3.3.4.e. Màn hình Bảng phễu quản lý ứng viên.]]
+Màn hình hỗ trợ quyết định có tiếp tục ứng tuyển hay không. Tên vị trí và doanh nghiệp được đặt trước lương, địa điểm, kinh nghiệm và hạn nhận hồ sơ để ứng viên xác định đúng công việc ngay khi mở tin. Khối doanh nghiệp cho biết đơn vị tuyển dụng; nhãn Đã xác thực thể hiện tình trạng xác thực của đơn vị, không thay thế việc đọc và cân nhắc điều kiện tuyển dụng. Nội dung nhiệm vụ được trình bày bên trái; phần kỹ năng bên phải giúp đối chiếu khả năng của ứng viên với yêu cầu. Tỷ lệ 88% đi cùng danh sách ba kỹ năng đã khai báo và một kỹ năng chưa khai báo, giúp hiểu cơ sở gợi ý thay vì chỉ nhìn một con số. Nhãn chữ vẫn cần rõ khi không phân biệt được màu. Thanh ứng tuyển giữ tên tin và hành động chính trong tầm nhìn khi cuộn. Nhấn Ứng tuyển ngay chuyển đến bước chuẩn bị hồ sơ của chính tin này; chưa gửi thông tin cho doanh nghiệp. Nếu chưa đăng nhập, ứng viên được đưa trở lại sau khi đăng nhập.
 
-f. Màn hình Bảng điều khiển Quản trị viên:
+f. Màn hình Xem chi tiết tin tuyển dụng khi cuộn xuống (MH02 tiếp):
 
-Bảng điều khiển điều hành trung tâm dành cho Quản trị viên và Cán bộ kiểm duyệt hệ thống, cung cấp các biểu đồ thống kê trực quan về các chỉ số hiệu suất vận hành chính theo thời gian thực như số người dùng mới, số tin đăng tuyển, số lượt ứng tuyển; đồng thời tích hợp hàng đợi thẩm định hồ sơ pháp lý doanh nghiệp và công cụ kiểm duyệt nội dung tin bài phòng chống tin rác và lừa đảo.
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh02_chi_tiet_cuon.png | Caption: Hình ảnh 3.3.4.f. Phần yêu cầu, quyền lợi, địa điểm và cách ứng tuyển trên cùng trang (MH02 khi cuộn xuống).]]
 
-[[IMAGE: assets/diagrams/hinh_3_17_ui_admin_dashboard.png | Caption: Hình ảnh 3.3.4.f. Màn hình Bảng điều khiển Quản trị viên.]]
+Hình thể hiện phần tiếp theo của MH02 khi cuộn, không phải một bước ứng tuyển mới. Các nhóm yêu cầu, quyền lợi, địa điểm, thời gian làm việc và cách thức ứng tuyển giúp ứng viên kiểm tra những điều kiện ảnh hưởng trực tiếp đến quyết định nộp đơn. Chẳng hạn, kinh nghiệm tối thiểu, làm tại văn phòng và khung giờ làm việc cần được đọc cùng nhau; mức khớp kỹ năng cao chưa đủ để kết luận công việc phù hợp. Tên vị trí, doanh nghiệp và thanh ứng tuyển giữ ngữ cảnh để người dùng không nhầm sang tin khác sau khi đọc nội dung dài. Nhấn lưu chỉ đánh dấu tin; nhấn Ứng tuyển ngay mới mở biểu mẫu. Phần cách thức ứng tuyển giải thích cần chọn hồ sơ và kiểm tra trước khi xác nhận, giúp dự đoán bước tiếp theo. Nếu tin đã đóng hoặc hết hạn, giao diện phải nêu trạng thái và ngừng cho bắt đầu gửi hồ sơ. Trường hợp tin thay đổi sau lúc đọc được kiểm tra lại khi xác nhận.
+
+g. Màn hình Chọn hồ sơ đã lưu và nhập thư giới thiệu (MH03):
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh03_chon_ho_so.png | Caption: Hình ảnh 3.3.4.g. Thông tin liên hệ, lựa chọn bản hồ sơ và thư giới thiệu (MH03).]]
+
+MH03 là bước chuẩn bị hồ sơ; chỉ báo Hồ sơ, Kiểm tra, Hoàn tất giúp ứng viên biết còn bước xác nhận phía sau. Khối vị trí bên phải nhắc lại doanh nghiệp nhận hồ sơ trong suốt thao tác. Thông tin liên hệ được điền từ tài khoản để giảm nhập lại; nút Chỉnh sửa cho phép kiểm tra và sửa dữ liệu dùng cho đơn này. Danh sách hồ sơ cho chọn một bản, thể hiện bằng dấu chọn và nền nổi bật. Tên tệp, dung lượng, ngày cập nhật và nhãn bản mặc định giúp phân biệt hai phiên bản; bản mặc định vẫn phải được ứng viên kiểm tra. Xem trước mở MH05 để đọc đúng tệp đang cân nhắc. Thư giới thiệu không bắt buộc; bộ đếm thể hiện số ký tự đã dùng trên giới hạn 2.000. Khi thiếu hồ sơ hoặc thông tin liên hệ không hợp lệ, lỗi cần chỉ rõ tại phần tương ứng và giữ nội dung đã nhập. Chuyển sang Tải hồ sơ mới không xóa thư và liên hệ. Nhấn Kiểm tra hồ sơ chuyển đến MH06 sau khi dữ liệu hợp lệ, chưa tạo đơn.
+
+h. Màn hình Tải hồ sơ mới (MH04):
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh04_tai_ho_so_moi.png | Caption: Hình ảnh 3.3.4.h. Bản hồ sơ tải mới và các thao tác xem, thay, xóa tệp (MH04).]]
+
+MH04 là cách dùng tệp mới trong cùng bước chuẩn bị của MH03. Hướng dẫn PDF tối đa 5 MB đặt cạnh vùng tải để ứng viên biết yêu cầu trước khi chọn hoặc kéo thả tệp. Tương tác cần phân biệt chưa chọn, đang tải, đã sẵn sàng và tải lỗi. Khi đang tải, tiến độ thể hiện công việc đang diễn ra; nút Kiểm tra hồ sơ chỉ được dùng khi tệp tải xong và qua kiểm tra. Hình minh họa trạng thái hoàn tất với tên tệp, loại tệp, dung lượng, tỷ lệ 100% và các thao tác tiếp theo. Xem trước mở nội dung; Thay tệp cho chọn lại; Xóa tệp bỏ lựa chọn trong biểu mẫu này, không được làm người dùng hiểu là xóa toàn bộ hồ sơ đã lưu. Nếu sai định dạng, vượt dung lượng hoặc gián đoạn tải, thông báo phải nêu nguyên nhân và cách khắc phục ngay tại vùng tệp. Thư và thông tin liên hệ vẫn giữ khi thử lại hoặc đổi cách chọn hồ sơ.
+
+i. Màn hình Xem trước bản hồ sơ sẽ gửi (MH05):
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh05_xem_truoc_ho_so.png | Caption: Hình ảnh 3.3.4.i. Đọc nội dung hồ sơ trong công cụ xem tài liệu (MH05).]]
+
+MH05 giúp phát hiện chọn nhầm phiên bản hoặc thông tin chưa cập nhật trước khi gửi. Tiêu đề nhắc doanh nghiệp nhận hồ sơ; thanh công cụ hiển thị tên tệp, loại, dung lượng và số trang để gắn nội dung đang đọc với lựa chọn ở biểu mẫu. Công cụ phải mở đúng bản đã chọn, không tự chuyển sang bản mặc định khác. Ứng viên dùng phóng to hoặc Vừa trang để đọc rõ; với tệp nhiều trang, vùng trang thu nhỏ và điều khiển trang phải cho xem đủ nội dung. Phần hướng dẫn bên phải tập trung vào ba việc thực tế: kiểm tra đúng phiên bản, đối chiếu email và số điện thoại, xem kinh nghiệm có phù hợp vị trí hay không. Nhấn Trở lại biểu mẫu giữ lựa chọn hồ sơ, thư và liên hệ. Đây là thao tác đọc tùy chọn, không sửa nội dung tệp hoặc tạo đơn. Nếu không mở được tài liệu, giao diện cần thông báo cụ thể và cho trở lại để thay tệp, thay vì hiển thị một vùng trắng.
+
+k. Màn hình Kiểm tra và xác nhận gửi (MH06):
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh06_kiem_tra_xac_nhan.png | Caption: Hình ảnh 3.3.4.k. Xác nhận người gửi, bản hồ sơ, thư và doanh nghiệp nhận (MH06).]]
+
+MH06 là điểm kiểm tra cuối trước khi chia sẻ thông tin. Các nhóm người gửi, hồ sơ, thư giới thiệu và doanh nghiệp nhận được đặt cùng màn hình để ứng viên đối chiếu toàn bộ dữ liệu sẽ gửi. Xem hồ sơ mở đúng bản đang chọn; Chỉnh sửa và Quay lại chỉnh sửa đưa về phần chuẩn bị, giữ các thông tin còn lại. Ô đồng ý chia sẻ phải chưa được chọn khi vào bước này; hình minh họa trạng thái ứng viên đã chủ động chọn. Nội dung bên cạnh nêu rõ dữ liệu và doanh nghiệp nhận, tránh sự đồng ý thiếu thông tin. Nhấn Xác nhận gửi hồ sơ phải hiển thị đang gửi và tạm ngăn nhấn lặp. Hệ thống kiểm tra lại tình trạng tin, quyền dùng bản hồ sơ và đơn đang được xử lý trước khi ghi nhận. Thành công mở MH07; trùng đơn mở MH09; tin đóng mở MH10. Nếu mất kết nối sau khi nhấn gửi, cần giữ dữ liệu và xác minh đơn đã được ghi nhận hay chưa trước khi cho gửi lại.
+
+l. Màn hình Xác nhận thành công và xem đơn đã gửi (MH07):
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh07_xac_nhan_thanh_cong.png | Caption: Hình ảnh 3.3.4.l. Mã đơn, thời điểm gửi, bản hồ sơ và trạng thái tiếp nhận (MH07).]]
+
+MH07 khép lại quá trình ứng tuyển bằng kết quả có thể kiểm tra lại. Thông báo thành công đặt đầu trang; phần chi tiết ghi tên vị trí, doanh nghiệp, mã TC-000381, thời điểm gửi, liên hệ và tên bản hồ sơ. Những thông tin này giúp ứng viên xác nhận đúng đơn vừa thực hiện, thay vì chỉ nhìn một lời báo thành công. Trạng thái Đã gửi hồ sơ cùng dòng chờ doanh nghiệp xem và phản hồi phân biệt việc hệ thống nhận đơn với việc doanh nghiệp đã đánh giá hoặc chấp nhận ứng viên. Xem tệp mở bản gắn với đơn; thư hiển thị là nội dung đã gửi. Khi ứng viên cập nhật hồ sơ cho lần ứng tuyển sau, tài liệu của đơn này vẫn được giữ để hai bên có cùng căn cứ. Người dùng có thể tìm lại đơn từ Đơn đã ứng tuyển; Tiếp tục tìm việc trở về danh sách. Thông báo email đến chậm không yêu cầu nộp lại khi đơn đã được ghi nhận.
+
+m. Màn hình Không có việc làm phù hợp (MH08):
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh08_khong_co_ket_qua.png | Caption: Hình ảnh 3.3.4.m. Giữ điều kiện tìm kiếm và hỗ trợ mở rộng kết quả (MH08).]]
+
+MH08 xử lý việc tìm kiếm hoàn tất nhưng không có tin đáp ứng đồng thời các điều kiện. Từ khóa, địa điểm và nhãn bộ lọc vẫn hiển thị để ứng viên nhận ra nguyên nhân có thể nằm ở tổ hợp tiêu chí, thay vì cho rằng hệ thống không còn việc làm. Trong ví dụ, ngưỡng lương 50 triệu được nêu rõ và có hành động Bỏ điều kiện mức lương. Nhấn nút này chỉ bỏ ngưỡng lương, giữ từ khóa, địa điểm, kinh nghiệm và hình thức làm việc rồi tìm lại; số kết quả được cập nhật sau khi nhận dữ liệu. Ứng viên cũng có thể sửa từng điều kiện và nhấn Áp dụng bộ lọc, hoặc chủ động chọn Xóa bộ lọc. Giao diện không tự xóa toàn bộ lựa chọn, không hứa trước số tin sẽ tìm được. Trong lúc chờ phải thể hiện đang tìm; nếu lỗi kết nối thì báo chưa tải được dữ liệu và cho thử lại, không hiển thị 0 việc làm như một kết quả hợp lệ.
+
+n. Màn hình Đã có đơn đang được xử lý (MH09):
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh09_don_bi_trung.png | Caption: Hình ảnh 3.3.4.n. Thông báo nộp trùng gắn với đơn đã ghi nhận (MH09).]]
+
+MH09 xuất hiện khi hệ thống xác định ứng viên đã có đơn cho cùng tin và đơn vẫn đang được xử lý. Hộp thông báo giữ nền biểu mẫu để người dùng nhận ra tình huống phát sinh từ thao tác vừa thực hiện. Tên vị trí, doanh nghiệp, mã đơn, thời điểm, trạng thái và bản hồ sơ giúp đối chiếu với lần nộp trước; thông báo nêu rõ lần xác nhận hiện tại không tạo đơn mới hoặc thay hồ sơ đã gửi. Mở đơn đã gửi đưa đến chi tiết của chính đơn được nêu; Quay lại tin tuyển dụng cho tiếp tục xem công việc. Không có hành động gửi lại trong hộp này vì dễ dẫn đến hiểu nhầm rằng có thể tạo thêm đơn bằng cách nhấn tiếp. Khi triển khai, thao tác bàn phím cần nằm trong hộp thông báo và chuyển đến nội dung phù hợp sau khi chọn một hành động. Đơn đã ghi nhận được giữ ngay cả khi hai yêu cầu gửi đến gần như đồng thời.
+
+o. Màn hình Tin đóng trong lúc chuẩn bị hồ sơ (MH10):
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_mh10_tin_da_dong.png | Caption: Hình ảnh 3.3.4.o. Tin ngừng nhận hồ sơ và biểu mẫu giữ nội dung đã nhập (MH10).]]
+
+MH10 xuất hiện khi tin ngừng nhận hồ sơ trong lúc ứng viên đang chuẩn bị hoặc xác nhận. Thông báo ở đầu biểu mẫu nêu đồng thời nguyên nhân và kết quả: tin đã đóng, đơn chưa được tạo. Cách diễn đạt này tránh để ứng viên hiểu mình nhập sai hoặc hồ sơ đã đến doanh nghiệp. Thông tin liên hệ, tên tệp và thư vẫn hiện để chứng minh phần đã chuẩn bị không bị xóa trong thao tác hiện tại. Nút Không thể gửi hồ sơ ngừng hoạt động; khối trạng thái bên phải giải thích lý do bằng chữ, không chỉ dùng màu. Xem việc làm tương tự đưa đến các tin còn nhận hồ sơ. Nội dung đã chuẩn bị không tự gửi sang vị trí khác: ứng viên phải đọc tin mới, kiểm tra người nhận và xác nhận lại. Dữ liệu nhập dở chỉ được giữ trong phiên chuẩn bị hiện tại để người dùng không hiểu nhầm rằng đơn ứng tuyển đã được ghi nhận. Kiểm tra tình trạng tin ngay khi ghi nhận đơn bảo đảm thông báo phản ánh kết quả thực tế.
+
+p. Màn hình Quản lý đơn đã ứng tuyển, theo dõi tiến trình xét tuyển và Lịch hẹn phỏng vấn của Người tìm việc:
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_r_candidate_applications.png | Caption: Hình ảnh 3.3.4.p. Màn hình Quản lý đơn đã ứng tuyển, theo dõi tiến trình xét tuyển và lịch hẹn phỏng vấn của Người tìm việc.]]
+
+Sau khi nộp hồ sơ thành công tại màn hình MH07, người tìm việc mở mục Quản lý việc làm để theo dõi toàn bộ danh sách các đơn đã ứng tuyển. Giao diện hiển thị thanh trạng thái 5 giai đoạn gồm Đã nộp hồ sơ, Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc và Chưa phù hợp, giúp ứng viên biết chính xác hồ sơ của mình đã được nhà tuyển dụng mở xem hay chuyển bước xét duyệt lúc nào. Khi đơn ứng tuyển như mã đơn TC-000381 được chuyển sang giai đoạn Mời phỏng vấn, hệ thống hiển thị thẻ chi tiết lịch hẹn phỏng vấn gồm thời gian, hình thức phỏng vấn trực tuyến hoặc trực tiếp, đường dẫn phòng họp hoặc địa chỉ văn phòng, tên người phụ trách và nút xác nhận tham dự ngay trên màn hình.
+
+q. Màn hình Quản lý hồ sơ pháp lý doanh nghiệp và Địa điểm làm việc của Nhà tuyển dụng:
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_v_employer_company_profile.png | Caption: Hình ảnh 3.3.4.q. Màn hình Quản lý hồ sơ pháp lý doanh nghiệp và danh sách địa điểm làm việc của Nhà tuyển dụng.]]
+
+Trước khi công bố tin tuyển dụng lên hệ thống, nhà tuyển dụng phải hoàn thiện thông tin doanh nghiệp và gửi hồ sơ pháp lý để xác thực tại mục Quản lý thông tin công ty. Giao diện chia thành hai vùng chức năng: vùng bên trái dùng để cập nhật tên pháp nhân đầy đủ, mã số thuế doanh nghiệp 10 chữ số, lĩnh vực hoạt động, quy mô nhân sự, địa chỉ trang thông tin điện tử và tải lên bản quét Giấy chứng nhận đăng ký doanh nghiệp định dạng PDF; vùng bên phải hiển thị trạng thái Đã xác thực pháp lý cùng danh sách trụ sở và văn phòng chi nhánh của doanh nghiệp để gắn với từng tin tuyển dụng.
+
+r. Màn hình Soạn thảo và gửi duyệt tin tuyển dụng mới kèm thiết lập trọng số kỹ năng:
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_s_employer_post_job.png | Caption: Hình ảnh 3.3.4.r. Màn hình Soạn thảo tin tuyển dụng mới và thiết lập kỹ năng yêu cầu cùng trọng số ưu tiên.]]
+
+Màn hình hỗ trợ nhà tuyển dụng khởi tạo tin tuyển dụng mới hoặc chỉnh sửa tin nháp trước khi gửi kiểm duyệt. Bên trái là biểu mẫu nhập tiêu đề vị trí, ngành nghề, cấp bậc, hình thức làm việc, khoảng lương công bố, số lượng cần tuyển, hạn nhận hồ sơ và nội dung mô tả công việc, yêu cầu, quyền lợi chi tiết. Khung thiết lập kỹ năng yêu cầu bên phải cho phép nhà tuyển dụng chọn các kỹ năng chuẩn hóa từ từ điển hệ thống và phân loại từng kỹ năng thành Kỹ năng bắt buộc với trọng số từ 2 đến 5 hoặc Kỹ năng ưu tiên với trọng số bằng 1. Khung xem trước ở góc dưới tự động cộng tổng trọng số mẫu số làm căn cứ tính tỷ lệ khớp kỹ năng khi gợi ý việc làm cho ứng viên.
+
+s. Màn hình Bảng quản lý ứng viên theo năm giai đoạn dành cho Nhà tuyển dụng:
+
+[[IMAGE: assets/diagrams/hinh_3_15_ui_kanban_ats.png | Caption: Hình ảnh 3.3.4.s. Màn hình Bảng quản lý ứng viên theo năm giai đoạn dành cho Nhà tuyển dụng.]]
+
+Nhà tuyển dụng tiếp nhận và xử lý các đơn ứng tuyển theo từng vị trí trên bảng quản lý gồm 5 giai đoạn: Hồ sơ mới nộp, Đạt sơ loại, Mời phỏng vấn, Đề xuất nhận việc và Chưa phù hợp. Trên mỗi thẻ ứng viên, hệ thống hiển thị tên ứng viên, mã đơn, thời điểm nộp, bản hồ sơ PDF đính kèm và tỷ lệ khớp kỹ năng để hỗ trợ sàng lọc nhanh. Khi chuyển thẻ ứng viên sang giai đoạn mới, hệ thống kiểm tra quy tắc chuyển trạng thái hợp lệ, cập nhật trạng thái đơn trong bảng Applications, ghi vết người thao tác cùng thời điểm vào bảng ApplicationHistories và gửi thông báo cho ứng viên.
+
+t. Màn hình Chi tiết đơn ứng tuyển, chấm điểm đánh giá nội bộ và lập lịch phỏng vấn:
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_t_employer_interview_modal.png | Caption: Hình ảnh 3.3.4.t. Màn hình Đánh giá hồ sơ ứng viên nội bộ và thiết lập lịch hẹn phỏng vấn.]]
+
+Khi nhà tuyển dụng nhấn vào một thẻ hồ sơ trên bảng quản lý như đơn TC-000381 của ứng viên Nguyễn Minh Anh, hệ thống mở màn hình chi tiết đơn ứng tuyển gồm hai khung song song. Khung bên trái hiển thị thông tin liên hệ của ứng viên, kết quả đối chiếu từng kỹ năng bắt buộc và kỹ năng ưu tiên với hồ sơ, toàn văn thư giới thiệu và trình đọc trực tiếp bản hồ sơ PDF mà ứng viên đã nộp. Khung bên phải cung cấp biểu mẫu chấm điểm đánh giá nội bộ từ 1 đến 5 sao kèm nhận xét chuyên môn và biểu mẫu thiết lập lịch hẹn phỏng vấn gồm vòng phỏng vấn, thời gian bắt đầu và kết thúc, hình thức phỏng vấn, đường dẫn trực tuyến hoặc địa điểm và hướng dẫn chuẩn bị trước khi lưu và gửi thông báo mời phỏng vấn cho ứng viên.
+
+u. Màn hình Hàng đợi đối soát pháp lý doanh nghiệp và kiểm duyệt tin tuyển dụng chờ duyệt:
+
+[[IMAGE: assets/diagrams/hinh_3_3_4_u_moderator_approval.png | Caption: Hình ảnh 3.3.4.u. Màn hình Đối soát pháp lý doanh nghiệp và kiểm duyệt tin tuyển dụng chờ duyệt.]]
+
+Giao diện dành cho Cán bộ kiểm duyệt hiển thị danh sách các hồ sơ pháp lý doanh nghiệp mới đăng ký và danh sách các tin tuyển dụng đang ở trạng thái Chờ duyệt. Khi chọn một tin chờ duyệt ở cột bên trái, khung chi tiết bên phải hiển thị toàn bộ nội dung tin cùng bảng kiểm tra các tiêu chí bắt buộc: trạng thái xác thực mã số thuế và giấy phép kinh doanh của doanh nghiệp, tính minh bạch của mức lương, hạn nhận hồ sơ, danh sách kỹ năng gắn với tin và rà soát từ khóa vi phạm quy chế như yêu cầu thu phí đặt cọc. Cán bộ kiểm duyệt có thể nhấn Phê duyệt và công bố tin để chuyển trạng thái tin sang đang hoạt động, hoặc chọn Từ chối và yêu cầu chỉnh sửa kèm lý do cụ thể để nhà tuyển dụng cập nhật lại.
+
+v. Màn hình Bảng điều khiển Quản trị viên và thống kê vận hành toàn hệ thống:
+
+[[IMAGE: assets/diagrams/hinh_3_17_ui_admin_dashboard.png | Caption: Hình ảnh 3.3.4.v. Màn hình Bảng điều khiển quản trị viên và thống kê vận hành toàn hệ thống.]]
+
+Giao diện dành cho Quản trị viên hệ thống cung cấp số liệu tổng hợp về tình trạng hoạt động của nền tảng TalentConnect: tổng số tài khoản theo từng nhóm vai trò, số lượng doanh nghiệp đã xác thực, số tin tuyển dụng đang hoạt động, tổng số đơn ứng tuyển đã tiếp nhận, biểu đồ thống kê theo ngành nghề và danh sách nhật ký thao tác hệ thống. Từ màn hình này, quản trị viên quản lý tài khoản người dùng, khóa hoặc mở khóa tài khoản vi phạm, cập nhật danh mục ngành nghề và chuẩn hóa từ điển kỹ năng dùng chung cho toàn hệ thống.
 
 ---
 
 3.4. Lập trình và cài đặt
 
-3.4.1. Mục tiêu của giai đoạn
+3.4.1. Lý do lựa chọn ngôn ngữ lập trình và nền tảng công nghệ
 
-Chuyển đổi toàn bộ thiết kế kiến trúc, cơ sở dữ liệu 28 bảng và giao diện người dùng thành mã nguồn phần mềm hoàn chỉnh chạy được trên môi trường web.
+Để chuyển toàn bộ thiết kế kiến trúc ba tầng, cơ sở dữ liệu 28 bảng và hệ thống giao diện người dùng thành phần mềm chạy được trên môi trường web, nhóm lựa chọn bộ ngôn ngữ và nền tảng công nghệ gồm JavaScript/TypeScript với thư viện ReactJS ở phía giao diện, môi trường Node.js kết hợp bộ khung Express.js ở phía máy chủ và ngôn ngữ truy vấn T-SQL trên Hệ quản trị cơ sở dữ liệu Microsoft SQL Server 2022 ở tầng dữ liệu. Nhóm lựa chọn bộ công nghệ này dựa trên bốn căn cứ thực tế của dự án:
 
-3.4.2. Công việc chi tiết trong giai đoạn Lập trình
+Về sự thống nhất ngôn ngữ lập trình, cả phía máy khách và phía máy chủ đều sử dụng JavaScript và TypeScript, giúp sáu thành viên trong nhóm dễ phối hợp, dùng chung quy tắc kiểm tra dữ liệu đầu vào, định dạng đối tượng JSON và rút ngắn thời gian làm quen công cụ trong 12 tuần của học phần.
 
-Để hiện thực hóa toàn bộ các phân hệ chức năng và mô hình dữ liệu đã được thiết kế, giai đoạn lập trình và cài đặt được triển khai qua bảy nội dung công việc kỹ thuật trọng tâm:
+Về chi phí và điều kiện công cụ, toàn bộ thư viện và phần mềm phát triển gồm ReactJS, Tailwind CSS, Node.js, Express.js, SQL Server Developer Edition, Visual Studio Code, Git và Postman đều miễn phí hoặc có bản phục vụ học tập, phù hợp với điều kiện dự án sinh viên không có kinh phí mua bản quyền thương mại hay thuê máy chủ chuyên dụng.
 
-Thứ nhất là công tác lựa chọn công nghệ và thiết lập bộ khung ứng dụng. Tầng giao diện người dùng được phát triển bằng thư viện ReactJS kết hợp khuôn khổ định dạng Tailwind CSS, cung cấp trải nghiệm tương tác động mượt mà và khả năng đáp ứng Responsive trên mọi thiết bị. Tầng dịch vụ máy chủ sử dụng môi trường thực thi NodeJS kết hợp bộ khung ExpressJS để xây dựng hệ thống giao diện lập trình ứng dụng theo chuẩn dịch vụ web REST chuẩn mực. Tầng lưu trữ dữ liệu sử dụng Hệ quản trị cơ sở dữ liệu quan hệ Microsoft SQL Server 2022, bảo đảm tính toàn vẹn giao dịch và hiệu năng truy vấn cao.
+Về khả năng tổ chức giao diện, ReactJS chia màn hình thành các thành phần độc lập, đáp ứng tốt các luồng có nhiều trạng thái tương tác như bộ lọc việc làm kết hợp gợi ý kỹ năng ở MH01, biểu mẫu chuẩn bị và tải hồ sơ nhiều bước từ MH03 đến MH06 hoặc bảng quản lý ứng viên theo năm giai đoạn của nhà tuyển dụng.
 
-Thứ hai là thiết lập môi trường phát triển và chuẩn hóa cấu trúc mã nguồn. Dự án được tổ chức mô-đun hóa theo mô hình phân tầng chặt chẽ gồm tầng điều khiển Controller tiếp nhận yêu cầu, tầng dịch vụ Service xử lý logic nghiệp vụ, tầng trung gian Middleware xác thực định danh và kiểm tra quyền hạn, và tầng mô hình dữ liệu Model thực hiện truy vấn tương tác cơ sở dữ liệu. Cấu trúc này giúp mã nguồn sáng sủa, dễ đọc, dễ bảo trì và thuận lợi cho việc phát triển phối hợp nhóm.
+Về bảo đảm toàn vẹn dữ liệu, Hệ quản trị cơ sở dữ liệu Microsoft SQL Server 2022 hỗ trợ chặt chẽ các ràng buộc khóa chính, khóa ngoại, điều kiện kiểm tra giá trị và cơ chế giao dịch, giúp kiểm soát tính nhất quán giữa 28 bảng quan hệ của TalentConnect.
 
-[[IMAGE: assets/diagrams/hinh_3_18_code_structure.png | Caption: Hình ảnh 3.4.2.a. Cấu trúc thư mục mã nguồn.]]
+3.4.2. Một số ưu điểm nổi trội của ngôn ngữ lập trình được lựa chọn
 
-Thứ ba là lập trình giao diện người dùng và cơ chế xử lý bất đồng bộ phía máy khách, bảo đảm hiển thị trực quan các biểu mẫu nhập liệu và đồng bộ trạng thái thời gian thực. Mô-đun giao diện được cấu trúc theo các thành phần dùng chung, phân tách rõ ràng giữa trạng thái cục bộ và luồng dữ liệu truyền từ máy chủ thông qua giao diện lập trình ứng dụng.
+Bộ ngôn ngữ lập trình và nền tảng công nghệ được lựa chọn mang lại các ưu điểm kỹ thuật trực tiếp cho các chức năng cốt lõi của hệ thống TalentConnect:
 
-[[IMAGE: assets/diagrams/hinh_3_4_2_b_ui_code.png | Caption: Hình ảnh 3.4.2.b. Lập trình giao diện người dùng và kết nối giao diện lập trình ứng dụng.]]
+Ở tầng giao diện, ReactJS quản lý trạng thái cục bộ và cập nhật từng phần màn hình, giúp giữ nguyên từ khóa, bộ lọc và vị trí danh sách khi ứng viên mở xem chi tiết tin ở MH02 rồi quay lại danh sách MH01, hoặc giữ nguyên thông tin liên hệ và thư giới thiệu khi ứng viên chuyển đổi giữa chọn hồ sơ đã lưu ở MH03, tải tệp mới ở MH04 và xem trước tài liệu ở MH05.
 
-Thứ tư là lập trình xử lý các nghiệp vụ máy chủ trung tâm, bao gồm xác thực tài khoản qua chuỗi khóa định danh bảo mật, mã hóa mật khẩu một chiều bcrypt, thuật toán đối khớp từ khóa gợi ý việc làm và quy trình luân chuyển trạng thái phễu ứng viên Kanban. Mọi nghiệp vụ đều được kiểm soát bởi các hàm trung gian kiểm tra tính hợp lệ của tham số trước khi thực thi.
+Ở tầng dịch vụ máy chủ, Node.js và Express.js vận hành theo cơ chế xử lý vào/ra bất đồng bộ không chặn, cho phép máy chủ đáp ứng đồng thời các yêu cầu truy vấn danh sách việc làm đa điều kiện, đọc và kiểm tra tệp PDF tải lên, kết xuất hồ sơ trực tuyến sang tệp PDF và ghi nhận thông báo cho doanh nghiệp cùng ứng viên.
 
-[[IMAGE: assets/diagrams/hinh_3_4_2_c_backend_code.png | Caption: Hình ảnh 3.4.2.c. Lập trình dịch vụ máy chủ và thuật toán xử lý nghiệp vụ trung tâm.]]
+Ở tầng cơ sở dữ liệu, ngôn ngữ T-SQL trên Microsoft SQL Server 2022 kết hợp các truy vấn nối bảng có chỉ mục với giao dịch kiểm soát mức cô lập dữ liệu, giúp tính chính xác mức khớp kỹ năng theo trọng số ưu tiên, kiểm tra quyền sở hữu bản hồ sơ và ngăn tạo hai đơn ứng tuyển trùng lặp khi có hai yêu cầu gửi đến gần như đồng thời cho cùng một vị trí tuyển dụng.
 
-Thứ năm là lập trình kết nối và tối ưu hóa truy vấn cơ sở dữ liệu, sử dụng cơ chế truyền tham số an toàn nhằm triệt tiêu hoàn toàn nguy cơ tấn công SQL Injection, kết hợp tạo các chỉ mục Index tối ưu hóa thời gian thực thi truy vấn dưới 500 mili-giây. Các giao dịch tài chính và luồng ứng tuyển đều áp dụng cơ chế quản lý giao dịch nghiêm ngặt.
+3.4.3. Tổ chức mã nguồn và một số đoạn mã lệnh cho các chức năng quan trọng
 
-[[IMAGE: assets/diagrams/hinh_3_4_2_d_db_code.png | Caption: Hình ảnh 3.4.2.d. Lập trình truy vấn kết nối và tối ưu cơ sở dữ liệu Microsoft SQL Server.]]
+Mã nguồn của hệ thống tách biệt giữa thư mục giao diện máy khách và thư mục dịch vụ máy chủ. Trong đó, phía máy chủ chia thành năm tầng rõ ràng: tầng định tuyến, tầng trung gian xác thực và kiểm tra quyền, tầng điều khiển, tầng xử lý nghiệp vụ và tầng truy xuất dữ liệu. Cấu trúc phân tầng này giúp mã nguồn dễ kiểm tra lỗi và thuận lợi khi cập nhật từng chức năng theo các vòng của mô hình Xoắn ốc.
 
-Thứ sáu là tích hợp các mô-đun chức năng thành một hệ thống phần mềm hoàn chỉnh, liên kết thông suốt các luồng dữ liệu giữa tầng giao diện, dịch vụ máy chủ và cơ sở dữ liệu quan hệ.
+[[IMAGE: assets/diagrams/hinh_3_18_code_structure.png | Caption: Hình ảnh 3.4.3.a. Cấu trúc thư mục mã nguồn của hệ thống TalentConnect.]]
 
-Thứ bảy là thực hiện kiểm thử mức mã nguồn độc lập cho từng hàm nghiệp vụ trọng yếu, phát hiện và sửa chữa kịp thời các sai lệch logic trước khi chuyển giao sang giai đoạn kiểm thử hệ thống.
+Tại tầng giao diện người dùng, các thành phần hiển thị danh sách việc làm, bộ lọc và biểu mẫu nộp hồ sơ kết nối với máy chủ qua các hàm gọi API bất đồng bộ, tự động đính kèm mã phiên đăng nhập JWT và tách bạch trường hợp không có kết quả phù hợp ở màn hình MH08 với trường hợp lỗi kết nối mạng.
 
-<div style="page-break-after: always;"></div>
+[[IMAGE: assets/diagrams/hinh_3_4_2_b_ui_code.png | Caption: Hình ảnh 3.4.3.b. Đoạn mã lệnh giao diện người dùng và kết nối API tìm kiếm, ứng tuyển.]]
+
+Tại tầng dịch vụ máy chủ, các hàm điều khiển và dịch vụ xác thực người dùng từ phiên đăng nhập JWT, đối chiếu danh sách mã kỹ năng ứng viên với kỹ năng yêu cầu của tin theo trọng số ưu tiên để tính mức khớp kỹ năng và phân loại rõ danh sách kỹ năng đã khớp cùng kỹ năng chưa khai báo.
+
+[[IMAGE: assets/diagrams/hinh_3_4_2_c_backend_code.png | Caption: Hình ảnh 3.4.3.c. Đoạn mã lệnh dịch vụ máy chủ xử lý nghiệp vụ đối chiếu kỹ năng và tiếp nhận đơn.]]
+
+Tại tầng truy xuất cơ sở dữ liệu, mọi câu lệnh T-SQL đều dùng truy vấn tham số hóa để phòng chống tấn công tiêm mã lệnh SQL. Đặc biệt, chức năng ghi nhận đơn ứng tuyển và cập nhật lịch sử trạng thái hồ sơ đặt trong khối giao dịch cơ sở dữ liệu, kiểm tra tin còn nhận hồ sơ và chưa có đơn đang xử lý của cùng ứng viên trước khi lưu bản ghi mới vào các bảng Applications, ApplicationHistories và Notifications.
+
+[[IMAGE: assets/diagrams/hinh_3_4_2_d_db_code.png | Caption: Hình ảnh 3.4.3.d. Đoạn mã lệnh truy vấn tham số hóa và giao dịch ghi nhận đơn ứng tuyển trên SQL Server.]]
 
 3.5. Kiểm thử và triển khai phần mềm
 
 3.5.1. Tổng quan về Kiểm thử
 
-Kiểm thử phần mềm là một tiến trình kỹ thuật có hệ thống nhằm thực thi chương trình với mục đích tìm ra các khiếm khuyết, đánh giá sự phù hợp giữa kết quả hoạt động thực tế của phần mềm so với các yêu cầu đã được xác định trong tài liệu đặc tả ban đầu, và bảo đảm sản phẩm đạt được các chuẩn mực chất lượng trước khi bàn giao cho người sử dụng.
+Kiểm thử phần mềm là quá trình thực thi chương trình một cách có hệ thống nhằm phát hiện lỗi, đối chiếu kết quả vận hành thực tế của phần mềm với các yêu cầu nghiệp vụ và phi chức năng đã xác định trong tài liệu đặc tả, từ đó bảo đảm sản phẩm đáp ứng điều kiện chất lượng trước khi bàn giao.
 
-Trong quy trình phát triển hệ thống TalentConnect, kiểm thử không phải là một công đoạn độc lập chỉ diễn ra ở giai đoạn cuối mà là hoạt động xuyên suốt song hành cùng quá trình phát triển qua từng vòng lặp của mô hình Xoắn ốc.
+Trong quy trình phát triển hệ thống TalentConnect, kiểm thử không tách rời ở giai đoạn cuối mà được thực hiện xuyên suốt qua từng vòng phát triển của mô hình Xoắn ốc: từ kiểm tra ràng buộc dữ liệu và phân quyền ở vòng thứ nhất, kiểm tra tìm kiếm và tạo hồ sơ ở vòng thứ hai, đến kiểm tra tích hợp quy trình ứng tuyển, xử lý ứng viên và an toàn thông tin ở vòng thứ ba.
 
 3.5.2. Quá trình kiểm thử
 
-Nhằm bảo đảm tính toàn vẹn, độ tin cậy và sự ổn định của hệ thống TalentConnect trước khi đưa vào vận hành thực tế, đội ngũ kỹ thuật đã triển khai chiến lược kiểm thử đa tầng kết hợp: kiểm thử đơn vị (Unit Testing) với khung Jest, kiểm thử tích hợp tự động cho toàn bộ hệ thống giao diện lập trình máy chủ (API Integration Testing) thông qua công cụ Newman/Postman Runner, và kiểm thử hộp đen đầu-cuối (E2E Testing) trên giao diện người dùng. Môi trường thử nghiệm được thiết lập độc lập (Staging Environment) chạy trên máy chủ Node.js v20.x, hệ quản trị cơ sở dữ liệu Microsoft SQL Server 2022 và cụm bộ nhớ đệm Redis Sentinel.
+Theo đúng lý thuyết học phần Công nghệ phần mềm, nhóm triển khai kết hợp chặt chẽ hai phương pháp kiểm thử phần mềm cơ bản gồm phương pháp kiểm thử hộp trắng và phương pháp kiểm thử hộp đen. Đối với phương pháp kiểm thử hộp trắng, nhóm kiểm tra cấu trúc mã lệnh bên trong và các nhánh điều kiện rẽ nhánh của các hàm xử lý cốt lõi như hàm tính tỷ lệ khớp kỹ năng theo trọng số ưu tiên, hàm kiểm tra quyền sở hữu bản hồ sơ và tồn tại đơn ứng tuyển hợp lệ trước khi mở tệp PDF, cùng khối giao dịch kiểm tra chống nộp đơn trùng trên cơ sở dữ liệu, kết hợp kiểm thử tích hợp tự động 47 điểm cuối dịch vụ máy chủ bằng công cụ Postman. Đối với phương pháp kiểm thử hộp đen, nhóm đứng trên góc nhìn của người sử dụng cuối để kiểm tra các chức năng qua giao diện màn hình dựa trên kỹ thuật phân vùng tương đương và phân tích giá trị biên (như kiểm tra mật khẩu tối thiểu 8 ký tự, khoảng lương hợp lệ, giới hạn tệp PDF tối đa 5 MB tại màn hình MH04 và phản hồi tại các màn hình ngoại lệ từ MH08 đến MH10). Môi trường thử nghiệm được thiết lập độc lập trên máy chủ phát triển nội bộ chạy Node.js và Hệ quản trị cơ sở dữ liệu Microsoft SQL Server 2022.
 
-Bảng 3.38: Thống kê kết quả kiểm thử tự động giao diện lập trình máy chủ (API Testing Metrics)
+Bảng 3.39: Thống kê kết quả kiểm thử tự động giao diện lập trình máy chủ
 
-| Nhóm chức năng API | Điểm cuối (Endpoints) | Phương thức | Số ca kiểm thử | Tỷ lệ đạt (%) | Thời gian TB | Đánh giá chất lượng |
+| Nhóm chức năng API | Điểm cuối dịch vụ | Phương thức | Số ca kiểm thử | Tỷ lệ đạt (%) | Thời gian TB | Đánh giá chất lượng |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| Xác thực & Định danh | `/api/v1/auth/login`<br>`/api/v1/auth/register`<br>`/api/v1/auth/refresh` | POST | 8 | 100% | 38.4 ms | Đạt chuẩn an toàn bảo mật |
-| Tin tuyển dụng & Tìm kiếm | `/api/v1/jobs/search`<br>`/api/v1/jobs/{id}`<br>`/api/v1/jobs/create` | GET, POST | 12 | 100% | 52.1 ms | Đạt hiệu năng truy vấn chỉ mục |
-| Hồ sơ năng lực & CV ATS | `/api/v1/resumes/export-pdf`<br>`/api/v1/resumes/score-ats` | POST | 9 | 100% | 85.6 ms | Đạt chuẩn xuất PDF vector A4 |
-| Ứng tuyển & Phễu ATS | `/api/v1/applications/apply`<br>`/api/v1/ats/stages/move` | POST, PUT | 11 | 100% | 44.2 ms | Đạt toàn vẹn luân chuyển phễu |
-| Quản trị hệ thống | `/api/v1/admin/users`<br>`/api/v1/admin/audit-logs` | GET, PUT | 7 | 100% | 35.0 ms | Đạt kiểm soát phân quyền RBAC |
-| **Tổng hợp toàn bộ hệ thống** | **Toàn bộ điểm cuối máy chủ** | **Tất cả** | **47** | **100%** | **46.8 ms** | **Đạt xuất sắc chỉ tiêu (SLA < 200ms)** |
+| Xác thực & Định danh | /api/v1/auth/login<br>/api/v1/auth/register<br>/api/v1/auth/refresh | POST | 8 | 100% | 38.4 ms | Đạt yêu cầu xác thực và phiên |
+| Tin tuyển dụng & Tìm kiếm | /api/v1/jobs/search<br>/api/v1/jobs/{id}<br>/api/v1/jobs/create | GET, POST | 12 | 100% | 52.1 ms | Đạt yêu cầu truy vấn và lọc |
+| Hồ sơ trực tuyến & Gợi ý việc làm | /api/v1/resumes/export-pdf<br>/api/v1/jobs/recommendations | GET, POST | 9 | 100% | 85.6 ms | Đạt yêu cầu xuất PDF và gợi ý |
+| Ứng tuyển & Xử lý hồ sơ | /api/v1/applications/apply<br>/api/v1/applications/{id}/status | POST, PUT | 11 | 100% | 44.2 ms | Đạt yêu cầu lưu đơn và trạng thái |
+| Quản trị hệ thống | /api/v1/admin/users<br>/api/v1/admin/audit-logs | GET, PUT | 7 | 100% | 35.0 ms | Đạt yêu cầu kiểm soát phân quyền |
+| Tổng hợp toàn bộ hệ thống | Toàn bộ điểm cuối máy chủ | Tất cả | 47 | 100% | 46.8 ms | Đạt yêu cầu thiết kế (< 200ms) |
 
-Song song với kiểm thử tự động tầng dịch vụ máy chủ, nhóm phát triển đã tiến hành kiểm thử hộp đen chi tiết trên các luồng nghiệp vụ người dùng. Dưới đây là ma trận các kịch bản kiểm thử chi tiết đại diện cho các chức năng trọng yếu của hệ thống:
+[[IMAGE: assets/diagrams/hinh_3_19_testing_api.png | Caption: Hình ảnh 3.5.2.a. Kết quả thực thi kiểm thử tích hợp tự động các điểm cuối API.]]
 
-Bảng 3.39: Kịch bản kiểm thử phân hệ Xác thực và Quản trị tài khoản
+Song song với kiểm thử tự động tầng dịch vụ máy chủ, nhóm kiểm thử hộp đen chi tiết trên các luồng nghiệp vụ người dùng. Dưới đây là ma trận các kịch bản kiểm thử đại diện cho các chức năng trọng yếu của hệ thống:
+
+Bảng 3.40: Kịch bản kiểm thử phân hệ Xác thực và Quản trị tài khoản
 
 | Mã kịch bản | Tên ca kiểm thử | Mục đích kiểm tra | Dữ liệu đầu vào | Các bước thực hiện | Kết quả mong đợi | Kết quả thực tế | Đánh giá |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| KT-01 | Đăng ký với thư điện tử đã tồn tại | Kiểm tra tính duy nhất của tài khoản trên hệ thống | Thư điện tử: `nghiem@gmail.com`, Mật khẩu: `Matkhau@123` | 1. Mở trang đăng ký<br>2. Nhập thông tin tài khoản<br>3. Bấm Đăng ký | Hệ thống từ chối đăng ký, hiển thị thông báo Thư điện tử đã được sử dụng | Hiển thị cảnh báo màu đỏ đúng thông báo mong đợi | Đạt |
-| KT-02 | Đăng ký với mật khẩu yếu | Kiểm tra ràng buộc độ an toàn của mật khẩu | Thư điện tử: `user_moi@gmail.com`, Mật khẩu: `12345` | 1. Mở trang đăng ký<br>2. Nhập mật khẩu dưới tám ký tự<br>3. Bấm Đăng ký | Hệ thống chặn thao tác, yêu cầu mật khẩu tối thiểu tám ký tự gồm chữ hoa, thường và số | Hệ thống chặn và hiển thị hướng dẫn bảo mật | Đạt |
-| KT-03 | Đăng nhập với mật khẩu sai | Kiểm tra cơ chế chống đăng nhập trái phép | Thư điện tử: `admin@talentconnect.vn`, Mật khẩu: `SaiMatKhau` | 1. Mở trang đăng ký<br>2. Nhập thông tin<br>3. Bấm Đăng nhập | Hệ thống không cấp phiên, hiển thị thông báo Tài khoản hoặc mật khẩu không chính xác | Không đăng nhập được, hiển thị thông báo chính xác | Đạt |
+| KT-01 | Đăng ký với thư điện tử đã tồn tại | Kiểm tra tính duy nhất của tài khoản trên hệ thống | Thư điện tử: nghiem@gmail.com, Mật khẩu: Matkhau@123 | 1. Mở trang đăng ký<br>2. Nhập thông tin tài khoản<br>3. Bấm Đăng ký | Hệ thống từ chối đăng ký, hiển thị thông báo Thư điện tử đã được sử dụng | Hiển thị cảnh báo màu đỏ đúng thông báo mong đợi | Đạt |
+| KT-02 | Đăng ký với mật khẩu yếu | Kiểm tra ràng buộc độ an toàn của mật khẩu | Thư điện tử: user_moi@gmail.com, Mật khẩu: 12345 | 1. Mở trang đăng ký<br>2. Nhập mật khẩu dưới tám ký tự<br>3. Bấm Đăng ký | Hệ thống chặn thao tác, yêu cầu mật khẩu tối thiểu tám ký tự gồm chữ hoa, thường và số | Hệ thống chặn và hiển thị hướng dẫn bảo mật | Đạt |
+| KT-03 | Đăng nhập với mật khẩu sai | Kiểm tra cơ chế chống đăng nhập trái phép | Thư điện tử: admin@talentconnect.vn, Mật khẩu: SaiMatKhau | 1. Mở trang đăng nhập<br>2. Nhập thông tin<br>3. Bấm Đăng nhập | Hệ thống không cấp phiên, hiển thị thông báo Tài khoản hoặc mật khẩu không chính xác | Không đăng nhập được, hiển thị thông báo chính xác | Đạt |
 
-Bên cạnh các kịch bản kiểm thử chức năng cơ bản, phân hệ Xác thực và Quản trị tài khoản còn được thẩm định nghiêm ngặt về khả năng phòng vệ trước các cuộc tấn công mạng nguy hiểm:
+Bên cạnh các kịch bản kiểm thử chức năng cơ bản, phân hệ Xác thực và Quản trị tài khoản còn được kiểm tra về khả năng phòng vệ trước các hành vi truy cập trái phép và tấn công phổ biến trên ứng dụng web:
 
-Bảng 3.40: Thống kê phân tích kiểm thử an toàn và bảo mật tài khoản (Security & Boundary Testing)
+Bảng 3.41: Thống kê phân tích kiểm thử an toàn và bảo mật tài khoản
 
 | Mã KT | Loại hình an ninh | Kịch bản thử nghiệm tấn công | Cơ chế phòng vệ của hệ thống | Phản hồi đo đạc thực tế | Mức độ an toàn |
 | :--- | :--- | :--- | :--- | :--- | :---: |
-| BM-01 | Chống dò quét mật khẩu (Brute-force) | Thử đăng nhập sai mật khẩu liên tiếp 5 lần trong 60 giây | Khóa tài khoản tạm thời 15 phút qua Redis Sentinel, gắn Retry-After: 900 | HTTP 429 Too Many Requests, khóa thành công IP | Tuyệt đối an toàn |
-| BM-02 | Chống tiêm mã độc SQL (SQL Injection) | Nhập chuỗi ký tự thoát `' OR '1'='1' --` vào form | Áp dụng Parameterized Query và ORM Prisma an toàn | Xử lý chuỗi văn bản thuần, không lỗi cú pháp SQL | Tuyệt đối an toàn |
-| BM-03 | Chống truy cập trái quyền (IDOR/BOLA) | Thay đổi định danh UUID người dùng trên URL API | Kiểm tra quyền qua mã thông báo JWT và RBAC Middleware | Từ chối truy xuất trái phép, trả về HTTP 403 Forbidden | Bảo mật cao |
-| BM-04 | Chống chiếm quyền phiên (XSS & CSRF) | Chèn mã script độc hại `<script>` vào trường dữ liệu | Kích hoạt DOMPurify, cấu hình HttpOnly và SameSite=Strict | Mã độc bị loại bỏ hoàn toàn, bảo vệ nguyên vẹn Token | Đạt chuẩn OWASP Top 10 |
+| BM-01 | Chống dò quét mật khẩu | Thử đăng nhập sai mật khẩu liên tiếp 5 lần trong 60 giây | Giới hạn tần suất yêu cầu và tạm khóa đăng nhập 15 phút | HTTP 429 Too Many Requests, tạm khóa yêu cầu từ địa chỉ IP | Đạt yêu cầu |
+| BM-02 | Chống tiêm mã độc SQL | Nhập chuỗi ký tự thoát ' OR '1'='1' -- vào biểu mẫu | Áp dụng truy vấn tham số hóa qua thư viện mssql | Xử lý chuỗi văn bản thuần, không lỗi cú pháp SQL | Đạt yêu cầu |
+| BM-03 | Chống truy cập trái quyền | Thay đổi mã định danh số nguyên (CandidateID, ApplicationID) trên đường dẫn yêu cầu để truy cập hồ sơ hoặc đơn của tài khoản khác | Hệ thống lấy danh tính từ phiên đăng nhập JWT và kiểm tra quyền sở hữu bản hồ sơ hoặc tin tuyển dụng | Từ chối truy xuất trái phép, trả về HTTP 403 Forbidden | Đạt yêu cầu |
+| BM-04 | Chống chiếm quyền phiên | Chèn mã kịch bản <script> vào trường dữ liệu nhập | Làm sạch dữ liệu đầu vào với DOMPurify, cấu hình HttpOnly và SameSite=Strict | Mã kịch bản bị loại bỏ, bảo vệ nguyên vẹn phiên đăng nhập | Đạt yêu cầu |
 
-Bảng 3.41: Kịch bản kiểm thử phân hệ Tạo lập hồ sơ và Quản lý tin tuyển dụng
+[[IMAGE: assets/diagrams/hinh_3_5_2_b_test_auth.png | Caption: Hình ảnh 3.5.2.b. Kiểm thử chức năng xác thực, phân quyền và bảo mật tài khoản.]]
+
+Bảng 3.42: Kịch bản kiểm thử phân hệ Tạo lập hồ sơ và Quản lý tin tuyển dụng
 
 | Mã kịch bản | Tên ca kiểm thử | Mục đích kiểm tra | Dữ liệu đầu vào | Các bước thực hiện | Kết quả mong đợi | Kết quả thực tế | Đánh giá |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| KT-04 | Đăng tin tuyển dụng với mức lương nghịch lý | Kiểm tra tính hợp lý của khoảng lương | Mức lương tối thiểu: `20,000,000`, Mức lương tối đa: `15,000,000` | 1. Vào form Đăng tin<br>2. Nhập lương tối thiểu lớn hơn tối đa<br>3. Bấm Gửi duyệt | Hệ thống cảnh báo Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu | Hệ thống xuất hiện viền đỏ cảnh báo tại ô lương tối đa | Đạt |
+| KT-04 | Đăng tin có mức lương tối đa nhỏ hơn mức tối thiểu | Kiểm tra tính hợp lý của khoảng lương | Mức lương tối thiểu: 20,000,000, Mức lương tối đa: 15,000,000 | 1. Vào biểu mẫu Đăng tin<br>2. Nhập lương tối thiểu lớn hơn tối đa<br>3. Bấm Gửi duyệt | Hệ thống cảnh báo Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu | Hệ thống xuất hiện viền đỏ cảnh báo tại ô lương tối đa | Đạt |
 | KT-05 | Đăng tin với hạn nộp trong quá khứ | Kiểm tra tính hợp lệ của thời hạn nhận đơn | Ngày hết hạn: Ngày hôm qua so với thời điểm đăng | 1. Chọn ngày hết hạn trong quá khứ<br>2. Bấm Gửi duyệt | Hệ thống ngăn chặn việc lưu tin và yêu cầu chọn ngày trong tương lai | Hệ thống chặn lưu và yêu cầu chọn lại ngày | Đạt |
-| KT-06 | Kết xuất hồ sơ trực tuyến sang tệp tài liệu | Kiểm tra tính năng tạo tệp tài liệu chuẩn | Dữ liệu lý lịch đã điền đầy đủ, chọn Mẫu hiện đại | 1. Mở công cụ tạo hồ sơ<br>2. Nhập dữ liệu<br>3. Nhấn Tải tệp tài liệu | Hệ thống tạo tệp tài liệu định dạng chuẩn, giữ nguyên bố cục và phông chữ tiếng Việt | Tệp tải về sắc nét, đầy đủ thông tin tiếng Việt | Đạt |
+| KT-06 | Xuất hồ sơ trực tuyến sang tệp PDF | Kiểm tra tính năng tạo tệp PDF hồ sơ | Dữ liệu lý lịch của Nguyễn Minh Anh đã điền đầy đủ, chọn mẫu trình bày | 1. Mở công cụ tạo hồ sơ<br>2. Nhập dữ liệu<br>3. Nhấn Xuất tệp PDF | Hệ thống tạo tệp CV_MinhAnh_Frontend_2026.pdf khổ A4, giữ đúng bố cục và tiếng Việt | Tệp PDF tải về hiển thị rõ ràng, đầy đủ thông tin tiếng Việt | Đạt |
 
-Bảng 3.42: Thống kê đo lường hiệu năng và độ chính xác phân hệ Hồ sơ & Tin tuyển dụng (Performance & Accuracy Metrics)
+Bảng 3.43: Thống kê đo lường hiệu năng và độ chính xác phân hệ Hồ sơ & Tin tuyển dụng
 
-| Chỉ số đo lường kỹ thuật | Phương pháp kiểm thử | Tiêu chuẩn cam kết (SLA) | Kết quả đo đạc thực tế | Mức độ tối ưu |
+| Chỉ số đo lường kỹ thuật | Phương pháp kiểm thử | Tiêu chuẩn cam kết | Kết quả đo đạc thực tế | Mức độ tối ưu |
 | :--- | :--- | :---: | :---: | :---: |
-| Tốc độ kết xuất hồ sơ PDF | Thực thi động cơ Chromium PDF Headless | < 1,500 mili-giây | 320 - 450 mili-giây | Vượt chuẩn SLA 3.3 lần |
-| Dung lượng tệp PDF tạo ra | Phân tích kích thước tệp vector khổ chuẩn A4 | < 500 KB / tệp | 184 KB / tệp | Tối ưu hóa băng thông tải |
-| Độ chuẩn xác phông chữ tiếng Việt | Kiểm tra bảng mã Unicode dựng sẵn UTF-8 | 100% không lỗi ký tự | 100% hiển thị chuẩn nét | Hoàn hảo không vỡ chữ |
-| Độ khớp từ khóa ATS | Thuật toán đối sánh từ khóa kỹ thuật với JD | > 85% từ khóa cốt lõi | 94.2% độ khớp chính xác | Đạt chuẩn ATS quốc tế |
-| Tốc độ lọc danh sách việc làm | Đánh giá truy vấn trên 50,000 tin tuyển dụng | < 300 mili-giây | 65 mili-giây | Đáp ứng tức thì thời gian thực |
+| Tốc độ kết xuất hồ sơ PDF | Thực thi công cụ tạo tệp PDF khổ A4 | < 1,500 mili-giây | 320 - 450 mili-giây | Đạt yêu cầu |
+| Dung lượng tệp PDF tạo ra | Kiểm tra kích thước tệp PDF xuất từ mẫu hồ sơ | < 5,000 KB / tệp | 184 KB / tệp | Đạt yêu cầu |
+| Độ chuẩn xác phông chữ tiếng Việt | Kiểm tra bảng mã Unicode dựng sẵn UTF-8 | 100% không lỗi ký tự | 100% hiển thị chuẩn nét | Đạt yêu cầu |
+| Tính mức khớp kỹ năng gợi ý (MatchScore) | Đối chiếu mã kỹ năng ứng viên với trọng số kỹ năng yêu cầu của tin | Đúng công thức trọng số và liệt kê đúng kỹ năng thiếu | Khớp 100% với kết quả tính kiểm tra (VD: 7/8 trọng số = 87,5%, hiển thị 88%) | Đạt yêu cầu |
+| Tốc độ lọc danh sách việc làm | Kiểm tra truy vấn lọc đa điều kiện trên bộ dữ liệu thử nghiệm | < 300 mili-giây | 65 mili-giây | Đạt yêu cầu |
 
-Bảng 3.43: Kịch bản kiểm thử phân hệ Tìm kiếm, Ứng tuyển và Quản lý phễu
+[[IMAGE: assets/diagrams/hinh_3_5_2_c_test_job_cv.png | Caption: Hình ảnh 3.5.2.c. Kiểm thử chức năng tạo hồ sơ PDF, đăng tin tuyển dụng và đối chiếu kỹ năng.]]
+
+Bảng 3.44: Kịch bản kiểm thử phân hệ Tìm kiếm, Ứng tuyển và Quản lý ứng viên
 
 | Mã kịch bản | Tên ca kiểm thử | Mục đích kiểm tra | Dữ liệu đầu vào | Các bước thực hiện | Kết quả mong đợi | Kết quả thực tế | Đánh giá |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| KT-07 | Tìm kiếm kết hợp đa tiêu chí | Kiểm tra tính chính xác của câu truy vấn lọc | Từ khóa: `Lập trình viên`, Ngành: `Công nghệ thông tin`, Tỉnh: `Hà Nội` | 1. Nhập từ khóa<br>2. Chọn bộ lọc tương ứng<br>3. Nhấn Tìm kiếm | Trả về danh sách chỉ gồm các việc làm thỏa mãn đồng thời cả ba điều kiện trên | Danh sách lọc chính xác các bài đăng phù hợp | Đạt |
-| KT-08 | Thử nghiệm tiêm mã lệnh độc hại vào ô tìm kiếm | Kiểm tra khả năng chống tấn công SQL Injection | Từ khóa: `' OR '1'='1' --` | 1. Nhập chuỗi mã độc vào ô tìm kiếm<br>2. Nhấn Tìm kiếm | Hệ thống xử lý chuỗi dưới dạng văn bản thuần, không xảy ra lỗi cơ sở dữ liệu | Không phát sinh lỗi hệ thống, hiển thị không tìm thấy kết quả | Đạt |
-| KT-09 | Nộp hồ sơ ứng tuyển lần đầu | Kiểm tra chức năng nộp đơn hợp lệ | Chọn bài tuyển dụng đang mở, chọn bản lý lịch mặc định | 1. Bấm Ứng tuyển ngay<br>2. Nhập thư giới thiệu<br>3. Bấm Xác nhận nộp | Ghi nhận bản ghi vào cơ sở dữ liệu với trạng thái Đã nộp, hiển thị thông báo thành công | Hồ sơ được ghi nhận tức thì, lịch sử ứng tuyển cập nhật | Đạt |
-| KT-10 | Nộp hồ sơ trùng lặp vào cùng một bài đăng | Kiểm tra cơ chế chống nộp đơn liên tiếp | Bài tuyển dụng đã nộp hồ sơ trước đó | 1. Vào lại tin đã nộp<br>2. Thao tác gửi đơn tiếp | Hệ thống đưa ra cảnh báo Bạn đã ứng tuyển vị trí này và chặn gửi đơn | Hệ thống vô hiệu hóa nút nộp và hiển thị cảnh báo | Đạt |
-| KT-11 | Chuyển trạng thái ứng viên trên bảng phễu | Kiểm tra luồng chuyển đổi trạng thái của doanh nghiệp | Chuyển thẻ ứng viên từ cột Tiếp nhận sang Hẹn phỏng vấn | 1. Mở bảng phễu quản lý<br>2. Kéo chuyển thẻ ứng viên<br>3. Xác nhận chuyển | Trạng thái trong cơ sở dữ liệu đổi sang Hẹn phỏng vấn và phát sinh thông báo cho ứng viên | Trạng thái cập nhật thành công, ứng viên nhận được thông báo | Đạt |
+| KT-07 | Tìm kiếm kết hợp đa tiêu chí | Kiểm tra tính chính xác của câu truy vấn lọc | Từ khóa: Frontend Developer, Địa điểm: Hà Nội, Lương tối thiểu: 14 triệu, Hình thức: Toàn thời gian | 1. Nhập từ khóa và địa điểm<br>2. Chọn điều kiện lọc và nhấn Áp dụng bộ lọc | Trả về danh sách chỉ gồm các tin đang hoạt động, còn hạn và thỏa mãn đồng thời các điều kiện đã chọn (MH01) | Danh sách lọc chính xác các tin phù hợp và giữ nguyên nhãn điều kiện | Đạt |
+| KT-08 | Thử nghiệm tiêm mã lệnh độc hại vào ô tìm kiếm | Kiểm tra khả năng chống tấn công SQL Injection | Từ khóa: ' OR '1'='1' -- | 1. Nhập chuỗi ký tự vào ô tìm kiếm<br>2. Nhấn Tìm kiếm | Hệ thống xử lý chuỗi dưới dạng văn bản thuần, không xảy ra lỗi cơ sở dữ liệu | Không phát sinh lỗi hệ thống, hiển thị màn hình không có kết quả phù hợp (MH08) | Đạt |
+| KT-09 | Nộp hồ sơ ứng tuyển lần đầu | Kiểm tra chức năng nộp đơn hợp lệ | Ứng viên CandidateID = 17, tin JobID = 241, bản hồ sơ ResumeID = 41 (CV_MinhAnh_Frontend_2026.pdf) | 1. Bấm Ứng tuyển ngay tại MH02<br>2. Chọn hồ sơ ở MH03, kiểm tra ở MH06<br>3. Tích đồng ý và bấm Xác nhận gửi hồ sơ | Lưu bản ghi vào bảng Applications với trạng thái Submitted (Đã gửi hồ sơ), cấp mã đơn TC-000381 và mở MH07 | Đơn được lưu thành công, hiển thị MH07 với mã TC-000381 và gửi thông báo cho doanh nghiệp | Đạt |
+| KT-10 | Nộp hồ sơ trùng lặp vào cùng một bài đăng | Kiểm tra cơ chế chống nộp đơn trùng đang xử lý | Ứng viên CandidateID = 17 gửi lại hồ sơ cho tin JobID = 241 khi đơn TC-000381 đang xử lý | 1. Mở lại tin đã nộp<br>2. Chọn hồ sơ và nhấn Xác nhận gửi hồ sơ | Hệ thống phát hiện đã có đơn đang xử lý, không tạo đơn mới, hiển thị hộp thông báo MH09 kèm mã đơn TC-000381 và nút Mở đơn đã gửi | Hiển thị đúng màn hình MH09 với thông tin đơn cũ và nút Mở đơn đã gửi, không sinh bản ghi trùng | Đạt |
+| KT-11 | Chuyển trạng thái ứng viên trên bảng quản lý | Kiểm tra luồng xử lý hồ sơ của nhà tuyển dụng | Chuyển đơn TC-000381 từ giai đoạn Hồ sơ mới nộp sang Mời phỏng vấn | 1. Mở bảng quản lý ứng viên<br>2. Chuyển thẻ ứng viên sang giai đoạn Mời phỏng vấn<br>3. Xác nhận cập nhật | Trạng thái đơn trong bảng Applications đổi từ Submitted sang Interview, ghi lịch sử vào ApplicationHistories và gửi thông báo cho ứng viên | Trạng thái cập nhật chính xác, lưu lịch sử người thao tác và ứng viên nhận được thông báo | Đạt |
 
-Bảng 3.44: Thống kê tổng hợp độ bao phủ kiểm thử và mức độ khắc phục khiếm khuyết toàn hệ thống (Test Coverage & Defect Metrics)
+[[IMAGE: assets/diagrams/hinh_3_5_2_d_test_apply_kanban.png | Caption: Hình ảnh 3.5.2.d. Kiểm thử luồng nộp hồ sơ ứng tuyển, bắt lỗi nộp trùng (MH09) và cập nhật giai đoạn ứng viên.]]
 
-| Phân hệ chức năng phần mềm | Tổng ca kiểm thử | Độ bao phủ (Coverage) | Lỗi phát hiện | Lỗi đã sửa | Tỷ lệ sửa lỗi (%) | Kết luận nghiệm thu |
+Tổng hợp toàn bộ quá trình kiểm thử, nhóm đã thực hiện tổng cộng 100 ca kiểm thử trên toàn hệ thống, bao gồm 47 ca kiểm thử tích hợp tự động các điểm cuối API, 38 ca kiểm thử đơn vị cho các hàm xử lý dữ liệu và 15 ca kiểm thử hộp đen giao diện và bảo mật trọng tâm:
+
+Bảng 3.45: Thống kê tổng hợp độ bao phủ kiểm thử và mức độ khắc phục khiếm khuyết toàn hệ thống
+
+| Phân hệ chức năng phần mềm | Tổng ca kiểm thử | Độ bao phủ | Lỗi phát hiện | Lỗi đã sửa | Tỷ lệ sửa lỗi (%) | Kết luận nghiệm thu |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | Xác thực & Quản trị tài khoản | 18 | 92.4% | 4 | 4 | 100% | Đạt tiêu chuẩn nghiệm thu |
-| Hồ sơ năng lực & CV ATS | 22 | 89.6% | 6 | 6 | 100% | Đạt tiêu chuẩn nghiệm thu |
-| Tìm kiếm & Đăng tin tuyển dụng | 26 | 94.1% | 5 | 5 | 100% | Đạt tiêu chuẩn nghiệm thu |
-| Ứng tuyển & Bảng phễu ATS | 20 | 91.8% | 3 | 3 | 100% | Đạt tiêu chuẩn nghiệm thu |
-| Quản trị viên & Báo cáo số liệu | 14 | 88.5% | 2 | 2 | 100% | Đạt tiêu chuẩn nghiệm thu |
-| **Tổng thể toàn bộ dự án phần mềm** | **100** | **91.3%** | **20** | **20** | **100%** | **Đủ điều kiện đóng gói & bàn giao triển khai** |
+| Hồ sơ trực tuyến & Xuất PDF | 22 | 89.6% | 6 | 6 | 100% | Đạt tiêu chuẩn nghiệm thu |
+| Tìm kiếm, Gợi ý & Đăng tin tuyển dụng | 26 | 94.1% | 5 | 5 | 100% | Đạt tiêu chuẩn nghiệm thu |
+| Ứng tuyển & Quản lý ứng viên | 20 | 91.8% | 3 | 3 | 100% | Đạt tiêu chuẩn nghiệm thu |
+| Kiểm duyệt & Thống kê vận hành | 14 | 88.5% | 2 | 2 | 100% | Đạt tiêu chuẩn nghiệm thu |
+| Tổng thể toàn bộ dự án phần mềm | 100 | 91.3% | 20 | 20 | 100% | Đủ điều kiện đóng gói & bàn giao triển khai |
 
 
 3.5.3. Triển khai và Cài đặt
 
-Quy trình đóng gói và triển khai hệ thống TalentConnect được thực hiện qua các bước tuần tự và chặt chẽ. Trước hết, đội ngũ kỹ thuật tiến hành chuẩn bị môi trường máy chủ chạy nền tảng Node.js cùng hệ quản trị cơ sở dữ liệu quan hệ SQL Server. Tiếp theo, hệ thống được thiết lập các biến môi trường bảo mật độc lập lưu trữ trong tệp cấu hình chứa thông tin kết nối và khóa bí mật của mã thông báo xác thực. Sau đó, kịch bản dịch chuyển dữ liệu được thực thi để khởi tạo đồng bộ toàn bộ 28 bảng dữ liệu quan hệ và nạp dữ liệu từ điển ban đầu. Kế tiếp, mã nguồn tầng giao diện ReactJS được đóng gói sang các tệp tĩnh nhằm tối ưu hóa dung lượng truyền tải trên mạng. Cuối cùng, máy chủ dịch vụ phía sau được kích hoạt và cấu hình các chính sách tường lửa mạng bảo đảm an toàn trước khi chính thức mở cổng phục vụ người dùng.
+Quy trình đóng gói và triển khai hệ thống TalentConnect được thực hiện qua các bước tuần tự. Trước hết, nhóm chuẩn bị môi trường máy chủ chạy nền tảng Node.js cùng Hệ quản trị cơ sở dữ liệu quan hệ Microsoft SQL Server 2022. Tiếp theo, hệ thống được thiết lập các biến môi trường lưu trữ trong tệp cấu hình riêng (.env), bao gồm chuỗi kết nối cơ sở dữ liệu, giới hạn dung lượng tệp tải lên và khóa bí mật ký JWT. Sau đó, kịch bản khởi tạo cơ sở dữ liệu được thực thi để tạo đồng bộ 28 bảng dữ liệu quan hệ, các ràng buộc khóa ngoại và nạp dữ liệu danh mục ban đầu (vai trò, ngành nghề, kỹ năng chuyên môn). Kế tiếp, mã nguồn tầng giao diện ReactJS được biên dịch sang các tệp tĩnh để giảm dung lượng truyền tải. Cuối cùng, dịch vụ máy chủ được khởi chạy, kiểm tra kết nối với cơ sở dữ liệu và thư mục lưu trữ tệp PDF trước khi mở cổng phục vụ người dùng.
 
 ---
 
@@ -1302,25 +1529,25 @@ Quy trình đóng gói và triển khai hệ thống TalentConnect được th�
 
 3.6.1. Khái niệm và Vai trò
 
-Bảo trì phần mềm là tập hợp toàn bộ các hoạt động điều chỉnh, sửa đổi và nâng cấp hệ thống phần mềm sau khi đã được bàn giao và đưa vào khai thác thực tế, nhằm khắc phục lỗi, thích nghi với môi trường mới và không ngừng nâng cao chất lượng phục vụ.
+Bảo trì phần mềm là tập hợp các hoạt động kiểm tra, sửa lỗi, điều chỉnh và nâng cấp hệ thống sau khi đã đưa vào vận hành, nhằm khắc phục các sai sót phát sinh trong thực tế sử dụng, thích ứng với thay đổi của môi trường kỹ thuật và cải thiện chất lượng phục vụ người tìm việc cùng doanh nghiệp.
 
 3.6.2. Các loại hình bảo trì áp dụng
 
-Hoạt động bảo trì hệ thống được chia thành bốn loại hình chiến lược. Thứ nhất là bảo trì sửa lỗi, tập trung xử lý dứt điểm các khiếm khuyết phát sinh trong quá trình vận hành thực tế. Thứ hai là bảo trì thích nghi, thực hiện cập nhật hệ thống bảo đảm tính tương thích hoàn hảo với các phiên bản mới của trình duyệt web và hệ quản trị cơ sở dữ liệu. Thứ ba là bảo trì hoàn thiện, nâng cấp hiệu năng tìm kiếm việc làm và tối ưu hóa tính công thái học của giao diện người dùng theo phản hồi thực tế. Thứ tư là bảo trì phòng ngừa, tiến hành rà soát định kỳ các lỗ hổng an toàn thông tin và cập nhật kịp thời các bản vá bảo mật trên toàn máy chủ.
+Hoạt động bảo trì hệ thống TalentConnect bao gồm bốn loại hình theo chuẩn công nghệ phần mềm: bảo trì sửa lỗi tập trung xử lý các sai sót về dữ liệu, giao diện hoặc phân quyền phát sinh trong quá trình người dùng thao tác; bảo trì thích nghi cập nhật cấu hình và thư viện để tương thích với các phiên bản mới của trình duyệt web, môi trường Node.js và hệ quản trị cơ sở dữ liệu; bảo trì hoàn thiện tối ưu tốc độ truy vấn tìm kiếm việc làm và cải thiện bố cục, thao tác trên các biểu mẫu theo góp ý thực tế; còn bảo trì phòng ngừa định kỳ rà soát nhật ký thao tác, kiểm tra an toàn thông tin, sao lưu dữ liệu và dọn dẹp các phiên làm việc đã hết hạn.
 
 3.6.3. Phân tích lỗi và Phương án bảo trì cụ thể
 
-Trường hợp thứ nhất là hiện tượng nghẽn hiệu năng truy vấn khi số lượng bài đăng và ứng viên tăng cao. Nguyên nhân của hiện tượng này xuất phát từ việc thiếu vắng cấu trúc chỉ mục trên các cột dữ liệu được tra cứu thường xuyên. Để khắc phục, đội ngũ kỹ thuật triển khai phương án đánh chỉ mục trên các trường tiêu đề công việc, mã ngành nghề, địa điểm làm việc và áp dụng kỹ thuật phân trang truy vấn chặt chẽ.
+Đối với hiện tượng chậm truy vấn khi số lượng tin tuyển dụng và đơn ứng tuyển tăng lên, nguyên nhân xuất phát từ việc thiếu chỉ mục trên các cột thường xuyên dùng để lọc và sắp xếp. Nhóm khắc phục bằng cách bổ sung chỉ mục tìm kiếm trên các cột trạng thái tin, hạn nhận đơn, mã ngành nghề, địa điểm làm việc và áp dụng phân trang ngay tại tầng cơ sở dữ liệu.
 
-Trường hợp thứ hai là rủi ro tệp đính kèm chứa mã độc hoặc quá dung lượng. Nguyên nhân của sự cố là do cơ chế kiểm tra định dạng tệp lỏng lẻo phía máy khách. Phương án giải quyết là thiết lập cơ chế thẩm định mã nhị phân tệp tin phía máy chủ, áp dụng trần dung lượng tối đa năm megabyte và tự động đổi tên tệp thành chuỗi ngẫu nhiên duy nhất nhằm phòng chống mã độc xâm nhập.
+Đối với rủi ro tệp hồ sơ tải lên sai định dạng hoặc vượt quá dung lượng cho phép do chỉ kiểm tra phần mở rộng tên tệp ở trình duyệt, nhóm bổ sung bước kiểm tra định dạng MIME và chữ ký tệp PDF ở phía máy chủ, giới hạn dung lượng tối đa 5 MB đúng như thiết kế màn hình MH04 và tự động chuẩn hóa tên tệp lưu trữ trên máy chủ để tránh ghi đè tệp cũ.
 
-Trường hợp thứ ba là xung đột trạng thái khi tin tuyển dụng bị đóng trong lúc ứng viên đang nộp đơn. Nguyên nhân của sự cố nằm ở việc thiếu cơ chế giao dịch đồng bộ khi xử lý đơn ứng tuyển. Phương án xử lý là áp dụng giao dịch cơ sở dữ liệu với mức cô lập nghiêm ngặt trong hệ quản trị để kiểm tra chặt chẽ điều kiện trước khi chính thức ghi nhận bản ghi.
+Đối với tình huống xung đột trạng thái khi tin tuyển dụng bị đóng trong lúc ứng viên đang chuẩn bị hồ sơ hoặc khi có hai yêu cầu gửi đơn đồng thời, nguyên nhân nằm ở việc kiểm tra trạng thái tin và ghi nhận đơn tách rời nhau. Nhóm xử lý bằng cách gom bước kiểm tra tình trạng tin, kiểm tra đơn trùng và tạo bản ghi đơn mới vào cùng một giao dịch cơ sở dữ liệu, đồng thời giữ nguyên dữ liệu trên biểu mẫu và hiển thị thông báo rõ ràng tại màn hình MH09 hoặc MH10.
 
-Trường hợp thứ tư là lỗi vỡ giao diện và sai phông chữ tiếng Việt khi xuất tệp tài liệu PDF. Nguyên nhân là do bộ phông chữ mặc định của hệ thống máy chủ thiếu bảng mã ký tự tiếng Việt có dấu. Phương án khắc phục là nhúng trực tiếp bộ phông chữ chuẩn quốc tế vào động cơ kết xuất tài liệu số để bảo đảm mọi tài liệu xuất bản đều hiển thị sắc nét và chuẩn xác.
+Đối với lỗi hiển thị sai dấu tiếng Việt khi xuất tệp PDF từ công cụ tạo hồ sơ trực tuyến do máy chủ thiếu phông chữ Unicode, nhóm nhúng trực tiếp bộ phông chữ chuẩn Unicode tiếng Việt vào công cụ kết xuất PDF để mọi bản hồ sơ xuất ra đều hiển thị rõ nét.
 
 3.6.4. Quy trình thực hiện bảo trì
 
-Quy trình thực hiện bảo trì phần mềm được chuẩn hóa thành một chu trình năm bước chặt chẽ, bắt đầu từ khâu tiếp nhận và phân loại lỗi theo mức độ nghiêm trọng, chuyển sang bước tái hiện lỗi trong môi trường thử nghiệm độc lập, tiếp tục với công tác lập phương án và hiệu chỉnh mã nguồn trên nhánh phát triển riêng biệt, thực hiện kiểm thử hồi quy toàn diện để đảm bảo không làm phát sinh lỗi mới, và kết thúc bằng việc triển khai bản vá lỗi an toàn lên hệ thống máy chủ chính thức.
+Quy trình bảo trì phần mềm của hệ thống diễn ra qua năm bước: tiếp nhận phản hồi và phân loại lỗi theo mức độ ảnh hưởng đến dữ liệu và quyền truy cập; tái hiện lỗi trên môi trường thử nghiệm độc lập; phân tích nguyên nhân và chỉnh sửa mã nguồn trên nhánh phát triển riêng; chạy lại bộ kịch bản kiểm thử hồi quy để bảo đảm việc sửa lỗi không làm ảnh hưởng đến các chức năng đã ổn định; và cập nhật phiên bản mới lên máy chủ kèm ghi nhận vào tài liệu kỹ thuật.
 
 <div style="page-break-after: always;"></div>
 
@@ -1328,26 +1555,30 @@ IV. KẾT LUẬN
 
 4.1. Tóm tắt nội dung
 
-Bài tập lớn kết thúc học phần Công nghệ phần mềm với đề tài "Quy trình xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect" đã hoàn thành trọn vẹn toàn bộ các mục tiêu nghiên cứu và thực nghiệm theo đúng barem yêu cầu của giảng viên hướng dẫn ThS. Bùi Thị Thanh.
+Bài tập lớn học phần Công nghệ phần mềm với đề tài "Quy trình xây dựng Website tuyển dụng và tìm kiếm việc làm TalentConnect" đã hoàn thành đầy đủ các nội dung từ khảo sát, phân tích yêu cầu đến thiết kế, lập trình và kiểm thử dưới sự hướng dẫn của giảng viên ThS. Bùi Thị Thanh.
 
-Nhóm đã làm chủ quy trình phát triển phần mềm theo mô hình Xoắn ốc, thực hiện khảo sát hiện trạng thực tế, đặc tả chi tiết các yêu cầu, thiết kế kiến trúc ba tầng vững chắc, xây dựng hệ thống cơ sở dữ liệu quan hệ hoàn chỉnh gồm 28 bảng thực thể đạt chuẩn ba dạng chuẩn, thiết kế giao diện công thái học hiện đại, lập trình các chức năng cốt lõi và kiểm thử toàn diện bảo đảm chất lượng phần mềm.
+Nhóm đã vận dụng quy trình phát triển phần mềm theo mô hình Xoắn ốc qua ba vòng lặp có kiểm soát rủi ro, xác định rõ phạm vi nghiệp vụ giữa người tìm việc, nhà tuyển dụng và ban quản trị, mô hình hóa các luồng xử lý bằng biểu đồ ca sử dụng và sơ đồ luồng dữ liệu, thiết kế kiến trúc ba tầng, xây dựng cơ sở dữ liệu quan hệ gồm 28 bảng đạt dạng chuẩn 3, thiết kế chi tiết 22 màn hình giao diện người dùng bao gồm cụm 10 màn hình từ MH01 đến MH10 cho luồng tìm kiếm, gợi ý kỹ năng và nộp hồ sơ ứng tuyển, lập trình các chức năng cốt lõi và kiểm thử 100 kịch bản trên toàn hệ thống.
 
 4.2. Bài học rút ra
 
-Quá trình thực hiện đề tài đã mang lại cho nhóm những bài học thực tiễn sâu sắc. Thứ nhất là bài học về phương pháp tiếp cận có hệ thống: việc phân tích và thiết kế bài bản trước khi lập trình giúp giảm thiểu tối đa rủi ro sửa đổi mã nguồn ở các giai đoạn sau. Thứ hai là bài học về kiểm soát rủi ro và làm việc nhóm: việc phân định trách nhiệm rõ ràng cho từng thành viên và nghiệm thu sản phẩm chạy được sau mỗi chu kỳ giúp nhóm luôn chủ động kiểm soát chất lượng và tiến độ. Thứ ba là bài học về tư duy hướng người dùng: thiết kế giao diện và luồng nghiệp vụ luôn phải lấy sự tiện lợi, an toàn và tính minh bạch thông tin của ứng viên cùng nhà tuyển dụng làm trọng tâm phụng sự.
+Qua 12 tuần làm đề tài, bài học rõ nhất với cả sáu thành viên là giá trị của việc chốt kỹ sơ đồ luồng dữ liệu, cấu trúc 28 bảng cơ sở dữ liệu và các ràng buộc toàn vẹn trước khi bắt tay vào viết mã nguồn, nhờ đó giảm hẳn tình trạng lệch tên trường hoặc phải sửa lại bảng khi ghép nối các phân hệ. Bên cạnh đó, cách chia dự án thành ba vòng xoắn ốc gắn với sản phẩm chạy thử ở từng chặng giúp nhóm phát hiện sớm những điểm bất cập về tốc độ truy vấn, phân quyền xem hồ sơ và bố cục biểu mẫu thay vì dồn rủi ro đến tuần cuối. Ở góc độ thiết kế giao diện, nhóm cũng nhận thấy mỗi màn hình và thông báo lỗi phải giải thích rõ nguyên nhân và giữ lại dữ liệu người dùng vừa nhập, đặc biệt ở các bước tải tệp PDF và xác nhận nộp đơn.
 
 4.3. Hạn chế và hướng phát triển
 
-Mặc dù đã đạt được các mục tiêu đề ra, hệ thống vẫn còn một số hạn chế nhất định do điều kiện thử nghiệm trên môi trường máy chủ nội bộ và chưa tích hợp cổng thanh toán trực tuyến chính thức. Trong tương lai, hướng phát triển trọng tâm của đề tài là tích hợp trí tuệ nhân tạo để tự động chấm điểm độ tương thích giữa hồ sơ ứng viên và yêu cầu tuyển dụng, phát triển ứng dụng di động đa nền tảng và tích hợp phòng họp trực tuyến phục vụ các buổi phỏng vấn từ xa thuận tiện.
+Do nhóm sáu sinh viên thực hiện dự án trong 12 tuần với các công cụ miễn phí và thử nghiệm trên môi trường máy chủ phát triển nội bộ, hệ thống hiện tập trung giải quyết các luồng nghiệp vụ tuyển dụng, tìm kiếm, đối chiếu kỹ năng theo trọng số và nộp hồ sơ cốt lõi. Các tính năng đòi hỏi hạ tầng bên thứ ba hoặc chi phí vận hành lớn như cổng thanh toán trực tuyến cho gói dịch vụ doanh nghiệp, phòng họp phỏng vấn truyền hình trực tiếp tích hợp sẵn trên trình duyệt và mô hình học máy chuyên sâu phân tích ngữ nghĩa tự động toàn văn bản hồ sơ được giữ ngoài phạm vi học phần. Đây chính là các hướng phát triển tiếp theo để hoàn thiện và mở rộng quy mô hệ thống TalentConnect trong tương lai.
 
 <div style="page-break-after: always;"></div>
 
 V. TÀI LIỆU THAM KHẢO
 
-1. Bùi Thị Thanh (2024), Bài giảng học phần Công nghệ phần mềm, Khoa Khoa học Liên ngành - Ngoại ngữ - Tin học, Học viện Hành chính Quốc gia.
+1. Bùi Thị Thanh (2024), Bài giảng học phần Công nghệ phần mềm, Khoa Khoa học Liên ngành - Ngoại ngữ - Tin học, Học viện Hành chính và Quản trị công.
 2. Roger S. Pressman, Bruce R. Maxim (2020), Software Engineering: A Practitioner's Approach, 9th Edition, McGraw-Hill Education.
 3. Ian Sommerville (2016), Software Engineering, 10th Edition, Pearson Education.
 4. Đặng Văn Đức (2008), Phân tích và thiết kế hướng đối tượng sử dụng UML, Nhà xuất bản Khoa học và Kỹ thuật, Hà Nội.
 5. Abraham Silberschatz, Henry F. Korth, S. Sudarshan (2019), Database System Concepts, 7th Edition, McGraw-Hill.
 6. Open Web Application Security Project (2021), Top 10 Web Application Security Risks, Tài liệu hướng dẫn an toàn ứng dụng web.
 7. Bộ Thông tin và Truyền thông (2023), Nghị định số 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân, Chính phủ nước Cộng hòa Xã hội Chủ nghĩa Việt Nam.
+8. TopCV (2026), *Trang tìm việc Frontend và trang chi tiết công việc*, https://www.topcv.vn/tim-viec-lam-frontend, truy cập ngày 05/10/2026.
+9. Indeed (2026), *Applying for a Job on Indeed*, https://support.indeed.com/hc/en-us/articles/204652920-Applying-for-a-Job-Using-a-Resume-File, truy cập ngày 05/10/2026.
+10. Nielsen Norman Group, *Ten Usability Heuristics for User Interface Design*, https://www.nngroup.com/articles/ten-usability-heuristics/, truy cập ngày 05/10/2026.
+11. W3C Web Accessibility Initiative (WAI), *Notifications and Multi-page Forms Tutorials*, https://www.w3.org/WAI/tutorials/forms/, truy cập ngày 05/10/2026.

@@ -10,8 +10,8 @@ Các địa chỉ `example.test` là định danh dành riêng cho môi trườn
 
 ## Quản trị viên
 
-| Họ tên | Email đăng nhập | Phạm vi | Trạng thái |
-|---|---|---|---|
+| Họ tên                  | Email đăng nhập        | Phạm vi                       | Trạng thái     |
+| ----------------------- | ---------------------- | ----------------------------- | -------------- |
 | Quản trị viên cục bộ 01 | `admin01@example.test` | Toàn thành phố trong ứng dụng | Đang hoạt động |
 | Quản trị viên cục bộ 02 | `admin02@example.test` | Toàn thành phố trong ứng dụng | Đang hoạt động |
 
