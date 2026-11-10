@@ -1,0 +1,31 @@
+﻿Ma_Phieu,Nhom_Nguoi_Dung,NV1,NV2,NV3,NV4,NV5,NV6,PC1,PC2,PC3,PM1,PM2,PM3,DL1,DL2,DL3,MC1,MC2,MC3,CN1,CN2,CN3,Diem_TB,Y_Kien_Dong_Gop
+KS001,Hành khách đi công tác,4,5,4,4,5,3,4,4,4,4,4,3,5,4,4,4,4,4,4,4,3,"4,00","App dễ dùng, làm thủ tục online nhanh nên ra sân bay đỡ phải xếp hàng."
+KS002,"Hành khách đi du lịch, thăm thân",4,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,"4,05","Giao diện dễ nhìn, giá vé hiện rõ cả thuế phí từ đầu."
+KS003,Hành khách đi công tác,4,4,4,4,4,1,4,4,4,3,4,1,4,4,4,3,4,3,4,3,2,"3,43","Muốn đổi giờ bay trên app mà không tự đổi được, vẫn phải gọi tổng đài hơi bất tiện."
+KS004,"Hành khách đi du lịch, thăm thân",3,3,3,1,3,2,3,3,3,3,3,2,3,2,3,2,1,3,2,2,1,"2,43","Lúc chuyển khoản quét mã QR bị trừ tiền rồi mà web báo hết thời gian giữ chỗ, phải chờ hơn tuần mới được hoàn lại tiền."
+KS005,Hội viên Bông Sen Vàng,5,4,4,4,4,2,4,4,4,4,4,3,5,4,5,4,4,4,4,2,3,"3,86","Mục tra cứu vé chỉ cần nhập mã đặt chỗ với họ tên là xem được hết thông tin, nên có thêm mã OTP cho an toàn."
+KS006,Hành khách đi công tác,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,"4,00",Ổn.
+KS007,"Nhân viên bán vé, phục vụ mặt đất",5,4,4,4,2,4,4,2,3,4,4,4,4,4,4,4,4,3,4,4,4,"3,76","Giờ cao điểm buổi sáng khách đông, máy in thẻ tự động ở sân bay thỉnh thoảng hết giấy mà không có thông báo sớm."
+KS008,"Hành khách đi du lịch, thăm thân",3,2,3,3,3,3,2,3,3,3,3,3,3,3,3,1,3,3,3,3,3,"2,81","Mấy đợt mở bán vé Tết vào tìm chuyến bay mạng rất chậm, chọn xong ghế hay bị báo lỗi kết nối."
+KS009,Hành khách đi công tác,2,4,4,5,4,4,4,4,4,4,4,4,4,4,3,4,4,4,4,4,4,"3,90","Mở web trên máy tính để so sánh giờ bay một lúc là tài khoản tự thoát ra, phải đăng nhập lại."
+KS010,"Hành khách đi du lịch, thăm thân",4,4,3,4,1,3,3,3,3,3,2,3,3,3,4,3,3,3,3,3,3,"3,05","Làm thủ tục online đã chọn sẵn ghế ngồi cạnh nhau cho cả nhà, đến lúc ra sân bay đổi máy bay khác lại bị xếp tách ra mỗi người một hàng."
+KS011,Hành khách đi công tác,4,4,4,4,5,4,5,4,5,4,4,4,4,4,4,4,4,5,4,4,4,"4,19","Làm thủ tục trên điện thoại nhanh, tiện."
+KS012,"Hành khách đi du lịch, thăm thân",3,2,2,3,3,3,3,3,3,2,3,3,4,3,3,3,3,3,3,2,3,"2,86","Lúc đặt vé có nhiều mục gợi ý mua thêm bảo hiểm với dịch vụ đi kèm, người lớn tuổi không để ý rất dễ bấm nhầm."
+KS013,Hội viên Bông Sen Vàng,5,5,4,4,5,2,5,4,4,4,4,2,5,4,5,4,4,4,4,4,3,"4,05",Đặt vé khứ hồi tới lúc muốn đổi giờ bay chiều về trên app thì không tự bấm đổi được.
+KS014,Hành khách đi công tác,4,4,4,3,4,2,4,4,4,4,4,2,4,4,4,4,4,3,4,4,2,"3,62","Hoàn tiền khi hủy vé còn hơi lâu, mình phải đợi gần hai tuần mới nhận lại được tiền."
+KS015,"Hành khách đi du lịch, thăm thân",3,4,4,5,4,4,4,4,4,4,4,4,4,4,4,4,5,4,4,4,4,"4,05",(Để trống)
+KS016,"Nhân viên bán vé, phục vụ mặt đất",4,4,4,2,4,3,4,4,4,4,4,3,4,3,4,3,2,4,2,3,2,"3,38",Nhiều khách quét mã QR thanh toán sát lúc hết hạn giữ chỗ hay bị trừ tiền nhưng chưa ra vé ngay.
+KS017,Hành khách đi công tác,4,5,4,4,4,4,5,4,4,4,4,4,5,4,4,4,4,4,4,4,4,"4,14",(Để trống)
+KS018,"Hành khách đi du lịch, thăm thân",4,4,5,4,4,4,4,4,4,4,4,4,4,5,4,4,4,4,4,4,4,"4,10",Mua thêm hành lý ký gửi trước trên app rẻ và tiện hơn ra sân bay.
+KS019,Hành khách đi công tác,3,4,1,3,4,2,4,4,4,3,4,2,3,3,3,3,3,3,3,3,2,"3,05","Lỡ gõ nhầm tên đệm lúc đặt vé mà trên web không cho sửa lại, gọi tổng đài nhờ hỗ trợ thì chờ máy hơi lâu."
+KS020,"Hành khách đi du lịch, thăm thân",4,4,4,4,2,4,4,3,2,4,4,4,4,4,4,4,4,2,4,4,4,"3,67","Cổng quét khuôn mặt ở sân bay có lúc nhận diện hơi chậm, phải đứng thử lại mấy lần mới qua được."
+KS021,Hội viên Bông Sen Vàng,2,5,4,4,4,4,4,4,4,4,4,4,4,5,3,4,4,4,4,4,4,"3,95",Lúc đổi dặm lấy vé thưởng tin nhắn mã OTP gửi về điện thoại hơi chậm.
+KS022,Hành khách đi công tác,4,4,4,4,5,4,4,4,4,4,5,4,5,4,4,4,4,4,4,4,4,"4,14",Đổi cửa ra máy bay có báo ngay trên ứng dụng nên dễ theo dõi.
+KS023,"Hành khách đi du lịch, thăm thân",3,1,3,3,3,3,1,3,3,2,3,3,3,3,3,1,3,3,3,3,3,"2,67","Hôm có khuyến mãi vào đặt vé bị đứng trang web suốt, tải lại được thì đã hết vé giá rẻ."
+KS024,Hành khách đi công tác,4,4,4,4,3,1,4,4,4,4,3,2,4,4,4,4,4,4,4,1,3,"3,48","Bạn mình chụp ảnh vé đăng mạng xã hội quên che mã đặt chỗ, bị người lạ vào đổi mất ghế ngồi."
+KS025,"Hành khách đi du lịch, thăm thân",3,4,3,4,4,4,4,4,4,4,4,3,4,4,3,3,4,3,4,4,4,"3,71",Không có ý kiến.
+KS026,Hành khách đi công tác,4,4,4,5,4,4,4,4,4,4,4,4,5,5,4,4,5,4,5,4,4,"4,24","Thanh toán bằng quét mã QR ngân hàng nhanh, có vé gửi về email ngay."
+KS027,"Hành khách đi du lịch, thăm thân",3,3,3,4,3,2,4,3,3,2,3,1,4,4,3,3,4,3,3,3,3,"3,05","Chữ ở phần điều kiện hoàn đổi vé trên điện thoại hơi nhỏ, lúc bấm hoàn vé cũng không hiện sẵn số tiền được nhận lại."
+KS028,Hành khách đi công tác,4,5,4,4,4,4,5,4,4,5,4,4,4,4,4,4,4,4,4,4,4,"4,14","Bình thường, dễ sử dụng."
+KS029,Hội viên Bông Sen Vàng,5,5,5,4,4,4,5,5,4,4,4,4,5,5,5,4,4,4,5,4,4,"4,43",(Để trống)
+KS030,Hành khách đi công tác,4,3,4,2,4,1,3,4,4,4,3,1,4,4,4,2,2,4,3,3,1,"3,05",Vé bị lỗi thanh toán phải chờ hoàn tiền mà trên app không xem được tiến độ xử lý tới đâu rồi.

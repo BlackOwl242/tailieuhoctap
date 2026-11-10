@@ -1052,16 +1052,16 @@ function buildDiag2_10() {
 function buildDiag3_1() {
   const w = 940, h = 440;
   const items = [
-    { name: '1. Hạ tầng phần cứng và thiết bị sân bay', mean: 3.79, rate: '75,8%' },
-    { name: '2. Phần mềm ứng dụng (Web / App đặt vé)', mean: 3.49, rate: '69,8%' },
-    { name: '3. Cơ sở dữ liệu (Lịch bay, PNR, Vé, Dặm)', mean: 3.92, rate: '78,4%' },
-    { name: '4. Mạng viễn thông và đường truyền kết nối', mean: 3.55, rate: '71,0%' },
-    { name: '5. Con người và quy trình hỗ trợ nghiệp vụ', mean: 3.49, rate: '69,8%' },
-    { name: 'Điểm trung bình toàn hệ thống (N = 150)', mean: 3.65, rate: '73,0%', bold: true }
+    { name: '1. Hạ tầng phần cứng và thiết bị sân bay', mean: 3.78, rate: '75,6%' },
+    { name: '2. Phần mềm ứng dụng (Web / App đặt vé)', mean: 3.50, rate: '64,4%' },
+    { name: '3. Cơ sở dữ liệu (Lịch bay, PNR, Vé, Dặm)', mean: 3.91, rate: '76,7%' },
+    { name: '4. Mạng viễn thông và đường truyền kết nối', mean: 3.57, rate: '65,6%' },
+    { name: '5. Con người và quy trình hỗ trợ nghiệp vụ', mean: 3.46, rate: '60,0%' },
+    { name: 'Điểm trung bình toàn hệ thống (N = 30)', mean: 3.64, rate: '68,4%', bold: true }
   ];
   let b = `
     <rect x="15" y="15" width="910" height="410" fill="none" stroke="#000000" stroke-width="1.4"/>
-    <text x="470" y="42" text-anchor="middle" class="t-title">KẾT QUẢ KHẢO SÁT ĐÁNH GIÁ 5 THÀNH PHẦN HỆ THỐNG (THANG ĐIỂM 5, N = 150)</text>
+    <text x="470" y="42" text-anchor="middle" class="t-title">KẾT QUẢ KHẢO SÁT ĐÁNH GIÁ 5 THÀNH PHẦN HỆ THỐNG (THANG ĐIỂM 5, N = 30)</text>
 
     <line x1="335" y1="75" x2="335" y2="365" class="line-solid"/>
     <line x1="335" y1="365" x2="835" y2="365" class="line-solid"/>
@@ -1079,7 +1079,7 @@ function buildDiag3_1() {
     const fill = it.bold ? '#cbd5e1' : '#e2e8f0';
     b += `<text x="323" y="${y + 18}" text-anchor="end" class="${it.bold ? 't-sub' : 't-norm'}">${esc(it.name)}</text>`;
     b += `<rect x="335" y="${y}" width="${bw}" height="26" fill="${fill}" stroke="#000000" stroke-width="1.3"/>`;
-    b += `<text x="${335 + bw + 10}" y="${y + 18}" class="t-sub">${String(it.mean).replace('.', ',')} / 5,0 (${it.rate})</text>`;
+    b += `<text x="${335 + bw + 10}" y="${y + 18}" class="t-sub">${it.mean.toFixed(2).replace('.', ',')} / 5,0 (${it.rate})</text>`;
   });
 
   return wrapSvg(w, h, b);
