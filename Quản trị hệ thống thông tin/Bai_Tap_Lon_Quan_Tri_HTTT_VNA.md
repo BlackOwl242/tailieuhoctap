@@ -10,7 +10,8 @@ Phân tích, đánh giá và đề xuất giải pháp nâng cấp, hoàn thiệ
 BÀI TẬP LỚN KẾT THÚC HỌC PHẦN
 Học phần : Quản trị hệ thống thông tin
 GVHD : ThS. Lê Hoàng Diệp
-Mã phách : .................................................. (Để trống)
+Sinh viên : Lê Quốc Huy – 2305HTTB011
+Lớp : 2305HTTB
 
 Hà Nội - 2026
 

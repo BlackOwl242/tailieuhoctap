@@ -1,38 +1,53 @@
 """Present the saved DVCQG publication without inventing missing procedure data."""
 
 from functools import lru_cache
-import gzip
 from html import escape
 import io
 import json
-from pathlib import Path
 import re
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 import zipfile
+
+
+class _NoRedirectHandler(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise ValueError("Không theo dõi chuyển hướng ngoài nguồn công bố.")
+
+
+_OPENER = build_opener(_NoRedirectHandler())
+
+
+def _build_valid_pdf(objects: list[bytes]) -> bytes:
+    buf = bytearray(b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
+    offsets: list[int] = []
+    for idx, body in enumerate(objects, start=1):
+        offsets.append(len(buf))
+        buf.extend(f"{idx} 0 obj\n".encode("ascii"))
+        buf.extend(body)
+        buf.extend(b"\nendobj\n")
+    xref_pos = len(buf)
+    count = len(objects) + 1
+    buf.extend(f"xref\n0 {count}\n0000000000 65535 f \n".encode("ascii"))
+    for off in offsets:
+        buf.extend(f"{off:010d} 00000 n \n".encode("ascii"))
+    buf.extend(f"trailer\n<< /Size {count} /Root 1 0 R >>\nstartxref\n{xref_pos}\n%%EOF\n".encode("ascii"))
+    return bytes(buf)
 
 
 @lru_cache(maxsize=1)
 def official_snapshot():
-    path = Path(__file__).resolve().parent / "data" / "official_procedure_forms_snapshot.json"
-    if not path.exists():
-        from official_procedure_policy import publication_bundle
-        reconciled = publication_bundle()
-        return {"details": reconciled.get("details", {}), "detailCheckedAt": {code: entry.get("detailCheckedAt", "") for code, entry in reconciled.get("entries", {}).items()}}
-    snapshot = json.loads(path.read_text(encoding="utf-8"))
     from official_procedure_policy import publication_bundle
     reconciled = publication_bundle()
-    snapshot["details"] = {**snapshot.get("details", {}), **reconciled.get("details", {})}
-    snapshot["detailCheckedAt"] = {**snapshot.get("detailCheckedAt", {}), **{code: entry.get("detailCheckedAt", "") for code, entry in reconciled.get("entries", {}).items() if entry.get("status") == "matched"}}
-    return snapshot
-
-
-@lru_cache(maxsize=1)
-def bundled_details():
-    path = Path(__file__).resolve().parent / "resources" / "official_procedure_details.json.gz"
-    if not path.exists():
-        return {}
-    with gzip.open(path, "rt", encoding="utf-8") as stream:
-        return json.load(stream).get("details", {})
+    return {
+        "checkedAt": reconciled.get("checkedAt", ""),
+        "sourceUrl": reconciled.get("sourceUrl", ""),
+        "details": reconciled.get("details", {}),
+        "detailCheckedAt": {
+            code: entry.get("detailCheckedAt", "")
+            for code, entry in reconciled.get("entries", {}).items()
+            if entry.get("status") == "matched"
+        },
+    }
 
 
 def names(record, *keys):
@@ -48,7 +63,7 @@ def published_procedure_detail(code):
     snapshot = official_snapshot()
     record = snapshot.get("details", {}).get(code)
     if not record:
-        return bundled_details().get(code)
+        return None
     proposal = record.get("procedureProposal") or {}
     source_url = record.get("_sourceUrl") or f"https://dichvucong.gov.vn/thu-tuc-hanh-chinh/{record['id']}"
     levels = [("isMinistry", "Cấp Bộ"), ("isProvince", "Cấp tỉnh"),
@@ -134,20 +149,22 @@ def _build_official_template_document(code, record, comp, att):
     legal_str = "; ".join(legal_items) or (f"Quyết định công bố số {decision_no}" if decision_no else "Theo công bố trên Cổng Dịch vụ công quốc gia")
 
     if fname.lower().endswith(".pdf"):
-        text_summary = f"Bieu mau TTHC {code}: {fname}"
-        stream_data = f"BT /F1 12 Tf 50 750 Td ({escape(text_summary[:80])}) Tj ET".encode("latin-1", "replace")
-        pdf = (
-            b"%PDF-1.4\n"
-            b"1 0 obj<< /Type /Catalog /Pages 2 0 R >>endobj\n"
-            b"2 0 obj<< /Type /Pages /Kids [3 0 R] /Count 1 >>endobj\n"
-            b"3 0 obj<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>endobj\n"
-            + f"4 0 obj<< /Length {len(stream_data)} >>stream\n".encode("ascii")
-            + stream_data
-            + b"\nendstream\nendobj\n"
-            b"5 0 obj<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>endobj\n"
-            b"xref\n0 6\n0000000000 65535 f \n"
-            b"trailer<< /Root 1 0 R /Size 6 >>\nstartxref\n0\n%%EOF\n"
+        safe_label = (
+            f"Bieu mau TTHC {code}: {fname[:80]}"
+            .encode("latin-1", "replace")
+            .decode("latin-1")
+            .replace("\\", "\\\\")
+            .replace("(", "\\(")
+            .replace(")", "\\)")
         )
+        stream_data = f"BT /F1 12 Tf 50 750 Td ({safe_label}) Tj ET".encode("latin-1")
+        pdf = _build_valid_pdf([
+            b"<< /Type /Catalog /Pages 2 0 R >>",
+            b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+            b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
+            f"<< /Length {len(stream_data)} >>\nstream\n".encode("ascii") + stream_data + b"\nendstream",
+            b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        ])
         return pdf, "application/pdf"
 
     paragraphs = [
@@ -205,17 +222,6 @@ def _build_official_template_document(code, record, comp, att):
     return buf.getvalue(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 
-def export_bundled_details():
-    snapshot = official_snapshot()
-    payload = {"sourceUrl": snapshot.get("sourceUrl"), "checkedAt": snapshot.get("checkedAt"),
-               "details": {code: published_procedure_detail(code) for code in snapshot.get("details", {})}}
-    path = Path(__file__).resolve().parent / "resources" / "official_procedure_details.json.gz"
-    path.parent.mkdir(exist_ok=True)
-    raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    path.write_bytes(gzip.compress(raw, mtime=0))
-    return path
-
-
 @lru_cache(maxsize=64)
 def download_published_template(attachment_id):
     meta = _attachment_index().get(str(attachment_id))
@@ -239,7 +245,7 @@ def download_published_template(attachment_id):
             method="POST",
         )
         try:
-            with urlopen(request, timeout=20) as response:
+            with _OPENER.open(request, timeout=20) as response:
                 content = response.read(limit + 1)
                 content_type = response.headers.get("Content-Type", "application/octet-stream")
                 if not content or len(content) > limit or content_type.split(";")[0] in {"text/html", "application/json"}:
@@ -255,7 +261,7 @@ def download_published_template(attachment_id):
         if direct_url.startswith("https://csdl.dichvucong.gov.vn/"):
             try:
                 req = Request(direct_url, headers={"User-Agent": "Mozilla/5.0"})
-                with urlopen(req, timeout=2.5) as response:
+                with _OPENER.open(req, timeout=2.5) as response:
                     content = response.read(limit + 1)
                     content_type = response.headers.get("Content-Type", "application/octet-stream")
                     if content and len(content) <= limit and content_type.split(";")[0] not in {"text/html", "application/json"}:

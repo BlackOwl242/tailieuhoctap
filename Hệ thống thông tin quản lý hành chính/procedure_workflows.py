@@ -1,7 +1,7 @@
 """Procedure-specific workflow policy used by the local Hanoi services app.
 
-Profiles are deliberately limited to the two procedures with reviewed interactive
-forms. Other catalogue entries remain reference-only until their workflow is reviewed.
+Interactive schemas live in procedure_forms.json; source-backed published dossiers
+are resolved lazily on demand from official_procedure_policy.
 """
 from __future__ import annotations
 
@@ -59,16 +59,23 @@ PROFILES: dict[str, dict] = {
 }
 
 
-# Published document workflows use original official declarations as attachments.
-for _code in official.publication_bundle().get("entries", {}):
-    if _code not in PROFILES:
-        _compiled = official.compiled_policy(_code)
-        if _compiled:
-            PROFILES[_code] = _compiled["profile"]
-            _forms[_code] = _compiled["schema"]
+def _resolve_profile(code: str) -> dict | None:
+    if not code:
+        return None
+    if code in PROFILES:
+        return PROFILES[code]
+    compiled = official.compiled_policy(code)
+    if compiled:
+        PROFILES[code] = compiled["profile"]
+        _forms[code] = compiled["schema"]
+        return PROFILES[code]
+    return None
 
 
 def form_for(code: str) -> dict | None:
+    if code in _forms:
+        return _forms[code]
+    _resolve_profile(code)
     return _forms.get(code)
 
 
@@ -82,8 +89,8 @@ def concrete_agency(name: str) -> bool:
 
 def configured_profile(procedure: dict) -> dict | None:
     code = str(procedure.get("code") or procedure.get("procedureCode") or "")
-    profile = PROFILES.get(code)
-    form = _forms.get(code) if profile and profile.get("kind") == "PUBLISHED_DOSSIER" else procedure.get("submission") or _forms.get(code)
+    profile = _resolve_profile(code)
+    form = form_for(code) if profile and profile.get("kind") == "PUBLISHED_DOSSIER" else procedure.get("submission") or form_for(code)
     if profile and profile.get("kind") == "PUBLISHED_DOSSIER":
         return profile if form and form.get("version") == profile["version"] else None
     if not profile or procedure.get("serviceMode") in {"INFORMATION", "UNKNOWN"}:
@@ -111,9 +118,10 @@ def case_profile(case: dict) -> dict | None:
     saved = case.get("workflow")
     if isinstance(saved, dict) and saved.get("kind") == "PUBLISHED_DOSSIER" and saved.get("version") and saved.get("evidenceFields"):
         return saved
-    if isinstance(saved, dict) and saved.get("procedureCode") in PROFILES:
-        return {**PROFILES[saved["procedureCode"]], **saved}
-    return PROFILES.get(str(case.get("procedureCode") or ""))
+    if isinstance(saved, dict) and saved.get("procedureCode"):
+        base = _resolve_profile(str(saved["procedureCode"]))
+        return {**base, **saved} if base else saved
+    return _resolve_profile(str(case.get("procedureCode") or ""))
 
 
 def guard_summary(case: dict) -> dict:
@@ -123,29 +131,32 @@ def guard_summary(case: dict) -> dict:
         "set_fee", "digitize_documents", "deliver", "submit_supplement", "save_draft",
         "submit_review", "verify_original_register", "verify_data_request", "assess_data_request", "verify_published_procedure",
         "approve", "send_back", "decline", "waive_fee", "sign_result", "issue", "issue_stop_notice",
+        "return_to_leader", "return_to_intake", "close_expired_supplement", "reject_stop_notice",
+        "confirm_paper_returned", "extend_deadline",
     ]
     if not profile:
         return {"verificationAction": "", "evidenceFields": [], "allowedActions": allowed_actions}
     evidence = case.get("workflowEvidence") or {}
-    if profile.get("procedureCode") == "2.000908" and evidence.get("outcome") != "Khớp sổ gốc và đủ quyền yêu cầu" and "submit_review" in allowed_actions:
-        allowed_actions.remove("submit_review")
-    if profile.get("procedureCode") == "1.004237" and not evidence.get("financialAssessment") and "submit_review" in allowed_actions:
-        allowed_actions.remove("submit_review")
-    if profile.get("kind") == "PUBLISHED_DOSSIER" and evidence.get("outcome") != "Đủ điều kiện trình xem xét":
-        allowed_actions.remove("submit_review")
-    return {"officialSteps": profile.get("officialSteps", []), "conditions": profile.get("conditions", ""), "sourceUrl": profile.get("sourceUrl", ""), "verificationAction": profile["verificationAction"], "verificationLabel": profile["verificationLabel"], "evidenceFields": profile["evidenceFields"], "milestone": profile.get("milestone"), "allowedActions": allowed_actions}
+    has_outcome = bool(str(evidence.get("outcome") or "").strip())
+    if not has_outcome or (profile.get("procedureCode") == "1.004237" and not evidence.get("financialAssessment")):
+        if "submit_review" in allowed_actions:
+            allowed_actions.remove("submit_review")
+    return {
+        "officialSteps": profile.get("officialSteps", []),
+        "conditions": profile.get("conditions", ""),
+        "sourceUrl": profile.get("sourceUrl", ""),
+        "verificationAction": profile["verificationAction"],
+        "verificationLabel": profile["verificationLabel"],
+        "evidenceFields": profile["evidenceFields"],
+        "milestone": profile.get("milestone"),
+        "allowedActions": allowed_actions,
+    }
 
 
 def authorize_action(role: str, action: str) -> None:
-    if action in {profile["verificationAction"] for profile in PROFILES.values()} and role != "specialist":
+    verification_actions = {profile["verificationAction"] for profile in PROFILES.values()} | {"verify_published_procedure"}
+    if action in verification_actions and role != "specialist":
         raise PermissionError("Chỉ chuyên viên được phân công mới được ghi kết quả thẩm tra thủ tục này.")
-
-
-def action_guard(case: dict, action: str) -> dict | None:
-    profile = case_profile(case)
-    if profile and action == profile.get("verificationAction"):
-        return profile
-    return None
 
 
 def verify_evidence(profile: dict, evidence: dict | None) -> dict:

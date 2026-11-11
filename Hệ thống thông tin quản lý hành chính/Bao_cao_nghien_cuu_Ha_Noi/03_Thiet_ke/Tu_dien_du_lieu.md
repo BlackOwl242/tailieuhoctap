@@ -1,507 +1,489 @@
-Bảng 4.0: Từ điển dữ liệu cơ quan giải quyết
+# Từ điển dữ liệu thực tế của hệ thống (SQLite 3: 30 bảng)
+
+Tài liệu đặc tả trực tiếp 30 bảng vật lý đang vận hành tại `data/hanoi-services.sqlite3` (chế độ `PRAGMA journal_mode = WAL`, `PRAGMA foreign_keys = ON`, `PRAGMA busy_timeout = 15000`), khớp 1-1 với `Mo_hinh_du_lieu.sql` và `Tu_dien_du_lieu.json`.
+
+---
+
+## Nhóm 1. Định danh, Tài khoản & Phân quyền RBAC (5 bảng)
+
+### 1.1. Bảng `users`: Tài khoản người dùng và phân quyền RBAC
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh cơ quan |
-| ma | varchar(50) | UQ | Không | Mã theo danh mục quản lý |
-| ten | text |  | Không | Tên chính thức |
-| cap | varchar(30) |  | Không | Cấp hoặc loại cơ quan |
-| hieu_luc_tu | date |  | Không | Ngày có hiệu lực |
-| hieu_luc_den | date |  | Có | Kết thúc hiệu lực nếu có |
+| `id` | `TEXT` | PK | Không | Định danh tài khoản (UUID) |
+| `email` | `TEXT` | UQ | Không | Địa chỉ email đăng nhập không phân biệt hoa thường |
+| `phone` | `TEXT` |  | Không | Số điện thoại liên hệ |
+| `full_name` | `TEXT` |  | Không | Họ và tên công dân hoặc cán bộ |
+| `password_salt` | `TEXT` |  | Không | Muối ngẫu nhiên hệ thập lục phân dùng băm mật khẩu |
+| `password_hash` | `TEXT` |  | Không | Giá trị băm mật khẩu PBKDF2-HMAC-SHA256 (600.000 vòng) |
+| `role` | `TEXT` |  | Không | Vai trò: `citizen`, `intake`, `specialist`, `leader`, `registrar`, `finance`, `admin` |
+| `active` | `INTEGER` |  | Không | Trạng thái kích hoạt tài khoản (`1`: hiệu lực, `0`: khóa/chờ duyệt) |
+| `email_verified` | `INTEGER` |  | Không | Cờ trạng thái xác minh email (mặc định `0`) |
+| `agency_scope` | `TEXT` |  | Không | Phạm vi cơ quan quản lý hoặc xử lý hồ sơ cụ thể |
+| `valid_from` | `TEXT` |  | Không | Ngày bắt đầu hiệu lực quyền cán bộ (`YYYY-MM-DD`) |
+| `valid_until` | `TEXT` |  | Không | Ngày kết thúc hiệu lực quyền cán bộ (`YYYY-MM-DD`) |
+| `may_sign_stop` | `INTEGER` |  | Không | Thẩm quyền ký và phát hành Thông báo dừng Mẫu 06 (`0`/`1`) |
+| `signing_authority_ref` | `TEXT` |  | Không | Số văn bản phân công thẩm quyền ký Mẫu 06 |
+| `must_change_password` | `INTEGER` |  | Không | Cờ yêu cầu đổi mật khẩu khởi tạo (`0`/`1`) |
+| `can_manage_agency_accounts` | `INTEGER` |  | Không | Quyền lập đề nghị quản lý tài khoản trong phạm vi cơ quan (`0`/`1`) |
+| `created_at` | `TEXT` |  | Không | Thời điểm tạo tài khoản (ISO 8601 UTC+07:00) |
+| `updated_at` | `TEXT` |  | Không | Thời điểm cập nhật gần nhất (ISO 8601 UTC+07:00) |
 
-Bảng 4.0: Từ điển dữ liệu danh mục thủ tục
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh thủ tục |
-| ma_quoc_gia | varchar(50) | UQ | Không | Mã thủ tục quốc gia |
-| ten | text |  | Không | Tên thủ tục |
-| linh_vuc | varchar(100) |  | Không | Lĩnh vực quản lý |
-
-Bảng 4.0: Từ điển dữ liệu phiên bản thủ tục
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh phiên bản |
-| thu_tuc_id | uuid | FK thu_tuc | Không | Thủ tục gốc |
-| co_quan_id | uuid | FK co_quan | Không | Cơ quan có thẩm quyền |
-| so_phien_ban | integer |  | Không | Số phiên bản theo cơ quan |
-| quyet_dinh | text |  | Không | Quyết định và căn cứ công bố |
-| hieu_luc_tu | timestamptz |  | Không | Bắt đầu áp dụng |
-| hieu_luc_den | timestamptz |  | Có | Kết thúc áp dụng |
-| quy_tac_han | jsonb |  | Không | Kiểu hạn và tham số được duyệt |
-| luoc_do_mau | jsonb |  | Không | Trường biểu mẫu và phiên bản |
-| trang_thai | varchar(30) |  | Không | Nháp, duyệt hoặc hết hiệu lực |
-| cau_hinh_quy_trinh | jsonb |  | Không | Bước, quyền, điều kiện, nhánh và phiên bản được duyệt |
-
-Bảng 4.0: Từ điển dữ liệu chủ thể giao dịch và hộ tịch
+### 1.2. Bảng `sessions`: Phiên đăng nhập HttpOnly và khóa chống giả mạo CSRF
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh nội bộ |
-| loai | varchar(30) |  | Không | Cá nhân hoặc tổ chức |
-| ho_ten | text |  | Không | Tên chủ thể |
-| dinh_danh_ma_hoa | text |  | Có | Thông tin định danh đã bảo vệ |
-| tham_chieu_dinh_danh | text |  | Có | Tham chiếu từ nền tảng xác thực |
-| lien_he | jsonb |  | Có | Kênh liên hệ được sử dụng |
+| `token_hash` | `TEXT` | PK | Không | Giá trị băm SHA-256 của mã phiên trong cookie (`hni_session` / `hni_citizen_session`) |
+| `user_id` | `TEXT` | FK `users` | Không | Tài khoản sở hữu phiên đăng nhập |
+| `csrf_token` | `TEXT` |  | Không | Mã bảo vệ phiên kiểm tra qua tiêu đề `X-CSRF-Token` |
+| `expires_at` | `INTEGER` |  | Không | Thời điểm hết hạn phiên (Unix timestamp giây) |
+| `created_at` | `TEXT` |  | Không | Thời điểm khởi tạo phiên |
 
-Bảng 4.0: Từ điển dữ liệu tài khoản cán bộ
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh tài khoản |
-| chu_the_id | uuid | FK chu_the | Không | Người sử dụng |
-| co_quan_id | uuid | FK co_quan | Không | Cơ quan công tác |
-| ma_dang_nhap | varchar(100) | UQ | Không | Tham chiếu danh tính |
-| trang_thai | varchar(30) |  | Không | Hoạt động hoặc khóa |
-| tao_luc | timestamptz |  | Không | Thời điểm cấp |
-
-Bảng 4.0: Từ điển dữ liệu quyền theo phạm vi
+### 1.3. Bảng `staff_access_requests`: Đề nghị cấp mới tài khoản cán bộ (phê duyệt độc lập)
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh lần cấp quyền |
-| tai_khoan_id | uuid | FK tai_khoan | Không | Tài khoản được cấp |
-| co_quan_id | uuid | FK co_quan | Không | Phạm vi cơ quan |
-| vai_tro | varchar(50) |  | Không | Vai trò nghiệp vụ |
-| hieu_luc_tu | timestamptz |  | Không | Bắt đầu quyền |
-| hieu_luc_den | timestamptz |  | Có | Hết quyền |
-| can_cu | text |  | Không | Căn cứ và người phê duyệt |
+| `id` | `TEXT` | PK | Không | Định danh đề nghị cấp quyền (UUID) |
+| `user_id` | `TEXT` | FK `users` | Không | Tài khoản cán bộ được đề nghị kích hoạt |
+| `requested_by` | `TEXT` | FK `users` | Không | Người lập đề nghị (quản trị viên hoặc quản lý cơ quan) |
+| `role` | `TEXT` |  | Không | Vai trò nghiệp vụ đề nghị cấp |
+| `agency_scope` | `TEXT` |  | Không | Cơ quan công tác cụ thể của cán bộ |
+| `valid_from` | `TEXT` |  | Không | Ngày bắt đầu hiệu lực đề nghị |
+| `valid_until` | `TEXT` |  | Không | Ngày kết thúc hiệu lực đề nghị |
+| `requested_sign_stop` | `INTEGER` |  | Không | Đề nghị cấp kèm quyền ký Thông báo dừng Mẫu 06 (`0`/`1`) |
+| `signing_authority_ref` | `TEXT` |  | Không | Số văn bản phân công thẩm quyền ký Mẫu 06 |
+| `authorized_sign_stop` | `INTEGER` |  | Không | Xác nhận duyệt quyền ký Mẫu 06 của quản trị viên duyệt (`0`/`1`) |
+| `reason` | `TEXT` |  | Không | Căn cứ lập đề nghị cấp tài khoản |
+| `status` | `TEXT` |  | Không | Trạng thái: `PENDING`, `APPROVED`, `REJECTED` |
+| `reviewed_by` | `TEXT` | FK `users` | Có | Quản trị viên hệ thống phê duyệt (khác người đề nghị) |
+| `review_note` | `TEXT` |  | Không | Ý kiến hoặc lý do phê duyệt/từ chối |
+| `created_at` | `TEXT` |  | Không | Thời điểm lập đề nghị |
+| `reviewed_at` | `TEXT` |  | Có | Thời điểm hoàn tất xem xét đề nghị |
 
-Bảng 4.0: Từ điển dữ liệu hồ sơ hành chính
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh nội bộ |
-| ma_yeu_cau | varchar(100) | UQ | Không | Khóa gửi lặp an toàn |
-| ma_ho_so | varchar(100) | UQ | Có | Mã chính thức sau tiếp nhận |
-| phien_ban_id | uuid | FK phien_ban_thu_tuc | Không | Phiên bản áp dụng |
-| nguoi_yeu_cau_id | uuid | FK chu_the | Không | Người giao dịch |
-| chu_the_ho_tich_id | uuid | FK chu_the | Có | Chủ thể sự kiện hộ tịch khi thủ tục yêu cầu |
-| trang_thai | varchar(40) |  | Không | Trạng thái nghiệp vụ |
-| nhan_luc | timestamptz |  | Có | Tiếp nhận hợp lệ |
-| han_goc | timestamptz |  | Có | Hạn ban đầu |
-| han_hien_hanh | timestamptz |  | Có | Hạn đang áp dụng |
-| du_lieu_khai | jsonb |  | Không | Nội dung tờ khai có phiên bản |
-| phien_ban | integer |  | Không | Số kiểm soát cập nhật đồng thời |
-| kenh_tiep_nhan | varchar(30) |  | Không | Trực tuyến, trực tiếp hoặc bưu chính |
-| ma_diem_tiep_nhan | varchar(50) |  | Có | Điểm tiếp nhận thực tế theo danh mục |
-| nguoi_ho_tro_id | uuid | FK tai_khoan | Có | Người hỗ trợ; không thay người giao dịch |
-
-Bảng 4.0: Từ điển dữ liệu căn cứ đại diện
+### 1.4. Bảng `staff_account_changes`: Đề nghị thay đổi quyền, phạm vi hoặc trạng thái tài khoản cán bộ
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh căn cứ |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ áp dụng |
-| nguoi_uy_quyen_id | uuid | FK chu_the | Không | Người được đại diện |
-| nguoi_dai_dien_id | uuid | FK chu_the | Không | Người giao dịch |
-| quan_he | varchar(100) |  | Không | Quan hệ hoặc căn cứ đại diện |
-| tai_lieu_tham_chieu | text |  | Có | Tài liệu chứng minh nếu áp dụng |
-| pham_vi | text |  | Không | Phạm vi đại diện |
-| hieu_luc_den | timestamptz |  | Có | Thời điểm hết hiệu lực |
+| `id` | `TEXT` | PK | Không | Định danh đề nghị thay đổi (UUID) |
+| `user_id` | `TEXT` | FK `users` | Không | Tài khoản cán bộ cần điều chỉnh (tối đa 01 đề nghị `PENDING` mỗi tài khoản) |
+| `requested_by` | `TEXT` | FK `users` | Không | Người lập đề nghị thay đổi |
+| `before_json` | `TEXT` |  | Không | Bản chụp JSON cấu hình quyền trước khi sửa |
+| `proposed_json` | `TEXT` |  | Không | Bản chụp JSON cấu hình quyền đề nghị áp dụng |
+| `reason` | `TEXT` |  | Không | Căn cứ điều chỉnh quyền hoặc thu hồi tài khoản |
+| `status` | `TEXT` |  | Không | Trạng thái: `PENDING`, `APPROVED`, `REJECTED` |
+| `reviewed_by` | `TEXT` | FK `users` | Có | Quản trị viên phê duyệt độc lập |
+| `review_note` | `TEXT` |  | Không | Ý kiến xem xét đề nghị |
+| `created_at` | `TEXT` |  | Không | Thời điểm tạo đề nghị |
+| `reviewed_at` | `TEXT` |  | Có | Thời điểm phê duyệt hoặc từ chối |
 
-Bảng 4.0: Từ điển dữ liệu thành phần hồ sơ
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh thành phần |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ chủ quản |
-| loai | varchar(100) |  | Không | Loại giấy tờ hoặc dữ liệu |
-| khoa_doi_tuong | text |  | Có | Khóa tệp trong kho |
-| bam_sha256 | char(64) |  | Có | Kiểm tra tính toàn vẹn tệp |
-| nguon_du_lieu | text |  | Có | Nguồn khai thác thay thế giấy tờ |
-| tham_chieu_nguon | text |  | Có | Định danh bản ghi nguồn |
-| trang_thai | varchar(40) |  | Không | Cần cung cấp, hợp lệ hoặc chờ kiểm tra |
-| phien_ban | integer |  | Không | Phiên bản thành phần |
-| kich_thuoc_byte | bigint |  | Có | Kích thước nếu thành phần là tệp |
-| loai_tep | varchar(100) |  | Có | Loại tệp được kiểm tra từ nội dung |
-
-Bảng 4.0: Từ điển dữ liệu phân công xử lý
+### 1.5. Bảng `staff_authority_events`: Nhật ký cấp và thu hồi thẩm quyền ký Thông báo dừng Mẫu 06
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh phân công |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ chịu trách nhiệm |
-| tai_khoan_id | uuid | FK tai_khoan | Không | Cán bộ được giao |
-| giao_luc | timestamptz |  | Không | Bắt đầu trách nhiệm |
-| ket_thuc_luc | timestamptz |  | Có | Kết thúc lần phân công |
-| nguoi_giao_id | uuid | FK tai_khoan | Không | Người quyết định |
-| ly_do | text |  | Không | Căn cứ phân công hoặc thay đổi |
+| `id` | `INTEGER` | PK | Không | Khóa tự tăng của sự kiện thẩm quyền |
+| `user_id` | `TEXT` | FK `users` | Không | Tài khoản lãnh đạo được cấp hoặc thu hồi quyền |
+| `changed_by` | `TEXT` | FK `users` | Không | Quản trị viên thực hiện thao tác |
+| `action` | `TEXT` |  | Không | Loại thao tác: `GRANT_STOP_SIGNING` hoặc `REVOKE_STOP_SIGNING` |
+| `authority_ref` | `TEXT` |  | Không | Số văn bản phân công thẩm quyền liên quan |
+| `reason` | `TEXT` |  | Không | Căn cứ cấp hoặc thu hồi quyền ký |
+| `created_at` | `TEXT` |  | Không | Thời điểm ghi nhận sự kiện |
 
-Bảng 4.0: Từ điển dữ liệu sự kiện xử lý
+---
 
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh sự kiện |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ liên quan |
-| tai_khoan_id | uuid | FK tai_khoan | Có | Cán bộ nếu có |
-| hanh_dong | varchar(100) |  | Không | Loại hành động |
-| truoc | varchar(40) |  | Có | Trạng thái trước |
-| sau | varchar(40) |  | Có | Trạng thái sau |
-| thoi_diem | timestamptz |  | Không | Thời điểm máy chủ |
-| can_cu | text |  | Có | Lý do và chứng từ tham chiếu |
-| ma_tuong_quan | varchar(100) |  | Không | Liên hệ giao dịch kỹ thuật |
+## Nhóm 2. Danh mục Thủ tục & Tin tức Cổng thông tin (7 bảng)
 
-Bảng 4.0: Từ điển dữ liệu yêu cầu bổ sung
+### 2.1. Bảng `procedure_catalog_edits`: Bản ghi hiệu chỉnh cục bộ danh mục thủ tục hành chính
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh lần yêu cầu |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ liên quan |
-| giai_doan | varchar(40) |  | Không | Tiếp nhận hoặc thẩm định |
-| noi_dung | text |  | Không | Thông tin cần bổ sung cụ thể |
-| can_cu | text |  | Không | Cơ sở yêu cầu |
-| nguoi_lap_id | uuid | FK tai_khoan | Không | Người lập |
-| lap_luc | timestamptz |  | Không | Thời điểm phát sinh |
-| phan_hoi_luc | timestamptz |  | Có | Nhận bổ sung |
-| trang_thai_quay_lai | varchar(40) |  | Không | Giai đoạn tiếp tục khi đủ |
+| `procedure_code` | `TEXT` | PK | Không | Mã thủ tục gốc trong danh mục tham chiếu |
+| `local_code` | `TEXT` |  | Không | Mã hiển thị sau hiệu chỉnh (nếu đổi mã cục bộ) |
+| `name` | `TEXT` |  | Không | Tên thủ tục hành chính |
+| `field` | `TEXT` |  | Không | Tên lĩnh vực hiển thị |
+| `category_key` | `TEXT` |  | Không | Khóa nhóm lĩnh vực liên kết |
+| `level` | `TEXT` |  | Không | Mức độ dịch vụ: `Toàn trình`, `Một phần`, `Cung cấp thông tin` |
+| `agency` | `TEXT` |  | Không | Cơ quan thực hiện công bố |
+| `source_url` | `TEXT` |  | Không | Liên kết HTTPS nguồn chính thức (`.gov.vn` / `chinhphu.vn`) |
+| `checked_at` | `TEXT` |  | Không | Ngày đối chiếu nguồn (`YYYY-MM-DD`) |
+| `reason` | `TEXT` |  | Không | Căn cứ chỉnh sửa nội dung danh mục |
+| `submission_json` | `TEXT` |  | Không | Cấu hình JSON biểu mẫu nộp đính kèm (nếu có) |
+| `version` | `INTEGER` |  | Không | Số phiên bản kiểm soát cập nhật đồng thời |
+| `updated_by` | `TEXT` |  | Không | Họ tên quản trị viên cập nhật cuối |
+| `updated_at` | `TEXT` |  | Không | Thời điểm cập nhật gần nhất |
 
-Bảng 4.0: Từ điển dữ liệu phiên bản kết quả
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh bản kết quả |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ chủ quản |
-| so_phien_ban | integer |  | Không | Phiên bản kết quả |
-| khoa_doi_tuong | text |  | Không | Tệp dự thảo hoặc phát hành |
-| bam_sha256 | char(64) |  | Không | Giá trị toàn vẹn |
-| so_van_ban | varchar(100) |  | Có | Số sau phát hành |
-| trang_thai | varchar(40) |  | Không | Dự thảo, ký hoặc phát hành |
-| thay_the_id | uuid | FK ket_qua | Có | Bản được thay thế |
-| phat_hanh_luc | timestamptz |  | Có | Thời điểm phát hành |
-| kich_thuoc_byte | bigint |  | Không | Kích thước bản kết quả |
-| loai_tep | varchar(100) |  | Không | Loại tệp kết quả được kiểm tra |
-
-Bảng 4.0: Từ điển dữ liệu bằng chứng chữ ký
+### 2.2. Bảng `procedure_catalog_audit`: Nhật ký kiểm toán chỉnh sửa danh mục thủ tục
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh bằng chứng |
-| ket_qua_id | uuid | FK ket_qua | Không | Bản có chữ ký |
-| nguoi_ky | text |  | Không | Thông tin chủ thể chứng thư |
-| tham_chieu_chung_thu | text |  | Không | Chứng thư kiểm tra |
-| ky_luc | timestamptz |  | Có | Thời điểm được xác định từ bằng chứng |
-| kiem_tra_luc | timestamptz |  | Không | Thời điểm kiểm tra |
-| ket_luan | varchar(40) |  | Không | Hợp lệ hoặc cần xử lý |
-| bang_chung | jsonb |  | Không | Chuỗi kiểm tra và trạng thái liên quan |
+| `id` | `INTEGER` | PK | Không | Khóa tự tăng của dòng nhật ký |
+| `procedure_code` | `TEXT` |  | Không | Mã thủ tục được tác động |
+| `actor_id` | `TEXT` |  | Không | Định danh quản trị viên thực hiện |
+| `actor_name` | `TEXT` |  | Không | Họ tên quản trị viên thực hiện |
+| `action` | `TEXT` |  | Không | Hành động: `UPDATED` hoặc `MOVED_CATEGORY` |
+| `reason` | `TEXT` |  | Không | Căn cứ thay đổi hoặc chuyển nhóm |
+| `before_json` | `TEXT` |  | Có | Trạng thái JSON trước khi sửa |
+| `after_json` | `TEXT` |  | Không | Trạng thái JSON sau khi sửa |
+| `created_at` | `TEXT` |  | Không | Thời điểm ghi nhật ký |
 
-Bảng 4.0: Từ điển dữ liệu khoản thu và miễn giảm
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh khoản thu |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ liên quan |
-| loai | varchar(100) |  | Không | Phí, lệ phí hoặc khoản áp dụng |
-| so_tien | numeric(18,2) |  | Không | Số phải thu không âm |
-| don_vi_tien | char(3) |  | Không | Đơn vị tiền tệ |
-| can_cu | text |  | Không | Biểu phí, miễn hoặc giảm |
-| trang_thai | varchar(40) |  | Không | Chờ thu, đủ, miễn hoặc hoàn |
-
-Bảng 4.0: Từ điển dữ liệu giao dịch và đối soát
+### 2.3. Bảng `procedure_category_edits`: Nhóm lĩnh vực thủ tục hành chính và hiệu chỉnh tên hiển thị
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh giao dịch |
-| khoan_thu_id | uuid | FK khoan_thu | Không | Khoản thu liên quan |
-| doi_tac | varchar(100) |  | Không | Nguồn thông báo |
-| ma_ngoai | varchar(150) |  | Không | Mã giao dịch bên ngoài |
-| so_tien | numeric(18,2) |  | Không | Số tiền không âm |
-| thoi_diem | timestamptz |  | Không | Thời điểm ghi nhận |
-| trang_thai | varchar(40) |  | Không | Nhận, đối soát hoặc hoàn |
-| tham_chieu_bang_chung | text |  | Không | Chứng từ hoặc thông báo đã xác minh |
+| `source_field` | `TEXT` | PK | Không | Khóa lĩnh vực gốc hoặc mã nhóm nội bộ (`local:*`) |
+| `display_name` | `TEXT` |  | Không | Tên lĩnh vực hiển thị trên cổng và bàn cán bộ |
+| `source_url` | `TEXT` |  | Không | Liên kết HTTPS nguồn công bố đối chiếu |
+| `checked_at` | `TEXT` |  | Không | Ngày kiểm tra nguồn công bố |
+| `reason` | `TEXT` |  | Không | Lý do tạo mới hoặc đổi tên lĩnh vực |
+| `version` | `INTEGER` |  | Không | Phiên bản kiểm soát đồng thời |
+| `updated_by` | `TEXT` |  | Không | Người cập nhật gần nhất |
+| `updated_at` | `TEXT` |  | Không | Thời điểm cập nhật |
 
-Bảng 4.0: Từ điển dữ liệu chứng cứ giao kết quả
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh giao nhận |
-| ket_qua_id | uuid | FK ket_qua | Không | Kết quả được giao |
-| nguoi_nhan_id | uuid | FK chu_the | Không | Chủ thể có quyền nhận |
-| kenh | varchar(50) |  | Không | Kho, trực tiếp hoặc bưu chính |
-| trang_thai | varchar(40) |  | Không | Chưa giao, đã giao hoặc lỗi |
-| thoi_diem | timestamptz |  | Có | Mốc giao xác nhận |
-| bang_chung | text |  | Có | Mã giao hoặc chứng từ liên quan |
-
-Bảng 4.0: Từ điển dữ liệu hàng đợi tích hợp
+### 2.4. Bảng `procedure_category_audit`: Nhật ký kiểm toán thay đổi nhóm lĩnh vực thủ tục
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh thông điệp |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ liên quan |
-| ma_thong_diep | varchar(150) | UQ | Không | Mã giữ nguyên khi gửi lại |
-| dich_nhan | varchar(150) |  | Không | Đích tích hợp |
-| noi_dung | jsonb |  | Không | Dữ liệu cần gửi theo hợp đồng |
-| trang_thai | varchar(40) |  | Không | Chờ, đã gửi hoặc cần xử lý |
-| so_lan_thu | integer |  | Không | Số lần gửi không âm |
-| thu_tiep_luc | timestamptz |  | Có | Mốc gửi tiếp |
-| ma_loi | varchar(100) |  | Có | Lỗi đã chuẩn hóa |
+| `id` | `INTEGER` | PK | Không | Khóa tự tăng của bản ghi kiểm toán |
+| `source_field` | `TEXT` |  | Không | Khóa lĩnh vực được sửa |
+| `actor_id` | `TEXT` |  | Không | Định danh quản trị viên thao tác |
+| `actor_name` | `TEXT` |  | Không | Họ tên quản trị viên thao tác |
+| `reason` | `TEXT` |  | Không | Căn cứ điều chỉnh lĩnh vực |
+| `before_json` | `TEXT` |  | Có | Dữ liệu JSON trước khi cập nhật |
+| `after_json` | `TEXT` |  | Không | Dữ liệu JSON sau khi cập nhật |
+| `created_at` | `TEXT` |  | Không | Thời điểm ghi nhận |
 
-Bảng 4.0: Từ điển dữ liệu lịch và ngoại lệ
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh lịch |
-| co_quan_id | uuid | FK co_quan | Không | Cơ quan áp dụng |
-| ngay | date |  | Không | Ngày lịch |
-| la_ngay_lam | boolean |  | Không | Có làm việc hay không |
-| bat_dau | time |  | Có | Giờ bắt đầu nếu có |
-| ket_thuc | time |  | Có | Giờ đóng ngày |
-| can_cu | text |  | Không | Căn cứ xác định lịch |
-
-Bảng 4.0: Từ điển dữ liệu nhật ký quản trị
+### 2.5. Bảng `news_articles`: Tin tức và thông báo xuất bản trên cổng dịch vụ công
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh sự kiện kiểm tra |
-| tai_khoan_id | uuid | FK tai_khoan | Có | Tài khoản tác động |
-| hanh_dong | varchar(100) |  | Không | Loại thao tác |
-| doi_tuong | text |  | Không | Định danh đối tượng; không sao chép nội dung hồ sơ |
-| thoi_diem | timestamptz |  | Không | Thời điểm máy chủ |
-| ket_qua | varchar(40) |  | Không | Thành công hoặc bị từ chối |
-| ma_tuong_quan | varchar(100) |  | Không | Liên hệ giao dịch |
+| `id` | `TEXT` | PK | Không | Mã định danh bài viết |
+| `title` | `TEXT` |  | Không | Tiêu đề bài viết |
+| `summary` | `TEXT` |  | Không | Tóm tắt nội dung hiển thị ngoài trang chủ |
+| `body` | `TEXT` |  | Không | Nội dung chi tiết bài viết |
+| `category` | `TEXT` |  | Không | Chuyên mục tin tức |
+| `image_path` | `TEXT` |  | Không | Tên tệp ảnh minh họa trong thư viện ứng dụng |
+| `source_url` | `TEXT` |  | Không | Liên kết HTTPS nguồn `.gov.vn` đối chiếu |
+| `status` | `TEXT` |  | Không | Trạng thái: `DRAFT`, `PUBLISHED`, `ARCHIVED` |
+| `featured` | `INTEGER` |  | Không | Đánh dấu tin nổi bật trên trang chủ (`0`/`1`) |
+| `published_at` | `TEXT` |  | Có | Thời điểm xuất bản chính thức |
+| `version` | `INTEGER` |  | Không | Số phiên bản chống ghi đè khi biên tập |
+| `created_by` | `TEXT` | FK `users` | Có | Tài khoản khởi tạo bài viết |
+| `updated_by` | `TEXT` | FK `users` | Có | Tài khoản biên tập gần nhất |
+| `created_at` | `TEXT` |  | Không | Thời điểm tạo bản ghi |
+| `updated_at` | `TEXT` |  | Không | Thời điểm sửa bản ghi |
 
-Bảng 4.0: Từ điển dữ liệu hệ thống kết nối
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh hệ thống |
-| ma | varchar(50) | UQ | Không | Mã nguồn theo hợp đồng |
-| ten | text |  | Không | Tên nền tảng |
-| loai | varchar(30) |  | Không | Thành phố, bộ, quốc gia hoặc đối tác |
-| chu_quan | text |  | Không | Đơn vị chịu trách nhiệm |
-| phien_ban_hop_dong | varchar(30) |  | Không | Phiên bản giao tiếp |
-| trang_thai | varchar(30) |  | Không | Được phép, thử hoặc ngừng |
-
-Bảng 4.0: Từ điển dữ liệu tuyến tác nghiệp theo phiên bản
+### 2.6. Bảng `news_audit_log`: Nhật ký biên tập, xuất bản và lưu trữ tin tức
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh tuyến |
-| phien_ban_id | uuid | FK phien_ban_thu_tuc | Không | Phiên bản thủ tục |
-| he_thong_id | uuid | FK he_thong_ket_noi | Không | Hệ thống được xử lý |
-| hieu_luc_tu | timestamptz |  | Không | Bắt đầu tuyến |
-| hieu_luc_den | timestamptz |  | Có | Kết thúc tuyến |
-| can_cu | text |  | Không | Quyết định áp dụng |
-| phe_duyet_id | uuid | FK tai_khoan | Không | Người phê duyệt |
+| `id` | `INTEGER` | PK | Không | Khóa tự tăng nhật ký biên tập |
+| `news_id` | `TEXT` | FK `news_articles` | Không | Mã bài viết được tác động |
+| `actor_id` | `TEXT` | FK `users` | Có | Quản trị viên thực hiện |
+| `actor_name` | `TEXT` |  | Không | Họ tên người thực hiện |
+| `action` | `TEXT` |  | Không | Thao tác: `CREATE_DRAFT`, `UPDATE`, `PUBLISH`, `ARCHIVE`, `DRAFT` |
+| `before_json` | `TEXT` |  | Có | Nội dung bài viết trước thao tác |
+| `after_json` | `TEXT` |  | Có | Nội dung bài viết sau thao tác |
+| `created_at` | `TEXT` |  | Không | Thời điểm ghi nhật ký |
 
-Bảng 4.0: Từ điển dữ liệu tham chiếu hồ sơ liên thông
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh tham chiếu |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ dùng chung |
-| he_thong_id | uuid | FK he_thong_ket_noi | Không | Hệ thống nguồn |
-| ma_ngoai | varchar(150) |  | Không | Mã hồ sơ tại nguồn |
-| trang_thai_nguon | varchar(40) |  | Không | Trạng thái do nguồn công bố |
-| su_kien_cuoi | varchar(150) |  | Có | Mã sự kiện cuối áp dụng |
-| thoi_diem_nguon | timestamptz |  | Không | Mốc nghiệp vụ của nguồn |
-| nhan_luc | timestamptz |  | Không | Mốc nhận tại địa phương |
-| thu_tu_cuoi | bigint |  | Có | Thứ tự sự kiện cuối đã áp dụng theo hợp đồng |
-
-Bảng 4.0: Từ điển dữ liệu nhiệm vụ phối hợp thẩm định
+### 2.7. Bảng `app_data_versions`: Phiên bản gói dữ liệu khởi tạo của ứng dụng
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh nhiệm vụ |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ cần ý kiến |
-| co_quan_id | uuid | FK co_quan | Không | Cơ quan được hỏi |
-| noi_dung | text |  | Không | Phạm vi yêu cầu |
-| bat_buoc | boolean |  | Không | Ý kiến bắt buộc theo quy trình |
-| han_tra_loi | timestamptz |  | Không | Hạn nhiệm vụ, không thay hạn hồ sơ |
-| trang_thai | varchar(40) |  | Không | Chờ nhận, xử lý, đã trả hoặc hủy |
-| tham_chieu_y_kien | text |  | Có | Tài liệu và phiên bản trả lời |
-| phien_ban | integer |  | Không | Kiểm soát cập nhật nhiệm vụ đồng thời |
+| `data_key` | `TEXT` | PK | Không | Tên khóa gói dữ liệu (ví dụ: `training-cases`) |
+| `version` | `INTEGER` |  | Không | Phiên bản dữ liệu đã áp dụng |
+| `applied_at` | `TEXT` |  | Không | Thời điểm áp dụng vào cơ sở dữ liệu |
 
-Bảng 4.0: Từ điển dữ liệu thông báo và trạng thái gửi
+---
+
+## Nhóm 3. Hồ sơ Một cửa, Biểu mẫu 01–06 & Khóa tra cứu Fernet (4 bảng)
+
+### 3.1. Bảng `cases`: Hồ sơ giải quyết thủ tục hành chính theo cơ chế một cửa
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh thông báo |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ liên quan |
-| nguoi_nhan_id | uuid | FK chu_the | Không | Chủ thể có quyền nhận |
-| kenh | varchar(30) |  | Không | Kênh đã được phép sử dụng |
-| ma_mau | varchar(50) |  | Không | Mẫu nội dung đã duyệt |
-| tham_chieu_gui | text |  | Có | Mã đối tác, không lưu bí mật truy cập |
-| trang_thai | varchar(30) |  | Không | Chờ, gửi, giao hoặc lỗi |
-| gui_luc | timestamptz |  | Có | Mốc gửi thực tế |
+| `id` | `INTEGER` | PK | Không | Định danh nội bộ tự tăng của hồ sơ |
+| `code` | `TEXT` | UQ | Không | Mã hồ sơ giao dịch (định dạng `HN-YYYY-XXXXXXXX`) |
+| `owner_id` | `TEXT` |  | Không | Mã băm SHA-256 của khóa tra cứu gắn với hồ sơ |
+| `procedure_code` | `TEXT` |  | Không | Mã thủ tục hành chính áp dụng |
+| `status` | `TEXT` |  | Không | Trạng thái máy trạng thái (`CHO_TIEP_NHAN`..`HOAN_THANH`/`TU_CHOI`/`KHONG_GIAI_QUYET`/`DUNG`) |
+| `version` | `INTEGER` |  | Không | Số phiên bản kiểm soát đồng thời lạc quan (Optimistic Locking) |
+| `idempotency_key` | `TEXT` | UQ | Có | Khóa chống gửi lặp khi nộp trực tuyến hoặc tiếp nhận tại quầy |
+| `payload_json` | `TEXT` |  | Không | Toàn bộ dữ liệu nghiệp vụ hồ sơ, biểu mẫu 01–06, thẩm tra, phí và kết quả (JSON) |
+| `created_at` | `TEXT` |  | Không | Thời điểm tạo hồ sơ |
+| `updated_at` | `TEXT` |  | Không | Thời điểm chuyển trạng thái hoặc cập nhật gần nhất |
 
-Bảng 4.0: Từ điển dữ liệu đợt nộp lưu hồ sơ
+#### Cấu trúc tài liệu JSON bên trong `cases.payload_json`
 
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh đợt |
-| co_quan_id | uuid | FK co_quan | Không | Đơn vị nộp |
-| lap_luc | timestamptz |  | Không | Mốc lập danh mục |
-| phe_duyet_id | uuid | FK tai_khoan | Có | Người duyệt nộp |
-| kho_dich | text |  | Không | Đầu mối lưu trữ nhận |
-| trang_thai | varchar(30) |  | Không | Nháp, gửi, nhận hoặc cần bổ sung |
+| Nhánh khóa JSON | Kiểu | Nội dung nghiệp vụ lưu trữ |
+| --- | --- | --- |
+| `applicant`, `subject` | `object` | Thông tin người nộp (`name`, `citizenId`/`organizationId`, `phone`, `email`, `address`) và chủ thể thủ tục (`name`, `relation`). |
+| `declaration`, `documentExemptions` | `object` | Dữ liệu tờ khai theo `schemaVersion` và giải trình thành phần được miễn nộp bản giấy. |
+| `attachments` | `array` | Danh sách tệp đính kèm/bổ sung/số hóa (`name`, `stored`, `size`, `type`, `sha256`, `componentId`). |
+| `workflow`, `milestones` | `object`, `array` | Bản chụp cấu hình quy trình ghim theo thời điểm nộp hồ sơ và các mốc kiểm tra trung gian. |
+| `workflowEvidence`, `workflowEvidenceHistory` | `object`, `array` | Kết quả đối chiếu sổ gốc (`2.000908`), thẩm tra yêu cầu dữ liệu (`1.004237`) hoặc thẩm định hồ sơ công bố. |
+| `assignment`, `assignmentHistory` | `object`, `array` | Chuyên viên đang thụ lý (`assigneeId`, `assigneeName`, `unit`, `assignedAt`) và lịch sử luân chuyển/trả lại. |
+| `supplement`, `supplementHistory` | `object`, `array` | Yêu cầu bổ sung, danh mục mục thiếu, hạn và số ngày làm việc tạm dừng được cộng bù, tệp bổ sung của công dân. |
+| `deadlineExtension` | `object` / `array` | Lịch sử gia hạn thời hạn giải quyết gắn với phiếu xin lỗi và hẹn lại ngày trả kết quả (**Mẫu 04**). |
+| `fee` | `object` | Trạng thái nghĩa vụ tài chính (`NOT_CONNECTED`/`DUE`/`PAID`/`RECONCILED`/`WAIVED`/`REFUNDED`), số tiền, căn cứ và tham chiếu giao dịch. |
+| `forms` | `object` | Dữ liệu xuất bản in các biểu mẫu một cửa `mau01`..`mau06` kèm mã QR tra cứu tiến độ hồ sơ. |
+| `withdrawal` | `object` | Yêu cầu dừng thực hiện (**Mẫu 05** trực tiếp/bưu chính/trực tuyến), dự thảo và bản ký phát hành Thông báo dừng (**Mẫu 06**), theo dõi trả hồ sơ giấy và hoàn phí. |
+| `result`, `delivery` | `object` | Kết quả đã phát hành (`number`, `content`, `issuedAt`, `signatureHash`, `files` tự động hiển thị tại Kho tài liệu điện tử công dân) và biên nhận trả kết quả. |
 
-Bảng 4.0: Từ điển dữ liệu hồ sơ và bằng chứng nộp lưu
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh lần nộp |
-| dot_id | uuid | FK dot_nop_luu | Không | Đợt nộp lưu |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ được nộp |
-| ma_goi | varchar(100) | UQ | Không | Mã gói có phiên bản |
-| bam_danh_muc | char(64) |  | Không | Toàn vẹn danh mục thành phần |
-| tham_chieu_bien_nhan | text |  | Có | Biên nhận của kho đích |
-| trang_thai | varchar(30) |  | Không | Chờ kiểm tra, được nhận hoặc trả lại |
-| nhan_luc | timestamptz |  | Có | Mốc được kho xác nhận |
-
-Bảng 4.0: Từ điển dữ liệu phản ánh và đánh giá phục vụ
+### 3.2. Bảng `case_events`: Sự kiện tiến trình và nhật ký xử lý hồ sơ một cửa
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh phản ánh |
-| ho_so_id | uuid | FK ho_so | Có | Hồ sơ nếu có quan hệ |
-| chu_the_id | uuid | FK chu_the | Có | Chủ thể nếu có thông tin hợp lệ |
-| loai | varchar(40) |  | Không | Phản ánh, đánh giá hoặc chuyển quy trình khác |
-| noi_dung | text |  | Không | Nội dung được bảo vệ |
-| co_quan_id | uuid | FK co_quan | Có | Đơn vị được giao trả lời |
-| trang_thai | varchar(30) |  | Không | Nhận, phân loại, xử lý hoặc trả lời |
-| tao_luc | timestamptz |  | Không | Mốc nhận |
+| `id` | `INTEGER` | PK | Không | Khóa tự tăng theo thứ tự thời gian sự kiện |
+| `case_id` | `INTEGER` | FK `cases` | Không | Hồ sơ phát sinh sự kiện |
+| `actor_role` | `TEXT` |  | Không | Vai trò tác nhân thực hiện (`citizen`, `intake`, `specialist`, `leader`, `registrar`, `finance`) |
+| `actor_name` | `TEXT` |  | Không | Tên hiển thị của người thực hiện |
+| `action` | `TEXT` |  | Không | Mã hành động nghiệp vụ (`submit`, `accept`, `assign`, `approve`, `sign_result`, `issue`...) |
+| `title` | `TEXT` |  | Không | Tiêu đề mốc xử lý |
+| `detail` | `TEXT` |  | Không | Diễn giải chi tiết hoặc căn cứ xử lý |
+| `audience` | `TEXT` |  | Không | Phạm vi hiển thị: `public` (công dân xem được) hoặc `internal` (nội bộ cơ quan) |
+| `created_at` | `TEXT` |  | Không | Thời điểm ghi sự kiện |
 
-Bảng 4.0: Từ điển dữ liệu thông điệp nhận và chống lặp
-
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh nội bộ |
-| he_thong_id | uuid | FK he_thong_ket_noi | Không | Nguồn đã xác thực |
-| ma_thong_diep | varchar(150) |  | Không | Mã sự kiện bên ngoài |
-| bam_noi_dung | char(64) |  | Không | So sánh nội dung gửi lại |
-| ho_so_id | uuid | FK ho_so | Có | Liên kết sau khi xác định hồ sơ |
-| trang_thai | varchar(30) |  | Không | Nhận, áp dụng, trùng hoặc cần đối chiếu |
-| nhan_luc | timestamptz |  | Không | Mốc nhận |
-| ma_loi | varchar(100) |  | Có | Lỗi xác thực hoặc nghiệp vụ |
-| thu_tu_nguon | bigint |  | Không | Thứ tự trong luồng hồ sơ tại nguồn |
-| thoi_diem_nguon | timestamptz |  | Không | Mốc phát sinh nghiệp vụ tại nguồn |
-| loai_su_kien | varchar(40) |  | Không | Loại sự kiện theo hợp đồng |
-| ma_ho_so_ngoai | varchar(150) |  | Không | Mã để xác định hồ sơ ở nguồn |
-| tham_chieu_noi_dung | text |  | Không | Nội dung được bảo vệ để áp dụng và kiểm chứng |
-
-Bảng 4.0: Từ điển dữ liệu điểm tiếp nhận theo hiệu lực
+### 3.3. Bảng `case_lookup_secrets`: Kho khóa tra cứu hồ sơ mã hóa Fernet tách biệt
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh điểm phục vụ |
-| ma | varchar(50) | UQ | Không | Mã điểm trong danh mục |
-| co_quan_id | uuid | FK co_quan | Không | Đơn vị quản lý điểm |
-| ten | text |  | Không | Tên điểm |
-| dia_chi | text |  | Không | Địa chỉ công khai |
-| hieu_luc_tu | timestamptz |  | Không | Bắt đầu phục vụ |
-| hieu_luc_den | timestamptz |  | Có | Kết thúc hoặc chuyển điểm |
+| `case_id` | `INTEGER` | PK, FK `cases` | Không | Hồ sơ gắn với khóa tra cứu |
+| `encrypted_key` | `BLOB` |  | Không | Khóa tra cứu 64 ký tự hex được mã hóa đối xứng Fernet bằng `data/lookup-vault.key` |
+| `submission_hash` | `TEXT` |  | Không | Băm SHA-256 của mã phiên nộp dùng đối chiếu chống gửi lặp |
+| `updated_at` | `TEXT` |  | Không | Thời điểm khởi tạo hoặc cấp lại khóa tra cứu |
 
-Bảng 4.0: Từ điển dữ liệu phiên bản mẫu và công thức báo cáo
+### 3.4. Bảng `feedback`: Đánh giá mức độ hài lòng của người dân sau khi kết thúc hồ sơ
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh mẫu phiên bản |
-| ma | varchar(50) |  | Không | Mã mẫu |
-| so_phien_ban | integer |  | Không | Phiên bản công thức |
-| ten | text |  | Không | Tên và mục đích |
-| dinh_nghia | jsonb |  | Không | Tử số, mẫu số, bộ lọc và loại trừ |
-| nguon_du_lieu | jsonb |  | Không | Hệ thống và mốc lấy dữ liệu |
-| phe_duyet_id | uuid | FK tai_khoan | Không | Người duyệt định nghĩa |
-| hieu_luc_tu | timestamptz |  | Không | Bắt đầu áp dụng |
-| hieu_luc_den | timestamptz |  | Có | Kết thúc áp dụng |
+| `id` | `INTEGER` | PK | Không | Định danh lượt đánh giá |
+| `case_id` | `INTEGER` | FK `cases` | Không | Hồ sơ đã hoàn thành hoặc kết thúc được đánh giá |
+| `owner_id` | `TEXT` |  | Không | Định danh chủ hồ sơ gửi đánh giá (mỗi hồ sơ tối đa 01 lần) |
+| `score` | `INTEGER` |  | Không | Điểm hài lòng từ 1 đến 5 sao |
+| `content` | `TEXT` |  | Không | Ý kiến nhận xét về chất lượng phục vụ |
+| `created_at` | `TEXT` |  | Không | Thời điểm gửi đánh giá |
 
-Bảng 4.0: Từ điển dữ liệu nguồn hướng dẫn có phiên bản
+---
 
-| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
-| --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh nguồn |
-| ten | text |  | Không | Tên tài liệu |
-| can_cu | text |  | Không | Nguồn và thẩm quyền ban hành |
-| so_phien_ban | integer |  | Không | Phiên bản được dùng |
-| dia_chi | text |  | Không | Địa chỉ hoặc khóa tài liệu |
-| bam_sha256 | char(64) |  | Không | Toàn vẹn bản đã duyệt |
-| phe_duyet_id | uuid | FK tai_khoan | Không | Người duyệt dùng hướng dẫn |
-| hieu_luc_tu | timestamptz |  | Không | Mốc áp dụng |
-| hieu_luc_den | timestamptz |  | Có | Mốc hết áp dụng |
-| trang_thai | varchar(30) |  | Không | Duyệt, thay thế hoặc thu hồi |
+## Nhóm 4. Không gian Công dân số (4 bảng)
 
-Bảng 4.0: Từ điển dữ liệu tài liệu kho của tổ chức, cá nhân
+### 4.1. Bảng `citizen_profiles`: Thông tin cá nhân tự khai trong không gian tài khoản công dân
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh bản tài liệu |
-| chu_the_id | uuid | FK chu_the | Không | Chủ thể sở hữu quyền khai thác |
-| ket_qua_id | uuid | FK ket_qua | Có | Bản kết quả nếu có |
-| thanh_phan_id | uuid | FK thanh_phan_ho_so | Có | Thành phần nếu có |
-| loai | varchar(100) |  | Không | Loại tài liệu |
-| nguon | text |  | Không | Cơ quan cấp và tham chiếu nguồn |
-| khoa_doi_tuong | text |  | Không | Bản lưu được bảo vệ |
-| bam_sha256 | char(64) |  | Không | Toàn vẹn bản lưu |
-| hieu_luc_tu | timestamptz |  | Có | Bắt đầu giá trị sử dụng nếu áp dụng |
-| hieu_luc_den | timestamptz |  | Có | Kết thúc giá trị sử dụng nếu áp dụng |
-| thay_the_id | uuid | FK tai_lieu_kho | Có | Bản được thay thế |
-| trang_thai | varchar(30) |  | Không | Chờ kiểm tra, hợp lệ hoặc bị thay thế |
+| `user_id` | `TEXT` | PK, FK `users` | Không | Tài khoản công dân sở hữu thông tin |
+| `details_json` | `TEXT` |  | Không | Dữ liệu JSON: ngày sinh, giới tính, giấy tờ định danh, địa chỉ thường trú và liên hệ |
+| `version` | `INTEGER` |  | Không | Phiên bản chống ghi đè khi cập nhật từ nhiều tab |
+| `updated_at` | `TEXT` |  | Không | Thời điểm lưu thông tin cá nhân gần nhất |
 
-Bảng 4.0: Từ điển dữ liệu quyền khai thác tài liệu kho
+### 4.2. Bảng `citizen_drafts`: Hồ sơ nháp lưu tờ khai trực tuyến của công dân
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh lần cấp |
-| tai_lieu_id | uuid | FK tai_lieu_kho | Không | Tài liệu được khai thác |
-| chu_the_id | uuid | FK chu_the | Không | Chủ thể được phép |
-| muc_dich | text |  | Không | Phạm vi và mục đích |
-| can_cu | text |  | Không | Căn cứ quyền hoặc đại diện |
-| hieu_luc_tu | timestamptz |  | Không | Bắt đầu quyền |
-| hieu_luc_den | timestamptz |  | Có | Kết thúc quyền |
-| trang_thai | varchar(30) |  | Không | Có hiệu lực hoặc thu hồi |
+| `id` | `TEXT` | PK | Không | Mã hồ sơ nháp (32 ký tự hex) |
+| `user_id` | `TEXT` | FK `users` | Không | Tài khoản công dân sở hữu bản nháp |
+| `procedure_code` | `TEXT` |  | Không | Mã thủ tục đang kê khai dở dang |
+| `details_json` | `TEXT` |  | Không | Nội dung các bước kê khai, thông tin liên hệ và giải trình miễn giấy tờ |
+| `version` | `INTEGER` |  | Không | Phiên bản bản nháp (tự động xóa cùng giao dịch nộp thành công nếu khớp) |
+| `updated_at` | `TEXT` |  | Không | Thời điểm lưu nháp gần nhất |
 
-Bảng 4.0: Từ điển dữ liệu chỉ đạo và trách nhiệm phản hồi
+### 4.3. Bảng `citizen_record_owners`: Liên kết quyền sở hữu hồ sơ, lịch hẹn và phản ánh với tài khoản công dân
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh nhiệm vụ |
-| ho_so_id | uuid | FK ho_so | Có | Hồ sơ liên quan nếu có |
-| co_quan_id | uuid | FK co_quan | Không | Phạm vi điều hành |
-| nguoi_giao_id | uuid | FK tai_khoan | Không | Người ra chỉ đạo |
-| nguoi_nhan_id | uuid | FK tai_khoan | Có | Người thực hiện |
-| noi_dung | text |  | Không | Nhiệm vụ có căn cứ |
-| tao_luc | timestamptz |  | Không | Thời điểm giao |
-| han_phan_hoi | timestamptz |  | Không | Mốc phản hồi nhiệm vụ |
-| trang_thai | varchar(30) |  | Không | Giao, xử lý hoặc hoàn thành |
-| tham_chieu_phan_hoi | text |  | Có | Bằng chứng thực hiện |
-| phien_ban | integer |  | Không | Kiểm soát cập nhật đồng thời |
+| `record_code` | `TEXT` | PK | Không | Mã bản ghi nghiệp vụ (`HN-*`, `LH-*`, `PA-*`, `PAKN-*`) |
+| `user_id` | `TEXT` | FK `users` | Không | Tài khoản công dân tạo bản ghi |
+| `created_at` | `TEXT` |  | Không | Thời điểm gắn quyền sở hữu |
 
-Bảng 4.0: Từ điển dữ liệu yêu cầu dừng và thông báo dừng
+### 4.4. Bảng `citizen_notification_reads`: Trạng thái đã đọc thông báo trong không gian công dân
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh yêu cầu dừng |
-| ho_so_id | uuid | FK ho_so | Không | Hồ sơ được đề nghị dừng |
-| kenh_yeu_cau | varchar(20) |  | Không | Trực tiếp hoặc bưu chính; trực tuyến đi qua chức năng Cổng quốc gia |
-| ma_phieu_yeu_cau | varchar(100) |  | Không | Mã/biên nhận Mẫu 05 hoặc mã tham chiếu bưu chính |
-| nguoi_yeu_cau_id | uuid | FK chu_the | Không | Cá nhân/tổ chức yêu cầu |
-| uy_quyen_id | uuid | FK uy_quyen | Có | Căn cứ đại diện nếu người yêu cầu không phải chủ thể |
-| thoi_diem_nhan | timestamptz |  | Không | Thời điểm hệ thống/cán bộ nhận yêu cầu |
-| can_cu | text |  | Không | Lý do dừng do người yêu cầu nêu |
-| tep_mau05_id | uuid | FK thanh_phan_ho_so | Không | Bản yêu cầu có chữ ký hoặc chứng cứ tiếp nhận |
-| trang_thai | varchar(30) |  | Không | TIEP_NHAN, CHO_KY_PHAT_HANH, KHONG_DU_DIEU_KIEN hoặc DA_PHAT_HANH |
-| ket_qua_kiem_tra | jsonb |  | Không | Chủ thể, mốc thời gian, tình trạng, quyết định và thông báo đã kiểm tra |
-| nguoi_kiem_tra_id | uuid | FK tai_khoan | Có | Cán bộ Một cửa kiểm tra |
-| kiem_tra_luc | timestamptz |  | Có | Thời điểm kiểm tra ngay khi nhận yêu cầu |
-| tep_mau06_du_thao_id | uuid | FK thanh_phan_ho_so | Có | Dự thảo thông báo, chưa làm đổi trạng thái hồ sơ |
-| tep_mau06_da_ky_id | uuid | FK thanh_phan_ho_so | Có | Bản Thông báo dừng đã ký |
-| nguoi_ky_id | uuid | FK tai_khoan | Có | Người có thẩm quyền ký thông báo |
-| quyen_ky_id | uuid | FK su_kien_quyen_ky_mau06 | Có | Quyền ký còn hiệu lực tại thời điểm ký |
-| phat_hanh_luc | timestamptz |  | Có | Mốc phát hành Mẫu 06 |
-| thong_bao_id | uuid | FK thong_bao | Có | Bằng chứng gửi/giao thông báo |
-| ly_do_khong_du_dieu_kien | text |  | Có | Kết quả khi đã có quyết định/thông báo hoặc ngoài điều kiện |
-| phien_ban | integer |  | Không | Kiểm soát cập nhật đồng thời |
+| `user_id` | `TEXT` | PK, FK `users` | Không | Tài khoản công dân |
+| `event_key` | `TEXT` | PK | Không | Khóa sự kiện thông báo (`case:*`, `appointment:*`, `feedback:*`) |
+| `read_at` | `TEXT` |  | Không | Thời điểm đánh dấu đã đọc |
 
-Bảng 4.0: Từ điển dữ liệu lịch sử cấp và thu hồi quyền ký mẫu 06
+---
+
+## Nhóm 5. Nghĩa vụ Tài chính & Hoàn phí Kiểm soát 4 mắt (3 bảng)
+
+### 5.1. Bảng `payment_records`: Bản ghi nghĩa vụ tài chính, thanh toán và đối soát phí/lệ phí
 
 | Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
 | --- | --- | --- | --- | --- |
-| id | uuid | PK | Không | Định danh sự kiện quyền ký |
-| tai_khoan_id | uuid | FK tai_khoan | Không | Tài khoản được cấp hoặc thu hồi |
-| nguoi_thay_doi_id | uuid | FK tai_khoan | Không | Quản trị viên khác người đề nghị |
-| hanh_dong | varchar(30) |  | Không | CAP hoặc THU_HOI |
-| van_ban_phan_cong | text |  | Không | Số văn bản làm căn cứ thẩm quyền |
-| can_cu | text |  | Không | Lý do cấp/thu hồi và dấu vết đối chiếu |
-| thoi_diem | timestamptz |  | Không | Thời điểm sự kiện quyền |
+| `id` | `INTEGER` | PK | Không | Định danh nội bộ khoản giao dịch |
+| `case_id` | `INTEGER` | FK `cases` | Không | Hồ sơ phát sinh khoản thu |
+| `transaction_ref` | `TEXT` | UQ | Không | Mã giao dịch duy nhất (`HN-THU-*`) |
+| `amount` | `INTEGER` |  | Không | Số tiền thu tính bằng đồng Việt Nam (VND) |
+| `status` | `TEXT` |  | Không | Trạng thái: `PENDING`, `PAID`, `RECONCILED`, `REFUNDED` |
+| `basis` | `TEXT` |  | Không | Căn cứ pháp lý và nội dung xác định mức thu |
+| `provider_mode` | `TEXT` |  | Không | Chế độ vận hành (`LOCAL_SANDBOX` / `LOCAL_RECONCILED`) |
+| `payment_method` | `TEXT` |  | Không | Phương thức nộp: `SANDBOX`, `BANK_TRANSFER`, `COUNTER_RECEIPT`, `POSTAL_RECEIPT`, `OTHER` |
+| `payer_reference` | `TEXT` |  | Không | Số biên lai hoặc mã tham chiếu chuyển khoản do người nộp khai |
+| `reconciliation_reference` | `TEXT` |  | Không | Số chứng từ kế toán đối soát nội bộ |
+| `created_at` | `TEXT` |  | Không | Thời điểm khởi tạo giao dịch |
+| `reconciled_at` | `TEXT` |  | Có | Thời điểm cán bộ tài chính/lãnh đạo xác nhận đối soát |
+
+### 5.2. Bảng `payment_events`: Nhật ký sự kiện giao dịch, đối soát và hoàn trả khoản thu
+
+| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
+| --- | --- | --- | --- | --- |
+| `id` | `INTEGER` | PK | Không | Khóa tự tăng sự kiện thanh toán |
+| `transaction_ref` | `TEXT` | FK `payment_records` | Không | Mã giao dịch liên quan |
+| `actor_id` | `TEXT` |  | Không | Định danh tài khoản thực hiện |
+| `actor_name` | `TEXT` |  | Không | Tên người thao tác |
+| `action` | `TEXT` |  | Không | Hành động: `CREATED`, `PAID_DECLARED`, `RECONCILED`, `REFUND_REQUESTED`, `REFUND_APPROVED`, `REFUND_REJECTED`, `REFUND_EXECUTED` |
+| `detail` | `TEXT` |  | Không | Chi tiết chứng từ hoặc ý kiến |
+| `idempotency_key` | `TEXT` |  | Không | Khóa đối chiếu sự kiện giao dịch |
+| `created_at` | `TEXT` |  | Không | Thời điểm phát sinh sự kiện |
+
+### 5.3. Bảng `payment_refunds`: Đề nghị hoàn phí/lệ phí theo nguyên tắc kiểm soát 4 mắt
+
+| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
+| --- | --- | --- | --- | --- |
+| `id` | `INTEGER` | PK | Không | Định danh đề nghị hoàn trả |
+| `transaction_ref` | `TEXT` | FK `payment_records` | Không | Mã giao dịch đã đối soát cần hoàn |
+| `reason` | `TEXT` |  | Không | Căn cứ lập đề nghị hoàn phí/lệ phí |
+| `status` | `TEXT` |  | Không | Trạng thái: `PENDING`, `APPROVED`, `REJECTED`, `EXECUTED` |
+| `requested_by` | `TEXT` |  | Không | Định danh cán bộ lập đề nghị hoàn |
+| `requested_at` | `TEXT` |  | Không | Thời điểm lập đề nghị hoàn |
+| `reviewed_by` | `TEXT` |  | Không | Định danh người phê duyệt độc lập (khác `requested_by`) |
+| `reviewed_at` | `TEXT` |  | Có | Thời điểm phê duyệt hoặc từ chối đề nghị hoàn |
+| `review_note` | `TEXT` |  | Không | Ý kiến phê duyệt hoặc từ chối |
+| `executed_at` | `TEXT` |  | Có | Thời điểm ghi nhận chứng từ chi hoàn thực tế |
+| `execution_reference` | `TEXT` |  | Không | Số ủy nhiệm chi hoặc chứng từ chi hoàn |
+
+---
+
+## Nhóm 6. Ký thử nghiệm Ed25519 & Quầy Dịch vụ / Lịch hẹn / PAKN (7 bảng)
+
+### 6.1. Bảng `sandbox_signing_authorities`: Ủy quyền ký số thử nghiệm Ed25519 cho lãnh đạo cơ quan
+
+| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
+| --- | --- | --- | --- | --- |
+| `user_id` | `TEXT` | PK, FK `users` | Không | Tài khoản lãnh đạo được cấp quyền ký |
+| `granted_by` | `TEXT` | FK `users` | Không | Quản trị viên hệ thống cấp quyền |
+| `authority_ref` | `TEXT` |  | Không | Số quyết định/văn bản phân công thẩm quyền ký |
+| `reason` | `TEXT` |  | Không | Lý do cấp hoặc thu hồi quyền ký |
+| `active` | `INTEGER` |  | Không | Trạng thái hiệu lực quyền ký (`1`: đang mở, `0`: đã thu hồi) |
+| `granted_at` | `TEXT` |  | Không | Thời điểm cấp quyền |
+| `revoked_at` | `TEXT` |  | Có | Thời điểm thu hồi quyền (nếu có) |
+
+### 6.2. Bảng `sandbox_signing_authority_events`: Nhật ký cấp và thu hồi quyền ký số thử nghiệm Ed25519
+
+| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
+| --- | --- | --- | --- | --- |
+| `id` | `INTEGER` | PK | Không | Khóa tự tăng sự kiện thẩm quyền ký |
+| `user_id` | `TEXT` | FK `users` | Không | Tài khoản lãnh đạo được tác động |
+| `actor_id` | `TEXT` | FK `users` | Không | Quản trị viên thực hiện cấp/thu hồi |
+| `action` | `TEXT` |  | Không | Thao tác: `GRANT` hoặc `REVOKE` |
+| `authority_ref` | `TEXT` |  | Không | Số văn bản thẩm quyền tham chiếu |
+| `reason` | `TEXT` |  | Không | Lý do thực hiện |
+| `created_at` | `TEXT` |  | Không | Thời điểm ghi nhật ký |
+
+### 6.3. Bảng `sandbox_signatures`: Bằng chứng chữ ký số thử nghiệm Ed25519 trên dự thảo kết quả đã duyệt
+
+| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
+| --- | --- | --- | --- | --- |
+| `id` | `INTEGER` | PK | Không | Định danh bản ghi chữ ký |
+| `case_id` | `INTEGER` | FK `cases` | Không | Hồ sơ có dự thảo kết quả được ký |
+| `document_hash` | `TEXT` |  | Không | Mã băm SHA-256 của thông điệp chuẩn hóa đã duyệt |
+| `signature_b64` | `TEXT` |  | Không | Chữ ký Ed25519 mã hóa Base64 |
+| `public_key_b64` | `TEXT` |  | Không | Khóa công khai Ed25519 (Base64) dùng kiểm tra tính toàn vẹn |
+| `signer_id` | `TEXT` | FK `users` | Không | Tài khoản lãnh đạo thực hiện ký |
+| `signer_name` | `TEXT` |  | Không | Họ tên người ký |
+| `authority_ref` | `TEXT` |  | Không | Số văn bản ủy quyền ký tại thời điểm ký |
+| `signed_at` | `TEXT` |  | Không | Thời điểm ký kết quả |
+| `mode` | `TEXT` |  | Không | Chế độ chữ ký (`LOCAL_SANDBOX`) |
+
+### 6.4. Bảng `public_appointments`: Lịch hẹn giao dịch trực tiếp tại Bộ phận Một cửa
+
+| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
+| --- | --- | --- | --- | --- |
+| `code` | `TEXT` | PK | Không | Mã lịch hẹn (`LH-*`) |
+| `citizen_name` | `TEXT` |  | Không | Họ tên người đặt lịch |
+| `citizen_id` | `TEXT` |  | Không | Số định danh cá nhân (nếu khai) |
+| `phone` | `TEXT` |  | Không | Số điện thoại đối chiếu khi tra cứu |
+| `agency` | `TEXT` |  | Không | Cơ quan tiếp nhận được chọn |
+| `procedure_code` | `TEXT` |  | Không | Mã thủ tục cần hướng dẫn/nộp |
+| `procedure_name` | `TEXT` |  | Không | Tên thủ tục hành chính |
+| `appointment_date` | `TEXT` |  | Không | Ngày hẹn làm việc (`YYYY-MM-DD`) |
+| `time_slot` | `TEXT` |  | Không | Khung giờ hẹn (tối đa 10 lịch/cơ quan/khung giờ) |
+| `queue_number` | `INTEGER` |  | Không | Số thứ tự phục vụ tại quầy trong ngày |
+| `note` | `TEXT` |  | Không | Ghi chú nhu cầu hướng dẫn của công dân |
+| `status` | `TEXT` |  | Không | Trạng thái: `BOOKED`, `CONFIRMED`, `CHECKED_IN`, `COMPLETED`, `CANCELLED` |
+| `created_at` | `TEXT` |  | Không | Thời điểm đặt lịch |
+| `counter_note` | `TEXT` |  | Không | Ghi chú tiếp đón/xử lý của cán bộ một cửa |
+
+### 6.5. Bảng `public_appointment_events`: Nhật ký xử lý lịch hẹn tại quầy một cửa
+
+| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
+| --- | --- | --- | --- | --- |
+| `id` | `INTEGER` | PK | Không | Khóa tự tăng sự kiện lịch hẹn |
+| `appointment_code` | `TEXT` | FK `public_appointments` | Không | Mã lịch hẹn được cập nhật |
+| `actor_id` | `TEXT` |  | Không | Tài khoản cán bộ cập nhật |
+| `actor_name` | `TEXT` |  | Không | Họ tên cán bộ xử lý |
+| `action` | `TEXT` |  | Không | Trạng thái chuyển tới |
+| `detail` | `TEXT` |  | Không | Ghi chú hướng dẫn hoặc lý do hủy |
+| `created_at` | `TEXT` |  | Không | Thời điểm cập nhật |
+
+### 6.6. Bảng `public_pakn`: Phản ánh, kiến nghị của người dân và tổ chức theo cơ quan
+
+| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
+| --- | --- | --- | --- | --- |
+| `code` | `TEXT` | PK | Không | Mã theo dõi phản ánh kiến nghị (`PA-*` / `PAKN-*`) |
+| `sender_name` | `TEXT` |  | Không | Họ tên người gửi phản ánh |
+| `phone` | `TEXT` |  | Không | Số điện thoại xác thực tra cứu kết quả trả lời |
+| `email` | `TEXT` |  | Không | Địa chỉ email liên hệ (nếu có) |
+| `agency` | `TEXT` |  | Không | Cơ quan nhận phản ánh kiến nghị |
+| `topic` | `TEXT` |  | Không | Chủ đề phản ánh |
+| `title` | `TEXT` |  | Không | Tiêu đề phản ánh kiến nghị |
+| `content` | `TEXT` |  | Không | Nội dung phản ánh chi tiết |
+| `status` | `TEXT` |  | Không | Trạng thái: `RECEIVED`, `REPLIED` |
+| `reply` | `TEXT` |  | Không | Nội dung trả lời chính thức của cơ quan |
+| `replied_by` | `TEXT` |  | Không | Định danh cán bộ/lãnh đạo trả lời |
+| `replied_at` | `TEXT` |  | Có | Thời điểm trả lời phản ánh |
+| `created_at` | `TEXT` |  | Không | Thời điểm tiếp nhận phản ánh |
+
+### 6.7. Bảng `public_feedback_events`: Nhật ký tiếp nhận và trả lời phản ánh kiến nghị
+
+| Tên trường | Kiểu dữ liệu | Khóa | Rỗng | Diễn giải |
+| --- | --- | --- | --- | --- |
+| `id` | `INTEGER` | PK | Không | Khóa tự tăng sự kiện phản ánh |
+| `feedback_code` | `TEXT` | FK `public_pakn` | Không | Mã phản ánh kiến nghị liên quan |
+| `actor_id` | `TEXT` |  | Không | Định danh cán bộ trả lời |
+| `actor_name` | `TEXT` |  | Không | Họ tên cán bộ trả lời |
+| `action` | `TEXT` |  | Không | Hành động xử lý (`REPLIED`) |
+| `detail` | `TEXT` |  | Không | Nội dung phản hồi lưu vết |
+| `created_at` | `TEXT` |  | Không | Thời điểm ghi nhật ký |
+
+---
+
+## Danh mục chỉ mục vật lý (25 chỉ mục)
+
+| Chỉ mục | Bảng đích | Cột / Điều kiện |
+| --- | --- | --- |
+| `idx_users_role_active` | `users` | `(role, active)` |
+| `idx_sessions_user` | `sessions` | `(user_id)` |
+| `idx_sessions_expires` | `sessions` | `(expires_at)` |
+| `idx_access_requests_status_created` | `staff_access_requests` | `(status, created_at DESC)` |
+| `idx_staff_access_user` | `staff_access_requests` | `(user_id)` |
+| `idx_account_changes_status_created` | `staff_account_changes` | `(status, created_at DESC)` |
+| `idx_account_changes_one_pending_per_user` | `staff_account_changes` | `UNIQUE (user_id) WHERE status = 'PENDING'` |
+| `idx_staff_authority_user` | `staff_authority_events` | `(user_id, id)` |
+| `idx_procedure_catalog_audit_code` | `procedure_catalog_audit` | `(procedure_code, id DESC)` |
+| `idx_procedure_category_audit_field` | `procedure_category_audit` | `(source_field, id DESC)` |
+| `idx_news_public` | `news_articles` | `(status, featured DESC, published_at DESC)` |
+| `idx_news_audit_article` | `news_audit_log` | `(news_id, id DESC)` |
+| `idx_cases_status_created` | `cases` | `(status, created_at DESC)` |
+| `idx_cases_owner` | `cases` | `(owner_id, created_at DESC)` |
+| `idx_events_case` | `case_events` | `(case_id, id)` |
+| `idx_feedback_case` | `feedback` | `(case_id)` |
+| `idx_citizen_drafts_owner` | `citizen_drafts` | `(user_id, updated_at)` |
+| `idx_citizen_records_user` | `citizen_record_owners` | `(user_id)` |
+| `idx_payment_records_case` | `payment_records` | `(case_id)` |
+| `idx_payment_events_ref` | `payment_events` | `(transaction_ref, id)` |
+| `idx_payment_refunds_ref` | `payment_refunds` | `(transaction_ref, id DESC)` |
+| `idx_sandbox_signatures_case` | `sandbox_signatures` | `(case_id, id DESC)` |
+| `idx_appointments_date_agency` | `public_appointments` | `(appointment_date, agency)` |
+| `idx_appointment_events_code` | `public_appointment_events` | `(appointment_code, id)` |
+| `idx_public_feedback_events_code` | `public_feedback_events` | `(feedback_code, id)` |

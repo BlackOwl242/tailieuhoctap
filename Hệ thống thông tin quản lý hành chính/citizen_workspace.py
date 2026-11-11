@@ -39,9 +39,10 @@ def snapshot(service, con, user):
         if withdrawal.get('status') == 'DA_PHAT_HANH' and isinstance(withdrawal.get('noticeFile'), dict):
             candidates.append((withdrawal['noticeFile'], 'Thông báo đã phát hành'))
         for item, kind in candidates:
-            if not item.get('stored'):
+            stored = item.get('stored') or item.get('storedName')
+            if not stored:
                 continue
-            documents.append({'id': f"{case['code']}:{item['stored']}", 'code': case['code'], 'name': item.get('name', 'Tài liệu'), 'size': item.get('size', 0), 'kind': kind, 'at': row['updated_at'], 'downloadUrl': f"/api/citizen/documents/{quote(case['code'], safe='')}/{quote(item['stored'], safe='')}"})
+            documents.append({'id': f"{case['code']}:{stored}", 'code': case['code'], 'name': item.get('name', 'Tài liệu'), 'size': item.get('size', 0), 'kind': kind, 'at': row['updated_at'], 'downloadUrl': f"/api/citizen/documents/{quote(case['code'], safe='')}/{quote(str(stored), safe='')}"})
     for item in appointments:
         note_hash = hashlib.sha256(item['counter_note'].encode()).hexdigest()[:16]
         notifications.append({'id': f"appointment:{item['code']}:{item['status']}:{note_hash}", 'kind': 'appointment', 'code': item['code'], 'title': 'Cập nhật lịch hẹn', 'detail': item['counter_note'] or f"{item['appointment_date']} · {item['time_slot']} · {item['agency']}", 'at': item['created_at']})

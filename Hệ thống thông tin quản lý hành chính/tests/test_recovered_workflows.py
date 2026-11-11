@@ -38,6 +38,12 @@ class Client:
         self.csrf = result['csrfToken']
         return self
 
+    def login_citizen(self, email='citizen@recovery.test', password='RecoveryTest2026Password'):
+        status, result = self.call('/api/citizen/auth/login', {'email': email, 'password': password})
+        assert status == 200, result
+        self.csrf = result['csrfToken']
+        return self
+
 
 class RecoveredWorkflowTests(unittest.TestCase):
     @classmethod
@@ -48,12 +54,21 @@ class RecoveredWorkflowTests(unittest.TestCase):
         app.DB_PATH = app.DATA_DIR / 'test.sqlite3'
         app.UPLOAD_DIR = app.DATA_DIR / 'uploads'
         app.init_db()
+        salt = uuid.uuid4().bytes
+        pw_hex = app.password_hash('RecoveryTest2026Password', salt).hex()
         with app.connect() as con:
-            for name, role, scope in [('intake', 'intake', 'UBND phường Kiểm thử A'), ('other', 'intake', 'UBND phường Kiểm thử B'), ('finance', 'finance', 'UBND phường Kiểm thử A'), ('finance2', 'finance', 'UBND phường Kiểm thử A'), ('admin', 'admin', 'Toàn thành phố'), ('leader', 'leader', 'UBND phường Kiểm thử A')]:
-                salt = uuid.uuid4().bytes
+            for name, role, scope in [
+                ('intake', 'intake', 'UBND phường Kiểm thử A'),
+                ('other', 'intake', 'UBND phường Kiểm thử B'),
+                ('finance', 'finance', 'UBND phường Kiểm thử A'),
+                ('finance2', 'finance', 'UBND phường Kiểm thử A'),
+                ('admin', 'admin', 'Toàn thành phố'),
+                ('leader', 'leader', 'UBND phường Kiểm thử A'),
+                ('citizen', 'citizen', ''),
+            ]:
                 now = app.now_iso()
                 con.execute('INSERT INTO users(id,email,full_name,password_salt,password_hash,role,active,agency_scope,created_at,updated_at) VALUES(?,?,?,?,?,?,1,?,?,?)',
-                            (name, name + '@recovery.test', name, salt.hex(), app.password_hash('RecoveryTest2026Password', salt).hex(), role, scope, now, now))
+                            (name, name + '@recovery.test', name, salt.hex(), pw_hex, role, scope, now, now))
         cls.server = app.ThreadingHTTPServer(('127.0.0.1', 0), app.AppHandler)
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
@@ -68,13 +83,17 @@ class RecoveredWorkflowTests(unittest.TestCase):
     def setUp(self):
         with app.PUBLIC_ATTEMPTS_LOCK:
             app.PUBLIC_ATTEMPTS.clear()
+        with app.AUTH_ATTEMPTS_LOCK:
+            app.AUTH_ATTEMPTS.clear()
         with app.connect() as con:
+            con.execute('DELETE FROM citizen_record_owners')
             con.execute('DELETE FROM public_appointment_events')
             con.execute('DELETE FROM public_feedback_events')
             con.execute('DELETE FROM public_appointments')
             con.execute('DELETE FROM public_pakn')
             con.execute('DELETE FROM cases')
-        self.public = Client(self.url)
+        self.anonymous = Client(self.url)
+        self.public = Client(self.url).login_citizen()
 
     def client(self, role):
         return Client(self.url).login(role)
@@ -121,7 +140,9 @@ class RecoveredWorkflowTests(unittest.TestCase):
         self.assertIn(b'Test real uploaded bytes', stored[0].read_bytes())
 
     def test_payment_requires_evidence_and_reconciliation_document(self):
-        key = self.case(); status, created = self.action(key, 'create_payment', {}, 1)
+        key = self.case()
+        self.assertEqual(self.anonymous.call('/api/public/cases/RECOVERY-CASE/actions', {'accessKey': key, 'action': 'create_payment', 'expectedVersion': 1, 'payload': {}})[0], 401)
+        status, created = self.action(key, 'create_payment', {}, 1)
         self.assertEqual(status, 200, created)
         case = created['case']; ref = case['payments'][0]['transactionRef']
         self.assertEqual(self.action(key, 'confirm_payment', {'transactionRef': ref}, case['version'])[0], 422)
@@ -134,6 +155,11 @@ class RecoveredWorkflowTests(unittest.TestCase):
         self.assertEqual(status, 200, reconciled)
         payment = finance.call('/api/payments')[1]['payments'][0]
         self.assertEqual(payment['reconciliationReference'], 'STATEMENT-TEST-001')
+        admin_payments = self.client('admin').call('/api/payments')[1]
+        self.assertEqual(admin_payments['payments'], [])
+        self.assertEqual(admin_payments['summary'].get('RECONCILED'), 1)
+        self.assertNotIn('BANK-TEST-001', json.dumps(admin_payments))
+        self.assertNotIn('RECOVERY-CASE', json.dumps(admin_payments))
 
     def test_refund_approval_and_execution_are_separate_and_atomic(self):
         self.case()
@@ -160,12 +186,13 @@ class RecoveredWorkflowTests(unittest.TestCase):
     def test_appointment_lookup_scope_status_and_audit(self):
         day = datetime.now(app.TZ).date() + timedelta(days=1)
         while not app.is_workday(day): day += timedelta(days=1)
-        body = {'name': 'Người hẹn kiểm thử', 'phone': '0900000000', 'agency': 'UBND phường Kiểm thử A', 'procedureCode': '2.000908', 'date': day.isoformat(), 'timeSlot': '08:00-09:00'}
+        body = {'name': 'Người hẹn kiểm thử', 'phone': '+84 900.000-000', 'agency': 'UBND phường Kiểm thử A', 'procedureCode': '2.000908', 'date': day.isoformat(), 'timeSlot': '08:00-09:00'}
+        self.assertEqual(self.anonymous.call('/api/public/appointments', body)[0], 401)
         status, created = self.public.call('/api/public/appointments', body)
         self.assertEqual(status, 201, created)
         code = created['code']
         self.assertEqual(self.public.call('/api/public/service-lookup', {'code': code, 'phone': '0911111111'})[0], 404)
-        self.assertEqual(self.public.call('/api/public/service-lookup', {'code': code, 'phone': body['phone']})[0], 200)
+        self.assertEqual(self.public.call('/api/public/service-lookup', {'code': code, 'phone': '0900 000 000'})[0], 200)
         self.assertEqual(self.client('other').call('/api/service-desk')[1]['appointments'], [])
         self.assertEqual(self.client('admin').call('/api/service-desk')[1]['appointments'], [])
         intake = self.client('intake'); update = {'code': code, 'expectedStatus': 'BOOKED', 'status': 'COMPLETED', 'note': 'Ghi chú xử lý kiểm thử'}
@@ -175,6 +202,15 @@ class RecoveredWorkflowTests(unittest.TestCase):
         self.assertEqual(intake.call('/api/service-desk/update', update)[0], 409)
         with app.connect() as con:
             self.assertEqual(con.execute('SELECT count(*) FROM public_appointment_events WHERE appointment_code=?', (code,)).fetchone()[0], 1)
+
+    def test_counter_case_links_existing_citizen_by_email(self):
+        intake = self.client('intake')
+        body = {**self.counter(), 'applicantEmail': 'CITIZEN@recovery.test'}
+        status, result = intake.call('/api/cases/counter', body)
+        self.assertEqual(status, 201, result)
+        code = result['case']['code']
+        citizen_cases = self.public.call('/api/citizen/cases')[1]['cases']
+        self.assertIn(code, [c['code'] for c in citizen_cases])
 
     def test_feedback_reply_is_scoped_and_not_overwritten(self):
         body = {'name': 'Người gửi kiểm thử', 'phone': '0900000000', 'agency': 'UBND phường Kiểm thử A', 'title': 'Góp ý chất lượng phục vụ', 'content': 'Đề nghị bổ sung hướng dẫn tại bộ phận tiếp nhận.'}

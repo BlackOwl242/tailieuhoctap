@@ -1,19 +1,48 @@
 :root {
-  font-family: "Segoe UI", Arial, sans-serif;
-  color: #243446;
-  background: #f5f6f8;
+  font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  color: #172b44;
+  background: #f5f7fa;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --navy: #233d79;
-  --teal: #24427f;
-  --ink: #243446;
-  --muted: #596b7a;
-  --line: #d9e0e8;
-  --paper: #fff;
+  --navy: #1b365d;
+  --brand: #1b365d;
+  --brand-hover: #142847;
+  --teal: #1b365d;
+  --civic-red: #b42318;
+  --civic-amber: #9a5b08;
+  --civic-green: #166534;
+  --ink: #172b44;
+  --muted: #526477;
+  --line: #d5dfec;
+  --surface-soft: #eef3f9;
+  --surface-warm: #fef9ec;
+  --paper: #ffffff;
+  --surface: #f5f7fa;
+  --line-strong: #b8c7d8;
+  --font-sans: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --font-heading: var(--font-sans);
+  --radius: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --shadow-xs: 0 1px 2px rgba(23, 43, 68, 0.04);
+  --shadow-sm: 0 1px 3px rgba(23, 43, 68, 0.06);
+  --shadow-md: 0 4px 12px rgba(23, 43, 68, 0.08);
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 html {
@@ -22,10 +51,17 @@ html {
 }
 
 body {
-  min-width: 0;
   min-height: 100vh;
   margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  color: var(--ink);
+  background: #f5f7fa;
+  line-height: 1.5;
+}
+
+img,
+svg {
+  max-width: 100%;
 }
 
 button,
@@ -37,4 +73,97 @@ textarea {
 
 button {
   cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Customizable native selects retain form and keyboard behavior. */
+@supports (appearance: base-select) and selector(::picker(select)) {
+  @media (min-width: 721px) {
+    select:not([multiple]):not([size]),
+    select:not([multiple]):not([size])::picker(select) {
+      appearance: base-select;
+    }
+
+    select:not([multiple]):not([size]) {
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    select:not([multiple]):not([size])::picker-icon {
+      color: var(--muted);
+      transition: rotate 0.15s ease;
+    }
+
+    select:not([multiple]):not([size]):open::picker-icon {
+      rotate: 180deg;
+    }
+
+    select:not([multiple]):not([size])::picker(select) {
+      margin-top: 4px;
+      padding: 4px;
+      box-sizing: border-box;
+      width: anchor-size(width);
+      min-width: 0;
+      max-width: anchor-size(width);
+      max-height: min(320px, 50vh);
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: var(--paper);
+      box-shadow: 0 6px 18px rgba(23, 43, 68, 0.14);
+    }
+
+    select:not([multiple]):not([size]) option {
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 4px;
+      color: var(--ink);
+      background: var(--paper);
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    select:not([multiple]):not([size]) option:hover,
+    select:not([multiple]):not([size]) option:focus {
+      background: var(--surface-soft);
+      color: var(--brand);
+    }
+
+    select:not([multiple]):not([size]) option:checked {
+      background: var(--surface-soft);
+      color: var(--brand);
+      font-weight: 600;
+    }
+
+    select:not([multiple]):not([size]) option::checkmark {
+      order: 1;
+      margin-left: auto;
+      color: var(--brand);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

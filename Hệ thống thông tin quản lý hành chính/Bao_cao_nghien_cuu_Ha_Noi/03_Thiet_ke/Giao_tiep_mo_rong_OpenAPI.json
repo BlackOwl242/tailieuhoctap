@@ -1,675 +1,1426 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
-    "title": "Giao tiếp mở rộng của thiết kế nghiên cứu",
+    "title": "API Mở rộng: Phân quyền RBAC, Tài chính 4 mắt, Bàn Dịch vụ, Biên tập Danh mục và Báo cáo 766",
     "version": "2.0.0",
-    "description": "Không phải địa chỉ giao tiếp đang vận hành của Hà Nội. Cần thống nhất hợp đồng, nguồn trạng thái, xác thực thông điệp và chữ ký trước phát triển."
+    "summary": "Đặc tả OpenAPI 3.1.0 đồng bộ 100% với hệ thống thực tế (/api/...)",
+    "description": "Giao diện lập trình ứng dụng phục vụ xác thực nội bộ, quản trị tài khoản cán bộ phê duyệt độc lập, thẩm quyền ký Ed25519 và Mẫu 06, đối soát - hoàn phí kiểm soát 4 mắt, đặt lịch hẹn và trả lời PAKN theo cơ quan, biên tập danh mục thủ tục/tin tức có nhật ký kiểm toán, báo cáo tổng hợp Bộ chỉ số 766 và cân đối kỳ theo TT 09/2026/TT-BTP."
   },
-  "paths": {
-    "/v1/routes": {
-      "get": {
-        "operationId": "extended1",
-        "summary": "Tra cứu tuyến tác nghiệp",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Kết quả tiếp nhận hoặc tra cứu",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RouteList"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Nguồn hoặc danh tính không hợp lệ"
-          },
-          "403": {
-            "description": "Ngoài phạm vi quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
-          },
-          "422": {
-            "description": "Không đủ điều kiện nghiệp vụ"
-          }
-        },
-        "parameters": [
-          {
-            "name": "asOf",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "procedureVersionId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8766",
+      "description": "Máy chủ ứng dụng cục bộ (SQLite WAL)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "StaffAuthBootstrap",
+      "description": "Xác thực phiên cán bộ, tài khoản cá nhân và khởi tạo bàn làm việc nội bộ"
+    },
+    {
+      "name": "RBACAndSigning",
+      "description": "Quản lý tài khoản cán bộ phê duyệt độc lập, thẩm quyền ký Mẫu 06 và chữ ký thử nghiệm Ed25519"
+    },
+    {
+      "name": "FinanceFourEyes",
+      "description": "Đối soát thu phí và quy trình đề nghị - phê duyệt - chi hoàn phí kiểm soát 4 mắt"
+    },
+    {
+      "name": "ServiceDeskAndPAKN",
+      "description": "Đặt lịch hẹn quầy Một cửa, gửi và trả lời phản ánh kiến nghị theo cơ quan"
+    },
+    {
+      "name": "CatalogAndNewsCMS",
+      "description": "Biên tập danh mục thủ tục, nhóm lĩnh vực và tin tức cổng thông tin kèm nhật ký kiểm toán"
+    },
+    {
+      "name": "ReportingAndVault",
+      "description": "Báo cáo tổng hợp Bộ chỉ số 766, cân đối kỳ TT 09/2026/TT-BTP, xuất CSV và kho khóa tra cứu Fernet"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "staffCookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "hni_session",
+        "description": "Cookie phiên đăng nhập của cán bộ và quản trị viên (HttpOnly, SameSite=Strict, thời hạn 12 giờ)."
       },
-      "post": {
-        "operationId": "extended7",
-        "summary": "Đề nghị cấu hình tuyến",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Kết quả tiếp nhận hoặc tra cứu",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Receipt"
-                }
-              }
+      "citizenCookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "hni_citizen_session",
+        "description": "Cookie phiên đăng nhập của công dân/tổ chức trên cổng dịch vụ công (HttpOnly, SameSite=Strict, thời hạn 12 giờ)."
+      },
+      "csrfTokenAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-CSRF-Token",
+        "description": "Mã chống giả mạo yêu cầu liên trang gắn với phiên hiện tại, bắt buộc trên các yêu cầu POST đã đăng nhập."
+      }
+    },
+    "parameters": {
+      "UserIdParam": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Định danh tài khoản hoặc đề nghị (UUID)",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "TransactionRefParam": {
+        "name": "ref",
+        "in": "path",
+        "required": true,
+        "description": "Mã tham chiếu giao dịch thu phí thử nghiệm (HN-THU-*)",
+        "schema": { "type": "string", "examples": ["HN-THU-20261015093000-A1B2C3"] }
+      },
+      "ProcedureCodeParam": {
+        "name": "code",
+        "in": "path",
+        "required": true,
+        "description": "Mã thủ tục hành chính",
+        "schema": { "type": "string" }
+      },
+      "CaseCodeParam": {
+        "name": "code",
+        "in": "path",
+        "required": true,
+        "description": "Mã hồ sơ một cửa (HN-YYYY-XXXXXXXX)",
+        "schema": { "type": "string" }
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": { "type": "string" }
+        }
+      },
+      "AccessReviewRequest": {
+        "type": "object",
+        "required": ["decision", "note"],
+        "properties": {
+          "decision": { "type": "string", "enum": ["APPROVE", "REJECT"] },
+          "note": { "type": "string", "minLength": 8 },
+          "authorizeSignStop": { "type": "boolean" }
+        }
+      },
+      "ReportingSummaryResponse": {
+        "type": "object",
+        "required": ["reportKind", "agency", "total", "byAgency", "byStatus", "byProcedure", "index766", "periodBalance"],
+        "properties": {
+          "reportKind": { "type": "string", "const": "INTERNAL_OPERATIONS" },
+          "officialForm": { "type": "boolean" },
+          "agency": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "total": { "type": "integer" },
+          "sampleTotal": { "type": "integer" },
+          "realTotal": { "type": "integer" },
+          "storedTotal": { "type": "integer" },
+          "agencies": { "type": "array", "items": { "type": "string" } },
+          "byAgency": { "type": "array", "items": { "type": "object" } },
+          "byStatus": { "type": "array", "items": { "type": "object" } },
+          "byProcedure": { "type": "array", "items": { "type": "object" } },
+          "byAgencyStatus": { "type": "array", "items": { "type": "object" } },
+          "index766": {
+            "type": "object",
+            "description": "Các nhóm chỉ tiêu theo Quyết định 766/QĐ-TTg: công khai minh bạch, tiến độ giải quyết (đúng hạn/trước hạn/quá hạn), dịch vụ trực tuyến - thanh toán trực tuyến, số hóa hồ sơ và mức độ hài lòng",
+            "properties": {
+              "transparencyScore": { "type": "number" },
+              "timelinessRate": { "type": "number" },
+              "onTimeCount": { "type": "integer" },
+              "overdueCount": { "type": "integer" },
+              "onlineServiceRate": { "type": "number" },
+              "digitizationRate": { "type": "number" },
+              "satisfactionScore": { "type": "number" },
+              "overallScore": { "type": "number" }
             }
           },
-          "401": {
-            "description": "Nguồn hoặc danh tính không hợp lệ"
-          },
-          "403": {
-            "description": "Ngoài phạm vi quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
-          },
-          "422": {
-            "description": "Không đủ điều kiện nghiệp vụ"
-          }
-        },
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Route"
-              }
+          "periodBalance": {
+            "type": "object",
+            "description": "Cân đối hồ sơ theo kỳ báo cáo (Thông tư 09/2026/TT-BTP): carriedOver + receivedInPeriod = resolvedInPeriod + inProgressEndPeriod",
+            "properties": {
+              "carriedOver": { "type": "integer", "description": "Số hồ sơ kỳ trước chuyển sang" },
+              "receivedInPeriod": { "type": "integer", "description": "Số hồ sơ tiếp nhận mới trong kỳ" },
+              "resolvedInPeriod": { "type": "integer", "description": "Số hồ sơ đã giải quyết xong trong kỳ" },
+              "inProgressEndPeriod": { "type": "integer", "description": "Số hồ sơ đang giải quyết chuyển kỳ sau" },
+              "balanced": { "type": "boolean" }
             }
           }
         }
-      }
-    },
-    "/v1/external-events": {
-      "post": {
-        "operationId": "extended2",
-        "summary": "Nhận sự kiện từ hệ thống được phép",
-        "security": [
-          {
-            "serviceAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Kết quả tiếp nhận hoặc tra cứu",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Receipt"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Nguồn hoặc danh tính không hợp lệ"
-          },
-          "403": {
-            "description": "Ngoài phạm vi quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
-          },
-          "422": {
-            "description": "Không đủ điều kiện nghiệp vụ"
-          }
-        },
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExternalEvent"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/coordination-tasks": {
-      "post": {
-        "operationId": "extended3",
-        "summary": "Tạo nhiệm vụ phối hợp",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Kết quả tiếp nhận hoặc tra cứu",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Receipt"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Nguồn hoặc danh tính không hợp lệ"
-          },
-          "403": {
-            "description": "Ngoài phạm vi quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
-          },
-          "422": {
-            "description": "Không đủ điều kiện nghiệp vụ"
-          }
-        },
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Task"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/archive-packages": {
-      "post": {
-        "operationId": "extended4",
-        "summary": "Gửi gói nộp lưu",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Kết quả tiếp nhận hoặc tra cứu",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Receipt"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Nguồn hoặc danh tính không hợp lệ"
-          },
-          "403": {
-            "description": "Ngoài phạm vi quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
-          },
-          "422": {
-            "description": "Không đủ điều kiện nghiệp vụ"
-          }
-        },
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ArchivePackage"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/feedback": {
-      "post": {
-        "operationId": "extended5",
-        "summary": "Tiếp nhận phản ánh, đánh giá",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Kết quả tiếp nhận hoặc tra cứu",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Receipt"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Nguồn hoặc danh tính không hợp lệ"
-          },
-          "403": {
-            "description": "Ngoài phạm vi quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
-          },
-          "422": {
-            "description": "Không đủ điều kiện nghiệp vụ"
-          }
-        },
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Feedback"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/reports/reconciliation": {
-      "get": {
-        "operationId": "extended6",
-        "summary": "Đối chiếu số liệu theo nguồn",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Kết quả tiếp nhận hoặc tra cứu",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Reconciliation"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Nguồn hoặc danh tính không hợp lệ"
-          },
-          "403": {
-            "description": "Ngoài phạm vi quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản, tuyến hoặc thông điệp"
-          },
-          "422": {
-            "description": "Không đủ điều kiện nghiệp vụ"
-          }
-        },
-        "parameters": [
-          {
-            "name": "asOf",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "sourceSystem",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
       }
     }
   },
-  "components": {
-    "schemas": {
-      "Route": {
-        "type": "object",
-        "required": [
-          "procedureVersionId",
-          "systemId",
-          "effectiveFrom",
-          "legalBasis"
-        ],
-        "properties": {
-          "procedureVersionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "systemId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "effectiveFrom": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "effectiveTo": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "legalBasis": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
-      },
-      "ExternalEvent": {
-        "type": "object",
-        "required": [
-          "sourceSystem",
-          "eventId",
-          "externalCaseId",
-          "occurredAt",
-          "sequence",
-          "eventType",
-          "payload"
-        ],
-        "properties": {
-          "sourceSystem": {
-            "type": "string"
-          },
-          "eventId": {
-            "type": "string",
-            "maxLength": 150
-          },
-          "externalCaseId": {
-            "type": "string",
-            "maxLength": 150
-          },
-          "occurredAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "sequence": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "eventType": {
-            "type": "string",
-            "enum": [
-              "RECEIVED",
-              "ACCEPTED",
-              "ASSESSMENT",
-              "ISSUED",
-              "DELIVERED",
-              "STOPPED"
-            ]
-          },
-          "payload": {
-            "type": "object",
-            "description": "Dữ liệu theo hợp đồng được duyệt, không nhận trường tùy ý"
-          }
-        }
-      },
-      "Task": {
-        "type": "object",
-        "required": [
-          "caseId",
-          "recipientAgencyId",
-          "scope",
-          "mandatory",
-          "dueAt",
-          "version"
-        ],
-        "properties": {
-          "caseId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "recipientAgencyId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "scope": {
-            "type": "string",
-            "minLength": 1
-          },
-          "mandatory": {
-            "type": "boolean"
-          },
-          "dueAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "version": {
-            "type": "integer",
-            "minimum": 1
-          }
-        }
-      },
-      "ArchivePackage": {
-        "type": "object",
-        "required": [
-          "packageId",
-          "caseId",
-          "manifestHash",
-          "items"
-        ],
-        "properties": {
-          "packageId": {
-            "type": "string"
-          },
-          "caseId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "manifestHash": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{64}$"
-          },
-          "items": {
-            "type": "array",
-            "minItems": 1,
-            "items": {
-              "type": "object",
-              "required": [
-                "documentId",
-                "version",
-                "sha256"
-              ],
-              "properties": {
-                "documentId": {
-                  "type": "string"
-                },
-                "version": {
-                  "type": "integer",
-                  "minimum": 1
-                },
-                "sha256": {
-                  "type": "string",
-                  "pattern": "^[0-9a-f]{64}$"
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "operationId": "loginStaff",
+        "tags": ["StaffAuthBootstrap"],
+        "summary": "Đăng nhập hệ thống nội bộ cho cán bộ và quản trị viên",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
                 }
               }
             }
           }
-        }
-      },
-      "Feedback": {
-        "type": "object",
-        "required": [
-          "type",
-          "content"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "SERVICE_FEEDBACK",
-              "SATISFACTION",
-              "OTHER_PROCESS"
-            ]
+        },
+        "responses": {
+          "200": {
+            "description": "Đăng nhập thành công, thiết lập cookie hni_session và trả csrfToken",
+            "content": { "application/json": { "schema": { "type": "object" } } }
           },
-          "content": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 5000
-          },
-          "caseId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        }
-      },
-      "Receipt": {
-        "type": "object",
-        "required": [
-          "id",
-          "correlationId",
-          "status"
-        ],
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "correlationId": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "description": "Nhận thông điệp khác với áp dụng thành công nghiệp vụ"
-          }
-        }
-      },
-      "RouteList": {
-        "type": "object",
-        "required": [
-          "asOf",
-          "items"
-        ],
-        "properties": {
-          "asOf": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Route"
-            }
-          }
-        }
-      },
-      "Reconciliation": {
-        "type": "object",
-        "required": [
-          "asOf",
-          "sourceSystem",
-          "caseCount",
-          "excludedDuplicates",
-          "pendingEvents"
-        ],
-        "properties": {
-          "asOf": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "sourceSystem": {
-            "type": "string"
-          },
-          "caseCount": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "excludedDuplicates": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "pendingEvents": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "lastSourceAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
+          "401": {
+            "description": "Sai thông tin đăng nhập hoặc tài khoản chưa hiệu lực",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }
       }
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "logoutStaff",
+        "tags": ["StaffAuthBootstrap"],
+        "summary": "Đăng xuất phiên cán bộ hiện tại",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã hủy phiên hni_session",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "getCurrentStaff",
+        "tags": ["StaffAuthBootstrap"],
+        "summary": "Kiểm tra phiên cán bộ hiện hành và nhận csrfToken",
+        "security": [
+          { "staffCookieAuth": [] },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin cán bộ đang đăng nhập hoặc null",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/auth/account": {
+      "get": {
+        "operationId": "getStaffPersonalAccount",
+        "tags": ["StaffAuthBootstrap"],
+        "summary": "Xem thông tin tài khoản cá nhân, phạm vi cơ quan, thời hạn hiệu lực và thẩm quyền ký",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chi tiết tài khoản cá nhân cán bộ",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/auth/contact": {
+      "post": {
+        "operationId": "updateStaffContact",
+        "tags": ["StaffAuthBootstrap"],
+        "summary": "Cập nhật số điện thoại liên hệ của cán bộ",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone"],
+                "properties": {
+                  "phone": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã cập nhật số điện thoại",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/auth/change-password": {
+      "post": {
+        "operationId": "changeStaffPassword",
+        "tags": ["StaffAuthBootstrap"],
+        "summary": "Đổi mật khẩu tài khoản cán bộ (bao gồm đổi mật khẩu khởi tạo bắt buộc)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["currentPassword", "newPassword"],
+                "properties": {
+                  "currentPassword": { "type": "string" },
+                  "newPassword": { "type": "string", "minLength": 12 },
+                  "confirmPassword": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã cập nhật mật khẩu và thu hồi các phiên khác",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/auth/revoke-other-sessions": {
+      "post": {
+        "operationId": "revokeOtherStaffSessions",
+        "tags": ["StaffAuthBootstrap"],
+        "summary": "Thu hồi toàn bộ các phiên đăng nhập khác của tài khoản cán bộ",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Số phiên khác đã bị hủy",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "operationId": "registerCitizenAlias",
+        "tags": ["StaffAuthBootstrap"],
+        "summary": "Bí danh tương thích để đăng ký tài khoản công dân",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fullName", "email", "phone", "password"],
+                "properties": {
+                  "fullName": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "phone": { "type": "string" },
+                  "password": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã tạo tài khoản công dân",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/bootstrap": {
+      "get": {
+        "operationId": "getStaffBootstrap",
+        "tags": ["StaffAuthBootstrap"],
+        "summary": "Tải dữ liệu bàn làm việc nội bộ theo vai trò và phạm vi cơ quan được cấp",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách hồ sơ trong phạm vi cơ quan, thống kê, danh sách chuyên viên cùng đơn vị và nhãn trạng thái",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "operationId": "listStaffUsersAndRequests",
+        "tags": ["RBACAndSigning"],
+        "summary": "Danh sách tài khoản cán bộ, đề nghị cấp mới và đề nghị thay đổi quyền theo phạm vi quản lý",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách users, accessRequests và accountChanges",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": {
+            "description": "Tài khoản không có quyền quản lý tài khoản cán bộ",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
       },
-      "serviceAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "description": "Danh tính dịch vụ đã cấp riêng; kiểm tra TLS hai chiều và chữ ký thông điệp theo hợp đồng ở tầng tích hợp"
+      "post": {
+        "operationId": "createStaffAccessRequest",
+        "tags": ["RBACAndSigning"],
+        "summary": "Lập đề nghị cấp mới tài khoản cán bộ ở trạng thái chờ quản trị viên khác phê duyệt (PENDING)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fullName", "email", "role", "agencyScope", "reason"],
+                "properties": {
+                  "fullName": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "phone": { "type": "string" },
+                  "role": { "type": "string", "enum": ["intake", "specialist", "leader", "registrar", "finance", "admin"] },
+                  "agencyScope": { "type": "string" },
+                  "validFrom": { "type": "string", "format": "date" },
+                  "validUntil": { "type": "string", "format": "date" },
+                  "maySignStop": { "type": "boolean" },
+                  "signingAuthorityRef": { "type": "string" },
+                  "canManageAgencyAccounts": { "type": "boolean" },
+                  "reason": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã tạo tài khoản chưa kích hoạt và lập đề nghị cấp quyền kèm mật khẩu khởi tạo một lần",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/users/access-requests/{id}/approve": {
+      "post": {
+        "operationId": "approveStaffAccessRequest",
+        "tags": ["RBACAndSigning"],
+        "summary": "Phê duyệt hoặc từ chối đề nghị cấp mới tài khoản cán bộ theo nguyên tắc 4 mắt (admin độc lập)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/UserIdParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AccessReviewRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã ghi nhận kết quả phê duyệt/từ chối đề nghị cấp quyền",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": {
+            "description": "Không phải admin hoặc người đề nghị tự phê duyệt",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/users/access-requests/{id}/review": {
+      "post": {
+        "operationId": "reviewStaffAccessRequestAlias",
+        "tags": ["RBACAndSigning"],
+        "summary": "Điểm cuối tương thích xem xét đề nghị cấp mới tài khoản cán bộ",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/UserIdParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AccessReviewRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã xử lý đề nghị cấp quyền",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/users/{id}/change-requests": {
+      "post": {
+        "operationId": "createStaffChangeRequest",
+        "tags": ["RBACAndSigning"],
+        "summary": "Lập đề nghị điều chỉnh vai trò, cơ quan, thời hạn hiệu lực hoặc trạng thái tài khoản cán bộ",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/UserIdParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["reason"],
+                "properties": {
+                  "role": { "type": "string" },
+                  "agencyScope": { "type": "string" },
+                  "active": { "type": "boolean" },
+                  "validFrom": { "type": "string" },
+                  "validUntil": { "type": "string" },
+                  "maySignStop": { "type": "boolean" },
+                  "signingAuthorityRef": { "type": "string" },
+                  "canManageAgencyAccounts": { "type": "boolean" },
+                  "resetTemporaryPassword": { "type": "boolean" },
+                  "reason": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã lập đề nghị thay đổi tài khoản ở trạng thái PENDING",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/users/change-requests/{id}/approve": {
+      "post": {
+        "operationId": "approveStaffChangeRequest",
+        "tags": ["RBACAndSigning"],
+        "summary": "Phê duyệt hoặc từ chối đề nghị thay đổi tài khoản cán bộ theo nguyên tắc 4 mắt",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/UserIdParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AccessReviewRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã áp dụng hoặc từ chối thay đổi tài khoản",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/users/account-changes/{id}/review": {
+      "post": {
+        "operationId": "reviewStaffAccountChangeAlias",
+        "tags": ["RBACAndSigning"],
+        "summary": "Điểm cuối tương thích xem xét đề nghị thay đổi tài khoản cán bộ",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/UserIdParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AccessReviewRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã xử lý đề nghị thay đổi tài khoản",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/users/{id}/stop-signing-authority": {
+      "post": {
+        "operationId": "revokeStopSigningAuthority",
+        "tags": ["RBACAndSigning"],
+        "summary": "Thu hồi tức thời thẩm quyền ký Thông báo dừng Mẫu 06 của lãnh đạo",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/UserIdParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["reason"],
+                "properties": {
+                  "reason": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã thu hồi quyền ký Mẫu 06 và ghi nhật ký staff_authority_events",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/users/{id}/stop-signature-authority": {
+      "post": {
+        "operationId": "revokeStopSignatureAuthorityAlias",
+        "tags": ["RBACAndSigning"],
+        "summary": "Điểm cuối tương thích thu hồi thẩm quyền ký Thông báo dừng Mẫu 06",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/UserIdParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["reason"],
+                "properties": {
+                  "reason": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã thu hồi thẩm quyền ký Mẫu 06",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/sandbox-signers": {
+      "get": {
+        "operationId": "listSandboxSigners",
+        "tags": ["RBACAndSigning"],
+        "summary": "Tra cứu danh sách lãnh đạo được cấp thẩm quyền ký kết quả thử nghiệm Ed25519",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách thẩm quyền ký thử nghiệm (admin) hoặc trạng thái quyền ký của lãnh đạo hiện tại",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      },
+      "post": {
+        "operationId": "manageSandboxSigner",
+        "tags": ["RBACAndSigning"],
+        "summary": "Cấp hoặc thu hồi thẩm quyền ký kết quả thử nghiệm Ed25519 cho lãnh đạo (admin)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "action", "reason"],
+                "properties": {
+                  "userId": { "type": "string", "format": "uuid" },
+                  "action": { "type": "string", "enum": ["grant", "revoke"] },
+                  "authorityRef": { "type": "string" },
+                  "reason": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã cập nhật thẩm quyền ký thử nghiệm",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/payments": {
+      "get": {
+        "operationId": "listPayments",
+        "tags": ["FinanceFourEyes"],
+        "summary": "Danh sách giao dịch phí, lệ phí và hồ sơ hoàn phí theo cơ quan phân quyền (finance, leader, admin)",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách giao dịch thu phí và nhật ký sự kiện tài chính",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/payments/{ref}/reconcile": {
+      "post": {
+        "operationId": "reconcilePayment",
+        "tags": ["FinanceFourEyes"],
+        "summary": "Đối soát chứng từ thu phí nội bộ (PAID -> RECONCILED)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/TransactionRefParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["expectedVersion", "statementReference"],
+                "properties": {
+                  "expectedVersion": { "type": "integer", "minimum": 1 },
+                  "statementReference": { "type": "string", "minLength": 4 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã đối soát giao dịch thu phí",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "409": {
+            "description": "Xung đột phiên bản hồ sơ hoặc trạng thái giao dịch",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/payments/{ref}/refund-request": {
+      "post": {
+        "operationId": "requestPaymentRefund",
+        "tags": ["FinanceFourEyes"],
+        "summary": "Lập đề nghị hoàn phí khi hồ sơ đã dừng, từ chối hoặc không giải quyết (PENDING)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/TransactionRefParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["reason"],
+                "properties": {
+                  "reason": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã tạo đề nghị hoàn phí chờ người thứ hai xem xét",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/payments/{ref}/refund-review": {
+      "post": {
+        "operationId": "reviewPaymentRefund",
+        "tags": ["FinanceFourEyes"],
+        "summary": "Xem xét phê duyệt hoặc từ chối đề nghị hoàn phí theo nguyên tắc 4 mắt (PENDING -> APPROVED | REJECTED)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/TransactionRefParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["decision", "note", "expectedVersion"],
+                "properties": {
+                  "decision": { "type": "string", "enum": ["APPROVE", "REJECT"] },
+                  "note": { "type": "string", "minLength": 8 },
+                  "expectedVersion": { "type": "integer", "minimum": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã ghi nhận kết quả phê duyệt/từ chối hoàn phí",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": {
+            "description": "Người lập đề nghị hoàn không được tự duyệt",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/payments/{ref}/refund-execute": {
+      "post": {
+        "operationId": "executePaymentRefund",
+        "tags": ["FinanceFourEyes"],
+        "summary": "Ghi nhận chứng từ chi hoàn thực tế sau khi được duyệt (APPROVED -> EXECUTED, chuyển khoản thu sang REFUNDED)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/TransactionRefParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["executionReference", "expectedVersion"],
+                "properties": {
+                  "executionReference": { "type": "string", "minLength": 4 },
+                  "expectedVersion": { "type": "integer", "minimum": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã ghi nhận chứng từ chi hoàn và chuyển giao dịch sang REFUNDED",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/public/appointments": {
+      "post": {
+        "operationId": "bookPublicAppointment",
+        "tags": ["ServiceDeskAndPAKN"],
+        "summary": "Đặt lịch hẹn làm việc tại Bộ phận Một cửa (tối đa 10 lượt/khung giờ/cơ quan, ngày làm việc trong 30 ngày tới)",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "phone", "agency", "procedureCode", "date", "timeSlot"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "agency": { "type": "string" },
+                  "procedureCode": { "type": "string" },
+                  "date": { "type": "string", "format": "date" },
+                  "timeSlot": {
+                    "type": "string",
+                    "enum": ["08:00-09:00", "09:00-10:00", "10:00-11:00", "14:00-15:00", "15:00-16:00"]
+                  },
+                  "note": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã cấp mã lịch hẹn LH-* và số thứ tự tại quầy",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/public/pakn": {
+      "post": {
+        "operationId": "submitPublicPAKN",
+        "tags": ["ServiceDeskAndPAKN"],
+        "summary": "Gửi phản ánh, kiến nghị đến cơ quan hành chính đang hoạt động",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "phone", "agency", "title", "content"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "email": { "type": "string" },
+                  "agency": { "type": "string" },
+                  "topic": { "type": "string" },
+                  "title": { "type": "string", "minLength": 8 },
+                  "content": { "type": "string", "minLength": 20 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã tiếp nhận phản ánh kiến nghị mã PA-*",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/public/service-lookup": {
+      "post": {
+        "operationId": "lookupAppointmentOrPAKN",
+        "tags": ["ServiceDeskAndPAKN"],
+        "summary": "Tra cứu lịch hẹn (LH-*) hoặc kết quả trả lời phản ánh kiến nghị (PA-*) của chủ tài khoản",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["code", "phone"],
+                "properties": {
+                  "code": { "type": "string" },
+                  "phone": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Thông tin lịch hẹn hoặc phản ánh kiến nghị",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "404": {
+            "description": "Không tìm thấy bản ghi khớp mã và số điện thoại",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/service-desk": {
+      "get": {
+        "operationId": "getAgencyServiceDesk",
+        "tags": ["ServiceDeskAndPAKN"],
+        "summary": "Danh sách lịch hẹn quầy và phản ánh kiến nghị theo phạm vi cơ quan (intake, leader; admin chỉ nhận tổng hợp)",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dữ liệu lịch hẹn và phản ánh kiến nghị của cơ quan",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/service-desk/update": {
+      "post": {
+        "operationId": "updateServiceDeskRecord",
+        "tags": ["ServiceDeskAndPAKN"],
+        "summary": "Cập nhật trạng thái lịch hẹn (CONFIRMED, CHECKED_IN, COMPLETED, CANCELLED) hoặc trả lời PAKN",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["code", "expectedStatus", "note"],
+                "properties": {
+                  "code": { "type": "string" },
+                  "expectedStatus": { "type": "string" },
+                  "status": { "type": "string" },
+                  "note": { "type": "string", "minLength": 8 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã cập nhật trạng thái lịch hẹn hoặc phản hồi PAKN",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "409": {
+            "description": "Xung đột trạng thái expectedStatus",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/service-desk/pakn-reply": {
+      "post": {
+        "operationId": "replyAgencyPAKN",
+        "tags": ["ServiceDeskAndPAKN"],
+        "summary": "Ghi nhận nội dung trả lời chính thức phản ánh kiến nghị của cơ quan",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["code", "expectedStatus", "note"],
+                "properties": {
+                  "code": { "type": "string", "examples": ["PA-1A2B3C4D5E6F"] },
+                  "expectedStatus": { "type": "string", "const": "RECEIVED" },
+                  "note": { "type": "string", "minLength": 8 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã trả lời phản ánh kiến nghị và lưu nhật ký public_feedback_events",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/news": {
+      "get": {
+        "operationId": "listManagedNews",
+        "tags": ["CatalogAndNewsCMS"],
+        "summary": "Danh sách toàn bộ tin tức (nháp, xuất bản, lưu trữ) kèm lịch sử kiểm toán cho admin",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách bài viết quản trị",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      },
+      "post": {
+        "operationId": "saveManagedNews",
+        "tags": ["CatalogAndNewsCMS"],
+        "summary": "Tạo mới, cập nhật, xuất bản hoặc lưu trữ tin tức cổng thông tin (admin)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "summary", "body", "category"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "action": { "type": "string", "enum": ["draft", "publish", "archive"] },
+                  "expectedVersion": { "type": "integer" },
+                  "title": { "type": "string" },
+                  "summary": { "type": "string" },
+                  "body": { "type": "string" },
+                  "category": { "type": "string" },
+                  "featured": { "type": "boolean" },
+                  "sourceUrl": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã lưu bài viết và ghi nhật ký news_audit_log",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/procedures/{code}/edit": {
+      "post": {
+        "operationId": "editProcedureCatalogEntry",
+        "tags": ["CatalogAndNewsCMS"],
+        "summary": "Chỉnh sửa thông tin biên tập thủ tục hành chính có lưu vết kiểm toán (admin)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/ProcedureCodeParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "field", "level", "agency", "sourceUrl", "checkedAt", "reason"],
+                "properties": {
+                  "expectedVersion": { "type": "integer" },
+                  "localCode": { "type": "string" },
+                  "name": { "type": "string" },
+                  "field": { "type": "string" },
+                  "categoryKey": { "type": "string" },
+                  "level": { "type": "string" },
+                  "agency": { "type": "string" },
+                  "sourceUrl": { "type": "string" },
+                  "checkedAt": { "type": "string", "format": "date" },
+                  "reason": { "type": "string", "minLength": 12 },
+                  "submission": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã lưu phiên bản chỉnh sửa danh mục thủ tục",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/procedures/{code}/history": {
+      "get": {
+        "operationId": "getProcedureEditHistory",
+        "tags": ["CatalogAndNewsCMS"],
+        "summary": "Lịch sử kiểm toán chỉnh sửa của một thủ tục hành chính (admin)",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/ProcedureCodeParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách bản ghi kiểm toán procedure_catalog_audit",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/procedure-categories/create": {
+      "post": {
+        "operationId": "createProcedureCategory",
+        "tags": ["CatalogAndNewsCMS"],
+        "summary": "Tạo mới nhóm lĩnh vực thủ tục hành chính (admin)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["displayName", "sourceUrl", "checkedAt", "reason"],
+                "properties": {
+                  "displayName": { "type": "string" },
+                  "sourceUrl": { "type": "string" },
+                  "checkedAt": { "type": "string", "format": "date" },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã tạo lĩnh vực thủ tục mới",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/procedure-categories/edit": {
+      "post": {
+        "operationId": "editProcedureCategory",
+        "tags": ["CatalogAndNewsCMS"],
+        "summary": "Cập nhật tên hiển thị và nguồn đối chiếu của lĩnh vực thủ tục (admin)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["key", "displayName", "sourceUrl", "checkedAt", "reason"],
+                "properties": {
+                  "key": { "type": "string" },
+                  "expectedVersion": { "type": "integer" },
+                  "displayName": { "type": "string" },
+                  "sourceUrl": { "type": "string" },
+                  "checkedAt": { "type": "string", "format": "date" },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã lưu thay đổi lĩnh vực thủ tục",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/procedure-categories/move": {
+      "post": {
+        "operationId": "moveProceduresToCategory",
+        "tags": ["CatalogAndNewsCMS"],
+        "summary": "Chuyển một hoặc nhiều thủ tục sang nhóm lĩnh vực đích (admin)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["procedureCodes", "targetCategoryKey", "reason"],
+                "properties": {
+                  "procedureCodes": { "type": "array", "items": { "type": "string" } },
+                  "targetCategoryKey": { "type": "string" },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Số lượng thủ tục đã được điều chuyển",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/procedure-categories/history": {
+      "get": {
+        "operationId": "getProcedureCategoryHistory",
+        "tags": ["CatalogAndNewsCMS"],
+        "summary": "Lịch sử kiểm toán chỉnh sửa của nhóm lĩnh vực thủ tục (admin)",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách bản ghi procedure_category_audit",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/reporting/summary": {
+      "get": {
+        "operationId": "getOperationsSummaryReport",
+        "tags": ["ReportingAndVault"],
+        "summary": "Báo cáo tổng hợp toàn hệ thống, Bộ chỉ số 766 và cân đối kỳ TT 09/2026/TT-BTP (chỉ dành cho admin, không chứa PII)",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "parameters": [
+          { "name": "agency", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "from", "in": "query", "required": false, "schema": { "type": "string", "format": "date" } },
+          { "name": "to", "in": "query", "required": false, "schema": { "type": "string", "format": "date" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Số liệu tổng hợp theo cơ quan, trạng thái, thủ tục, index766 và periodBalance",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ReportingSummaryResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Chỉ quản trị viên hệ thống được xem báo cáo tổng hợp",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/reporting/summary.csv": {
+      "get": {
+        "operationId": "exportOperationsSummaryCsv",
+        "tags": ["ReportingAndVault"],
+        "summary": "Xuất tệp CSV báo cáo tổng hợp vận hành, Bộ chỉ số 766 và cân đối kỳ (admin)",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "parameters": [
+          { "name": "agency", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "from", "in": "query", "required": false, "schema": { "type": "string", "format": "date" } },
+          { "name": "to", "in": "query", "required": false, "schema": { "type": "string", "format": "date" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tệp CSV UTF-8 BOM"
+          }
+        }
+      }
+    },
+    "/api/export/cases.csv": {
+      "get": {
+        "operationId": "exportAgencyCasesCsv",
+        "tags": ["ReportingAndVault"],
+        "summary": "Xuất CSV danh sách hồ sơ thuộc phạm vi cơ quan (cán bộ nghiệp vụ; chặn admin, ẩn tên người nộp với finance)",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "parameters": [
+          { "name": "agency", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "from", "in": "query", "required": false, "schema": { "type": "string", "format": "date" } },
+          { "name": "to", "in": "query", "required": false, "schema": { "type": "string", "format": "date" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tệp CSV danh sách hồ sơ theo phạm vi cơ quan"
+          },
+          "403": {
+            "description": "Quản trị viên không được xuất danh sách hồ sơ cá nhân",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/export/users.csv": {
+      "get": {
+        "operationId": "exportStaffUsersCsv",
+        "tags": ["ReportingAndVault"],
+        "summary": "Xuất CSV danh sách tài khoản cán bộ theo phạm vi quản lý (admin hoặc quản lý cơ quan)",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "parameters": [
+          { "name": "agency", "in": "query", "required": false, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tệp CSV danh sách tài khoản cán bộ"
+          }
+        }
+      }
+    },
+    "/api/cases/{code}/lookup-key": {
+      "post": {
+        "operationId": "manageCaseLookupKey",
+        "tags": ["ReportingAndVault"],
+        "summary": "Xem lại hoặc cấp mới khóa tra cứu hồ sơ từ kho Fernet (chỉ dành cho intake và registrar thuộc cơ quan)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/CaseCodeParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["action"],
+                "properties": {
+                  "action": { "type": "string", "enum": ["reveal", "rotate"] },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Bắt buộc khi action = rotate"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Khóa tra cứu 64 ký tự hex giải mã hoặc khóa mới vừa xoay vòng",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "accessKey", "version"],
+                  "properties": {
+                    "code": { "type": "string" },
+                    "accessKey": { "type": "string" },
+                    "version": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Xung đột phiên bản khi xoay vòng khóa tra cứu",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
       }
     }
   }

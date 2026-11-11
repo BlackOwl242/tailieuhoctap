@@ -1,460 +1,483 @@
-/* Thiết kế đề xuất. Không phải lược đồ nội bộ của Hà Nội. */
-/* Cần xác nhận nghiệp vụ và an toàn trước triển khai. */
-CREATE TABLE co_quan (
-    id uuid NOT NULL PRIMARY KEY,
-    ma varchar(50) NOT NULL UNIQUE,
-    ten text NOT NULL,
-    cap varchar(30) NOT NULL,
-    hieu_luc_tu date NOT NULL,
-    hieu_luc_den date
+-- ============================================================================
+-- MÔ HÌNH DỮ LIỆU VẬT LÝ SQLITE 3 (30 BẢNG ĐANG VẬN HÀNH THỰC TẾ)
+-- Dự án: Hệ thống thông tin quản lý tiếp nhận và giải quyết TTHC theo cơ chế
+--        một cửa tại thành phố Hà Nội (Cục bộ: data/hanoi-services.sqlite3)
+-- Thứ tự DDL đã chuẩn hóa: Không có tham chiếu khóa ngoại ngược (0 forward-FK).
+-- ============================================================================
+
+PRAGMA journal_mode = WAL;
+PRAGMA foreign_keys = ON;
+PRAGMA busy_timeout = 15000;
+
+-- ============================================================================
+-- NHÓM 1: ĐỊNH DANH, TÀI KHOẢN & PHÂN QUYỀN RBAC (5 BẢNG)
+-- Đặt trước để đáp ứng khóa ngoại từ các bảng danh mục/tin tức, công dân, chữ ký
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    phone TEXT NOT NULL DEFAULT '',
+    full_name TEXT NOT NULL,
+    password_salt TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('citizen', 'intake', 'specialist', 'leader', 'registrar', 'finance', 'admin')),
+    active INTEGER NOT NULL DEFAULT 1,
+    email_verified INTEGER NOT NULL DEFAULT 0,
+    agency_scope TEXT NOT NULL DEFAULT '',
+    valid_from TEXT NOT NULL DEFAULT '',
+    valid_until TEXT NOT NULL DEFAULT '',
+    may_sign_stop INTEGER NOT NULL DEFAULT 0,
+    signing_authority_ref TEXT NOT NULL DEFAULT '',
+    must_change_password INTEGER NOT NULL DEFAULT 0,
+    can_manage_agency_accounts INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
 );
 
-CREATE TABLE thu_tuc (
-    id uuid NOT NULL PRIMARY KEY,
-    ma_quoc_gia varchar(50) NOT NULL UNIQUE,
-    ten text NOT NULL,
-    linh_vuc varchar(100) NOT NULL
+CREATE INDEX IF NOT EXISTS idx_users_role_active
+    ON users(role, active);
+
+CREATE TABLE IF NOT EXISTS sessions (
+    token_hash TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    csrf_token TEXT NOT NULL,
+    expires_at INTEGER NOT NULL,
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE phien_ban_thu_tuc (
-    id uuid NOT NULL PRIMARY KEY,
-    thu_tuc_id uuid NOT NULL REFERENCES thu_tuc(id),
-    co_quan_id uuid NOT NULL REFERENCES co_quan(id),
-    so_phien_ban integer NOT NULL CHECK (so_phien_ban > 0),
-    quyet_dinh text NOT NULL,
-    hieu_luc_tu timestamptz NOT NULL,
-    hieu_luc_den timestamptz,
-    quy_tac_han jsonb NOT NULL,
-    luoc_do_mau jsonb NOT NULL,
-    trang_thai varchar(30) NOT NULL,
-    cau_hinh_quy_trinh jsonb NOT NULL,
-    UNIQUE (thu_tuc_id, co_quan_id, so_phien_ban),
-    CHECK (hieu_luc_den IS NULL OR hieu_luc_den > hieu_luc_tu)
+CREATE INDEX IF NOT EXISTS idx_sessions_user
+    ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires
+    ON sessions(expires_at);
+
+CREATE TABLE IF NOT EXISTS staff_access_requests (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    requested_by TEXT NOT NULL REFERENCES users(id),
+    role TEXT NOT NULL,
+    agency_scope TEXT NOT NULL,
+    valid_from TEXT NOT NULL,
+    valid_until TEXT NOT NULL,
+    requested_sign_stop INTEGER NOT NULL DEFAULT 0,
+    signing_authority_ref TEXT NOT NULL DEFAULT '',
+    authorized_sign_stop INTEGER NOT NULL DEFAULT 0,
+    reason TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    reviewed_by TEXT REFERENCES users(id),
+    review_note TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    reviewed_at TEXT
 );
 
-CREATE TABLE chu_the (
-    id uuid NOT NULL PRIMARY KEY,
-    loai varchar(30) NOT NULL,
-    ho_ten text NOT NULL,
-    dinh_danh_ma_hoa text,
-    tham_chieu_dinh_danh text,
-    lien_he jsonb
+CREATE INDEX IF NOT EXISTS idx_access_requests_status_created
+    ON staff_access_requests(status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_staff_access_user
+    ON staff_access_requests(user_id);
+
+CREATE TABLE IF NOT EXISTS staff_account_changes (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    requested_by TEXT NOT NULL REFERENCES users(id),
+    before_json TEXT NOT NULL,
+    proposed_json TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    reviewed_by TEXT REFERENCES users(id),
+    review_note TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    reviewed_at TEXT
 );
 
-CREATE TABLE tai_khoan (
-    id uuid NOT NULL PRIMARY KEY,
-    chu_the_id uuid NOT NULL REFERENCES chu_the(id),
-    co_quan_id uuid NOT NULL REFERENCES co_quan(id),
-    ma_dang_nhap varchar(100) NOT NULL UNIQUE,
-    trang_thai varchar(30) NOT NULL,
-    tao_luc timestamptz NOT NULL
+CREATE INDEX IF NOT EXISTS idx_account_changes_status_created
+    ON staff_account_changes(status, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_account_changes_one_pending_per_user
+    ON staff_account_changes(user_id) WHERE status = 'PENDING';
+
+CREATE TABLE IF NOT EXISTS staff_authority_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    changed_by TEXT NOT NULL REFERENCES users(id),
+    action TEXT NOT NULL CHECK (action IN ('GRANT_STOP_SIGNING', 'REVOKE_STOP_SIGNING')),
+    authority_ref TEXT NOT NULL DEFAULT '',
+    reason TEXT NOT NULL,
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE quyen_pham_vi (
-    id uuid NOT NULL PRIMARY KEY,
-    tai_khoan_id uuid NOT NULL REFERENCES tai_khoan(id),
-    co_quan_id uuid NOT NULL REFERENCES co_quan(id),
-    vai_tro varchar(50) NOT NULL,
-    hieu_luc_tu timestamptz NOT NULL,
-    hieu_luc_den timestamptz,
-    can_cu text NOT NULL
+CREATE INDEX IF NOT EXISTS idx_staff_authority_user
+    ON staff_authority_events(user_id, id);
+
+-- ============================================================================
+-- NHÓM 2: DANH MỤC THỦ TỤC & TIN TỨC CỔNG THÔNG TIN (7 BẢNG)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS procedure_catalog_edits (
+    procedure_code TEXT PRIMARY KEY,
+    local_code TEXT NOT NULL DEFAULT '',
+    name TEXT NOT NULL,
+    field TEXT NOT NULL,
+    category_key TEXT NOT NULL DEFAULT '',
+    level TEXT NOT NULL,
+    agency TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    checked_at TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    submission_json TEXT NOT NULL DEFAULT '',
+    version INTEGER NOT NULL DEFAULT 1,
+    updated_by TEXT NOT NULL,
+    updated_at TEXT NOT NULL
 );
 
-CREATE TABLE ho_so (
-    id uuid NOT NULL PRIMARY KEY,
-    ma_yeu_cau varchar(100) NOT NULL UNIQUE,
-    ma_ho_so varchar(100) UNIQUE,
-    phien_ban_id uuid NOT NULL REFERENCES phien_ban_thu_tuc(id),
-    nguoi_yeu_cau_id uuid NOT NULL REFERENCES chu_the(id),
-    chu_the_ho_tich_id uuid REFERENCES chu_the(id),
-    trang_thai varchar(40) NOT NULL,
-    nhan_luc timestamptz,
-    han_goc timestamptz,
-    han_hien_hanh timestamptz,
-    du_lieu_khai jsonb NOT NULL,
-    phien_ban integer NOT NULL CHECK (phien_ban > 0),
-    kenh_tiep_nhan varchar(30) NOT NULL,
-    ma_diem_tiep_nhan varchar(50),
-    nguoi_ho_tro_id uuid REFERENCES tai_khoan(id)
+CREATE TABLE IF NOT EXISTS procedure_catalog_audit (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    procedure_code TEXT NOT NULL,
+    actor_id TEXT NOT NULL,
+    actor_name TEXT NOT NULL,
+    action TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    before_json TEXT,
+    after_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE uy_quyen (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    nguoi_uy_quyen_id uuid NOT NULL REFERENCES chu_the(id),
-    nguoi_dai_dien_id uuid NOT NULL REFERENCES chu_the(id),
-    quan_he varchar(100) NOT NULL,
-    tai_lieu_tham_chieu text,
-    pham_vi text NOT NULL,
-    hieu_luc_den timestamptz
+CREATE INDEX IF NOT EXISTS idx_procedure_catalog_audit_code
+    ON procedure_catalog_audit(procedure_code, id DESC);
+
+CREATE TABLE IF NOT EXISTS procedure_category_edits (
+    source_field TEXT PRIMARY KEY,
+    display_name TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    checked_at TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    updated_by TEXT NOT NULL,
+    updated_at TEXT NOT NULL
 );
 
-CREATE TABLE thanh_phan_ho_so (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    loai varchar(100) NOT NULL,
-    khoa_doi_tuong text,
-    bam_sha256 char(64),
-    nguon_du_lieu text,
-    tham_chieu_nguon text,
-    trang_thai varchar(40) NOT NULL,
-    phien_ban integer NOT NULL CHECK (phien_ban > 0),
-    kich_thuoc_byte bigint CHECK (kich_thuoc_byte >= 0),
-    loai_tep varchar(100)
+CREATE TABLE IF NOT EXISTS procedure_category_audit (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_field TEXT NOT NULL,
+    actor_id TEXT NOT NULL,
+    actor_name TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    before_json TEXT,
+    after_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE phan_cong (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    tai_khoan_id uuid NOT NULL REFERENCES tai_khoan(id),
-    giao_luc timestamptz NOT NULL,
-    ket_thuc_luc timestamptz,
-    nguoi_giao_id uuid NOT NULL REFERENCES tai_khoan(id),
-    ly_do text NOT NULL
+CREATE INDEX IF NOT EXISTS idx_procedure_category_audit_field
+    ON procedure_category_audit(source_field, id DESC);
+
+CREATE TABLE IF NOT EXISTS news_articles (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    summary TEXT NOT NULL,
+    body TEXT NOT NULL,
+    category TEXT NOT NULL,
+    image_path TEXT NOT NULL DEFAULT '',
+    source_url TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL CHECK (status IN ('DRAFT', 'PUBLISHED', 'ARCHIVED')),
+    featured INTEGER NOT NULL DEFAULT 0,
+    published_at TEXT,
+    version INTEGER NOT NULL DEFAULT 1,
+    created_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+    updated_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
 );
 
-CREATE TABLE su_kien_xu_ly (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    tai_khoan_id uuid REFERENCES tai_khoan(id),
-    hanh_dong varchar(100) NOT NULL,
-    truoc varchar(40),
-    sau varchar(40),
-    thoi_diem timestamptz NOT NULL,
-    can_cu text,
-    ma_tuong_quan varchar(100) NOT NULL
+CREATE INDEX IF NOT EXISTS idx_news_public
+    ON news_articles(status, featured DESC, published_at DESC);
+
+CREATE TABLE IF NOT EXISTS news_audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    news_id TEXT NOT NULL REFERENCES news_articles(id),
+    actor_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+    actor_name TEXT NOT NULL,
+    action TEXT NOT NULL,
+    before_json TEXT,
+    after_json TEXT,
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE yeu_cau_bo_sung (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    giai_doan varchar(40) NOT NULL,
-    noi_dung text NOT NULL,
-    can_cu text NOT NULL,
-    nguoi_lap_id uuid NOT NULL REFERENCES tai_khoan(id),
-    lap_luc timestamptz NOT NULL,
-    phan_hoi_luc timestamptz,
-    trang_thai_quay_lai varchar(40) NOT NULL
+CREATE INDEX IF NOT EXISTS idx_news_audit_article
+    ON news_audit_log(news_id, id DESC);
+
+CREATE TABLE IF NOT EXISTS app_data_versions (
+    data_key TEXT PRIMARY KEY,
+    version INTEGER NOT NULL,
+    applied_at TEXT NOT NULL
 );
 
-CREATE TABLE ket_qua (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    so_phien_ban integer NOT NULL CHECK (so_phien_ban > 0),
-    khoa_doi_tuong text NOT NULL,
-    bam_sha256 char(64) NOT NULL,
-    so_van_ban varchar(100),
-    trang_thai varchar(40) NOT NULL,
-    thay_the_id uuid REFERENCES ket_qua(id),
-    phat_hanh_luc timestamptz,
-    kich_thuoc_byte bigint NOT NULL CHECK (kich_thuoc_byte >= 0),
-    loai_tep varchar(100) NOT NULL,
-    UNIQUE (ho_so_id, so_phien_ban)
+-- ============================================================================
+-- NHÓM 3: HỒ SƠ MỘT CỬA, BIỂU MẪU 01-06 & KHÓA TRA CỨU FERNET (4 BẢNG)
+-- Cấu trúc JSON bên trong cases.payload_json:
+--   - applicant: {name, citizenId/organizationId, phone, email, address}
+--   - subject: {name, relation}, applicantType ('citizen' | 'organization')
+--   - agencyScope, receivingAgency, submissionChannel ('ONLINE' | 'TRUC_TIEP')
+--   - declaration: dữ liệu tờ khai theo schemaVersion, documentExemptions
+--   - attachments: [{name, stored, size, type, sha256, componentId}]
+--   - workflow: bản chụp cấu hình quy trình tại thời điểm nộp, milestones
+--   - workflowEvidence, workflowEvidenceHistory: kết quả đối chiếu/thẩm tra
+--   - assignment: {assigneeId, assigneeName, unit, assignedAt, assignedBy}
+--   - assignmentHistory: lịch sử phân công và hoàn trả giữa các vai trò
+--   - supplement, supplementHistory: {reason, items, requestedAt, submittedAt,
+--       resumeStatus, stage, requestNumber, citizenNote, newFiles}
+--   - deadlineExtension: lịch sử gia hạn kèm phiếu xin lỗi Mẫu 04
+--   - fee: {status, paymentStatus, amount, currency, basis, configuredAt,
+--       paidAt, reconciledAt, waivedAt, waiverReason, refundStatus, transactionRef}
+--   - forms: {mau01, mau02, mau03, mau04, mau05, mau06} (kèm mã QR tra cứu)
+--   - withdrawal: {status, channel, requesterType, reason, requestDocuments,
+--       noticeNumber, noticeFile, noticeDelivery, refundFollowUp, returnPaperFollowUp}
+--   - draftResult, approvedAt, approvedById, approvalNote, approvalHistory
+--   - result: {number, content, issuedAt, signatureHash, files: [{name, stored,
+--       size, type, sha256}]} (đồng bộ sang kho tài liệu điện tử của công dân)
+--   - delivery: {receiver, evidence, channel, deliveredAt, mode}
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS cases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT NOT NULL UNIQUE,
+    owner_id TEXT NOT NULL,
+    procedure_code TEXT NOT NULL,
+    status TEXT NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    idempotency_key TEXT UNIQUE,
+    payload_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
 );
 
-CREATE TABLE chu_ky (
-    id uuid NOT NULL PRIMARY KEY,
-    ket_qua_id uuid NOT NULL REFERENCES ket_qua(id),
-    nguoi_ky text NOT NULL,
-    tham_chieu_chung_thu text NOT NULL,
-    ky_luc timestamptz,
-    kiem_tra_luc timestamptz NOT NULL,
-    ket_luan varchar(40) NOT NULL,
-    bang_chung jsonb NOT NULL
+CREATE INDEX IF NOT EXISTS idx_cases_status_created
+    ON cases(status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_cases_owner
+    ON cases(owner_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS case_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id INTEGER NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+    actor_role TEXT NOT NULL,
+    actor_name TEXT NOT NULL,
+    action TEXT NOT NULL,
+    title TEXT NOT NULL,
+    detail TEXT NOT NULL DEFAULT '',
+    audience TEXT NOT NULL DEFAULT 'public',
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE khoan_thu (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    loai varchar(100) NOT NULL,
-    so_tien numeric(18,2) NOT NULL CHECK (so_tien >= 0),
-    don_vi_tien char(3) NOT NULL,
-    can_cu text NOT NULL,
-    trang_thai varchar(40) NOT NULL
+CREATE INDEX IF NOT EXISTS idx_events_case
+    ON case_events(case_id, id);
+
+CREATE TABLE IF NOT EXISTS case_lookup_secrets (
+    case_id INTEGER PRIMARY KEY REFERENCES cases(id) ON DELETE CASCADE,
+    encrypted_key BLOB NOT NULL,
+    submission_hash TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL
 );
 
-CREATE TABLE giao_dich (
-    id uuid NOT NULL PRIMARY KEY,
-    khoan_thu_id uuid NOT NULL REFERENCES khoan_thu(id),
-    doi_tac varchar(100) NOT NULL,
-    ma_ngoai varchar(150) NOT NULL,
-    so_tien numeric(18,2) NOT NULL CHECK (so_tien >= 0),
-    thoi_diem timestamptz NOT NULL,
-    trang_thai varchar(40) NOT NULL,
-    tham_chieu_bang_chung text NOT NULL,
-    UNIQUE (doi_tac, ma_ngoai)
+CREATE TABLE IF NOT EXISTS feedback (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id INTEGER NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+    owner_id TEXT NOT NULL,
+    score INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE giao_nhan (
-    id uuid NOT NULL PRIMARY KEY,
-    ket_qua_id uuid NOT NULL REFERENCES ket_qua(id),
-    nguoi_nhan_id uuid NOT NULL REFERENCES chu_the(id),
-    kenh varchar(50) NOT NULL,
-    trang_thai varchar(40) NOT NULL,
-    thoi_diem timestamptz,
-    bang_chung text
+CREATE INDEX IF NOT EXISTS idx_feedback_case
+    ON feedback(case_id);
+
+-- ============================================================================
+-- NHÓM 4: KHÔNG GIAN CÔNG DÂN SỐ (4 BẢNG)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS citizen_profiles (
+    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    details_json TEXT NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    updated_at TEXT NOT NULL
 );
 
-CREATE TABLE hang_doi_gui (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    ma_thong_diep varchar(150) NOT NULL UNIQUE,
-    dich_nhan varchar(150) NOT NULL,
-    noi_dung jsonb NOT NULL,
-    trang_thai varchar(40) NOT NULL,
-    so_lan_thu integer NOT NULL CHECK (so_lan_thu >= 0),
-    thu_tiep_luc timestamptz,
-    ma_loi varchar(100)
+CREATE TABLE IF NOT EXISTS citizen_drafts (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    procedure_code TEXT NOT NULL,
+    details_json TEXT NOT NULL,
+    version INTEGER NOT NULL,
+    updated_at TEXT NOT NULL
 );
 
-CREATE TABLE lich_lam_viec (
-    id uuid NOT NULL PRIMARY KEY,
-    co_quan_id uuid NOT NULL REFERENCES co_quan(id),
-    ngay date NOT NULL,
-    la_ngay_lam boolean NOT NULL,
-    bat_dau time,
-    ket_thuc time,
-    can_cu text NOT NULL,
-    UNIQUE (co_quan_id, ngay)
+CREATE INDEX IF NOT EXISTS idx_citizen_drafts_owner
+    ON citizen_drafts(user_id, updated_at);
+
+CREATE TABLE IF NOT EXISTS citizen_record_owners (
+    record_code TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE nhat_ky (
-    id uuid NOT NULL PRIMARY KEY,
-    tai_khoan_id uuid REFERENCES tai_khoan(id),
-    hanh_dong varchar(100) NOT NULL,
-    doi_tuong text NOT NULL,
-    thoi_diem timestamptz NOT NULL,
-    ket_qua varchar(40) NOT NULL,
-    ma_tuong_quan varchar(100) NOT NULL
+CREATE INDEX IF NOT EXISTS idx_citizen_records_user
+    ON citizen_record_owners(user_id);
+
+CREATE TABLE IF NOT EXISTS citizen_notification_reads (
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    event_key TEXT NOT NULL,
+    read_at TEXT NOT NULL,
+    PRIMARY KEY (user_id, event_key)
 );
 
-CREATE TABLE he_thong_ket_noi (
-    id uuid NOT NULL PRIMARY KEY,
-    ma varchar(50) NOT NULL UNIQUE,
-    ten text NOT NULL,
-    loai varchar(30) NOT NULL,
-    chu_quan text NOT NULL,
-    phien_ban_hop_dong varchar(30) NOT NULL,
-    trang_thai varchar(30) NOT NULL
+-- ============================================================================
+-- NHÓM 5: NGHĨA VỤ TÀI CHÍNH & HOÀN PHÍ KIỂM SOÁT 4 MẮT (3 BẢNG)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS payment_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id INTEGER NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+    transaction_ref TEXT NOT NULL UNIQUE,
+    amount INTEGER NOT NULL,
+    status TEXT NOT NULL,
+    basis TEXT NOT NULL,
+    provider_mode TEXT NOT NULL DEFAULT 'LOCAL_SANDBOX',
+    payment_method TEXT NOT NULL DEFAULT 'SANDBOX',
+    payer_reference TEXT NOT NULL DEFAULT '',
+    reconciliation_reference TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    reconciled_at TEXT
 );
 
-CREATE TABLE tuyen_xu_ly (
-    id uuid NOT NULL PRIMARY KEY,
-    phien_ban_id uuid NOT NULL REFERENCES phien_ban_thu_tuc(id),
-    he_thong_id uuid NOT NULL REFERENCES he_thong_ket_noi(id),
-    hieu_luc_tu timestamptz NOT NULL,
-    hieu_luc_den timestamptz,
-    can_cu text NOT NULL,
-    phe_duyet_id uuid NOT NULL REFERENCES tai_khoan(id),
-    CHECK (hieu_luc_den IS NULL OR hieu_luc_den > hieu_luc_tu)
+CREATE INDEX IF NOT EXISTS idx_payment_records_case
+    ON payment_records(case_id);
+
+CREATE TABLE IF NOT EXISTS payment_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    transaction_ref TEXT NOT NULL REFERENCES payment_records(transaction_ref) ON DELETE CASCADE,
+    actor_id TEXT NOT NULL DEFAULT '',
+    actor_name TEXT NOT NULL,
+    action TEXT NOT NULL,
+    detail TEXT NOT NULL DEFAULT '',
+    idempotency_key TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE tham_chieu_lien_thong (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    he_thong_id uuid NOT NULL REFERENCES he_thong_ket_noi(id),
-    ma_ngoai varchar(150) NOT NULL,
-    trang_thai_nguon varchar(40) NOT NULL,
-    su_kien_cuoi varchar(150),
-    thoi_diem_nguon timestamptz NOT NULL,
-    nhan_luc timestamptz NOT NULL,
-    thu_tu_cuoi bigint CHECK (thu_tu_cuoi > 0),
-    UNIQUE (he_thong_id, ma_ngoai),
-    UNIQUE (ho_so_id, he_thong_id)
+CREATE INDEX IF NOT EXISTS idx_payment_events_ref
+    ON payment_events(transaction_ref, id);
+
+CREATE TABLE IF NOT EXISTS payment_refunds (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    transaction_ref TEXT NOT NULL REFERENCES payment_records(transaction_ref) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'PENDING',
+    requested_by TEXT NOT NULL,
+    requested_at TEXT NOT NULL,
+    reviewed_by TEXT NOT NULL DEFAULT '',
+    reviewed_at TEXT,
+    review_note TEXT NOT NULL DEFAULT '',
+    executed_at TEXT,
+    execution_reference TEXT NOT NULL DEFAULT ''
 );
 
-CREATE TABLE nhiem_vu_phoi_hop (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    co_quan_id uuid NOT NULL REFERENCES co_quan(id),
-    noi_dung text NOT NULL,
-    bat_buoc boolean NOT NULL,
-    han_tra_loi timestamptz NOT NULL,
-    trang_thai varchar(40) NOT NULL,
-    tham_chieu_y_kien text,
-    phien_ban integer NOT NULL CHECK (phien_ban > 0)
+CREATE INDEX IF NOT EXISTS idx_payment_refunds_ref
+    ON payment_refunds(transaction_ref, id DESC);
+
+-- ============================================================================
+-- NHÓM 6: KÝ THỬ NGHIỆM ED25519 & QUẦY DỊCH VỤ / LỊCH HẸN / PAKN (7 BẢNG)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS sandbox_signing_authorities (
+    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    granted_by TEXT NOT NULL REFERENCES users(id),
+    authority_ref TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    active INTEGER NOT NULL DEFAULT 1,
+    granted_at TEXT NOT NULL,
+    revoked_at TEXT
 );
 
-CREATE TABLE thong_bao (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    nguoi_nhan_id uuid NOT NULL REFERENCES chu_the(id),
-    kenh varchar(30) NOT NULL,
-    ma_mau varchar(50) NOT NULL,
-    tham_chieu_gui text,
-    trang_thai varchar(30) NOT NULL,
-    gui_luc timestamptz
+CREATE TABLE IF NOT EXISTS sandbox_signing_authority_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    actor_id TEXT NOT NULL REFERENCES users(id),
+    action TEXT NOT NULL,
+    authority_ref TEXT NOT NULL DEFAULT '',
+    reason TEXT NOT NULL,
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE dot_nop_luu (
-    id uuid NOT NULL PRIMARY KEY,
-    co_quan_id uuid NOT NULL REFERENCES co_quan(id),
-    lap_luc timestamptz NOT NULL,
-    phe_duyet_id uuid REFERENCES tai_khoan(id),
-    kho_dich text NOT NULL,
-    trang_thai varchar(30) NOT NULL
+CREATE TABLE IF NOT EXISTS sandbox_signatures (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id INTEGER NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+    document_hash TEXT NOT NULL,
+    signature_b64 TEXT NOT NULL,
+    public_key_b64 TEXT NOT NULL,
+    signer_id TEXT NOT NULL REFERENCES users(id),
+    signer_name TEXT NOT NULL,
+    authority_ref TEXT NOT NULL,
+    signed_at TEXT NOT NULL,
+    mode TEXT NOT NULL DEFAULT 'LOCAL_SANDBOX',
+    UNIQUE (case_id, document_hash)
 );
 
-CREATE TABLE ho_so_nop_luu (
-    id uuid NOT NULL PRIMARY KEY,
-    dot_id uuid NOT NULL REFERENCES dot_nop_luu(id),
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    ma_goi varchar(100) NOT NULL UNIQUE,
-    bam_danh_muc char(64) NOT NULL,
-    tham_chieu_bien_nhan text,
-    trang_thai varchar(30) NOT NULL,
-    nhan_luc timestamptz
+CREATE INDEX IF NOT EXISTS idx_sandbox_signatures_case
+    ON sandbox_signatures(case_id, id DESC);
+
+CREATE TABLE IF NOT EXISTS public_appointments (
+    code TEXT PRIMARY KEY,
+    citizen_name TEXT NOT NULL,
+    citizen_id TEXT NOT NULL DEFAULT '',
+    phone TEXT NOT NULL,
+    agency TEXT NOT NULL,
+    procedure_code TEXT NOT NULL,
+    procedure_name TEXT NOT NULL,
+    appointment_date TEXT NOT NULL,
+    time_slot TEXT NOT NULL,
+    queue_number INTEGER NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    counter_note TEXT NOT NULL DEFAULT ''
 );
 
-CREATE TABLE phan_anh_kien_nghi (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid REFERENCES ho_so(id),
-    chu_the_id uuid REFERENCES chu_the(id),
-    loai varchar(40) NOT NULL,
-    noi_dung text NOT NULL,
-    co_quan_id uuid REFERENCES co_quan(id),
-    trang_thai varchar(30) NOT NULL,
-    tao_luc timestamptz NOT NULL
+CREATE INDEX IF NOT EXISTS idx_appointments_date_agency
+    ON public_appointments(appointment_date, agency);
+
+CREATE TABLE IF NOT EXISTS public_appointment_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    appointment_code TEXT NOT NULL REFERENCES public_appointments(code) ON DELETE CASCADE,
+    actor_id TEXT NOT NULL DEFAULT '',
+    actor_name TEXT NOT NULL,
+    action TEXT NOT NULL,
+    detail TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE thong_diep_nhan (
-    id uuid NOT NULL PRIMARY KEY,
-    he_thong_id uuid NOT NULL REFERENCES he_thong_ket_noi(id),
-    ma_thong_diep varchar(150) NOT NULL,
-    bam_noi_dung char(64) NOT NULL,
-    ho_so_id uuid REFERENCES ho_so(id),
-    trang_thai varchar(30) NOT NULL,
-    nhan_luc timestamptz NOT NULL,
-    ma_loi varchar(100),
-    thu_tu_nguon bigint NOT NULL CHECK (thu_tu_nguon > 0),
-    thoi_diem_nguon timestamptz NOT NULL,
-    loai_su_kien varchar(40) NOT NULL,
-    ma_ho_so_ngoai varchar(150) NOT NULL,
-    tham_chieu_noi_dung text NOT NULL,
-    UNIQUE (he_thong_id, ma_thong_diep)
+CREATE INDEX IF NOT EXISTS idx_appointment_events_code
+    ON public_appointment_events(appointment_code, id);
+
+CREATE TABLE IF NOT EXISTS public_pakn (
+    code TEXT PRIMARY KEY,
+    sender_name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT NOT NULL DEFAULT '',
+    agency TEXT NOT NULL,
+    topic TEXT NOT NULL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    status TEXT NOT NULL,
+    reply TEXT NOT NULL DEFAULT '',
+    replied_by TEXT NOT NULL DEFAULT '',
+    replied_at TEXT,
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE diem_tiep_nhan (
-    id uuid NOT NULL PRIMARY KEY,
-    ma varchar(50) NOT NULL UNIQUE,
-    co_quan_id uuid NOT NULL REFERENCES co_quan(id),
-    ten text NOT NULL,
-    dia_chi text NOT NULL,
-    hieu_luc_tu timestamptz NOT NULL,
-    hieu_luc_den timestamptz,
-    CHECK (hieu_luc_den IS NULL OR hieu_luc_tu IS NULL OR hieu_luc_den > hieu_luc_tu)
+CREATE TABLE IF NOT EXISTS public_feedback_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    feedback_code TEXT NOT NULL REFERENCES public_pakn(code) ON DELETE CASCADE,
+    actor_id TEXT NOT NULL,
+    actor_name TEXT NOT NULL,
+    action TEXT NOT NULL,
+    detail TEXT NOT NULL,
+    created_at TEXT NOT NULL
 );
 
-CREATE TABLE mau_bao_cao (
-    id uuid NOT NULL PRIMARY KEY,
-    ma varchar(50) NOT NULL,
-    so_phien_ban integer NOT NULL CHECK (so_phien_ban > 0),
-    ten text NOT NULL,
-    dinh_nghia jsonb NOT NULL,
-    nguon_du_lieu jsonb NOT NULL,
-    phe_duyet_id uuid NOT NULL REFERENCES tai_khoan(id),
-    hieu_luc_tu timestamptz NOT NULL,
-    hieu_luc_den timestamptz,
-    UNIQUE (ma, so_phien_ban),
-    CHECK (hieu_luc_den IS NULL OR hieu_luc_tu IS NULL OR hieu_luc_den > hieu_luc_tu)
-);
-
-CREATE TABLE tai_lieu_huong_dan (
-    id uuid NOT NULL PRIMARY KEY,
-    ten text NOT NULL,
-    can_cu text NOT NULL,
-    so_phien_ban integer NOT NULL CHECK (so_phien_ban > 0),
-    dia_chi text NOT NULL,
-    bam_sha256 char(64) NOT NULL,
-    phe_duyet_id uuid NOT NULL REFERENCES tai_khoan(id),
-    hieu_luc_tu timestamptz NOT NULL,
-    hieu_luc_den timestamptz,
-    trang_thai varchar(30) NOT NULL,
-    CHECK (hieu_luc_den IS NULL OR hieu_luc_tu IS NULL OR hieu_luc_den > hieu_luc_tu)
-);
-
-CREATE TABLE tai_lieu_kho (
-    id uuid NOT NULL PRIMARY KEY,
-    chu_the_id uuid NOT NULL REFERENCES chu_the(id),
-    ket_qua_id uuid REFERENCES ket_qua(id),
-    thanh_phan_id uuid REFERENCES thanh_phan_ho_so(id),
-    loai varchar(100) NOT NULL,
-    nguon text NOT NULL,
-    khoa_doi_tuong text NOT NULL,
-    bam_sha256 char(64) NOT NULL,
-    hieu_luc_tu timestamptz,
-    hieu_luc_den timestamptz,
-    thay_the_id uuid REFERENCES tai_lieu_kho(id),
-    trang_thai varchar(30) NOT NULL,
-    CHECK (hieu_luc_den IS NULL OR hieu_luc_tu IS NULL OR hieu_luc_den > hieu_luc_tu)
-);
-
-CREATE TABLE quyen_khai_thac_kho (
-    id uuid NOT NULL PRIMARY KEY,
-    tai_lieu_id uuid NOT NULL REFERENCES tai_lieu_kho(id),
-    chu_the_id uuid NOT NULL REFERENCES chu_the(id),
-    muc_dich text NOT NULL,
-    can_cu text NOT NULL,
-    hieu_luc_tu timestamptz NOT NULL,
-    hieu_luc_den timestamptz,
-    trang_thai varchar(30) NOT NULL,
-    CHECK (hieu_luc_den IS NULL OR hieu_luc_tu IS NULL OR hieu_luc_den > hieu_luc_tu)
-);
-
-CREATE TABLE chi_dao_dieu_hanh (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid REFERENCES ho_so(id),
-    co_quan_id uuid NOT NULL REFERENCES co_quan(id),
-    nguoi_giao_id uuid NOT NULL REFERENCES tai_khoan(id),
-    nguoi_nhan_id uuid REFERENCES tai_khoan(id),
-    noi_dung text NOT NULL,
-    tao_luc timestamptz NOT NULL,
-    han_phan_hoi timestamptz NOT NULL,
-    trang_thai varchar(30) NOT NULL,
-    tham_chieu_phan_hoi text,
-    phien_ban integer NOT NULL CHECK (phien_ban > 0)
-);
-
-CREATE TABLE yeu_cau_dung (
-    id uuid NOT NULL PRIMARY KEY,
-    ho_so_id uuid NOT NULL REFERENCES ho_so(id),
-    kenh_yeu_cau varchar(20) NOT NULL,
-    ma_phieu_yeu_cau varchar(100) NOT NULL,
-    nguoi_yeu_cau_id uuid NOT NULL REFERENCES chu_the(id),
-    uy_quyen_id uuid REFERENCES uy_quyen(id),
-    thoi_diem_nhan timestamptz NOT NULL,
-    can_cu text NOT NULL,
-    tep_mau05_id uuid NOT NULL REFERENCES thanh_phan_ho_so(id),
-    trang_thai varchar(30) NOT NULL,
-    ket_qua_kiem_tra jsonb NOT NULL,
-    nguoi_kiem_tra_id uuid REFERENCES tai_khoan(id),
-    kiem_tra_luc timestamptz,
-    tep_mau06_du_thao_id uuid REFERENCES thanh_phan_ho_so(id),
-    tep_mau06_da_ky_id uuid REFERENCES thanh_phan_ho_so(id),
-    nguoi_ky_id uuid REFERENCES tai_khoan(id),
-    quyen_ky_id uuid REFERENCES su_kien_quyen_ky_mau06(id),
-    phat_hanh_luc timestamptz,
-    thong_bao_id uuid REFERENCES thong_bao(id),
-    ly_do_khong_du_dieu_kien text,
-    phien_ban integer NOT NULL CHECK (phien_ban > 0),
-    UNIQUE (ho_so_id, ma_phieu_yeu_cau),
-    CHECK (kenh_yeu_cau IN ('TRUC_TIEP', 'BUU_CHINH')),
-    CHECK (trang_thai IN ('TIEP_NHAN', 'CHO_KY_PHAT_HANH', 'KHONG_DU_DIEU_KIEN', 'DA_PHAT_HANH')),
-    CHECK (phien_ban > 0)
-);
-
-CREATE TABLE su_kien_quyen_ky_mau06 (
-    id uuid NOT NULL PRIMARY KEY,
-    tai_khoan_id uuid NOT NULL REFERENCES tai_khoan(id),
-    nguoi_thay_doi_id uuid NOT NULL REFERENCES tai_khoan(id),
-    hanh_dong varchar(30) NOT NULL,
-    van_ban_phan_cong text NOT NULL,
-    can_cu text NOT NULL,
-    thoi_diem timestamptz NOT NULL,
-    CHECK (hanh_dong IN ('CAP', 'THU_HOI'))
-);
-
-CREATE INDEX ix_ho_so_xu_ly ON ho_so (trang_thai, han_hien_hanh);
-CREATE INDEX ix_su_kien ON su_kien_xu_ly (ho_so_id, thoi_diem);
-CREATE INDEX ix_su_kien_quyen_ky_mau06 ON su_kien_quyen_ky_mau06 (tai_khoan_id, thoi_diem);
-CREATE UNIQUE INDEX uq_phan_cong_hien_hanh ON phan_cong (ho_so_id) WHERE ket_thuc_luc IS NULL;
+CREATE INDEX IF NOT EXISTS idx_public_feedback_events_code
+    ON public_feedback_events(feedback_code, id);

@@ -10,7 +10,6 @@ from urllib.parse import urljoin,urlencode,urlparse
 from http.cookiejar import CookieJar
 from concurrent.futures import ThreadPoolExecutor,as_completed
 ROOT=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(ROOT/'tmp'/'research-deps'))
 from bs4 import BeautifulSoup
 BASE='https://dichvucong.moit.gov.vn/'
 INDEX=BASE+'VdxpTTHCOnline.aspx?LevelType=-1&ServiceName=&ServiceType='

@@ -15,30 +15,33 @@ def init_schema(con):
     con.executescript("""
         CREATE TABLE IF NOT EXISTS public_appointments (
             code TEXT PRIMARY KEY, citizen_name TEXT NOT NULL, citizen_id TEXT NOT NULL DEFAULT '',
-            phone TEXT NOT NULL, agency TEXT NOT NULL, procedure_code TEXT NOT NULL,
-            procedure_name TEXT NOT NULL, appointment_date TEXT NOT NULL, time_slot TEXT NOT NULL,
-            queue_number INTEGER NOT NULL, note TEXT NOT NULL DEFAULT '', status TEXT NOT NULL,
+            phone TEXT NOT NULL, agency TEXT NOT NULL, procedure_code TEXT NOT NULL DEFAULT '',
+            procedure_name TEXT NOT NULL DEFAULT '', appointment_date TEXT NOT NULL, time_slot TEXT NOT NULL,
+            queue_number TEXT NOT NULL, note TEXT NOT NULL DEFAULT '', status TEXT NOT NULL DEFAULT 'BOOKED',
             created_at TEXT NOT NULL, counter_note TEXT NOT NULL DEFAULT ''
         );
+        CREATE INDEX IF NOT EXISTS idx_appointments_date_agency ON public_appointments(appointment_date, agency);
         CREATE TABLE IF NOT EXISTS public_pakn (
             code TEXT PRIMARY KEY, sender_name TEXT NOT NULL, phone TEXT NOT NULL,
             email TEXT NOT NULL DEFAULT '', agency TEXT NOT NULL, topic TEXT NOT NULL,
-            title TEXT NOT NULL, content TEXT NOT NULL, status TEXT NOT NULL,
+            title TEXT NOT NULL, content TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'RECEIVED',
             reply TEXT NOT NULL DEFAULT '', replied_by TEXT NOT NULL DEFAULT '',
-            replied_at TEXT, created_at TEXT NOT NULL
+            replied_at TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL
         );
         CREATE TABLE IF NOT EXISTS public_appointment_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            appointment_code TEXT NOT NULL REFERENCES public_appointments(code),
+            appointment_code TEXT NOT NULL REFERENCES public_appointments(code) ON DELETE CASCADE,
             actor_id TEXT NOT NULL DEFAULT '', actor_name TEXT NOT NULL,
             action TEXT NOT NULL, detail TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL
         );
         CREATE TABLE IF NOT EXISTS public_feedback_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            feedback_code TEXT NOT NULL REFERENCES public_pakn(code),
+            feedback_code TEXT NOT NULL REFERENCES public_pakn(code) ON DELETE CASCADE,
             actor_id TEXT NOT NULL, actor_name TEXT NOT NULL,
             action TEXT NOT NULL, detail TEXT NOT NULL, created_at TEXT NOT NULL
         );
+        CREATE INDEX IF NOT EXISTS idx_appointment_events_code ON public_appointment_events(appointment_code);
+        CREATE INDEX IF NOT EXISTS idx_public_feedback_events_code ON public_feedback_events(feedback_code);
     """)
 
 
@@ -48,6 +51,13 @@ def _normalize_agency(name: str) -> str:
         if val.endswith(suffix) and len(val) > len(suffix) + 3:
             val = val[:-len(suffix)].strip()
     return val
+
+
+def _normalize_phone(raw: str) -> str:
+    cleaned = re.sub(r"[\s.()\-]+", "", str(raw or "").strip())
+    if cleaned.startswith("+84"):
+        cleaned = "0" + cleaned[3:]
+    return cleaned
 
 
 def _agency_allowed(user, agency):
@@ -62,12 +72,12 @@ def get_records(service, handler, user):
     # System administrators see aggregates, not applicant contact details.
     if user['role'] not in {'intake', 'leader', 'admin'}:
         raise PermissionError('Tài khoản không được xem lịch hẹn hoặc phản ánh của cơ quan.')
-    with service.connect() as con:
+    with service.DB_LOCK, service.connect() as con:
         if user['role'] == 'admin':
             return handler.send_json({'appointments': [], 'feedback': [], 'summary': {
                 'appointments': con.execute('SELECT count(*) FROM public_appointments').fetchone()[0],
                 'feedback': con.execute('SELECT count(*) FROM public_pakn').fetchone()[0]}})
-        all_appointments = con.execute('SELECT * FROM public_appointments ORDER BY appointment_date DESC,queue_number LIMIT 500').fetchall()
+        all_appointments = con.execute('SELECT * FROM public_appointments ORDER BY appointment_date DESC, CAST(queue_number AS INTEGER), queue_number LIMIT 500').fetchall()
         all_feedback = con.execute('SELECT * FROM public_pakn ORDER BY created_at DESC LIMIT 500').fetchall()
         appointments = [dict(r) for r in all_appointments if _agency_allowed(user, r['agency'])]
         feedback = [dict(r) for r in all_feedback if _agency_allowed(user, r['agency'])]
@@ -78,14 +88,16 @@ def create_public(service, handler, kind, body):
     citizen = handler.require_citizen()
     service.check_public_rate_limit(handler.public_address(), kind, 8)
     name = service.clean_text(body.get('name'), 150)
-    phone = service.clean_text(body.get('phone'), 40)
+    raw_phone = service.clean_text(body.get('phone'), 40)
+    phone = _normalize_phone(raw_phone)
     agency = service.clean_text(body.get('agency'), 180)
     if not workflows.concrete_agency(agency):
         raise ValueError('Chọn một cơ quan tiếp nhận cụ thể.')
-    if len(name) < 2 or not re.fullmatch(r'[+0-9(). -]{8,40}', phone):
+    if len(name) < 2 or not re.fullmatch(r'[+0-9(). -]{8,40}', raw_phone) or not re.fullmatch(r'\+?\d{8,15}', phone):
         raise ValueError('Nhập họ tên và số điện thoại liên hệ hợp lệ.')
     now = service.now_iso()
     with service.DB_LOCK, service.connect() as con:
+        con.execute('BEGIN IMMEDIATE')
         today = datetime.now(service.TZ).date()
         active_intakes = con.execute(
             "SELECT agency_scope FROM users WHERE role='intake' AND active=1 AND (valid_from='' OR valid_from<=?) AND (valid_until='' OR valid_until>=?)",
@@ -116,7 +128,7 @@ def create_public(service, handler, kind, body):
             queue = max_q + 1
             code = 'LH-' + secrets.token_hex(6).upper()
             con.execute('INSERT INTO public_appointments(code,citizen_name,phone,agency,procedure_code,procedure_name,appointment_date,time_slot,queue_number,note,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
-                        (code, name, phone, agency, procedure['code'], procedure['name'], day.isoformat(), slot, queue, service.clean_text(body.get('note'), 1000), 'BOOKED', now))
+                        (code, name, phone, agency, procedure['code'], procedure['name'], day.isoformat(), slot, str(queue), service.clean_text(body.get('note'), 1000), 'BOOKED', now))
             con.execute('INSERT INTO citizen_record_owners(record_code,user_id,created_at) VALUES(?,?,?)', (code, citizen['id'], now))
             return handler.send_json({'code': code, 'queueNumber': queue, 'message': 'Đã ghi nhận lịch hẹn trong hệ thống. Lịch hẹn không thay thế việc tiếp nhận hồ sơ.'}, 201)
         title = service.clean_text(body.get('title'), 180)
@@ -137,10 +149,11 @@ def lookup_public(service, handler, body):
     citizen = handler.require_citizen()
     service.check_public_rate_limit(handler.public_address(), 'service-lookup', 30)
     code = service.clean_text(body.get('code'), 40).upper()
-    phone = service.clean_text(body.get('phone'), 40)
-    if not re.fullmatch(r'[+0-9(). -]{8,40}', phone):
+    raw_phone = service.clean_text(body.get('phone'), 40)
+    phone = _normalize_phone(raw_phone)
+    if not re.fullmatch(r'[+0-9(). -]{8,40}', raw_phone) or not re.fullmatch(r'\+?\d{8,15}', phone):
         raise ValueError('Nhập số điện thoại liên hệ đã khai khi gửi thông tin.')
-    with service.connect() as con:
+    with service.DB_LOCK, service.connect() as con:
         if code.startswith('LH-'):
             row = con.execute('SELECT code,citizen_name,phone,agency,procedure_code,procedure_name,appointment_date,time_slot,queue_number,note,status,counter_note,created_at FROM public_appointments WHERE code=?', (code,)).fetchone()
         elif code.startswith(('PA-', 'PAKN-')):
@@ -148,7 +161,7 @@ def lookup_public(service, handler, body):
         else:
             row = None
         owner = con.execute('SELECT user_id FROM citizen_record_owners WHERE record_code=?', (code,)).fetchone()
-        if not row or (owner and owner['user_id'] != citizen['id']) or not secrets.compare_digest(row['phone'], phone):
+        if not row or (owner and owner['user_id'] != citizen['id']) or not secrets.compare_digest(_normalize_phone(row['phone']), phone):
             return handler.send_error_json('Không tìm thấy thông tin khớp mã và số điện thoại.', 404)
         result = dict(row)
         result.pop('phone')
@@ -207,13 +220,14 @@ def create_counter_case(service, handler, user, body):
     applicant_type = service.clean_text(body.get('applicantType'), 20)
     name = service.clean_text(body.get('applicantName'), 150)
     citizen_id = service.clean_text(body.get('citizenId'), 40)
-    phone = service.clean_text(body.get('applicantPhone'), 40)
+    raw_phone = service.clean_text(body.get('applicantPhone'), 40)
+    phone = _normalize_phone(raw_phone)
     address = service.clean_text(body.get('applicantAddress'), 300)
     summary = service.clean_text(body.get('requestSummary'), 1200)
     originals = service.clean_text(body.get('paperOriginals'), 2000)
     if applicant_type not in {'citizen', 'organization'} or len(name) < 2 or len(citizen_id) < 3 or len(address) < 3:
         raise ValueError('Khai đầy đủ chủ thể, tên, số định danh và địa chỉ người nộp.')
-    if not re.fullmatch(r'[+0-9(). -]{8,40}', phone) or len(summary) < 8 or len(originals) < 8 or body.get('identityVerified') is not True:
+    if not re.fullmatch(r'[+0-9(). -]{8,40}', raw_phone) or not re.fullmatch(r'\+?\d{8,15}', phone) or len(summary) < 8 or len(originals) < 8 or body.get('identityVerified') is not True:
         raise ValueError('Ghi điện thoại, nội dung yêu cầu, danh mục giấy tờ và xác nhận đã đối chiếu người nộp.')
     try:
         request_key = str(uuid.UUID(str(body.get('submissionKey', ''))))
@@ -246,6 +260,10 @@ def create_counter_case(service, handler, user, body):
                              (code, hashlib.sha256(lookup.encode('ascii')).hexdigest(), procedure_code, 'DA_TIEP_NHAN', idem, json.dumps(payload, ensure_ascii=False), created, created))
         case_id = cursor.lastrowid
         con.execute('INSERT INTO case_lookup_secrets(case_id,encrypted_key,updated_at) VALUES(?,?,?)', (case_id, service.lookup_cipher().encrypt(lookup.encode('ascii')), created))
+        if email:
+            citizen_row = con.execute("SELECT id FROM users WHERE email=? AND role='citizen'", (email,)).fetchone()
+            if citizen_row:
+                con.execute('INSERT OR IGNORE INTO citizen_record_owners(record_code,user_id,created_at) VALUES(?,?,?)', (code, citizen_row['id'], created))
         service.add_event(con, case_id, 'intake', user['full_name'], 'accept', 'Đã tiếp nhận hồ sơ tại quầy', summary, 'public')
         row = con.execute('SELECT * FROM cases WHERE id=?', (case_id,)).fetchone()
         return handler.send_json({'case': service.case_dict(con, row, True, user['role'])}, 201)

@@ -228,39 +228,23 @@ function Write-Cover-Page {
     $selection.Font.Size = 14
     $selection.Font.Bold = $true
     
-    if (-not $isInner) {
-        # Exact Mẫu Bìa 1
-        $selection.TypeText("Học phần : Quản trị hệ thống thông tin")
+    $selection.ParagraphFormat.LineSpacingRule = 1 # 1.5 lines
+    $selection.TypeText("Học phần : Quản trị hệ thống thông tin")
+    $selection.TypeParagraph()
+    $selection.TypeText("GVHD      : ThS. Lê Hoàng Diệp")
+    $selection.TypeParagraph()
+    $selection.TypeText("Sinh viên : Lê Quốc Huy – 2305HTTB011")
+    $selection.TypeParagraph()
+    $selection.TypeText("Lớp          : 2305HTTB")
+    $selection.TypeParagraph()
+    for ($i = 0; $i -lt 3; $i++) {
         $selection.TypeParagraph()
-        $selection.TypeText("GVHD      : ThS. Lê Hoàng Diệp")
-        $selection.TypeParagraph()
-        $selection.TypeText("Mã phách : .................................................. ")
-        $selection.Font.Bold = $false
-        $selection.TypeText("(Để trống)")
-        $selection.TypeParagraph()
-        for ($i = 0; $i -lt 4; $i++) {
-            $selection.TypeParagraph()
-        }
-    } else {
-        # Trang bìa phụ (Single author: Lê Quốc Huy)
-        $selection.ParagraphFormat.LineSpacingRule = 1 # 1.5 lines
-        $selection.TypeText("Học phần : Quản trị hệ thống thông tin")
-        $selection.TypeParagraph()
-        $selection.TypeText("GVHD      : ThS. Lê Hoàng Diệp")
-        $selection.TypeParagraph()
-        $selection.TypeText("Sinh viên : Lê Quốc Huy – 2305HTTB011")
-        $selection.TypeParagraph()
-        $selection.TypeText("Lớp          : 2305HTTB")
-        $selection.TypeParagraph()
-        for ($i = 0; $i -lt 3; $i++) {
-            $selection.TypeParagraph()
-        }
     }
     
     $selection.ParagraphFormat.FirstLineIndent = 0
     $selection.ParagraphFormat.LeftIndent = 0
     $selection.ParagraphFormat.Alignment = 1 # Center
-    $selection.ParagraphFormat.SpaceBefore = if ($isInner) { 54 } else { 58 }
+    $selection.ParagraphFormat.SpaceBefore = 54
     $selection.ParagraphFormat.SpaceAfter = 0
     $selection.Font.Size = 14
     $selection.Font.Bold = $true

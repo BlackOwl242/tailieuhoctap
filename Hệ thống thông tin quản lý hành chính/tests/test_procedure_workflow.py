@@ -110,5 +110,19 @@ class ProcedureWorkflowTests(unittest.TestCase):
             self.assertEqual(app.compute_deadline("2.000908", datetime(2026, 10, 12, 15, 0, 1, tzinfo=app.TZ))[0], "2026-10-13")
         self.assertIsNone(app.compute_deadline("1.004237", datetime.now(app.TZ))[0])
 
+    def test_hour_sla_across_working_windows_and_2027_holidays(self):
+        profile_4h = {"deadline": {"kind": "HOUR", "quantity": 4, "note": "4 giờ làm việc"}}
+        profile_8h = {"deadline": {"kind": "HOUR", "quantity": 8, "note": "8 giờ làm việc"}}
+        # Accepted at 10:30 on a workday -> 1h morning (10:30..11:30) + 3h afternoon (13:30..16:30) = 16:30 same day
+        due_same, _ = app.compute_deadline("TEST-H", datetime(2026, 10, 12, 10, 30, tzinfo=app.TZ), profile=profile_4h)
+        self.assertEqual(due_same, "2026-10-12")
+        # Accepted at 10:00 on a workday -> only 5 working hours left on Monday (1.5h + 3.5h), so 8h spills 3h into Tuesday
+        due_next, _ = app.compute_deadline("TEST-H", datetime(2026, 10, 12, 10, 0, tzinfo=app.TZ), profile=profile_8h)
+        self.assertEqual(due_next, "2026-10-13")
+        # Accepted at 16:00 on Thursday 2027-02-04 (day before Tet Dinh Mao 2027-02-05..2027-02-11):
+        # 1h on 2027-02-04 (16:00..17:00) + 3h on next workday Friday 2027-02-12 (08:00..11:00)
+        due_after_tet, _ = app.compute_deadline("TEST-H", datetime(2027, 2, 4, 16, 0, tzinfo=app.TZ), profile=profile_4h)
+        self.assertEqual(due_after_tet, "2027-02-12")
+
 
 if __name__ == "__main__": unittest.main()

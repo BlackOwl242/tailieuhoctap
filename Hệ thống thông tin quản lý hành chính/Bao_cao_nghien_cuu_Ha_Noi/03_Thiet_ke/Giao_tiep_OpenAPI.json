@@ -1,751 +1,1214 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
-    "title": "Giao tiếp thiết kế quản lý hồ sơ hành chính",
-    "version": "1.0.0",
-    "description": "Thiết kế đề xuất; không phải đặc tả điểm cuối hiện hữu của Hà Nội. Cần thống nhất hợp đồng với đơn vị quản lý trước phát triển."
+    "title": "API Cốt lõi Cổng Dịch vụ công và Quy trình Hồ sơ Một cửa Hà Nội",
+    "version": "2.0.0",
+    "summary": "Đặc tả OpenAPI 3.1.0 đồng bộ 100% với hệ thống thực tế (/api/...)",
+    "description": "Giao diện lập trình ứng dụng cốt lõi phục vụ tra cứu thủ tục công khai, không gian công dân số, nộp hồ sơ trực tuyến/tại quầy và xử lý quy trình một cửa (Mẫu 01-06, kiểm soát đồng thời lạc quan expectedVersion, kho khóa tra cứu Fernet và trả kết quả điện tử)."
   },
-  "paths": {
-    "/v1/procedures/{id}/versions": {
-      "get": {
-        "operationId": "operation1",
-        "summary": "Tra cứu phiên bản",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Không đủ quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
-          },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
-          }
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8766",
+      "description": "Máy chủ ứng dụng cục bộ (SQLite WAL)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "PublicCatalog",
+      "description": "Tra cứu danh mục 2.075 thủ tục, lĩnh vực, cơ quan tiếp nhận, tin tức và kiểm tra nhanh trạng thái hồ sơ không lộ PII"
+    },
+    {
+      "name": "CitizenAuthWorkspace",
+      "description": "Xác thực công dân (bao gồm mô phỏng VNeID), hồ sơ cá nhân, bản nháp, thông báo và kho tài liệu điện tử"
+    },
+    {
+      "name": "CaseWorkflow",
+      "description": "Tiếp nhận, thẩm định, phê duyệt, gia hạn Mẫu 04, ký thử nghiệm Ed25519, phát hành điện tử và dừng hồ sơ Mẫu 05/06"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "staffCookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "hni_session",
+        "description": "Cookie phiên đăng nhập của cán bộ và quản trị viên (HttpOnly, SameSite=Strict, thời hạn 12 giờ)."
+      },
+      "citizenCookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "hni_citizen_session",
+        "description": "Cookie phiên đăng nhập của công dân/tổ chức trên cổng dịch vụ công (HttpOnly, SameSite=Strict, thời hạn 12 giờ)."
+      },
+      "csrfTokenAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-CSRF-Token",
+        "description": "Mã chống giả mạo yêu cầu liên trang gắn với phiên hiện tại, bắt buộc trên các yêu cầu POST đã đăng nhập."
+      }
+    },
+    "parameters": {
+      "ProcedureCodeParam": {
+        "name": "code",
+        "in": "path",
+        "required": true,
+        "description": "Mã thủ tục hành chính quốc gia (ví dụ: 2.000908, 1.004237)",
+        "schema": {
+          "type": "string",
+          "examples": ["2.000908", "1.004237"]
+        }
+      },
+      "CaseCodeParam": {
+        "name": "code",
+        "in": "path",
+        "required": true,
+        "description": "Mã hồ sơ một cửa định dạng HN-YYYY-XXXXXXXX",
+        "schema": {
+          "type": "string",
+          "examples": ["HN-2026-A1B2C3D4"]
+        }
+      },
+      "StoredFileParam": {
+        "name": "stored",
+        "in": "path",
+        "required": true,
+        "description": "Tên tệp lưu trữ vật lý đã chuẩn hóa trong thư mục hồ sơ",
+        "schema": {
+          "type": "string"
         }
       }
     },
-    "/v1/applications": {
-      "post": {
-        "operationId": "operation2",
-        "summary": "Tạo yêu cầu",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Không đủ quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
-          },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Application"
-              }
-            }
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Thông báo lỗi tiếng Việt rõ nghĩa theo ngữ cảnh nghiệp vụ"
           }
         }
-      }
-    },
-    "/v1/cases/{id}/accept": {
-      "post": {
-        "operationId": "operation3",
-        "summary": "Tiếp nhận",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Không đủ quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
-          },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Action"
-              }
-            }
+      },
+      "AttachmentInput": {
+        "type": "object",
+        "required": ["name", "data"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "componentId": { "type": "string" },
+          "data": {
+            "type": "string",
+            "description": "Nội dung tệp mã hóa Data URL hoặc Base64 (PNG, JPEG, PDF, TXT; tối đa 4 MB/tệp)"
           }
         }
-      }
-    },
-    "/v1/cases/{id}/supplements": {
-      "post": {
-        "operationId": "operation4",
-        "summary": "Yêu cầu bổ sung",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Không đủ quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
-          },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Action"
-              }
-            }
+      },
+      "CaseStatus": {
+        "type": "string",
+        "enum": [
+          "NHAP",
+          "CHO_TIEP_NHAN",
+          "CHO_BO_SUNG",
+          "DA_TIEP_NHAN",
+          "DANG_THU_LY",
+          "TRINH_DUYET",
+          "DA_PHE_DUYET",
+          "DA_PHAT_HANH",
+          "HOAN_THANH",
+          "TU_CHOI",
+          "KHONG_GIAI_QUYET",
+          "DUNG"
+        ]
+      },
+      "PublicStatusSummary": {
+        "type": "object",
+        "required": ["code", "procedureCode", "procedureName", "receivingAgency", "status", "statusLabel"],
+        "properties": {
+          "code": { "type": "string" },
+          "procedureCode": { "type": "string" },
+          "procedureName": { "type": "string" },
+          "receivingAgency": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/CaseStatus" },
+          "statusLabel": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "acceptedAt": { "type": ["string", "null"], "format": "date-time" },
+          "deadline": { "type": ["string", "null"] },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "milestones": {
+            "type": "array",
+            "items": { "type": "object" }
           }
         }
-      }
-    },
-    "/v1/cases/{id}/assignments": {
-      "post": {
-        "operationId": "operation5",
-        "summary": "Phân công",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
+      },
+      "CaseRecord": {
+        "type": "object",
+        "required": ["code", "procedureCode", "status", "statusLabel", "version"],
+        "properties": {
+          "code": { "type": "string" },
+          "procedureCode": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/CaseStatus" },
+          "statusLabel": { "type": "string" },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Phiên bản kiểm soát đồng thời lạc quan (Optimistic Locking)"
+          },
+          "receivingAgency": { "type": "string" },
+          "agencyScope": { "type": "string" },
+          "submissionChannel": { "type": "string", "enum": ["ONLINE", "TRUC_TIEP"] },
+          "applicantType": { "type": "string", "enum": ["citizen", "organization"] },
+          "applicant": { "type": "object" },
+          "declaration": { "type": "object" },
+          "attachments": { "type": "array", "items": { "type": "object" } },
+          "workflow": { "type": "object" },
+          "workflowEvidence": { "type": ["object", "null"] },
+          "assignment": { "type": ["object", "null"] },
+          "supplement": { "type": ["object", "null"] },
+          "deadline": { "type": ["string", "null"] },
+          "deadlineExtension": { "type": ["object", "array", "null"] },
+          "fee": { "type": "object" },
+          "forms": {
+            "type": "object",
+            "description": "Dữ liệu in biểu mẫu một cửa Mẫu 01..06 kèm dữ liệu mã QR tra cứu",
+            "properties": {
+              "mau01": { "type": ["object", "null"] },
+              "mau02": { "type": ["object", "null"] },
+              "mau03": { "type": ["object", "null"] },
+              "mau04": { "type": ["object", "null"] },
+              "mau05": { "type": ["object", "null"] },
+              "mau06": { "type": ["object", "null"] }
             }
           },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
+          "withdrawal": { "type": ["object", "null"] },
+          "sandboxSignature": { "type": ["object", "null"] },
+          "result": {
+            "type": ["object", "null"],
+            "properties": {
+              "number": { "type": "string" },
+              "content": { "type": "string" },
+              "issuedAt": { "type": "string", "format": "date-time" },
+              "signatureHash": { "type": "string" },
+              "files": {
+                "type": "array",
+                "description": "Tệp kết quả điện tử sinh tự động khi phát hành, đồng bộ sang kho tài liệu công dân",
+                "items": { "type": "object" }
               }
             }
           },
-          "403": {
-            "description": "Không đủ quyền"
+          "delivery": { "type": ["object", "null"] },
+          "events": { "type": "array", "items": { "type": "object" } }
+        }
+      },
+      "StaffCaseActionRequest": {
+        "type": "object",
+        "required": ["action", "expectedVersion"],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "request_supplement",
+              "reject_intake",
+              "assign",
+              "return_to_intake",
+              "digitize_documents",
+              "set_fee",
+              "waive_fee",
+              "verify_original_register",
+              "assess_data_request",
+              "verify_published_procedure",
+              "save_draft",
+              "submit_review",
+              "approve",
+              "send_back",
+              "decline",
+              "extend_deadline",
+              "sign_result",
+              "return_to_leader",
+              "issue",
+              "deliver",
+              "prepare_stop_notice",
+              "issue_stop_notice",
+              "reject_stop_notice",
+              "confirm_paper_returned",
+              "close_expired_supplement"
+            ],
+            "description": "Mã thao tác nghiệp vụ một cửa theo vai trò cán bộ"
           },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Phiên bản hiện tại của hồ sơ; trả 409 nếu hồ sơ vừa bị phiên khác cập nhật"
           },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Action"
-              }
-            }
+          "payload": {
+            "type": "object",
+            "description": "Tham số chi tiết tương ứng với từng action (ví dụ: assignee, draft, reason, newDeadline, resultNumber, amount, basis, files...)"
           }
         }
-      }
-    },
-    "/v1/cases/{id}/approvals": {
-      "post": {
-        "operationId": "operation6",
-        "summary": "Trình duyệt",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+      },
+      "CitizenCaseActionRequest": {
+        "type": "object",
+        "required": ["action", "accessKey", "expectedVersion"],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "submit_supplement",
+              "request_withdrawal",
+              "create_payment",
+              "confirm_payment",
+              "feedback"
+            ],
+            "description": "Thao tác trực tuyến của chủ hồ sơ (bổ sung hồ sơ, gửi Mẫu 05 trực tuyến xin dừng/rút, thanh toán thử nghiệm, đánh giá hài lòng)"
           },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
+          "accessKey": {
+            "type": "string",
+            "description": "Khóa tra cứu 64 ký tự hex được cấp khi nộp hồ sơ"
           },
-          "403": {
-            "description": "Không đủ quyền"
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
           },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
-          },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Action"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/cases/{id}/issuance": {
-      "post": {
-        "operationId": "operation7",
-        "summary": "Phát hành",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Không đủ quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
-          },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Action"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/cases/{id}/deliveries": {
-      "post": {
-        "operationId": "operation8",
-        "summary": "Giao kết quả",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Không đủ quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
-          },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Action"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/payments/notifications": {
-      "post": {
-        "operationId": "operation9",
-        "summary": "Nhận thông báo thu",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 150
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Không đủ quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
-          },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentNotification"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/cases/{id}/events": {
-      "get": {
-        "operationId": "operation10",
-        "summary": "Tra cứu lịch sử",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Thành công",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Không đủ quyền"
-          },
-          "409": {
-            "description": "Xung đột phiên bản hoặc trạng thái"
-          },
-          "422": {
-            "description": "Không thỏa điều kiện nghiệp vụ"
-          },
-          "503": {
-            "description": "Thành phần phụ thuộc chưa đáp ứng"
+          "payload": {
+            "type": "object"
           }
         }
       }
     }
   },
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
-      }
-    },
-    "schemas": {
-      "Application": {
-        "type": "object",
-        "required": [
-          "procedureVersionId",
-          "requesterId",
-          "formData",
-          "receptionChannel"
-        ],
-        "properties": {
-          "procedureVersionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "requesterId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "subjectId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Bắt buộc theo loại thủ tục khi có chủ thể chuyên biệt"
-          },
-          "receptionChannel": {
-            "type": "string",
-            "enum": [
-              "ONLINE",
-              "DIRECT",
-              "POSTAL"
-            ]
-          },
-          "formData": {
-            "type": "object"
-          },
-          "representationEvidenceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "attachments": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
+  "paths": {
+    "/api/health": {
+      "get": {
+        "operationId": "getHealth",
+        "tags": ["PublicCatalog"],
+        "summary": "Kiểm tra trạng thái sẵn sàng của dịch vụ",
+        "responses": {
+          "200": {
+            "description": "Máy chủ đang hoạt động",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {
+                    "status": { "type": "string", "const": "ok" }
+                  }
+                }
+              }
             }
           }
         }
-      },
-      "Action": {
-        "type": "object",
-        "required": [
-          "version",
-          "reason"
+      }
+    },
+    "/api/procedures": {
+      "get": {
+        "operationId": "listProcedures",
+        "tags": ["PublicCatalog"],
+        "summary": "Lấy danh mục 2.075 thủ tục hành chính",
+        "parameters": [
+          {
+            "name": "summary",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["0", "1"] },
+            "description": "Truyền summary=1 để nhận bản rút gọn phục vụ tải nhanh trên cổng"
+          }
         ],
-        "properties": {
-          "version": {
-            "type": "integer",
-            "minimum": 1
+        "responses": {
+          "200": {
+            "description": "Danh sách thủ tục hành chính và tổng số bản ghi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["procedures", "count"],
+                  "properties": {
+                    "procedures": { "type": "array", "items": { "type": "object" } },
+                    "count": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/procedures/{code}/detail": {
+      "get": {
+        "operationId": "getProcedureDetail",
+        "tags": ["PublicCatalog"],
+        "summary": "Xem chi tiết nội dung công bố, thành phần hồ sơ và điều kiện trực tuyến của thủ tục",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProcedureCodeParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chi tiết thủ tục hành chính",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["procedure", "detail"],
+                  "properties": {
+                    "procedure": { "type": "object" },
+                    "detail": { "type": "object" }
+                  }
+                }
+              }
+            }
           },
-          "reason": {
-            "type": "string"
+          "404": {
+            "description": "Không tìm thấy mã thủ tục",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/procedures/{code}/templates/{attachmentId}": {
+      "get": {
+        "operationId": "downloadProcedureTemplate",
+        "tags": ["PublicCatalog"],
+        "summary": "Tải biểu mẫu đơn, tờ khai công bố của thủ tục hành chính",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProcedureCodeParam" },
+          {
+            "name": "attachmentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Luồng tệp biểu mẫu đính kèm"
           },
-          "legalBasis": {
-            "type": "string"
+          "404": {
+            "description": "Không tìm thấy mẫu đơn",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           },
-          "assigneeId": {
-            "type": "string",
-            "format": "uuid"
+          "429": {
+            "description": "Vượt ngưỡng giới hạn tải mẫu đơn",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           },
-          "documentVersionId": {
-            "type": "string",
-            "format": "uuid"
+          "502": {
+            "description": "Không tải được tệp nguồn từ Cổng Dịch vụ công quốc gia",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/procedure-categories": {
+      "get": {
+        "operationId": "listProcedureCategories",
+        "tags": ["PublicCatalog"],
+        "summary": "Lấy danh mục nhóm lĩnh vực thủ tục hành chính",
+        "responses": {
+          "200": {
+            "description": "Danh sách nhóm lĩnh vực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["categories"],
+                  "properties": {
+                    "categories": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/agencies": {
+      "get": {
+        "operationId": "listPublicAgencies",
+        "tags": ["PublicCatalog"],
+        "summary": "Danh sách cơ quan tiếp nhận đang hoạt động (Sở/ngành, Trung tâm PVHCC và 126 UBND xã/phường)",
+        "responses": {
+          "200": {
+            "description": "Danh sách tên cơ quan tiếp nhận có bộ phận Một cửa hiệu lực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["agencies"],
+                  "properties": {
+                    "agencies": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/news": {
+      "get": {
+        "operationId": "listPublicNews",
+        "tags": ["PublicCatalog"],
+        "summary": "Danh sách tin tức, thông báo hướng dẫn đã xuất bản trên cổng",
+        "responses": {
+          "200": {
+            "description": "Danh sách bài viết công khai",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["articles"],
+                  "properties": {
+                    "articles": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/status-check": {
+      "get": {
+        "operationId": "checkPublicCaseStatusGet",
+        "tags": ["PublicCatalog"],
+        "summary": "Tra cứu nhanh trạng thái hồ sơ bằng mã hồ sơ (không cần đăng nhập, ẩn toàn bộ PII)",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Mã hồ sơ định dạng HN-YYYY-XXXXXXXX"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin tiến độ tổng quát không chứa dữ liệu cá nhân",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PublicStatusSummary" }
+              }
+            }
           },
-          "supplementPhase": {
-            "type": "string",
-            "enum": [
-              "RECEPTION",
-              "ASSESSMENT"
-            ]
-          },
-          "deliveryEvidence": {
-            "type": "string"
+          "404": {
+            "description": "Không tìm thấy mã hồ sơ",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }
       },
-      "PaymentNotification": {
-        "type": "object",
-        "required": [
-          "partner",
-          "transactionId",
-          "chargeId",
-          "amount",
-          "signature"
+      "post": {
+        "operationId": "checkPublicCaseStatusPost",
+        "tags": ["PublicCatalog"],
+        "summary": "Tra cứu nhanh trạng thái hồ sơ qua thân JSON (không cần đăng nhập, ẩn toàn bộ PII)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["code"],
+                "properties": {
+                  "code": { "type": "string", "examples": ["HN-2026-A1B2C3D4"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Thông tin tiến độ tổng quát không chứa dữ liệu cá nhân",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PublicStatusSummary" }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy mã hồ sơ",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/auth/register": {
+      "post": {
+        "operationId": "registerCitizen",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Đăng ký tài khoản công dân mới và khởi tạo phiên đăng nhập",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fullName", "email", "phone", "password"],
+                "properties": {
+                  "fullName": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "phone": { "type": "string" },
+                  "password": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đăng ký thành công, cấp cookie hni_citizen_session và csrfToken",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "422": {
+            "description": "Thông tin đăng ký không hợp lệ hoặc trùng email",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/auth/login": {
+      "post": {
+        "operationId": "loginCitizen",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Đăng nhập tài khoản công dân (hỗ trợ email/mật khẩu và mô phỏng định danh điện tử VNeID cục bộ)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "examples": ["congdan@example.test"] },
+                  "password": { "type": "string" },
+                  "provider": {
+                    "type": "string",
+                    "enum": ["PASSWORD", "VNEID_SANDBOX"],
+                    "description": "Chế độ đăng nhập mật khẩu chuẩn hoặc mô phỏng VNeID mức 2 phục vụ thử nghiệm cục bộ"
+                  },
+                  "citizenId": { "type": "string", "description": "Số định danh cá nhân 12 số khi thử nghiệm luồng VNeID_SANDBOX" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đăng nhập thành công, thiết lập cookie hni_citizen_session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["user", "csrfToken"],
+                  "properties": {
+                    "user": { "type": "object" },
+                    "csrfToken": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sai thông tin xác thực",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/auth/logout": {
+      "post": {
+        "operationId": "logoutCitizen",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Đăng xuất phiên công dân hiện tại",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
         ],
-        "properties": {
-          "partner": {
-            "type": "string"
+        "responses": {
+          "200": {
+            "description": "Đã xóa phiên và thu hồi cookie hni_citizen_session",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/auth/me": {
+      "get": {
+        "operationId": "getCurrentCitizen",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Kiểm tra phiên đăng nhập công dân hiện hành và lấy csrfToken",
+        "security": [
+          { "citizenCookieAuth": [] },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin công dân đang đăng nhập hoặc null nếu chưa đăng nhập",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": { "type": ["object", "null"] },
+                    "csrfToken": { "type": ["string", "null"] }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/citizen/profile": {
+      "get": {
+        "operationId": "getCitizenProfile",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Đọc thông tin hồ sơ công dân tự khai để điền sẵn tờ khai trực tuyến",
+        "security": [
+          { "citizenCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin cá nhân tự khai và số phiên bản hiện tại",
+            "content": { "application/json": { "schema": { "type": "object" } } }
           },
-          "transactionId": {
-            "type": "string"
-          },
-          "chargeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "amount": {
-            "type": "number",
-            "minimum": 0
-          },
-          "signature": {
-            "type": "string"
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
+          "401": {
+            "description": "Chưa đăng nhập công dân",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }
       },
-      "Response": {
-        "type": "object",
-        "required": [
-          "id",
-          "correlationId"
+      "post": {
+        "operationId": "updateCitizenProfile",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Cập nhật thông tin cá nhân tự khai của công dân",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
         ],
-        "properties": {
-          "id": {
-            "type": "string"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expectedVersion": { "type": "integer", "minimum": 0 },
+                  "citizenId": { "type": "string" },
+                  "birthDate": { "type": "string", "format": "date" },
+                  "gender": { "type": "string" },
+                  "permanentAddress": { "type": "string" },
+                  "contactAddress": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã lưu thông tin cá nhân",
+            "content": { "application/json": { "schema": { "type": "object" } } }
           },
-          "version": {
-            "type": "integer"
+          "409": {
+            "description": "Xung đột phiên bản expectedVersion",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/workspace": {
+      "get": {
+        "operationId": "getCitizenWorkspace",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Tải không gian công dân số (hồ sơ, bản nháp, lịch hẹn, PAKN, thông báo, kho tài liệu điện tử)",
+        "security": [
+          { "citizenCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tổng hợp dữ liệu không gian làm việc của công dân",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/cases": {
+      "get": {
+        "operationId": "listCitizenCases",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Liệt kê toàn bộ hồ sơ một cửa thuộc tài khoản công dân đang đăng nhập",
+        "security": [
+          { "citizenCookieAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách hồ sơ của công dân",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["cases"],
+                  "properties": {
+                    "cases": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/CaseRecord" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/citizen/drafts": {
+      "post": {
+        "operationId": "saveOrDeleteCitizenDraft",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Lưu hoặc xóa bản nháp tờ khai trực tuyến của công dân",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["action"],
+                "properties": {
+                  "action": { "type": "string", "enum": ["save", "delete"] },
+                  "id": { "type": "string" },
+                  "procedureCode": { "type": "string" },
+                  "expectedVersion": { "type": "integer" },
+                  "draft": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã lưu hoặc xóa bản nháp",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/drafts/{id}": {
+      "get": {
+        "operationId": "getCitizenDraftById",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Mở lại bản nháp tờ khai trực tuyến đã lưu",
+        "security": [
+          { "citizenCookieAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chi tiết bản nháp",
+            "content": { "application/json": { "schema": { "type": "object" } } }
           },
-          "correlationId": {
-            "type": "string"
+          "404": {
+            "description": "Không tìm thấy bản nháp",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/notifications/read": {
+      "post": {
+        "operationId": "markCitizenNotificationsRead",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Đánh dấu đã đọc các thông báo sự kiện hồ sơ trong không gian công dân",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["keys"],
+                "properties": {
+                  "keys": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã ghi nhận trạng thái đã đọc",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/change-password": {
+      "post": {
+        "operationId": "changeCitizenPassword",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Đổi mật khẩu tài khoản công dân và hủy các phiên đăng nhập khác",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["currentPassword", "newPassword", "confirmPassword"],
+                "properties": {
+                  "currentPassword": { "type": "string" },
+                  "newPassword": { "type": "string", "minLength": 12 },
+                  "confirmPassword": { "type": "string", "minLength": 12 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã cập nhật mật khẩu mới",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/revoke-other-sessions": {
+      "post": {
+        "operationId": "revokeOtherCitizenSessions",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Thu hồi toàn bộ các phiên đăng nhập khác của công dân",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Số phiên khác đã bị thu hồi",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/citizen/documents/{code}/{stored}": {
+      "get": {
+        "operationId": "downloadCitizenVaultDocument",
+        "tags": ["CitizenAuthWorkspace"],
+        "summary": "Tải tài liệu đã nộp hoặc kết quả điện tử từ kho tài liệu của công dân",
+        "security": [
+          { "citizenCookieAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/CaseCodeParam" },
+          { "$ref": "#/components/parameters/StoredFileParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nội dung nhị phân của tệp tài liệu"
           },
-          "status": {
-            "type": "string"
+          "404": {
+            "description": "Tệp không tồn tại hoặc không thuộc quyền sở hữu của công dân",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/cases": {
+      "post": {
+        "operationId": "submitOnlineCase",
+        "tags": ["CaseWorkflow"],
+        "summary": "Nộp hồ sơ trực tuyến (sinh mã hồ sơ HN-YYYY-*, khóa tra cứu 64 hex mã hóa Fernet và trạng thái CHO_TIEP_NHAN)",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["procedureCode", "receivingAgency", "applicantType", "applicant", "submissionKey"],
+                "properties": {
+                  "procedureCode": { "type": "string" },
+                  "receivingAgency": { "type": "string" },
+                  "applicantType": { "type": "string", "enum": ["citizen", "organization"] },
+                  "submissionKey": { "type": "string", "format": "uuid" },
+                  "applicant": { "type": "object" },
+                  "subject": { "type": "object" },
+                  "declaration": { "type": "object" },
+                  "documentExemptions": { "type": "object" },
+                  "requestSummary": { "type": "string" },
+                  "attachments": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/AttachmentInput" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Hồ sơ trực tuyến đã được ghi nhận kèm mã hồ sơ và accessKey",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["case", "accessKey"],
+                  "properties": {
+                    "case": { "$ref": "#/components/schemas/CaseRecord" },
+                    "accessKey": { "type": "string" }
+                  }
+                }
+              }
+            }
           },
-          "ruleCode": {
-            "type": "string"
+          "422": {
+            "description": "Thiếu thành phần hồ sơ bắt buộc hoặc cơ quan không thuộc tuyến tiếp nhận",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/cases/counter": {
+      "post": {
+        "operationId": "createCounterCase",
+        "tags": ["CaseWorkflow"],
+        "summary": "Tiếp nhận hồ sơ trực tiếp tại quầy Một cửa (vai trò intake; đối chiếu bản chính và lập Mẫu 01)",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "procedureCode",
+                  "receivingAgency",
+                  "applicantType",
+                  "applicantName",
+                  "citizenId",
+                  "applicantPhone",
+                  "applicantAddress",
+                  "requestSummary",
+                  "paperOriginals",
+                  "identityVerified",
+                  "submissionKey"
+                ],
+                "properties": {
+                  "procedureCode": { "type": "string" },
+                  "receivingAgency": { "type": "string" },
+                  "applicantType": { "type": "string", "enum": ["citizen", "organization"] },
+                  "applicantName": { "type": "string" },
+                  "citizenId": { "type": "string" },
+                  "applicantPhone": { "type": "string" },
+                  "applicantEmail": { "type": "string" },
+                  "applicantAddress": { "type": "string" },
+                  "requestSummary": { "type": "string" },
+                  "paperOriginals": { "type": "string" },
+                  "identityVerified": { "type": "boolean" },
+                  "submissionKey": { "type": "string", "format": "uuid" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã lập hồ sơ trực tiếp tại quầy ở trạng thái DA_TIEP_NHAN",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": {
+            "description": "Chỉ cán bộ tiếp nhận thuộc cơ quan đó được lập hồ sơ tại quầy",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/cases/{code}": {
+      "get": {
+        "operationId": "getCaseDetail",
+        "tags": ["CaseWorkflow"],
+        "summary": "Xem chi tiết hồ sơ theo vai trò cán bộ và phạm vi cơ quan (chặn admin, ẩn PII với finance)",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/CaseCodeParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chi tiết hồ sơ, biểu mẫu 01-06 và nhật ký xử lý",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CaseRecord" }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy hồ sơ trong phạm vi được phân quyền",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/cases/{code}/files/{stored}": {
+      "get": {
+        "operationId": "downloadCaseFile",
+        "tags": ["CaseWorkflow"],
+        "summary": "Tải tệp đính kèm, bản quét số hóa, văn bản Mẫu 05/06 hoặc kết quả điện tử của hồ sơ",
+        "security": [
+          { "staffCookieAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/CaseCodeParam" },
+          { "$ref": "#/components/parameters/StoredFileParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Luồng tệp tài liệu (nosniff)"
+          },
+          "403": {
+            "description": "Vai trò tài chính hoặc quản trị viên không được mở tệp thành phần hồ sơ cá nhân",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "404": {
+            "description": "Không tìm thấy tệp hoặc hồ sơ ngoài phạm vi cơ quan",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/cases/{code}/actions": {
+      "post": {
+        "operationId": "executeStaffCaseAction",
+        "tags": ["CaseWorkflow"],
+        "summary": "Thực hiện thao tác nghiệp vụ một cửa có kiểm soát đồng thời lạc quan expectedVersion",
+        "description": "Hỗ trợ đầy đủ luồng nghiệp vụ: tiếp nhận Mẫu 01 (accept), hướng dẫn bổ sung Mẫu 02 (request_supplement), từ chối Mẫu 03 (reject_intake), phân công/hoàn trả (assign, return_to_intake, return_to_leader), số hóa tại quầy (digitize_documents), thẩm định chuyên môn (verify_original_register, assess_data_request, verify_published_procedure), lưu và trình dự thảo (save_draft, submit_review), phê duyệt/trả lại/từ chối giải quyết không bế tắc (approve, send_back, decline -> KHONG_GIAI_QUYET), gia hạn kèm phiếu xin lỗi Mẫu 04 (extend_deadline), cấu hình/miễn phí (set_fee, waive_fee), ký thử nghiệm Ed25519 (sign_result), phát hành sinh tệp kết quả điện tử (issue), trả kết quả (deliver) và xử lý dừng hồ sơ Mẫu 05/06 (prepare_stop_notice, issue_stop_notice, reject_stop_notice, confirm_paper_returned, close_expired_supplement).",
+        "security": [
+          { "staffCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/CaseCodeParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/StaffCaseActionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Hồ sơ đã cập nhật trạng thái và tăng version thêm 1",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CaseRecord" }
+              }
+            }
+          },
+          "403": {
+            "description": "Không đúng vai trò, cơ quan hoặc thiếu thẩm quyền ký được cấp riêng",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "409": {
+            "description": "Xung đột phiên bản expectedVersion (Optimistic Locking)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "422": {
+            "description": "Vi phạm điều kiện tiên quyết của máy trạng thái hoặc dữ liệu biểu mẫu",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/public/cases/lookup": {
+      "post": {
+        "operationId": "lookupCaseWithAccessKey",
+        "tags": ["CaseWorkflow"],
+        "summary": "Tra cứu chi tiết hồ sơ một cửa của người nộp bằng mã hồ sơ và khóa tra cứu 64 ký tự hex",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["code", "accessKey"],
+                "properties": {
+                  "code": { "type": "string" },
+                  "accessKey": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chi tiết hồ sơ dành cho người nộp",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CaseRecord" }
+              }
+            }
+          },
+          "404": {
+            "description": "Mã hồ sơ hoặc khóa tra cứu không khớp",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/public/cases/{code}/actions": {
+      "post": {
+        "operationId": "executeCitizenCaseAction",
+        "tags": ["CaseWorkflow"],
+        "summary": "Thao tác trực tuyến của người nộp trên hồ sơ (bổ sung, gửi Mẫu 05 trực tuyến, nộp phí thử nghiệm, đánh giá)",
+        "security": [
+          { "citizenCookieAuth": [], "csrfTokenAuth": [] }
+        ],
+        "parameters": [
+          { "$ref": "#/components/parameters/CaseCodeParam" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CitizenCaseActionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã ghi nhận thao tác của người nộp và cập nhật hồ sơ",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CaseRecord" }
+              }
+            }
+          },
+          "409": {
+            "description": "Xung đột phiên bản expectedVersion",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "422": {
+            "description": "Dữ liệu thao tác không hợp lệ hoặc không đúng trạng thái cho phép",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }
       }

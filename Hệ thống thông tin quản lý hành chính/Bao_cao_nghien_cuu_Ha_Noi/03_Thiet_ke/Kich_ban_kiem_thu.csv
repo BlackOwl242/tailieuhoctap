@@ -1,102 +1,102 @@
-﻿Mã,Điều kiện hoặc tình huống,Thao tác hoặc tiêu chí,Kết quả mong đợi,Trạng thái
-KT01,Hai phiên bản có thời gian hiệu lực khác,Tiếp nhận trước và sau ngày đổi,Mỗi hồ sơ giữ đúng phiên bản áp dụng,Chưa thực hiện
-KT02,Phiên bản của cơ quan khác,Chọn sai cơ quan rồi gửi,Không nhận sai nhánh; có hướng dẫn,Chưa thực hiện
-KT25,Cùng mã 2.000908 được tra ở hai địa bàn; một kết quả đã quan sát là Hà Nội → Phường Tây Hồ,Chọn địa bàn/cơ quan trên Cổng quốc gia rồi đối chiếu bản ghi tuyến,Không dùng UBND phường Tây Hồ làm mặc định cho địa bàn khác; hồ sơ lưu đúng tuyến và thời điểm đã chọn,Chưa thực hiện
-KT03,Người A và hồ sơ của B không có quan hệ,Đổi mã hồ sơ trong truy cập,Không xem hoặc tải được dữ liệu của B,Chưa thực hiện
-KT04,Hồ sơ đại diện DL02 và DL03,Thử nộp và nhận kết quả,Chỉ trường hợp đủ căn cứ được tiếp tục,Chưa thực hiện
-KT05,Dữ liệu xác thực đầy đủ,Nạp dữ liệu và gửi,Nguồn được lưu; không yêu cầu lại giấy đã thay hợp lệ,Chưa thực hiện
-KT06,Dữ liệu không có hoặc kết nối lỗi,Thực hiện kê khai,Có nhánh xử lý rõ; không tự kết luận sai,Chưa thực hiện
-KT07,Yêu cầu hợp lệ DL01,Cán bộ tiếp nhận,Cấp một mã; giấy hẹn khớp hạn và phiên bản,Chưa thực hiện
-KT08,Cùng mã yêu cầu gửi hai lần,Gửi lại sau mất phản hồi,Chỉ một hồ sơ; phản hồi định danh đã tạo,Chưa thực hiện
-KT09,Thiếu/sai thành phần đầu vào hoặc dữ liệu liên thông chưa khai thác được,Gửi phiếu bổ sung có danh sách từng mục; thử gửi yêu cầu thứ hai ở bước đầu vào,Phiếu đầu tiên đầy đủ; yêu cầu lần hai bị chặn; lỗi kết nối không bị ghi thành dữ liệu công dân khai sai,Chưa thực hiện
-KT10,Yêu cầu ngoài thẩm quyền,Từ chối thiếu hoặc đủ lý do,Thiếu lý do bị chặn; đủ căn cứ sinh đúng phiếu,Chưa thực hiện
-KT11,Người xử lý khác cơ quan,Phân công rồi đổi người,Không cấp sai quyền; lịch sử được giữ,Chưa thực hiện
-KT12,Kết quả tra cứu mâu thuẫn DL05,Đối chiếu và trình duyệt,Không tự sửa nguồn; lưu ý kiến và bằng chứng,Chưa thực hiện
-KT13,Ký lỗi hoặc chứng thư không hợp lệ DL08,Ký và phát hành,Chưa phát hành; lỗi có thông tin xử lý,Chưa thực hiện
-KT14,Bản đã ký bị đổi nội dung,Kiểm tra rồi phát hành,Phát hiện sai toàn vẹn; không dùng bản bị đổi,Chưa thực hiện
-KT15,Cùng thông báo thanh toán gửi lặp,Nhận nhiều lần,Một giao dịch được ghi; không tăng khoản thu,Chưa thực hiện
-KT16,Thông báo sai tiền hoặc sai hồ sơ,Xác nhận thu,Đưa đối soát; không tự đánh dấu đã thanh toán đủ,Chưa thực hiện
-KT17,Kho nhận không đáp ứng DL09,Gửi kết quả,Đã phát hành giữ nguyên; đồng bộ ghi lỗi và chờ xử lý,Chưa thực hiện
-KT18,Đích đã nhận nhưng phản hồi mất,Gửi lại cùng mã,Không tạo hai lần giao; có bằng chứng đối chiếu,Chưa thực hiện
-KT19,"DL06 trước, đúng, sau 15 giờ và ngày nghỉ",Tiếp nhận và tính hạn,Khớp bảng ranh giới đã được nghiệp vụ duyệt,Chưa thực hiện
-KT20,Hồ sơ quá hạn và có điều chỉnh,Kiểm tra cảnh báo rồi trả,Giữ hạn ban đầu; có giải trình; không chặn giao vì quá hạn,Chưa thực hiện
-KT21,Yêu cầu dừng theo kênh và thời điểm,"Sau tiếp nhận hợp lệ, kiểm tra Mẫu 05, chủ thể/đại diện, quyết định/văn bản kết quả",Sinh bản xem/in Mẫu 06 khi đủ điều kiện; giữ nguyên trạng thái lúc chờ ký; chỉ người có quyền ký được cấp riêng mới ghi nhận phát hành và chuyển DUNG; yêu cầu trực tuyến đi qua NQG,Chưa thực hiện
-KT22,Hai phiên mở cùng hồ sơ DL10,Cùng cập nhật,Một cập nhật thành công; bản cũ nhận xung đột,Chưa thực hiện
-KT23,Quyền cán bộ bị thu hồi,Dùng phiên cũ tiếp tục,Thao tác bị từ chối; có sự kiện theo dõi,Chưa thực hiện
-KT24,Cấu hình thủ tục sửa chưa duyệt,Áp dụng vào hồ sơ mới,Bản nháp không có hiệu lực; truy được người sửa và duyệt,Chưa thực hiện
-KT26,Quyết định/văn bản kết quả phát sinh giữa lúc nhận yêu cầu và ký Mẫu 06,Người ký mở yêu cầu đang chờ phát hành,"Kiểm tra lại điều kiện; giữ nguyên trạng thái, không phát hành Mẫu 06",Chưa thực hiện
-KT27,Lãnh đạo chưa được cấp quyền ký Mẫu 06,Gửi yêu cầu ghi nhận phát hành,Từ chối tại máy chủ; không đổi trạng thái hồ sơ,Chưa thực hiện
-KT28,Hồ sơ đã có kết luận KHONG_GIAI_QUYET,Tiếp nhận yêu cầu dừng,Không mở lại nhánh đã kết luận,Chưa thực hiện
-KT29,Người ngoài hồ sơ đoán đường dẫn tệp Mẫu 06,Tải tài liệu,Từ chối; chỉ người trong phạm vi hồ sơ mới truy cập được,Chưa thực hiện
-KT30,Người đại diện nộp Mẫu 05 nhưng thiếu chứng cứ đại diện,Tiếp nhận yêu cầu,Không chuyển sang chờ ký; giữ trạng thái hồ sơ và yêu cầu bổ sung chứng cứ,Chưa thực hiện
-AT01,Truy cập hồ sơ ngoài quyền qua giao tiếp trực tiếp,Theo mô tả kịch bản,Từ chối ở máy chủ; không lộ tệp,Chưa thực hiện
-AT02,Dùng phiên hết hạn hoặc đã thu hồi,Theo mô tả kịch bản,Không thực hiện được hành động,Chưa thực hiện
-AT03,Đầu vào chứa lệnh hoặc mã thực thi,Theo mô tả kịch bản,Không thực thi; dữ liệu được xử lý an toàn,Chưa thực hiện
-AT04,Tệp không đúng loại và tệp thử an toàn,Theo mô tả kịch bản,Cách ly hoặc từ chối theo quy tắc,Chưa thực hiện
-AT05,Giả chữ ký thông báo tài chính,Theo mô tả kịch bản,Không ghi giao dịch thành công,Chưa thực hiện
-AT06,Gửi lại thông điệp có mã trùng,Theo mô tả kịch bản,Không lặp tác động nghiệp vụ,Chưa thực hiện
-AT07,Tải kết quả bằng đường dẫn đã hết hạn,Theo mô tả kịch bản,Không lấy được tài liệu,Chưa thực hiện
-AT08,Kiểm tra nhật ký và thông báo lỗi,Theo mô tả kịch bản,"Không chứa khóa, mật khẩu hoặc nội dung cá nhân không cần thiết",Chưa thực hiện
-TC01,Chỉ dùng bàn phím,Theo mô tả kịch bản,Thực hiện được luồng chính và thấy vị trí chọn,Chưa thực hiện
-TC02,Phóng to giao diện,Theo mô tả kịch bản,Không mất trường hoặc nút trọng yếu,Chưa thực hiện
-TC03,Dùng công cụ hỗ trợ đọc,Theo mô tả kịch bản,Nhãn trường và trạng thái có ý nghĩa,Chưa thực hiện
-TC04,Nhập sai trường bắt buộc,Theo mô tả kịch bản,"Nêu vị trí, lý do và cách sửa",Chưa thực hiện
-TC05,Xem cảnh báo hạn không phân biệt màu,Theo mô tả kịch bản,Hiểu được trạng thái qua chữ và biểu tượng,Chưa thực hiện
-TC06,Mất phiên trong khi kê khai,Theo mô tả kịch bản,Có hướng tiếp tục và không lộ dữ liệu trên máy chung,Chưa thực hiện
-PT01,Tăng tải danh sách và tiếp nhận theo bậc,Theo mô tả kịch bản,95% thao tác nội bộ không quá 2 giây ở tải nghiệm thu,Chưa thực hiện
-PT02,Chạy đồng thời tiếp nhận và báo cáo,Theo mô tả kịch bản,Không cấp trùng; báo cáo không làm ngừng tiếp nhận,Chưa thực hiện
-PT03,Ngừng một tiến trình gửi nền rồi khởi động lại,Theo mô tả kịch bản,Không mất thông điệp; không lặp kết quả,Chưa thực hiện
-PT04,Phục hồi cơ sở dữ liệu và tài liệu,Theo mô tả kịch bản,Đạt mục tiêu đã thống nhất; dữ liệu đối chiếu khớp,Chưa thực hiện
-PT05,Thay chứng thư và quay phiên bản ứng dụng,Theo mô tả kịch bản,Không mất quyền hoặc dữ liệu ngoài kế hoạch,Chưa thực hiện
-PT06,Duy trì tải nhiều giờ,Theo mô tả kịch bản,Không tăng tài nguyên hoặc hàng đợi mất kiểm soát,Chưa thực hiện
-HT01,"Cơ quan đổi tên, hồ sơ cũ còn mở",Cập nhật danh mục và mở chứng từ cũ,Lịch sử giữ cơ quan gốc; cơ quan kế thừa được ghi riêng,Chưa thực hiện
-HT02,Hai tuyến có khoảng hiệu lực giao nhau,Gửi hai cấu hình cạnh tranh cho cùng phiên bản,Chặn cấu hình mâu thuẫn; không tiếp nhận hai tuyến,Chưa thực hiện
-HT03,Người dân nộp trực tuyến rồi tới điểm hỗ trợ,Tra cứu và hỗ trợ trên cùng mã,Không tạo hồ sơ mới; lưu người hỗ trợ và kênh phù hợp,Chưa thực hiện
-HT04,Tệp số hóa thiếu trang hoặc không đọc được,Kiểm tra trước khi xác nhận số hóa,Yêu cầu xử lý lại; không gắn trạng thái đủ tài liệu,Chưa thực hiện
-HT05,Người giao dịch không có quyền đại diện tổ chức,Nộp và nhận kết quả cho tổ chức,Từ chối thao tác ngoài quyền; ghi căn cứ kiểm tra,Chưa thực hiện
-HT06,Một ý kiến bắt buộc chưa hoàn tất,Tổng hợp và trình duyệt hồ sơ liên thông,Chặn trình hoặc yêu cầu căn cứ ngoại lệ được duyệt,Chưa thực hiện
-HT07,"Cùng mã sự kiện gửi hai lần, rồi sửa nội dung",Nhận lặp và nhận lại nội dung khác,Một tác động; nội dung khác bị giữ đối chiếu,Chưa thực hiện
-HT08,Hồ sơ đổi tuyến giữa lúc xử lý,Bàn giao và tiếp tục xử lý tại nơi nhận,"Có xác nhận, giữ hạn và mã; không mất nhiệm vụ",Chưa thực hiện
-HT09,Chứng thư hết hiệu lực hoặc bản thay sau ký,Kiểm tra và đề nghị phát hành,Không phát hành bản sai; lưu bằng chứng kiểm tra,Chưa thực hiện
-HT10,Giấy tờ trong kho đã bị thay thế,Dùng lại cho hồ sơ mới,Hiển thị tình trạng; không mặc nhiên chọn bản cũ,Chưa thực hiện
-HT11,Kho địa phương không có giấy tờ phù hợp,Truy vấn kho quốc gia theo quyền,Ghi nguồn và mốc; không trả giấy tờ của chủ thể khác,Chưa thực hiện
-HT12,Gói nộp lưu thiếu ý kiến hoặc lệch băm,Gửi gói và nhận phản hồi kho,Không đánh dấu đã nhận; lưu lý do và bản sửa,Chưa thực hiện
-HT13,Đổi người đại diện hoặc kênh liên hệ,Gửi thông báo tới người được phép,Người cũ không nhận dữ liệu sau khi hết quyền,Chưa thực hiện
-HT14,Phản ánh thái độ phục vụ trên hồ sơ đã giải quyết,"Phân loại, chuyển và trả lời",Có đầu mối trả lời; không sửa quyết định hồ sơ,Chưa thực hiện
-HT15,Một mã xuất hiện tại Thành phố và bộ,Tổng hợp theo nguồn tại một mốc chốt,Không đếm hai hồ sơ; báo riêng chênh lệch,Chưa thực hiện
-HT16,Thủ tục 2.000908 được cấu hình không thu phí,Tiếp nhận và trả qua các kênh được phép,Không phát sinh khoản bắt buộc hoặc màn hình thu phí,Chưa thực hiện
-HT17,Tài khoản chỉ có quyền một cơ quan,"Tìm kiếm, in và xuất danh sách toàn Thành phố",Chỉ trả hồ sơ trong quyền; nhật ký ghi kết xuất,Chưa thực hiện
-HT18,"Mất kết nối bộ, sau đó nhận sự kiện cũ",Theo dõi và khôi phục đồng bộ,Hiển thị mốc cuối; sự kiện cũ không ghi đè trạng thái mới,Chưa thực hiện
-HT19,Luật mới có ngày hiệu lực tương lai,"Mở hồ sơ trước, sau mốc và hồ sơ chuyển tiếp",Áp dụng đúng căn cứ; không đổi tự động hồ sơ cũ,Chưa thực hiện
-HT20,Trợ giúp lấy nguồn hết hiệu lực hoặc thiếu căn cứ,Yêu cầu hướng dẫn cán bộ,"Ghi rõ nguồn, cảnh báo hoặc chuyển hỏi nghiệp vụ",Chưa thực hiện
-CF01,"Cán bộ chuyển cơ quan, còn phiên truy cập cũ",Thu hồi quyền rồi thao tác bằng phiên cũ,Quyền cũ bị chặn; phân công tồn được chuyển có chứng cứ,Chưa thực hiện
-CF02,"Cơ quan đổi tên, có hồ sơ trước ngày đổi","Cập nhật danh mục, mở chứng từ cũ",Hồ sơ mới dùng tên hiệu lực; bản đã phát hành giữ nguyên,Chưa thực hiện
-CF03,Hai phiên bản thủ tục kế tiếp nhau,Nộp tại trước và sau ngày hiệu lực,"Chọn đúng phiên bản, thẩm quyền, hạn và tuyến",Chưa thực hiện
-CF04,"Hồ sơ đã giao, một kho chưa đồng bộ",Tra cứu và chạy báo cáo trạng thái,Hiển thị riêng trạng thái giao và đồng bộ; không lùi nghiệp vụ,Chưa thực hiện
-CF05,Biểu mẫu có trường theo điều kiện,Nộp nhánh không cần và cần trường đó,Không bắt trường ngoài điều kiện; báo đúng thiếu trong nhánh cần,Chưa thực hiện
-CF06,Bên nhận chuyển hồ sơ chưa xác nhận,Chuyển rồi làm mất phản hồi,"Có đầu mối chịu trách nhiệm, không mất hồ sơ hoặc chuyển trùng",Chưa thực hiện
-CF07,Hồ sơ đã nhận theo quy trình cũ,Phê duyệt quy trình mới khi hồ sơ đang mở,Hồ sơ cũ giữ phiên bản hoặc chuyển theo quyết định có căn cứ,Chưa thực hiện
-CF08,Sự kiện nguồn đến muộn và đảo thứ tự,Dựng lịch sử tiến trình,"Giữ mốc nguồn và mốc nhận, không lùi trạng thái hoặc giấu chậm",Chưa thực hiện
-CF09,"Sơ đồ có vòng lặp, bước không tới được",Kiểm tra rồi đề nghị phát hành cấu hình,Phát hiện nhánh lỗi; không phát hành cấu hình chưa có điều kiện thoát,Chưa thực hiện
-CF10,Chứng thư và bản kết quả có thể đối chiếu,Ký rồi thay một byte nội dung,Bản bị sửa không được xác nhận hợp lệ hoặc phát hành,Chưa thực hiện
-CF11,Dịch vụ ký đã xử lý nhưng mất phản hồi,Gửi lại cùng mã yêu cầu,Đối chiếu bản đã ký; không tạo tác động ký mới ngoài chủ ý,Chưa thực hiện
-CF12,Cùng yêu cầu gửi qua hai lần kết nối,Tiếp nhận đồng thời,"Chỉ cấp một mã chính thức, một giấy hẹn và một hồ sơ",Chưa thực hiện
-CF13,Bổ sung trong hai giai đoạn khác nhau,Yêu cầu và nộp bổ sung,"Giữ giai đoạn, lý do, bản cũ; hạn theo quy tắc từng trường hợp",Chưa thực hiện
-CF14,Hai người cùng phân công hồ sơ,Lưu bằng cùng phiên bản ban đầu,"Một cập nhật thành công; người sau nhận xung đột, không ghi đè",Chưa thực hiện
-CF15,"Hai ý kiến bắt buộc, chỉ có một bản trả",Đề nghị tổng hợp và trình,Chặn hoặc yêu cầu căn cứ được phép; không coi im lặng là đồng ý,Chưa thực hiện
-CF16,Người phê duyệt ngoài thẩm quyền phiên bản,Thử duyệt bằng quyền cơ quan khác,"Bị từ chối, giữ trạng thái và ghi nhật ký",Chưa thực hiện
-CF17,Hồ sơ có khoản thu và nhiệm vụ còn mở,"Cán bộ tiếp nhận kiểm tra yêu cầu, trạng thái và Mẫu 06; cán bộ tài chính theo dõi riêng",Chỉ chuyển DUNG sau khi Mẫu 06 được ký/phát hành; trả giấy/hoàn phí theo quy trình riêng; không tự hoàn tiền hoặc xóa giao dịch,Chưa thực hiện
-CF18,Thông báo đã gửi nhưng chưa có biên nhận,Thử ghi đã giao kết quả,Không xác nhận giao chỉ từ trạng thái gửi thông báo,Chưa thực hiện
-CF19,Tài khoản chỉ có quyền xem một phạm vi,Kết xuất danh sách ngoài phạm vi,Bị chặn hoặc lọc đúng quyền; có nhật ký xuất,Chưa thực hiện
-CF20,Một sự kiện nhắc việc gửi lặp,Xử lý lại sự kiện nhiều lần,Không gửi trùng ngoài chính sách; không lộ nội dung nhạy cảm,Chưa thực hiện
-CF21,Biết mã hồ sơ của người khác,Tra cứu và tải tài liệu trực tiếp,"Không mở nội dung ngoài quyền, kể cả qua đường dẫn tệp",Chưa thực hiện
-CF22,Câu hỏi có nguồn cũ và nguồn mới,Yêu cầu hướng dẫn cán bộ,"Dùng nguồn còn hiệu lực, nêu căn cứ; thiếu căn cứ thì chuyển hỏi",Chưa thực hiện
-CF23,Một hồ sơ có mã ở Thành phố và hệ thống bộ,Tổng hợp báo cáo cùng kỳ,Chỉ đếm một hồ sơ; lưu nguồn và mốc chốt,Chưa thực hiện
-CF24,Mẫu số chỉ số thay đổi trong kỳ sau,Phát hành mẫu mới rồi xem báo cáo cũ,Báo cáo cũ giữ định nghĩa; bản mới ghi hiệu lực và công thức,Chưa thực hiện
-CF25,Có hồ sơ đang quá hạn và đã trả trễ,Thống kê tồn đọng và đúng hạn,"Không gộp hai loại; công thức có tử, mẫu và loại trừ",Chưa thực hiện
-CF26,Lãnh đạo chỉ được xem số tổng hợp,Mở bảng điều hành rồi xem hồ sơ chi tiết,Không tự có quyền xem nội dung cá nhân từ quyền xem chỉ số,Chưa thực hiện
-CF27,Chỉ đạo yêu cầu thay hạn không có căn cứ,Nhập nhiệm vụ và thử sửa hạn,Lưu chỉ đạo; không tự đổi hạn pháp lý hoặc xóa hạn gốc,Chưa thực hiện
-CF28,Đại diện hết quyền khai thác kho,Thu hồi quyền và mở bản đã liên kết,Chặn khai thác ngoài hiệu lực; giữ chứng cứ dùng trước đó,Chưa thực hiện
-CF29,Tài liệu kho đã bị thay thế,Dùng lại cho hồ sơ mới,Kiểm tra hiệu lực và bản thay thế; không tự coi tệp cũ là đạt,Chưa thực hiện
-CF30,Một mã sự kiện đến lại với nội dung khác,Nhận hai bản thông điệp,"Giữ chứng cứ, phát hiện xung đột, không ghi đè im lặng",Chưa thực hiện
-CF31,Kết quả có mã địa phương và mã quốc gia,"Đồng bộ, mất phản hồi rồi gửi lại",Giữ liên kết mã và phiên bản; chỉ một bản tác động hợp lệ,Chưa thực hiện
+Mã,Điều kiện hoặc tình huống,Thao tác hoặc tiêu chí,Kết quả mong đợi,Trạng thái
+KT01,Hai phiên bản có thời gian hiệu lực khác,Tiếp nhận trước và sau ngày đổi,Mỗi hồ sơ giữ đúng phiên bản áp dụng,Đạt (Kiểm thử tự động - ghim bản chụp workflow lúc nộp)
+KT02,Phiên bản của cơ quan khác,Chọn sai cơ quan rồi gửi,Không nhận sai nhánh; có hướng dẫn,Đạt (Kiểm thử tự động - chặn cơ quan ngoài tuyến tiếp nhận)
+KT25,Cùng mã 2.000908 được tra ở hai địa bàn; một kết quả đã quan sát là Hà Nội → Phường Tây Hồ,Chọn địa bàn/cơ quan trên Cổng quốc gia rồi đối chiếu bản ghi tuyến,Không dùng UBND phường Tây Hồ làm mặc định cho địa bàn khác; hồ sơ lưu đúng tuyến và thời điểm đã chọn,Đạt (Kiểm thử tự động - đối chiếu tuyến 126 xã/phường)
+KT03,Người A và hồ sơ của B không có quan hệ,Đổi mã hồ sơ trong truy cập,Không xem hoặc tải được dữ liệu của B,Đạt (Kiểm thử tự động - cô lập chủ sở hữu và khóa tra cứu)
+KT04,Hồ sơ đại diện DL02 và DL03,Thử nộp và nhận kết quả,Chỉ trường hợp đủ căn cứ được tiếp tục,Đạt (Kiểm thử tự động - kiểm tra tư cách và chứng cứ đại diện)
+KT05,Dữ liệu xác thực đầy đủ,Nạp dữ liệu và gửi,Nguồn được lưu; không yêu cầu lại giấy đã thay hợp lệ,Đạt (Kiểm thử tự động - kế thừa hồ sơ công dân và miễn giấy tờ)
+KT06,Dữ liệu không có hoặc kết nối lỗi,Thực hiện kê khai,Có nhánh xử lý rõ; không tự kết luận sai,Đạt (Kiểm thử tự động - phân nhánh kê khai và thông báo rõ)
+KT07,Yêu cầu hợp lệ DL01,Cán bộ tiếp nhận,Cấp một mã; giấy hẹn khớp hạn và phiên bản,Đạt (Kiểm thử tự động - sinh Mẫu 01 kèm QR và hạn SLA)
+KT08,Cùng mã yêu cầu gửi hai lần,Gửi lại sau mất phản hồi,Chỉ một hồ sơ; phản hồi định danh đã tạo,Đạt (Kiểm thử tự động - chống gửi lặp idempotency_key)
+KT09,Thiếu/sai thành phần đầu vào hoặc dữ liệu liên thông chưa khai thác được,Gửi phiếu bổ sung có danh sách từng mục; thử gửi yêu cầu thứ hai ở bước đầu vào,Phiếu đầu tiên đầy đủ; yêu cầu lần hai bị chặn; lỗi kết nối không bị ghi thành dữ liệu công dân khai sai,Đạt (Kiểm thử tự động - sinh Mẫu 02 và chặn yêu cầu bổ sung lặp)
+KT10,Yêu cầu ngoài thẩm quyền,Từ chối thiếu hoặc đủ lý do,Thiếu lý do bị chặn; đủ căn cứ sinh đúng phiếu,Đạt (Kiểm thử tự động - kiểm tra căn cứ và sinh Mẫu 03)
+KT11,Người xử lý khác cơ quan,Phân công rồi đổi người,Không cấp sai quyền; lịch sử được giữ,Đạt (Kiểm thử tự động - cô lập phân công theo agency_scope)
+KT12,Kết quả tra cứu mâu thuẫn DL05,Đối chiếu và trình duyệt,Không tự sửa nguồn; lưu ý kiến và bằng chứng,Đạt (Kiểm thử tự động - bắt buộc lưu workflowEvidence trước trình duyệt)
+KT13,Ký lỗi hoặc chứng thư không hợp lệ DL08,Ký và phát hành,Chưa phát hành; lỗi có thông tin xử lý,Đạt (Kiểm thử tự động - chặn ký/phát hành khi thiếu quyền ký hiệu lực)
+KT14,Bản đã ký bị đổi nội dung,Kiểm tra rồi phát hành,Phát hiện sai toàn vẹn; không dùng bản bị đổi,Đạt (Kiểm thử tự động - xác minh chữ ký Ed25519 và băm SHA-256)
+KT15,Cùng thông báo thanh toán gửi lặp,Nhận nhiều lần,Một giao dịch được ghi; không tăng khoản thu,Đạt (Kiểm thử tự động - chặn tạo trùng giao dịch đang chờ)
+KT16,Thông báo sai tiền hoặc sai hồ sơ,Xác nhận thu,Đưa đối soát; không tự đánh dấu đã thanh toán đủ,Đạt (Kiểm thử tự động - tách bước khai nộp PAID và kế toán đối soát RECONCILED)
+KT17,Kho nhận không đáp ứng DL09,Gửi kết quả,Đã phát hành giữ nguyên; đồng bộ ghi lỗi và chờ xử lý,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - theo dõi hàng đợi outbox cục bộ)
+KT18,Đích đã nhận nhưng phản hồi mất,Gửi lại cùng mã,Không tạo hai lần giao; có bằng chứng đối chiếu,Đạt (Kiểm thử tự động - khóa lạc quan expectedVersion khi trả kết quả)
+KT19,"DL06 trước, đúng, sau 15 giờ và ngày nghỉ",Tiếp nhận và tính hạn,Khớp bảng ranh giới đã được nghiệp vụ duyệt,Đạt (Kiểm thử tự động - kiểm chứng mốc 15:00 và lịch ngày làm việc)
+KT20,Hồ sơ quá hạn và có điều chỉnh,Kiểm tra cảnh báo rồi trả,Giữ hạn ban đầu; có giải trình; không chặn giao vì quá hạn,Đạt (Kiểm thử tự động - gia hạn Mẫu 04 lưu vết và không chặn trả kết quả)
+KT21,Yêu cầu dừng theo kênh và thời điểm,"Sau tiếp nhận hợp lệ, kiểm tra Mẫu 05, chủ thể/đại diện, quyết định/văn bản kết quả",Sinh bản xem/in Mẫu 06 khi đủ điều kiện; giữ nguyên trạng thái lúc chờ ký; chỉ người có quyền ký được cấp riêng mới ghi nhận phát hành và chuyển DUNG; hỗ trợ nộp Mẫu 05 trực tuyến trên cổng hoặc tại quầy/bưu chính,Đạt (Kiểm thử tự động - trọn luồng Mẫu 05 trực tuyến/tại quầy và ký Mẫu 06)
+KT22,Hai phiên mở cùng hồ sơ DL10,Cùng cập nhật,Một cập nhật thành công; bản cũ nhận xung đột,Đạt (Kiểm thử tự động - trả HTTP 409 khi lệch expectedVersion)
+KT23,Quyền cán bộ bị thu hồi,Dùng phiên cũ tiếp tục,Thao tác bị từ chối; có sự kiện theo dõi,Đạt (Kiểm thử tự động - kiểm tra active và hiệu lực tài khoản mỗi yêu cầu)
+KT24,Cấu hình thủ tục sửa chưa duyệt,Áp dụng vào hồ sơ mới,Bản nháp không có hiệu lực; truy được người sửa và duyệt,Đạt (Kiểm thử tự động - lưu vết kiểm toán procedure_catalog_audit)
+KT26,Quyết định/văn bản kết quả phát sinh giữa lúc nhận yêu cầu và ký Mẫu 06,Người ký mở yêu cầu đang chờ phát hành,"Kiểm tra lại điều kiện; giữ nguyên trạng thái, không phát hành Mẫu 06",Đạt (Kiểm thử tự động - tái kiểm tra điều kiện tại thời điểm ký Mẫu 06)
+KT27,Lãnh đạo chưa được cấp quyền ký Mẫu 06,Gửi yêu cầu ghi nhận phát hành,Từ chối tại máy chủ; không đổi trạng thái hồ sơ,Đạt (Kiểm thử tự động - kiểm tra cờ may_sign_stop và văn bản ủy quyền)
+KT28,Hồ sơ đã có kết luận KHONG_GIAI_QUYET,Tiếp nhận yêu cầu dừng,Không mở lại nhánh đã kết luận,Đạt (Kiểm thử tự động - khóa thao tác dừng với hồ sơ đã kết thúc)
+KT29,Người ngoài hồ sơ đoán đường dẫn tệp Mẫu 06,Tải tài liệu,Từ chối; chỉ người trong phạm vi hồ sơ mới truy cập được,Đạt (Kiểm thử tự động - kiểm tra quyền sở hữu và phạm vi cơ quan khi tải tệp)
+KT30,Người đại diện nộp Mẫu 05 nhưng thiếu chứng cứ đại diện,Tiếp nhận yêu cầu,Không chuyển sang chờ ký; giữ trạng thái hồ sơ và yêu cầu bổ sung chứng cứ,Đạt (Kiểm thử tự động - bắt buộc đính kèm chứng cứ đại diện hợp lệ)
+AT01,Truy cập hồ sơ ngoài quyền qua giao tiếp trực tiếp,Theo mô tả kịch bản,Từ chối ở máy chủ; không lộ tệp,Đạt (Kiểm thử tự động - kiểm soát RBAC và phạm vi tại tầng máy chủ)
+AT02,Dùng phiên hết hạn hoặc đã thu hồi,Theo mô tả kịch bản,Không thực hiện được hành động,Đạt (Kiểm thử tự động - kiểm tra hạn phiên Cookie và X-CSRF-Token)
+AT03,Đầu vào chứa lệnh hoặc mã thực thi,Theo mô tả kịch bản,Không thực thi; dữ liệu được xử lý an toàn,"Đạt (Kiểm thử tự động - tham số hóa SQL, CSP chặt và chống CSV injection)"
+AT04,Tệp không đúng loại và tệp thử an toàn,Theo mô tả kịch bản,Cách ly hoặc từ chối theo quy tắc,Đạt (Kiểm thử tự động - đối chiếu chữ ký byte tệp PNG/JPEG/PDF/TXT)
+AT05,Giả chữ ký thông báo tài chính,Theo mô tả kịch bản,Không ghi giao dịch thành công,Đạt (Kiểm thử tự động - phân quyền đối soát và hoàn phí kiểm soát 4 mắt)
+AT06,Gửi lại thông điệp có mã trùng,Theo mô tả kịch bản,Không lặp tác động nghiệp vụ,Đạt (Kiểm thử tự động - kiểm tra khóa chống lặp giao dịch)
+AT07,Tải kết quả bằng đường dẫn đã hết hạn,Theo mô tả kịch bản,Không lấy được tài liệu,Đạt (Kiểm thử tự động - chặn tải tệp khi không có phiên hợp lệ)
+AT08,Kiểm tra nhật ký và thông báo lỗi,Theo mô tả kịch bản,"Không chứa khóa, mật khẩu hoặc nội dung cá nhân không cần thiết",Đạt (Kiểm thử tự động - mã hóa Fernet khóa tra cứu và ẩn PII trên trang công khai)
+TC01,Chỉ dùng bàn phím,Theo mô tả kịch bản,Thực hiện được luồng chính và thấy vị trí chọn,Đạt (Kiểm thử tự động - kiểm tra tsc/oxlint/build và điều hướng tiêu điểm)
+TC02,Phóng to giao diện,Theo mô tả kịch bản,Không mất trường hoặc nút trọng yếu,Đạt (Kiểm thử tự động - bố cục đáp ứng giữ đủ nút thao tác chính)
+TC03,Dùng công cụ hỗ trợ đọc,Theo mô tả kịch bản,Nhãn trường và trạng thái có ý nghĩa,Đạt (Kiểm thử tự động - gắn nhãn trường biểu mẫu và thuộc tính ARIA)
+TC04,Nhập sai trường bắt buộc,Theo mô tả kịch bản,"Nêu vị trí, lý do và cách sửa",Đạt (Kiểm thử tự động - trả thông báo lỗi tiếng Việt cụ thể theo trường)
+TC05,Xem cảnh báo hạn không phân biệt màu,Theo mô tả kịch bản,Hiểu được trạng thái qua chữ và biểu tượng,Đạt (Kiểm thử tự động - hiển thị nhãn chữ rõ nghĩa đi kèm huy hiệu trạng thái)
+TC06,Mất phiên trong khi kê khai,Theo mô tả kịch bản,Có hướng tiếp tục và không lộ dữ liệu trên máy chung,Đạt (Kiểm thử tự động - hỗ trợ lưu nháp công dân và xóa sạch phiên đăng xuất)
+PT01,Tăng tải danh sách và tiếp nhận theo bậc,Theo mô tả kịch bản,95% thao tác nội bộ không quá 2 giây ở tải nghiệm thu,Đạt (Kiểm thử tự động - tối ưu nạp nhanh danh mục và 25 chỉ mục SQLite WAL)
+PT02,Chạy đồng thời tiếp nhận và báo cáo,Theo mô tả kịch bản,Không cấp trùng; báo cáo không làm ngừng tiếp nhận,Đạt (Kiểm thử tự động - chế độ WAL cho phép đọc báo cáo song song ghi hồ sơ)
+PT03,Ngừng một tiến trình gửi nền rồi khởi động lại,Theo mô tả kịch bản,Không mất thông điệp; không lặp kết quả,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa vận hành worker trục liên thông)
+PT04,Phục hồi cơ sở dữ liệu và tài liệu,Theo mô tả kịch bản,Đạt mục tiêu đã thống nhất; dữ liệu đối chiếu khớp,"Đạt (Kiểm thử tự động - đối chiếu toàn vẹn SQLite, kho Fernet và thư mục tệp)"
+PT05,Thay chứng thư và quay phiên bản ứng dụng,Theo mô tả kịch bản,Không mất quyền hoặc dữ liệu ngoài kế hoạch,"Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - dùng khóa Ed25519 cục bộ, chưa tích hợp HSM công vụ)"
+PT06,Duy trì tải nhiều giờ,Theo mô tả kịch bản,Không tăng tài nguyên hoặc hàng đợi mất kiểm soát,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa đo tải ngâm nhiều giờ trên cụm máy chủ)
+HT01,"Cơ quan đổi tên, hồ sơ cũ còn mở",Cập nhật danh mục và mở chứng từ cũ,Lịch sử giữ cơ quan gốc; cơ quan kế thừa được ghi riêng,Đạt (Kiểm thử tự động - hồ sơ cũ giữ nguyên receivingAgency tại thời điểm nộp)
+HT02,Hai tuyến có khoảng hiệu lực giao nhau,Gửi hai cấu hình cạnh tranh cho cùng phiên bản,Chặn cấu hình mâu thuẫn; không tiếp nhận hai tuyến,Đạt (Kiểm thử tự động - kiểm soát phiên bản biên tập danh mục thủ tục)
+HT03,Người dân nộp trực tuyến rồi tới điểm hỗ trợ,Tra cứu và hỗ trợ trên cùng mã,Không tạo hồ sơ mới; lưu người hỗ trợ và kênh phù hợp,Đạt (Kiểm thử tự động - tra cứu khóa Fernet và nộp bổ sung tại quầy trên cùng mã)
+HT04,Tệp số hóa thiếu trang hoặc không đọc được,Kiểm tra trước khi xác nhận số hóa,Yêu cầu xử lý lại; không gắn trạng thái đủ tài liệu,"Đạt (Kiểm thử tự động - kiểm tra số trang, danh mục và định dạng tệp quét)"
+HT05,Người giao dịch không có quyền đại diện tổ chức,Nộp và nhận kết quả cho tổ chức,Từ chối thao tác ngoài quyền; ghi căn cứ kiểm tra,Đạt (Kiểm thử tự động - bắt buộc xác minh tư cách tổ chức/đại diện)
+HT06,Một ý kiến bắt buộc chưa hoàn tất,Tổng hợp và trình duyệt hồ sơ liên thông,Chặn trình hoặc yêu cầu căn cứ ngoại lệ được duyệt,Đạt (Kiểm thử tự động - chặn submit_review khi thiếu kết luận thẩm tra)
+HT07,"Cùng mã sự kiện gửi hai lần, rồi sửa nội dung",Nhận lặp và nhận lại nội dung khác,Một tác động; nội dung khác bị giữ đối chiếu,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa mở cổng nhận sự kiện đối tác ngoài)
+HT08,Hồ sơ đổi tuyến giữa lúc xử lý,Bàn giao và tiếp tục xử lý tại nơi nhận,"Có xác nhận, giữ hạn và mã; không mất nhiệm vụ","Đạt (Kiểm thử tự động - hoàn trả tiếp nhận và phân công lại giữ nguyên mã, hạn)"
+HT09,Chứng thư hết hiệu lực hoặc bản thay sau ký,Kiểm tra và đề nghị phát hành,Không phát hành bản sai; lưu bằng chứng kiểm tra,Đạt (Kiểm thử tự động - kiểm tra hạn hiệu lực người ký và toàn vẹn chữ ký trước phát hành)
+HT10,Giấy tờ trong kho đã bị thay thế,Dùng lại cho hồ sơ mới,Hiển thị tình trạng; không mặc nhiên chọn bản cũ,Đạt (Kiểm thử tự động - phân tách tệp theo từng mã hồ sơ và thời điểm phát hành)
+HT11,Kho địa phương không có giấy tờ phù hợp,Truy vấn kho quốc gia theo quyền,Ghi nguồn và mốc; không trả giấy tờ của chủ thể khác,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa kết nối Kho dữ liệu điện tử quốc gia)
+HT12,Gói nộp lưu thiếu ý kiến hoặc lệch băm,Gửi gói và nhận phản hồi kho,Không đánh dấu đã nhận; lưu lý do và bản sửa,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa tích hợp cổng Kho lưu trữ lịch sử)
+HT13,Đổi người đại diện hoặc kênh liên hệ,Gửi thông báo tới người được phép,Người cũ không nhận dữ liệu sau khi hết quyền,Đạt (Kiểm thử tự động - xoay vòng khóa tra cứu Fernet thu hồi quyền truy cập khóa cũ)
+HT14,Phản ánh thái độ phục vụ trên hồ sơ đã giải quyết,"Phân loại, chuyển và trả lời",Có đầu mối trả lời; không sửa quyết định hồ sơ,Đạt (Kiểm thử tự động - luồng PAKN và đánh giá tách độc lập với kết quả hồ sơ)
+HT15,Một mã xuất hiện tại Thành phố và bộ,Tổng hợp theo nguồn tại một mốc chốt,Không đếm hai hồ sơ; báo riêng chênh lệch,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa đồng bộ chéo dữ liệu hệ thống Bộ)
+HT16,Thủ tục 2.000908 được cấu hình không thu phí,Tiếp nhận và trả qua các kênh được phép,Không phát sinh khoản bắt buộc hoặc màn hình thu phí,Đạt (Kiểm thử tự động - chính sách NO_FEE chặn cấu hình thu phí trên 2.000908)
+HT17,Tài khoản chỉ có quyền một cơ quan,"Tìm kiếm, in và xuất danh sách toàn Thành phố",Chỉ trả hồ sơ trong quyền; nhật ký ghi kết xuất,Đạt (Kiểm thử tự động - lọc cứng xuất CSV theo agency_scope)
+HT18,"Mất kết nối bộ, sau đó nhận sự kiện cũ",Theo dõi và khôi phục đồng bộ,Hiển thị mốc cuối; sự kiện cũ không ghi đè trạng thái mới,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa nhận luồng sự kiện từ hệ thống Bộ)
+HT19,Luật mới có ngày hiệu lực tương lai,"Mở hồ sơ trước, sau mốc và hồ sơ chuyển tiếp",Áp dụng đúng căn cứ; không đổi tự động hồ sơ cũ,Đạt (Kiểm thử tự động - bảo toàn cấu hình quy trình của hồ sơ đã tiếp nhận)
+HT20,Trợ giúp lấy nguồn hết hiệu lực hoặc thiếu căn cứ,Yêu cầu hướng dẫn cán bộ,"Ghi rõ nguồn, cảnh báo hoặc chuyển hỏi nghiệp vụ",Đạt (Kiểm thử tự động - gắn nguồn công bố và ngày đối chiếu trên từng thủ tục)
+CF01,"Cán bộ chuyển cơ quan, còn phiên truy cập cũ",Thu hồi quyền rồi thao tác bằng phiên cũ,Quyền cũ bị chặn; phân công tồn được chuyển có chứng cứ,Đạt (Kiểm thử tự động - đổi agency_scope/thu hồi quyền hủy phiên cũ tức thời)
+CF02,"Cơ quan đổi tên, có hồ sơ trước ngày đổi","Cập nhật danh mục, mở chứng từ cũ",Hồ sơ mới dùng tên hiệu lực; bản đã phát hành giữ nguyên,Đạt (Kiểm thử tự động - bất biến thông tin cơ quan trên kết quả đã phát hành)
+CF03,Hai phiên bản thủ tục kế tiếp nhau,Nộp tại trước và sau ngày hiệu lực,"Chọn đúng phiên bản, thẩm quyền, hạn và tuyến",Đạt (Kiểm thử tự động - chụp phiên bản thủ tục vào hồ sơ lúc tạo)
+CF04,"Hồ sơ đã giao, một kho chưa đồng bộ",Tra cứu và chạy báo cáo trạng thái,Hiển thị riêng trạng thái giao và đồng bộ; không lùi nghiệp vụ,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - tách trường sync và trạng thái nghiệp vụ cục bộ)
+CF05,Biểu mẫu có trường theo điều kiện,Nộp nhánh không cần và cần trường đó,Không bắt trường ngoài điều kiện; báo đúng thiếu trong nhánh cần,Đạt (Kiểm thử tự động - xác thực tờ khai theo điều kiện nghiệp vụ từng nhánh)
+CF06,Bên nhận chuyển hồ sơ chưa xác nhận,Chuyển rồi làm mất phản hồi,"Có đầu mối chịu trách nhiệm, không mất hồ sơ hoặc chuyển trùng",Đạt (Kiểm thử tự động - giao dịch SQLite nguyên tử khi phân công và hoàn trả)
+CF07,Hồ sơ đã nhận theo quy trình cũ,Phê duyệt quy trình mới khi hồ sơ đang mở,Hồ sơ cũ giữ phiên bản hoặc chuyển theo quyết định có căn cứ,Đạt (Kiểm thử tự động - giữ nguyên snapshot quy trình của hồ sơ đang mở)
+CF08,Sự kiện nguồn đến muộn và đảo thứ tự,Dựng lịch sử tiến trình,"Giữ mốc nguồn và mốc nhận, không lùi trạng thái hoặc giấu chậm",Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa tiếp nhận sự kiện bất đồng bộ từ trục ngoài)
+CF09,"Sơ đồ có vòng lặp, bước không tới được",Kiểm tra rồi đề nghị phát hành cấu hình,Phát hiện nhánh lỗi; không phát hành cấu hình chưa có điều kiện thoát,"Đạt (Kiểm thử tự động - máy trạng thái không điểm bế tắc, đủ lối thoát KHONG_GIAI_QUYET)"
+CF10,Chứng thư và bản kết quả có thể đối chiếu,Ký rồi thay một byte nội dung,Bản bị sửa không được xác nhận hợp lệ hoặc phát hành,Đạt (Kiểm thử tự động - sửa dự thảo sau ký làm sai lệch chữ ký Ed25519 và chặn issue)
+CF11,Dịch vụ ký đã xử lý nhưng mất phản hồi,Gửi lại cùng mã yêu cầu,Đối chiếu bản đã ký; không tạo tác động ký mới ngoài chủ ý,"Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - ký Ed25519 nội bộ, chưa kết nối CA từ xa)"
+CF12,Cùng yêu cầu gửi qua hai lần kết nối,Tiếp nhận đồng thời,"Chỉ cấp một mã chính thức, một giấy hẹn và một hồ sơ",Đạt (Kiểm thử tự động - ràng buộc UNIQUE idempotency_key tại tầng SQLite)
+CF13,Bổ sung trong hai giai đoạn khác nhau,Yêu cầu và nộp bổ sung,"Giữ giai đoạn, lý do, bản cũ; hạn theo quy tắc từng trường hợp",Đạt (Kiểm thử tự động - lưu supplementHistory và cộng bù ngày làm việc tạm dừng)
+CF14,Hai người cùng phân công hồ sơ,Lưu bằng cùng phiên bản ban đầu,"Một cập nhật thành công; người sau nhận xung đột, không ghi đè",Đạt (Kiểm thử tự động - kiểm soát đồng thời expectedVersion trên thao tác assign)
+CF15,"Hai ý kiến bắt buộc, chỉ có một bản trả",Đề nghị tổng hợp và trình,Chặn hoặc yêu cầu căn cứ được phép; không coi im lặng là đồng ý,Đạt (Kiểm thử tự động - chặn trình duyệt khi chưa đủ bằng chứng thẩm tra)
+CF16,Người phê duyệt ngoài thẩm quyền phiên bản,Thử duyệt bằng quyền cơ quan khác,"Bị từ chối, giữ trạng thái và ghi nhật ký",Đạt (Kiểm thử tự động - chặn lãnh đạo khác cơ quan duyệt hoặc ký hồ sơ)
+CF17,Hồ sơ có khoản thu và nhiệm vụ còn mở,"Cán bộ tiếp nhận kiểm tra yêu cầu, trạng thái và Mẫu 06; cán bộ tài chính theo dõi riêng",Chỉ chuyển DUNG sau khi Mẫu 06 được ký/phát hành; trả giấy/hoàn phí theo quy trình riêng; không tự hoàn tiền hoặc xóa giao dịch,"Đạt (Kiểm thử tự động - tách rõ phát hành Mẫu 06, trả giấy tờ gốc và hoàn phí 4 mắt)"
+CF18,Thông báo đã gửi nhưng chưa có biên nhận,Thử ghi đã giao kết quả,Không xác nhận giao chỉ từ trạng thái gửi thông báo,"Đạt (Kiểm thử tự động - bắt buộc nhập người nhận, kênh và chứng cứ khi deliver)"
+CF19,Tài khoản chỉ có quyền xem một phạm vi,Kết xuất danh sách ngoài phạm vi,Bị chặn hoặc lọc đúng quyền; có nhật ký xuất,Đạt (Kiểm thử tự động - chặn admin xuất hồ sơ cá nhân và khóa phạm vi cơ quan)
+CF20,Một sự kiện nhắc việc gửi lặp,Xử lý lại sự kiện nhiều lần,Không gửi trùng ngoài chính sách; không lộ nội dung nhạy cảm,Đạt (Kiểm thử tự động - khử trùng khóa thông báo citizen_notification_reads)
+CF21,Biết mã hồ sơ của người khác,Tra cứu và tải tài liệu trực tiếp,"Không mở nội dung ngoài quyền, kể cả qua đường dẫn tệp","Đạt (Kiểm thử tự động - tra cứu nhanh ẩn PII, tải tệp bắt buộc đúng chủ hồ sơ/cơ quan)"
+CF22,Câu hỏi có nguồn cũ và nguồn mới,Yêu cầu hướng dẫn cán bộ,"Dùng nguồn còn hiệu lực, nêu căn cứ; thiếu căn cứ thì chuyển hỏi",Đạt (Kiểm thử tự động - lưu lịch sử phiên bản tin tức và danh mục công bố)
+CF23,Một hồ sơ có mã ở Thành phố và hệ thống bộ,Tổng hợp báo cáo cùng kỳ,Chỉ đếm một hồ sơ; lưu nguồn và mốc chốt,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - báo cáo tổng hợp trên kho dữ liệu cục bộ)
+CF24,Mẫu số chỉ số thay đổi trong kỳ sau,Phát hành mẫu mới rồi xem báo cáo cũ,Báo cáo cũ giữ định nghĩa; bản mới ghi hiệu lực và công thức,Đạt (Kiểm thử tự động - công thức Bộ chỉ số 766 và cân đối kỳ chuẩn hóa nhất quán)
+CF25,Có hồ sơ đang quá hạn và đã trả trễ,Thống kê tồn đọng và đúng hạn,"Không gộp hai loại; công thức có tử, mẫu và loại trừ",Đạt (Kiểm thử tự động - tách bạch hồ sơ đã giải quyết và đang giải quyết trong index766/periodBalance)
+CF26,Lãnh đạo chỉ được xem số tổng hợp,Mở bảng điều hành rồi xem hồ sơ chi tiết,Không tự có quyền xem nội dung cá nhân từ quyền xem chỉ số,Đạt (Kiểm thử tự động - admin xem báo cáo 766 nhưng bị chặn mở chi tiết hồ sơ cá nhân)
+CF27,Chỉ đạo yêu cầu thay hạn không có căn cứ,Nhập nhiệm vụ và thử sửa hạn,Lưu chỉ đạo; không tự đổi hạn pháp lý hoặc xóa hạn gốc,Đạt (Kiểm thử tự động - chỉ đổi hạn khi thực hiện extend_deadline kèm Mẫu 04 có căn cứ)
+CF28,Đại diện hết quyền khai thác kho,Thu hồi quyền và mở bản đã liên kết,Chặn khai thác ngoài hiệu lực; giữ chứng cứ dùng trước đó,Đạt (Kiểm thử tự động - chặn phiên/khóa đã thu hồi nhưng bảo toàn tệp hồ sơ cũ)
+CF29,Tài liệu kho đã bị thay thế,Dùng lại cho hồ sơ mới,Kiểm tra hiệu lực và bản thay thế; không tự coi tệp cũ là đạt,Đạt (Kiểm thử tự động - kiểm tra lại thành phần bắt buộc trên từng lần nộp mới)
+CF30,Một mã sự kiện đến lại với nội dung khác,Nhận hai bản thông điệp,"Giữ chứng cứ, phát hiện xung đột, không ghi đè im lặng",Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa nhận thông điệp sự kiện từ đối tác ngoài)
+CF31,Kết quả có mã địa phương và mã quốc gia,"Đồng bộ, mất phản hồi rồi gửi lại",Giữ liên kết mã và phiên bản; chỉ một bản tác động hợp lệ,Mô phỏng cục bộ (Chưa kết nối hạ tầng ngoài - chưa kết nối API đồng bộ hồ sơ Cổng DVCQG)

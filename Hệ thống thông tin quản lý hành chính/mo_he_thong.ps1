@@ -1,9 +1,9 @@
-﻿$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
-$url = 'http://127.0.0.1:8766/'
+$port = if ($env:HANOI_SERVICES_PORT) { [int]$env:HANOI_SERVICES_PORT } else { 8766 }
+$url = "http://127.0.0.1:$port/"
 $launcher = Join-Path $root 'run.bat'
-$port = 8766
 
 function Test-SystemReady {
     try {

@@ -1,8 +1,11 @@
-import { Fragment, useCallback, useEffect, useState, type FormEvent } from 'react'
+import { Fragment, useCallback, useEffect, useState, type FormEvent, type KeyboardEvent } from 'react'
+import type { ApiRequest, Procedure } from './types'
 
-type Request = <T>(path: string, body?: unknown) => Promise<T>
-type Person = { role: string; agencyScope?: string }
-type Procedure = { code: string; name: string; submissionEnabled?: boolean; counterEnabled?: boolean }
+type Person = {
+  role: string
+  agencyScope?: string
+}
+
 type DeskRecord = {
   code: string
   agency: string
@@ -74,6 +77,28 @@ const nextStatuses: Record<string, string[]> = {
   CHECKED_IN: ['COMPLETED'],
 }
 
+function isAbortError(reason: unknown): boolean {
+  return reason instanceof DOMException && reason.name === 'AbortError'
+}
+
+function handleTabArrows<T extends string>(
+  event: KeyboardEvent<HTMLDivElement>,
+  tabs: T[],
+  current: T,
+  onSelect: (next: T) => void,
+) {
+  if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+  const index = tabs.indexOf(current)
+  if (index === -1 || tabs.length < 2) return
+  event.preventDefault()
+  const delta = event.key === 'ArrowRight' ? 1 : -1
+  const nextIndex = (index + delta + tabs.length) % tabs.length
+  const nextTab = tabs[nextIndex]
+  onSelect(nextTab)
+  const buttons = event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]')
+  buttons[nextIndex]?.focus()
+}
+
 function DeskRecordTableRow({
   record,
   appointment,
@@ -84,7 +109,7 @@ function DeskRecordTableRow({
   record: DeskRecord
   appointment: boolean
   canEdit: boolean
-  request: Request
+  request: ApiRequest
   onChanged: () => Promise<void>
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -93,7 +118,9 @@ function DeskRecordTableRow({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const options = nextStatuses[record.status] || []
-  const closed = !canEdit || (appointment ? !options.length : ['REPLIED', 'DA_TRA_LOI', 'CLOSED'].includes(record.status))
+  const closed =
+    !canEdit ||
+    (appointment ? !options.length : ['REPLIED', 'DA_TRA_LOI', 'CLOSED'].includes(record.status))
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -129,6 +156,7 @@ function DeskRecordTableRow({
             </span>
           </div>
         </td>
+
         {appointment ? (
           <>
             <td data-label="Lịch hẹn & Số thứ tự">
@@ -142,13 +170,20 @@ function DeskRecordTableRow({
             </td>
             <td data-label="Thủ tục & Cơ quan">
               <div className="account-cell-user">
-                <b>{[record.procedure_code, record.procedure_name].filter(Boolean).join(' · ') || 'Hướng dẫn chung'}</b>
+                <b>
+                  {[record.procedure_code, record.procedure_name].filter(Boolean).join(' · ') ||
+                    'Hướng dẫn chung'}
+                </b>
                 <span className="account-cell-email">{record.agency}</span>
               </div>
             </td>
             <td data-label="Nội dung & Ghi chú">
               <div className="desk-cell-notes">
-                {record.note ? <p>{record.note}</p> : <span className="account-cell-email">Không có ghi chú ban đầu</span>}
+                {record.note ? (
+                  <p>{record.note}</p>
+                ) : (
+                  <span className="account-cell-email">Không có ghi chú ban đầu</span>
+                )}
                 {record.counter_note && (
                   <small className="desk-reply-note">
                     <b>Ghi chú quầy:</b> {record.counter_note}
@@ -183,11 +218,13 @@ function DeskRecordTableRow({
             </td>
           </>
         )}
+
         <td data-label="Trạng thái">
           <span className={`request-status ${statusBadgeClass[record.status] || ''}`}>
             {statusNames[record.status] || record.status}
           </span>
         </td>
+
         <td className="col-actions" data-label="Thao tác">
           {!closed ? (
             <button
@@ -206,6 +243,7 @@ function DeskRecordTableRow({
           )}
         </td>
       </tr>
+
       {expanded && !closed && (
         <tr className="account-edit-row">
           <td colSpan={6}>
@@ -215,15 +253,24 @@ function DeskRecordTableRow({
                   {appointment ? `Xử lý lịch hẹn ${record.code}` : `Phản hồi kiến nghị ${record.code}`} ·{' '}
                   {record.citizen_name || record.sender_name || 'Công dân'}
                 </b>
-                <button type="button" className="text-button" onClick={() => setExpanded(false)}>
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => setExpanded(false)}
+                >
                   Thu gọn
                 </button>
               </div>
+
               <div className="form-grid account-form">
                 {appointment && (
                   <label>
-                    Trạng thái chuyển tiếp
-                    <select required value={status} onChange={event => setStatus(event.target.value)}>
+                    <span>Trạng thái chuyển tiếp</span>
+                    <select
+                      required
+                      value={status}
+                      onChange={event => setStatus(event.target.value)}
+                    >
                       <option value="">Chọn trạng thái xử lý</option>
                       {options.map(value => (
                         <option key={value} value={value}>
@@ -233,8 +280,13 @@ function DeskRecordTableRow({
                     </select>
                   </label>
                 )}
+
                 <label className="span-two">
-                  {appointment ? 'Ghi chú tiếp đón / hướng dẫn tại quầy' : 'Nội dung trả lời chính thức của cơ quan'}
+                  <span>
+                    {appointment
+                      ? 'Ghi chú tiếp đón / hướng dẫn tại quầy'
+                      : 'Nội dung trả lời chính thức của cơ quan'}
+                  </span>
                   <textarea
                     required
                     minLength={8}
@@ -249,17 +301,27 @@ function DeskRecordTableRow({
                     onChange={event => setNote(event.target.value)}
                   />
                 </label>
+
                 {error && (
                   <p className="form-error span-two" role="alert">
                     {error}
                   </p>
                 )}
+
                 <div className="form-actions span-two">
-                  <button type="button" className="button secondary" onClick={() => setExpanded(false)}>
+                  <button
+                    type="button"
+                    className="button secondary"
+                    onClick={() => setExpanded(false)}
+                  >
                     Hủy
                   </button>
                   <button className="button primary" disabled={busy}>
-                    {busy ? 'Đang lưu…' : appointment ? 'Lưu trạng thái lịch hẹn' : 'Gửi nội dung phản hồi'}
+                    {busy
+                      ? 'Đang lưu…'
+                      : appointment
+                        ? 'Lưu trạng thái lịch hẹn'
+                        : 'Gửi nội dung phản hồi'}
                   </button>
                 </div>
               </div>
@@ -279,7 +341,7 @@ export function AdministrativeServiceDesk({
 }: {
   user: Person
   procedures: Procedure[]
-  request: Request
+  request: ApiRequest
   onCaseCreated?: (caseRecord: any) => Promise<void> | void
 }) {
   const canIntake = user.role === 'intake'
@@ -301,39 +363,41 @@ export function AdministrativeServiceDesk({
   const eligible = ['intake', 'leader', 'admin'].includes(user.role)
   const canEdit = ['intake', 'leader'].includes(user.role)
 
-  const load = useCallback(async () => {
-    if (!eligible) return
-    const result = await request<{
-      appointments: DeskRecord[]
-      feedback: DeskRecord[]
-      summary?: { appointments?: Record<string, number>; feedback?: Record<string, number> }
-    }>('/api/service-desk')
-    setAppointments(result.appointments || [])
-    setFeedback(result.feedback || [])
-    setSummary(result.summary || null)
-  }, [eligible, request])
+  const load = useCallback(
+    async (signal?: AbortSignal) => {
+      if (!eligible) return
+      const result = await request<{
+        appointments: DeskRecord[]
+        feedback: DeskRecord[]
+        summary?: { appointments?: Record<string, number>; feedback?: Record<string, number> }
+      }>('/api/service-desk', undefined, signal)
+      if (signal?.aborted) return
+      setAppointments(result.appointments || [])
+      setFeedback(result.feedback || [])
+      setSummary(result.summary || null)
+    },
+    [eligible, request],
+  )
 
   useEffect(() => {
     if (!eligible) return
-    let active = true
-    void request<{
+    const controller = new AbortController()
+    request<{
       appointments: DeskRecord[]
       feedback: DeskRecord[]
       summary?: { appointments?: Record<string, number>; feedback?: Record<string, number> }
-    }>('/api/service-desk')
+    }>('/api/service-desk', undefined, controller.signal)
       .then(result => {
-        if (active) {
-          setAppointments(result.appointments || [])
-          setFeedback(result.feedback || [])
-          setSummary(result.summary || null)
-        }
+        if (controller.signal.aborted) return
+        setAppointments(result.appointments || [])
+        setFeedback(result.feedback || [])
+        setSummary(result.summary || null)
       })
       .catch(cause => {
-        if (active) setError(cause instanceof Error ? cause.message : 'Không tải được dữ liệu quầy Một cửa.')
+        if (controller.signal.aborted || isAbortError(cause)) return
+        setError(cause instanceof Error ? cause.message : 'Không tải được dữ liệu quầy Một cửa.')
       })
-    return () => {
-      active = false
-    }
+    return () => controller.abort()
   }, [eligible, request])
 
   async function create(event: FormEvent<HTMLFormElement>) {
@@ -366,20 +430,34 @@ export function AdministrativeServiceDesk({
   if (!eligible) return null
 
   const pendingAppointments = appointments.filter(item =>
-    ['BOOKED', 'DA_DAT', 'CHO_XAC_NHAN', 'CONFIRMED', 'DA_XAC_NHAN', 'CHECKED_IN'].includes(item.status),
+    ['BOOKED', 'DA_DAT', 'CHO_XAC_NHAN', 'CONFIRMED', 'DA_XAC_NHAN', 'CHECKED_IN'].includes(
+      item.status,
+    ),
   ).length
   const pendingFeedback = feedback.filter(
     item => !['REPLIED', 'DA_TRA_LOI', 'CLOSED'].includes(item.status),
   ).length
 
+  const availableTabs: ('intake' | 'appointments' | 'feedback')[] = canIntake
+    ? ['intake', 'appointments', 'feedback']
+    : ['appointments', 'feedback']
+
   return (
     <div className="service-desk-workspace">
-      <div className="staff-module-tabs" role="tablist" aria-label="Phân hệ Quầy một cửa">
+      <div
+        className="staff-module-tabs"
+        role="tablist"
+        aria-label="Phân hệ Quầy một cửa"
+        onKeyDown={event => handleTabArrows(event, availableTabs, activeTab, setActiveTab)}
+      >
         {canIntake && (
           <button
             type="button"
+            id="desk-tab-intake"
             role="tab"
+            tabIndex={activeTab === 'intake' ? 0 : -1}
             aria-selected={activeTab === 'intake'}
+            aria-controls="desk-panel-intake"
             className={`staff-module-tab${activeTab === 'intake' ? ' active' : ''}`}
             onClick={() => setActiveTab('intake')}
           >
@@ -388,23 +466,29 @@ export function AdministrativeServiceDesk({
         )}
         <button
           type="button"
+          id="desk-tab-appointments"
           role="tab"
+          tabIndex={activeTab === 'appointments' ? 0 : -1}
           aria-selected={activeTab === 'appointments'}
+          aria-controls="desk-panel-appointments"
           className={`staff-module-tab${activeTab === 'appointments' ? ' active' : ''}`}
           onClick={() => setActiveTab('appointments')}
         >
           <span>Lịch hẹn công dân</span>
-          <b>{pendingAppointments || appointments.length}</b>
+          <b className="tabular-nums">{pendingAppointments || appointments.length}</b>
         </button>
         <button
           type="button"
+          id="desk-tab-feedback"
           role="tab"
+          tabIndex={activeTab === 'feedback' ? 0 : -1}
           aria-selected={activeTab === 'feedback'}
+          aria-controls="desk-panel-feedback"
           className={`staff-module-tab${activeTab === 'feedback' ? ' active' : ''}`}
           onClick={() => setActiveTab('feedback')}
         >
           <span>Phản ánh, kiến nghị</span>
-          <b>{pendingFeedback || feedback.length}</b>
+          <b className="tabular-nums">{pendingFeedback || feedback.length}</b>
         </button>
         <div className="staff-module-tabs-end">
           <button
@@ -425,11 +509,16 @@ export function AdministrativeServiceDesk({
           {error}
         </p>
       )}
+
       {notice && (
         <div className="citizen-success service-desk-banner" role="status">
           <span>{notice}</span>
           {createdCase && onCaseCreated && (
-            <button type="button" className="button primary compact-btn" onClick={() => void onCaseCreated(createdCase)}>
+            <button
+              type="button"
+              className="button primary compact-btn"
+              onClick={() => void onCaseCreated(createdCase)}
+            >
               Mở hồ sơ {createdCase.code} →
             </button>
           )}
@@ -460,16 +549,23 @@ export function AdministrativeServiceDesk({
       )}
 
       {activeTab === 'intake' && canIntake && (
-        <section className="panel service-desk-intake">
+        <section
+          id="desk-panel-intake"
+          role="tabpanel"
+          aria-labelledby="desk-tab-intake"
+          className="panel service-desk-intake"
+        >
           <div className="panel-title">
             <div>
               <h2>Lập hồ sơ tiếp nhận trực tiếp tại quầy Một cửa</h2>
-              <p>Đối chiếu giấy tờ tùy thân và kiểm đếm thành phần hồ sơ giấy trước khi ghi nhận vào hệ thống.</p>
+              <p>
+                Đối chiếu giấy tờ tùy thân và kiểm đếm thành phần hồ sơ giấy trước khi ghi nhận vào hệ thống.
+              </p>
             </div>
           </div>
           <form className="form-grid account-form" onSubmit={create}>
             <label className="span-two">
-              Thủ tục hành chính
+              <span>Thủ tục hành chính</span>
               <select name="procedureCode" required>
                 <option value="">Chọn thủ tục tiếp nhận tại quầy</option>
                 {procedures
@@ -482,7 +578,7 @@ export function AdministrativeServiceDesk({
               </select>
             </label>
             <label>
-              Cơ quan tiếp nhận
+              <span>Cơ quan tiếp nhận</span>
               <input
                 name="receivingAgency"
                 required
@@ -492,34 +588,58 @@ export function AdministrativeServiceDesk({
               />
             </label>
             <label>
-              Loại chủ thể nộp
+              <span>Loại chủ thể nộp</span>
               <select name="applicantType">
                 <option value="citizen">Cá nhân / Công dân</option>
                 <option value="organization">Tổ chức / Doanh nghiệp</option>
               </select>
             </label>
             <label>
-              Họ và tên / Tên tổ chức
-              <input name="applicantName" required minLength={2} maxLength={150} placeholder="Nguyễn Văn A" />
+              <span>Họ và tên / Tên tổ chức</span>
+              <input
+                name="applicantName"
+                required
+                minLength={2}
+                maxLength={150}
+                placeholder="Nguyễn Văn A"
+              />
             </label>
             <label>
-              Số CCCD / Mã số định danh / MST
-              <input name="citizenId" required minLength={3} maxLength={40} placeholder="00109xxxxxxx" />
+              <span>Số CCCD / Mã số định danh / MST</span>
+              <input
+                name="citizenId"
+                required
+                minLength={3}
+                maxLength={40}
+                placeholder="00109xxxxxxx"
+              />
             </label>
             <label>
-              Số điện thoại liên hệ
-              <input name="applicantPhone" type="tel" required minLength={8} maxLength={40} placeholder="09xxxxxxxx" />
+              <span>Số điện thoại liên hệ</span>
+              <input
+                name="applicantPhone"
+                type="tel"
+                required
+                minLength={8}
+                maxLength={40}
+                placeholder="09xxxxxxxx"
+              />
             </label>
             <label>
-              Địa chỉ Email (nếu có)
-              <input name="applicantEmail" type="email" maxLength={254} placeholder="congdan@example.com" />
+              <span>Địa chỉ Email (nếu có)</span>
+              <input
+                name="applicantEmail"
+                type="email"
+                maxLength={254}
+                placeholder="congdan@example.com"
+              />
             </label>
             <label className="span-two">
-              Địa chỉ thường trú / Trụ sở
+              <span>Địa chỉ thường trú / Trụ sở</span>
               <input name="applicantAddress" required minLength={3} maxLength={300} />
             </label>
             <label className="span-two">
-              Nội dung yêu cầu giải quyết
+              <span>Nội dung yêu cầu giải quyết</span>
               <textarea
                 name="requestSummary"
                 required
@@ -530,7 +650,7 @@ export function AdministrativeServiceDesk({
               />
             </label>
             <label className="span-two">
-              Danh mục giấy tờ bản chính / bản sao đã nhận tại quầy
+              <span>Danh mục giấy tờ bản chính / bản sao đã nhận tại quầy</span>
               <textarea
                 name="paperOriginals"
                 required
@@ -541,7 +661,10 @@ export function AdministrativeServiceDesk({
               />
             </label>
             <label className="span-two check-row">
-              <input type="checkbox" name="identityVerified" required /> Đã đối chiếu giấy tờ tùy thân người nộp và kiểm đếm đủ thành phần hồ sơ giấy
+              <input type="checkbox" name="identityVerified" required />
+              <span>
+                Đã đối chiếu giấy tờ tùy thân người nộp và kiểm đếm đủ thành phần hồ sơ giấy
+              </span>
             </label>
             <div className="form-actions span-two">
               <button className="button primary" disabled={busy}>
@@ -553,7 +676,12 @@ export function AdministrativeServiceDesk({
       )}
 
       {activeTab === 'appointments' && (
-        <section className="panel">
+        <section
+          id="desk-panel-appointments"
+          role="tabpanel"
+          aria-labelledby="desk-tab-appointments"
+          className="panel"
+        >
           <div className="panel-title">
             <div>
               <h2>Danh sách lịch hẹn làm việc tại cơ quan ({appointments.length})</h2>
@@ -562,7 +690,7 @@ export function AdministrativeServiceDesk({
             <span className="count-chip">{pendingAppointments} lịch đang mở</span>
           </div>
           {appointments.length ? (
-            <div className="data-table-wrap">
+            <div className="table-scroll data-table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -582,20 +710,27 @@ export function AdministrativeServiceDesk({
                       appointment
                       canEdit={canEdit}
                       request={request}
-                      onChanged={load}
+                      onChanged={() => load()}
                     />
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <div className="empty-state compact-empty">Chưa có lịch hẹn công dân trong phạm vi cơ quan.</div>
+            <div className="empty-state compact-empty">
+              Chưa có lịch hẹn công dân trong phạm vi cơ quan.
+            </div>
           )}
         </section>
       )}
 
       {activeTab === 'feedback' && (
-        <section className="panel">
+        <section
+          id="desk-panel-feedback"
+          role="tabpanel"
+          aria-labelledby="desk-tab-feedback"
+          className="panel"
+        >
           <div className="panel-title">
             <div>
               <h2>Phản ánh, kiến nghị gửi đến cơ quan ({feedback.length})</h2>
@@ -604,7 +739,7 @@ export function AdministrativeServiceDesk({
             <span className="count-chip">{pendingFeedback} chờ phản hồi</span>
           </div>
           {feedback.length ? (
-            <div className="data-table-wrap">
+            <div className="table-scroll data-table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -624,14 +759,16 @@ export function AdministrativeServiceDesk({
                       appointment={false}
                       canEdit={canEdit}
                       request={request}
-                      onChanged={load}
+                      onChanged={() => load()}
                     />
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <div className="empty-state compact-empty">Chưa có phản ánh, kiến nghị trong phạm vi cơ quan.</div>
+            <div className="empty-state compact-empty">
+              Chưa có phản ánh, kiến nghị trong phạm vi cơ quan.
+            </div>
           )}
         </section>
       )}
@@ -639,23 +776,45 @@ export function AdministrativeServiceDesk({
   )
 }
 
-export function PublicAdministrativeServices({ request }: { request: Request }) {
-  const [profile, setProfile] = useState<{ name: string; phone: string; email: string } | null>(null)
-  useEffect(() => {
-    let active = true
-    request<{ profile: { name: string; phone: string; email: string } }>('/api/citizen/profile').then(result => { if (active) setProfile(result.profile) }).catch(() => {})
-    return () => { active = false }
-  }, [request])
-  const [kind, setKind] = useState(() => new URLSearchParams(location.search).get('tab') === 'phan-anh' ? 'pakn' : 'appointments')
+export function PublicAdministrativeServices({ request }: { request: ApiRequest }) {
+  const [profile, setProfile] = useState<{ name: string; phone: string; email: string } | null>(
+    null,
+  )
+  const [kind, setKind] = useState(() =>
+    new URLSearchParams(location.search).get('tab') === 'phan-anh' ? 'pakn' : 'appointments',
+  )
   const [agencies, setAgencies] = useState<string[]>([])
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+
   useEffect(() => {
-    void request<{ agencies: string[] }>('/api/public/agencies')
-      .then(r => setAgencies(r.agencies))
-      .catch(cause => setError(String(cause)))
+    const controller = new AbortController()
+    request<{ profile: { name: string; phone: string; email: string } }>(
+      '/api/citizen/profile',
+      undefined,
+      controller.signal,
+    )
+      .then(result => {
+        if (!controller.signal.aborted) setProfile(result.profile)
+      })
+      .catch(() => {})
+    return () => controller.abort()
   }, [request])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    request<{ agencies: string[] }>('/api/public/agencies', undefined, controller.signal)
+      .then(result => {
+        if (!controller.signal.aborted) setAgencies(result.agencies)
+      })
+      .catch(cause => {
+        if (controller.signal.aborted || isAbortError(cause)) return
+        setError(cause instanceof Error ? cause.message : String(cause))
+      })
+    return () => controller.abort()
+  }, [request])
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = event.currentTarget
@@ -669,7 +828,9 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
         values,
       )
       const queueInfo = result.queueNumber ? ` Số thứ tự quầy: ${result.queueNumber}.` : ''
-      setNotice(`${result.message} Mã theo dõi: ${result.code}.${queueInfo} Giữ mã này để liên hệ cơ quan xử lý.`)
+      setNotice(
+        `${result.message} Mã theo dõi: ${result.code}.${queueInfo} Giữ mã này để liên hệ cơ quan xử lý.`,
+      )
       form.reset()
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Chưa gửi được thông tin.')
@@ -677,6 +838,7 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
       setBusy(false)
     }
   }
+
   return (
     <section className="citizen-service-card">
       <div className="panel">
@@ -700,30 +862,49 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
             </button>
           ))}
         </div>
+
         <form className="citizen-action-form" key={kind} onSubmit={submit}>
-          <>
-            <label className="citizen-field">
-              Họ và tên
-              <input name="name" defaultValue={profile?.name || ''} autoComplete="name" required minLength={2} maxLength={150} />
-            </label>
-            <label className="citizen-field">
-              Cơ quan
-              <select name="agency" required>
-                <option value="">Chọn cơ quan</option>
-                {agencies.map(a => (
-                  <option key={a}>{a}</option>
-                ))}
-              </select>
-            </label>
-          </>
           <label className="citizen-field">
-            Số điện thoại
-            <input name="phone" type="tel" defaultValue={profile?.phone || ''} autoComplete="tel" required minLength={8} maxLength={40} />
+            <span>Họ và tên</span>
+            <input
+              name="name"
+              defaultValue={profile?.name || ''}
+              autoComplete="name"
+              required
+              minLength={2}
+              maxLength={150}
+            />
           </label>
+
+          <label className="citizen-field">
+            <span>Cơ quan</span>
+            <select name="agency" required>
+              <option value="">Chọn cơ quan</option>
+              {agencies.map(agency => (
+                <option key={agency} value={agency}>
+                  {agency}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="citizen-field">
+            <span>Số điện thoại</span>
+            <input
+              name="phone"
+              type="tel"
+              defaultValue={profile?.phone || ''}
+              autoComplete="tel"
+              required
+              minLength={8}
+              maxLength={40}
+            />
+          </label>
+
           {kind === 'appointments' && (
             <>
               <label className="citizen-field">
-                Mã thủ tục
+                <span>Mã thủ tục</span>
                 <input
                   name="procedureCode"
                   required
@@ -732,43 +913,56 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
                 />
               </label>
               <label className="citizen-field">
-                Ngày hẹn
+                <span>Ngày hẹn</span>
                 <input name="date" type="date" required />
               </label>
               <label className="citizen-field">
-                Khung giờ
+                <span>Khung giờ</span>
                 <select name="timeSlot" required>
-                  {['08:00-09:00', '09:00-10:00', '10:00-11:00', '14:00-15:00', '15:00-16:00'].map(slot => (
-                    <option key={slot}>{slot}</option>
-                  ))}
+                  {['08:00-09:00', '09:00-10:00', '10:00-11:00', '14:00-15:00', '15:00-16:00'].map(
+                    slot => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    ),
+                  )}
                 </select>
               </label>
               <label className="citizen-field">
-                Nội dung cần hướng dẫn
+                <span>Nội dung cần hướng dẫn</span>
                 <textarea name="note" rows={3} maxLength={1000} />
               </label>
             </>
           )}
+
           {kind === 'pakn' && (
             <>
               <label className="citizen-field">
-                Email
-                <input name="email" defaultValue={profile?.email || ''} autoComplete="email" type="email" maxLength={254} />
+                <span>Email</span>
+                <input
+                  name="email"
+                  defaultValue={profile?.email || ''}
+                  autoComplete="email"
+                  type="email"
+                  maxLength={254}
+                />
               </label>
               <label className="citizen-field">
-                Tiêu đề
+                <span>Tiêu đề</span>
                 <input name="title" required minLength={8} maxLength={180} />
               </label>
               <label className="citizen-field">
-                Nội dung
+                <span>Nội dung</span>
                 <textarea name="content" required minLength={20} maxLength={4000} rows={5} />
               </label>
             </>
           )}
+
           <button className="button primary" disabled={busy}>
             {busy ? 'Đang xử lý…' : 'Gửi thông tin'}
           </button>
         </form>
+
         {error && (
           <p className="form-error" role="alert">
             {error}
@@ -779,6 +973,7 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
             {notice}
           </p>
         )}
+
         <p className="citizen-service-existing-track">
           Muốn xem tiến độ hồ sơ đã nộp? <a href="/tra-cuu-ho-so">Đến trang Tra cứu hồ sơ</a>.
         </p>
@@ -786,3 +981,5 @@ export function PublicAdministrativeServices({ request }: { request: Request }) 
     </section>
   )
 }
+
+export default AdministrativeServiceDesk
