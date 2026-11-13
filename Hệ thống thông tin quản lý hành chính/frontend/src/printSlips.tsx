@@ -17,8 +17,8 @@ export function QrCodeBadge({ code, size = 76 }: { code: string; size?: number }
         <rect
           width={viewSize}
           height={viewSize}
-          fill="#ffffff"
-          stroke="#d5dfec"
+          fill="var(--color-bg-surface)"
+          stroke="var(--color-border-default)"
           strokeWidth="0.6"
         />
         {matrix.map((row, r) =>
@@ -30,16 +30,16 @@ export function QrCodeBadge({ code, size = 76 }: { code: string; size?: number }
                 y={r + 4}
                 width="1"
                 height="1"
-                fill="#1b365d"
+                fill="var(--color-brand-primary)"
               />
             ) : null,
           ),
         )}
       </svg>
       <div className="qr-verification-meta">
-        <small>MÃ TRA CỨU TRỰC TUYẾN</small>
+        <span>Mã tra cứu trực tuyến</span>
         <b className="tabular-nums">{code}</b>
-        <span>/tra-cuu-ho-so?code={code}</span>
+        <small className="tabular-nums">/tra-cuu-ho-so?code={code}</small>
       </div>
     </div>
   )

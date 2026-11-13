@@ -1,21 +1,48 @@
 import {
+  Activity,
+  BarChart3,
+  BookOpenCheck,
+  CalendarCheck2,
+  CheckSquare,
+  CreditCard,
+  ExternalLink,
+  HelpCircle,
+  Inbox,
+  Info,
+  KeyRound,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Newspaper,
+  RefreshCw,
+  ShieldCheck,
+  Star,
+  Users,
+  X,
+} from 'lucide-react'
+import {
   Suspense,
   lazy,
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type FormEvent,
-  type ReactNode,
 } from 'react'
 import './App.css'
 import './StaffProcedureCatalog.css'
 import { Index766Panel, PeriodBalancePanel } from './analytics766'
+import { CitizenReceiptView, CitizenTrackingPage } from './CitizenTracking'
 import {
-  CitizenReceiptView,
-  CitizenTrackingPage,
-  PublicProcedureSearch,
-} from './CitizenTracking'
+  CivicShell,
+  MetricCard,
+  ModalDialog,
+  PanelHeading,
+  SLABadge,
+  SkipLink,
+  StatusTag,
+} from './design-system'
 import { InformationHome } from './InformationHome'
 import {
   CLOSED_STATUSES,
@@ -23,7 +50,6 @@ import {
   computeIndex766,
   computePeriodBalance,
   daysUntil,
-  dueText,
   encodeFile,
   getActions,
   handleTabArrows,
@@ -36,7 +62,6 @@ import {
 } from './portalUtils'
 import { ReportExportButtons } from './ReportExport'
 import { readCasesReport } from './reportExportUtils'
-import { CaseDetail } from './StaffCaseDetail'
 import {
   CITIZEN_UPLOAD_LIMIT_TEXT,
   type Bootstrap,
@@ -48,6 +73,9 @@ import {
   type User,
 } from './types'
 
+const LazyCaseDetail = lazy(() =>
+  import('./StaffCaseDetail').then(mod => ({ default: mod.CaseDetail })),
+)
 const LazyCitizenApplicationForm = lazy(() => import('./CitizenSubmission'))
 const LazyCitizenProfilePage = lazy(() => import('./CitizenProfile'))
 const LazyCitizenWorkspace = lazy(() => import('./CitizenWorkspace'))
@@ -87,8 +115,6 @@ const LazyServiceConnections = lazy(() =>
   import('./StaffAdminModules').then(mod => ({ default: mod.ServiceConnections })),
 )
 
-const NATIONAL_PORTAL = 'https://dichvucong.gov.vn/'
-const CENTER_HOME = 'https://ttpvhcc.hanoi.gov.vn/trang-chu'
 const CITY_SUPPORT = 'https://ttpvhcc.hanoi.gov.vn/'
 const RECEIPT_STORAGE_KEY = 'hanoiCitizenReceipt'
 
@@ -108,6 +134,12 @@ const QUEUE_FILTERS = [
   { key: 'SUPPLEMENT', label: 'Chờ bổ sung', statuses: ['CHO_BO_SUNG'] },
   { key: 'CLOSED', label: 'Đã kết thúc', statuses: [...CLOSED_STATUSES] },
 ]
+
+const STAFF_DEMO_ACCOUNTS = [
+  { label: 'Một cửa Tây Hồ', email: 'intake.tayho@example.test', password: '123' },
+  { label: 'Lãnh đạo Tây Hồ', email: 'leader.tayho@example.test', password: '123' },
+  { label: 'Quản trị hệ thống', email: 'admin01@example.test', password: '123' },
+] as const
 
 function routeFromPath(): PortalRoute {
   const pathname = window.location.pathname
@@ -187,100 +219,24 @@ function LoadingFallback({ label = 'Đang tải phân hệ…' }: { label?: stri
   )
 }
 
-function PanelHeading({
-  title,
-  description,
-  action,
-}: {
-  kicker?: string
-  title: string
-  description: string
-  action?: ReactNode
-}) {
+function StaffAgencyMasthead() {
   return (
-    <div className="ops-panel-heading">
-      <div>
-        <h2>{title}</h2>
-        {description && <p>{description}</p>}
-      </div>
-      {action && <div className="ops-panel-action">{action}</div>}
-    </div>
-  )
-}
-
-function MetricCard({
-  label,
-  value,
-  note,
-  tone,
-  onClick,
-}: {
-  label: string
-  value: number
-  note: string
-  tone: string
-  onClick?: () => void
-}) {
-  const cls = `metric-card tone-${tone}${onClick ? ' metric-button' : ''}`
-  const content = (
-    <>
-      <small className="metric-label">{label}</small>
-      <b className="metric-value tabular-nums">{value.toLocaleString('vi-VN')}</b>
-      <em className="metric-note">{note}</em>
-    </>
-  )
-  return onClick ? (
-    <button type="button" className={cls} onClick={onClick}>
-      {content}
-    </button>
-  ) : (
-    <article className={cls}>{content}</article>
-  )
-}
-
-function AgencyMasthead({ staff = false }: { staff?: boolean }) {
-  return (
-    <div className="agency-masthead">
+    <div className="agency-masthead" data-surface="staff">
       <div className="agency-masthead-inner">
         <a className="agency-emblem" href="/" aria-label="Trang chủ hệ thống">
-          <img src="/images/hanoi-logo.png" alt="Biểu trưng Hà Nội" />
+          <img src="/images/hanoi-logo.png" alt="Biểu trưng Thành phố Hà Nội" />
         </a>
         <div className="agency-title">
-          <span>{staff ? 'KHU VỰC CÁN BỘ' : 'TRANG THÔNG TIN ĐIỆN TỬ'}</span>
-          {staff ? (
-            <b>
-              HỆ THỐNG MỘT CỬA
-              <br className="masthead-break" /> TIẾP NHẬN VÀ GIẢI QUYẾT TTHC
-            </b>
-          ) : (
-            <b>
-              TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG
-              <br className="masthead-break" /> THÀNH PHỐ HÀ NỘI
-            </b>
-          )}
-          <small>
-            {staff
-              ? 'TIẾP NHẬN VÀ GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH'
-              : 'HÀNH CHÍNH THÔNG MINH - TẬN TÂM PHỤC VỤ'}
-          </small>
+          <span>TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG THÀNH PHỐ HÀ NỘI</span>
+          <b>HỆ THỐNG THÔNG TIN GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH</b>
+          <small>PHÂN HỆ TÁC NGHIỆP MỘT CỬA &amp; ĐIỀU HÀNH NỘI BỘ</small>
         </div>
-        {!staff && (
-          <a
-            className="national-portal-banner"
-            href={NATIONAL_PORTAL}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Mở Cổng Dịch vụ công quốc gia"
-          >
-            <img src="/images/congdichvucongquocgia.png" alt="Cổng Dịch vụ công quốc gia" />
-          </a>
-        )}
       </div>
     </div>
   )
 }
 
-function NotFoundPage({
+function NotFoundSection({
   onHome,
   onCatalog,
 }: {
@@ -289,25 +245,23 @@ function NotFoundPage({
 }) {
   const attemptedPath = window.location.pathname
   return (
-    <div className="public-site">
-      <AgencyMasthead />
-      <main className="not-found-page" aria-labelledby="not-found-heading">
-        <div className="panel not-found-card">
-          <h1 id="not-found-heading">404 — Không tìm thấy trang</h1>
-          <p>
-            Đường dẫn <code>{attemptedPath}</code> không tồn tại hoặc đã thay đổi trên hệ thống thông tin giải quyết thủ tục hành chính.
-          </p>
-          <div className="not-found-actions">
-            <button type="button" className="button primary" onClick={onHome}>
-              Về Trang chủ
-            </button>
-            <button type="button" className="button secondary" onClick={onCatalog}>
-              Danh mục thủ tục
-            </button>
-          </div>
+    <section className="not-found-page" aria-labelledby="not-found-heading">
+      <div className="panel not-found-card">
+        <h1 id="not-found-heading">404 — Không tìm thấy trang</h1>
+        <p>
+          Đường dẫn <code>{attemptedPath}</code> không tồn tại hoặc đã thay đổi trên hệ thống thông
+          tin giải quyết thủ tục hành chính.
+        </p>
+        <div className="not-found-actions">
+          <button type="button" className="button primary" onClick={onHome}>
+            Về Trang chủ
+          </button>
+          <button type="button" className="button secondary" onClick={onCatalog}>
+            Danh mục thủ tục
+          </button>
         </div>
-      </main>
-    </div>
+      </div>
+    </section>
   )
 }
 
@@ -318,16 +272,24 @@ function AuthScreen({
   onAuthenticated: (user: User, csrf: string) => void
   onBack: () => void
 }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-surface', 'staff')
+  }, [])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setBusy(true)
     setError('')
-    const values = Object.fromEntries(new FormData(event.currentTarget).entries())
     try {
-      const data = await api<{ user: User; csrfToken: string }>('/api/auth/login', values)
+      const data = await api<{ user: User; csrfToken: string }>('/api/auth/login', {
+        email,
+        password,
+      })
       onAuthenticated(data.user, data.csrfToken)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Không thể xử lý yêu cầu.')
@@ -337,32 +299,50 @@ function AuthScreen({
   }
 
   return (
-    <main className="auth-page official-auth">
-      <AgencyMasthead staff />
+    <main className="auth-page official-auth" data-surface="staff">
+      <StaffAgencyMasthead />
       <section className="auth-content">
         <div className="auth-intro">
           <button type="button" className="staff-back-link" onClick={onBack}>
-            ← Quay về cổng thông tin
+            ← Quay về cổng dịch vụ công
           </button>
-          <h1>Bàn làm việc nội bộ</h1>
+          <h1>Bàn làm việc nghiệp vụ Một cửa</h1>
           <p>
-            Đăng nhập để tiếp nhận, phân công, thẩm định, phê duyệt và theo dõi hồ sơ trong phạm vi tài khoản được cấp.
+            Đăng nhập bằng tài khoản công vụ được phân quyền để tiếp nhận, phân công, thẩm định, ký
+            duyệt kết quả và giám sát Bộ chỉ số 766 trong phạm vi cơ quan.
           </p>
+          <div className="auth-guidance">
+            <p>
+              <b>Phân quyền theo vai trò &amp; đơn vị</b>
+              <span>
+                Tài khoản cán bộ được kiểm soát theo cơ quan tiếp nhận (cấp thành phố hoặc UBND
+                phường, xã), vai trò chuyên môn và thời hạn hiệu lực.
+              </span>
+            </p>
+            <p>
+              <b>Bảo toàn trạng thái làm việc</b>
+              <span>
+                Mọi thao tác phê duyệt, yêu cầu bổ sung hoặc cấp khóa tra cứu đều ghi vết kiểm toán
+                đầy đủ theo thời gian thực.
+              </span>
+            </p>
+          </div>
         </div>
 
         <section className="auth-panel" aria-labelledby="staff-login-title">
           <div className="auth-card">
-            <h2 id="staff-login-title">Truy cập bàn xử lý</h2>
-            <p className="muted">
-              Dùng tài khoản công vụ nội bộ đã được cấp.
-            </p>
+            <h2 id="staff-login-title">Đăng nhập cán bộ nội bộ</h2>
+            <p className="muted">Sử dụng email công vụ và mật khẩu đã được cấp phát.</p>
             <form onSubmit={submit} className="form-stack">
               <label htmlFor="staff-login-email">
-                <span>Email tài khoản</span>
+                <span>Email tài khoản công vụ</span>
                 <input
                   id="staff-login-email"
                   name="email"
                   type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="ten.canbo@hanoi.gov.vn"
                   autoComplete="username"
                   maxLength={254}
                   required
@@ -374,6 +354,8 @@ function AuthScreen({
                   id="staff-login-password"
                   name="password"
                   type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
                   autoComplete="current-password"
                   maxLength={128}
                   required
@@ -385,35 +367,63 @@ function AuthScreen({
                 </div>
               )}
               <button className="button primary full" disabled={busy}>
-                {busy ? 'Đang xác thực…' : 'Đăng nhập cán bộ'}
+                {busy ? 'Đang xác thực…' : 'Đăng nhập bàn làm việc'}
               </button>
             </form>
+
+            <div className="sandbox-demo-helper" aria-label="Tài khoản thực hành nội bộ">
+              <div className="sandbox-demo-helper__title">
+                <KeyRound size={14} strokeWidth={1.75} aria-hidden="true" />
+                <span>Tài khoản thực hành cục bộ (Bấm để điền nhanh)</span>
+              </div>
+              <div className="sandbox-demo-helper__chips">
+                {STAFF_DEMO_ACCOUNTS.map(demo => (
+                  <button
+                    key={demo.email}
+                    type="button"
+                    className="sandbox-demo-chip"
+                    onClick={() => {
+                      setEmail(demo.email)
+                      setPassword(demo.password)
+                      setError('')
+                    }}
+                  >
+                    {demo.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="auth-footnote">
-              <span className="lock-icon" aria-hidden="true">
-                i
-              </span>
+              <Info size={16} strokeWidth={1.75} aria-hidden="true" />
               <span>
-                Quản trị viên cấp tài khoản và giới hạn quyền theo vai trò, cơ quan và thời hạn hiệu lực.
+                Quản trị viên cấp tài khoản và giới hạn quyền theo vai trò, cơ quan và thời hạn hiệu
+                lực.
               </span>
             </div>
           </div>
         </section>
       </section>
       <footer className="auth-legal">
-        Hệ thống thông tin giải quyết thủ tục hành chính Thành phố Hà Nội · Phân hệ nghiệp vụ nội bộ.
+        Hệ thống thông tin giải quyết thủ tục hành chính Thành phố Hà Nội · Phân hệ nghiệp vụ nội
+        bộ.
       </footer>
     </main>
   )
 }
 
-function CitizenAuthScreen({
+function CitizenAuthSection({
   onAuthenticated,
-  onBack,
+  onNavigatePath,
+  returnContextLabel,
 }: {
   onAuthenticated: (user: User, csrf: string, registered: boolean) => void
-  onBack: () => void
+  onNavigatePath: (path: string) => void
+  returnContextLabel?: string
 }) {
   const [register, setRegister] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -436,121 +446,175 @@ function CitizenAuthScreen({
   }
 
   return (
-    <main className="auth-page official-auth citizen-auth-page">
-      <AgencyMasthead />
-      <section className="auth-content">
-        <div className="auth-intro">
-          <button type="button" className="staff-back-link" onClick={onBack}>
-            ← Quay về cổng thông tin
-          </button>
-          <h1>Một tài khoản để sử dụng <span className="auth-title-phrase">dịch vụ công</span></h1>
+    <section className="auth-content">
+      <div className="auth-intro">
+        {returnContextLabel && (
+          <div className="citizen-source-note" role="status">
+            <strong>Yêu cầu xác thực tài khoản công dân</strong>
+            <span>{returnContextLabel}</span>
+          </div>
+        )}
+        <h1>
+          Một tài khoản thống nhất để thực hiện{' '}
+          <span className="auth-title-phrase">dịch vụ công trực tuyến</span>
+        </h1>
+        <p>
+          Đăng nhập để nộp hồ sơ trực tuyến tự động điền thông tin định danh, theo dõi tiến độ chi
+          tiết, bổ sung tài liệu, thanh toán phí/lệ phí, đặt lịch hẹn Một cửa và quản lý kho dữ liệu
+          cá nhân.
+        </p>
+        <div className="auth-guidance">
           <p>
-            Đăng nhập để nộp và theo dõi hồ sơ trực tuyến, bổ sung giấy tờ, nộp phí, gửi yêu cầu rút hồ sơ, đặt lịch hẹn và gửi phản ánh.
-          </p>
-          <p>Nếu chỉ cần kiểm tra tiến độ công khai, hãy mở mục <a href="/tra-cuu-ho-so">Tra cứu hồ sơ</a>.</p>
-        </div>
-
-        <section className="auth-panel" aria-labelledby="citizen-auth-title">
-          <div className="auth-card">
-            <h2 id="citizen-auth-title">{register ? 'Đăng ký tài khoản' : 'Đăng nhập công dân'}</h2>
-
-            <form className="form-stack" onSubmit={submit} key={register ? 'register' : 'login'}>
-              {register && (
-                <>
-                  <label htmlFor="citizen-reg-name">
-                    <span>Họ và tên</span>
-                    <input
-                      id="citizen-reg-name"
-                      name="name"
-                      autoComplete="name"
-                      minLength={2}
-                      maxLength={150}
-                      required
-                    />
-                  </label>
-                  <label htmlFor="citizen-reg-phone">
-                    <span>Số điện thoại</span>
-                    <input
-                      id="citizen-reg-phone"
-                      name="phone"
-                      type="tel"
-                      autoComplete="tel"
-                      minLength={8}
-                      maxLength={40}
-                      required
-                    />
-                  </label>
-                </>
-              )}
-              <label htmlFor="citizen-auth-email">
-                <span>Email</span>
-                <input
-                  id="citizen-auth-email"
-                  name="email"
-                  type="email"
-                  autoComplete="username"
-                  maxLength={254}
-                  defaultValue={register ? '' : 'congdan@example.test'}
-                  required
-                />
-              </label>
-              <label htmlFor="citizen-auth-password">
-                <span>Mật khẩu</span>
-                <input
-                  id="citizen-auth-password"
-                  name="password"
-                  type="password"
-                  autoComplete={register ? 'new-password' : 'current-password'}
-                  minLength={register ? 12 : undefined}
-                  maxLength={128}
-                  defaultValue={register ? '' : '123'}
-                  required
-                />
-              </label>
-              {register && (
-                <>
-                  <small className="muted">Từ 12 ký tự, gồm chữ hoa, chữ thường và chữ số.</small>
-                  <label htmlFor="citizen-reg-confirm">
-                    <span>Nhập lại mật khẩu</span>
-                    <input
-                      id="citizen-reg-confirm"
-                      name="confirmPassword"
-                      type="password"
-                      autoComplete="new-password"
-                      minLength={12}
-                      maxLength={128}
-                      required
-                    />
-                  </label>
-                </>
-              )}
-              {error && (
-                <div className="form-error" role="alert">
-                  {error}
-                </div>
-              )}
-              <button className="button primary full" disabled={busy}>
-                {busy ? 'Đang xử lý…' : register ? 'Đăng ký và tiếp tục' : 'Đăng nhập và tiếp tục'}
-              </button>
-              <button
-                type="button"
-                className="text-button"
-                disabled={busy}
-                onClick={() => {
-                  setRegister(value => !value)
-                  setError('')
+            <b>Tra cứu nhanh không cần đăng nhập</b>
+            <span>
+              Nếu chỉ cần kiểm tra trạng thái xử lý công khai bằng Mã hồ sơ, bạn có thể mở trực tiếp{' '}
+              <a
+                href="/tra-cuu-ho-so"
+                className="plain-link"
+                onClick={e => {
+                  e.preventDefault()
+                  onNavigatePath('/tra-cuu-ho-so')
                 }}
               >
-                {register ? 'Đã có tài khoản? Đăng nhập' : 'Chưa có tài khoản? Đăng ký mới'}
-              </button>
-            </form>
-          </div>
-        </section>
+                Tra cứu hồ sơ
+              </a>
+              .
+            </span>
+          </p>
+          <p>
+            <b>Bảo vệ dữ liệu cá nhân (Nghị định 13/2023/NĐ-CP)</b>
+            <span>
+              Hệ thống không hiển thị công khai họ tên, số định danh hoặc tài liệu đính kèm khi chưa
+              xác thực chủ hồ sơ.
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <section className="auth-panel" aria-labelledby="citizen-auth-title">
+        <div className="auth-card">
+          <h2 id="citizen-auth-title">
+            {register ? 'Đăng ký tài khoản công dân' : 'Đăng nhập công dân / tổ chức'}
+          </h2>
+
+          <form className="form-stack" onSubmit={submit} key={register ? 'register' : 'login'}>
+            {register && (
+              <>
+                <label htmlFor="citizen-reg-name">
+                  <span>Họ và tên</span>
+                  <input
+                    id="citizen-reg-name"
+                    name="name"
+                    autoComplete="name"
+                    minLength={2}
+                    maxLength={150}
+                    required
+                  />
+                </label>
+                <label htmlFor="citizen-reg-phone">
+                  <span>Số điện thoại liên hệ</span>
+                  <input
+                    id="citizen-reg-phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    minLength={8}
+                    maxLength={40}
+                    required
+                  />
+                </label>
+              </>
+            )}
+            <label htmlFor="citizen-auth-email">
+              <span>Email đăng nhập</span>
+              <input
+                id="citizen-auth-email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="congdan@example.vn"
+                autoComplete="username"
+                maxLength={254}
+                required
+              />
+            </label>
+            <label htmlFor="citizen-auth-password">
+              <span>Mật khẩu</span>
+              <input
+                id="citizen-auth-password"
+                name="password"
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                autoComplete={register ? 'new-password' : 'current-password'}
+                minLength={register ? 12 : undefined}
+                maxLength={128}
+                required
+              />
+            </label>
+            {register && (
+              <>
+                <small className="muted">Từ 12 ký tự, gồm chữ hoa, chữ thường và chữ số.</small>
+                <label htmlFor="citizen-reg-confirm">
+                  <span>Nhập lại mật khẩu</span>
+                  <input
+                    id="citizen-reg-confirm"
+                    name="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    minLength={12}
+                    maxLength={128}
+                    required
+                  />
+                </label>
+              </>
+            )}
+            {error && (
+              <div className="form-error" role="alert">
+                {error}
+              </div>
+            )}
+            <button className="button primary full" disabled={busy}>
+              {busy ? 'Đang xử lý…' : register ? 'Đăng ký và tiếp tục' : 'Đăng nhập và tiếp tục'}
+            </button>
+            <button
+              type="button"
+              className="text-button"
+              disabled={busy}
+              onClick={() => {
+                setRegister(value => !value)
+                setError('')
+              }}
+            >
+              {register ? 'Đã có tài khoản? Đăng nhập' : 'Chưa có tài khoản? Đăng ký mới'}
+            </button>
+          </form>
+
+          {!register && (
+            <div className="sandbox-demo-helper" aria-label="Tài khoản công dân thực hành">
+              <div className="sandbox-demo-helper__title">
+                <ShieldCheck size={14} strokeWidth={1.75} aria-hidden="true" />
+                <span>Môi trường thực hành cục bộ (Bấm để điền mẫu)</span>
+              </div>
+              <div className="sandbox-demo-helper__chips">
+                <button
+                  type="button"
+                  className="sandbox-demo-chip"
+                  onClick={() => {
+                    setEmail('congdan@example.test')
+                    setPassword('123')
+                    setError('')
+                  }}
+                >
+                  Điền tài khoản mẫu: Nguyễn Văn An (congdan@example.test)
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </section>
-      <footer className="auth-legal">
-        Trung tâm Phục vụ hành chính công Thành phố Hà Nội · Cổng Dịch vụ công trực tuyến.
-      </footer>
-    </main>
+    </section>
   )
 }
 
@@ -563,7 +627,7 @@ function StaffReauthModal({
   onReauthenticated: (nextUser: User, csrf: string) => Promise<void>
   onSignOut: () => Promise<void>
 }) {
-  const [password, setPassword] = useState('123')
+  const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -578,65 +642,59 @@ function StaffReauthModal({
       })
       await onReauthenticated(result.user, result.csrfToken)
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Không thể xác thực lại phiên làm việc.')
+      setError(
+        cause instanceof Error ? cause.message : 'Không thể xác thực lại phiên làm việc.',
+      )
     } finally {
       setBusy(false)
     }
   }
 
   return (
-    <div className="modal-backdrop">
-      <section
-        className="application-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="staff-reauth-title"
-      >
-        <div className="modal-head">
-          <div>
-            <h3 id="staff-reauth-title">Phiên cán bộ đã hết hạn</h3>
+    <ModalDialog
+      open
+      title="Phiên làm việc cán bộ đã hết hạn"
+      description="Hồ sơ đang mở và nội dung nhận xét/dự thảo chưa lưu của bạn vẫn được giữ nguyên trên màn hình. Vui lòng nhập lại mật khẩu để tiếp tục."
+      onClose={() => {
+        /* Modal stays open until re-authenticated or explicitly signed out */
+      }}
+    >
+      <form className="form-stack" onSubmit={handleSubmit}>
+        <label htmlFor="reauth-email">
+          <span>Tài khoản cán bộ</span>
+          <input id="reauth-email" type="email" value={user.email} readOnly />
+        </label>
+        <label htmlFor="reauth-password">
+          <span>Mật khẩu xác thực lại</span>
+          <input
+            id="reauth-password"
+            type="password"
+            value={password}
+            onChange={event => setPassword(event.target.value)}
+            autoComplete="current-password"
+            required
+          />
+        </label>
+        {error && (
+          <div className="form-error" role="alert">
+            {error}
           </div>
+        )}
+        <div className="form-actions">
+          <button type="submit" className="button primary" disabled={busy}>
+            {busy ? 'Đang khôi phục phiên…' : 'Đăng nhập lại & giữ nội dung đang soạn'}
+          </button>
+          <button
+            type="button"
+            className="button secondary"
+            disabled={busy}
+            onClick={() => void onSignOut()}
+          >
+            Đăng xuất về trang chủ
+          </button>
         </div>
-        <p className="muted">
-          Hồ sơ đang mở và nội dung nhận xét/dự thảo chưa lưu của bạn vẫn được giữ nguyên trên màn hình. Vui lòng nhập lại mật khẩu để tiếp tục làm việc.
-        </p>
-        <form className="form-stack" onSubmit={handleSubmit}>
-          <label htmlFor="reauth-email">
-            <span>Tài khoản cán bộ</span>
-            <input id="reauth-email" type="email" value={user.email} readOnly />
-          </label>
-          <label htmlFor="reauth-password">
-            <span>Mật khẩu</span>
-            <input
-              id="reauth-password"
-              type="password"
-              value={password}
-              onChange={event => setPassword(event.target.value)}
-              autoComplete="current-password"
-              required
-            />
-          </label>
-          {error && (
-            <div className="form-error" role="alert">
-              {error}
-            </div>
-          )}
-          <div className="form-actions">
-            <button type="submit" className="button primary" disabled={busy}>
-              {busy ? 'Đang khôi phục phiên…' : 'Đăng nhập lại & giữ nội dung đang soạn'}
-            </button>
-            <button
-              type="button"
-              className="button secondary"
-              disabled={busy}
-              onClick={() => void onSignOut()}
-            >
-              Đăng xuất về trang chủ
-            </button>
-          </div>
-        </form>
-      </section>
-    </div>
+      </form>
+    </ModalDialog>
   )
 }
 
@@ -673,19 +731,22 @@ function PasswordChangeScreen({
   }
 
   return (
-    <main className="auth-page official-auth">
-      <AgencyMasthead staff />
+    <main className="auth-page official-auth" data-surface="staff">
+      <StaffAgencyMasthead />
       <section className="auth-content password-change-content">
         <div className="auth-intro">
           <h1>Đổi mật khẩu khởi tạo</h1>
           <p>
-            Đây là lần đăng nhập đầu tiên. Hãy đổi mật khẩu được bàn giao trước khi mở dữ liệu và chức năng nghiệp vụ.
+            Đây là lần đăng nhập đầu tiên. Hãy đổi mật khẩu được bàn giao trước khi mở dữ liệu và
+            chức năng nghiệp vụ.
           </p>
         </div>
         <section className="auth-panel" aria-labelledby="password-change-title">
           <div className="auth-card">
             <h2 id="password-change-title">Tạo mật khẩu riêng</h2>
-            <p className="muted">Mật khẩu cần có từ 12 ký tự, gồm chữ hoa, chữ thường và chữ số.</p>
+            <p className="muted">
+              Mật khẩu cần có từ 12 ký tự, gồm chữ hoa, chữ thường và chữ số.
+            </p>
             <form onSubmit={submit} className="form-stack">
               <label htmlFor="pw-current">
                 <span>Mật khẩu khởi tạo</span>
@@ -744,368 +805,36 @@ function PasswordChangeScreen({
   )
 }
 
-function CitizenWorkflow({
-  view,
-  receipt,
-  initialProcedureCode,
-  citizenSignedIn,
-  onRequireLogin,
-  onBack,
-  onSubmit,
-  onTrack,
-  onCatalog,
-  onSubmitted,
+function GuideContent({
+  isStaff = false,
+  onNavigatePath,
 }: {
-  view: PublicView
-  receipt: SubmissionReceipt | null
-  initialProcedureCode: string
-  citizenSignedIn: boolean
-  onRequireLogin: () => void
-  onBack: () => void
-  onSubmit: () => void
-  onTrack: () => void
-  onCatalog: () => void
-  onSubmitted: (value: SubmissionReceipt) => void
+  isStaff?: boolean
+  onNavigatePath?: (path: string) => void
 }) {
-  return (
-    <div className="public-site citizen-workflow-site">
-      <AgencyMasthead />
-      <header className="citizen-workflow-header">
-        <button type="button" className="text-button" onClick={onBack}>
-          ← Về cổng dịch vụ
-        </button>
-        <nav aria-label="Dịch vụ công dân">
-          <button
-            type="button"
-            className={view === 'catalog' ? 'active' : ''}
-            onClick={onCatalog}
-          >
-            Danh mục thủ tục
-          </button>
-          <button
-            type="button"
-            className={view === 'submit' || view === 'receipt' ? 'active' : ''}
-            onClick={onSubmit}
-          >
-            Nộp hồ sơ
-          </button>
-          <button
-            type="button"
-            className={view === 'track' ? 'active' : ''}
-            onClick={onTrack}
-          >
-            Tra cứu hồ sơ
-          </button>
-          <a href="/huong-dan">Hướng dẫn</a>
-        </nav>
-      </header>
-
-      <main className="citizen-workflow-main">
-        {view === 'catalog' && (
-          <Suspense fallback={<LoadingFallback label="Đang tải danh mục thủ tục…" />}>
-            <LazyCitizenProcedureCatalog request={api} />
-          </Suspense>
-        )}
-        {view === 'submit' && (
-          <Suspense fallback={<LoadingFallback label="Đang tải biểu mẫu nộp hồ sơ…" />}>
-            <LazyCitizenApplicationForm
-              request={api}
-              initialProcedureCode={initialProcedureCode}
-              onSubmitted={onSubmitted}
-            />
-          </Suspense>
-        )}
-        {view === 'receipt' && receipt && (
-          <CitizenReceiptView receipt={receipt} onTrack={onTrack} />
-        )}
-        {view === 'track' && (
-          <CitizenTrackingPage
-            initialReceipt={receipt}
-            citizenSignedIn={citizenSignedIn}
-            onRequireLogin={onRequireLogin}
-          />
-        )}
-      </main>
-
-      <footer className="citizen-workflow-footer">
-        <span>
-          Tra cứu nhanh trạng thái công khai bằng Mã hồ sơ, hoặc đăng nhập tài khoản công dân để xem toàn bộ thành phần hồ sơ và gửi thao tác trực tuyến.
-        </span>
-        <button type="button" className="text-button" onClick={onBack}>
-          Về trang chủ
-        </button>
-      </footer>
-    </div>
-  )
-}
-
-function PublicPortal({
-  onStaff,
-  onGuide,
-  onNavigate,
-  onReceipt,
-  receipt,
-  signedIn,
-  initialView,
-  initialProcedureCode,
-  citizenSignedIn = false,
-}: {
-  citizenSignedIn?: boolean
-  onStaff: () => void
-  onGuide: () => void
-  onNavigate: (
-    route: PortalRoute,
-    procedureCode?: string,
-    applicantType?: 'citizen' | 'organization',
-  ) => void
-  onReceipt: (value: SubmissionReceipt) => void
-  receipt: SubmissionReceipt | null
-  signedIn: boolean
-  initialView: 'public' | 'catalog' | 'submit' | 'track'
-  initialProcedureCode: string
-}) {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const [view, setView] = useState<PublicView>(() => {
-    if (
-      initialView === 'submit' &&
-      receipt &&
-      new URLSearchParams(window.location.search).get('v') === 'receipt'
-    ) {
-      return 'receipt'
-    }
-    return initialView
-  })
-
-  if (view !== 'public') {
-    return (
-      <CitizenWorkflow
-        view={view}
-        receipt={receipt}
-        initialProcedureCode={initialProcedureCode}
-        citizenSignedIn={citizenSignedIn}
-        onRequireLogin={() => onNavigate('citizen-login')}
-        onBack={() => {
-          setView('public')
-          onNavigate('public')
-        }}
-        onSubmit={() => {
-          setView('submit')
-          onNavigate('submit')
-        }}
-        onTrack={() => {
-          setView('track')
-          onNavigate('track')
-        }}
-        onCatalog={() => {
-          setView('catalog')
-          onNavigate('catalog')
-        }}
-        onSubmitted={value => {
-          onReceipt(value)
-          setView('receipt')
-        }}
-      />
-    )
-  }
-
-  return (
-    <div className="public-site">
-      <AgencyMasthead />
-      <header className={`public-header official-header${mobileNavOpen ? ' mobile-open' : ''}`}>
-        <button
-          className="mobile-nav-toggle"
-          type="button"
-          aria-expanded={mobileNavOpen}
-          aria-controls="public-main-navigation"
-          onClick={() => setMobileNavOpen(open => !open)}
-        >
-          <span aria-hidden="true">☰</span> Danh mục
-        </button>
-        <nav className="public-nav" id="public-main-navigation" aria-label="Điều hướng chính">
-          <a
-            className="nav-home"
-            href="/"
-            onClick={event => {
-              event.preventDefault()
-              onNavigate('public')
-            }}
-          >
-            ⌂ <span>Trang chủ</span>
-          </a>
-          <a
-            href="/thu-tuc"
-            onClick={event => {
-              event.preventDefault()
-              onNavigate('catalog')
-            }}
-          >
-            Danh mục thủ tục
-          </a>
-          <a
-            href="/nop-ho-so"
-            onClick={event => {
-              event.preventDefault()
-              onNavigate('submit')
-            }}
-          >
-            Nộp hồ sơ
-          </a>
-          <a
-            href="/tra-cuu-ho-so"
-            onClick={event => {
-              event.preventDefault()
-              onNavigate('track')
-            }}
-          >
-            Tra cứu hồ sơ
-          </a>
-          <a
-            href="/tien-ich"
-            onClick={event => {
-              event.preventDefault()
-              onNavigate('citizen-services')
-            }}
-          >
-            Lịch hẹn &amp; phản ánh
-          </a>
-          <a
-            href="/huong-dan"
-            onClick={event => {
-              event.preventDefault()
-              onGuide()
-            }}
-          >
-            Hướng dẫn sử dụng
-          </a>
-          <details className="official-nav-info">
-            <summary>Thông tin</summary>
-            <div className="official-nav-info-menu">
-              <a href="/#gioi-thieu">Giới thiệu</a>
-              <a href="/#tin-tuc">Tin tức, sự kiện</a>
-              <a href="/#thu-vien-anh">Thư viện ảnh</a>
-              <a href="/#ho-tro">Liên hệ</a>
-            </div>
-          </details>
-        </nav>
-        <div className="public-header-actions">
-          {!citizenSignedIn && (
-            <button type="button" className="button staff-entry-button" onClick={onStaff}>
-              {signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}
-            </button>
-          )}
-        </div>
-      </header>
-
-      <main>
-        <InformationHome />
-        <PublicProcedureSearch onOpenProcedure={code => onNavigate('catalog', code)} />
-        <section className="support-strip" id="ho-tro">
-          <div>
-            <h2>Trung tâm Phục vụ hành chính công Hà Nội</h2>
-            <p>
-              Thông tin, hướng dẫn và thông báo về việc thực hiện thủ tục hành chính tại Thành phố.
-            </p>
-          </div>
-          <div className="support-actions">
-            <a className="button secondary" href={CITY_SUPPORT} target="_blank" rel="noreferrer">
-              Trang thông tin Trung tâm
-            </a>
-            <a className="support-phone" href="tel:0241022">
-              024 1022 <small>nhánh 7, 8</small>
-            </a>
-            <a className="support-phone" href="tel:19001009">
-              1900 1009 <small>tổng đài thông minh</small>
-            </a>
-          </div>
-        </section>
-      </main>
-
-      <footer className="public-footer">
-        <a
-          className="public-brand"
-          href={CENTER_HOME}
-          aria-label="Mở Trang thông tin Trung tâm Phục vụ hành chính công Hà Nội"
-        >
-          <img className="footer-emblem" src="/images/hanoi-logo.png" alt="" />
-          <span>
-            <b>TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG</b>
-            <small>THÀNH PHỐ HÀ NỘI</small>
-          </span>
-        </a>
-        <span>
-          Giao dịch trực tuyến của cá nhân, tổ chức và doanh nghiệp được thực hiện trên Cổng Dịch vụ công quốc gia. Tuyến xử lý phụ thuộc thủ tục và cơ quan thực hiện được chọn.
-        </span>
-        <a href={NATIONAL_PORTAL} target="_blank" rel="noreferrer">
-          dichvucong.gov.vn ↗
-        </a>
-      </footer>
-    </div>
-  )
-}
-
-function PublicCitizenServicesPage({
-  onHome,
-  onStaff,
-  signedIn,
-  citizenSignedIn = false,
-}: {
-  onHome: () => void
-  onStaff: () => void
-  signedIn: boolean
-  citizenSignedIn?: boolean
-}) {
-  return (
-    <div className="public-site citizen-services-site">
-      <AgencyMasthead />
-      <header className="citizen-workflow-header citizen-services-header">
-        <button type="button" className="text-button" onClick={onHome}>
-          ← Về trang chủ
-        </button>
-        <nav aria-label="Điều hướng dịch vụ công">
-          <a href="/thu-tuc">Danh mục thủ tục</a>
-          <a href="/nop-ho-so">Nộp hồ sơ</a>
-          <a href="/tra-cuu-ho-so">Tra cứu hồ sơ</a>
-          <a href="/huong-dan">Hướng dẫn</a>
-        </nav>
-        {!citizenSignedIn && (
-          <button type="button" className="button secondary" onClick={onStaff}>
-            {signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}
-          </button>
-        )}
-      </header>
-      <main className="citizen-service-page-main">
-        <div className="citizen-page-heading">
-          <h1>Lịch hẹn và phản ánh, kiến nghị</h1>
-          <p>
-            Đặt lịch làm việc tại cơ quan hoặc gửi phản ánh, kiến nghị. Nộp hồ sơ và tra cứu tiến độ hồ sơ đã gửi tại các trang riêng.
-          </p>
-        </div>
-        <Suspense fallback={<LoadingFallback label="Đang tải tiện ích công dân…" />}>
-          <LazyPublicAdministrativeServices request={api} />
-        </Suspense>
-      </main>
-      <footer className="citizen-workflow-footer">
-        <span>
-          Lịch hẹn giúp chủ động thời gian giao dịch tại Bộ phận Một cửa; không thay thế việc nộp hồ sơ theo thủ tục.
-        </span>
-        <a className="text-link" href="/">
-          Về trang chủ
-        </a>
-      </footer>
-    </div>
-  )
-}
-
-function GuideContent({ isStaff = false }: { isStaff?: boolean }) {
   const [audience, setAudience] = useState<'citizen' | 'staff'>(() =>
     isStaff || new URLSearchParams(window.location.search).get('role') === 'staff'
       ? 'staff'
       : 'citizen',
   )
 
+  const go = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (!onNavigatePath) return
+    e.preventDefault()
+    onNavigatePath(path)
+  }
+
   return (
     <div className="guide-content">
-      <section className="guide-switch" aria-label="Chọn hướng dẫn">
+      <div className="citizen-page-heading">
+        <h1>Hướng dẫn thực hiện thủ tục hành chính &amp; tác nghiệp</h1>
+        <p>
+          Tài liệu hướng dẫn từng bước dành cho người dân, tổ chức sử dụng dịch vụ công trực tuyến và
+          cán bộ giải quyết hồ sơ Một cửa.
+        </p>
+      </div>
+
+      <section className="guide-switch" aria-label="Chọn đối tượng hướng dẫn">
         <button
           type="button"
           className={audience === 'citizen' ? 'active' : ''}
@@ -1120,55 +849,68 @@ function GuideContent({ isStaff = false }: { isStaff?: boolean }) {
           aria-pressed={audience === 'staff'}
           onClick={() => setAudience('staff')}
         >
-          Cán bộ
+          Cán bộ Một cửa
         </button>
       </section>
 
       {audience === 'citizen' ? (
         <>
           <section className="guide-note">
-            <b>Thông tin tài khoản</b>
+            <b>Chuẩn bị tài khoản &amp; Dữ liệu cá nhân tái sử dụng</b>
             <p>
-              Đăng nhập bằng tài khoản của bạn. Trước khi lập hồ sơ, có thể mở <a href="/tai-khoan/thong-tin-ca-nhan">Thông tin cá nhân</a> để kiểm tra dữ liệu điền sẵn.
+              Đăng nhập bằng tài khoản công dân. Trước khi lập hồ sơ, bạn có thể mở{' '}
+              <a
+                href="/tai-khoan/thong-tin-ca-nhan"
+                onClick={e => go(e, '/tai-khoan/thong-tin-ca-nhan')}
+              >
+                Thông tin định danh &amp; Kho tài liệu
+              </a>{' '}
+              để kiểm tra dữ liệu tự động điền sẵn theo nguyên tắc kê khai một lần.
             </p>
           </section>
           <section className="guide-lead">
-            <h2>Tra cứu, gửi và theo dõi hồ sơ trực tuyến</h2>
+            <h2>Quy trình 4 bước thực hiện dịch vụ công trực tuyến</h2>
             <p>
-              Hệ thống cung cấp đầy đủ thông tin thủ tục hành chính, biểu mẫu tờ khai điện tử, tra cứu nhanh trạng thái công khai và theo dõi hồ sơ trực tuyến.
+              Hệ thống công khai đầy đủ thông tin pháp lý thủ tục hành chính, biểu mẫu điện tử, tra
+              cứu tiến độ công khai và theo dõi kết quả giải quyết trực tuyến.
             </p>
             <div className="guide-links">
-              <a className="button secondary" href="/thu-tuc">
+              <a className="button secondary" href="/thu-tuc" onClick={e => go(e, '/thu-tuc')}>
                 Tra cứu danh mục thủ tục
               </a>
-              <a className="button primary" href="/nop-ho-so">
-                Mở trang nộp hồ sơ
+              <a className="button primary" href="/nop-ho-so" onClick={e => go(e, '/nop-ho-so')}>
+                Nộp hồ sơ trực tuyến
               </a>
             </div>
           </section>
           <ol className="guide-steps">
             <li>
-              <b>Tìm và xem thông tin thủ tục</b>
+              <b>Tìm kiếm và xem thông tin tóm tắt thủ tục</b>
               <p>
-                Mở “Danh mục thủ tục”, lọc theo tên, mã hoặc lĩnh vực rồi chọn một kết quả để xem trình tự, thành phần hồ sơ và cơ quan thực hiện.
+                Mở “Danh mục thủ tục”, lọc ngay theo từ khóa, mức độ dịch vụ công hoặc lĩnh vực để
+                xem thời hạn giải quyết, lệ phí, thành phần hồ sơ và cơ quan thực hiện.
               </p>
             </li>
             <li>
-              <b>Chọn thủ tục, cơ quan và khai tờ khai</b>
+              <b>Chọn thủ tục, cơ quan tiếp nhận và điền tờ khai</b>
               <p>
-                Trang nộp có 5 bước: chọn thủ tục &amp; cơ quan tiếp nhận, khai thông tin chủ hồ sơ, điền tờ khai chuyên ngành, đính kèm thành phần giấy tờ và xác nhận gửi.
+                Quy trình nộp gồm 5 bước rõ ràng: chọn thủ tục &amp; cơ quan tiếp nhận, kiểm tra
+                thông tin chủ hồ sơ đã đồng bộ, điền tờ khai chuyên ngành, đính kèm giấy tờ và xác
+                nhận gửi.
               </p>
             </li>
             <li>
-              <b>Đính kèm giấy tờ, kiểm tra và gửi</b>
+              <b>Đính kèm giấy tờ, rà soát và gửi hồ sơ</b>
               <p>
-                Tải giấy tờ theo từng thành phần ({CITIZEN_UPLOAD_LIMIT_TEXT}) Kiểm tra lại tờ khai và chọn phương thức nhận kết quả.
+                Tải giấy tờ theo từng thành phần ({CITIZEN_UPLOAD_LIMIT_TEXT}), kiểm tra lại bản tóm
+                tắt kê khai và lựa chọn hình thức nhận kết quả.
               </p>
             </li>
             <li>
-              <b>Tra cứu tiến độ, bổ sung hoặc đề nghị rút hồ sơ</b>
+              <b>Tra cứu tiến độ, nộp phí, bổ sung hoặc nhận kết quả</b>
               <p>
-                Mở “Tra cứu hồ sơ” để kiểm tra nhanh trạng thái công khai không cần đăng nhập, hoặc đăng nhập để in phiếu Mẫu 01/02/03/04/06 kèm mã QR, nộp phí, bổ sung tài liệu và gửi đề nghị rút hồ sơ trực tuyến.
+                Mở “Tra cứu hồ sơ” để kiểm tra nhanh tiến độ bằng Mã hồ sơ, hoặc đăng nhập để in
+                phiếu Mẫu 01–06 kèm mã QR, nộp phí trực tuyến và tải kết quả điện tử.
               </p>
             </li>
           </ol>
@@ -1178,75 +920,53 @@ function GuideContent({ isStaff = false }: { isStaff?: boolean }) {
           <section className="guide-lead">
             <h2>Quy trình tác nghiệp trên Bàn làm việc cán bộ</h2>
             <p>
-              Bàn cán bộ tổ chức tập trung theo luồng: Bàn điều hành &amp; Bộ chỉ số 766, Hộp xử lý hồ sơ, Quầy một cửa &amp; Lịch hẹn, Danh mục thủ tục và Đối soát tài chính.
+              Bàn làm việc cán bộ được thiết kế chuẩn công thái học theo luồng xử lý: Bàn điều hành
+              &amp; Bộ chỉ số 766, Hộp xử lý hồ sơ, Quầy một cửa &amp; Lịch hẹn, Thẩm định chia đôi
+              màn hình và Đối soát tài chính.
             </p>
             {!isStaff && (
-              <a className="button primary" href="/staff">
-                Đăng nhập bàn cán bộ
-              </a>
+              <div className="guide-links">
+                <a className="button primary" href="/staff" onClick={e => go(e, '/staff')}>
+                  Mở Bàn làm việc cán bộ
+                </a>
+              </div>
             )}
           </section>
           <ol className="guide-steps">
             <li>
-              <b>Điều hành, Cân đối kỳ &amp; Bộ chỉ số 766</b>
+              <b>Điều hành tác nghiệp, Cân đối kỳ &amp; Bộ chỉ số 766</b>
               <p>
-                Từ “Bàn điều hành”, theo dõi ngay các hồ sơ có thể xử lý theo vai trò, hồ sơ sắp đến hạn và quá hạn. Chuyển sang tab “Phân tích &amp; Giám sát hạn” để xem Báo cáo cân đối kỳ (TT 09/2026/TT-BTP) và Bộ chỉ số 766 (QĐ 766/QĐ-TTg).
+                Từ “Bàn điều hành”, theo dõi ngay các hồ sơ cần xử lý theo vai trò, hồ sơ sắp đến hạn
+                và quá hạn. Chuyển sang tab “Phân tích, Cân đối kỳ &amp; Chỉ số 766” để giám sát theo
+                Thông tư 09/2026/TT-BTP và Quyết định 766/QĐ-TTg.
               </p>
             </li>
             <li>
-              <b>Tiếp nhận tại quầy &amp; Xử lý lịch hẹn</b>
+              <b>Tiếp nhận hàng loạt, lọc nhanh (phím /) &amp; Quầy một cửa</b>
               <p>
-                Tại “Quầy một cửa &amp; Lịch hẹn”, cán bộ Một cửa lập hồ sơ trực tiếp tại quầy, xác nhận công dân đến theo lịch hẹn và trả lời phản ánh kiến nghị.
+                Tại “Hộp xử lý hồ sơ”, nhấn phím <code>/</code> để tìm kiếm nhanh, tích chọn nhiều hồ
+                sơ để tiếp nhận hoặc phân công hàng loạt. Tại “Quầy một cửa”, lập hồ sơ trực tiếp và
+                xác nhận lịch hẹn công dân.
               </p>
             </li>
             <li>
-              <b>Thẩm định, gia hạn Mẫu 04, phê duyệt và phát hành</b>
+              <b>Thẩm định chia đôi màn hình &amp; phê duyệt quyết định</b>
               <p>
-                Mở một hồ sơ từ “Hộp xử lý”: chuyên viên/lãnh đạo có thể điều chuyển, ấn định nghĩa vụ tài chính, ban hành Phiếu xin lỗi &amp; gia hạn Mẫu 04, trình duyệt (kể cả đề xuất không giải quyết khi kết quả xác minh âm tính), ký số kết quả và phát hành.
+                Mở hồ sơ để đối chiếu song song tờ khai/tài liệu đính kèm và bản xem trước phiếu A4
+                chuẩn thể thức ở cột phải, đồng thời thực hiện phê duyệt, yêu cầu bổ sung hoặc gia
+                hạn Mẫu 04 ngay trên thanh tác nghiệp.
               </p>
             </li>
             <li>
-              <b>In biểu mẫu chuẩn (Mẫu 01, 02, 03, 04, 06) có mã QR</b>
+              <b>In biểu mẫu pháp lý chuẩn (Mẫu 01–06) tích hợp mã QR</b>
               <p>
-                Ngay trên thanh tiêu đề của hồ sơ, cán bộ có thể in các biểu mẫu hành chính kèm mã QR định danh tra cứu hoặc cấp lại Khóa tra cứu cho công dân.
+                Cán bộ in trực tiếp các biểu mẫu hành chính chuẩn khổ A4 kèm mã QR định danh tra cứu
+                không bị chặn cửa sổ bật lên, hoặc cấp lại khóa tra cứu bảo mật cho chủ hồ sơ.
               </p>
             </li>
           </ol>
         </>
       )}
-    </div>
-  )
-}
-
-function StandaloneGuide({
-  signedIn,
-  onHome,
-  onStaff,
-}: {
-  signedIn: boolean
-  onHome: () => void
-  onStaff: () => void
-}) {
-  return (
-    <div className="public-site guide-site">
-      <AgencyMasthead />
-      <header className="guide-site-header">
-        <button type="button" className="text-button" onClick={onHome}>
-          ← {signedIn ? 'Về bàn cán bộ' : 'Về trang chủ'}
-        </button>
-        <button type="button" className="button primary" onClick={onStaff}>
-          {signedIn ? 'Mở bàn cán bộ' : 'Đăng nhập cán bộ'}
-        </button>
-      </header>
-      <main className="guide-site-main">
-        <GuideContent />
-      </main>
-      <footer className="public-footer">
-        <span>
-          Trung tâm Phục vụ hành chính công Thành phố Hà Nội · Hướng dẫn thực hiện thủ tục hành chính.
-        </span>
-        <a href="/thu-tuc">Về danh mục thủ tục</a>
-      </footer>
     </div>
   )
 }
@@ -1459,13 +1179,38 @@ function StaffHome({
               <option value="all">Toàn bộ thời gian</option>
             </select>
           )}
-          <ReportExportButtons getReport={viewMode === 'work' ? readCasesReport : () => ({
-            title: 'Hồ sơ theo kỳ giám sát',
-            subtitle: `${period === 'all' ? 'Toàn bộ thời gian' : `${period} ngày gần nhất`} · Hồ sơ cập nhật trong kỳ · Phạm vi được cấp`,
-            filename: 'ho-so-theo-ky-giam-sat',
-            headers: ['Mã hồ sơ', 'Mã thủ tục', 'Tên thủ tục', 'Cơ quan tiếp nhận', ...(user.role === 'finance' ? [] : ['Người nộp']), 'Trạng thái', 'Ngày gửi', 'Hạn giải quyết'],
-            rows: periodCases.map(item => [item.code, item.procedureCode, item.procedure?.name || '', item.agencyScope || item.receivingAgency || '', ...(user.role === 'finance' ? [] : [item.applicant?.name || '']), data.statusLabels[item.status] || item.status, toDate(item.createdAt), toDate(item.deadline)]),
-          })} compact />
+          <ReportExportButtons
+            getReport={
+              viewMode === 'work'
+                ? readCasesReport
+                : () => ({
+                    title: 'Hồ sơ theo kỳ giám sát',
+                    subtitle: `${period === 'all' ? 'Toàn bộ thời gian' : `${period} ngày gần nhất`} · Hồ sơ cập nhật trong kỳ · Phạm vi được cấp`,
+                    filename: 'ho-so-theo-ky-giam-sat',
+                    headers: [
+                      'Mã hồ sơ',
+                      'Mã thủ tục',
+                      'Tên thủ tục',
+                      'Cơ quan tiếp nhận',
+                      ...(user.role === 'finance' ? [] : ['Người nộp']),
+                      'Trạng thái',
+                      'Ngày gửi',
+                      'Hạn giải quyết',
+                    ],
+                    rows: periodCases.map(item => [
+                      item.code,
+                      item.procedureCode,
+                      item.procedure?.name || '',
+                      item.agencyScope || item.receivingAgency || '',
+                      ...(user.role === 'finance' ? [] : [item.applicant?.name || '']),
+                      data.statusLabels[item.status] || item.status,
+                      toDate(item.createdAt),
+                      toDate(item.deadline),
+                    ]),
+                  })
+            }
+            compact
+          />
           <button
             type="button"
             className="button primary compact-btn"
@@ -1477,7 +1222,12 @@ function StaffHome({
       </div>
 
       {viewMode === 'work' ? (
-        <div id="ops-panel-work" role="tabpanel" aria-labelledby="ops-tab-work" className="staff-dashboard">
+        <div
+          id="ops-panel-work"
+          role="tabpanel"
+          aria-labelledby="ops-tab-work"
+          className="staff-dashboard"
+        >
           <section className="metric-grid" aria-label="Chỉ số công việc">
             <MetricCard
               label="Cần xử lý theo vai trò"
@@ -1508,7 +1258,8 @@ function StaffHome({
               tone="amber"
               onClick={
                 dueSoon.length
-                  ? () => onOpenQueue({ deadlineFilter: 'soon', label: 'Hồ sơ đến hạn trong 3 ngày' })
+                  ? () =>
+                      onOpenQueue({ deadlineFilter: 'soon', label: 'Hồ sơ đến hạn trong 3 ngày' })
                   : undefined
               }
             />
@@ -1533,7 +1284,7 @@ function StaffHome({
               </button>
             </div>
             <div className="stage-pipeline-grid">
-              {OPERATION_STAGES.map((stage, index) => {
+              {OPERATION_STAGES.map(stage => {
                 const count = data.cases.filter(item => stage.statuses.includes(item.status)).length
                 const maxStage = Math.max(
                   1,
@@ -1550,14 +1301,13 @@ function StaffHome({
                     className="stage-pipeline-step"
                     key={stage.label}
                     onClick={() =>
-                      onOpenQueue({ statuses: stage.statuses, label: `Giai đoạn ${stage.label}` })
+                      onOpenQueue({ statuses: stage.statuses, label: `Công đoạn: ${stage.label}` })
                     }
                   >
                     <div className="stage-pipeline-top">
-                      <span className="stage-number">0{index + 1}</span>
+                      <span className="stage-label">{stage.label}</span>
                       <b className="tabular-nums">{count}</b>
                     </div>
-                    <span className="stage-label">{stage.label}</span>
                     <span className="stage-track">
                       <i style={{ width: `${width}%` }} />
                     </span>
@@ -1580,41 +1330,43 @@ function StaffHome({
               />
               {attention.length ? (
                 <div className="attention-list">
-                  {attention.map(item => (
-                    <button
-                      type="button"
-                      className="attention-row"
-                      key={item.code}
-                      onClick={() => onOpen(item)}
-                    >
-                      <span
-                        className="attention-mark"
-                        data-tone={
-                          (daysUntil(item.deadline) ?? 999) < 0
-                            ? 'red'
-                            : item.status === 'DA_TIEP_NHAN' && !item.assignment?.assigneeId
-                              ? 'amber'
-                              : 'blue'
-                        }
-                      />
-                      <span className="attention-main">
-                        <b>{item.procedure?.name || item.procedureCode}</b>
-                        <small>
-                          <span className="case-code-inline tabular-nums">{item.code}</span> ·{' '}
-                          {item.applicant?.name || 'Chưa có thông tin người nộp'} ·{' '}
-                          {item.agencyScope || item.receivingAgency || ''}
-                        </small>
-                      </span>
-                      <span className="attention-side">
-                        <span className={`status-pill status-${item.status}`}>
-                          {data.statusLabels[item.status] || item.status}
+                  {attention.map(item => {
+                    const due = daysUntil(item.deadline)
+                    return (
+                      <button
+                        type="button"
+                        className="attention-row"
+                        key={item.code}
+                        onClick={() => onOpen(item)}
+                      >
+                        <span
+                          className="attention-mark"
+                          data-tone={
+                            (due ?? 999) < 0
+                              ? 'red'
+                              : item.status === 'DA_TIEP_NHAN' && !item.assignment?.assigneeId
+                                ? 'amber'
+                                : 'blue'
+                          }
+                        />
+                        <span className="attention-main">
+                          <b>{item.procedure?.name || item.procedureCode}</b>
+                          <small>
+                            <span className="case-code-inline tabular-nums">{item.code}</span> ·{' '}
+                            {item.applicant?.name || 'Chưa có thông tin người nộp'} ·{' '}
+                            {item.agencyScope || item.receivingAgency || ''}
+                          </small>
                         </span>
-                        <small className={(daysUntil(item.deadline) ?? 999) < 0 ? 'text-danger' : ''}>
-                          {dueText(item)}
-                        </small>
-                      </span>
-                    </button>
-                  ))}
+                        <span className="attention-side">
+                          <StatusTag
+                            status={item.status}
+                            label={data.statusLabels[item.status] || item.status}
+                          />
+                          <SLABadge item={item} />
+                        </span>
+                      </button>
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="empty-state compact-empty">
@@ -1882,12 +1634,7 @@ function StaffHome({
                     >
                       <span
                         className="attention-mark"
-                        data-tone={
-                          daysUntil(item.deadline) !== null &&
-                          (daysUntil(item.deadline) as number) < 0
-                            ? 'red'
-                            : 'blue'
-                        }
+                        data-tone={(daysUntil(item.deadline) ?? 999) < 0 ? 'red' : 'blue'}
                       />
                       <span className="attention-main">
                         <b>{item.procedure?.name || item.procedureCode}</b>
@@ -1896,10 +1643,11 @@ function StaffHome({
                         </small>
                       </span>
                       <span className="attention-side">
-                        <span className={`status-pill status-${item.status}`}>
-                          {data.statusLabels[item.status] || item.status}
-                        </span>
-                        <small>{dueText(item)}</small>
+                        <StatusTag
+                          status={item.status}
+                          label={data.statusLabels[item.status] || item.status}
+                        />
+                        <SLABadge item={item} />
                       </span>
                     </button>
                   ))}
@@ -1933,9 +1681,16 @@ function StaffHome({
                   <div className="feedback-list">
                     {feedback.slice(0, 3).map((row, index) => (
                       <article key={`${row.code}-${index}`}>
-                        <b>
-                          {'★'.repeat(row.score)}
-                          {'☆'.repeat(5 - row.score)}
+                        <b aria-label={`${row.score} trên 5 sao`}>
+                          {Array.from({ length: 5 }, (_, sIdx) => (
+                            <Star
+                              key={sIdx}
+                              size={13}
+                              strokeWidth={1.75}
+                              fill={sIdx < row.score ? 'currentColor' : 'none'}
+                              aria-hidden="true"
+                            />
+                          ))}
                         </b>
                         <span>{row.code}</span>
                         <p>{row.content || 'Không có nội dung nhận xét.'}</p>
@@ -2000,26 +1755,46 @@ function OperationsMonitor({
 function QueueItem({
   item,
   label,
+  selected,
+  onToggleSelect,
   onOpen,
 }: {
   item: CaseFile
   label: string
+  selected: boolean
+  onToggleSelect: (code: string) => void
   onOpen: (item: CaseFile) => void
 }) {
   const assignee =
     item.assignment?.assignee ||
     item.assignment?.assigneeName ||
     (item.assignment?.assigneeId ? 'Đã phân công' : 'Chưa phân công')
-  const dueDays = daysUntil(item.deadline)
-  const tone =
-    dueDays !== null && dueDays < 0 && !CLOSED_STATUSES.has(item.status)
-      ? 'overdue'
-      : dueDays !== null && dueDays <= 3 && !CLOSED_STATUSES.has(item.status)
-        ? 'soon'
-        : 'normal'
 
   return (
-    <tr className="queue-table-row" onClick={() => onOpen(item)}>
+    <tr
+      className={`queue-table-row${selected ? ' is-selected' : ''}`}
+      tabIndex={0}
+      onClick={() => onOpen(item)}
+      onKeyDown={event => {
+        if (event.key === 'Enter') {
+          event.preventDefault()
+          onOpen(item)
+        }
+      }}
+    >
+      <td
+        className="col-check"
+        data-label="Chọn"
+        onClick={event => event.stopPropagation()}
+        onKeyDown={event => event.stopPropagation()}
+      >
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={() => onToggleSelect(item.code)}
+          aria-label={`Chọn hồ sơ ${item.code}`}
+        />
+      </td>
       <td data-label="Mã hồ sơ & Kênh nộp">
         <div className="account-cell-user">
           <b className="case-code tabular-nums">{item.code}</b>
@@ -2048,11 +1823,8 @@ function QueueItem({
       </td>
       <td data-label="Trạng thái & Hạn">
         <div className="queue-cell-status">
-          <span className={`status-pill status-${item.status}`}>{label}</span>
-          <div className={`deadline-tag ${tone}`}>
-            <span className="deadline-dot" />
-            <span className="deadline-text">{dueText(item)}</span>
-          </div>
+          <StatusTag status={item.status} label={label} />
+          <SLABadge item={item} />
         </div>
       </td>
       <td className="col-actions" data-label="Thao tác" onClick={event => event.stopPropagation()}>
@@ -2074,12 +1846,17 @@ function CaseQueue({
   data,
   initialFocus,
   onOpen,
+  onRefresh,
+  onNotice,
 }: {
   user: User
   data: Bootstrap
   initialFocus: QueueFocus | null
   onOpen: (item: CaseFile) => void
+  onRefresh: () => Promise<Bootstrap>
+  onNotice: (text: string) => void
 }) {
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
   const [query, setQuery] = useState('')
   const [bucket, setBucket] = useState('ALL')
   const [focusedStatuses, setFocusedStatuses] = useState(initialFocus?.statuses || [])
@@ -2092,6 +1869,34 @@ function CaseQueue({
   const [createdFrom, setCreatedFrom] = useState(initialFocus?.createdFrom || '')
   const [createdTo, setCreatedTo] = useState(initialFocus?.createdTo || '')
   const [sort, setSort] = useState('deadline')
+  const [pageSize, setPageSize] = useState(20)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedCodes, setSelectedCodes] = useState<Set<string>>(() => new Set())
+  const [bulkAssignee, setBulkAssignee] = useState('')
+  const [bulkBusy, setBulkBusy] = useState(false)
+  const [bulkError, setBulkError] = useState('')
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      const inEditable =
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        searchInputRef.current?.focus()
+        searchInputRef.current?.select()
+      } else if (!inEditable && event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        event.preventDefault()
+        searchInputRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   const agencyOptions = useMemo(
     () =>
@@ -2226,31 +2031,138 @@ function CaseQueue({
     updatedSince,
   ])
 
-  const exportVisibleCases = () => ({
-      title: 'Bảng kê hồ sơ đang xem',
-      subtitle: [agencyFilter === 'all' ? user.agencyScope || 'Phạm vi được cấp' : agencyFilter, selectedBucket.label, focusLabel, query.trim() ? `Tìm: ${query.trim()}` : '', procedureFilter ? `Mã thủ tục: ${procedureFilter}` : '', createdFrom || createdTo ? `Ngày gửi: ${createdFrom || 'không giới hạn'} – ${createdTo || 'không giới hạn'}` : '', updatedSince ? `Cập nhật từ: ${updatedSince}` : '', `${filtered.length} hồ sơ`].filter(Boolean).join(' · '),
-      filename: 'danh-sach-ho-so-trong-pham-vi',
-      headers: [
-        'Mã hồ sơ',
-        'Mã thủ tục',
-        'Tên thủ tục',
-        'Cơ quan tiếp nhận',
-        ...(user.role === 'finance' ? [] : ['Người nộp']),
-        'Trạng thái',
-        'Ngày gửi',
-        'Hạn giải quyết',
-      ],
-      rows: filtered.map(item => [
-        item.code,
-        item.procedureCode,
-        item.procedure?.name || '',
-        item.agencyScope || item.receivingAgency || '',
-        ...(user.role === 'finance' ? [] : [item.applicant?.name || '']),
-        data.statusLabels[item.status] || item.status,
-        toDate(item.createdAt),
-        toDate(item.deadline),
-      ]),
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const safePage = Math.min(currentPage, totalPages)
+  const pageItems = useMemo(
+    () => filtered.slice((safePage - 1) * pageSize, safePage * pageSize),
+    [filtered, pageSize, safePage],
+  )
+
+  const selectedCases = useMemo(
+    () => data.cases.filter(item => selectedCodes.has(item.code)),
+    [data.cases, selectedCodes],
+  )
+  const bulkIntakeTargets = useMemo(
+    () =>
+      selectedCases.filter(item =>
+        getActions(user, item).some(act => act.value === 'accept'),
+      ),
+    [selectedCases, user],
+  )
+  const bulkAssignTargets = useMemo(
+    () => selectedCases.filter(item => getActions(user, item).some(act => act.value === 'assign')),
+    [selectedCases, user],
+  )
+  const allPageSelected =
+    pageItems.length > 0 && pageItems.every(item => selectedCodes.has(item.code))
+
+  const toggleRow = (code: string) => {
+    setSelectedCodes(prev => {
+      const next = new Set(prev)
+      if (next.has(code)) next.delete(code)
+      else next.add(code)
+      return next
     })
+  }
+
+  const toggleAllCurrentPage = () => {
+    setSelectedCodes(prev => {
+      const next = new Set(prev)
+      if (allPageSelected) {
+        pageItems.forEach(item => next.delete(item.code))
+      } else {
+        pageItems.forEach(item => next.add(item.code))
+      }
+      return next
+    })
+  }
+
+  async function runBulkIntake() {
+    if (!bulkIntakeTargets.length) return
+    setBulkBusy(true)
+    setBulkError('')
+    try {
+      let okCount = 0
+      for (const target of bulkIntakeTargets) {
+        await api(`/api/cases/${encodeURIComponent(target.code)}/actions`, {
+          action: 'accept',
+          payload: {},
+          expectedVersion: target.version,
+        })
+        okCount += 1
+      }
+      setSelectedCodes(new Set())
+      await onRefresh()
+      onNotice(`Đã tiếp nhận hàng loạt ${okCount} hồ sơ đủ điều kiện.`)
+    } catch (cause) {
+      setBulkError(cause instanceof Error ? cause.message : 'Không thể tiếp nhận hàng loạt.')
+    } finally {
+      setBulkBusy(false)
+    }
+  }
+
+  async function runBulkAssign() {
+    if (!bulkAssignTargets.length || !bulkAssignee) return
+    setBulkBusy(true)
+    setBulkError('')
+    try {
+      let okCount = 0
+      for (const target of bulkAssignTargets) {
+        await api(`/api/cases/${encodeURIComponent(target.code)}/actions`, {
+          action: 'assign',
+          payload: { assignee: bulkAssignee, unit: user.agencyScope || '' },
+          expectedVersion: target.version,
+        })
+        okCount += 1
+      }
+      setSelectedCodes(new Set())
+      await onRefresh()
+      onNotice(`Đã phân công hàng loạt ${okCount} hồ sơ.`)
+    } catch (cause) {
+      setBulkError(cause instanceof Error ? cause.message : 'Không thể phân công hàng loạt.')
+    } finally {
+      setBulkBusy(false)
+    }
+  }
+
+  const exportVisibleCases = () => ({
+    title: 'Bảng kê hồ sơ đang xem',
+    subtitle: [
+      agencyFilter === 'all' ? user.agencyScope || 'Phạm vi được cấp' : agencyFilter,
+      selectedBucket.label,
+      focusLabel,
+      query.trim() ? `Tìm: ${query.trim()}` : '',
+      procedureFilter ? `Mã thủ tục: ${procedureFilter}` : '',
+      createdFrom || createdTo
+        ? `Ngày gửi: ${createdFrom || 'không giới hạn'} – ${createdTo || 'không giới hạn'}`
+        : '',
+      updatedSince ? `Cập nhật từ: ${updatedSince}` : '',
+      `${filtered.length} hồ sơ`,
+    ]
+      .filter(Boolean)
+      .join(' · '),
+    filename: 'danh-sach-ho-so-trong-pham-vi',
+    headers: [
+      'Mã hồ sơ',
+      'Mã thủ tục',
+      'Tên thủ tục',
+      'Cơ quan tiếp nhận',
+      ...(user.role === 'finance' ? [] : ['Người nộp']),
+      'Trạng thái',
+      'Ngày gửi',
+      'Hạn giải quyết',
+    ],
+    rows: filtered.map(item => [
+      item.code,
+      item.procedureCode,
+      item.procedure?.name || '',
+      item.agencyScope || item.receivingAgency || '',
+      ...(user.role === 'finance' ? [] : [item.applicant?.name || '']),
+      data.statusLabels[item.status] || item.status,
+      toDate(item.createdAt),
+      toDate(item.deadline),
+    ]),
+  })
 
   const counts = (filter: (typeof QUEUE_FILTERS)[number]) =>
     data.cases.filter(item => !filter.statuses.length || filter.statuses.includes(item.status))
@@ -2269,6 +2181,7 @@ function CaseQueue({
             setBucket(nextKey)
             setFocusedStatuses([])
             setFocusLabel('')
+            setCurrentPage(1)
           })
         }
       >
@@ -2286,6 +2199,7 @@ function CaseQueue({
               setBucket(filter.key)
               setFocusedStatuses([])
               setFocusLabel('')
+              setCurrentPage(1)
             }}
           >
             <span>{filter.label}</span>
@@ -2324,6 +2238,7 @@ function CaseQueue({
               setCreatedFrom('')
               setCreatedTo('')
               setQuery('')
+              setCurrentPage(1)
             }}
           >
             Xóa điều kiện lọc ×
@@ -2339,13 +2254,22 @@ function CaseQueue({
       >
         <div className="queue-filter-grid">
           <label className="queue-search" htmlFor="queue-search-input">
-            <span>Tìm kiếm nhanh</span>
+            <span className="queue-search__head">
+              <span>Tìm kiếm nhanh</span>
+              <span className="queue-kbd-hint">
+                Phím <kbd>/</kbd>
+              </span>
+            </span>
             <input
+              ref={searchInputRef}
               id="queue-search-input"
               className="search-input"
               type="search"
               value={query}
-              onChange={event => setQuery(event.target.value)}
+              onChange={event => {
+                setQuery(event.target.value)
+                setCurrentPage(1)
+              }}
               placeholder="Mã hồ sơ, mã/tên thủ tục, họ tên chủ hồ sơ"
             />
           </label>
@@ -2355,7 +2279,10 @@ function CaseQueue({
               <select
                 id="queue-agency-select"
                 value={agencyFilter}
-                onChange={event => setAgencyFilter(event.target.value)}
+                onChange={event => {
+                  setAgencyFilter(event.target.value)
+                  setCurrentPage(1)
+                }}
               >
                 <option value="all">Tất cả cơ quan ({agencyOptions.length})</option>
                 {agencyOptions.map(agency => (
@@ -2377,7 +2304,10 @@ function CaseQueue({
             <select
               id="queue-deadline-select"
               value={deadlineFilter}
-              onChange={event => setDeadlineFilter(event.target.value)}
+              onChange={event => {
+                setDeadlineFilter(event.target.value)
+                setCurrentPage(1)
+              }}
             >
               <option value="all">Mọi thời hạn</option>
               <option value="overdue">Đã quá hạn</option>
@@ -2390,7 +2320,10 @@ function CaseQueue({
             <select
               id="queue-assignee-select"
               value={assigneeFilter}
-              onChange={event => setAssigneeFilter(event.target.value)}
+              onChange={event => {
+                setAssigneeFilter(event.target.value)
+                setCurrentPage(1)
+              }}
             >
               <option value="all">Tất cả</option>
               <option value="assigned">Đã phân công</option>
@@ -2407,7 +2340,10 @@ function CaseQueue({
             <select
               id="queue-sort-select"
               value={sort}
-              onChange={event => setSort(event.target.value)}
+              onChange={event => {
+                setSort(event.target.value)
+                setCurrentPage(1)
+              }}
             >
               <option value="deadline">Hạn giải quyết gần nhất</option>
               <option value="updated">Mới cập nhật</option>
@@ -2416,11 +2352,28 @@ function CaseQueue({
           </label>
         </div>
 
-        {filtered.length > 0 ? (
+        {bulkError && (
+          <div className="form-error queue-bulk-error" role="alert">
+            <span>{bulkError}</span>
+            <button type="button" className="text-button" onClick={() => setBulkError('')}>
+              Đóng
+            </button>
+          </div>
+        )}
+
+        {pageItems.length > 0 ? (
           <div className="table-scroll data-table-wrap">
             <table className="data-table queue-data-table">
               <thead>
                 <tr>
+                  <th className="col-check">
+                    <input
+                      type="checkbox"
+                      checked={allPageSelected}
+                      onChange={toggleAllCurrentPage}
+                      aria-label="Chọn tất cả hồ sơ trên trang hiện tại"
+                    />
+                  </th>
                   <th>Mã hồ sơ &amp; Kênh nộp</th>
                   <th>Thủ tục hành chính &amp; Chủ hồ sơ</th>
                   <th>Cơ quan &amp; Người phụ trách</th>
@@ -2429,11 +2382,13 @@ function CaseQueue({
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(item => (
+                {pageItems.map(item => (
                   <QueueItem
                     key={item.code}
                     item={item}
                     label={data.statusLabels[item.status] || item.status}
+                    selected={selectedCodes.has(item.code)}
+                    onToggleSelect={toggleRow}
                     onOpen={onOpen}
                   />
                 ))}
@@ -2448,11 +2403,110 @@ function CaseQueue({
 
         <div className="queue-footer">
           <span>
-            Hiển thị <b className="tabular-nums">{filtered.length.toLocaleString('vi-VN')}</b> /{' '}
-            <b className="tabular-nums">{data.cases.length.toLocaleString('vi-VN')}</b> hồ sơ trong phạm vi phân quyền.
+            Hiển thị{' '}
+            <b className="tabular-nums">
+              {filtered.length === 0 ? 0 : (safePage - 1) * pageSize + 1}–
+              {Math.min(safePage * pageSize, filtered.length)}
+            </b>{' '}
+            trên <b className="tabular-nums">{filtered.length.toLocaleString('vi-VN')}</b> hồ sơ lọc
+            (tổng phạm vi <b className="tabular-nums">{data.cases.length.toLocaleString('vi-VN')}</b>
+            ).
           </span>
+
+          <div className="queue-pagination-controls">
+            <label htmlFor="queue-page-size" className="queue-page-size-label">
+              <span>Số dòng:</span>
+              <select
+                id="queue-page-size"
+                value={pageSize}
+                onChange={e => {
+                  setPageSize(Number(e.target.value))
+                  setCurrentPage(1)
+                }}
+              >
+                <option value={20}>20 / trang</option>
+                <option value={50}>50 / trang</option>
+                <option value={100}>100 / trang</option>
+              </select>
+            </label>
+            {totalPages > 1 && (
+              <>
+                <button
+                  type="button"
+                  className="button secondary compact-btn"
+                  disabled={safePage <= 1}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                >
+                  ← Trước
+                </button>
+                <span className="tabular-nums">
+                  Trang <b>{safePage}</b> / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className="button secondary compact-btn"
+                  disabled={safePage >= totalPages}
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                >
+                  Sau →
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </section>
+
+      {selectedCodes.size > 0 && (
+        <div className="hcds-bulk-bar" role="region" aria-label="Thao tác hồ sơ hàng loạt">
+          <CheckSquare size={18} strokeWidth={1.75} aria-hidden="true" />
+          <span className="tabular-nums">
+            Đã chọn <b>{selectedCodes.size}</b> hồ sơ
+          </span>
+          {bulkIntakeTargets.length > 0 && (
+            <button
+              type="button"
+              className="button primary compact-btn"
+              disabled={bulkBusy}
+              onClick={() => void runBulkIntake()}
+            >
+              Tiếp nhận ({bulkIntakeTargets.length})
+            </button>
+          )}
+          {bulkAssignTargets.length > 0 && (data.staff || []).length > 0 && (
+            <div className="bulk-assign-group">
+              <select
+                aria-label="Chọn chuyên viên phân công hàng loạt"
+                className="bulk-assign-select"
+                value={bulkAssignee}
+                onChange={e => setBulkAssignee(e.target.value)}
+              >
+                <option value="">— Chọn chuyên viên —</option>
+                {(data.staff || []).map(member => (
+                  <option key={member.id} value={member.id}>
+                    {member.name} ({roleNames[member.role] || member.role})
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="button secondary compact-btn"
+                disabled={bulkBusy || !bulkAssignee}
+                onClick={() => void runBulkAssign()}
+              >
+                Phân công ({bulkAssignTargets.length})
+              </button>
+            </div>
+          )}
+          <button
+            type="button"
+            className="text-button bulk-clear-btn"
+            disabled={bulkBusy}
+            onClick={() => setSelectedCodes(new Set())}
+          >
+            Bỏ chọn
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -2460,194 +2514,27 @@ function CaseQueue({
 function StaffNavIcon({ name }: { name: string }) {
   switch (name) {
     case 'dashboard':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="3" y="3" width="7" height="9" rx="1" />
-          <rect x="14" y="3" width="7" height="5" rx="1" />
-          <rect x="14" y="12" width="7" height="9" rx="1" />
-          <rect x="3" y="16" width="7" height="5" rx="1" />
-        </svg>
-      )
+      return <LayoutDashboard size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'inbox':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M22 12h-6l-2 3h-4l-2-3H2" />
-          <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-        </svg>
-      )
+      return <Inbox size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'desk':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="3" y="4" width="18" height="18" rx="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-          <path d="M8 14h.01" />
-          <path d="M12 14h.01" />
-          <path d="M16 14h.01" />
-        </svg>
-      )
+      return <CalendarCheck2 size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'catalog':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-        </svg>
-      )
+      return <BookOpenCheck size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'activity':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
-      )
+      return <Activity size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'connections':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="2" y="5" width="20" height="14" rx="2" />
-          <line x1="2" y1="10" x2="22" y2="10" />
-        </svg>
-      )
+      return <CreditCard size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'users':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
-      )
+      return <Users size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'reports':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <line x1="18" y1="20" x2="18" y2="10" />
-          <line x1="12" y1="20" x2="12" y2="4" />
-          <line x1="6" y1="20" x2="6" y2="14" />
-        </svg>
-      )
+      return <BarChart3 size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'news':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-      )
+      return <Newspaper size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'guide':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
-        </svg>
-      )
+      return <HelpCircle size={16} strokeWidth={1.75} aria-hidden="true" />
     case 'signout':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" y1="12" x2="9" y2="12" />
-        </svg>
-      )
+      return <LogOut size={16} strokeWidth={1.75} aria-hidden="true" />
     default:
       return null
   }
@@ -2732,6 +2619,14 @@ export function App() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [page])
+
+  useEffect(() => {
+    if (route === 'staff') {
+      document.documentElement.setAttribute('data-surface', 'staff')
+    } else {
+      document.documentElement.setAttribute('data-surface', 'citizen')
+    }
+  }, [route])
 
   useEffect(() => {
     if (captureMode) document.documentElement.classList.add('capture-mode')
@@ -2819,7 +2714,33 @@ export function App() {
     }
     setCitizenProcedureCode(next === 'submit' ? procedureCode : '')
     setRoute(next)
+    window.scrollTo(0, 0)
   }
+
+  const navigateByPath = useCallback(
+    (rawPath: string) => {
+      if (rawPath === '/staff') {
+        navigateRoute('staff')
+        return
+      }
+      const url = new URL(rawPath, window.location.origin)
+      if (url.pathname === '/nop-ho-so' && url.searchParams.get('v') !== 'receipt') {
+        persistReceipt(null)
+        setCitizenReceipt(null)
+      }
+      const target = `${url.pathname}${url.search}${url.hash}`
+      if (`${window.location.pathname}${window.location.search}${window.location.hash}` !== target) {
+        window.history.pushState({ route: routeFromPath() }, '', target)
+      }
+      const nextRoute = routeFromPath()
+      setCitizenProcedureCode(url.searchParams.get('procedure') || '')
+      setRoute(nextRoute)
+      window.dispatchEvent(new PopStateEvent('popstate'))
+      window.scrollTo(0, 0)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, pageHistory],
+  )
 
   useEffect(() => {
     const syncRoute = () => {
@@ -2827,6 +2748,7 @@ export function App() {
       setRoute(nextRoute)
       const searchParams = new URLSearchParams(window.location.search)
       setCitizenProcedureCode(searchParams.get('procedure') || '')
+      setCitizenReceipt(readStoredReceipt())
 
       if (nextRoute === 'staff') {
         const urlPage = searchParams.get('page') || window.history.state?.page
@@ -2941,7 +2863,6 @@ export function App() {
         if (!active) return
         if (!result.user) {
           if (routeFromPath() === 'staff') {
-            // Non-destructive session expiry on /staff: keep selected & actionText intact!
             setStaffSessionExpired(true)
             return
           }
@@ -3231,7 +3152,6 @@ export function App() {
   }
 
   function openCase(item: CaseFile) {
-    // CRITICAL STATE LEAK FIX: always clear previous case's action & draft notes when switching cases!
     setAction('')
     setActionText('')
     setAssignee('')
@@ -3278,202 +3198,210 @@ export function App() {
     }
   }
 
-  const citizenAccountBar = (
-    <div className="citizen-account-bar">
-      <span>{citizen ? `Công dân: ${citizen.name}` : 'Dịch vụ trực tuyến dành cho công dân'}</span>
-      <div>
-        {citizen ? (
-          <>
-            <a
-              className="text-button"
-              href="/tai-khoan"
-              aria-current={route === 'citizen-profile' ? 'page' : undefined}
-            >
-              Tài khoản của tôi
-            </a>
-            <a className="text-button" href="/tai-khoan/ho-so">
-              Dịch vụ công của tôi
-            </a>
-            <button type="button" className="text-button" onClick={() => void signOutCitizen()}>
-              Đăng xuất
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            className="text-button"
-            onClick={() => navigateRoute('citizen-login')}
-          >
-            Đăng nhập công dân
-          </button>
-        )}
-      </div>
-      {citizenError && <span role="alert">{citizenError}</span>}
-    </div>
-  )
-
-  if (route === 'not-found') {
-    return (
-      <>
-        {citizenAccountBar}
-        <NotFoundPage
-          onHome={() => navigateRoute('public')}
-          onCatalog={() => navigateRoute('catalog')}
-        />
-      </>
-    )
-  }
-
-  // Note: 'track' (/tra-cuu-ho-so) is intentionally open to unauthenticated visitors for Public Quick Status Check!
-  const citizenServiceRoute =
-    route === 'citizen-profile' || route === 'submit' || route === 'citizen-services'
-
-  if ((citizenServiceRoute || route === 'citizen-login') && !citizenReady) {
-    return (
-      <main className="auth-page">
-        <p role="status">Đang kiểm tra phiên đăng nhập…</p>
-      </main>
-    )
-  }
-
-  if ((citizenServiceRoute || route === 'citizen-login') && !citizen) {
-    return (
-      <CitizenAuthScreen
-        onBack={() => navigateRoute('public')}
-        onAuthenticated={(account, csrf, registered) => {
-          setCitizenSessionToken(csrf)
-          setCitizen(account)
-          setCitizenError('')
-          if (registered || route === 'citizen-login') {
-            navigateRoute('citizen-profile')
-          }
-        }}
-      />
-    )
-  }
-
-  if (route === 'citizen-profile') {
-    return (
-      <Suspense fallback={<LoadingFallback label="Đang tải không gian tài khoản công dân…" />}>
-        <LazyCitizenWorkspace
-          name={citizen?.name || ''}
-          request={api}
-          onChanged={(next: User) => setCitizen(next)}
-          onSignOut={signOutCitizen}
-          renderProfile={onDirtyChange => (
-            <Suspense fallback={<LoadingFallback label="Đang tải thông tin cá nhân…" />}>
-              <LazyCitizenProfilePage
-                onDirtyChange={onDirtyChange}
-                request={api}
-                onChanged={(next: User) => setCitizen(next)}
-                onHome={() => navigateRoute('public')}
-                onSubmit={() => navigateRoute('submit')}
-              />
-            </Suspense>
-          )}
-          renderCase={(code, onUpdated) => (
-            <CitizenTrackingPage
-              key={code}
-              initialReceipt={null}
-              initialCode={code}
-              embedded
-              citizenSignedIn
-              onUpdated={onUpdated}
-            />
-          )}
-        />
-      </Suspense>
-    )
-  }
-
-  if (route === 'citizen-login') {
-    return (
-      <>
-        {citizenAccountBar}
-        <PublicPortal
-          key="citizen-home"
-          onStaff={() => navigateRoute('public')}
-          onGuide={() => navigateRoute('guide')}
-          onNavigate={navigateRoute}
-          onReceipt={updateReceipt}
-          receipt={citizenReceipt}
-          citizenSignedIn
-          signedIn={false}
-          initialView="public"
-          initialProcedureCode=""
-        />
-      </>
-    )
-  }
-
+  // Staff route handling (Auth, Password Change, or Staff Shell)
   if (route === 'staff' && citizen && !user) {
     return (
-      <main className="auth-page">
-        <AgencyMasthead />
-        <section className="auth-card">
-          <h1>Tài khoản công dân</h1>
-          <p>Bàn cán bộ chỉ dành cho tài khoản nội bộ được cấp quyền.</p>
-          <button
-            type="button"
-            className="button primary"
-            onClick={() => navigateRoute('public')}
-          >
-            Về cổng dịch vụ công dân
-          </button>
+      <CivicShell
+        currentPath="/staff"
+        citizenUser={citizen}
+        onNavigate={navigateByPath}
+        onLogoutCitizen={() => void signOutCitizen()}
+      >
+        <section className="not-found-page">
+          <div className="panel not-found-card">
+            <h1>Khu vực nghiệp vụ nội bộ</h1>
+            <p>
+              Bạn đang đăng nhập bằng tài khoản công dân ({citizen.name}). Bàn làm việc Một cửa chỉ
+              dành cho tài khoản cán bộ được phân quyền.
+            </p>
+            <div className="not-found-actions">
+              <button
+                type="button"
+                className="button primary"
+                onClick={() => navigateRoute('public')}
+              >
+                Về Cổng dịch vụ công dân
+              </button>
+              <button
+                type="button"
+                className="button secondary"
+                onClick={() => void signOutCitizen().then(() => navigateRoute('staff'))}
+              >
+                Đăng xuất công dân &amp; mở đăng nhập cán bộ
+              </button>
+            </div>
+          </div>
         </section>
-      </main>
+      </CivicShell>
     )
   }
 
-  if (user?.mustChangePassword) {
+  if (route === 'staff' && user?.mustChangePassword) {
     return <PasswordChangeScreen onChanged={passwordChanged} onSignOut={() => void signOut()} />
   }
 
-  if (route === 'guide') {
-    return (
-      <StandaloneGuide
-        signedIn={Boolean(user)}
-        onHome={() => navigateRoute(user ? 'staff' : 'public')}
-        onStaff={() => navigateRoute('staff')}
-      />
-    )
-  }
-
-  if (route === 'citizen-services') {
-    return (
-      <>
-        {citizenAccountBar}
-        <PublicCitizenServicesPage
-          onHome={() => navigateRoute('public')}
-          onStaff={() => navigateRoute('staff')}
-          signedIn={Boolean(user)}
-          citizenSignedIn={Boolean(citizen) && !user}
-        />
-      </>
-    )
-  }
-
-  if (!user && route === 'staff') {
+  if (route === 'staff' && !user) {
     return <AuthScreen onAuthenticated={authenticate} onBack={() => navigateRoute('public')} />
   }
 
-  if (route === 'public' || route === 'catalog' || route === 'submit' || route === 'track') {
+  // Unified Citizen Surface (<CivicShell>) across ALL non-staff routes!
+  if (route !== 'staff') {
+    const currentPath = window.location.pathname || '/'
+    const citizenProtectedRoute =
+      route === 'citizen-profile' || route === 'submit' || route === 'citizen-services'
+
+    const isReceiptQuery =
+      route === 'submit' &&
+      Boolean(citizenReceipt) &&
+      new URLSearchParams(window.location.search).get('v') === 'receipt'
+    const activeSubmitView: PublicView = isReceiptQuery ? 'receipt' : 'submit'
+
+    const returnContextLabel =
+      route === 'submit'
+        ? 'Đăng nhập để kê khai tự động từ hồ sơ công dân và gửi hồ sơ trực tuyến (hệ thống sẽ giữ nguyên thủ tục bạn đã chọn).'
+        : route === 'citizen-services'
+          ? 'Đăng nhập để đặt lịch hẹn giao dịch Một cửa hoặc gửi phản ánh, kiến nghị có định danh.'
+          : route === 'citizen-profile'
+            ? 'Đăng nhập để truy cập Không gian công dân số, Kho tài liệu điện tử và danh sách hồ sơ của bạn.'
+            : undefined
+
     return (
-      <>
-        {citizenAccountBar}
-        <PublicPortal
-          key={route}
-          onStaff={() => navigateRoute(citizen && !user ? 'public' : 'staff')}
-          onGuide={() => navigateRoute('guide')}
-          onNavigate={navigateRoute}
-          onReceipt={updateReceipt}
-          receipt={citizenReceipt}
-          citizenSignedIn={Boolean(citizen)}
-          signedIn={Boolean(user)}
-          initialView={route}
-          initialProcedureCode={citizenProcedureCode}
-        />
-      </>
+      <CivicShell
+        currentPath={currentPath}
+        citizenUser={citizen}
+        onNavigate={navigateByPath}
+        onLogoutCitizen={() => void signOutCitizen()}
+      >
+        {citizenError && (
+          <div className="form-error citizen-alert-banner" role="alert">
+            <span>{citizenError}</span>
+            <button type="button" className="text-button" onClick={() => setCitizenError('')}>
+              Đóng
+            </button>
+          </div>
+        )}
+
+        {(citizenProtectedRoute || route === 'citizen-login') && !citizenReady ? (
+          <LoadingFallback label="Đang kiểm tra phiên xác thực công dân…" />
+        ) : (citizenProtectedRoute || route === 'citizen-login') && !citizen ? (
+          <CitizenAuthSection
+            returnContextLabel={returnContextLabel}
+            onNavigatePath={navigateByPath}
+            onAuthenticated={(account, csrf, registered) => {
+              setCitizenSessionToken(csrf)
+              setCitizen(account)
+              setCitizenError('')
+              // Preserve current route when citizen signed in specifically to submit or book appointment!
+              if (registered || route === 'citizen-login') {
+                navigateRoute('citizen-profile')
+              }
+            }}
+          />
+        ) : route === 'not-found' ? (
+          <NotFoundSection
+            onHome={() => navigateRoute('public')}
+            onCatalog={() => navigateRoute('catalog')}
+          />
+        ) : route === 'citizen-profile' ? (
+          <Suspense fallback={<LoadingFallback label="Đang tải Không gian công dân số…" />}>
+            <LazyCitizenWorkspace
+              embeddedInCivicShell
+              name={citizen?.name || ''}
+              request={api}
+              onChanged={(next: User) => setCitizen(next)}
+              onSignOut={signOutCitizen}
+              renderProfile={onDirtyChange => (
+                <Suspense fallback={<LoadingFallback label="Đang tải thông tin định danh…" />}>
+                  <LazyCitizenProfilePage
+                    embedded
+                    onDirtyChange={onDirtyChange}
+                    request={api}
+                    onChanged={(next: User) => setCitizen(next)}
+                    onHome={() => navigateRoute('public')}
+                    onSubmit={() => navigateRoute('submit')}
+                  />
+                </Suspense>
+              )}
+              renderCase={(code, onUpdated) => (
+                <CitizenTrackingPage
+                  key={code}
+                  initialReceipt={null}
+                  initialCode={code}
+                  embedded
+                  citizenSignedIn
+                  onUpdated={onUpdated}
+                />
+              )}
+            />
+          </Suspense>
+        ) : route === 'catalog' ? (
+          <Suspense fallback={<LoadingFallback label="Đang tải danh mục thủ tục hành chính…" />}>
+            <LazyCitizenProcedureCatalog request={api} />
+          </Suspense>
+        ) : route === 'submit' ? (
+          activeSubmitView === 'receipt' && citizenReceipt ? (
+            <CitizenReceiptView
+              receipt={citizenReceipt}
+              onTrack={() =>
+                navigateByPath(`/tra-cuu-ho-so?code=${encodeURIComponent(citizenReceipt.code)}`)
+              }
+            />
+          ) : (
+            <Suspense fallback={<LoadingFallback label="Đang tải biểu mẫu nộp hồ sơ trực tuyến…" />}>
+              <LazyCitizenApplicationForm
+                request={api}
+                initialProcedureCode={citizenProcedureCode}
+                onSubmitted={value => updateReceipt(value)}
+              />
+            </Suspense>
+          )
+        ) : route === 'track' ? (
+          <CitizenTrackingPage
+            initialReceipt={citizenReceipt}
+            citizenSignedIn={Boolean(citizen)}
+            onRequireLogin={() => navigateRoute('citizen-login')}
+          />
+        ) : route === 'citizen-services' ? (
+          <div>
+            <div className="citizen-page-heading">
+              <h1>Lịch hẹn giao dịch Một cửa &amp; Phản ánh, kiến nghị</h1>
+              <p>
+                Chủ động đặt lịch làm việc tại Bộ phận Một cửa để giảm thời gian chờ đợi hoặc gửi
+                phản ánh, kiến nghị tới cơ quan có thẩm quyền.
+              </p>
+            </div>
+            <Suspense fallback={<LoadingFallback label="Đang tải tiện ích công dân…" />}>
+              <LazyPublicAdministrativeServices request={api} />
+            </Suspense>
+          </div>
+        ) : route === 'guide' ? (
+          <GuideContent isStaff={Boolean(user)} onNavigatePath={navigateByPath} />
+        ) : (
+          <>
+            <InformationHome onNavigate={navigateByPath} />
+            <section className="support-strip" id="ho-tro">
+              <div>
+                <h2>Trung tâm Phục vụ hành chính công Thành phố Hà Nội</h2>
+                <p>
+                  Hỗ trợ giải đáp quy trình, thành phần hồ sơ và hướng dẫn thực hiện dịch vụ công
+                  trực tuyến 24/7.
+                </p>
+              </div>
+              <div className="support-actions">
+                <a className="button secondary" href={CITY_SUPPORT} target="_blank" rel="noreferrer">
+                  Cổng thông tin Trung tâm
+                </a>
+                <a className="support-phone tabular-nums" href="tel:0241022">
+                  024 1022 <small>nhánh 7, 8</small>
+                </a>
+                <a className="support-phone tabular-nums" href="tel:19001009">
+                  1900 1009 <small>tổng đài thông minh</small>
+                </a>
+              </div>
+            </section>
+          </>
+        )}
+      </CivicShell>
     )
   }
 
@@ -3678,7 +3606,9 @@ export function App() {
   const activeNavKey = page === 'detail' ? 'inbox' : page === 'monitoring' ? 'home' : page
 
   return (
-    <div className={`app-shell${captureMode ? ' capture-mode' : ''}`}>
+    <div className={`app-shell${captureMode ? ' capture-mode' : ''}`} data-surface="staff">
+      <SkipLink targetId="staff-main-workspace" />
+
       {staffSessionExpired && (
         <StaffReauthModal
           user={user}
@@ -3701,7 +3631,7 @@ export function App() {
           aria-expanded={mobileNavOpen}
           onClick={() => setMobileNavOpen(open => !open)}
         >
-          <span>☰</span>
+          <Menu size={18} strokeWidth={1.75} aria-hidden="true" />
           <small>Danh mục</small>
         </button>
 
@@ -3728,7 +3658,8 @@ export function App() {
             className="text-button staff-public-link"
             onClick={() => navigateRoute('public')}
           >
-            Cổng công dân ↗
+            <span>Cổng công dân</span>
+            <ExternalLink size={14} strokeWidth={1.75} aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -3767,7 +3698,7 @@ export function App() {
             aria-label="Đóng danh mục"
             onClick={() => setMobileNavOpen(false)}
           >
-            ×
+            <X size={16} strokeWidth={1.75} aria-hidden="true" />
           </button>
         </div>
 
@@ -3808,7 +3739,7 @@ export function App() {
         </div>
       </aside>
 
-      <main className="workspace">
+      <main id="staff-main-workspace" className="workspace" tabIndex={-1}>
         {page !== 'detail' && (
           <div className="page-heading staff-page-bar">
             <div className="staff-page-bar-title">
@@ -3832,7 +3763,8 @@ export function App() {
                       )
                   }
                 >
-                  ↻ Làm mới
+                  <RefreshCw size={14} strokeWidth={1.75} aria-hidden="true" />
+                  <span>Làm mới</span>
                 </button>
               </div>
             )}
@@ -3841,7 +3773,7 @@ export function App() {
 
         {message && (
           <div className="toast-success" role="status">
-            <span>✓ {message}</span>
+            <span>{message}</span>
             <button type="button" onClick={() => setMessage('')}>
               Đóng
             </button>
@@ -3851,7 +3783,7 @@ export function App() {
           <div className="form-error page-error" role="alert">
             <span>{error}</span>
             <button type="button" onClick={() => setError('')}>
-              ×
+              Đóng
             </button>
           </div>
         )}
@@ -3863,6 +3795,8 @@ export function App() {
             data={data}
             initialFocus={queueFocus}
             onOpen={openCase}
+            onRefresh={refresh}
+            onNotice={setMessage}
           />
         )}
 
@@ -3907,30 +3841,32 @@ export function App() {
         )}
 
         {page === 'detail' && selected && (
-          <CaseDetail
-            key={`${selected.code}:${selected.version}:${selected.withdrawal?.status || ''}`}
-            item={selected}
-            isStaff={isStaff}
-            signingAuthorityRef={user.signingAuthorityRef || ''}
-            labels={data.statusLabels}
-            actionOptions={actionOptions}
-            action={action}
-            setAction={setAction}
-            actionText={actionText}
-            setActionText={setActionText}
-            assignee={assignee}
-            setAssignee={setAssignee}
-            extendDays={extendDays}
-            setExtendDays={setExtendDays}
-            staff={data.staff || []}
-            busy={busy}
-            onSubmitAction={submitAction}
-            onLookupKeyChanged={async () => {
-              setSelected(await api<CaseFile>(`/api/cases/${encodeURIComponent(selected.code)}`))
-              await refresh()
-            }}
-            onBack={goBack}
-          />
+          <Suspense fallback={<LoadingFallback label="Đang tải hồ sơ nghiệp vụ…" />}>
+            <LazyCaseDetail
+              key={`${selected.code}:${selected.version}:${selected.withdrawal?.status || ''}`}
+              item={selected}
+              isStaff={isStaff}
+              signingAuthorityRef={user.signingAuthorityRef || ''}
+              labels={data.statusLabels}
+              actionOptions={actionOptions}
+              action={action}
+              setAction={setAction}
+              actionText={actionText}
+              setActionText={setActionText}
+              assignee={assignee}
+              setAssignee={setAssignee}
+              extendDays={extendDays}
+              setExtendDays={setExtendDays}
+              staff={data.staff || []}
+              busy={busy}
+              onSubmitAction={submitAction}
+              onLookupKeyChanged={async () => {
+                setSelected(await api<CaseFile>(`/api/cases/${encodeURIComponent(selected.code)}`))
+                await refresh()
+              }}
+              onBack={goBack}
+            />
+          </Suspense>
         )}
 
         {page === 'detail' && !selected && (
@@ -3993,7 +3929,7 @@ export function App() {
           </Suspense>
         )}
 
-        {page === 'guide' && <GuideContent isStaff />}
+        {page === 'guide' && <GuideContent isStaff onNavigatePath={navigateByPath} />}
 
         {page === 'profile' && (
           <Suspense fallback={<LoadingFallback />}>

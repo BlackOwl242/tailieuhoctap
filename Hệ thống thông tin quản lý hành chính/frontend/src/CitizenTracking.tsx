@@ -1,8 +1,23 @@
+import {
+  Check,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Download,
+  ExternalLink,
+  FileText,
+  FolderSearch,
+  PauseCircle,
+  Printer,
+  Search,
+  Send,
+  ShieldCheck,
+  Star,
+  XCircle,
+} from 'lucide-react'
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { QrCodeBadge } from './printSlips'
-import { printInternalTable, printOfficialSlip } from './printUtils'
-import { serviceModeLabel } from './procedureLabels'
-import { matchesTopicField, normalizeTopicField, showcaseProcedureCodes } from './serviceTopics'
+import './CitizenWorkspace.css'
+import { SLABadge, ServiceLevelBadge, StatusTag } from './design-system'
 import {
   CLOSED_STATUSES,
   api,
@@ -13,6 +28,9 @@ import {
   toDate,
   validateCitizenFiles,
 } from './portalUtils'
+import { QrCodeBadge } from './printSlips'
+import { printInternalTable, printOfficialSlip } from './printUtils'
+import { matchesTopicField, normalizeTopicField, showcaseProcedureCodes } from './serviceTopics'
 import {
   CITIZEN_UPLOAD_LIMIT_TEXT,
   type CaseFile,
@@ -22,6 +40,26 @@ import {
 } from './types'
 
 const NATIONAL_SERVICES = 'https://dichvucong.gov.vn/dvc-dich-vu-cong-truc-tuyen'
+
+const SATISFACTION_LEVELS = [
+  { value: 1, label: 'Rất không hài lòng', toneClass: 'is-critical' },
+  { value: 2, label: 'Không hài lòng', toneClass: 'is-critical' },
+  { value: 3, label: 'Bình thường', toneClass: 'is-neutral' },
+  { value: 4, label: 'Hài lòng', toneClass: 'is-positive' },
+  { value: 5, label: 'Rất hài lòng', toneClass: 'is-positive' },
+] as const
+
+const LOW_SCORE_REASON_CHIPS = [
+  'Thời gian giải quyết chậm so với giấy hẹn',
+  'Hướng dẫn, yêu cầu bổ sung hồ sơ chưa rõ ràng',
+  'Biểu mẫu điện tử hoặc thao tác trực tuyến còn bất tiện',
+  'Phản hồi, phối hợp giải quyết chưa kịp thời',
+  'Thông tin phí, lệ phí hoặc nhận kết quả chưa thuận tiện',
+] as const
+
+function DateValue({ value }: { value?: string }) {
+  return <span className="tabular-nums">{toDate(value)}</span>
+}
 
 export function PublicProcedureSearch({
   onOpenProcedure,
@@ -99,11 +137,14 @@ export function PublicProcedureSearch({
       <div className="section-heading">
         <div>
           <h2 id="public-procedure-title">
-            Tra cứu {procedures.length.toLocaleString('vi-VN')} thủ tục hành chính theo lĩnh vực
+            Tra cứu{' '}
+            <span className="tabular-nums">{procedures.length.toLocaleString('vi-VN')}</span> thủ
+            tục hành chính theo lĩnh vực
           </h2>
         </div>
         <a className="plain-link" href={NATIONAL_SERVICES} target="_blank" rel="noreferrer">
-          Cổng Dịch vụ công quốc gia ↗
+          <span>Cổng Dịch vụ công quốc gia</span>{' '}
+          <ExternalLink size={14} strokeWidth={1.75} aria-hidden="true" />
         </a>
       </div>
 
@@ -155,16 +196,21 @@ export function PublicProcedureSearch({
       {!loading && !error && (
         <>
           <p className="catalog-status">
-            Đang xem {Math.min(limit, results.length).toLocaleString('vi-VN')} trong{' '}
-            {results.length.toLocaleString('vi-VN')} thủ tục hành chính
+            Đang hiển thị{' '}
+            <span className="tabular-nums">
+              {Math.min(limit, results.length).toLocaleString('vi-VN')}
+            </span>{' '}
+            trong tổng số{' '}
+            <span className="tabular-nums">{results.length.toLocaleString('vi-VN')}</span> thủ tục
+            hành chính
           </p>
           <div className="public-procedure-results">
             {results.slice(0, limit).map(item => (
               <article key={item.code}>
                 <div>
                   <small>
-                    {item.code} · {normalizeTopicField(item.field) || 'Chưa phân nhóm'} ·{' '}
-                    {serviceModeLabel(item.level)}
+                    <span className="mono-code tabular-nums">{item.code}</span> ·{' '}
+                    {normalizeTopicField(item.field) || 'Chưa phân nhóm'}
                   </small>
                   <h3>{item.name}</h3>
                   <p>{item.agency || 'Cơ quan thực hiện theo thủ tục trên Cổng quốc gia'}</p>
@@ -172,13 +218,16 @@ export function PublicProcedureSearch({
                     <p className="public-route-summary">{item.routing.summary}</p>
                   )}
                 </div>
-                <button
-                  type="button"
-                  className="procedure-detail-link"
-                  onClick={() => onOpenProcedure(item.code)}
-                >
-                  Xem thông tin thủ tục
-                </button>
+                <div className="citizen-case-badges">
+                  <ServiceLevelBadge level={item.level} serviceMode={item.serviceMode} />
+                  <button
+                    type="button"
+                    className="procedure-detail-link"
+                    onClick={() => onOpenProcedure(item.code)}
+                  >
+                    Xem thông tin thủ tục
+                  </button>
+                </div>
               </article>
             ))}
           </div>
@@ -224,33 +273,45 @@ export function CitizenReceiptView({
 
   return (
     <section className="citizen-receipt-page">
-      <h1>Hồ sơ đã được gửi</h1>
+      <h1>Hồ sơ đã được gửi đến cơ quan tiếp nhận</h1>
       <p>
-        Hồ sơ đã vào hàng đợi tiếp nhận. Hãy lưu mã hồ sơ bên dưới để tra cứu tiến độ hoặc liên hệ với cơ quan tiếp nhận.
+        Hồ sơ đã vào hàng đợi tiếp nhận trực tuyến. Vui lòng lưu mã số hồ sơ bên dưới để tra cứu
+        tiến độ hoặc đối chiếu khi liên hệ Bộ phận Một cửa.
       </p>
 
       <div className="receipt-credentials">
         <div>
-          <small>MÃ HỒ SƠ</small>
-          <b className="tabular-nums">{receipt.code}</b>
-          {receipt.statusLabel && <span>Trạng thái: {receipt.statusLabel}</span>}
+          <span className="receipt-code-label">Mã số hồ sơ tiếp nhận</span>
+          <b className="mono-code tabular-nums">{receipt.code}</b>
+          {receipt.statusLabel && (
+            <div className="receipt-status-row">
+              <StatusTag status={receipt.status} label={receipt.statusLabel} />
+            </div>
+          )}
         </div>
         <QrCodeBadge code={receipt.code} size={84} />
       </div>
 
       <div className="citizen-source-note">
-        <b>Theo dõi bằng tài khoản hoặc tra cứu nhanh công khai</b>
+        <b>Theo dõi qua tài khoản công dân hoặc tra cứu nhanh công khai</b>
         <span>
-          Hồ sơ đã gắn với tài khoản công dân của bạn. Chọn Theo dõi hồ sơ để xem toàn bộ tiến độ; hoặc dùng mã QR / mã hồ sơ trên để tra cứu nhanh trạng thái công khai bất kỳ lúc nào.
+          Hồ sơ đã gắn với tài khoản của bạn. Chọn “Theo dõi hồ sơ” để xem toàn bộ tiến độ xử lý,
+          hoặc sử dụng mã QR / mã hồ sơ trên để tra cứu trạng thái công khai bất kỳ lúc nào.
         </span>
       </div>
 
       <div className="citizen-receipt-actions">
         <button type="button" className="button secondary" onClick={() => void copyReceipt()}>
-          {copied ? 'Đã sao chép mã hồ sơ' : 'Sao chép mã hồ sơ'}
+          {copied ? (
+            <Check size={16} strokeWidth={1.75} aria-hidden="true" />
+          ) : (
+            <Copy size={16} strokeWidth={1.75} aria-hidden="true" />
+          )}
+          <span>{copied ? 'Đã sao chép mã hồ sơ' : 'Sao chép mã hồ sơ'}</span>
         </button>
         <button type="button" className="button primary" onClick={onTrack}>
-          Theo dõi hồ sơ
+          <FolderSearch size={16} strokeWidth={1.75} aria-hidden="true" />
+          <span>Theo dõi hồ sơ</span>
         </button>
       </div>
     </section>
@@ -264,15 +325,15 @@ export function CaseDeclaration({ item }: { item: CaseFile }) {
   return (
     <section className="citizen-case-section">
       <h3>Tờ khai đã nộp</h3>
-      <dl className="case-declaration">
+      <dl className="hcds-kv-list case-declaration">
         {entries.map(field => (
-          <div key={field.id}>
+          <div className="hcds-kv-row hcds-kv-row--two" key={field.id}>
             <dt>{field.label}</dt>
             <dd>{item.declaration[field.id] || 'Không khai'}</dd>
           </div>
         ))}
-        <div>
-          <dt>Nhận kết quả</dt>
+        <div className="hcds-kv-row hcds-kv-row--two">
+          <dt>Hình thức nhận kết quả</dt>
           <dd>
             {channelNames[item.deliveryMethod || ''] || item.deliveryMethod || 'Chưa chọn'}
             {item.deliveryAddress && ` · ${item.deliveryAddress}`}
@@ -299,13 +360,20 @@ export function CitizenCaseStatus({
   busy: boolean
   onAction: (action: CitizenCaseActionKind, payload: Record<string, unknown>) => Promise<void>
 }) {
-  const [score, setScore] = useState('5')
+  const [score, setScore] = useState(5)
+  const [selectedReasons, setSelectedReasons] = useState<string[]>([])
   const [feedback, setFeedback] = useState('')
   const [localError, setLocalError] = useState('')
   const [supplementFileNames, setSupplementFileNames] = useState<string[]>([])
   const [paymentMethod, setPaymentMethod] = useState('BANK_TRANSFER')
   const [withdrawOpen, setWithdrawOpen] = useState(false)
   const [withdrawReason, setWithdrawReason] = useState('')
+
+  function toggleReasonChip(reason: string) {
+    setSelectedReasons(prev =>
+      prev.includes(reason) ? prev.filter(item => item !== reason) : [...prev, reason],
+    )
+  }
 
   async function submitSupplement(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -330,8 +398,17 @@ export function CitizenCaseStatus({
 
   async function submitFeedback(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    await onAction('feedback', { score: Number(score), content: feedback })
+    const parts: string[] = []
+    if (score <= 3 && selectedReasons.length > 0) {
+      parts.push(`[Nội dung góp ý: ${selectedReasons.join('; ')}]`)
+    }
+    if (feedback.trim()) {
+      parts.push(feedback.trim())
+    }
+    const composedContent = parts.join(' ').slice(0, 1000)
+    await onAction('feedback', { score, content: composedContent })
     setFeedback('')
+    setSelectedReasons([])
   }
 
   async function submitWithdrawal(event: FormEvent<HTMLFormElement>) {
@@ -390,127 +467,120 @@ export function CitizenCaseStatus({
 
   return (
     <article className="citizen-case-view">
-      <header className="citizen-case-heading">
-        <div>
-          <h2>{item.procedure?.name || 'Hồ sơ thủ tục hành chính'}</h2>
-          <p>
-            Mã thủ tục <b>{item.procedureCode}</b> · Mã hồ sơ{' '}
-            <b className="tabular-nums">{item.code}</b> · Cơ quan tiếp nhận: {item.receivingAgency}
-          </p>
-        </div>
-        <div className="citizen-case-current-status">
-          <small>TRẠNG THÁI HIỆN TẠI</small>
-          <b>{item.statusLabel}</b>
-        </div>
-      </header>
+      {/* Single-layer Overview, Summary Metadata & Statutory Slip Bar Panel */}
+      <section className="citizen-case-panel">
+        <header className="citizen-case-heading">
+          <div>
+            <h2>{item.procedure?.name || 'Hồ sơ thủ tục hành chính'}</h2>
+            <p className="citizen-case-heading__meta">
+              Mã thủ tục <b className="mono-code tabular-nums">{item.procedureCode}</b> · Mã hồ sơ{' '}
+              <b className="mono-code tabular-nums">{item.code}</b> · Cơ quan tiếp nhận:{' '}
+              {item.receivingAgency}
+            </p>
+          </div>
+          <div className="citizen-case-badges">
+            <StatusTag status={item.status} label={item.statusLabel} />
+            <SLABadge item={item} />
+          </div>
+        </header>
 
-      <div className="citizen-slip-bar">
-        <QrCodeBadge code={item.code} size={68} />
-        <div className="citizen-slip-actions">
-          {canPrintMau01 && (
-            <button
-              type="button"
-              className="button secondary compact-btn"
-              onClick={() => printOfficialSlip('MAU_01', item, item.statusLabel)}
-            >
-              In dự thảo tiếp nhận
-            </button>
-          )}
-          {canPrintMau02 && (
-            <button
-              type="button"
-              className="button secondary compact-btn"
-              onClick={() => printOfficialSlip('MAU_02', item, item.statusLabel)}
-            >
-              In dự thảo bổ sung
-            </button>
-          )}
-          {canPrintMau03 && (
-            <button
-              type="button"
-              className="button secondary compact-btn"
-              onClick={() => printOfficialSlip('MAU_03', item, item.statusLabel)}
-            >
-              In dự thảo từ chối tiếp nhận
-            </button>
-          )}
-          {canPrintMau04 && (
-            <button
-              type="button"
-              className="button secondary compact-btn"
-              onClick={() => printOfficialSlip('MAU_04', item, item.statusLabel)}
-            >
-              In dự thảo xin lỗi và gia hạn
-            </button>
-          )}
-          {item.withdrawal?.reason && (
-            <button type="button" className="button secondary compact-btn" onClick={() => printOfficialSlip('MAU_05', item)}>
-              In dự thảo yêu cầu dừng
-            </button>
-          )}
-          {canPrintMau06 && (
-            <button
-              type="button"
-              className="button secondary compact-btn"
-              onClick={() => printOfficialSlip('MAU_06', item, item.statusLabel)}
-            >
-              In dự thảo thông báo dừng
-            </button>
-          )}
+        <dl className="hcds-kv-list case-declaration">
+          <div className="hcds-kv-row hcds-kv-row--two">
+            <dt>Ngày gửi hồ sơ</dt>
+            <dd>
+              <DateValue value={item.createdAt} />
+            </dd>
+          </div>
+          <div className="hcds-kv-row hcds-kv-row--two">
+            <dt>Thời hạn hẹn trả kết quả</dt>
+            <dd>
+              {item.deadline ? (
+                <DateValue value={item.deadline} />
+              ) : (
+                item.deadlineNote || 'Chưa xác định'
+              )}
+            </dd>
+          </div>
+          <div className="hcds-kv-row hcds-kv-row--two">
+            <dt>Người đứng tên hồ sơ</dt>
+            <dd>{item.applicant?.name || 'Chưa ghi nhận'}</dd>
+          </div>
+        </dl>
+
+        <div className="citizen-slip-bar">
+          <QrCodeBadge code={item.code} size={68} />
+          <div className="citizen-slip-actions">
+            {canPrintMau01 && (
+              <button
+                type="button"
+                className="button secondary compact-btn"
+                onClick={() => printOfficialSlip('MAU_01', item, item.statusLabel)}
+              >
+                <Printer size={14} strokeWidth={1.75} aria-hidden="true" />
+                <span>In dự thảo tiếp nhận (Mẫu 01)</span>
+              </button>
+            )}
+            {canPrintMau02 && (
+              <button
+                type="button"
+                className="button secondary compact-btn"
+                onClick={() => printOfficialSlip('MAU_02', item, item.statusLabel)}
+              >
+                <Printer size={14} strokeWidth={1.75} aria-hidden="true" />
+                <span>In dự thảo bổ sung (Mẫu 02)</span>
+              </button>
+            )}
+            {canPrintMau03 && (
+              <button
+                type="button"
+                className="button secondary compact-btn"
+                onClick={() => printOfficialSlip('MAU_03', item, item.statusLabel)}
+              >
+                <Printer size={14} strokeWidth={1.75} aria-hidden="true" />
+                <span>In dự thảo từ chối tiếp nhận (Mẫu 03)</span>
+              </button>
+            )}
+            {canPrintMau04 && (
+              <button
+                type="button"
+                className="button secondary compact-btn"
+                onClick={() => printOfficialSlip('MAU_04', item, item.statusLabel)}
+              >
+                <Printer size={14} strokeWidth={1.75} aria-hidden="true" />
+                <span>In dự thảo xin lỗi &amp; gia hạn (Mẫu 04)</span>
+              </button>
+            )}
+            {item.withdrawal?.reason && (
+              <button
+                type="button"
+                className="button secondary compact-btn"
+                onClick={() => printOfficialSlip('MAU_05', item)}
+              >
+                <Printer size={14} strokeWidth={1.75} aria-hidden="true" />
+                <span>In dự thảo yêu cầu dừng (Mẫu 05)</span>
+              </button>
+            )}
+            {canPrintMau06 && (
+              <button
+                type="button"
+                className="button secondary compact-btn"
+                onClick={() => printOfficialSlip('MAU_06', item, item.statusLabel)}
+              >
+                <Printer size={14} strokeWidth={1.75} aria-hidden="true" />
+                <span>In dự thảo thông báo dừng (Mẫu 06)</span>
+              </button>
+            )}
+          </div>
         </div>
-      </div>
-
-      {item.milestones?.length > 0 && (
-        <section className="citizen-case-section">
-          <h3>Mốc kiểm tra và thông báo</h3>
-          {item.milestones.map(
-            (milestone: { id: string; label: string; dueDate: string; completedAt?: string }) => (
-              <p key={milestone.id}>
-                {milestone.label}: {toDate(milestone.dueDate)} ·{' '}
-                {milestone.completedAt ? 'Đã thực hiện' : 'Đang theo dõi'}
-              </p>
-            ),
-          )}
-          <p>Đây là mốc xử lý trung gian, không phải hạn trả kết quả cuối cùng.</p>
-        </section>
-      )}
-
-      <div className="citizen-progress evidence-progress" aria-label="Tiến độ xử lý hồ sơ">
-        {(item.progress || []).map(
-          (phase: { id: string; label: string; state: string; at?: string }, index: number) => (
-            <div key={phase.id} className={phase.state}>
-              <i>
-                {phase.state === 'completed'
-                  ? '✓'
-                  : phase.state === 'terminated'
-                    ? '×'
-                    : index + 1}
-              </i>
-              <b>{phase.label}</b>
-              <span>
-                {(
-                  {
-                    completed: 'Đã hoàn tất',
-                    current: 'Đang xử lý',
-                    pending: 'Chưa thực hiện',
-                    paused: 'Chờ bổ sung',
-                    terminated: 'Đã kết thúc tại khâu này',
-                  } as Record<string, string>
-                )[phase.state]}
-              </span>
-              {phase.at && <time>{toDate(phase.at)}</time>}
-            </div>
-          ),
-        )}
-      </div>
+      </section>
 
       {mau04 && (
         <div className="citizen-request-warning">
           <b>Phiếu xin lỗi và hẹn lại ngày trả kết quả (Mẫu 04)</b>
           <p>
-            Hạn cũ: {toDate(mau04.previousDeadline)} · Gia hạn thêm:{' '}
-            <b>{mau04.addDays || 0} ngày</b> · Hạn trả mới:{' '}
-            <b>{toDate(mau04.newDeadline || item.deadline)}</b>.
+            Hạn cũ: <DateValue value={mau04.previousDeadline} /> · Gia hạn thêm:{' '}
+            <b className="tabular-nums">{mau04.addDays || 0} ngày</b> · Hạn trả mới:{' '}
+            <b className="tabular-nums">{toDate(mau04.newDeadline || item.deadline)}</b>.
           </p>
           {mau04.reason && <p>Lý do cơ quan thông báo: {mau04.reason}</p>}
         </div>
@@ -518,11 +588,11 @@ export function CitizenCaseStatus({
 
       {item.status === 'CHO_BO_SUNG' && (
         <div className="citizen-request-warning">
-          <b>Cơ quan đang yêu cầu bạn bổ sung thông tin (Mẫu 02)</b>
+          <b>Cơ quan đang yêu cầu bổ sung, hoàn thiện hồ sơ (Mẫu 02)</b>
           <p>{item.supplement?.reason}</p>
           {supplementDue && (
             <p>
-              <b>Thời hạn hoàn thiện bổ sung:</b> {toDate(supplementDue)}
+              <b>Thời hạn hoàn thiện bổ sung:</b> <DateValue value={supplementDue} />
             </p>
           )}
           {item.supplement?.items && item.supplement.items.length > 0 && (
@@ -540,7 +610,12 @@ export function CitizenCaseStatus({
           <b>Nội dung bạn đã giải trình / bổ sung:</b>
           <span>
             {item.supplement.citizenNote}
-            {item.supplement.respondedAt ? ` (${toDate(item.supplement.respondedAt)})` : ''}
+            {item.supplement.respondedAt ? (
+              <>
+                {' '}
+                (<DateValue value={item.supplement.respondedAt} />)
+              </>
+            ) : null}
           </span>
         </div>
       )}
@@ -549,8 +624,9 @@ export function CitizenCaseStatus({
         <div className="citizen-request-warning">
           <b>Cơ quan đã tiếp nhận yêu cầu xin rút / dừng giải quyết hồ sơ</b>
           <p>
-            Ngày tiếp nhận yêu cầu: {toDate(item.withdrawal.requestReceivedAt)} · Lý do:{' '}
-            {item.withdrawal.reason}. Hồ sơ đang chờ người có thẩm quyền ký phát hành Thông báo dừng giải quyết (Mẫu 06).
+            Ngày tiếp nhận yêu cầu: <DateValue value={item.withdrawal.requestReceivedAt} /> · Lý do:{' '}
+            {item.withdrawal.reason}. Hồ sơ đang chờ người có thẩm quyền ký phát hành Thông báo dừng
+            giải quyết (Mẫu 06).
           </p>
         </div>
       )}
@@ -559,17 +635,21 @@ export function CitizenCaseStatus({
         <div className="citizen-request-warning">
           <b>
             Đã phát hành Thông báo dừng giải quyết hồ sơ (Mẫu 06) số{' '}
-            {item.withdrawal.noticeNumber}
+            <span className="tabular-nums">{item.withdrawal.noticeNumber}</span>
           </b>
           <p>
             Ngày ban hành:{' '}
-            {toDate(item.withdrawal.noticeDate || item.withdrawal.noticeIssuedAt)} · Kênh gửi:{' '}
+            <DateValue value={item.withdrawal.noticeDate || item.withdrawal.noticeIssuedAt} /> ·
+            Kênh gửi:{' '}
             {channelNames[item.withdrawal.noticeDelivery?.channel] ||
               item.withdrawal.noticeDelivery?.channel ||
               'Trực tiếp'}
-            {item.withdrawal.noticeDelivery?.reference
-              ? ` (${item.withdrawal.noticeDelivery.reference})`
-              : ''}
+            {item.withdrawal.noticeDelivery?.reference ? (
+              <>
+                {' '}
+                (<span className="tabular-nums">{item.withdrawal.noticeDelivery.reference}</span>)
+              </>
+            ) : null}
             .
           </p>
           {item.withdrawal.collectionOffice && (
@@ -579,74 +659,142 @@ export function CitizenCaseStatus({
             </p>
           )}
           {noticeDoc?.downloadUrl && (
-            <p>
-              <a className="button secondary" href={noticeDoc.downloadUrl}>
-                Tải Thông báo dừng Mẫu 06 đã ký ({noticeDoc.name || 'Tệp đính kèm'})
+            <div className="citizen-result-files">
+              <a className="button secondary compact-btn" href={noticeDoc.downloadUrl}>
+                <Download size={14} strokeWidth={1.75} aria-hidden="true" />
+                <span>
+                  Tải Thông báo dừng Mẫu 06 đã ký ({noticeDoc.name || 'Tệp đính kèm'})
+                </span>
               </a>
-            </p>
+            </div>
           )}
         </div>
       )}
 
       {item.publicNote && (
         <div className="citizen-request-warning">
-          <b>Thông tin từ cơ quan</b>
+          <b>Thông tin hướng dẫn từ cơ quan giải quyết</b>
           <p>{item.publicNote}</p>
         </div>
       )}
 
-      <div className="citizen-case-summary">
-        <div>
-          <small>Ngày gửi</small>
-          <b>{toDate(item.createdAt)}</b>
-        </div>
-        <div>
-          <small>Thời hạn</small>
-          <b>{item.deadline ? toDate(item.deadline) : item.deadlineNote || 'Chưa xác định'}</b>
-        </div>
-        <div>
-          <small>Người nộp</small>
-          <b>{item.applicant?.name}</b>
-        </div>
-      </div>
+      {/* Single-layer Processing Progress Panel */}
+      {(item.progress?.length > 0 || item.milestones?.length > 0) && (
+        <section className="citizen-case-section">
+          <h3>Tiến độ xử lý theo quy trình</h3>
+          {item.progress?.length > 0 && (
+            <div className="citizen-progress evidence-progress" aria-label="Tiến độ xử lý hồ sơ">
+              {item.progress.map(
+                (phase: { id: string; label: string; state: string; at?: string }, index: number) => (
+                  <div key={phase.id} className={phase.state}>
+                    <i className="citizen-progress-step-icon">
+                      {phase.state === 'completed' ? (
+                        <CheckCircle2 size={16} strokeWidth={1.75} aria-hidden="true" />
+                      ) : phase.state === 'terminated' ? (
+                        <XCircle size={16} strokeWidth={1.75} aria-hidden="true" />
+                      ) : phase.state === 'paused' ? (
+                        <PauseCircle size={16} strokeWidth={1.75} aria-hidden="true" />
+                      ) : phase.state === 'current' ? (
+                        <Clock size={16} strokeWidth={1.75} aria-hidden="true" />
+                      ) : (
+                        <span className="tabular-nums">{index + 1}</span>
+                      )}
+                    </i>
+                    <b>{phase.label}</b>
+                    <span>
+                      {(
+                        {
+                          completed: 'Đã hoàn tất',
+                          current: 'Đang xử lý',
+                          pending: 'Chưa thực hiện',
+                          paused: 'Chờ bổ sung',
+                          terminated: 'Đã kết thúc tại khâu này',
+                        } as Record<string, string>
+                      )[phase.state]}
+                    </span>
+                    {phase.at && <time className="tabular-nums">{toDate(phase.at)}</time>}
+                  </div>
+                ),
+              )}
+            </div>
+          )}
+
+          {item.milestones?.length > 0 && (
+            <>
+              <h4>Mốc kiểm tra trung gian</h4>
+              <dl className="hcds-kv-list case-declaration">
+                {item.milestones.map(
+                  (milestone: {
+                    id: string
+                    label: string
+                    dueDate: string
+                    completedAt?: string
+                  }) => (
+                    <div className="hcds-kv-row hcds-kv-row--two" key={milestone.id}>
+                      <dt>{milestone.label}</dt>
+                      <dd>
+                        <DateValue value={milestone.dueDate} /> ·{' '}
+                        <StatusTag
+                          tone={milestone.completedAt ? 'success' : 'info'}
+                          label={milestone.completedAt ? 'Đã thực hiện' : 'Đang theo dõi'}
+                        />
+                      </dd>
+                    </div>
+                  ),
+                )}
+              </dl>
+              <p className="field-help">
+                Đây là mốc kiểm soát nội bộ trung gian, không phải hạn trả kết quả cuối cùng.
+              </p>
+            </>
+          )}
+        </section>
+      )}
 
       <CaseDeclaration item={item} />
 
       {typeof item.fee?.amount === 'number' && (
         <section className="citizen-case-section citizen-payment-section">
           <h3>Khoản thu phí, lệ phí theo hồ sơ</h3>
-          <dl className="case-declaration">
-            <div>
-              <dt>Số tiền</dt>
+          <dl className="hcds-kv-list case-declaration">
+            <div className="hcds-kv-row hcds-kv-row--two">
+              <dt>Số tiền phải nộp</dt>
               <dd>
                 <b className="tabular-nums">
                   {Number(item.fee.amount).toLocaleString('vi-VN')} đồng
                 </b>
               </dd>
             </div>
-            <div>
+            <div className="hcds-kv-row hcds-kv-row--two">
               <dt>Căn cứ pháp lý thu phí</dt>
-              <dd>{item.fee.basis}</dd>
+              <dd>{item.fee.basis || 'Theo quy định hiện hành'}</dd>
             </div>
-            <div>
+            <div className="hcds-kv-row hcds-kv-row--two">
               <dt>Trạng thái khoản thu</dt>
-              <dd>{feeStatusLabels[item.fee.status] || item.fee.status}</dd>
+              <dd>
+                <StatusTag
+                  status={item.fee.status}
+                  label={feeStatusLabels[item.fee.status] || item.fee.status}
+                />
+              </dd>
             </div>
           </dl>
           <p className="field-help">
-            Sau khi nộp theo hướng dẫn của cơ quan, gửi mã giao dịch hoặc số biên lai để kế toán đối chiếu.
+            Sau khi nộp phí theo hướng dẫn của cơ quan, gửi mã giao dịch hoặc số biên lai để kế
+            toán đối chiếu.
           </p>
           <div className="citizen-payment-actions">
             {item.fee.status === 'DUE' &&
               (pendingPayment ? (
                 <form
-                  className="citizen-action-form citizen-payment-form"
+                  className="citizen-payment-subform"
                   onSubmit={confirmPayment}
                   aria-busy={busy}
                 >
-                  <h4>Thông tin chứng từ đã nộp</h4>
+                  <h4>Kê khai chứng từ đã nộp</h4>
                   <p className="citizen-payment-reference">
-                    Mã khoản thu: <b>{pendingPayment.transactionRef}</b>
+                    Mã theo dõi khoản thu:{' '}
+                    <b className="mono-code tabular-nums">{pendingPayment.transactionRef}</b>
                   </p>
                   <div className="citizen-payment-fields">
                     <label className="citizen-field">
@@ -656,7 +804,7 @@ export function CitizenCaseStatus({
                         onChange={event => setPaymentMethod(event.target.value)}
                         disabled={busy}
                       >
-                        <option value="BANK_TRANSFER">Chuyển khoản</option>
+                        <option value="BANK_TRANSFER">Chuyển khoản ngân hàng</option>
                         <option value="COUNTER_RECEIPT">Nộp tại quầy có biên lai</option>
                         <option value="POSTAL_RECEIPT">Nộp qua bưu chính có chứng từ</option>
                         <option value="OTHER">Hình thức khác có chứng từ</option>
@@ -666,18 +814,21 @@ export function CitizenCaseStatus({
                       <span>Mã giao dịch / số biên lai</span>
                       <input
                         name="paymentEvidence"
+                        className="tabular-nums"
                         required
                         minLength={4}
                         maxLength={160}
                         disabled={busy}
                         autoComplete="off"
                       />
-                      <small>Nhập đúng mã trên chứng từ bạn đã nộp.</small>
+                      <small className="field-help">Nhập đúng mã trên chứng từ bạn đã nộp.</small>
                     </label>
                   </div>
-                  <button className="button primary" disabled={busy}>
-                    {busy ? 'Đang gửi…' : 'Gửi chứng từ để đối chiếu'}
-                  </button>
+                  <div>
+                    <button type="submit" className="button primary" disabled={busy}>
+                      {busy ? 'Đang gửi…' : 'Gửi chứng từ để đối chiếu'}
+                    </button>
+                  </div>
                 </form>
               ) : (
                 <button
@@ -709,7 +860,8 @@ export function CitizenCaseStatus({
                   )
                 }
               >
-                In phiếu theo dõi khoản thu
+                <Printer size={15} strokeWidth={1.75} aria-hidden="true" />
+                <span>In phiếu theo dõi khoản thu</span>
               </button>
             )}
           </div>
@@ -717,13 +869,15 @@ export function CitizenCaseStatus({
       )}
 
       <section className="citizen-case-section">
-        <h3>Nội dung đề nghị</h3>
-        <p>{item.requestSummary}</p>
+        <h3>Nội dung đề nghị &amp; thành phần hồ sơ</h3>
+        <p>{item.requestSummary || 'Theo tờ khai điện tử đính kèm.'}</p>
         {item.attachments && item.attachments.length > 0 && (
-          <div className="citizen-file-list">
-            <b>Tài liệu đã gửi</b>
+          <div className="citizen-file-list" aria-label="Danh sách tài liệu đã gửi">
             {item.attachments.map((file, index) => (
-              <span key={`${file.name}-${index}`}>{file.name}</span>
+              <span className="citizen-file-tag" key={`${file.name}-${index}`}>
+                <FileText size={13} strokeWidth={1.75} aria-hidden="true" />
+                <span>{file.name}</span>
+              </span>
             ))}
           </div>
         )}
@@ -731,40 +885,49 @@ export function CitizenCaseStatus({
 
       {item.status === 'CHO_BO_SUNG' && (
         <form className="citizen-action-form" onSubmit={submitSupplement}>
-          <h3>Gửi nội dung bổ sung</h3>
+          <h3>Gửi nội dung bổ sung hồ sơ</h3>
           <label className="citizen-field">
-            <span>Nội dung trả lời</span>
+            <span>Nội dung giải trình, trả lời</span>
             <textarea
               name="note"
               rows={4}
               maxLength={1200}
-              placeholder="Trả lời từng yêu cầu của cơ quan."
+              placeholder="Giải trình rõ từng nội dung theo yêu cầu tại Mẫu 02 của cơ quan."
             />
           </label>
           <div className="citizen-field supplement-upload">
-            <span id="supplement-files-label">Tài liệu bổ sung</span>
+            <span id="supplement-files-label">Tài liệu bổ sung đính kèm</span>
             <label className="supplement-upload-picker">
               <span className="supplement-upload-button">Chọn tệp</span>
-              <span className="supplement-upload-names">{supplementFileNames.length ? supplementFileNames.join(', ') : 'Chưa chọn tệp'}</span>
+              <span className="supplement-upload-names">
+                {supplementFileNames.length ? supplementFileNames.join(', ') : 'Chưa chọn tệp'}
+              </span>
               <input
-              name="supplementFiles"
-              type="file"
-              aria-labelledby="supplement-files-label"
-              accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
-              multiple
-              onChange={event => setSupplementFileNames(Array.from(event.currentTarget.files || [], file => file.name))}
-            />
+                name="supplementFiles"
+                type="file"
+                aria-labelledby="supplement-files-label"
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+                multiple
+                onChange={event =>
+                  setSupplementFileNames(
+                    Array.from(event.currentTarget.files || [], file => file.name),
+                  )
+                }
+              />
             </label>
-            <small>{CITIZEN_UPLOAD_LIMIT_TEXT}</small>
+            <small className="field-help">{CITIZEN_UPLOAD_LIMIT_TEXT}</small>
           </div>
           {localError && (
             <div className="form-error" role="alert">
               {localError}
             </div>
           )}
-          <button className="button primary" disabled={busy}>
-            Gửi bổ sung
-          </button>
+          <div>
+            <button type="submit" className="button primary" disabled={busy}>
+              <Send size={15} strokeWidth={1.75} aria-hidden="true" />
+              <span>{busy ? 'Đang gửi…' : 'Gửi hồ sơ bổ sung'}</span>
+            </button>
+          </div>
         </form>
       )}
 
@@ -774,7 +937,8 @@ export function CitizenCaseStatus({
             <div>
               <h3>Đề nghị dừng / rút hồ sơ trực tuyến</h3>
               <p className="muted">
-                Dành cho chủ hồ sơ khi chưa có kết quả giải quyết. Cơ quan sẽ xem xét và phát hành Thông báo dừng giải quyết (Mẫu 06).
+                Dành cho chủ hồ sơ khi chưa ban hành kết quả giải quyết. Cơ quan sẽ xem xét và phát
+                hành Thông báo dừng giải quyết (Mẫu 06).
               </p>
             </div>
             <button
@@ -792,7 +956,7 @@ export function CitizenCaseStatus({
           </div>
 
           {withdrawOpen && (
-            <form className="citizen-action-form" onSubmit={submitWithdrawal}>
+            <form className="citizen-withdrawal-subform" onSubmit={submitWithdrawal}>
               <label className="citizen-field">
                 <span>Lý do đề nghị dừng / rút hồ sơ</span>
                 <textarea
@@ -819,7 +983,7 @@ export function CitizenCaseStatus({
                 >
                   Hủy
                 </button>
-                <button className="button primary" disabled={busy}>
+                <button type="submit" className="button primary" disabled={busy}>
                   {busy ? 'Đang gửi đề nghị…' : 'Xác nhận gửi đề nghị dừng'}
                 </button>
               </div>
@@ -831,14 +995,22 @@ export function CitizenCaseStatus({
       {item.result && (
         <section className="citizen-case-section">
           <h3>Kết quả giải quyết</h3>
-          <p>{item.result.content || 'Cơ quan đã ghi nhận kết quả.'}</p>
-          {item.result.number && (
-            <p>
-              Số văn bản: <b>{item.result.number}</b>
-            </p>
-          )}
+          <dl className="hcds-kv-list case-declaration">
+            <div className="hcds-kv-row hcds-kv-row--two">
+              <dt>Nội dung kết quả</dt>
+              <dd>{item.result.content || 'Cơ quan đã ghi nhận kết quả giải quyết.'}</dd>
+            </div>
+            {item.result.number && (
+              <div className="hcds-kv-row hcds-kv-row--two">
+                <dt>Số hiệu văn bản</dt>
+                <dd>
+                  <b className="tabular-nums">{item.result.number}</b>
+                </dd>
+              </div>
+            )}
+          </dl>
           {!!item.result.files?.length && (
-            <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <div className="citizen-result-files">
               {item.result.files.map((file, idx) =>
                 file.downloadUrl ? (
                   <a
@@ -846,7 +1018,8 @@ export function CitizenCaseStatus({
                     className="button secondary compact-btn"
                     href={file.downloadUrl}
                   >
-                    Tải văn bản kết quả điện tử ({file.name})
+                    <Download size={14} strokeWidth={1.75} aria-hidden="true" />
+                    <span>Tải văn bản kết quả điện tử ({file.name})</span>
                   </a>
                 ) : null,
               )}
@@ -858,19 +1031,31 @@ export function CitizenCaseStatus({
       {item.delivery && (
         <section className="citizen-case-section">
           <h3>Thông tin trả kết quả</h3>
-          <p>
-            <b>Người nhận:</b> {item.delivery.receiver} · <b>Hình thức nhận:</b>{' '}
-            {channelNames[item.delivery.channel] || item.delivery.channel}
-          </p>
-          <p>
-            <b>Mã biên nhận / bưu gửi:</b> {item.delivery.evidence} · <b>Thời gian:</b>{' '}
-            {toDate(item.delivery.deliveredAt || item.delivery.at)}
-          </p>
+          <dl className="hcds-kv-list case-declaration">
+            <div className="hcds-kv-row hcds-kv-row--two">
+              <dt>Người nhận kết quả</dt>
+              <dd>{item.delivery.receiver}</dd>
+            </div>
+            <div className="hcds-kv-row hcds-kv-row--two">
+              <dt>Hình thức nhận</dt>
+              <dd>{channelNames[item.delivery.channel] || item.delivery.channel}</dd>
+            </div>
+            <div className="hcds-kv-row hcds-kv-row--two">
+              <dt>Mã biên nhận / bưu gửi</dt>
+              <dd className="tabular-nums">{item.delivery.evidence || 'Theo hồ sơ lưu'}</dd>
+            </div>
+            <div className="hcds-kv-row hcds-kv-row--two">
+              <dt>Thời gian bàn giao</dt>
+              <dd>
+                <DateValue value={item.delivery.deliveredAt || item.delivery.at} />
+              </dd>
+            </div>
+          </dl>
         </section>
       )}
 
       <section className="citizen-case-section">
-        <h3>Lịch sử xử lý</h3>
+        <h3>Nhật ký xử lý hồ sơ</h3>
         {item.events?.length ? (
           <div className="citizen-timeline">
             {item.events.map((event, index) => (
@@ -878,63 +1063,151 @@ export function CitizenCaseStatus({
                 <i />
                 <div>
                   <b>{event.title}</b>
-                  <time>{toDate(event.at)}</time>
+                  <time className="tabular-nums">{toDate(event.at)}</time>
                   {event.detail && <p>{event.detail}</p>}
                 </div>
               </article>
             ))}
           </div>
         ) : (
-          <p>Chưa có cập nhật.</p>
+          <p className="muted">Chưa có bản ghi cập nhật.</p>
         )}
       </section>
 
+      {/* Decision 766/QĐ-TTg Pillar 5 Citizen Satisfaction Micro-Survey */}
       {CLOSED_STATUSES.has(item.status) && !item.feedbackSubmitted && (
-        <form className="citizen-action-form" onSubmit={submitFeedback}>
-          <h3>Đánh giá quá trình xử lý</h3>
+        <form className="citizen-action-form d766-survey" onSubmit={submitFeedback}>
+          <div className="d766-survey__head">
+            <div>
+              <h3>Đánh giá mức độ hài lòng giải quyết TTHC</h3>
+              <p className="d766-survey__desc">
+                Khảo sát theo Quyết định <span className="tabular-nums">766/QĐ-TTg</span> (Nhóm chỉ
+                số Sự hài lòng — tối đa <span className="tabular-nums">18/100</span> điểm). Ý kiến
+                đánh giá được ghi nhận độc lập, không ảnh hưởng đến kết quả hồ sơ.
+              </p>
+            </div>
+            <StatusTag tone="info" label="Chỉ số Sự hài lòng · QĐ 766" />
+          </div>
+
+          <div
+            className="d766-rating-grid"
+            role="radiogroup"
+            aria-label="Chọn mức độ hài lòng từ 1 đến 5"
+          >
+            {SATISFACTION_LEVELS.map(level => {
+              const selected = score === level.value
+              return (
+                <button
+                  key={level.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  disabled={busy}
+                  className={`d766-rating-btn ${selected ? `is-selected ${level.toneClass}` : ''}`.trim()}
+                  onClick={() => setScore(level.value)}
+                >
+                  <span className="d766-rating-btn__score tabular-nums">
+                    <Star size={16} strokeWidth={1.75} aria-hidden="true" />
+                    <span>{level.value} / 5</span>
+                  </span>
+                  <span className="d766-rating-btn__label">{level.label}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {score <= 3 && (
+            <div className="d766-reasons" role="group" aria-label="Gợi ý nội dung cần cải thiện">
+              <span className="d766-reasons__title">
+                Nội dung cần cơ quan chấn chỉnh, cải thiện (chọn nhanh một hoặc nhiều mục):
+              </span>
+              <div className="d766-reasons__chips">
+                {LOW_SCORE_REASON_CHIPS.map(reason => {
+                  const active = selectedReasons.includes(reason)
+                  return (
+                    <button
+                      key={reason}
+                      type="button"
+                      className="d766-reason-chip"
+                      aria-pressed={active}
+                      disabled={busy}
+                      onClick={() => toggleReasonChip(reason)}
+                    >
+                      {active && <Check size={14} strokeWidth={1.75} aria-hidden="true" />}
+                      <span>{reason}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           <label className="citizen-field">
-            <span>Mức đánh giá</span>
-            <select value={score} onChange={event => setScore(event.target.value)}>
-              {[5, 4, 3, 2, 1].map(value => (
-                <option key={value} value={value}>
-                  {value} / 5
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="citizen-field">
-            <span>Ý kiến</span>
+            <span>Ý kiến góp ý chi tiết (không bắt buộc)</span>
             <textarea
               value={feedback}
               onChange={event => setFeedback(event.target.value)}
               rows={3}
               maxLength={1000}
+              placeholder="Ghi rõ trải nghiệm của bạn để cơ quan nâng cao chất lượng phục vụ…"
+              disabled={busy}
             />
           </label>
-          <button className="button secondary" disabled={busy}>
-            Gửi đánh giá
-          </button>
+
+          <div>
+            <button type="submit" className="button primary" disabled={busy}>
+              <Send size={15} strokeWidth={1.75} aria-hidden="true" />
+              <span>{busy ? 'Đang gửi đánh giá…' : 'Gửi đánh giá hài lòng'}</span>
+            </button>
+          </div>
         </form>
       )}
 
       {item.feedbackSubmitted && (
-        <p className="citizen-success">Ứng dụng đã ghi nhận đánh giá của hồ sơ này.</p>
+        <p className="citizen-success" role="status">
+          Hệ thống đã ghi nhận đánh giá mức độ hài lòng của bạn đối với hồ sơ này. Trân trọng cảm
+          ơn!
+        </p>
       )}
 
       {item.result?.signature && (
         <section className="citizen-case-section">
-          <h3>Kiểm tra chữ ký kết quả</h3>
-          <p>
-            {item.result.signature.verified
-              ? 'Chữ ký số của văn bản kết quả hợp lệ.'
-              : 'Không xác minh được chữ ký của nội dung hiện tại.'}
-          </p>
-          <p>
-            Mã băm tài liệu: <code>{item.result.signature.documentHash}</code>
-          </p>
-          <p>
-            Người ký: {item.result.signature.signer} · {toDate(item.result.signature.signedAt)}
-          </p>
+          <div className="d766-survey__head">
+            <h3>Xác thực chữ ký số văn bản kết quả</h3>
+            <StatusTag
+              tone={item.result.signature.verified ? 'success' : 'danger'}
+              label={
+                item.result.signature.verified
+                  ? 'Chữ ký số hợp lệ'
+                  : 'Không xác minh được chữ ký'
+              }
+            />
+          </div>
+          <dl className="hcds-kv-list case-declaration">
+            <div className="hcds-kv-row hcds-kv-row--two">
+              <dt>Trạng thái kiểm tra</dt>
+              <dd>
+                {item.result.signature.verified
+                  ? 'Chữ ký số của văn bản kết quả toàn vẹn và hợp lệ.'
+                  : 'Không xác minh được chữ ký của nội dung hiện tại.'}
+              </dd>
+            </div>
+            <div className="hcds-kv-row hcds-kv-row--two">
+              <dt>Mã băm tài liệu (SHA-256)</dt>
+              <dd>
+                <code className="mono-code tabular-nums">
+                  {item.result.signature.documentHash}
+                </code>
+              </dd>
+            </div>
+            <div className="hcds-kv-row hcds-kv-row--two">
+              <dt>Người ký &amp; thời điểm ký</dt>
+              <dd>
+                <ShieldCheck size={14} strokeWidth={1.75} aria-hidden="true" />{' '}
+                {item.result.signature.signer} · <DateValue value={item.result.signature.signedAt} />
+              </dd>
+            </div>
+          </dl>
         </section>
       )}
     </article>
@@ -1034,7 +1307,9 @@ export function CitizenTrackingPage({
               .catch(() => {})
           } else {
             setError(
-              reason instanceof Error ? reason.message : 'Không tìm thấy hồ sơ với thông tin đã nhập.',
+              reason instanceof Error
+                ? reason.message
+                : 'Không tìm thấy hồ sơ với thông tin đã nhập.',
             )
           }
         })
@@ -1156,7 +1431,8 @@ export function CitizenTrackingPage({
         <div className="citizen-page-heading">
           <h1>Tra cứu hồ sơ dịch vụ công</h1>
           <p>
-            Tra cứu nhanh trạng thái công khai không cần đăng nhập, hoặc đăng nhập công dân / nhập khóa tra cứu để mở toàn bộ hồ sơ, nộp phí, bổ sung tài liệu và gửi đề nghị dừng hồ sơ.
+            Tra cứu nhanh trạng thái công khai không cần đăng nhập, hoặc đăng nhập công dân / nhập
+            khóa tra cứu để mở toàn bộ hồ sơ, nộp phí, bổ sung tài liệu và gửi đề nghị dừng hồ sơ.
           </p>
         </div>
       )}
@@ -1174,6 +1450,7 @@ export function CitizenTrackingPage({
               <span>Mã số hồ sơ</span>
               <input
                 id="public-quick-code"
+                className="mono-code tabular-nums"
                 value={quickCode}
                 onChange={event => setQuickCode(event.target.value.toUpperCase())}
                 placeholder="Ví dụ: HN-2026-XXXXXXXX"
@@ -1181,8 +1458,9 @@ export function CitizenTrackingPage({
                 required
               />
             </label>
-            <button className="button primary" disabled={quickBusy}>
-              {quickBusy ? 'Đang kiểm tra…' : 'Tra cứu nhanh trạng thái'}
+            <button type="submit" className="button primary" disabled={quickBusy}>
+              <Search size={16} strokeWidth={1.75} aria-hidden="true" />
+              <span>{quickBusy ? 'Đang kiểm tra…' : 'Tra cứu nhanh trạng thái'}</span>
             </button>
           </form>
 
@@ -1193,42 +1471,60 @@ export function CitizenTrackingPage({
           )}
 
           {quickResult && (
-            <div className="quick-check-result" role="region" aria-label="Kết quả trạng thái công khai">
+            <div
+              className="quick-check-result"
+              role="region"
+              aria-label="Kết quả trạng thái công khai"
+            >
               <div className="quick-check-top">
                 <div>
-                  <small>MÃ HỒ SƠ: {quickResult.code}</small>
+                  <p className="quick-check-code-line">
+                    Mã số hồ sơ:{' '}
+                    <b className="mono-code tabular-nums">{quickResult.code}</b>
+                  </p>
                   <h3>
-                    {quickResult.procedureCode ? `${quickResult.procedureCode} · ` : ''}
+                    {quickResult.procedureCode ? (
+                      <>
+                        <span className="mono-code tabular-nums">{quickResult.procedureCode}</span>{' '}
+                        ·{' '}
+                      </>
+                    ) : null}
                     {quickResult.procedureName || 'Hồ sơ thủ tục hành chính'}
                   </h3>
-                  <p>Cơ quan tiếp nhận: {quickResult.receivingAgency || 'Theo phân tuyến thủ tục'}</p>
+                  <p className="muted">
+                    Cơ quan tiếp nhận: {quickResult.receivingAgency || 'Theo phân tuyến thủ tục'}
+                  </p>
                 </div>
-                <span className={`status-pill status-${quickResult.status}`}>
-                  {quickResult.statusLabel}
-                </span>
+                <StatusTag status={quickResult.status} label={quickResult.statusLabel} />
               </div>
 
-              <dl className="quick-check-facts">
-                <div>
-                  <dt>Ngày tiếp nhận / tạo</dt>
-                  <dd>{toDate(quickResult.acceptedAt || quickResult.createdAt)}</dd>
+              <dl className="hcds-kv-list">
+                <div className="hcds-kv-row hcds-kv-row--two">
+                  <dt>Ngày tiếp nhận / tạo hồ sơ</dt>
+                  <dd>
+                    <DateValue value={quickResult.acceptedAt || quickResult.createdAt} />
+                  </dd>
                 </div>
-                <div>
+                <div className="hcds-kv-row hcds-kv-row--two">
                   <dt>Hạn hẹn trả kết quả</dt>
                   <dd>
-                    {quickResult.deadline
-                      ? toDate(quickResult.deadline)
-                      : quickResult.deadlineNote || 'Theo quy định thủ tục'}
+                    {quickResult.deadline ? (
+                      <DateValue value={quickResult.deadline} />
+                    ) : (
+                      quickResult.deadlineNote || 'Theo quy định thủ tục'
+                    )}
                   </dd>
                 </div>
                 {quickResult.supplementDueAt && (
-                  <div>
-                    <dt>Hạn bổ sung (Mẫu 02)</dt>
-                    <dd>{toDate(quickResult.supplementDueAt)}</dd>
+                  <div className="hcds-kv-row hcds-kv-row--two">
+                    <dt>Hạn bổ sung hồ sơ (Mẫu 02)</dt>
+                    <dd>
+                      <DateValue value={quickResult.supplementDueAt} />
+                    </dd>
                   </div>
                 )}
                 {quickResult.hasMau04Extension && (
-                  <div>
+                  <div className="hcds-kv-row hcds-kv-row--two">
                     <dt>Gia hạn giải quyết</dt>
                     <dd>Đã ban hành Phiếu xin lỗi &amp; hẹn lại ngày trả (Mẫu 04)</dd>
                   </div>
@@ -1238,7 +1534,8 @@ export function CitizenTrackingPage({
               {!citizenSignedIn && !item && (
                 <div className="quick-check-auth-prompt">
                   <span>
-                    Để xem tờ khai chi tiết, tải tệp đính kèm, nộp phí, bổ sung hồ sơ hoặc gửi yêu cầu rút hồ sơ:
+                    Để xem tờ khai chi tiết, tải tệp đính kèm, nộp phí, bổ sung hồ sơ hoặc gửi yêu
+                    cầu rút hồ sơ:
                   </span>
                   {onRequireLogin ? (
                     <button
@@ -1273,9 +1570,14 @@ export function CitizenTrackingPage({
                   disabled={busy}
                   onClick={() => void lookup(undefined, { code: record.code, accessKey: '' })}
                 >
-                  <b className="tabular-nums">{record.code}</b>
+                  <span className="citizen-owned-case__head">
+                    <b className="mono-code tabular-nums">{record.code}</b>
+                    <StatusTag
+                      status={record.status}
+                      label={record.statusLabel || record.status}
+                    />
+                  </span>
                   <span>{record.procedure?.name || record.procedureCode}</span>
-                  <small>{record.statusLabel || record.status}</small>
                 </button>
               ))}
             </div>
@@ -1297,6 +1599,7 @@ export function CitizenTrackingPage({
               <span>Mã hồ sơ</span>
               <input
                 id="full-lookup-code"
+                className="mono-code tabular-nums"
                 value={code}
                 onChange={event => setCode(event.target.value.toUpperCase())}
                 placeholder="HN-2026-XXXXXXXX"
@@ -1306,10 +1609,14 @@ export function CitizenTrackingPage({
             </label>
             <label className="citizen-field" htmlFor="full-lookup-key">
               <span>
-                Khóa tra cứu{!citizenSignedIn ? ' (bắt buộc nếu chưa đăng nhập)' : ' (nếu tra cứu hồ sơ quầy)'}
+                Khóa tra cứu
+                {!citizenSignedIn
+                  ? ' (bắt buộc nếu chưa đăng nhập)'
+                  : ' (nếu tra cứu hồ sơ quầy)'}
               </span>
               <input
                 id="full-lookup-key"
+                className="mono-code tabular-nums"
                 value={accessKey}
                 onChange={event => setAccessKey(event.target.value)}
                 autoComplete="off"
@@ -1317,8 +1624,9 @@ export function CitizenTrackingPage({
                 required={!citizenSignedIn}
               />
             </label>
-            <button className="button secondary" disabled={busy}>
-              {busy ? 'Đang mở hồ sơ…' : 'Mở chi tiết hồ sơ'}
+            <button type="submit" className="button secondary" disabled={busy}>
+              <FolderSearch size={16} strokeWidth={1.75} aria-hidden="true" />
+              <span>{busy ? 'Đang mở hồ sơ…' : 'Mở chi tiết hồ sơ'}</span>
             </button>
           </form>
         </section>

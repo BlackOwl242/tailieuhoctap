@@ -1,49 +1,149 @@
+/* ==========================================================================
+   CITIZEN PROFILE — HCDS SEMANTIC TOKENS & ONCE-ONLY READINESS
+   Compliant with Decree 42/2022/NĐ-CP & WCAG 2.2 AA (1.4.11 / 2.5.8)
+   ========================================================================== */
+
 .citizen-profile-page {
-  width: min(100% - 40px, 1000px);
+  width: min(100% - 32px, 1000px);
   max-width: 100%;
   min-width: 0;
   margin: 0 auto;
-  padding: 24px 0 48px;
+  padding: var(--space-6) 0 var(--space-12);
+  color: var(--color-fg-primary);
+}
+
+.citizen-profile-page.is-embedded {
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .profile-navigation {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 12px 16px;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 16px;
-  margin-bottom: 28px;
+  gap: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border-default);
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 
+.profile-navigation .text-button {
+  min-height: var(--control-height, 44px);
+}
+
+.profile-status-note {
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-sm);
+}
+
+/* Once-Only Principle Banner (Nghị định 42/2022/NĐ-CP) */
+.profile-once-only-banner {
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-5);
+  background: var(--color-brand-subtle);
+  border: 1px solid var(--color-brand-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.profile-once-only-banner__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+}
+
+.profile-once-only-banner__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-brand-primary);
+  font-size: var(--text-base);
+}
+
+.profile-once-only-banner__title svg {
+  flex-shrink: 0;
+}
+
+.profile-once-only-banner__head .hcds-verified-badge {
+  font-variant-numeric: tabular-nums;
+}
+
+.profile-once-only-banner__desc {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-fg-tertiary);
+}
+
+.profile-completion {
+  margin: var(--space-1) 0 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-brand-border);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-fg-secondary);
+}
+
+.profile-completion b {
+  color: var(--color-fg-primary);
+}
+
+/* Form Layout & WCAG 1.4.11 Control Borders */
 .profile-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .profile-form .citizen-form-section {
   margin: 0;
+  padding: var(--space-5);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .profile-form .citizen-form-section h2 {
-  margin-top: 0;
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-fg-primary);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
-.profile-form .citizen-form-section > p,
-.profile-source,
-.profile-completion {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--muted);
+.profile-form .citizen-form-section > p {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-fg-secondary);
 }
 
-.profile-source {
-  margin: 0 0 12px;
+.profile-form input:not([type='checkbox']):not([type='radio']):not([type='file']),
+.profile-form select {
+  min-height: var(--control-height, 44px);
+  border-color: var(--color-border-control);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
 }
 
-.profile-completion {
-  margin-bottom: 24px;
+.profile-form input.hcds-verified-input[readonly] {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-border-default);
+  color: var(--color-fg-primary);
 }
 
 .profile-wide {
@@ -51,62 +151,118 @@
   min-width: 0;
 }
 
-.profile-actions {
+/* Accessible 44px Touch Target Checkbox Row (WCAG 2.5.8 & 1.4.11) */
+.profile-checkbox-row,
+.profile-reuse label {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px 20px;
+  gap: var(--space-3);
+  min-height: var(--control-height, 44px);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+  color: var(--color-fg-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.profile-actions span {
-  font-size: 13px;
-  color: var(--muted);
+.profile-checkbox-row:hover,
+.profile-reuse label:hover {
+  border-color: var(--color-brand-interactive);
+  background: var(--color-brand-subtle);
 }
 
-.citizen-profile-page .form-error .text-button {
-  display: block;
-  margin-top: 10px;
+.profile-checkbox-row input[type='checkbox'],
+.profile-reuse input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 2px solid var(--color-border-control);
+  border-radius: var(--radius-sm);
+  accent-color: var(--color-brand-primary);
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .profile-reuse {
   display: flex;
-  gap: 12px 24px;
+  gap: var(--space-3) var(--space-6);
   flex-wrap: wrap;
   align-items: center;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 16px;
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-border-default);
+  margin-bottom: var(--space-4);
   min-width: 0;
 }
 
 .profile-reuse p {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--text-sm);
+  color: var(--color-fg-secondary);
 }
 
-.profile-reuse label {
+.profile-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+  padding-top: var(--space-2);
 }
 
-.profile-reuse input[type="checkbox"] {
-  width: 17px;
-  height: 17px;
+.profile-actions .button {
+  min-height: var(--control-height, 44px);
 }
 
-@media (max-width: 600px) {
+.profile-actions > span {
+  font-size: var(--text-xs);
+  color: var(--color-fg-secondary);
+}
+
+.profile-error-banner {
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
   .citizen-profile-page {
-    width: calc(100% - 24px);
-    padding: 16px 0 36px;
+    width: calc(100% - 32px);
+    padding: var(--space-5) 0 var(--space-10);
+  }
+
+  .citizen-profile-page.is-embedded {
+    width: 100%;
+    padding: 0;
   }
 
   .profile-form .citizen-form-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .citizen-account-bar > div {
-    flex-wrap: wrap;
-    gap: 8px 16px;
+  .profile-form .citizen-form-section {
+    padding: var(--space-4);
+  }
+}
+
+@media (max-width: 640px) {
+  .citizen-profile-page {
+    width: calc(100% - 24px);
+    padding: var(--space-4) 0 var(--space-8);
+  }
+
+  .citizen-profile-page.is-embedded {
+    width: 100%;
+    padding: 0;
+  }
+
+  .profile-once-only-banner {
+    padding: var(--space-4);
+  }
+
+  .profile-actions .button {
+    width: 100%;
   }
 }

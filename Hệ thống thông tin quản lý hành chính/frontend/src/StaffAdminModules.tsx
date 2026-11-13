@@ -1,15 +1,34 @@
 import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  ExternalLink,
+  Plus,
+} from 'lucide-react'
+import {
   Fragment,
   Suspense,
   lazy,
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type FormEvent,
-  type ReactNode,
+  type KeyboardEvent as ReactKeyboardEvent,
 } from 'react'
 import { Index766Panel, PeriodBalancePanel } from './analytics766'
+import {
+  ConfirmDialog,
+  MetricCard,
+  ModalDialog,
+  PanelHeading,
+  StatusTag,
+  type SemanticTone,
+} from './design-system'
 import { ReportExportButtons } from './ReportExport'
 import { serviceModeLabel } from './procedureLabels'
 import {
@@ -41,54 +60,77 @@ import type {
 
 const LazyCitizenProcedureDetail = lazy(() => import('./CitizenProcedureDetail'))
 
-export function PanelHeading({
-  title,
-  description,
-  action,
+function FourEyesTrail({
+  makerRole = 'Người lập đề nghị (Maker)',
+  makerName,
+  makerAt,
+  checkerRole = 'Người phê duyệt độc lập (Checker)',
+  checkerName,
+  checkerAt,
+  status,
+  pendingText = 'Chờ người có thẩm quyền độc lập phê duyệt',
 }: {
-  kicker?: string
-  title: string
-  description: string
-  action?: ReactNode
+  makerRole?: string
+  makerName: string
+  makerAt?: string
+  checkerRole?: string
+  checkerName?: string
+  checkerAt?: string
+  status: string
+  pendingText?: string
 }) {
-  return (
-    <div className="ops-panel-heading">
-      <div>
-        <h2>{title}</h2>
-        {description && <p>{description}</p>}
-      </div>
-      {action && <div className="ops-panel-action">{action}</div>}
-    </div>
-  )
-}
+  const normalized = status.toUpperCase()
+  const checkerTone: SemanticTone =
+    normalized === 'APPROVED' || normalized === 'EXECUTED' || normalized === 'RECONCILED'
+      ? 'success'
+      : normalized === 'REJECTED'
+        ? 'danger'
+        : 'warning'
 
-export function MetricCard({
-  label,
-  value,
-  note,
-  tone,
-  onClick,
-}: {
-  label: string
-  value: number
-  note: string
-  tone: string
-  onClick?: () => void
-}) {
-  const cls = `metric-card tone-${tone}${onClick ? ' metric-button' : ''}`
-  const content = (
-    <>
-      <small className="metric-label">{label}</small>
-      <b className="metric-value tabular-nums">{value.toLocaleString('vi-VN')}</b>
-      <em className="metric-note">{note}</em>
-    </>
-  )
-  return onClick ? (
-    <button type="button" className={cls} onClick={onClick}>
-      {content}
-    </button>
-  ) : (
-    <article className={cls}>{content}</article>
+  const checkerTagLabel =
+    normalized === 'EXECUTED'
+      ? 'Bước 2 · Đã duyệt & thực hiện'
+      : normalized === 'RECONCILED'
+        ? 'Bước 2 · Đã đối soát độc lập'
+        : normalized === 'APPROVED'
+          ? 'Bước 2 · Đã phê duyệt độc lập'
+          : normalized === 'REJECTED'
+            ? 'Bước 2 · Đã từ chối'
+            : 'Bước 2 · Chờ duyệt độc lập'
+
+  return (
+    <div className="four-eyes-trail" role="group" aria-label="Quy trình kiểm soát hai lớp Maker - Checker">
+      <div className="four-eyes-trail__step">
+        <StatusTag tone="info" label="Bước 1 · Lập đề nghị" />
+        <div className="four-eyes-trail__meta">
+          <small>{makerRole}</small>
+          <b>{makerName}</b>
+          {makerAt && <span className="tabular-nums">{toDate(makerAt)}</span>}
+        </div>
+      </div>
+
+      <ArrowRight
+        size={15}
+        strokeWidth={1.75}
+        aria-hidden="true"
+        className="four-eyes-trail__arrow"
+      />
+
+      <div className="four-eyes-trail__step">
+        <StatusTag tone={checkerTone} label={checkerTagLabel} />
+        <div className="four-eyes-trail__meta">
+          <small>{checkerRole}</small>
+          {normalized === 'PENDING' || normalized === 'PAID' ? (
+            <span>{pendingText}</span>
+          ) : (
+            <>
+              <b>{checkerName || 'Cấp có thẩm quyền độc lập'}</b>
+              {checkerAt && <span className="tabular-nums">{toDate(checkerAt)}</span>}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -218,11 +260,15 @@ export function PersonalAccount({
           </div>
           <div>
             <dt>Hiệu lực từ</dt>
-            <dd>{user.validFrom ? toDate(user.validFrom) : 'Không giới hạn ngày bắt đầu'}</dd>
+            <dd className="tabular-nums">
+              {user.validFrom ? toDate(user.validFrom) : 'Không giới hạn ngày bắt đầu'}
+            </dd>
           </div>
           <div>
             <dt>Hiệu lực đến</dt>
-            <dd>{user.validUntil ? toDate(user.validUntil) : 'Không giới hạn ngày kết thúc'}</dd>
+            <dd className="tabular-nums">
+              {user.validUntil ? toDate(user.validUntil) : 'Không giới hạn ngày kết thúc'}
+            </dd>
           </div>
           <div>
             <dt>Nguồn cấp quyền</dt>
@@ -230,7 +276,8 @@ export function PersonalAccount({
               {details?.accessSource || 'Đang tải thông tin…'}
               {details?.approval && (
                 <small>
-                  {details.approval.reviewer} · {toDate(details.approval.reviewed_at)}
+                  {details.approval.reviewer} ·{' '}
+                  <span className="tabular-nums">{toDate(details.approval.reviewed_at)}</span>
                   <br />
                   Căn cứ: {details.approval.reason}
                 </small>
@@ -239,7 +286,12 @@ export function PersonalAccount({
           </div>
           <div>
             <dt>Quyền ký Mẫu 06</dt>
-            <dd>{user.maySignStop ? user.signingAuthorityRef || 'Đã được cấp' : 'Chưa được cấp'}</dd>
+            <dd>
+              <StatusTag
+                tone={user.maySignStop ? 'success' : 'neutral'}
+                label={user.maySignStop ? user.signingAuthorityRef || 'Đã được cấp' : 'Chưa được cấp'}
+              />
+            </dd>
           </div>
         </dl>
       </section>
@@ -324,7 +376,7 @@ export function PersonalAccount({
       <section className="panel personal-session-panel">
         <div>
           <h2>Phiên đăng nhập</h2>
-          <p>
+          <p className="tabular-nums">
             {details
               ? `${details.activeSessions} phiên còn hiệu lực. Phiên hiện tại hết hạn ${toDate(details.sessionExpiresAt)}.`
               : 'Đang tải phiên đăng nhập…'}
@@ -367,6 +419,10 @@ export function StaffAccountManagement({
   const [accountPage, setAccountPage] = useState(1)
   const [accountPageSize, setAccountPageSize] = useState(20)
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [createAgencySelection, setCreateAgencySelection] = useState('')
+  const [createCustomAgency, setCreateCustomAgency] = useState('')
+  const [editAgencySelection, setEditAgencySelection] = useState('')
+  const [editCustomAgency, setEditCustomAgency] = useState('')
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({})
   const [signingAuthorityChecks, setSigningAuthorityChecks] = useState<Record<string, boolean>>({})
   const [revokingAccount, setRevokingAccount] = useState<ManagedUser | null>(null)
@@ -374,18 +430,6 @@ export function StaffAccountManagement({
   const [today] = useState(() =>
     new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date()),
   )
-
-  useEffect(() => {
-    if (!revokingAccount) return
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !busy) {
-        setRevokingAccount(null)
-        setRevokeReason('')
-      }
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [busy, revokingAccount])
 
   const accessState = (account: ManagedUser) =>
     !account.active
@@ -399,6 +443,20 @@ export function StaffAccountManagement({
   const agencyOptions = [...new Set(users.map(account => account.agencyScope).filter(Boolean))].sort(
     (a, b) => a.localeCompare(b, 'vi'),
   )
+
+  const selectableAgencies = useMemo(() => {
+    const pool = new Set<string>(['Toàn thành phố'])
+    if (actor.agencyScope) pool.add(actor.agencyScope)
+    for (const agencyName of agencyOptions) {
+      if (agencyName) pool.add(agencyName)
+    }
+    for (const req of requests) {
+      if (req.agencyScope) pool.add(req.agencyScope)
+    }
+    return [...pool].sort((a, b) =>
+      a === 'Toàn thành phố' ? -1 : b === 'Toàn thành phố' ? 1 : a.localeCompare(b, 'vi'),
+    )
+  }, [actor.agencyScope, agencyOptions, requests])
 
   const visibleUsers = users.filter(account => {
     if (agencyFilter !== 'all' && account.agencyScope !== agencyFilter) return false
@@ -492,6 +550,8 @@ export function StaffAccountManagement({
         signingAuthorityRef: String(values.signingAuthorityRef || '').trim(),
       })
       form.reset()
+      setCreateAgencySelection('')
+      setCreateCustomAgency('')
       setShowCreateForm(false)
       onNotice(
         'Đã lập đề nghị cấp tài khoản. Tài khoản chỉ hoạt động sau khi một quản trị viên khác duyệt.',
@@ -572,6 +632,16 @@ export function StaffAccountManagement({
   function beginAccountChange(account: ManagedUser, active = account.active) {
     setEditing(account)
     setProposedActive(active)
+    if (account.agencyScope && selectableAgencies.includes(account.agencyScope)) {
+      setEditAgencySelection(account.agencyScope)
+      setEditCustomAgency('')
+    } else if (account.agencyScope) {
+      setEditAgencySelection('__CUSTOM__')
+      setEditCustomAgency(account.agencyScope)
+    } else {
+      setEditAgencySelection(selectableAgencies[0] || '')
+      setEditCustomAgency('')
+    }
     setError('')
   }
 
@@ -676,7 +746,8 @@ export function StaffAccountManagement({
             className="button primary compact-btn"
             onClick={() => setShowCreateForm(open => !open)}
           >
-            {showCreateForm ? 'Đóng biểu mẫu cấp tài khoản' : '+ Lập đề nghị cấp tài khoản'}
+            {!showCreateForm && <Plus size={15} strokeWidth={1.75} aria-hidden="true" />}
+            <span>{showCreateForm ? 'Đóng biểu mẫu cấp tài khoản' : 'Lập đề nghị cấp tài khoản'}</span>
           </button>
         </div>
       </div>
@@ -687,87 +758,73 @@ export function StaffAccountManagement({
         </div>
       )}
 
-      {revokingAccount && (
-        <div
-          className="modal-backdrop"
-          role="presentation"
-          onClick={() => {
-            if (!busy) {
-              setRevokingAccount(null)
-              setRevokeReason('')
-            }
-          }}
-        >
-          <div
-            className="application-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="revoke-mau06-title"
-            onClick={event => event.stopPropagation()}
-          >
-            <div className="modal-head">
-              <div>
-                <h2 id="revoke-mau06-title">
-                  Thu hồi quyền ký Mẫu 06 · {revokingAccount.name}
-                </h2>
-              </div>
+      <ModalDialog
+        open={Boolean(revokingAccount)}
+        title={
+          revokingAccount
+            ? `Thu hồi quyền ký Mẫu 06 · ${revokingAccount.name}`
+            : 'Thu hồi quyền ký Mẫu 06'
+        }
+        description="Quyết định thu hồi thẩm quyền ký Thông báo dừng giải quyết (Mẫu 06) được lưu vết bất biến trong nhật ký kiểm toán."
+        onClose={() => {
+          if (!busy) {
+            setRevokingAccount(null)
+            setRevokeReason('')
+          }
+        }}
+      >
+        {revokingAccount && (
+          <form className="form-stack" onSubmit={submitRevokeStopSigning}>
+            <p className="muted case-reset-margin">
+              Văn bản phân công hiện hành:{' '}
+              <b className="mono-code tabular-nums">
+                {revokingAccount.signingAuthorityRef || '—'}
+              </b>
+              . Nhập rõ căn cứ thu hồi (tối thiểu 12 ký tự) để lưu nhật ký kiểm toán.
+            </p>
+            <label>
+              <span>Căn cứ thu hồi quyền ký Mẫu 06</span>
+              <textarea
+                required
+                minLength={12}
+                maxLength={1200}
+                rows={3}
+                autoFocus
+                value={revokeReason}
+                onChange={event => setRevokeReason(event.target.value)}
+                placeholder="Số quyết định điều động, thay đổi phân công nhiệm vụ…"
+              />
+            </label>
+            <div className="form-actions">
               <button
                 type="button"
-                className="icon-button"
-                aria-label="Đóng hộp thoại"
+                className="button secondary"
                 disabled={busy}
                 onClick={() => {
                   setRevokingAccount(null)
                   setRevokeReason('')
                 }}
               >
-                ×
+                Hủy bỏ
+              </button>
+              <button
+                type="submit"
+                className="button warning"
+                disabled={busy || revokeReason.trim().length < 12}
+              >
+                {busy ? 'Đang thu hồi…' : 'Xác nhận thu hồi quyền ký'}
               </button>
             </div>
-            <form className="form-stack" onSubmit={submitRevokeStopSigning}>
-              <p className="muted">
-                Văn bản phân công hiện hành: <b>{revokingAccount.signingAuthorityRef || '—'}</b>. Nhập rõ căn cứ thu hồi (tối thiểu 12 ký tự) để lưu nhật ký kiểm toán.
-              </p>
-              <label>
-                <span>Căn cứ thu hồi quyền ký Mẫu 06</span>
-                <textarea
-                  required
-                  minLength={12}
-                  maxLength={1200}
-                  rows={3}
-                  autoFocus
-                  value={revokeReason}
-                  onChange={event => setRevokeReason(event.target.value)}
-                  placeholder="Số quyết định điều động, thay đổi phân công nhiệm vụ…"
-                />
-              </label>
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className="button secondary"
-                  disabled={busy}
-                  onClick={() => {
-                    setRevokingAccount(null)
-                    setRevokeReason('')
-                  }}
-                >
-                  Hủy
-                </button>
-                <button className="button primary" disabled={busy || revokeReason.trim().length < 12}>
-                  {busy ? 'Đang thu hồi…' : 'Xác nhận thu hồi quyền ký'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+          </form>
+        )}
+      </ModalDialog>
 
       {showCreateForm && (
         <section className="panel account-create-panel">
           <div className="panel-title">
             <div>
               <h2>Lập đề nghị cấp tài khoản cán bộ</h2>
-              <p>Tài khoản chỉ hoạt động sau khi một quản trị viên hệ thống độc lập phê duyệt.</p>
+              <p>Tài khoản chỉ hoạt động sau khi một quản trị viên hệ thống độc lập phê duyệt (nguyên tắc hai lớp Maker – Checker).</p>
             </div>
             <button
               type="button"
@@ -788,7 +845,7 @@ export function StaffAccountManagement({
             </label>
             <label>
               <span>Số điện thoại</span>
-              <input name="phone" type="tel" autoComplete="off" maxLength={40} />
+              <input name="phone" className="tabular-nums" type="tel" autoComplete="off" maxLength={40} />
             </label>
             <label>
               <span>Vai trò</span>
@@ -802,15 +859,42 @@ export function StaffAccountManagement({
             </label>
             <label className="span-two">
               <span>Cơ quan / đơn vị được giao</span>
-              <input
-                name="agencyScope"
-                maxLength={180}
-                defaultValue={isSystemAdmin ? '' : actor.agencyScope}
-                readOnly={!isSystemAdmin}
-                placeholder="Nhập đúng tên cơ quan/đơn vị theo danh mục nội bộ"
-                required
-              />
+              {isSystemAdmin ? (
+                <select
+                  name={createAgencySelection === '__CUSTOM__' ? undefined : 'agencyScope'}
+                  value={createAgencySelection || selectableAgencies[0] || ''}
+                  onChange={event => setCreateAgencySelection(event.target.value)}
+                  required
+                >
+                  {selectableAgencies.map(agency => (
+                    <option key={agency} value={agency}>
+                      {agency}
+                    </option>
+                  ))}
+                  <option value="__CUSTOM__">Nhập tên cơ quan / đơn vị mới khác…</option>
+                </select>
+              ) : (
+                <>
+                  <select value={actor.agencyScope} disabled aria-label="Cơ quan / đơn vị được giao">
+                    <option value={actor.agencyScope}>{actor.agencyScope}</option>
+                  </select>
+                  <input type="hidden" name="agencyScope" value={actor.agencyScope} />
+                </>
+              )}
             </label>
+            {isSystemAdmin && createAgencySelection === '__CUSTOM__' && (
+              <label className="span-two">
+                <span>Tên cơ quan / đơn vị mới</span>
+                <input
+                  name="agencyScope"
+                  maxLength={180}
+                  value={createCustomAgency}
+                  onChange={event => setCreateCustomAgency(event.target.value)}
+                  placeholder="Nhập đầy đủ tên cơ quan / đơn vị hành chính"
+                  required
+                />
+              </label>
+            )}
             <label className="span-two check-row">
               <input name="maySignStop" type="checkbox" />
               <span>
@@ -1058,23 +1142,22 @@ export function StaffAccountManagement({
                               </span>
                             </td>
                             <td className="col-validity" data-label="Thời hạn hiệu lực">
-                              <span className="account-cell-validity">
+                              <span className="account-cell-validity tabular-nums">
                                 {account.validFrom || 'Không giới hạn'} <small>đến</small>{' '}
                                 {account.validUntil || 'Không giới hạn'}
                               </span>
                             </td>
                             <td className="col-status" data-label="Trạng thái">
-                              <span
-                                className={`request-status ${
-                                  state === 'Đang hiệu lực'
-                                    ? 'request-approved'
-                                    : state === 'Hết thời hạn' || !account.active
-                                      ? 'request-rejected'
-                                      : 'request-pending'
-                                }`}
-                              >
-                                {!account.active ? 'Tạm ngưng' : state}
-                              </span>
+                              <StatusTag
+                                tone={
+                                  !account.active || state === 'Hết thời hạn'
+                                    ? 'danger'
+                                    : state === 'Đang hiệu lực'
+                                      ? 'success'
+                                      : 'warning'
+                                }
+                                label={!account.active ? 'Tạm ngưng' : state}
+                              />
                             </td>
                             <td className="col-actions" data-label="Thao tác">
                               <div className="managed-user-actions">
@@ -1100,7 +1183,7 @@ export function StaffAccountManagement({
                                 {account.active && (
                                   <button
                                     type="button"
-                                    className="button secondary compact-btn"
+                                    className="button warning compact-btn"
                                     disabled={
                                       busy ||
                                       pendingChange ||
@@ -1115,7 +1198,7 @@ export function StaffAccountManagement({
                                 {isSystemAdmin && account.maySignStop && (
                                   <button
                                     type="button"
-                                    className="button secondary compact-btn"
+                                    className="button warning compact-btn"
                                     disabled={busy}
                                     onClick={() => {
                                       setRevokingAccount(account)
@@ -1161,14 +1244,61 @@ export function StaffAccountManagement({
                                     </label>
                                     <label>
                                       <span>Cơ quan / phạm vi</span>
-                                      <input
-                                        name="agencyScope"
-                                        defaultValue={account.agencyScope}
-                                        maxLength={180}
-                                        required
-                                        readOnly={!isSystemAdmin}
-                                      />
+                                      {isSystemAdmin ? (
+                                        <select
+                                          name={
+                                            editAgencySelection === '__CUSTOM__'
+                                              ? undefined
+                                              : 'agencyScope'
+                                          }
+                                          value={editAgencySelection}
+                                          onChange={event =>
+                                            setEditAgencySelection(event.target.value)
+                                          }
+                                          required
+                                        >
+                                          {selectableAgencies.map(agency => (
+                                            <option key={agency} value={agency}>
+                                              {agency}
+                                            </option>
+                                          ))}
+                                          <option value="__CUSTOM__">
+                                            Nhập tên cơ quan / đơn vị khác…
+                                          </option>
+                                        </select>
+                                      ) : (
+                                        <>
+                                          <select
+                                            value={account.agencyScope}
+                                            disabled
+                                            aria-label="Cơ quan / phạm vi"
+                                          >
+                                            <option value={account.agencyScope}>
+                                              {account.agencyScope}
+                                            </option>
+                                          </select>
+                                          <input
+                                            type="hidden"
+                                            name="agencyScope"
+                                            value={account.agencyScope}
+                                          />
+                                        </>
+                                      )}
                                     </label>
+                                    {isSystemAdmin && editAgencySelection === '__CUSTOM__' && (
+                                      <label className="span-two">
+                                        <span>Tên cơ quan / phạm vi khác</span>
+                                        <input
+                                          name="agencyScope"
+                                          value={editCustomAgency}
+                                          onChange={event =>
+                                            setEditCustomAgency(event.target.value)
+                                          }
+                                          maxLength={180}
+                                          required
+                                        />
+                                      </label>
+                                    )}
                                     <label>
                                       <span>Hiệu lực từ</span>
                                       <input
@@ -1276,7 +1406,8 @@ export function StaffAccountManagement({
                       disabled={currentAccountPage <= 1}
                       onClick={() => setAccountPage(1)}
                     >
-                      « Đầu
+                      <ChevronsLeft size={14} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Đầu</span>
                     </button>
                     <button
                       type="button"
@@ -1284,9 +1415,10 @@ export function StaffAccountManagement({
                       disabled={currentAccountPage <= 1}
                       onClick={() => setAccountPage(p => Math.max(1, p - 1))}
                     >
-                      ‹ Trước
+                      <ChevronLeft size={14} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Trước</span>
                     </button>
-                    <span className="account-page-indicator">
+                    <span className="account-page-indicator tabular-nums">
                       Trang <b>{currentAccountPage}</b> / {accountPageCount}
                     </span>
                     <button
@@ -1295,7 +1427,8 @@ export function StaffAccountManagement({
                       disabled={currentAccountPage >= accountPageCount}
                       onClick={() => setAccountPage(p => Math.min(accountPageCount, p + 1))}
                     >
-                      Sau ›
+                      <span>Sau</span>
+                      <ChevronRight size={14} strokeWidth={1.75} aria-hidden="true" />
                     </button>
                     <button
                       type="button"
@@ -1303,7 +1436,8 @@ export function StaffAccountManagement({
                       disabled={currentAccountPage >= accountPageCount}
                       onClick={() => setAccountPage(accountPageCount)}
                     >
-                      Cuối »
+                      <span>Cuối</span>
+                      <ChevronsRight size={14} strokeWidth={1.75} aria-hidden="true" />
                     </button>
                   </div>
                 )}
@@ -1326,9 +1460,9 @@ export function StaffAccountManagement({
             <div className="panel-title">
               <div>
                 <h2>Đề nghị cấp quyền mới</h2>
-                <p>Lịch sử lập và phê duyệt tài khoản mới.</p>
+                <p>Kiểm soát hai lớp: Người lập đề nghị (Maker) độc lập với Người phê duyệt (Checker).</p>
               </div>
-              <span className="count-chip">
+              <span className="count-chip tabular-nums">
                 {requests.filter(r => r.status === 'PENDING').length} chờ duyệt
               </span>
             </div>
@@ -1343,39 +1477,44 @@ export function StaffAccountManagement({
                           {requestItem.email} · {roleNames[requestItem.role] || requestItem.role}
                         </small>
                       </div>
-                      <span className={`request-status request-${requestItem.status.toLowerCase()}`}>
-                        {requestItem.status === 'PENDING'
-                          ? 'Chờ duyệt'
-                          : requestItem.status === 'APPROVED'
-                            ? 'Đã duyệt'
-                            : 'Từ chối'}
-                      </span>
+                      <StatusTag
+                        status={requestItem.status}
+                        label={
+                          requestItem.status === 'PENDING'
+                            ? 'Chờ duyệt độc lập'
+                            : requestItem.status === 'APPROVED'
+                              ? 'Đã phê duyệt'
+                              : 'Đã từ chối'
+                        }
+                      />
                     </div>
+                    <FourEyesTrail
+                      makerName={requestItem.requestedBy}
+                      makerAt={requestItem.createdAt}
+                      checkerName={requestItem.reviewedBy}
+                      checkerAt={requestItem.reviewedAt}
+                      status={requestItem.status}
+                      pendingText="Chờ quản trị viên hệ thống độc lập phê duyệt"
+                    />
                     <div className="access-request-facts">
                       <span>
                         <small>Cơ quan</small>
                         <b>{requestItem.agencyScope}</b>
                       </span>
                       <span>
-                        <small>Thời hạn</small>
-                        <b>
+                        <small>Thời hạn hiệu lực</small>
+                        <b className="tabular-nums">
                           {requestItem.validFrom} – {requestItem.validUntil}
                         </b>
                       </span>
-                      <span>
-                        <small>Người đề nghị</small>
-                        <b>{requestItem.requestedBy}</b>
-                      </span>
-                      {requestItem.reviewedBy && (
-                        <span>
-                          <small>Người duyệt</small>
-                          <b>{requestItem.reviewedBy}</b>
-                        </span>
-                      )}
                     </div>
                     {requestItem.maySignStop && (
                       <p className="request-reason">
-                        <b>Đề nghị quyền ký Mẫu 06:</b> {requestItem.signingAuthorityRef}.
+                        <b>Đề nghị quyền ký Mẫu 06:</b>{' '}
+                        <span className="mono-code tabular-nums">
+                          {requestItem.signingAuthorityRef}
+                        </span>
+                        .
                       </p>
                     )}
                     <p className="request-reason">
@@ -1383,14 +1522,14 @@ export function StaffAccountManagement({
                     </p>
                     {requestItem.status === 'PENDING' && requestItem.requestedById === actor.id && (
                       <p className="form-notice">
-                        Bạn đã lập đề nghị này; cần một quản trị viên khác xử lý.
+                        Bạn là người lập đề nghị (Maker); cần một quản trị viên độc lập (Checker) phê duyệt.
                       </p>
                     )}
                     {!isSystemAdmin &&
                       requestItem.status === 'PENDING' &&
                       requestItem.requestedById !== actor.id && (
                         <p className="form-notice">
-                          Đề nghị đang chờ quản trị viên hệ thống duyệt.
+                          Đề nghị đang chờ quản trị viên hệ thống độc lập phê duyệt.
                         </p>
                       )}
                     {isSystemAdmin &&
@@ -1431,7 +1570,7 @@ export function StaffAccountManagement({
                           <div className="form-actions">
                             <button
                               type="button"
-                              className="button secondary"
+                              className="button warning"
                               disabled={reviewing === requestItem.id}
                               onClick={() => void reviewRequest(requestItem, 'reject')}
                             >
@@ -1465,9 +1604,9 @@ export function StaffAccountManagement({
             <div className="panel-title">
               <div>
                 <h2>Đề nghị điều chỉnh tài khoản</h2>
-                <p>Thay đổi vai trò, thời hạn hoặc trạng thái hoạt động.</p>
+                <p>Thay đổi vai trò, thời hạn hoặc trạng thái hoạt động theo nguyên tắc hai lớp.</p>
               </div>
-              <span className="count-chip">
+              <span className="count-chip tabular-nums">
                 {changes.filter(change => change.status === 'PENDING').length} chờ xử lý
               </span>
             </div>
@@ -1480,31 +1619,42 @@ export function StaffAccountManagement({
                         <b>{change.name}</b>
                         <small>{change.email}</small>
                       </div>
-                      <span className={`request-status request-${change.status.toLowerCase()}`}>
-                        {change.status === 'PENDING'
-                          ? 'Chờ duyệt'
-                          : change.status === 'APPROVED'
-                            ? 'Đã áp dụng'
-                            : 'Từ chối'}
-                      </span>
+                      <StatusTag
+                        status={change.status}
+                        label={
+                          change.status === 'PENDING'
+                            ? 'Chờ duyệt độc lập'
+                            : change.status === 'APPROVED'
+                              ? 'Đã áp dụng'
+                              : 'Đã từ chối'
+                        }
+                      />
                     </div>
+                    <FourEyesTrail
+                      makerName={change.requestedBy}
+                      makerAt={change.createdAt}
+                      checkerName={change.reviewedBy}
+                      checkerAt={change.reviewedAt}
+                      status={change.status}
+                      pendingText="Chờ quản trị viên hệ thống độc lập phê duyệt"
+                    />
                     <div className="account-change-diff">
                       <span>
                         <small>Quyền hiện tại</small>
-                        <b>{accessSummary(change.before)}</b>
+                        <b className="tabular-nums">{accessSummary(change.before)}</b>
                       </span>
                       <span>
                         <small>Đề nghị mới</small>
-                        <b>{accessSummary(change.proposed)}</b>
+                        <b className="tabular-nums">{accessSummary(change.proposed)}</b>
                       </span>
                     </div>
                     <p className="request-reason">
-                      <b>Căn cứ:</b> {change.reason} · <b>Người lập:</b> {change.requestedBy}
+                      <b>Căn cứ:</b> {change.reason}
                     </p>
                     {change.status === 'PENDING' &&
                       (change.requestedById === actor.id || change.userId === actor.id) && (
                         <p className="form-notice">
-                          Người lập và chủ tài khoản không được duyệt đề nghị này.
+                          Người lập (Maker) và chủ tài khoản không được tự phê duyệt đề nghị này.
                         </p>
                       )}
                     {!isSystemAdmin &&
@@ -1512,7 +1662,7 @@ export function StaffAccountManagement({
                       change.requestedById !== actor.id &&
                       change.userId !== actor.id && (
                         <p className="form-notice">
-                          Đề nghị đang chờ quản trị viên hệ thống duyệt.
+                          Đề nghị đang chờ quản trị viên hệ thống độc lập phê duyệt.
                         </p>
                       )}
                     {isSystemAdmin &&
@@ -1537,7 +1687,7 @@ export function StaffAccountManagement({
                           <div className="form-actions">
                             <button
                               type="button"
-                              className="button secondary"
+                              className="button warning"
                               disabled={reviewing === change.id}
                               onClick={() => void reviewAccountChange(change, 'reject')}
                             >
@@ -1554,15 +1704,9 @@ export function StaffAccountManagement({
                           </div>
                         </div>
                       )}
-                    {change.reviewedBy && (
+                    {change.reviewedBy && change.reviewNote && (
                       <p className="request-reason">
-                        <b>Người xử lý:</b> {change.reviewedBy}
-                        {change.reviewNote && (
-                          <>
-                            {' '}
-                            · <b>Ý kiến:</b> {change.reviewNote}
-                          </>
-                        )}
+                        <b>Ý kiến người duyệt:</b> {change.reviewNote}
                       </p>
                     )}
                   </article>
@@ -1788,19 +1932,19 @@ export function AdministrativeReports({
             <MetricCard
               label="Tổng số hồ sơ"
               value={report.total}
-              note="Hồ sơ tiếp nhận và theo dõi trong kỳ"
+              hint="Hồ sơ tiếp nhận và theo dõi trong kỳ"
               tone="navy"
             />
             <MetricCard
               label="Đơn vị có hồ sơ"
               value={report.byAgency.length}
-              note="Cơ quan tiếp nhận trong kỳ"
+              hint="Cơ quan tiếp nhận trong kỳ"
               tone="blue"
             />
             <MetricCard
               label="Nhóm trạng thái"
               value={report.byStatus.length}
-              note="Trạng thái xử lý hiện hành"
+              hint="Trạng thái xử lý hiện hành"
               tone="green"
             />
           </section>
@@ -1872,9 +2016,11 @@ export function AdministrativeReports({
                         return (
                           <tr key={`${row.agency}-${row.status}`}>
                             <td data-label="Cơ quan tiếp nhận">{row.agency}</td>
-                            <td data-label="Trạng thái hiện tại">{row.status}</td>
+                            <td data-label="Trạng thái hiện tại">
+                              <StatusTag status={statuses[0]} label={row.status} />
+                            </td>
                             <td data-label="Số hồ sơ">
-                              <b className="tabular-nums">{row.count}</b>
+                              <b className="tabular-nums">{row.count.toLocaleString('vi-VN')}</b>
                             </td>
                             <td data-label="Thao tác">
                               <button
@@ -1890,7 +2036,8 @@ export function AdministrativeReports({
                                   })
                                 }
                               >
-                                Mở danh sách →
+                                <span>Mở danh sách</span>
+                                <ArrowRight size={14} strokeWidth={1.75} aria-hidden="true" />
                               </button>
                             </td>
                           </tr>
@@ -1928,12 +2075,21 @@ export function AdministrativeReports({
                     </thead>
                     <tbody>
                       {report.byProcedure.map(row => {
-                        const code = row.name.split(' · ')[0]
+                        const [code, ...rest] = row.name.split(' · ')
+                        const procTitle = rest.join(' · ')
                         return (
                           <tr key={row.name}>
-                            <td data-label="Mã và tên thủ tục">{row.name}</td>
+                            <td data-label="Mã và tên thủ tục">
+                              {procTitle ? (
+                                <>
+                                  <span className="mono-code tabular-nums">{code}</span> · {procTitle}
+                                </>
+                              ) : (
+                                row.name
+                              )}
+                            </td>
                             <td data-label="Số hồ sơ">
-                              <b className="tabular-nums">{row.count}</b>
+                              <b className="tabular-nums">{row.count.toLocaleString('vi-VN')}</b>
                             </td>
                             <td data-label="Thao tác">
                               <button
@@ -1948,7 +2104,8 @@ export function AdministrativeReports({
                                   })
                                 }
                               >
-                                Mở danh sách →
+                                <span>Mở danh sách</span>
+                                <ArrowRight size={14} strokeWidth={1.75} aria-hidden="true" />
                               </button>
                             </td>
                           </tr>
@@ -1994,6 +2151,7 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
     { id: number; news_id: string; actor_name: string; action: string; created_at: string }[]
   >([])
   const [editing, setEditing] = useState<ManagedNews | null>(null)
+  const [archivingArticle, setArchivingArticle] = useState<ManagedNews | null>(null)
   const [filter, setFilter] = useState('ALL')
   const [query, setQuery] = useState('')
   const [busy, setBusy] = useState(false)
@@ -2100,12 +2258,6 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
   }
 
   async function changeStatus(article: ManagedNews, action: 'archive' | 'draft') {
-    if (
-      action === 'archive' &&
-      !window.confirm(`Lưu trữ tin “${article.title}”? Tin sẽ không còn hiển thị công khai.`)
-    ) {
-      return
-    }
     setBusy(true)
     setError('')
     try {
@@ -2116,6 +2268,7 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
       })
       await refresh()
       setEditing(result.article)
+      setArchivingArticle(null)
       onNotice(action === 'archive' ? 'Đã lưu trữ tin.' : 'Đã chuyển tin về bản nháp.')
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Không cập nhật được trạng thái tin.')
@@ -2141,6 +2294,26 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
 
   return (
     <div className="news-management">
+      <ConfirmDialog
+        open={Boolean(archivingArticle)}
+        title="Lưu trữ bài viết công khai"
+        message={
+          archivingArticle
+            ? `Lưu trữ bài viết “${archivingArticle.title}”? Bài viết sẽ ngừng hiển thị trên Cổng thông tin công dân nhưng vẫn giữ lịch sử kiểm toán biên tập.`
+            : ''
+        }
+        confirmLabel="Lưu trữ bài viết"
+        cancelLabel="Giữ công khai"
+        tone="danger"
+        busy={busy}
+        onClose={() => {
+          if (!busy) setArchivingArticle(null)
+        }}
+        onConfirm={() => {
+          if (archivingArticle) void changeStatus(archivingArticle, 'archive')
+        }}
+      />
+
       <div className="news-management-toolbar">
         <div className="news-management-stats">
           <div>
@@ -2161,7 +2334,8 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
           </div>
         </div>
         <button type="button" className="button primary" onClick={newArticle}>
-          ＋ Soạn bài viết mới
+          <Plus size={15} strokeWidth={1.75} aria-hidden="true" />
+          <span>Soạn bài viết mới</span>
         </button>
       </div>
 
@@ -2211,15 +2385,24 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
                       setError('')
                     }}
                   >
-                    <span className={`news-status news-status-${article.status.toLowerCase()}`}>
-                      {article.status === 'PUBLISHED'
-                        ? 'Đang công khai'
-                        : article.status === 'DRAFT'
-                          ? 'Bản nháp'
-                          : 'Đã lưu trữ'}
-                    </span>
+                    <StatusTag
+                      tone={
+                        article.status === 'PUBLISHED'
+                          ? 'success'
+                          : article.status === 'DRAFT'
+                            ? 'warning'
+                            : 'neutral'
+                      }
+                      label={
+                        article.status === 'PUBLISHED'
+                          ? 'Đang công khai'
+                          : article.status === 'DRAFT'
+                            ? 'Bản nháp'
+                            : 'Đã lưu trữ'
+                      }
+                    />
                     <b>{article.title}</b>
-                    <small>
+                    <small className="tabular-nums">
                       {article.category} · {article.date || toDate(article.updatedAt)}
                     </small>
                   </button>
@@ -2227,9 +2410,9 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
                     {article.status === 'PUBLISHED' ? (
                       <button
                         type="button"
-                        className="text-button"
+                        className="button warning compact-btn"
                         disabled={busy}
-                        onClick={() => void changeStatus(article, 'archive')}
+                        onClick={() => setArchivingArticle(article)}
                       >
                         Lưu trữ
                       </button>
@@ -2260,13 +2443,22 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
                   <h2>{editing.id ? 'Hiệu chỉnh bài viết' : 'Soạn bài viết mới'}</h2>
                 </div>
                 {editing.id && (
-                  <span className={`news-status news-status-${editing.status.toLowerCase()}`}>
-                    {editing.status === 'PUBLISHED'
-                      ? 'Đang công khai'
-                      : editing.status === 'DRAFT'
-                        ? 'Bản nháp'
-                        : 'Đã lưu trữ'}
-                  </span>
+                  <StatusTag
+                    tone={
+                      editing.status === 'PUBLISHED'
+                        ? 'success'
+                        : editing.status === 'DRAFT'
+                          ? 'warning'
+                          : 'neutral'
+                    }
+                    label={
+                      editing.status === 'PUBLISHED'
+                        ? 'Đang công khai'
+                        : editing.status === 'DRAFT'
+                          ? 'Bản nháp'
+                          : 'Đã lưu trữ'
+                    }
+                  />
                 )}
               </div>
               <form
@@ -2361,7 +2553,7 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
                   </button>
                 </div>
                 {editing.id && (
-                  <small>
+                  <small className="tabular-nums">
                     Phiên bản {editing.version} · Cập nhật {toDate(editing.updatedAt)}
                   </small>
                 )}
@@ -2394,7 +2586,7 @@ export function NewsManagement({ onNotice }: { onNotice: (message: string) => vo
                         : 'cập nhật'}{' '}
                 ·{' '}
                 {articles.find(article => article.id === item.news_id)?.title || 'Tin đã lưu trữ'}{' '}
-                <time>{toDate(item.created_at)}</time>
+                <time className="tabular-nums">{toDate(item.created_at)}</time>
               </p>
             ))}
           </div>
@@ -2517,28 +2709,28 @@ export function AdminOverview({ onNavigate }: { onNavigate: (page: string) => vo
         <MetricCard
           label="Tổng tài khoản cán bộ"
           value={accounts.length}
-          note="Mở danh bạ tài khoản"
+          hint="Mở danh bạ tài khoản"
           tone="navy"
           onClick={() => onNavigate('users')}
         />
         <MetricCard
           label="Đang có hiệu lực"
           value={activeAccounts.length}
-          note="Đã kích hoạt và còn hạn"
+          hint="Đã kích hoạt và còn hạn"
           tone="blue"
           onClick={() => onNavigate('users')}
         />
         <MetricCard
           label="Sắp hết hạn (≤ 30 ngày)"
           value={expiring.length}
-          note="Cần rà soát gia hạn"
+          hint="Cần rà soát gia hạn"
           tone="amber"
           onClick={() => onNavigate('users')}
         />
         <MetricCard
           label="Đề nghị chờ duyệt"
           value={pending.length}
-          note="Cấp mới hoặc điều chỉnh quyền"
+          hint="Cấp mới hoặc điều chỉnh quyền"
           tone="red"
           onClick={() => onNavigate('users')}
         />
@@ -2555,9 +2747,10 @@ export function AdminOverview({ onNavigate }: { onNavigate: (page: string) => vo
           <PanelHeading
             title="Phân bổ theo vai trò nghiệp vụ"
             description="Số lượng tài khoản theo nhóm thẩm quyền."
-            action={
+            actions={
               <button type="button" className="text-button" onClick={() => onNavigate('users')}>
-                Quản lý tài khoản →
+                <span>Quản lý tài khoản</span>
+                <ArrowRight size={14} strokeWidth={1.75} aria-hidden="true" />
               </button>
             }
           />
@@ -2582,9 +2775,10 @@ export function AdminOverview({ onNavigate }: { onNavigate: (page: string) => vo
           <PanelHeading
             title="Đề nghị phân quyền chờ xử lý"
             description="Yêu cầu phê duyệt độc lập từ quản trị viên khác."
-            action={
+            actions={
               <button type="button" className="text-button" onClick={() => onNavigate('users')}>
-                Xử lý đề nghị →
+                <span>Xử lý đề nghị</span>
+                <ArrowRight size={14} strokeWidth={1.75} aria-hidden="true" />
               </button>
             }
           />
@@ -2598,7 +2792,7 @@ export function AdminOverview({ onNavigate }: { onNavigate: (page: string) => vo
                       {item.kind} · {item.detail}
                     </small>
                   </span>
-                  <time>{toDate(item.at)}</time>
+                  <time className="tabular-nums">{toDate(item.at)}</time>
                 </div>
               ))}
             </div>
@@ -2615,9 +2809,10 @@ export function AdminOverview({ onNavigate }: { onNavigate: (page: string) => vo
           <PanelHeading
             title="Tài khoản sắp hết thời hạn"
             description="Trong vòng 30 ngày tới."
-            action={
+            actions={
               <button type="button" className="text-button" onClick={() => onNavigate('users')}>
-                Gia hạn →
+                <span>Gia hạn</span>
+                <ArrowRight size={14} strokeWidth={1.75} aria-hidden="true" />
               </button>
             }
           />
@@ -2631,7 +2826,7 @@ export function AdminOverview({ onNavigate }: { onNavigate: (page: string) => vo
                       {account.email} · {account.agencyScope}
                     </small>
                   </span>
-                  <time>Hết hạn {toDate(account.validUntil)}</time>
+                  <time className="tabular-nums">Hết hạn {toDate(account.validUntil)}</time>
                 </div>
               ))}
             </div>
@@ -2648,9 +2843,10 @@ export function AdminOverview({ onNavigate }: { onNavigate: (page: string) => vo
           <PanelHeading
             title="Lịch sử cấp và điều chỉnh gần đây"
             description="Truy vết các quyết định phân quyền mới nhất."
-            action={
+            actions={
               <button type="button" className="text-button" onClick={() => onNavigate('users')}>
-                Xem tất cả →
+                <span>Xem tất cả</span>
+                <ArrowRight size={14} strokeWidth={1.75} aria-hidden="true" />
               </button>
             }
           />
@@ -2662,7 +2858,7 @@ export function AdminOverview({ onNavigate }: { onNavigate: (page: string) => vo
                     <b>{item.name}</b>
                     <small>{item.detail}</small>
                   </span>
-                  <time>{toDate(item.at)}</time>
+                  <time className="tabular-nums">{toDate(item.at)}</time>
                 </div>
               ))}
             </div>
@@ -2736,6 +2932,7 @@ export function ProcedureCatalog({
   const [selectedMembers, setSelectedMembers] = useState<string[]>([])
   const [targetCategoryKey, setTargetCategoryKey] = useState('')
   const [savingMove, setSavingMove] = useState(false)
+  const categoryListRef = useRef<HTMLDivElement>(null)
 
   const memberPageSize = 20
   const pageSize = 12
@@ -2844,6 +3041,33 @@ export function ProcedureCatalog({
     setShowCategoryHistory(false)
     setManagingMembers(false)
     setError('')
+  }
+
+  function handleCategoryListboxKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return
+    if (!visibleCategories.length) return
+
+    event.preventDefault()
+    const currentIndex = Math.max(
+      0,
+      visibleCategories.findIndex(item => item.key === selectedCategory?.key),
+    )
+    let nextIndex = currentIndex
+    if (event.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % visibleCategories.length
+    } else if (event.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + visibleCategories.length) % visibleCategories.length
+    } else if (event.key === 'Home') {
+      nextIndex = 0
+    } else if (event.key === 'End') {
+      nextIndex = visibleCategories.length - 1
+    }
+
+    const nextCategory = visibleCategories[nextIndex]
+    if (!nextCategory) return
+    selectCategory(nextCategory.key)
+    const options = categoryListRef.current?.querySelectorAll<HTMLButtonElement>('[role="option"]')
+    options?.[nextIndex]?.focus()
   }
 
   function startEdit() {
@@ -3050,7 +3274,8 @@ export function ProcedureCatalog({
             disabled={saving}
             onClick={returnToCatalog}
           >
-            ← Về danh sách thủ tục
+            <ArrowLeft size={15} strokeWidth={1.75} aria-hidden="true" />
+            <span>Về danh sách thủ tục</span>
           </button>
           <div>
             {canManage && !editing && (
@@ -3069,7 +3294,8 @@ export function ProcedureCatalog({
               target="_blank"
               rel="noreferrer"
             >
-              Mở trang công dân ↗
+              <span>Mở trang công dân</span>
+              <ExternalLink size={14} strokeWidth={1.75} aria-hidden="true" />
             </a>
           </div>
         </div>
@@ -3092,10 +3318,10 @@ export function ProcedureCatalog({
               {history.length ? (
                 history.map(entry => (
                   <article key={`${entry.createdAt}-${entry.actor}`}>
-                    <b>
+                    <b className="tabular-nums">
                       Phiên bản {String(entry.after.version ?? '—')} · {entry.actor}
                     </b>
-                    <time>{toDate(entry.createdAt)}</time>
+                    <time className="tabular-nums">{toDate(entry.createdAt)}</time>
                     <p>{entry.reason}</p>
                   </article>
                 ))
@@ -3111,7 +3337,7 @@ export function ProcedureCatalog({
             <div className="catalog-editor-heading">
               <div>
                 <h2>Chỉnh sửa danh mục nội bộ</h2>
-                <p>{selected.code}</p>
+                <p className="mono-code tabular-nums">{selected.code}</p>
               </div>
               <button
                 type="button"
@@ -3127,6 +3353,7 @@ export function ProcedureCatalog({
                 <span>Mã thủ tục</span>
                 <input
                   name="code"
+                  className="mono-code tabular-nums"
                   defaultValue={selected.code}
                   required
                   minLength={2}
@@ -3226,11 +3453,11 @@ export function ProcedureCatalog({
               <dl>
                 <div>
                   <dt>Mã đang dùng</dt>
-                  <dd>{selected.code}</dd>
+                  <dd className="mono-code tabular-nums">{selected.code}</dd>
                 </div>
                 <div>
                   <dt>Mã bản ghi nguồn</dt>
-                  <dd>{selected.ref || 'Chưa có'}</dd>
+                  <dd className="mono-code tabular-nums">{selected.ref || 'Chưa có'}</dd>
                 </div>
                 <div>
                   <dt>Lĩnh vực</dt>
@@ -3247,12 +3474,12 @@ export function ProcedureCatalog({
                 {selected.sourceCode && selected.sourceCode !== selected.code && (
                   <div>
                     <dt>Mã nguồn chính thức</dt>
-                    <dd>{selected.sourceCode}</dd>
+                    <dd className="mono-code tabular-nums">{selected.sourceCode}</dd>
                   </div>
                 )}
               </dl>
               {(selected.localEdit || selected.categoryEdit) && (
-                <p>
+                <p className="tabular-nums">
                   Bản cập nhật nội bộ bởi{' '}
                   {selected.localEdit?.updatedBy || selected.categoryEdit?.updatedBy}, phiên bản{' '}
                   {selected.localEdit?.version || selected.categoryEdit?.version}. Ngày đối chiếu:{' '}
@@ -3313,7 +3540,9 @@ export function ProcedureCatalog({
           <section className="panel field-catalog-panel" aria-label="Danh mục lĩnh vực thủ tục">
             <div className="field-catalog-header">
               <div>
-                <h2>Lĩnh vực thủ tục ({classifiedFieldCount.toLocaleString('vi-VN')})</h2>
+                <h2 className="tabular-nums">
+                  Lĩnh vực thủ tục ({classifiedFieldCount.toLocaleString('vi-VN')})
+                </h2>
               </div>
               <div className="field-catalog-header-actions">
                 {canManage && (
@@ -3325,7 +3554,14 @@ export function ProcedureCatalog({
                       setError('')
                     }}
                   >
-                    {newCategoryOpen ? 'Đóng tạo lĩnh vực' : '+ Tạo lĩnh vực'}
+                    {newCategoryOpen ? (
+                      <span>Đóng tạo lĩnh vực</span>
+                    ) : (
+                      <>
+                        <Plus size={14} strokeWidth={1.75} aria-hidden="true" />
+                        <span>Tạo lĩnh vực</span>
+                      </>
+                    )}
                   </button>
                 )}
                 <label className="field-catalog-search">
@@ -3373,11 +3609,18 @@ export function ProcedureCatalog({
             )}
 
             <div className="field-catalog-layout">
-              <div className="field-catalog-list" role="listbox" aria-label="Các lĩnh vực">
+              <div
+                ref={categoryListRef}
+                className="field-catalog-list"
+                role="listbox"
+                aria-label="Các lĩnh vực"
+                onKeyDown={handleCategoryListboxKeyDown}
+              >
                 {visibleCategories.map(category => (
                   <button
                     type="button"
                     role="option"
+                    tabIndex={selectedCategory?.key === category.key ? 0 : -1}
                     aria-selected={selectedCategory?.key === category.key}
                     className={`field-catalog-row${selectedCategory?.key === category.key ? ' active' : ''}`}
                     key={category.key}
@@ -3483,7 +3726,7 @@ export function ProcedureCatalog({
                       <div className="field-detail-heading">
                         <div>
                           <h3>{selectedCategory.name}</h3>
-                          <p>
+                          <p className="tabular-nums">
                             {selectedCategory.procedures.length.toLocaleString('vi-VN')} thủ tục thuộc lĩnh vực này
                           </p>
                         </div>
@@ -3515,8 +3758,10 @@ export function ProcedureCatalog({
 
                       {selectedCategory.categoryEdit && (
                         <div className="field-catalog-provenance">
-                          <b>Phiên bản {selectedCategory.categoryEdit.version}</b>
-                          <span>
+                          <b className="tabular-nums">
+                            Phiên bản {selectedCategory.categoryEdit.version}
+                          </b>
+                          <span className="tabular-nums">
                             Cập nhật bởi {selectedCategory.categoryEdit.updatedBy} ·{' '}
                             {toDate(selectedCategory.categoryEdit.updatedAt)}
                           </span>
@@ -3527,7 +3772,8 @@ export function ProcedureCatalog({
                               target="_blank"
                               rel="noreferrer"
                             >
-                              Mở nguồn đối chiếu ↗
+                              <span>Mở nguồn đối chiếu</span>
+                              <ExternalLink size={13} strokeWidth={1.75} aria-hidden="true" />
                             </a>
                           )}
                         </div>
@@ -3547,7 +3793,7 @@ export function ProcedureCatalog({
                             placeholder="Mã thủ tục hoặc tên thủ tục"
                           />
                         </label>
-                        <span>
+                        <span className="tabular-nums">
                           {categoryMemberMatches.length.toLocaleString('vi-VN')} /{' '}
                           {selectedCategory.procedures.length.toLocaleString('vi-VN')} thủ tục
                         </span>
@@ -3556,7 +3802,7 @@ export function ProcedureCatalog({
                       {managingMembers && canManage && (
                         <form className="field-member-manager" onSubmit={moveSelectedMembers}>
                           <div className="field-member-selection">
-                            <span>
+                            <span className="tabular-nums">
                               Đã chọn {selectedMembers.length.toLocaleString('vi-VN')} thủ tục
                             </span>
                             <div>
@@ -3685,7 +3931,7 @@ export function ProcedureCatalog({
                               }}
                             >
                               <span>
-                                <b>{item.code}</b> · {item.name}
+                                <b className="mono-code tabular-nums">{item.code}</b> · {item.name}
                               </span>
                             </button>
                           </div>
@@ -3705,9 +3951,10 @@ export function ProcedureCatalog({
                             disabled={memberPage <= 1}
                             onClick={() => setMemberPage(value => Math.max(1, value - 1))}
                           >
-                            ‹ Trước
+                            <ChevronLeft size={14} strokeWidth={1.75} aria-hidden="true" />
+                            <span>Trước</span>
                           </button>
-                          <span>
+                          <span className="tabular-nums">
                             Trang {memberPage} / {categoryMemberPages}
                           </span>
                           <button
@@ -3718,7 +3965,8 @@ export function ProcedureCatalog({
                               setMemberPage(value => Math.min(categoryMemberPages, value + 1))
                             }
                           >
-                            Sau ›
+                            <span>Sau</span>
+                            <ChevronRight size={14} strokeWidth={1.75} aria-hidden="true" />
                           </button>
                         </div>
                       )}
@@ -3738,10 +3986,10 @@ export function ProcedureCatalog({
                           {categoryHistory.length ? (
                             categoryHistory.map(entry => (
                               <article key={`${entry.createdAt}-${entry.actor}`}>
-                                <b>
-                                  {String(entry.after.version ?? '—')} · {entry.actor}
+                                <b className="tabular-nums">
+                                  Phiên bản {String(entry.after.version ?? '—')} · {entry.actor}
                                 </b>
-                                <time>{toDate(entry.createdAt)}</time>
+                                <time className="tabular-nums">{toDate(entry.createdAt)}</time>
                                 <p>{entry.reason}</p>
                               </article>
                             ))
@@ -3834,7 +4082,7 @@ export function ProcedureCatalog({
           <div>
             <h2 id="staff-procedure-results-heading">Danh sách thủ tục hành chính</h2>
           </div>
-          <span>
+          <span className="tabular-nums">
             {filtered.length
               ? `${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, filtered.length)} / ${filtered.length.toLocaleString('vi-VN')}`
               : '0 kết quả'}
@@ -3857,7 +4105,9 @@ export function ProcedureCatalog({
                 return (
                   <tr key={`${stableCode}-${item.ref}`}>
                     <td data-label="Mã thủ tục">
-                      <span className="staff-procedure-code">{item.code}</span>
+                      <span className="staff-procedure-code mono-code tabular-nums">
+                        {item.code}
+                      </span>
                     </td>
                     <td data-label="Tên thủ tục">
                       <button
@@ -3875,11 +4125,16 @@ export function ProcedureCatalog({
                     </td>
                     <td data-label="Cơ quan">{item.agency || 'Chưa xác định'}</td>
                     <td data-label="Tình trạng dữ liệu">
-                      <span
-                        className={`staff-procedure-data-status${item.localEdit || item.categoryEdit ? ' internal' : ''}`}
-                      >
-                        {sourceStatus(item)}
-                      </span>
+                      <StatusTag
+                        tone={
+                          item.localEdit || item.categoryEdit
+                            ? 'warning'
+                            : item.verified || item.routing?.status === 'catalog-reference-only'
+                              ? 'success'
+                              : 'neutral'
+                        }
+                        label={sourceStatus(item)}
+                      />
                     </td>
                   </tr>
                 )
@@ -3902,9 +4157,10 @@ export function ProcedureCatalog({
               disabled={page <= 1}
               onClick={() => setPage(current => Math.max(1, current - 1))}
             >
-              ‹ Trang trước
+              <ChevronLeft size={14} strokeWidth={1.75} aria-hidden="true" />
+              <span>Trang trước</span>
             </button>
-            <span>
+            <span className="tabular-nums">
               Trang {page} / {pageCount}
             </span>
             <button
@@ -3913,7 +4169,8 @@ export function ProcedureCatalog({
               disabled={page >= pageCount}
               onClick={() => setPage(current => Math.min(pageCount, current + 1))}
             >
-              Trang sau ›
+              <span>Trang sau</span>
+              <ChevronRight size={14} strokeWidth={1.75} aria-hidden="true" />
             </button>
           </div>
         )}
@@ -3931,6 +4188,8 @@ export function CaseActivityLog({
 }) {
   const [query, setQuery] = useState('')
   const [audience, setAudience] = useState('all')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState<25 | 50 | 100>(25)
 
   const events = useMemo(
     () =>
@@ -3956,6 +4215,10 @@ export function CaseActivityLog({
     [cases, query, audience],
   )
 
+  const pageCount = Math.max(1, Math.ceil(events.length / pageSize))
+  const currentPage = Math.min(page, pageCount)
+  const pagedEvents = events.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
   return (
     <div className="activity-workspace">
       <section className="panel activity-controls">
@@ -3966,7 +4229,10 @@ export function CaseActivityLog({
             className="search-input"
             type="search"
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => {
+              setQuery(e.target.value)
+              setPage(1)
+            }}
             placeholder="Mã hồ sơ, thao tác, người thực hiện…"
           />
         </label>
@@ -3975,7 +4241,10 @@ export function CaseActivityLog({
           <select
             id="activity-audience"
             value={audience}
-            onChange={e => setAudience(e.target.value)}
+            onChange={e => {
+              setAudience(e.target.value)
+              setPage(1)
+            }}
           >
             <option value="all">Công khai và nội bộ</option>
             <option value="public">Hiển thị cho công dân</option>
@@ -3990,60 +4259,136 @@ export function CaseActivityLog({
 
       <section className="panel activity-panel">
         {events.length ? (
-          <div className="table-scroll data-table-wrap">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Thời điểm</th>
-                  <th>Sự kiện &amp; Hồ sơ</th>
-                  <th>Người thực hiện</th>
-                  <th>Phạm vi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {events.map((event, index) => (
-                  <tr key={`${event.code}-${event.at}-${index}`}>
-                    <td data-label="Thời điểm">
-                      <time className="account-cell-email">{toDate(event.at)}</time>
-                    </td>
-                    <td data-label="Sự kiện & Hồ sơ">
-                      <div className="account-cell-user">
-                        <b>{event.title}</b>
-                        <button
-                          type="button"
-                          className="activity-case-link"
-                          onClick={() => {
-                            const item = cases.find(record => record.code === event.code)
-                            if (item) onOpen(item)
-                          }}
-                        >
-                          {event.code} · {event.procedureName}
-                        </button>
-                        {event.detail && (
-                          <span className="account-cell-email">{event.detail}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td data-label="Người thực hiện">
-                      <div className="account-cell-user">
-                        <b>{event.actor || 'Hệ thống'}</b>
-                        <span className="account-cell-email">
-                          {roleNames[event.role || ''] || event.role || 'Tự động'}
-                        </span>
-                      </div>
-                    </td>
-                    <td data-label="Phạm vi">
-                      <span
-                        className={`request-status ${event.audience === 'internal' ? 'request-pending' : 'request-approved'}`}
-                      >
-                        {event.audience === 'internal' ? 'Nội bộ' : 'Công khai'}
-                      </span>
-                    </td>
+          <>
+            <div className="table-scroll data-table-wrap">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Thời điểm</th>
+                    <th>Sự kiện &amp; Hồ sơ</th>
+                    <th>Người thực hiện</th>
+                    <th>Phạm vi</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {pagedEvents.map((event, index) => (
+                    <tr key={`${event.code}-${event.at}-${index}`}>
+                      <td data-label="Thời điểm">
+                        <time className="account-cell-email tabular-nums">
+                          {toDate(event.at)}
+                        </time>
+                      </td>
+                      <td data-label="Sự kiện & Hồ sơ">
+                        <div className="account-cell-user">
+                          <b>{event.title}</b>
+                          <button
+                            type="button"
+                            className="activity-case-link"
+                            onClick={() => {
+                              const item = cases.find(record => record.code === event.code)
+                              if (item) onOpen(item)
+                            }}
+                          >
+                            <span className="mono-code tabular-nums">{event.code}</span> ·{' '}
+                            {event.procedureName}
+                          </button>
+                          {event.detail && (
+                            <span className="account-cell-email">{event.detail}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td data-label="Người thực hiện">
+                        <div className="account-cell-user">
+                          <b>{event.actor || 'Hệ thống'}</b>
+                          <span className="account-cell-email">
+                            {roleNames[event.role || ''] || event.role || 'Tự động'}
+                          </span>
+                        </div>
+                      </td>
+                      <td data-label="Phạm vi">
+                        <StatusTag
+                          tone={event.audience === 'internal' ? 'warning' : 'success'}
+                          label={event.audience === 'internal' ? 'Nội bộ' : 'Công khai'}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="account-pagination">
+              <div className="account-pagination-info">
+                <span>
+                  Hiển thị{' '}
+                  <b className="tabular-nums">
+                    {(currentPage - 1) * pageSize + 1}–
+                    {Math.min(currentPage * pageSize, events.length)}
+                  </b>{' '}
+                  / <b className="tabular-nums">{events.length.toLocaleString('vi-VN')}</b> sự
+                  kiện
+                </span>
+                <label className="account-pagesize-select">
+                  <span>Số dòng:</span>
+                  <select
+                    value={pageSize}
+                    onChange={e => {
+                      setPageSize(Number(e.target.value) as 25 | 50 | 100)
+                      setPage(1)
+                    }}
+                  >
+                    <option value={25}>25 / trang</option>
+                    <option value={50}>50 / trang</option>
+                    <option value={100}>100 / trang</option>
+                  </select>
+                </label>
+              </div>
+
+              {pageCount > 1 && (
+                <div className="account-pagination-controls">
+                  <button
+                    type="button"
+                    className="button secondary compact-btn"
+                    disabled={currentPage <= 1}
+                    onClick={() => setPage(1)}
+                  >
+                    <ChevronsLeft size={14} strokeWidth={1.75} aria-hidden="true" />
+                    <span>Đầu</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="button secondary compact-btn"
+                    disabled={currentPage <= 1}
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                  >
+                    <ChevronLeft size={14} strokeWidth={1.75} aria-hidden="true" />
+                    <span>Trước</span>
+                  </button>
+                  <span className="account-page-indicator tabular-nums">
+                    Trang <b>{currentPage}</b> / {pageCount}
+                  </span>
+                  <button
+                    type="button"
+                    className="button secondary compact-btn"
+                    disabled={currentPage >= pageCount}
+                    onClick={() => setPage(p => Math.min(pageCount, p + 1))}
+                  >
+                    <span>Sau</span>
+                    <ChevronRight size={14} strokeWidth={1.75} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    className="button secondary compact-btn"
+                    disabled={currentPage >= pageCount}
+                    onClick={() => setPage(pageCount)}
+                  >
+                    <span>Cuối</span>
+                    <ChevronsRight size={14} strokeWidth={1.75} aria-hidden="true" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           <div className="empty-state">Chưa có sự kiện phù hợp trong phạm vi dữ liệu được cấp.</div>
         )}
@@ -4164,6 +4509,8 @@ export function ServiceConnections({
   const [signerId, setSignerId] = useState('')
   const [authorityRef, setAuthorityRef] = useState('')
   const [authorityReason, setAuthorityReason] = useState('')
+  const [revokingSigner, setRevokingSigner] = useState<SandboxSigner | null>(null)
+  const [revokeSignerReason, setRevokeSignerReason] = useState('')
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
@@ -4242,7 +4589,12 @@ export function ServiceConnections({
     return () => controller.abort()
   }, [user.role])
 
-  async function changeSigner(action: 'grant' | 'revoke', targetId = signerId, revokeReason = '') {
+  async function changeSigner(
+    action: 'grant' | 'revoke',
+    targetId = signerId,
+    revokeReason = '',
+    targetAuthorityRef = authorityRef,
+  ): Promise<boolean> {
     setBusy(true)
     setError('')
     setNotice('')
@@ -4250,19 +4602,23 @@ export function ServiceConnections({
       await api('/api/sandbox-signers', {
         action,
         userId: targetId,
-        authorityRef,
+        authorityRef: targetAuthorityRef,
         reason: revokeReason || authorityReason,
       })
-      setAuthorityRef('')
-      setAuthorityReason('')
+      if (action === 'grant') {
+        setAuthorityRef('')
+        setAuthorityReason('')
+      }
       await loadOperations()
       setNotice(
         action === 'grant'
           ? 'Đã cấp thẩm quyền ký số cho tài khoản lãnh đạo.'
           : 'Đã thu hồi thẩm quyền ký số.',
       )
+      return true
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Không cập nhật được quyền ký.')
+      return false
     } finally {
       setBusy(false)
     }
@@ -4347,25 +4703,25 @@ export function ServiceConnections({
         >
           <PanelHeading
             title="Giao dịch thu phí, đối soát chứng từ và hoàn trả"
-            description="Quản lý nghĩa vụ tài chính phát sinh trên hồ sơ trong phạm vi đơn vị."
+            description="Quản lý nghĩa vụ tài chính phát sinh trên hồ sơ trong phạm vi đơn vị theo nguyên tắc hai lớp (Maker - Checker)."
           />
           <div className="sandbox-payment-summary">
             <MetricCard
               label="Tổng giao dịch"
               value={payments.length}
-              note="Trong phạm vi được phép xem"
+              hint="Trong phạm vi được phép xem"
               tone="navy"
             />
             <MetricCard
               label="Chờ đối soát"
               value={payments.filter(item => item.status === 'PAID').length}
-              note="Người nộp đã khai chứng từ"
+              hint="Người nộp đã khai chứng từ"
               tone="amber"
             />
             <MetricCard
               label="Chờ duyệt hoàn"
               value={payments.filter(item => item.refund?.status === 'PENDING').length}
-              note="Cần người có thẩm quyền duyệt"
+              hint="Cần người có thẩm quyền độc lập duyệt"
               tone="red"
             />
           </div>
@@ -4403,7 +4759,7 @@ export function ServiceConnections({
         >
           <PanelHeading
             title="Quản lý thẩm quyền ký số kết quả nội bộ (Ed25519)"
-            description="Cấp hoặc thu hồi quyền ký kết quả cho lãnh đạo đơn vị."
+            description="Cấp hoặc thu hồi quyền ký kết quả cho lãnh đạo đơn vị. Mọi thao tác thu hồi yêu cầu xác nhận căn cứ kiểm toán."
           />
           <form
             className="sandbox-signer-form"
@@ -4482,7 +4838,7 @@ export function ServiceConnections({
                       <td data-label="Căn cứ phân quyền ký">
                         {person.authority_ref ? (
                           <div className="account-cell-user">
-                            <b>{person.authority_ref}</b>
+                            <b className="mono-code tabular-nums">{person.authority_ref}</b>
                             <span className="account-cell-email">{person.reason || ''}</span>
                           </div>
                         ) : (
@@ -4490,25 +4846,21 @@ export function ServiceConnections({
                         )}
                       </td>
                       <td className="col-status" data-label="Trạng thái">
-                        <span
-                          className={`request-status ${person.effective ? 'request-approved' : 'request-pending'}`}
-                        >
-                          {person.effective ? 'Đang hiệu lực' : 'Chưa kích hoạt'}
-                        </span>
+                        <StatusTag
+                          tone={person.effective ? 'success' : 'warning'}
+                          label={person.effective ? 'Đang hiệu lực' : 'Chưa kích hoạt'}
+                        />
                       </td>
                       <td className="col-actions" data-label="Thao tác">
                         {person.authority_ref ? (
                           <button
                             type="button"
-                            className="button secondary compact-btn"
+                            className="button warning compact-btn"
                             disabled={busy || !person.effective}
                             onClick={() => {
-                              setSignerId(person.id)
-                              void changeSigner(
-                                'revoke',
-                                person.id,
-                                'Thu hồi thẩm quyền ký số theo quyết định rà soát quản trị.',
-                              )
+                              setRevokingSigner(person)
+                              setRevokeSignerReason('')
+                              setError('')
                             }}
                           >
                             Thu hồi
@@ -4527,6 +4879,84 @@ export function ServiceConnections({
               Chưa có tài khoản lãnh đạo để cấp quyền ký.
             </div>
           )}
+
+          <ModalDialog
+            open={Boolean(revokingSigner)}
+            title="Xác nhận thu hồi thẩm quyền ký số Ed25519"
+            description={
+              revokingSigner
+                ? `Tài khoản lãnh đạo: ${revokingSigner.full_name} (${revokingSigner.email}) · Văn bản phân quyền hiện hành: ${revokingSigner.authority_ref || '—'}`
+                : undefined
+            }
+            onClose={() => {
+              if (!busy) {
+                setRevokingSigner(null)
+                setRevokeSignerReason('')
+              }
+            }}
+          >
+            {revokingSigner && (
+              <form
+                className="form-stack"
+                onSubmit={async event => {
+                  event.preventDefault()
+                  const trimmed = revokeSignerReason.trim()
+                  if (trimmed.length < 12) return
+                  const ok = await changeSigner(
+                    'revoke',
+                    revokingSigner.id,
+                    trimmed,
+                    revokingSigner.authority_ref || '',
+                  )
+                  if (ok) {
+                    setRevokingSigner(null)
+                    setRevokeSignerReason('')
+                  }
+                }}
+              >
+                <p className="source-warning small-warning case-reset-margin">
+                  Thu hồi quyền ký số sẽ ngăn tài khoản này ký phát hành văn bản kết quả ngay lập tức. Toàn bộ căn cứ thu hồi được lưu vào nhật ký kiểm toán không thể sửa xóa.
+                </p>
+                <label>
+                  <span>Căn cứ và lý do thu hồi thẩm quyền ký số (tối thiểu 12 ký tự)</span>
+                  <textarea
+                    value={revokeSignerReason}
+                    onChange={event => setRevokeSignerReason(event.target.value)}
+                    minLength={12}
+                    maxLength={1200}
+                    rows={3}
+                    required
+                    placeholder="Ví dụ: Thu hồi theo Quyết định điều động công tác số … ngày …"
+                  />
+                </label>
+                {error && (
+                  <p className="form-error" role="alert">
+                    {error}
+                  </p>
+                )}
+                <div className="form-actions">
+                  <button
+                    type="button"
+                    className="button secondary"
+                    disabled={busy}
+                    onClick={() => {
+                      setRevokingSigner(null)
+                      setRevokeSignerReason('')
+                    }}
+                  >
+                    Hủy bỏ
+                  </button>
+                  <button
+                    type="submit"
+                    className="button warning"
+                    disabled={busy || revokeSignerReason.trim().length < 12}
+                  >
+                    {busy ? 'Đang thu hồi…' : 'Xác nhận thu hồi quyền ký'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </ModalDialog>
         </section>
       )}
 
@@ -4543,17 +4973,16 @@ export function ServiceConnections({
                   ? 'Máy chủ ứng dụng & Cơ sở dữ liệu SQLite đang hoạt động'
                   : 'Chưa xác nhận được kết nối cơ sở dữ liệu'}
               </h2>
-              <p>
+              <p className="tabular-nums">
                 {storage?.database === 'connected'
                   ? `Đang lưu trữ ${(storage?.procedureCount ?? data.procedures.length).toLocaleString('vi-VN')} thủ tục hành chính, ${(storage?.caseRecords ?? data.cases.length).toLocaleString('vi-VN')} hồ sơ trong phạm vi và ${(storage?.publishedNews ?? 0).toLocaleString('vi-VN')} bài viết công khai.`
                   : 'Không đọc được trạng thái từ máy chủ.'}
               </p>
             </div>
-            <span
-              className={`environment-badge ${storage?.database === 'connected' ? 'environment-connected' : 'environment-disconnected'}`}
-            >
-              {storage?.database === 'connected' ? 'Đã kết nối nội bộ' : 'Mất kết nối'}
-            </span>
+            <StatusTag
+              tone={storage?.database === 'connected' ? 'success' : 'danger'}
+              label={storage?.database === 'connected' ? 'Đã kết nối nội bộ' : 'Mất kết nối'}
+            />
           </section>
 
           <div className="integration-cards">
@@ -4561,7 +4990,7 @@ export function ServiceConnections({
               <article className="panel integration-card" key={service.name}>
                 <div className="integration-card-top">
                   <span className="integration-category">{service.category}</span>
-                  <span className="connection-state-text">Đang vận hành</span>
+                  <StatusTag tone="success" label="Đang vận hành" />
                 </div>
                 <h3>{service.name}</h3>
                 <p>{service.detail}</p>
@@ -4581,9 +5010,10 @@ export function ServiceConnections({
             <PanelHeading
               title="Hàng chờ đồng bộ bên ngoài (Outbox)"
               description="Theo dõi các bản ghi đồng bộ phát sinh từ luồng xử lý hồ sơ."
-              action={
+              actions={
                 <button type="button" className="text-button" onClick={() => onNavigate('home')}>
-                  Về bàn điều hành →
+                  <span>Về bàn điều hành</span>
+                  <ArrowRight size={14} strokeWidth={1.75} aria-hidden="true" />
                 </button>
               }
             />
@@ -4591,19 +5021,19 @@ export function ServiceConnections({
               <MetricCard
                 label="Tổng tác vụ"
                 value={outbox.length}
-                note="Bản ghi hàng chờ"
+                hint="Bản ghi hàng chờ"
                 tone="navy"
               />
               <MetricCard
                 label="Đang chờ"
                 value={pendingCount}
-                note="Chưa được bên nhận xác nhận"
+                hint="Chưa được bên nhận xác nhận"
                 tone="amber"
               />
               <MetricCard
                 label="Có lỗi"
                 value={errorCount}
-                note="Cần kiểm tra lại"
+                hint="Cần kiểm tra lại"
                 tone="red"
               />
             </div>
@@ -4611,9 +5041,9 @@ export function ServiceConnections({
               <div className="outbox-list">
                 {outbox.map(row => (
                   <div className="outbox-row" key={row.code}>
-                    <b>{row.code}</b>
-                    <span>{row.status}</span>
-                    <span>{row.attempts} lần thử</span>
+                    <b className="mono-code tabular-nums">{row.code}</b>
+                    <StatusTag status={row.status} label={row.status} />
+                    <span className="tabular-nums">{row.attempts} lần thử</span>
                     <small>{row.lastError || 'Đang chờ xử lý đồng bộ.'}</small>
                   </div>
                 ))}
@@ -4666,13 +5096,37 @@ function SandboxPaymentRow({
   const ownRefund = payment.refund?.requested_by === user.id
   const canManagePayment = ['finance', 'leader'].includes(user.role)
 
+  const feeDeclaredEvent =
+    payment.events?.find(
+      ev => ev.action === 'PAID_DECLARED' || ev.action === 'SANDBOX_CONFIRMED',
+    ) || payment.events?.find(ev => ev.action === 'CREATED')
+  const feeReconciledEvent = payment.events?.find(ev => ev.action === 'RECONCILED')
+  const refundMakerEvent = payment.events?.find(ev => ev.action === 'REFUND_REQUESTED')
+  const refundCheckerEvent = payment.events?.find(
+    ev =>
+      ev.action === 'REFUND_EXECUTED' ||
+      ev.action === 'REFUND_APPROVED' ||
+      ev.action === 'REFUND_REJECTED',
+  )
+
+  const paymentStatusLabel =
+    (
+      {
+        PENDING: 'Chờ xác nhận nộp',
+        PAID: 'Chờ đối soát độc lập',
+        RECONCILED: 'Đã đối soát nội bộ',
+        REFUNDED: 'Đã thực hiện hoàn trả',
+      } as Record<string, string>
+    )[payment.status] || payment.status
+
   return (
     <article className="sandbox-payment-row">
       <header>
         <div className="sandbox-payment-identity">
-          <b>{payment.transactionRef}</b>
+          <b className="mono-code tabular-nums">{payment.transactionRef}</b>
           <span>
-            Hồ sơ {payment.caseCode} · Mã thủ tục {payment.procedureCode}
+            Hồ sơ <b className="mono-code tabular-nums">{payment.caseCode}</b> · Mã thủ tục{' '}
+            <span className="mono-code tabular-nums">{payment.procedureCode}</span>
           </span>
         </div>
         <strong className="tabular-nums">
@@ -4681,37 +5135,56 @@ function SandboxPaymentRow({
       </header>
 
       <div className="sandbox-payment-facts">
-        <span>
-          Trạng thái:{' '}
-          <b>
-            {(
-              {
-                PENDING: 'Chờ xác nhận',
-                PAID: 'Người nộp khai đã thanh toán · chờ đối soát',
-                RECONCILED: 'Đã đối soát nội bộ',
-                REFUNDED: 'Đã ghi nhận chứng từ hoàn',
-              } as Record<string, string>
-            )[payment.status] || payment.status}
-          </b>
-        </span>
+        <StatusTag status={payment.status} label={paymentStatusLabel} />
         <span>{payment.agency}</span>
-        <span>{toDate(payment.createdAt)}</span>
+        <span className="tabular-nums">{toDate(payment.createdAt)}</span>
       </div>
 
-      <p className="sandbox-payment-basis"><span>Căn cứ thu: </span>{payment.basis}</p>
+      <p className="sandbox-payment-basis">
+        <span>Căn cứ thu: </span>
+        {payment.basis}
+      </p>
+
+      {(payment.status === 'PAID' || payment.status === 'RECONCILED') && (
+        <FourEyesTrail
+          makerRole="Người khai / ghi nhận chứng từ nộp (Maker)"
+          makerName={feeDeclaredEvent?.actor_name || 'Người nộp hồ sơ'}
+          makerAt={feeDeclaredEvent?.created_at || payment.createdAt}
+          checkerRole="Người đối soát sổ khoản thu độc lập (Checker)"
+          checkerName={feeReconciledEvent?.actor_name}
+          checkerAt={feeReconciledEvent?.created_at || payment.reconciledAt}
+          status={payment.status}
+          pendingText="Chờ kế toán hoặc lãnh đạo đơn vị đối chiếu chứng từ kho bạc/ngân hàng"
+        />
+      )}
 
       {payment.refund && (
         <div className="sandbox-refund-status">
-          <b>
-            Đề nghị hoàn:{' '}
-            {payment.refund.status === 'PENDING'
-              ? 'Đang chờ xem xét'
-              : payment.refund.status === 'APPROVED'
-                ? 'Đã duyệt, chờ thực hiện hoàn'
-                : payment.refund.status === 'EXECUTED'
-                  ? 'Đã ghi nhận thực hiện hoàn'
-                  : 'Đã từ chối'}
-          </b>
+          <div className="sandbox-refund-head">
+            <b>Đề nghị hoàn trả khoản thu</b>
+            <StatusTag
+              status={payment.refund.status}
+              label={
+                payment.refund.status === 'PENDING'
+                  ? 'Chờ phê duyệt độc lập'
+                  : payment.refund.status === 'APPROVED'
+                    ? 'Đã duyệt · chờ chi hoàn'
+                    : payment.refund.status === 'EXECUTED'
+                      ? 'Đã ghi nhận thực hiện hoàn'
+                      : 'Đã từ chối hoàn'
+              }
+            />
+          </div>
+          <FourEyesTrail
+            makerRole="Người lập đề nghị hoàn (Maker)"
+            makerName={refundMakerEvent?.actor_name || payment.refund.requested_by}
+            makerAt={refundMakerEvent?.created_at || payment.refund.requested_at}
+            checkerRole="Người phê duyệt hoàn độc lập (Checker)"
+            checkerName={refundCheckerEvent?.actor_name}
+            checkerAt={refundCheckerEvent?.created_at || payment.refund.executed_at}
+            status={payment.refund.status}
+            pendingText="Chờ cán bộ tài chính khác hoặc lãnh đạo đơn vị phê duyệt độc lập"
+          />
           <p>{payment.refund.reason}</p>
           {payment.refund.review_note && <small>Ý kiến: {payment.refund.review_note}</small>}
         </div>
@@ -4725,7 +5198,9 @@ function SandboxPaymentRow({
 
       {!!payment.events?.length && (
         <details className="sandbox-payment-events">
-          <summary>Lịch sử giao dịch ({payment.events.length} sự kiện)</summary>
+          <summary className="tabular-nums">
+            Lịch sử giao dịch ({payment.events.length} sự kiện)
+          </summary>
           <ol>
             {payment.events.map((event, index) => (
               <li key={`${event.created_at}-${index}`}>
@@ -4743,7 +5218,7 @@ function SandboxPaymentRow({
                     } as Record<string, string>
                   )[event.action] || event.action}
                 </b>
-                <time>
+                <time className="tabular-nums">
                   {toDate(event.created_at)} · {event.actor_name}
                 </time>
                 <p>{event.detail}</p>
@@ -4839,6 +5314,20 @@ function SandboxPaymentRow({
           <div className="form-actions">
             <button
               type="button"
+              className="button warning"
+              disabled={busy || reviewNote.trim().length < 8}
+              onClick={() =>
+                void act(
+                  'refund-review',
+                  { decision: 'REJECT', note: reviewNote },
+                  'Đã từ chối đề nghị hoàn trong ứng dụng.',
+                )
+              }
+            >
+              Từ chối
+            </button>
+            <button
+              type="button"
               className="button primary"
               disabled={busy || reviewNote.trim().length < 8}
               onClick={() =>
@@ -4850,20 +5339,6 @@ function SandboxPaymentRow({
               }
             >
               Duyệt đề nghị hoàn
-            </button>
-            <button
-              type="button"
-              className="button secondary"
-              disabled={busy || reviewNote.trim().length < 8}
-              onClick={() =>
-                void act(
-                  'refund-review',
-                  { decision: 'REJECT', note: reviewNote },
-                  'Đã từ chối đề nghị hoàn trong ứng dụng.',
-                )
-              }
-            >
-              Từ chối
             </button>
           </div>
         </details>
@@ -4900,8 +5375,9 @@ function SandboxPaymentRow({
 
       {payment.refund?.execution_reference && (
         <p>
-          Chứng từ thực hiện hoàn: {payment.refund.execution_reference} ·{' '}
-          {toDate(payment.refund.executed_at)}
+          Chứng từ thực hiện hoàn:{' '}
+          <b className="mono-code tabular-nums">{payment.refund.execution_reference}</b> ·{' '}
+          <span className="tabular-nums">{toDate(payment.refund.executed_at)}</span>
         </p>
       )}
     </article>

@@ -1,43 +1,62 @@
+/* ==========================================================================
+   HANOI CIVIC DESIGN SYSTEM (HCDS) — CITIZEN PORTAL, CATALOG, DETAIL,
+   SUBMISSION WIZARD & ADMINISTRATIVE SERVICES STYLES
+   Compliant with DESIGN.md, Decree 42/2022/NĐ-CP, Circular 21/2023 & WCAG 2.2 AA
+   ========================================================================== */
+
+/* ---------- 1. Procedure Detail Page & USWDS Summary Integration ---------- */
+
 .citizen-workflow-main:has(.procedure-detail-page) {
-  width: min(100% - 48px, 1240px);
+  width: min(100% - 40px, var(--container-max));
 }
 
 .procedure-detail-page {
-  --procedure-border: var(--line);
-  --procedure-tint: var(--surface-soft);
+  --procedure-border: var(--color-border-default);
+  --procedure-tint: var(--color-brand-subtle);
   min-width: 0;
   max-width: 100%;
-  color: var(--ink);
+  color: var(--color-fg-primary);
   font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.65;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
 }
 
-.procedure-print-document { display: none; }
+.procedure-print-document {
+  display: none;
+}
 
 .procedure-breadcrumb {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px 12px;
-  margin-bottom: 20px;
-  color: var(--muted);
-  font-size: 14px;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-5);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-sm);
 }
 
 .procedure-breadcrumb a {
-  color: var(--navy);
+  color: var(--color-brand-primary);
+  text-decoration: none;
+  font-weight: 500;
 }
 
 .procedure-detail-page a:hover {
   text-decoration: underline;
 }
 
+.procedure-page-heading {
+  margin-bottom: var(--space-4);
+}
+
 .procedure-page-heading h1 {
   max-width: 1050px;
-  margin: 0 0 18px;
-  color: var(--ink);
-  font: 600 24px/1.45 var(--font-sans);
+  margin: 0 0 var(--space-4);
+  color: var(--color-fg-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: var(--leading-snug);
   letter-spacing: normal;
   overflow-wrap: anywhere;
 }
@@ -46,31 +65,37 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .procedure-code {
   margin-right: auto;
-  color: var(--muted);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-sm);
 }
 
 .procedure-code b {
-  color: var(--ink);
+  color: var(--color-fg-primary);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 .procedure-detail-page .button {
-  min-height: 42px;
-  padding: 9px 16px;
-  border-radius: var(--radius);
-  font: 600 14px/1.45 var(--font-sans);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-snug);
   box-shadow: none;
   text-align: center;
 }
 
 .procedure-detail-page .button.secondary {
-  color: var(--navy);
-  border: 1px solid var(--procedure-border);
-  background: var(--paper);
+  color: var(--color-brand-primary);
+  border: 1px solid var(--color-border-control);
+  background: var(--color-bg-surface);
 }
 
 .procedure-detail-page .button.secondary:hover {
@@ -78,8 +103,13 @@
 }
 
 .procedure-detail-page .button.primary {
-  color: var(--paper);
-  background: var(--navy);
+  color: var(--color-fg-inverse);
+  background: var(--color-brand-primary);
+  border: 1px solid var(--color-brand-primary);
+}
+
+.procedure-detail-page .button.primary:hover:not(:disabled) {
+  background: var(--color-brand-hover);
 }
 
 .procedure-detail-page .button:disabled {
@@ -88,15 +118,16 @@
 }
 
 .procedure-source-line {
-  margin: 14px 0 24px;
-  color: var(--muted);
-  font-size: 13px;
+  margin: var(--space-3) 0 var(--space-5);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
 }
 
 .procedure-detail-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 28px;
+  gap: var(--space-6);
   align-items: start;
 }
 
@@ -106,26 +137,32 @@
 }
 
 .procedure-section {
-  scroll-margin-top: 24px;
-  margin-bottom: 28px;
+  scroll-margin-top: var(--scroll-offset-top);
+  margin-bottom: var(--space-8);
 }
 
 .procedure-section h2,
 .procedure-detail-sidebar h2 {
-  margin: 0 0 14px;
-  color: var(--navy);
-  font: 600 18px/1.45 var(--font-sans);
+  margin: 0 0 var(--space-3);
+  color: var(--color-brand-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
   letter-spacing: normal;
 }
 
 .procedure-section h2 {
-  padding-bottom: 10px;
+  padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--procedure-border);
 }
 
 .procedure-section h3 {
-  margin: 14px 0 8px;
-  font: 600 16px/1.55 var(--font-sans);
+  margin: var(--space-4) 0 var(--space-2);
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: var(--leading-normal);
 }
 
 .procedure-info-grid {
@@ -133,15 +170,15 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   margin: 0;
   border: 1px solid var(--procedure-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  background: var(--paper);
+  background: var(--color-bg-surface);
 }
 
 .procedure-info-fact {
   min-width: 0;
   display: grid;
-  grid-template-columns: 140px minmax(0, 1fr);
+  grid-template-columns: 148px minmax(0, 1fr);
   border-bottom: 1px solid var(--procedure-border);
 }
 
@@ -159,18 +196,19 @@
 }
 
 .procedure-info-fact dt {
-  padding: 10px 12px;
+  padding: var(--space-3);
   background: var(--procedure-tint);
-  color: var(--ink);
+  color: var(--color-fg-primary);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 .procedure-info-fact dd {
   min-width: 0;
   margin: 0;
-  padding: 10px 12px;
+  padding: var(--space-3);
   border-left: 1px solid var(--procedure-border);
+  font-size: var(--text-sm);
   overflow-wrap: anywhere;
 }
 
@@ -181,25 +219,28 @@
 }
 
 .procedure-step + .procedure-step {
-  margin-top: 18px;
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .procedure-missing,
 .procedure-result-code {
-  color: var(--muted);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-sm);
 }
 
 .procedure-data-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
 }
 
 .procedure-data-table th,
 .procedure-data-table td {
-  padding: 12px;
+  padding: var(--space-3);
   border: 1px solid var(--procedure-border);
   text-align: left;
   vertical-align: top;
@@ -208,7 +249,7 @@
 
 .procedure-data-table th {
   background: var(--procedure-tint);
-  color: var(--ink);
+  color: var(--color-fg-primary);
   font-weight: 600;
 }
 
@@ -228,27 +269,33 @@
 .procedure-quantity,
 .procedure-template-list {
   display: grid;
-  gap: 10px;
+  gap: var(--space-2);
+}
+
+.procedure-fees {
+  font-variant-numeric: tabular-nums;
 }
 
 .procedure-fees b {
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .procedure-fees .procedure-text {
-  margin-top: 6px;
+  margin-top: var(--space-1);
 }
 
 .procedure-document-table th:nth-child(1) {
-  width: 52%;
+  width: 50%;
 }
 
 .procedure-document-table th:nth-child(2) {
-  width: 32%;
+  width: 34%;
 }
 
 .procedure-quantity {
-  gap: 4px;
+  gap: var(--space-1);
+  font-variant-numeric: tabular-nums;
 }
 
 .procedure-template-list {
@@ -258,35 +305,52 @@
 }
 
 .procedure-template-list a {
-  color: var(--navy);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  color: var(--color-brand-primary);
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .procedure-template-list small {
   display: block;
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 12px;
+  margin-top: var(--space-1);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-xs);
 }
 
+/* Ergonomic >= 40px touch target for template downloads (Fitts's Law) */
 .procedure-template-download {
-  display: inline;
-  min-height: 32px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--navy);
-  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 6px var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-brand-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
   text-align: left;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
   overflow-wrap: anywhere;
   cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.procedure-template-download:hover:not(:disabled) {
+  background: var(--procedure-tint);
+  border-color: var(--color-brand-interactive);
 }
 
 .procedure-template-download:disabled {
-  color: var(--muted);
+  color: var(--color-fg-secondary);
+  opacity: 0.65;
   cursor: wait;
 }
 
@@ -294,66 +358,121 @@
   width: 27%;
 }
 
-.procedure-case-select {
+/* Dedicated .hcds-case-option radio cards — eliminates .procedure-case-select CSS collision */
+.hcds-case-fieldset {
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.hcds-case-fieldset legend {
+  padding: 0;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-fg-primary);
+}
+
+.hcds-case-options {
   display: grid;
-  gap: 8px;
-  margin-bottom: 18px;
+  gap: var(--space-2);
+}
+
+.hcds-case-option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-fg-primary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: var(--leading-snug);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.hcds-case-option:hover {
+  border-color: var(--color-brand-interactive);
+  background: var(--color-bg-subtle);
+}
+
+.hcds-case-option.is-selected,
+.hcds-case-option:has(input:checked) {
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-subtle);
   font-weight: 600;
+  color: var(--color-brand-primary);
 }
 
-.procedure-case-select select,
-.procedure-intake-panel select,
-.procedure-intake-panel input {
-  width: 100%;
-  min-height: 42px;
-  height: auto;
-  padding: 9px 12px;
-  border: 1px solid var(--procedure-border);
-  border-radius: var(--radius);
-  background: var(--paper);
-  color: var(--ink);
-  font: 400 14px/1.5 var(--font-sans);
+.hcds-case-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--color-brand-primary);
 }
 
-.procedure-case-select select {
-  white-space: normal;
+.hcds-case-option span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .procedure-detail-sidebar {
   position: sticky;
-  top: 24px;
+  top: var(--scroll-offset-top);
   display: grid;
-  gap: 18px;
+  gap: var(--space-4);
   min-width: 0;
-  max-height: calc(100dvh - 48px);
+  max-height: calc(100dvh - 104px);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
 .procedure-intake-panel {
-  padding: 20px;
+  padding: var(--space-5);
   border: 1px solid var(--procedure-border);
   border-radius: var(--radius-md);
-  background: var(--paper);
+  background: var(--color-bg-surface);
   box-shadow: var(--shadow-xs);
 }
 
 .procedure-intake-panel h2 {
-  font-size: 17px;
+  font-size: var(--text-base);
 }
 
 .procedure-intake-panel > p {
-  margin: 0 0 14px;
-  color: var(--muted);
-  font-size: 14px;
+  margin: 0 0 var(--space-3);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-sm);
 }
 
 .procedure-intake-panel label {
   display: grid;
   gap: 6px;
-  margin-top: 14px;
-  font-size: 14px;
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
   font-weight: 600;
+}
+
+.procedure-intake-panel select,
+.procedure-intake-panel input {
+  width: 100%;
+  min-height: 44px;
+  height: auto;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-fg-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
 }
 
 .procedure-intake-panel input[readonly] {
@@ -361,9 +480,9 @@
 }
 
 .procedure-intake-panel .procedure-intake-hint {
-  margin: 12px 0;
-  font-size: 13px;
-  color: var(--muted);
+  margin: var(--space-3) 0;
+  font-size: var(--text-xs);
+  color: var(--color-fg-secondary);
 }
 
 .procedure-intake-panel > .button {
@@ -371,61 +490,1032 @@
 }
 
 .procedure-intake-mode {
-  margin: 18px 0 0;
-  padding-top: 14px;
+  margin: var(--space-4) 0 0;
+  padding-top: var(--space-3);
   border-top: 1px solid var(--procedure-border);
-  font-size: 13px;
+  font-size: var(--text-xs);
 }
 
 .procedure-intake-mode dt {
-  color: var(--muted);
+  color: var(--color-fg-secondary);
+  margin-bottom: var(--space-1);
 }
 
 .procedure-intake-mode dd {
-  margin: 4px 0 0;
+  margin: 0;
   font-weight: 600;
 }
 
 .procedure-section-nav {
   border: 1px solid var(--procedure-border);
   border-radius: var(--radius-md);
-  background: var(--paper);
-  padding: 18px;
+  background: var(--color-bg-surface);
+  padding: var(--space-4);
 }
 
 .procedure-section-nav h2 {
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 
 .procedure-section-nav a {
   display: block;
   padding: 6px 0;
-  color: var(--ink);
-  font-size: 14px;
+  color: var(--color-fg-primary);
+  font-size: var(--text-sm);
+  text-decoration: none;
 }
 
 .procedure-return-link {
-  color: var(--navy);
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-brand-primary);
+  font-size: var(--text-sm);
   font-weight: 600;
+  text-decoration: none;
 }
 
 .procedure-fallback-docs {
-  padding-left: 20px;
+  padding-left: var(--space-5);
 }
 
 .procedure-fallback-docs li {
-  margin-bottom: 14px;
+  margin-bottom: var(--space-3);
 }
 
-.citizen-catalog-layout.catalog-list-layout {
-  grid-template-columns: minmax(0, 1fr);
+/* ---------- 2. InformationHome — Task-First Civic Action Hero & Life-Events ---------- */
+
+.hcds-home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
-@media (max-width: 1050px) {
+.hcds-hero {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-bottom: 2px solid var(--color-accent-rule);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.hcds-hero__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 84ch;
+}
+
+.hcds-hero__title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-brand-primary);
+  line-height: var(--leading-tight);
+}
+
+.hcds-hero__subtitle {
+  font-size: var(--text-base);
+  color: var(--color-fg-secondary);
+  line-height: var(--leading-normal);
+}
+
+.hcds-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.hcds-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-fg-secondary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.hcds-tab:hover {
+  color: var(--color-brand-primary);
+  background: var(--color-bg-subtle);
+}
+
+.hcds-tab[aria-selected="true"] {
+  color: var(--color-brand-primary);
+  background: var(--color-brand-subtle);
+  border-bottom-color: var(--color-brand-primary);
+}
+
+.hcds-hero__search-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hcds-hero__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+.hcds-hero__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.hcds-hero__input-icon {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--color-fg-secondary);
+  pointer-events: none;
+}
+
+.hcds-hero__input-wrap input {
+  min-height: 48px;
+  padding-left: 40px;
+  font-size: var(--text-base);
+  border-color: var(--color-border-control);
+}
+
+.hcds-hero__submit {
+  min-height: 48px;
+  padding: 0 var(--space-5);
+  white-space: nowrap;
+}
+
+.hcds-hero__chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hcds-hero__chips-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-fg-secondary);
+}
+
+.hcds-keyword-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+  color: var(--color-fg-primary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.hcds-keyword-chip:hover {
+  border-color: var(--color-brand-interactive);
+  background: var(--color-brand-subtle);
+  color: var(--color-brand-primary);
+}
+
+.hcds-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.hcds-quick-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: 68px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+  color: var(--color-fg-primary);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.hcds-quick-card:hover {
+  border-color: var(--color-brand-interactive);
+  background: var(--color-brand-subtle);
+}
+
+.hcds-quick-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-brand-primary);
+  flex-shrink: 0;
+}
+
+.hcds-quick-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hcds-quick-card__title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-brand-primary);
+}
+
+.hcds-quick-card__desc {
+  font-size: var(--text-xs);
+  color: var(--color-fg-secondary);
+  line-height: var(--leading-snug);
+}
+
+/* 6 Life-Event Citizen Service Groups (Decree 42/2022) */
+.hcds-section-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.hcds-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.hcds-section-head h2 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-fg-primary);
+}
+
+.hcds-section-head p {
+  font-size: var(--text-sm);
+  color: var(--color-fg-secondary);
+}
+
+.hcds-lifeevent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.hcds-lifeevent-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-fg-primary);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.hcds-lifeevent-card:hover {
+  border-color: var(--color-brand-interactive);
+  background: var(--color-bg-subtle);
+}
+
+.hcds-lifeevent-card__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.hcds-lifeevent-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--color-brand-subtle);
+  color: var(--color-brand-primary);
+  flex-shrink: 0;
+}
+
+.hcds-lifeevent-card__title {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-brand-primary);
+  line-height: var(--leading-snug);
+}
+
+.hcds-lifeevent-card__desc {
+  font-size: var(--text-sm);
+  color: var(--color-fg-secondary);
+  line-height: var(--leading-normal);
+}
+
+.hcds-lifeevent-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-brand-interactive);
+}
+
+/* Editorial News & Public Announcements — Flat Dividers, Zero Card-in-Card */
+.hcds-editorial-surface {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.hcds-bulletin-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-accent-tint);
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+
+.hcds-bulletin-bar__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--color-accent-heritage);
+}
+
+.hcds-bulletin-bar a {
+  color: var(--color-fg-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.hcds-bulletin-bar a:hover {
+  color: var(--color-brand-primary);
+  text-decoration: underline;
+}
+
+.hcds-editorial-lead-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.hcds-lead-article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hcds-lead-article__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  color: var(--color-fg-primary);
+  text-decoration: none;
+}
+
+.hcds-lead-article__link:hover .hcds-lead-article__title {
+  color: var(--color-brand-interactive);
+  text-decoration: underline;
+}
+
+.hcds-news-thumb {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-muted);
+}
+
+.hcds-lead-article__title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  color: var(--color-fg-primary);
+}
+
+.hcds-lead-article__desc {
+  font-size: var(--text-sm);
+  color: var(--color-fg-secondary);
+  line-height: var(--leading-normal);
+}
+
+.hcds-news-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-fg-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.hcds-editorial-side-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hcds-editorial-side-list h3 {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-brand-primary);
+}
+
+.hcds-side-news-item {
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.hcds-side-news-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.hcds-side-news-item a {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--color-fg-primary);
+  text-decoration: none;
+}
+
+.hcds-side-news-item a:hover b {
+  color: var(--color-brand-interactive);
+  text-decoration: underline;
+}
+
+.hcds-side-news-item b {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-snug);
+}
+
+.hcds-news-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.hcds-news-search-field {
+  flex: 1 1 280px;
+  max-width: 420px;
+}
+
+.hcds-news-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.hcds-filter-btn {
+  min-height: 36px;
+  padding: 6px var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+  color: var(--color-fg-primary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hcds-filter-btn[aria-pressed="true"] {
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-primary);
+  color: var(--color-fg-inverse);
+}
+
+.hcds-news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.hcds-news-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.hcds-news-item a {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--color-fg-primary);
+  text-decoration: none;
+}
+
+.hcds-news-item a:hover b {
+  color: var(--color-brand-interactive);
+  text-decoration: underline;
+}
+
+.hcds-news-item b {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-snug);
+}
+
+.hcds-support-links-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.hcds-support-link-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+  color: var(--color-fg-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.hcds-support-link-item:hover {
+  border-color: var(--color-brand-interactive);
+  color: var(--color-brand-primary);
+}
+
+/* ---------- 3. CitizenProcedureCatalog — 2-Column Asymmetric Layout ---------- */
+
+.hcds-catalog-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.hcds-catalog-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.hcds-catalog-header h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-fg-primary);
+  margin-bottom: var(--space-1);
+}
+
+.hcds-catalog-header p {
+  font-size: var(--text-sm);
+  color: var(--color-fg-secondary);
+  max-width: 76ch;
+}
+
+.hcds-catalog-stats-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-fg-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.hcds-catalog-stats-inline b {
+  color: var(--color-brand-primary);
+  font-size: var(--text-sm);
+}
+
+.hcds-catalog-shell {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.hcds-catalog-sidebar {
+  position: sticky;
+  top: var(--scroll-offset-top);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-height: calc(100dvh - 104px);
+  overflow-y: auto;
+}
+
+.hcds-filter-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.hcds-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.hcds-filter-group:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.hcds-filter-group__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.hcds-filter-group__title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-fg-primary);
+}
+
+.hcds-level-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-fg-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.hcds-level-option:hover {
+  border-color: var(--color-brand-interactive);
+  background: var(--color-bg-subtle);
+}
+
+.hcds-level-option[aria-pressed="true"] {
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-subtle);
+}
+
+.hcds-level-option__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-brand-primary);
+}
+
+.hcds-level-option__desc {
+  font-size: var(--text-xs);
+  color: var(--color-fg-secondary);
+  line-height: var(--leading-snug);
+}
+
+.hcds-catalog-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.hcds-catalog-search-bar {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-3);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.hcds-catalog-search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.hcds-catalog-search-input-wrap input {
+  min-height: 44px;
+  padding-left: 38px;
+  border-color: var(--color-border-control);
+  font-size: var(--text-base);
+}
+
+.hcds-catalog-mobile-filter-btn {
+  display: none;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.hcds-active-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hcds-active-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px var(--space-3);
+  border: 1px solid var(--color-brand-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-brand-subtle);
+  color: var(--color-brand-primary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hcds-active-chip:hover {
+  border-color: var(--color-brand-primary);
+}
+
+.hcds-service-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  font-size: var(--text-xs);
+  color: var(--color-fg-secondary);
+}
+
+.hcds-service-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hcds-catalog-toolbar-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-fg-secondary);
+}
+
+.hcds-catalog-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hcds-catalog-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-fg-primary);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.hcds-catalog-card:hover {
+  border-color: var(--color-brand-interactive);
+  background: var(--color-bg-subtle);
+}
+
+.hcds-catalog-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.hcds-catalog-card__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-fg-secondary);
+}
+
+.hcds-catalog-card__code {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-brand-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.hcds-catalog-card__title {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-fg-primary);
+  line-height: var(--leading-snug);
+  overflow-wrap: anywhere;
+}
+
+.hcds-catalog-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-fg-secondary);
+}
+
+.hcds-catalog-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-brand-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ---------- 4. CitizenSubmission — Draft Safety, MyInfo & Check Answers ---------- */
+
+.hcds-draft-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+}
+
+.hcds-draft-bar__info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-fg-secondary);
+}
+
+.hcds-draft-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.hcds-amber-alert {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--status-warning-bg);
+  border: 1.5px solid var(--status-warning-border);
+  border-radius: var(--radius-sm);
+  color: var(--status-warning-fg);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.hcds-amber-alert__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+.hcds-amber-alert ul {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: grid;
+  gap: 4px;
+}
+
+.hcds-field-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.hcds-doc-flat-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.hcds-doc-flat-item:first-of-type {
+  padding-top: var(--space-2);
+}
+
+.hcds-kv-action {
+  justify-self: end;
+}
+
+/* ---------- 5. PublicAdministrativeServices — Single Panel & Lookup ---------- */
+
+.hcds-services-panel {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.hcds-services-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.hcds-services-form-grid .field-wide {
+  grid-column: 1 / -1;
+}
+
+.hcds-lookup-result {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hcds-owned-records {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ---------- 6. Canonical 4-Tier Responsive Breakpoints ---------- */
+
+@media (max-width: 1024px) {
   .procedure-detail-layout {
-    grid-template-columns: minmax(0, 1fr) 260px;
-    gap: 20px;
+    grid-template-columns: minmax(0, 1fr) 256px;
+    gap: var(--space-5);
   }
 
   .procedure-info-grid {
@@ -439,9 +1529,29 @@
   .procedure-info-fact:nth-last-child(2) {
     border-bottom: 1px solid var(--procedure-border);
   }
+
+  .hcds-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hcds-lifeevent-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hcds-editorial-lead-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hcds-news-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hcds-support-links-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 768px) {
   .procedure-detail-layout {
     display: flex;
     flex-direction: column;
@@ -463,7 +1573,7 @@
   .procedure-intake-panel {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 12px 16px;
+    gap: var(--space-3) var(--space-4);
   }
 
   .procedure-intake-panel h2,
@@ -484,19 +1594,37 @@
   .procedure-detail-content {
     width: 100%;
   }
+
+  .hcds-catalog-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hcds-catalog-sidebar {
+    display: none;
+  }
+
+  .hcds-catalog-mobile-filter-btn {
+    display: inline-flex;
+  }
+
+  .hcds-services-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .citizen-workflow-main:has(.procedure-detail-page) {
     width: calc(100% - 24px);
   }
 
-  .procedure-page-heading h1 {
-    font-size: 20px;
+  .procedure-page-heading h1,
+  .hcds-hero__title,
+  .hcds-catalog-header h1 {
+    font-size: var(--text-xl);
   }
 
   .procedure-breadcrumb {
-    font-size: 13px;
+    font-size: var(--text-xs);
     gap: 6px;
   }
 
@@ -505,7 +1633,7 @@
   }
 
   .procedure-page-actions {
-    gap: 8px;
+    gap: var(--space-2);
   }
 
   .procedure-page-actions .button {
@@ -514,7 +1642,7 @@
 
   .procedure-intake-panel {
     grid-template-columns: minmax(0, 1fr);
-    padding: 16px;
+    padding: var(--space-4);
   }
 
   .procedure-info-fact {
@@ -522,13 +1650,13 @@
   }
 
   .procedure-info-fact dt {
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
   }
 
   .procedure-info-fact dd {
-    padding: 9px 12px;
-    font-size: 14px;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
     border-left: 0;
     border-top: 1px solid var(--procedure-border);
   }
@@ -547,18 +1675,18 @@
 
   .procedure-data-table tbody {
     display: grid;
-    gap: 14px;
+    gap: var(--space-3);
   }
 
   .procedure-data-table tr {
     border: 1px solid var(--procedure-border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
     overflow: hidden;
   }
 
   .procedure-data-table td {
     border: 0;
-    padding: 10px 12px;
+    padding: var(--space-3);
   }
 
   .procedure-data-table td + td {
@@ -568,8 +1696,8 @@
   .procedure-data-table td::before {
     display: block;
     content: attr(data-label);
-    margin-bottom: 4px;
-    color: var(--ink);
+    margin-bottom: var(--space-1);
+    color: var(--color-fg-primary);
     font-weight: 600;
   }
 
@@ -578,129 +1706,153 @@
   }
 
   .procedure-data-table td:first-child::before {
-    color: var(--muted);
-    font-size: 13px;
+    color: var(--color-fg-secondary);
+    font-size: var(--text-xs);
+  }
+
+  .hcds-hero,
+  .hcds-editorial-surface,
+  .hcds-services-panel {
+    padding: var(--space-4);
+  }
+
+  .hcds-hero__form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hcds-quick-grid,
+  .hcds-lifeevent-grid,
+  .hcds-news-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hcds-catalog-search-bar {
+    flex-direction: column;
+    padding: var(--space-3);
+  }
+
+  .hcds-catalog-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-4);
   }
 }
+
+/* ---------- 7. Statutory A4 Print Isolation (Decree 30/2020/NĐ-CP) ---------- */
 
 @media print {
   @page {
     size: A4 portrait;
-    margin: 20mm 20mm 20mm 30mm;
+    margin: 20mm 15mm 20mm 30mm;
   }
 
   body,
-  .public-site {
-    background: #ffffff !important;
+  .public-site,
+  .civic-shell {
+    background: #ffffff;
   }
 
+  .gov-trust-banner,
+  .civic-masthead,
+  .civic-navbar,
+  .civic-footer,
   .agency-masthead,
   .citizen-account-bar,
   .citizen-workflow-header,
   .citizen-workflow-footer,
   .procedure-detail-sidebar,
   .procedure-page-actions .button,
-  .procedure-breadcrumb {
-    display: none !important;
+  .procedure-breadcrumb,
+  .hcds-summary-box {
+    display: none;
   }
 
-  .citizen-workflow-main:has(.procedure-detail-page) {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .procedure-detail-layout {
-    display: block;
+  .citizen-workflow-main:has(.procedure-detail-page),
+  .civic-main:has(.procedure-detail-page) {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
   }
 
   .procedure-detail-page {
-    color: #000 !important;
-    font: 13pt/1.5 "Times New Roman", Times, serif;
+    color: #000000;
+    font: 13pt/1.5 var(--font-legal-serif);
   }
 
-  .procedure-page-heading h1 {
-    color: #000;
-    font: bold 16pt/1.3 "Times New Roman", Times, serif;
+  .procedure-detail-page > :not(.procedure-print-document) {
+    display: none;
   }
 
-  .procedure-section h2,
-  .procedure-section h3 {
-    color: #000;
-    font-family: "Times New Roman", Times, serif;
+  .procedure-print-document {
+    display: block;
+    color: #000000;
+    font: 13pt/1.5 var(--font-legal-serif);
   }
 
-  .procedure-section h2 { font-size: 14pt; border-color: #000; }
-  .procedure-section h3 { font-size: 13pt; }
-  .procedure-source-line, .procedure-code, .procedure-missing,
-  .procedure-detail-page a { color: #000 !important; }
-  .procedure-info-grid { border-color: #000; border-radius: 0; overflow: visible; }
-  .procedure-info-fact { break-inside: avoid; }
-  .procedure-detail-page .table-scroll { overflow: visible; }
-  .procedure-detail-page button:not(.procedure-template-download) { display: none; }
-  .procedure-template-download { border: 0; padding: 0; color: #000; background: transparent; font: inherit; }
-  .procedure-detail-page > :not(.procedure-print-document) { display: none !important; }
-  .procedure-print-document { display: block; color: #000; font: 13pt/1.5 "Times New Roman", Times, serif; }
-  .procedure-print-heading { text-align: center; margin-bottom: 14pt; }
-  .procedure-print-heading > p:first-child { font-weight: bold; }
-  .procedure-print-heading h1 { margin: 8pt 0; color: #000; font: bold 14pt/1.4 "Times New Roman", Times, serif; }
-  .procedure-print-heading p, .procedure-print-document p { margin: 0 0 6pt; }
-  .procedure-print-source { font-style: italic; font-size: 11pt; overflow-wrap: anywhere; }
-  .procedure-print-document section { margin-top: 12pt; }
-  .procedure-print-document h2, .procedure-print-document h3 { color: #000; font: bold 13pt/1.5 "Times New Roman", Times, serif; margin: 0 0 4pt; break-after: avoid; }
-  .procedure-print-document h3 { font-style: italic; }
-  .procedure-print-document .procedure-text { color: #000; font: inherit; white-space: pre-wrap; text-align: justify; }
-  .procedure-print-document ol { margin: 0 0 6pt; padding-left: 20pt; }
-  .procedure-print-document li { padding-left: 2pt; }
-  .procedure-print-document .procedure-print-method { margin-bottom: 8pt; }
-  .procedure-print-document .procedure-fees { color: #000; }
-
-  .procedure-section {
-    break-inside: auto;
+  .procedure-print-heading {
+    text-align: center;
+    margin-bottom: 14pt;
   }
 
-  .procedure-section h2,
-  .procedure-section h3 {
+  .procedure-print-heading > p:first-child {
+    font-weight: bold;
+  }
+
+  .procedure-print-heading h1 {
+    margin: 8pt 0;
+    color: #000000;
+    font: bold 14pt/1.4 var(--font-legal-serif);
+  }
+
+  .procedure-print-heading p,
+  .procedure-print-document p {
+    margin: 0 0 6pt;
+  }
+
+  .procedure-print-source {
+    font-style: italic;
+    font-size: 11pt;
+    overflow-wrap: anywhere;
+  }
+
+  .procedure-print-document section {
+    margin-top: 12pt;
+  }
+
+  .procedure-print-document h2,
+  .procedure-print-document h3 {
+    color: #000000;
+    font: bold 13pt/1.5 var(--font-legal-serif);
+    margin: 0 0 4pt;
     break-after: avoid;
   }
 
-  .procedure-info-grid {
-    display: block;
+  .procedure-print-document h3 {
+    font-style: italic;
   }
 
-  .procedure-info-fact {
-    grid-template-columns: 145px minmax(0, 1fr);
+  .procedure-print-document .procedure-text {
+    color: #000000;
+    font: inherit;
+    white-space: pre-wrap;
+    text-align: justify;
   }
 
-  .procedure-data-table {
-    display: table;
-    font-size: 12pt;
+  .procedure-print-document ol {
+    margin: 0 0 6pt;
+    padding-left: 20pt;
   }
 
-  .procedure-data-table thead {
-    display: table-header-group;
+  .procedure-print-document li {
+    padding-left: 2pt;
   }
 
-  .procedure-data-table tbody {
-    display: table-row-group;
+  .procedure-print-document .procedure-print-method {
+    margin-bottom: 8pt;
   }
 
-  .procedure-data-table tr {
-    display: table-row;
-  }
-
-  .procedure-data-table td {
-    display: table-cell;
-    width: auto;
-  }
-
-  .procedure-data-table th,
-  .procedure-data-table td {
-    border: 1px solid #000;
-  }
-
-  .procedure-data-table td::before {
-    display: none;
+  .procedure-print-document .procedure-fees {
+    color: #000000;
   }
 }

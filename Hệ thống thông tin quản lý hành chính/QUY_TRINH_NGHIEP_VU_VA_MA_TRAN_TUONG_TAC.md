@@ -15,14 +15,14 @@ Tài liệu này hướng dẫn thao tác trên phiên bản hệ thống trong 
 
 Kịch bản dưới đây dùng **một hồ sơ mới**, thủ tục **Cấp bản sao từ sổ gốc — 2.000908**, cơ quan ví dụ **UBND phường Tây Hồ**. Đây là dữ liệu thực hành, không phải hồ sơ hay kết quả có giá trị pháp lý. Mã hồ sơ được hệ thống sinh sau khi gửi: trong các bước dưới đây ký hiệu là **[MÃ HỒ SƠ]**; phải dùng chính mã vừa nhận, không gõ nguyên chữ trong ngoặc.
 
-| Vai trò | Tài khoản thực hành ví dụ | Việc chính trên cùng hồ sơ |
-|---|---|---|
-| Người dân | `congdan@example.test` | Lập, gửi, bổ sung và theo dõi |
-| Một cửa | `intake.tayho@example.test` | Kiểm tra, tiếp nhận, phân công |
-| Chuyên viên | `specialist.tayho@example.test` | Đối chiếu sổ gốc, lập dự thảo và trình |
-| Lãnh đạo | `leader.tayho@example.test` | Phê duyệt và ký thử nghiệm |
-| Văn thư | `registrar.tayho@example.test` | Phát hành và ghi nhận trả kết quả |
-| Tài chính | `finance.tayho@example.test` | Chỉ tham gia nếu thực sự phát sinh khoản thu được cấu hình |
+| Vai trò     | Tài khoản thực hành ví dụ       | Việc chính trên cùng hồ sơ                                 |
+| ----------- | ------------------------------- | ---------------------------------------------------------- |
+| Người dân   | `congdan@example.test`          | Lập, gửi, bổ sung và theo dõi                              |
+| Một cửa     | `intake.tayho@example.test`     | Kiểm tra, tiếp nhận, phân công                             |
+| Chuyên viên | `specialist.tayho@example.test` | Đối chiếu sổ gốc, lập dự thảo và trình                     |
+| Lãnh đạo    | `leader.tayho@example.test`     | Phê duyệt và ký thử nghiệm                                 |
+| Văn thư     | `registrar.tayho@example.test`  | Phát hành và ghi nhận trả kết quả                          |
+| Tài chính   | `finance.tayho@example.test`    | Chỉ tham gia nếu thực sự phát sinh khoản thu được cấu hình |
 
 Danh sách trên là tài khoản mẫu của dữ liệu thực hành; tài khoản thực tế, hiệu lực và quyền ký cần kiểm tra trên hệ thống. Đăng xuất trước khi đổi vai; dùng mật khẩu được cấp theo tài liệu tài khoản, không giả định mật khẩu ban đầu còn hiệu lực. Có thể chọn cơ quan khác nếu có đủ tài khoản và chuyên viên cùng phạm vi, và cơ quan đó quản lý sổ gốc tương ứng.
 

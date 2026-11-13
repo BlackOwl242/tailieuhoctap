@@ -1,5 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { ArrowLeft, ArrowRight, RefreshCw, Save, ShieldCheck } from 'lucide-react'
+import { createContext, useContext, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import './CitizenProfile.css'
+import { ConfirmDialog, LockedFieldNotice, VerifiedFieldBadge } from './design-system'
 import {
   identityTypes,
   type ApiRequest,
@@ -10,19 +12,37 @@ import {
 
 export type { CitizenProfile } from './types'
 
+const CitizenProfileEmbedContext = createContext(false)
+
+export function CitizenProfileEmbedBoundary({ children }: { children: ReactNode }) {
+  return (
+    <CitizenProfileEmbedContext.Provider value={true}>
+      {children}
+    </CitizenProfileEmbedContext.Provider>
+  )
+}
+
+const TABULAR_KEYS = new Set<DetailKey>(['phone', 'dateOfBirth', 'identityNumber', 'identityDate'])
+const CORE_PROFILE_FIELD_TOTAL = 7
+
 export function CitizenProfilePage({
   request,
   onChanged,
   onHome,
   onSubmit,
   onDirtyChange,
+  embedded,
 }: {
   request: ApiRequest
   onChanged: (user: User) => void
   onHome: () => void
   onSubmit: () => void
   onDirtyChange?: (dirty: boolean) => void
+  embedded?: boolean
 }) {
+  const inWorkspace = useContext(CitizenProfileEmbedContext)
+  const isEmbedded = embedded ?? inWorkspace
+
   const [profile, setProfile] = useState<CitizenProfile | null>(null)
   const [communes, setCommunes] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,6 +50,7 @@ export function CitizenProfilePage({
   const [dirty, setDirty] = useState(false)
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
+  const [pendingLeave, setPendingLeave] = useState<(() => void) | null>(null)
   const [today] = useState(() =>
     new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date()),
   )
@@ -49,9 +70,11 @@ export function CitizenProfilePage({
   }, [dirty])
 
   function leave(action: () => void) {
-    if (!dirty || window.confirm('Thông tin mới chưa được lưu. Bạn có muốn rời trang?')) {
+    if (!dirty) {
       action()
+      return
     }
+    setPendingLeave(() => action)
   }
 
   useEffect(() => {
@@ -117,12 +140,15 @@ export function CitizenProfilePage({
     setNotice('')
     setBusy(true)
     try {
-      const result = await request<{ profile: CitizenProfile; user: User }>('/api/citizen/profile', profile)
+      const result = await request<{ profile: CitizenProfile; user: User }>(
+        '/api/citizen/profile',
+        profile,
+      )
       setProfile(result.profile)
       onChanged(result.user)
       setDirty(false)
       setNotice(
-        'Đã lưu thông tin cá nhân. Hồ sơ lập mới sẽ dùng thông tin này; hồ sơ đã gửi giữ nguyên nội dung.',
+        'Đã lưu thông tin cá nhân. Hồ sơ lập mới sẽ tự động điền thông tin này; hồ sơ đã gửi giữ nguyên nội dung.',
       )
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Chưa lưu được thông tin.')
@@ -142,6 +168,7 @@ export function CitizenProfilePage({
       list?: string
     } = {},
   ) {
+    const isTabular = TABULAR_KEYS.has(key) || options.type === 'date' || options.type === 'tel'
     return (
       <label className="citizen-field" key={key}>
         <span>
@@ -150,6 +177,7 @@ export function CitizenProfilePage({
         </span>
         <input
           name={key}
+          className={isTabular ? 'tabular-nums' : undefined}
           disabled={busy}
           type={options.type || 'text'}
           value={profile?.[key] || ''}
@@ -186,41 +214,75 @@ export function CitizenProfilePage({
     )
   }
 
-  return (
-    <section className="citizen-profile-page">
-      <nav className="profile-navigation" aria-label="Điều hướng tài khoản">
-        <button type="button" className="text-button" onClick={() => leave(onHome)}>
-          ← Về cổng dịch vụ
-        </button>
-        <button type="button" className="text-button" onClick={() => leave(onSubmit)}>
-          Nộp hồ sơ →
-        </button>
-      </nav>
+  const completedCoreCount = profile
+    ? Math.max(0, CORE_PROFILE_FIELD_TOTAL - profile.missingFields.length)
+    : 0
 
-      <header className="citizen-page-heading">
-        <h1>Thông tin cá nhân</h1>
-        <p>Lưu thông tin một lần để tự động điền khi nộp hồ sơ, đặt lịch hẹn và gửi phản ánh.</p>
-      </header>
+  const body = (
+    <>
+      {!isEmbedded && (
+        <>
+          <nav className="profile-navigation" aria-label="Điều hướng tài khoản">
+            <button type="button" className="text-button" onClick={() => leave(onHome)}>
+              <ArrowLeft size={16} strokeWidth={1.75} aria-hidden="true" />
+              <span>Về cổng dịch vụ</span>
+            </button>
+            <button type="button" className="text-button" onClick={() => leave(onSubmit)}>
+              <span>Nộp hồ sơ trực tuyến</span>
+              <ArrowRight size={16} strokeWidth={1.75} aria-hidden="true" />
+            </button>
+          </nav>
+
+          <header className="citizen-page-heading">
+            <h1>Thông tin cá nhân</h1>
+            <p>
+              Quản lý dữ liệu công dân dùng chung để tự động điền khi nộp hồ sơ, đặt lịch hẹn Một
+              cửa và gửi phản ánh, kiến nghị.
+            </p>
+          </header>
+        </>
+      )}
 
       {loading ? (
-        <p role="status">Đang tải thông tin cá nhân…</p>
+        <p className="profile-status-note" role="status">
+          Đang tải thông tin cá nhân…
+        </p>
       ) : (
         profile && (
           <>
-            <p className="profile-source">
-              Thông tin cá nhân lưu tại đây dùng để tự động điền biểu mẫu điện tử. Vui lòng kiểm tra
-              kỹ nội dung tờ khai và thành phần hồ sơ trước khi gửi.
-            </p>
-            {profile.missingFields.length > 0 && (
-              <p className="profile-completion">
-                Có thể bổ sung thêm: {profile.missingFields.join('; ')}. Các trường chưa có thông tin
-                vẫn được để trống khi tự điền.
+            <aside
+              className="profile-once-only-banner"
+              aria-label="Nguyên tắc cung cấp dữ liệu một lần"
+            >
+              <div className="profile-once-only-banner__head">
+                <div className="profile-once-only-banner__title">
+                  <ShieldCheck size={18} strokeWidth={1.75} aria-hidden="true" />
+                  <strong>Nguyên tắc “Cung cấp dữ liệu một lần” (Nghị định 42/2022/NĐ-CP)</strong>
+                </div>
+                <VerifiedFieldBadge
+                  text={
+                    profile.missingFields.length === 0
+                      ? 'Sẵn sàng tự động điền biểu mẫu 5 bước'
+                      : `Đã hoàn thiện ${completedCoreCount}/${CORE_PROFILE_FIELD_TOTAL} trường cốt lõi`
+                  }
+                />
+              </div>
+              <p className="profile-once-only-banner__desc">
+                Các trường định danh, liên hệ và địa chỉ đã lưu tại đây sẽ tự động điền vào quy
+                trình nộp hồ sơ trực tuyến 5 bước, đặt lịch hẹn Một cửa và gửi phản ánh. Hồ sơ đã
+                nộp trước đó giữ nguyên nội dung tại thời điểm tiếp nhận.
               </p>
-            )}
+              {profile.missingFields.length > 0 && (
+                <p className="profile-completion">
+                  <b>Gợi ý bổ sung để điền tự động trọn vẹn:</b> {profile.missingFields.join('; ')}.
+                  Các trường chưa khai vẫn có thể nhập trực tiếp trên từng tờ khai.
+                </p>
+              )}
+            </aside>
 
             <form onSubmit={save} className="profile-form" aria-busy={busy}>
               <section className="citizen-form-section">
-                <h2>1. Thông tin cơ bản</h2>
+                <h2>Thông tin cơ bản</h2>
                 <div className="citizen-form-grid">
                   {renderField('name', 'Họ và tên', { required: true, autoComplete: 'name' })}
                   {renderField('dateOfBirth', 'Ngày sinh', { type: 'date', autoComplete: 'bday' })}
@@ -233,7 +295,9 @@ export function CitizenProfilePage({
                     >
                       <option value="">Chưa cung cấp</option>
                       {['Nam', 'Nữ', 'Khác'].map(value => (
-                        <option key={value}>{value}</option>
+                        <option key={value} value={value}>
+                          {value}
+                        </option>
                       ))}
                     </select>
                   </label>
@@ -242,7 +306,7 @@ export function CitizenProfilePage({
               </section>
 
               <section className="citizen-form-section">
-                <h2>2. Thông tin liên hệ</h2>
+                <h2>Thông tin liên hệ</h2>
                 <div className="citizen-form-grid">
                   {renderField('phone', 'Số điện thoại', {
                     type: 'tel',
@@ -250,16 +314,27 @@ export function CitizenProfilePage({
                     maxLength: 40,
                     autoComplete: 'tel',
                   })}
-                  <label className="citizen-field">
-                    <span>Email đăng nhập</span>
-                    <input type="email" value={profile.email} readOnly autoComplete="email" />
-                    <small>Email này dùng để đăng nhập tài khoản công dân.</small>
-                  </label>
+                  <div className="citizen-field">
+                    <label htmlFor="citizen-profile-email">
+                      <span>Email đăng nhập</span>
+                    </label>
+                    <input
+                      id="citizen-profile-email"
+                      className="hcds-verified-input"
+                      type="email"
+                      value={profile.email}
+                      readOnly
+                      autoComplete="email"
+                    />
+                    <LockedFieldNotice>
+                      Email định danh tài khoản công dân, được khóa để bảo vệ phiên đăng nhập.
+                    </LockedFieldNotice>
+                  </div>
                 </div>
               </section>
 
               <section className="citizen-form-section">
-                <h2>3. Giấy tờ nhận dạng</h2>
+                <h2>Giấy tờ định danh cá nhân</h2>
                 <div className="citizen-form-grid">
                   <label className="citizen-field">
                     <span>Loại giấy tờ</span>
@@ -269,7 +344,9 @@ export function CitizenProfilePage({
                       onChange={event => change('identityType', event.target.value)}
                     >
                       {identityTypes.map(value => (
-                        <option key={value}>{value}</option>
+                        <option key={value} value={value}>
+                          {value}
+                        </option>
                       ))}
                     </select>
                   </label>
@@ -284,17 +361,17 @@ export function CitizenProfilePage({
               </section>
 
               <section className="citizen-form-section">
-                <h2>4. Địa chỉ thường trú</h2>
+                <h2>Địa chỉ thường trú</h2>
                 <p>
-                  Ghi theo địa chỉ hành chính hiện tại. Với Hà Nội, có thể chọn phường, xã từ danh
-                  sách gợi ý.
+                  Ghi theo địa giới hành chính hiện hành. Với Thành phố Hà Nội, có thể chọn nhanh từ
+                  danh sách 126 phường, xã gợi ý.
                 </p>
                 {renderAddress('permanent')}
               </section>
 
               <section className="citizen-form-section">
-                <h2>5. Địa chỉ liên hệ</h2>
-                <label className="citizen-consent">
+                <h2>Địa chỉ liên hệ nhận kết quả</h2>
+                <label className="citizen-consent profile-checkbox-row">
                   <input
                     type="checkbox"
                     disabled={busy}
@@ -305,8 +382,8 @@ export function CitizenProfilePage({
                 </label>
                 {!profile.sameContactAddress && renderAddress('contact')}
                 <p>
-                  Địa chỉ này được gợi ý khi nhận kết quả qua bưu chính. Bạn có thể đổi riêng cho
-                  từng hồ sơ.
+                  Địa chỉ này được tự động gợi ý khi đăng ký nhận kết quả qua dịch vụ bưu chính công
+                  ích. Bạn vẫn có thể thay đổi riêng cho từng hồ sơ.
                 </p>
               </section>
 
@@ -323,11 +400,14 @@ export function CitizenProfilePage({
               )}
 
               <div className="profile-actions">
-                <button className="button primary" disabled={busy || !dirty}>
-                  {busy ? 'Đang lưu…' : 'Lưu thông tin cá nhân'}
+                <button type="submit" className="button primary" disabled={busy || !dirty}>
+                  <Save size={16} strokeWidth={1.75} aria-hidden="true" />
+                  <span>{busy ? 'Đang lưu…' : 'Lưu thông tin cá nhân'}</span>
                 </button>
                 {profile.updatedAt && (
-                  <span>Lần cập nhật: {new Date(profile.updatedAt).toLocaleString('vi-VN')}</span>
+                  <span className="tabular-nums">
+                    Lần cập nhật gần nhất: {new Date(profile.updatedAt).toLocaleString('vi-VN')}
+                  </span>
                 )}
               </div>
             </form>
@@ -336,14 +416,45 @@ export function CitizenProfilePage({
       )}
 
       {error && (
-        <div role="alert" className="form-error">
-          {error}
-          <button type="button" className="text-button" onClick={reload} disabled={busy}>
-            Tải lại thông tin đã lưu
+        <div role="alert" className="form-error profile-error-banner">
+          <span>{error}</span>
+          <button type="button" className="button secondary compact-btn" onClick={reload} disabled={busy}>
+            <RefreshCw size={14} strokeWidth={1.75} aria-hidden="true" />
+            <span>Tải lại thông tin đã lưu</span>
           </button>
         </div>
       )}
-    </section>
+
+      <ConfirmDialog
+        open={Boolean(pendingLeave)}
+        title="Chưa lưu thay đổi thông tin cá nhân"
+        message="Thông tin bạn vừa chỉnh sửa chưa được lưu vào hồ sơ công dân. Bạn có muốn rời trang và hủy các thay đổi này?"
+        confirmLabel="Rời trang"
+        cancelLabel="Tiếp tục chỉnh sửa"
+        tone="danger"
+        onConfirm={() => {
+          const nextAction = pendingLeave
+          setPendingLeave(null)
+          setDirty(false)
+          nextAction?.()
+        }}
+        onClose={() => setPendingLeave(null)}
+      />
+    </>
+  )
+
+  if (isEmbedded) {
+    return (
+      <section className="citizen-profile-page is-embedded" aria-label="Thông tin cá nhân công dân">
+        {body}
+      </section>
+    )
+  }
+
+  return (
+    <main id="main-content" className="citizen-profile-page">
+      {body}
+    </main>
   )
 }
 

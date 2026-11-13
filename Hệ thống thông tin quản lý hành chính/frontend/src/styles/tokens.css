@@ -1,0 +1,206 @@
+/* ==========================================================================
+   HANOI CIVIC DESIGN SYSTEM (HCDS) — 3-TIER DESIGN TOKENS
+   Compliant with USWDS 3.0 Token Architecture, WCAG 2.2 AA & Decree 42/2022
+   ========================================================================== */
+
+:root {
+  /* ---------- TIER 1: PRIMITIVE TOKENS ---------- */
+  --p-navy-950: #0b192c;
+  --p-navy-900: #122643;
+  --p-navy-800: #1b365d;
+  --p-navy-700: #0f4c81;
+  --p-navy-100: #dce7f5;
+  --p-navy-50: #edf2f8;
+
+  --p-bronze-800: #7c4021;
+  --p-bronze-700: #8c4a27;
+  --p-bronze-500: #c58b32;
+  --p-bronze-100: #f3e4c6;
+  --p-bronze-50: #fbf6ec;
+
+  --p-slate-950: #0f172a;
+  --p-slate-900: #102033;
+  --p-slate-700: #334155;
+  --p-slate-600: #475569;
+  --p-slate-500: #64748b; /* 4.76:1 on #ffffff -> Passes WCAG 1.4.11 >= 3:1 */
+  --p-slate-300: #cbd5e1;
+  --p-slate-200: #e2e8f0;
+  --p-slate-100: #f1f5f9;
+  --p-slate-75: #f4f6f9;
+  --p-slate-50: #f8fafc;
+  --p-white: #ffffff;
+
+  --p-blue-800: #1e40af;
+  --p-blue-700: #1d4ed8;
+  --p-blue-200: #bfdbfe;
+  --p-blue-50: #eff6ff;
+
+  --p-amber-800: #92400e;
+  --p-amber-700: #b45309;
+  --p-amber-200: #fde68a;
+  --p-amber-50: #fffbeb;
+
+  --p-green-800: #166534;
+  --p-green-700: #15803d;
+  --p-green-200: #bbf7d0;
+  --p-green-50: #f0fdf4;
+
+  --p-red-800: #991b1b;
+  --p-red-700: #b42318;
+  --p-red-200: #fecaca;
+  --p-red-50: #fef2f2;
+
+  /* Typography Primitives (Two-World Separation) */
+  --font-sans: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  --font-legal-serif: "Times New Roman", "Tinos", Times, serif;
+
+  /* 7-Step Ergonomic Type Scale (Zero .5px fractional values) */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+
+  --leading-tight: 1.3;
+  --leading-snug: 1.45;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.65;
+
+  /* 4pt / 8pt Spatial Scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Architectural Border Radii */
+  --radius: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Controlled Elevation Shadows */
+  --shadow-xs: 0 1px 2px rgba(16, 32, 51, 0.05);
+  --shadow-sm: 0 1px 3px rgba(16, 32, 51, 0.07), 0 1px 2px rgba(16, 32, 51, 0.04);
+  --shadow-md: 0 8px 24px rgba(16, 32, 51, 0.12);
+  --shadow-lg: 0 16px 40px rgba(16, 32, 51, 0.18);
+
+  /* Z-Index Scale */
+  --z-base: 1;
+  --z-sticky: 30;
+  --z-dropdown: 40;
+  --z-sidebar: 50;
+  --z-topbar: 60;
+  --z-drawer: 80;
+  --z-modal: 100;
+  --z-skip: 200;
+
+  /* ---------- TIER 2: SEMANTIC ROLE TOKENS ---------- */
+  --color-brand-primary: var(--p-navy-800);
+  --color-brand-hover: var(--p-navy-900);
+  --color-brand-interactive: var(--p-navy-700);
+  --color-brand-subtle: var(--p-navy-50);
+  --color-brand-border: var(--p-navy-100);
+
+  --color-accent-heritage: var(--p-bronze-700);
+  --color-accent-rule: var(--p-bronze-500);
+  --color-accent-tint: var(--p-bronze-50);
+  --color-accent-border: var(--p-bronze-100);
+
+  --color-bg-canvas: var(--p-slate-75);
+  --color-bg-surface: var(--p-white);
+  --color-bg-subtle: var(--p-slate-50);
+  --color-bg-muted: var(--p-slate-100);
+
+  --color-fg-primary: var(--p-slate-900);
+  --color-fg-secondary: var(--p-slate-600);
+  --color-fg-tertiary: var(--p-slate-700);
+  --color-fg-inverse: var(--p-white);
+
+  --color-border-subtle: var(--p-slate-200);
+  --color-border-default: var(--p-slate-300);
+  --color-border-control: var(--p-slate-500); /* WCAG 1.4.11 >= 3:1 */
+  --color-focus-ring: var(--p-navy-700);
+
+  /* Semantic Status Families (Soft-Tint GOV.UK v5 Standard) */
+  --status-neutral-bg: var(--p-slate-100);
+  --status-neutral-border: var(--p-slate-300);
+  --status-neutral-fg: var(--p-slate-700);
+
+  --status-info-bg: var(--p-blue-50);
+  --status-info-border: var(--p-blue-200);
+  --status-info-fg: var(--p-blue-800);
+
+  --status-warning-bg: var(--p-amber-50);
+  --status-warning-border: var(--p-amber-200);
+  --status-warning-fg: var(--p-amber-800);
+
+  --status-success-bg: var(--p-green-50);
+  --status-success-border: var(--p-green-200);
+  --status-success-fg: var(--p-green-800);
+
+  --status-danger-bg: var(--p-red-50);
+  --status-danger-border: var(--p-red-200);
+  --status-danger-fg: var(--p-red-800);
+
+  /* Legacy Alias Compatibility (Mapped strictly to Semantic Tokens) */
+  --navy: var(--color-brand-primary);
+  --brand: var(--color-brand-primary);
+  --brand-hover: var(--color-brand-hover);
+  --civic-red: var(--p-red-700);
+  --civic-amber: var(--p-amber-800);
+  --civic-green: var(--p-green-800);
+  --ink: var(--color-fg-primary);
+  --muted: var(--color-fg-secondary);
+  --line: var(--color-border-default);
+  --line-strong: var(--color-border-control);
+  --surface-soft: var(--color-brand-subtle);
+  --surface-warm: var(--color-accent-tint);
+  --paper: var(--color-bg-surface);
+  --surface: var(--color-bg-canvas);
+
+  /* ---------- TIER 3: SURFACE DENSITY DEFAULTS ---------- */
+  --control-height: 44px;
+  --body-font-size: 15px;
+  --container-max: 1280px;
+  --scroll-offset-top: 84px;
+}
+
+/* Citizen Comfortable Mode (Default for Public & Citizen Workspace) */
+[data-surface="citizen"] {
+  --control-height: 44px;
+  --body-font-size: var(--text-base);
+  --container-max: 1280px;
+  --scroll-offset-top: 88px;
+}
+
+/* Citizen Elderly / Large Text Accessibility Toggle (Circular 26/2020/TT-BTTTT) */
+[data-font-scale="large"] {
+  font-size: 112.5%;
+}
+
+/* Staff Compact Workstation Mode (High-density 8-hour ergonomics) */
+[data-surface="staff"] {
+  --control-height: 38px;
+  --body-font-size: var(--text-sm);
+  --container-max: 100%;
+  --scroll-offset-top: 72px;
+}
+
+/* Windows High Contrast / Forced Colors Safety */
+@media (forced-colors: active) {
+  :root {
+    --color-border-default: CanvasText;
+    --color-border-control: ButtonText;
+    --color-focus-ring: Highlight;
+  }
+}

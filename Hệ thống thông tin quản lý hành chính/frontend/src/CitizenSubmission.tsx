@@ -1,6 +1,20 @@
+import {
+  AlertTriangle,
+  FileText,
+  FolderOpen,
+  Save,
+  Trash2,
+  Upload,
+} from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { serviceModeLabel } from './procedureLabels'
+import {
+  ErrorSummary,
+  LockedFieldNotice,
+  ServiceLevelBadge,
+  VerifiedFieldBadge,
+} from './design-system'
 import { normalizeAgency, procedureAgencies } from './procedureAgencies'
+import { serviceModeLabel } from './procedureLabels'
 import {
   CITIZEN_UPLOAD_LIMIT_TEXT,
   CITIZEN_UPLOAD_MAX_FILES,
@@ -13,8 +27,12 @@ import {
   type SubmissionReceipt,
   type SubmissionSchema,
 } from './types'
+import './ProcedureDetail.css'
 
 export type { SubmissionField, SubmissionSchema }
+
+const DRAFT_FILES_VALUE_KEY = '__draftAttachmentNames'
+const DRAFT_FILES_STORAGE_PREFIX = 'hanoiCitizenDraftFiles:'
 
 type SavedDraft = {
   id: string
@@ -40,6 +58,11 @@ type LibraryDocument = {
   name: string
   size: number
   downloadUrl: string
+}
+
+type ValidationIssue = {
+  id?: string
+  message: string
 }
 
 const STEP_TITLES = [
@@ -78,6 +101,46 @@ const REUSABLE_PROFILE_FIELDS = [
   'submitterPhone',
   'submitterEmail',
 ] as const
+
+function parseSavedAttachmentNames(raw?: string | null): Record<string, string[]> {
+  if (!raw) return {}
+  try {
+    const parsed = JSON.parse(raw) as unknown
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+    const out: Record<string, string[]> = {}
+    for (const [compId, names] of Object.entries(parsed as Record<string, unknown>)) {
+      if (Array.isArray(names)) {
+        const clean = names.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+        if (clean.length > 0) out[compId] = clean
+      }
+    }
+    return out
+  } catch {
+    return {}
+  }
+}
+
+function readLocalDraftFiles(draftId: string): Record<string, string[]> {
+  if (!draftId) return {}
+  try {
+    return parseSavedAttachmentNames(localStorage.getItem(`${DRAFT_FILES_STORAGE_PREFIX}${draftId}`))
+  } catch {
+    return {}
+  }
+}
+
+function writeLocalDraftFiles(draftId: string, map: Record<string, string[]>) {
+  if (!draftId) return
+  try {
+    if (Object.keys(map).length > 0) {
+      localStorage.setItem(`${DRAFT_FILES_STORAGE_PREFIX}${draftId}`, JSON.stringify(map))
+    } else {
+      localStorage.removeItem(`${DRAFT_FILES_STORAGE_PREFIX}${draftId}`)
+    }
+  } catch {
+    /* Ignore storage quota errors */
+  }
+}
 
 function visibleFormItem(
   item: SubmissionField,
@@ -131,6 +194,9 @@ export function CitizenApplicationForm({
   const [draft, setDraft] = useState<{ id: string; version: number; updatedAt: string } | null>(null)
   const [draftLoading, setDraftLoading] = useState(Boolean(initialDraftId))
   const [draftNotice, setDraftNotice] = useState('')
+  const [restoredAttachmentNames, setRestoredAttachmentNames] = useState<Record<string, string[]>>(
+    {},
+  )
   const savedKeys = useRef<{ submissionKey: string; submissionToken: string } | null>(null)
 
   const [procedures, setProcedures] = useState<Procedure[]>([])
@@ -176,7 +242,7 @@ export function CitizenApplicationForm({
   const [confirmed, setConfirmed] = useState(false)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
+  const [validationErrors, setValidationErrors] = useState<ValidationIssue[]>([])
   const [keys, setKeys] = useState<{ submissionKey: string; submissionToken: string } | null>(null)
 
   const syncProfileDefaults = useCallback(
@@ -253,16 +319,26 @@ export function CitizenApplicationForm({
       .then(result => {
         if (controller.signal.aborted) return
         const saved = result.draft
+        const serializedFiles = saved.values[DRAFT_FILES_VALUE_KEY]
+        const parsedFromServer = parseSavedAttachmentNames(serializedFiles)
+        const parsedFromLocal = readLocalDraftFiles(saved.id)
+        const restoredMap =
+          Object.keys(parsedFromServer).length > 0 ? parsedFromServer : parsedFromLocal
+
+        const cleanValues = { ...saved.values }
+        delete cleanValues[DRAFT_FILES_VALUE_KEY]
+
         edited.current = {
-          fields: new Set(Object.keys(saved.values)),
+          fields: new Set(Object.keys(cleanValues)),
           contact: new Set(['name', 'phone', 'email']),
           delivery: true,
         }
         setDraft({ id: saved.id, version: saved.version, updatedAt: saved.updatedAt })
+        setRestoredAttachmentNames(restoredMap)
         setSelectedCode(saved.procedureCode)
         setSchemaLoading(Boolean(saved.procedureCode))
         setApplicantType(saved.applicantType)
-        setValues(saved.values)
+        setValues(cleanValues)
         setContact(saved.contact)
         setAgency(saved.agency)
         setDelivery(saved.delivery)
@@ -276,12 +352,16 @@ export function CitizenApplicationForm({
             ? { submissionKey: saved.submissionKey, submissionToken: saved.submissionToken }
             : null
         setDraftNotice(
-          'Đã mở hồ sơ nháp. Kiểm tra lại nội dung và chọn lại các tệp đính kèm trước khi gửi.',
+          'Đã khôi phục nội dung tờ khai nháp. Vui lòng kiểm tra thông tin và đính kèm lại tệp giấy tờ trước khi gửi.',
         )
       })
       .catch(reason => {
         if (controller.signal.aborted || isAbortError(reason)) return
-        setError(reason instanceof Error ? reason.message : 'Chưa mở được hồ sơ nháp.')
+        setValidationErrors([
+          {
+            message: reason instanceof Error ? reason.message : 'Chưa mở được hồ sơ nháp.',
+          },
+        ])
       })
       .finally(() => {
         if (!controller.signal.aborted) setDraftLoading(false)
@@ -301,7 +381,9 @@ export function CitizenApplicationForm({
       })
       .catch(reason => {
         if (controller.signal.aborted || isAbortError(reason)) return
-        setProfileError(reason instanceof Error ? reason.message : 'Chưa tải được thông tin cá nhân.')
+        setProfileError(
+          reason instanceof Error ? reason.message : 'Chưa tải được thông tin cá nhân.',
+        )
       })
     return () => controller.abort()
   }, [applicantType, request, syncProfileDefaults, useOwnInformation])
@@ -338,7 +420,11 @@ export function CitizenApplicationForm({
       })
       .catch(reason => {
         if (controller.signal.aborted || isAbortError(reason)) return
-        setError(reason instanceof Error ? reason.message : 'Không tải được danh mục.')
+        setValidationErrors([
+          {
+            message: reason instanceof Error ? reason.message : 'Không tải được danh mục.',
+          },
+        ])
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false)
@@ -359,7 +445,11 @@ export function CitizenApplicationForm({
       })
       .catch(reason => {
         if (controller.signal.aborted || isAbortError(reason)) return
-        setError(reason instanceof Error ? reason.message : 'Không tải được biểu mẫu thủ tục.')
+        setValidationErrors([
+          {
+            message: reason instanceof Error ? reason.message : 'Không tải được biểu mẫu thủ tục.',
+          },
+        ])
       })
       .finally(() => {
         if (!controller.signal.aborted) setSchemaLoading(false)
@@ -393,6 +483,7 @@ export function CitizenApplicationForm({
   )
 
   const proxy = effectiveValues.submissionRole === 'Nộp thay theo ủy quyền'
+  const isOwnCitizenApplicant = applicantType === 'citizen' && useOwnInformation && !proxy
   const hasIntake =
     Boolean(effectiveAgency) &&
     agencies.some(item => normalizeAgency(item) === normalizeAgency(effectiveAgency))
@@ -412,15 +503,107 @@ export function CitizenApplicationForm({
           .includes(query.trim().toLocaleLowerCase('vi')),
       )
 
+  const missingRestoredAttachments = useMemo(() => {
+    const entries: { componentId: string; label: string; fileNames: string[] }[] = []
+    for (const [compId, fileNames] of Object.entries(restoredAttachmentNames)) {
+      if (!fileNames.length || documents[compId]?.length) continue
+      const matchedComp = schema?.documents.find(doc => doc.id === compId)
+      entries.push({
+        componentId: compId,
+        label: matchedComp?.label || compId,
+        fileNames,
+      })
+    }
+    return entries
+  }, [restoredAttachmentNames, documents, schema])
+
+  const profileDesiredValues = useMemo<Record<string, string>>(() => {
+    if (!profile) return {}
+    const personal: Record<string, string> = isOwnCitizenApplicant
+      ? {
+          address: profile.contactAddress,
+          identityType: profile.identityType,
+          identityNumber: profile.identityNumber,
+          identityDate: profile.identityDate,
+          identityPlace: profile.identityPlace,
+          dateOfBirth: profile.dateOfBirth,
+          gender: profile.gender,
+          nationality: profile.nationality,
+          nationalityType:
+            profile.nationality === 'Việt Nam'
+              ? 'Trong nước'
+              : profile.nationality
+                ? 'Cá nhân nước ngoài tại Việt Nam'
+                : '',
+          passport: profile.identityType === 'Hộ chiếu' ? profile.identityNumber : '',
+          originalOwner: effectiveValues.relation === 'Người được cấp bản chính' ? profile.name : '',
+        }
+      : {}
+    const submitter: Record<string, string> = proxy
+      ? {
+          submitterName: profile.name,
+          submitterIdentity: profile.identityNumber,
+          submitterIdentityDate: profile.identityDate,
+          submitterIdentityPlace: profile.identityPlace,
+          submitterAddress: profile.contactAddress,
+          submitterPhone: profile.phone,
+          submitterEmail: profile.email,
+        }
+      : {}
+    return { ...personal, ...submitter }
+  }, [profile, isOwnCitizenApplicant, proxy, effectiveValues.relation])
+
+  function isProfileSyncedContact(key: 'name' | 'phone' | 'email'): boolean {
+    if (!profile || !isOwnCitizenApplicant) return false
+    const val = contact[key]?.trim()
+    return Boolean(val) && val === profile[key]?.trim()
+  }
+
+  function isProfileSyncedField(fieldId: string): boolean {
+    if (!profile) return false
+    if (!(REUSABLE_PROFILE_FIELDS as readonly string[]).includes(fieldId)) return false
+    const val = effectiveValues[fieldId]?.trim()
+    const target = profileDesiredValues[fieldId]?.trim()
+    return Boolean(val && target && val === target)
+  }
+
+  function isProfileSyncedDelivery(): boolean {
+    if (!profile || !isOwnCitizenApplicant) return false
+    return (
+      Boolean(deliveryAddress.trim()) && deliveryAddress.trim() === profile.contactAddress?.trim()
+    )
+  }
+
   async function saveDraft() {
     if (!selectedCode) {
-      setError('Chọn thủ tục trước khi lưu nháp.')
+      setValidationErrors([
+        { id: 'submission-procedure-search', message: 'Chọn thủ tục trước khi lưu nháp.' },
+      ])
       return
     }
     setBusy(true)
-    setError('')
+    setValidationErrors([])
     setDraftNotice('')
     const requestKeys = keys || savedKeys.current || createSubmissionKeys()
+
+    const attachmentNamesSnapshot: Record<string, string[]> = {}
+    for (const [compId, prevNames] of Object.entries(restoredAttachmentNames)) {
+      if (!documents[compId]?.length && prevNames.length > 0) {
+        attachmentNamesSnapshot[compId] = prevNames
+      }
+    }
+    for (const [compId, fileList] of Object.entries(documents)) {
+      if (fileList.length > 0) {
+        attachmentNamesSnapshot[compId] = fileList.map(file => file.name)
+      }
+    }
+
+    const draftValues: Record<string, string> = { ...effectiveValues }
+    delete draftValues[DRAFT_FILES_VALUE_KEY]
+    if (Object.keys(attachmentNamesSnapshot).length > 0) {
+      draftValues[DRAFT_FILES_VALUE_KEY] = JSON.stringify(attachmentNamesSnapshot).slice(0, 9500)
+    }
+
     try {
       const result = await request<{ draft: { id: string; version: number; updatedAt: string } }>(
         '/api/citizen/drafts',
@@ -429,7 +612,7 @@ export function CitizenApplicationForm({
           version: draft?.version || 0,
           procedureCode: selectedCode,
           applicantType,
-          values: effectiveValues,
+          values: draftValues,
           contact,
           agency: effectiveAgency,
           delivery,
@@ -441,6 +624,8 @@ export function CitizenApplicationForm({
         },
       )
       setDraft(result.draft)
+      writeLocalDraftFiles(result.draft.id, attachmentNamesSnapshot)
+      setRestoredAttachmentNames(attachmentNamesSnapshot)
       savedKeys.current = requestKeys
       setKeys(requestKeys)
       const params = new URLSearchParams(location.search)
@@ -448,14 +633,17 @@ export function CitizenApplicationForm({
       params.set('procedure', selectedCode)
       history.replaceState(history.state, '', `${location.pathname}?${params}`)
       setDraftNotice(
-        'Đã lưu nội dung tờ khai vào tài khoản. Tệp đính kèm chưa được lưu trong nháp và cần chọn lại khi mở trên lần khác.',
+        'Đã lưu nội dung tờ khai và danh sách tên tệp đính kèm vào tài khoản. Nếu đóng trình duyệt, vui lòng đính kèm lại tệp nhị phân từ thiết bị trước khi gửi.',
       )
     } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : 'Chưa lưu được hồ sơ nháp. Nội dung đang nhập vẫn được giữ.',
-      )
+      setValidationErrors([
+        {
+          message:
+            reason instanceof Error
+              ? reason.message
+              : 'Chưa lưu được hồ sơ nháp. Nội dung đang nhập vẫn được giữ.',
+        },
+      ])
     } finally {
       setBusy(false)
     }
@@ -513,6 +701,7 @@ export function CitizenApplicationForm({
         [libraryComponent]: [...(old[libraryComponent] || []), file],
       }))
       setLibraryComponent('')
+      setValidationErrors([])
       setKeys(null)
       setConfirmed(false)
     } catch (reason) {
@@ -533,11 +722,12 @@ export function CitizenApplicationForm({
     setAgency('')
     setValues(syncProfileDefaults(profile, applicantType, useOwnInformation, { ...DEFAULT_VALUES }))
     setDocuments({})
+    setRestoredAttachmentNames({})
     setDocumentExemptions({})
     setDelivery('')
     setConfirmed(false)
     setKeys(null)
-    setError('')
+    setValidationErrors([])
     const params = new URLSearchParams(location.search)
     if (code) params.set('procedure', code)
     else params.delete('procedure')
@@ -561,6 +751,7 @@ export function CitizenApplicationForm({
     sessionStorage.setItem('hanoiApplicantType', type)
     setValues(syncProfileDefaults(profile, type, useOwnInformation, { ...DEFAULT_VALUES }))
     setConfirmed(false)
+    setValidationErrors([])
     setKeys(null)
   }
 
@@ -568,6 +759,7 @@ export function CitizenApplicationForm({
     setUseOwnInformation(checked)
     setValues(current => syncProfileDefaults(profile, applicantType, checked, current))
     setConfirmed(false)
+    setValidationErrors([])
     setKeys(null)
   }
 
@@ -581,6 +773,7 @@ export function CitizenApplicationForm({
       return updated
     })
     setConfirmed(false)
+    setValidationErrors([])
     setKeys(null)
   }
 
@@ -588,81 +781,168 @@ export function CitizenApplicationForm({
     edited.current.contact.add(id)
     setContact(old => ({ ...old, [id]: value }))
     setConfirmed(false)
+    setValidationErrors([])
     setKeys(null)
   }
 
-  function validateStage(index: number): string {
-    if (index === 0 && schemaLoading) return 'Đang tải biểu mẫu của thủ tục…'
-    if (index === 0 && procedure?.serviceMode === 'INFORMATION') {
-      return 'Thủ tục này thuộc mức Cung cấp thông tin, thực hiện nộp trực tiếp tại Bộ phận Một cửa.'
+  function validateStageItems(index: number): ValidationIssue[] {
+    const issues: ValidationIssue[] = []
+
+    if (index === 0) {
+      if (schemaLoading) {
+        issues.push({ message: 'Đang tải biểu mẫu của thủ tục…' })
+        return issues
+      }
+      if (!selectedCode) {
+        issues.push({
+          id: 'submission-procedure-search',
+          message: 'Vui lòng chọn thủ tục hành chính cần nộp hồ sơ.',
+        })
+        return issues
+      }
+      if (procedure?.serviceMode === 'INFORMATION') {
+        issues.push({
+          message:
+            'Thủ tục này thuộc mức Cung cấp thông tin, thực hiện nộp trực tiếp tại Bộ phận Một cửa.',
+        })
+      }
+      if (procedure?.submissionEnabled !== true) {
+        issues.push({
+          message:
+            procedure?.submissionDisabledReason ||
+            'Thủ tục chưa có tờ khai và quy trình đã đối chiếu.',
+        })
+      }
+      if (!schema) {
+        issues.push({
+          message:
+            'Thủ tục này chưa có biểu mẫu trực tuyến. Vui lòng chọn thủ tục mức Toàn trình hoặc Một phần.',
+        })
+      } else if (schema.sourceStatus === 'official-document-list-only') {
+        issues.push({
+          message:
+            'Nguồn công khai mới xác nhận thành phần hồ sơ, chưa có cấu trúc tờ khai điện tử.',
+        })
+      }
+      if (!effectiveAgency) {
+        issues.push({
+          id: 'submission-agency',
+          message:
+            'Chọn đúng cơ quan tiếp nhận. Nếu danh sách trống, đơn vị quản trị cần cấp tài khoản tiếp nhận cho cơ quan.',
+        })
+      }
     }
-    if (index === 0 && procedure?.submissionEnabled !== true) {
-      return (
-        procedure?.submissionDisabledReason ||
-        'Thủ tục chưa có tờ khai và quy trình đã đối chiếu.'
-      )
+
+    if (index === 1) {
+      if (contact.name.trim().length < 2) {
+        issues.push({
+          id: 'applicant-contact-name',
+          message: 'Nhập họ tên người nộp hoặc tên tổ chức yêu cầu giải quyết.',
+        })
+      }
+      if (contact.phone && !/^[+0-9(). -]{8,40}$/.test(contact.phone)) {
+        issues.push({
+          id: 'applicant-contact-phone',
+          message: 'Số điện thoại không hợp lệ (gồm 8 đến 40 chữ số).',
+        })
+      }
+      if (!contact.phone.trim() && !contact.email.trim()) {
+        issues.push({
+          id: 'applicant-contact-phone',
+          message: 'Cần cung cấp số điện thoại hoặc email để cơ quan liên hệ khi xử lý hồ sơ.',
+        })
+      }
     }
-    if (index === 0 && !schema) {
-      return 'Thủ tục này chưa có biểu mẫu trực tuyến. Vui lòng chọn thủ tục mức Toàn trình hoặc Một phần.'
-    }
-    if (index === 0 && schema?.sourceStatus === 'official-document-list-only') {
-      return 'Nguồn công khai mới xác nhận thành phần hồ sơ, chưa có cấu trúc tờ khai điện tử.'
-    }
-    if (index === 0 && !effectiveAgency) {
-      return 'Chọn đúng cơ quan tiếp nhận. Nếu danh sách trống, đơn vị quản trị cần cấp tài khoản tiếp nhận cho cơ quan.'
-    }
-    if (index === 1 && contact.name.trim().length < 2) return 'Nhập tên người nộp hoặc tổ chức.'
-    if (index === 1 && contact.phone && !/^[+0-9(). -]{8,40}$/.test(contact.phone)) {
-      return 'Số điện thoại không hợp lệ.'
-    }
-    if (index === 1 && !contact.phone.trim() && !contact.email.trim()) {
-      return 'Cần số điện thoại hoặc email để cơ quan liên hệ.'
-    }
+
     if (index === 2) {
-      const missing = fields.find(field => field.required && !effectiveValues[field.id]?.trim())
-      if (missing) return `Cần khai: ${missing.label}.`
+      for (const field of fields) {
+        if (field.required && !effectiveValues[field.id]?.trim()) {
+          issues.push({
+            id: `field-${field.id}`,
+            message: `Cần khai đầy đủ trường bắt buộc: ${field.label}.`,
+          })
+        }
+      }
     }
+
     if (index === 3) {
-      const missing = components.find(
-        component => component.required && !documents[component.id]?.length,
-      )
-      if (missing) return `Thiếu: ${missing.label}.`
-      if (schema?.declarationMode === 'OFFICIAL_ATTACHMENTS') {
-        const unexplained = components.find(
-          component =>
-            !documents[component.id]?.length &&
-            (documentExemptions[component.id] || '').trim().length < 12,
-        )
-        if (unexplained) {
-          return `Đính kèm hoặc ghi căn cứ không phải nộp: ${unexplained.label}.`
+      for (const component of components) {
+        if (component.required && !documents[component.id]?.length) {
+          issues.push({
+            id: `doc-${component.id}`,
+            message: `Thiếu tệp đính kèm bắt buộc: ${component.label}.`,
+          })
+        } else if (
+          schema?.declarationMode === 'OFFICIAL_ATTACHMENTS' &&
+          !documents[component.id]?.length &&
+          (documentExemptions[component.id] || '').trim().length < 12
+        ) {
+          issues.push({
+            id: `exemption-${component.id}`,
+            message: `Đính kèm tệp hoặc ghi rõ căn cứ không phải nộp đối với: ${component.label}.`,
+          })
         }
       }
       if (files.length > CITIZEN_UPLOAD_MAX_FILES) {
-        return `Tối đa ${CITIZEN_UPLOAD_MAX_FILES} tệp đính kèm mỗi lần gửi.`
+        issues.push({
+          message: `Tối đa ${CITIZEN_UPLOAD_MAX_FILES} tệp đính kèm mỗi lần gửi.`,
+        })
       }
       if (files.some(entry => entry.file.size > CITIZEN_UPLOAD_MAX_FILE_BYTES)) {
-        return 'Mỗi tệp đính kèm không được vượt quá 8 MB.'
+        issues.push({
+          message: 'Mỗi tệp đính kèm không được vượt quá 8 MB.',
+        })
       }
       if (
         files.reduce((sum, entry) => sum + entry.file.size, 0) > CITIZEN_UPLOAD_MAX_TOTAL_BYTES
       ) {
-        return 'Tổng dung lượng tệp đính kèm không được vượt quá 9 MB.'
+        issues.push({
+          message: 'Tổng dung lượng tệp đính kèm không được vượt quá 9 MB.',
+        })
       }
     }
-    if (index === 4 && !delivery) return 'Chọn phương thức nhận kết quả.'
-    if (index === 4 && delivery === 'Bưu chính' && deliveryAddress.trim().length < 10) {
-      return 'Nhập đầy đủ địa chỉ nhận qua bưu chính.'
+
+    if (index === 4) {
+      if (!delivery) {
+        issues.push({
+          id: 'submission-delivery-method',
+          message: 'Chọn phương thức nhận kết quả giải quyết.',
+        })
+      }
+      if (delivery === 'Bưu chính' && deliveryAddress.trim().length < 10) {
+        issues.push({
+          id: 'submission-delivery-address',
+          message: 'Nhập đầy đủ địa chỉ nhận kết quả qua dịch vụ bưu chính (tối thiểu 10 ký tự).',
+        })
+      }
+      if (!confirmed) {
+        issues.push({
+          id: 'submission-confirm-checkbox',
+          message: 'Cần đánh dấu xác nhận chịu trách nhiệm về thông tin đã kê khai.',
+        })
+      }
+      if (!hasIntake) {
+        issues.push({
+          message:
+            'Cơ quan chưa có cán bộ tiếp nhận còn hiệu lực. Hồ sơ chưa được gửi; liên hệ quản trị viên để cấp tài khoản tiếp nhận.',
+        })
+      }
     }
-    if (index === 4 && !confirmed) return 'Cần xác nhận đã kiểm tra hồ sơ.'
-    if (index === 4 && !hasIntake) {
-      return 'Cơ quan chưa có cán bộ tiếp nhận còn hiệu lực. Hồ sơ chưa được gửi; liên hệ quản trị viên để cấp tài khoản tiếp nhận.'
-    }
-    return ''
+
+    return issues
+  }
+
+  function focusErrorSummary() {
+    window.setTimeout(() => {
+      const el = document.querySelector<HTMLElement>('.hcds-error-summary')
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      el?.focus({ preventScroll: true })
+    }, 30)
   }
 
   function go(index: number) {
     setStep(index)
-    setError('')
+    setValidationErrors([])
     setConfirmed(false)
     setKeys(null)
     document
@@ -676,9 +956,10 @@ export function CitizenApplicationForm({
       return
     }
     event.preventDefault()
-    const stageError = validateStage(step)
-    if (stageError) {
-      setError(stageError)
+    const stageIssues = validateStageItems(step)
+    if (stageIssues.length > 0) {
+      setValidationErrors(stageIssues)
+      focusErrorSummary()
       return
     }
     if (step < 4) {
@@ -686,17 +967,20 @@ export function CitizenApplicationForm({
       return
     }
     for (let index = 0; index < 4; index++) {
-      const issue = validateStage(index)
-      if (issue) {
-        go(index)
-        setError(issue)
+      const priorIssues = validateStageItems(index)
+      if (priorIssues.length > 0) {
+        setStep(index)
+        setConfirmed(false)
+        setKeys(null)
+        setValidationErrors(priorIssues)
+        focusErrorSummary()
         return
       }
     }
     const requestKeys = keys || savedKeys.current || createSubmissionKeys()
     setKeys(requestKeys)
     setBusy(true)
-    setError('')
+    setValidationErrors([])
     try {
       const declaration = Object.fromEntries(
         fields.map(field => [field.id, effectiveValues[field.id] || '']),
@@ -741,13 +1025,20 @@ export function CitizenApplicationForm({
           files.map(entry => encodeAttachment(entry.file, entry.componentId)),
         ),
       })
+      if (draft?.id) {
+        writeLocalDraftFiles(draft.id, {})
+      }
       onSubmitted(receipt)
     } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : 'Không gửi được hồ sơ. Thông tin đang nhập vẫn được giữ để thử lại.',
-      )
+      setValidationErrors([
+        {
+          message:
+            reason instanceof Error
+              ? reason.message
+              : 'Không gửi được hồ sơ. Thông tin đang nhập vẫn được giữ để thử lại.',
+        },
+      ])
+      focusErrorSummary()
     } finally {
       setBusy(false)
     }
@@ -756,40 +1047,62 @@ export function CitizenApplicationForm({
   return (
     <section className="citizen-form-page submission-wizard">
       <div className="citizen-page-heading">
-        <h1>Lập hồ sơ mới</h1>
+        <h1>Nộp hồ sơ dịch vụ công trực tuyến</h1>
         <p>
-          Chọn thủ tục, khai đúng trường hợp và kiểm tra giấy tờ trước khi gửi. Hồ sơ chỉ được tạo sau bước cuối.
+          Hoàn thành từng bước kê khai, đính kèm thành phần hồ sơ và kiểm tra tổng thể trước khi gửi chính thức.
         </p>
       </div>
 
-      <div className="profile-reuse">
-        <p>
-          {profile
-            ? 'Thông tin đã lưu được dùng để điền sẵn khi bạn tự nộp hồ sơ.'
-            : profileError
-              ? 'Chưa tải được thông tin cá nhân. Bạn có thể tự điền các trường bên dưới.'
-              : 'Đang tải thông tin cá nhân để điền sẵn…'}
-        </p>
-        <a href="/tai-khoan/thong-tin-ca-nhan">Xem, cập nhật thông tin cá nhân</a>
-      </div>
+      <div className="hcds-draft-bar">
+        <div className="hcds-draft-bar__info">
+          <span>
+            {profile
+              ? 'Thông tin công dân đã xác thực sẽ được tự động đồng bộ vào các trường tương ứng.'
+              : profileError
+                ? 'Chưa tải được hồ sơ cá nhân. Bạn có thể tự nhập đầy đủ các trường bên dưới.'
+                : 'Đang tải thông tin hồ sơ cá nhân để điền sẵn…'}
+          </span>
+          <a href="/tai-khoan/thong-tin-ca-nhan">Cập nhật hồ sơ cá nhân</a>
+        </div>
 
-      <div className="profile-reuse">
-        <button
-          type="button"
-          className="button secondary"
-          disabled={busy || draftLoading || !selectedCode}
-          onClick={() => void saveDraft()}
-        >
-          Lưu nháp vào tài khoản
-        </button>
-        <a href="/tai-khoan/ho-so-nhap">Hồ sơ nháp của tôi</a>
-        {draftLoading && <span role="status">Đang mở hồ sơ nháp…</span>}
+        <div className="hcds-draft-bar__actions">
+          <button
+            type="button"
+            className="button secondary"
+            disabled={busy || draftLoading || !selectedCode}
+            onClick={() => void saveDraft()}
+          >
+            <Save size={15} strokeWidth={1.75} aria-hidden="true" />
+            <span>Lưu nháp vào tài khoản</span>
+          </button>
+          <a href="/tai-khoan/ho-so-nhap">Hồ sơ nháp của tôi</a>
+          {draftLoading && <span role="status">Đang mở hồ sơ nháp…</span>}
+        </div>
       </div>
 
       {draftNotice && (
         <p className="citizen-success" role="status">
           {draftNotice}
         </p>
+      )}
+
+      {missingRestoredAttachments.length > 0 && (
+        <div className="hcds-amber-alert" role="status">
+          <div className="hcds-amber-alert__title">
+            <AlertTriangle size={18} strokeWidth={1.75} aria-hidden="true" />
+            <span>Cần chọn lại tệp đính kèm từ thiết bị cho hồ sơ nháp</span>
+          </div>
+          <p>
+            Để bảo vệ an toàn dữ liệu trên trình duyệt, tệp nhị phân không lưu tự động khi đóng trang. Hệ thống đã ghi nhận các tệp bạn từng chọn ở phiên trước — vui lòng đính kèm lại tại Bước 4:
+          </p>
+          <ul>
+            {missingRestoredAttachments.map(entry => (
+              <li key={entry.componentId}>
+                <b>{entry.label}:</b> {entry.fileNames.join(', ')}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <ol className="submission-steps" aria-label="Các bước lập hồ sơ">
@@ -799,7 +1112,7 @@ export function CitizenApplicationForm({
             aria-current={step === index ? 'step' : undefined}
             className={index === step ? 'current' : index < step ? 'completed' : ''}
           >
-            <span>{index + 1}</span>
+            <span className="tabular-nums">{index + 1}</span>
             {index < step ? (
               <button type="button" disabled={busy} onClick={() => go(index)}>
                 {title}
@@ -812,75 +1125,86 @@ export function CitizenApplicationForm({
       </ol>
 
       <p className="required-field-note">
-        Dấu sao màu đỏ (<RequiredMark />) ở cuối nhãn cho biết thông tin cần điền.
+        Dấu sao màu đỏ (<RequiredMark />) cho biết trường thông tin bắt buộc kê khai.
       </p>
 
-      <form className="citizen-application-form" onSubmit={proceed}>
+      <form className="citizen-application-form" noValidate onSubmit={proceed}>
+        <ErrorSummary errors={validationErrors} />
+
         {step === 0 && (
           <section className="citizen-form-section">
-            <h2>1. Chọn thủ tục và cơ quan</h2>
-            <label className="citizen-field" htmlFor="submission-procedure-search">
-              <span>Tìm theo mã, tên, lĩnh vực hoặc cơ quan</span>
-              <input
-                id="submission-procedure-search"
-                type="search"
-                value={query}
-                onChange={event => {
-                  setQuery(event.target.value)
-                  setLimit(10)
-                }}
-                placeholder="Nhập mã thủ tục, tên thủ tục hoặc tên Sở/ngành"
-              />
-            </label>
+            <h2>1. Chọn thủ tục hành chính và cơ quan tiếp nhận</h2>
 
             {!procedure && (
-              <div className="procedure-choice-list">
-                {loading || schemaLoading ? (
-                  <p role="status">Đang tải danh mục…</p>
-                ) : (
-                  <>
-                    {results.slice(0, limit).map(item => (
-                      <button
-                        type="button"
-                        key={item.code}
-                        onClick={() => changeProcedure(item.code)}
-                      >
-                        <span>
-                          <b>{item.name}</b>
-                          <small>
-                            {item.code} · {item.agency} · {serviceModeLabel(item.level)}
-                          </small>
-                        </span>
-                        <i>Chọn</i>
-                      </button>
-                    ))}
-                    {results.length > limit && (
-                      <button type="button" onClick={() => setLimit(current => current + 10)}>
-                        Xem thêm ({results.length - limit} thủ tục)
-                      </button>
-                    )}
-                    {!results.length && (
-                      <p>
-                        {initialProcedureCode &&
-                        !procedures.some(item => item.code === initialProcedureCode)
-                          ? 'Mã thủ tục trong đường dẫn không có trong danh mục. Hãy chọn lại.'
-                          : 'Không tìm thấy thủ tục phù hợp với từ khóa.'}
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
+              <>
+                <label className="citizen-field" htmlFor="submission-procedure-search">
+                  <span>Tìm theo mã, tên thủ tục, lĩnh vực hoặc cơ quan</span>
+                  <input
+                    id="submission-procedure-search"
+                    type="search"
+                    value={query}
+                    onChange={event => {
+                      setQuery(event.target.value)
+                      setLimit(10)
+                    }}
+                    placeholder="Nhập mã thủ tục (ví dụ: 2.000908), tên thủ tục hoặc tên Sở/ngành"
+                  />
+                </label>
+
+                <div className="procedure-choice-list">
+                  {loading || schemaLoading ? (
+                    <p role="status">Đang tải danh mục thủ tục…</p>
+                  ) : (
+                    <>
+                      {results.slice(0, limit).map(item => (
+                        <button
+                          type="button"
+                          key={item.code}
+                          onClick={() => changeProcedure(item.code)}
+                        >
+                          <span>
+                            <b>{item.name}</b>
+                            <small className="tabular-nums">
+                              {item.code} · {item.agency} · {serviceModeLabel(item.level)}
+                            </small>
+                          </span>
+                          <i>Chọn</i>
+                        </button>
+                      ))}
+                      {results.length > limit && (
+                        <button type="button" onClick={() => setLimit(current => current + 10)}>
+                          Xem thêm (<span className="tabular-nums">{results.length - limit}</span>{' '}
+                          thủ tục)
+                        </button>
+                      )}
+                      {!results.length && (
+                        <p>
+                          {initialProcedureCode &&
+                          !procedures.some(item => item.code === initialProcedureCode)
+                            ? 'Mã thủ tục trong đường dẫn không có trong danh mục. Hãy chọn lại.'
+                            : 'Không tìm thấy thủ tục phù hợp với từ khóa.'}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </>
             )}
 
             {procedure && (
               <>
                 <div className="selected-procedure">
                   <div>
-                    <small>
+                    <small className="tabular-nums">
                       {procedure.code} · {procedure.field}
                     </small>
                     <b>{procedure.name}</b>
-                    <span>{serviceModeLabel(procedure.level)}</span>
+                    <div>
+                      <ServiceLevelBadge
+                        level={procedure.level}
+                        serviceMode={procedure.serviceMode}
+                      />
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -892,30 +1216,33 @@ export function CitizenApplicationForm({
                 </div>
 
                 <div className="citizen-source-note">
-                  <b>Mức dịch vụ theo danh mục công bố</b>
+                  <b>Giải thích mức độ dịch vụ công (Nghị định 42/2022/NĐ-CP)</b>
                   <span>
                     {procedure.level === 'Toàn trình'
-                      ? 'Toàn trình: các bước có thể thực hiện trực tuyến theo quy trình công bố, gồm thanh toán nếu có và trả kết quả điện tử hoặc bưu chính.'
+                      ? 'Trực tuyến toàn trình (Nộp & nhận kết quả tại nhà): thực hiện trực tuyến toàn bộ các bước kê khai, thanh toán lệ phí (nếu có) và nhận kết quả điện tử hoặc qua bưu chính.'
                       : procedure.level === 'Một phần'
-                        ? 'Một phần: có thể nộp và theo dõi trực tuyến; một hoặc nhiều khâu cần thực hiện theo yêu cầu riêng của thủ tục.'
-                        : 'Chỉ cung cấp thông tin: thủ tục chỉ tra cứu thông tin và nộp trực tiếp tại Bộ phận Một cửa.'}
+                        ? 'Trực tuyến một phần: nộp và theo dõi hồ sơ trực tuyến; việc xuất trình bản chính hoặc nhận kết quả thực hiện theo quy định riêng của thủ tục.'
+                        : 'Cung cấp thông tin: tra cứu thành phần hồ sơ trên cổng và nộp trực tiếp tại Bộ phận Một cửa.'}
                   </span>
                 </div>
 
                 {schema ? (
                   <>
                     <p>
-                      <b>Biểu mẫu:</b> {schema.title}
+                      <b>Biểu mẫu điện tử:</b> {schema.title}
                     </p>
-                    {schema.deadlineText && (schema.deadlineText.length > 240 ? (
-                      <details className="submission-reference-details">
-                        <summary>Xem thông tin về thời hạn và cách thức thực hiện</summary>
-                        <p>{schema.deadlineText}</p>
-                      </details>
-                    ) : <p>{schema.deadlineText}</p>)}
-                    <p>{schema.feeText}</p>
+                    {schema.deadlineText &&
+                      (schema.deadlineText.length > 240 ? (
+                        <details className="submission-reference-details">
+                          <summary>Xem quy định về thời hạn và cách thức giải quyết</summary>
+                          <p className="tabular-nums">{schema.deadlineText}</p>
+                        </details>
+                      ) : (
+                        <p className="tabular-nums">{schema.deadlineText}</p>
+                      ))}
+                    <p className="tabular-nums">{schema.feeText}</p>
                     <a href={`/thu-tuc/${encodeURIComponent(procedure.code)}`}>
-                      Xem chi tiết thủ tục, thành phần hồ sơ và mẫu đơn
+                      Xem đầy đủ trình tự, thành phần hồ sơ và biểu mẫu gốc
                     </a>
                   </>
                 ) : (
@@ -925,9 +1252,12 @@ export function CitizenApplicationForm({
                 )}
 
                 <label className="citizen-field" htmlFor="submission-province">
-                  <span>Tỉnh, thành phố</span>
+                  <span>Tỉnh / Thành phố</span>
                   <input id="submission-province" value="Thành phố Hà Nội" readOnly />
                 </label>
+                <LockedFieldNotice>
+                  Đơn vị hành chính mặc định theo thẩm quyền giải quyết của Thành phố Hà Nội.
+                </LockedFieldNotice>
 
                 <label className="citizen-field" htmlFor="submission-agency">
                   <span>
@@ -941,6 +1271,7 @@ export function CitizenApplicationForm({
                     onChange={event => {
                       setAgency(event.target.value)
                       setValues(old => ({ ...old, registerAuthority: event.target.value }))
+                      setValidationErrors([])
                     }}
                     disabled={!matchingAgencies.length}
                   >
@@ -956,13 +1287,13 @@ export function CitizenApplicationForm({
                     ))}
                   </select>
                   <small>
-                    Chọn cơ quan thuộc tuyến của thủ tục. Việc gửi cần cán bộ tiếp nhận còn hiệu lực tại cơ quan đó. Với cấp bản sao, phải là cơ quan đang lưu sổ gốc.
+                    Chọn đúng cơ quan thuộc thẩm quyền của thủ tục. Đối với thủ tục cấp bản sao trích lục, chọn cơ quan đang lưu giữ sổ gốc.
                   </small>
                 </label>
 
                 {(!effectiveAgency || !hasIntake) && (
                   <p className="citizen-source-note">
-                    Hãy chọn cơ quan tiếp nhận để chuẩn bị hồ sơ theo biểu mẫu chính thức.
+                    Hãy chọn cơ quan tiếp nhận để khởi tạo tờ khai theo đúng thẩm quyền.
                   </p>
                 )}
               </>
@@ -972,7 +1303,7 @@ export function CitizenApplicationForm({
 
         {step === 1 && (
           <section className="citizen-form-section">
-            <h2>2. Người yêu cầu giải quyết</h2>
+            <h2>2. Thông tin người yêu cầu giải quyết</h2>
             <div className="citizen-applicant-type">
               <label>
                 <input
@@ -980,7 +1311,7 @@ export function CitizenApplicationForm({
                   checked={applicantType === 'citizen'}
                   onChange={() => chooseApplicant('citizen')}
                 />{' '}
-                Cá nhân
+                Cá nhân / Công dân
               </label>
               <label>
                 <input
@@ -988,7 +1319,7 @@ export function CitizenApplicationForm({
                   checked={applicantType === 'organization'}
                   onChange={() => chooseApplicant('organization')}
                 />{' '}
-                Tổ chức
+                Tổ chức / Doanh nghiệp
               </label>
             </div>
 
@@ -1001,25 +1332,31 @@ export function CitizenApplicationForm({
                     disabled={proxy || !profile}
                     onChange={event => toggleOwnInformation(event.target.checked)}
                   />
-                  Tôi là người yêu cầu, dùng thông tin cá nhân đã lưu
+                  Tôi là người yêu cầu, tự động điền thông tin từ hồ sơ cá nhân
                 </label>
               )}
               <p>
                 {proxy
-                  ? 'Bạn đang nộp thay. Khai thông tin người yêu cầu ở đây; thông tin tài khoản chỉ điền vào phần người nộp thay.'
+                  ? 'Bạn đang nộp thay theo ủy quyền. Nhập thông tin người được ủy quyền tại đây; thông tin tài khoản của bạn sẽ tự động điền vào mục Người nộp thay ở bước kế tiếp.'
                   : applicantType === 'organization'
-                    ? 'Khai tên và thông tin liên hệ của tổ chức; hệ thống không dùng thông tin cá nhân làm thông tin tổ chức.'
-                    : 'Thông tin điền sẵn vẫn có thể sửa riêng cho hồ sơ này.'}
+                    ? 'Nhập tên pháp nhân và đầu mối liên hệ của tổ chức.'
+                    : 'Bạn vẫn có thể điều chỉnh thông tin liên hệ riêng cho hồ sơ này nếu cần.'}
               </p>
             </div>
 
             <div className="citizen-form-grid">
-              <label className="citizen-field">
-                <span>
-                  {applicantType === 'citizen' ? 'Họ và tên người yêu cầu' : 'Tên tổ chức yêu cầu'}
-                  <RequiredMark />
+              <label className="citizen-field field-wide" htmlFor="applicant-contact-name">
+                <span className="hcds-field-label-row">
+                  <span>
+                    {applicantType === 'citizen' ? 'Họ và tên người yêu cầu' : 'Tên tổ chức yêu cầu'}
+                    <RequiredMark />
+                  </span>
+                  {isProfileSyncedContact('name') && (
+                    <VerifiedFieldBadge text="Đồng bộ từ hồ sơ cá nhân" />
+                  )}
                 </span>
                 <input
+                  id="applicant-contact-name"
                   value={contact.name}
                   onChange={event => changeContact('name', event.target.value)}
                   minLength={2}
@@ -1030,15 +1367,22 @@ export function CitizenApplicationForm({
               </label>
 
               <p id="contact-requirement" className="contact-requirement">
-                Số điện thoại hoặc email
+                Phương thức liên hệ bắt buộc
                 <RequiredMark />
-                <small>Điền ít nhất một trong hai để cơ quan liên hệ khi xử lý hồ sơ.</small>
+                <small>Cung cấp ít nhất số điện thoại hoặc email để nhận thông báo tiến độ và kết quả.</small>
               </p>
 
-              <label className="citizen-field">
-                <span>Số điện thoại</span>
+              <label className="citizen-field" htmlFor="applicant-contact-phone">
+                <span className="hcds-field-label-row">
+                  <span>Số điện thoại</span>
+                  {isProfileSyncedContact('phone') && (
+                    <VerifiedFieldBadge text="Đồng bộ từ hồ sơ cá nhân" />
+                  )}
+                </span>
                 <input
+                  id="applicant-contact-phone"
                   type="tel"
+                  className="tabular-nums"
                   value={contact.phone}
                   onChange={event => changeContact('phone', event.target.value)}
                   maxLength={40}
@@ -1047,9 +1391,15 @@ export function CitizenApplicationForm({
                 />
               </label>
 
-              <label className="citizen-field">
-                <span>Email</span>
+              <label className="citizen-field" htmlFor="applicant-contact-email">
+                <span className="hcds-field-label-row">
+                  <span>Địa chỉ Email</span>
+                  {isProfileSyncedContact('email') && (
+                    <VerifiedFieldBadge text="Đồng bộ từ hồ sơ cá nhân" />
+                  )}
+                </span>
                 <input
+                  id="applicant-contact-email"
                   type="email"
                   value={contact.email}
                   onChange={event => changeContact('email', event.target.value)}
@@ -1059,8 +1409,6 @@ export function CitizenApplicationForm({
                 />
               </label>
             </div>
-
-            <p>Các thông tin của thủ tục được khai ở bước tiếp theo.</p>
           </section>
         )}
 
@@ -1068,309 +1416,421 @@ export function CitizenApplicationForm({
           <section className="citizen-form-section">
             <h2>3. {schema?.title}</h2>
             {proxy && (
-              <p>
-                Bạn đang nộp thay theo ủy quyền.{' '}
+              <p className="citizen-source-note">
+                Bạn đang khai theo tư cách <b>Người nộp thay theo ủy quyền</b>.{' '}
                 <button type="button" className="text-button" onClick={() => go(1)}>
-                  Kiểm tra tên và liên hệ của người yêu cầu ở bước 2
+                  Kiểm tra lại thông tin người ủy quyền tại Bước 2
                 </button>
-                . Thông tin tài khoản chỉ dùng cho phần người nộp thay dưới đây.
+                .
               </p>
             )}
-            <p>{schema?.legalBasis}</p>
+            {schema?.legalBasis && <p>{schema.legalBasis}</p>}
             {schema?.declarationMode === 'OFFICIAL_ATTACHMENTS' && (
-              <p>
-                Tải biểu mẫu gốc ở bước Thành phần hồ sơ, điền đầy đủ, ký theo yêu cầu và đính kèm bản đã hoàn thiện. Nội dung bên dưới giúp cơ quan xác định yêu cầu của hồ sơ.
+              <p className="citizen-source-note">
+                Tải biểu mẫu gốc ở Bước 4 (Thành phần hồ sơ), kê khai đầy đủ, ký xác nhận theo quy định và đính kèm bản điện tử hoàn chỉnh.
               </p>
             )}
 
             <div className="citizen-form-grid">
-              {fields.map(field => (
-                <label
-                  className={`citizen-field${
-                    field.type === 'textarea' ||
-                    field.id === 'submissionRole' ||
-                    field.id === 'verificationMethod'
-                      ? ' field-wide'
-                      : ''
-                  }`}
-                  key={field.id}
-                >
-                  <span>
-                    {field.label}
-                    {field.required && <RequiredMark />}
-                  </span>
-                  {field.type === 'select' ? (
-                    <select
-                      required={field.required}
-                      value={effectiveValues[field.id] || ''}
-                      onChange={event => changeValue(field.id, event.target.value)}
-                    >
-                      <option value="">Chọn…</option>
-                      {field.options?.map(option => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  ) : field.type === 'textarea' ? (
-                    <textarea
-                      rows={4}
-                      required={field.required}
-                      maxLength={field.maxLength || 500}
-                      value={effectiveValues[field.id] || ''}
-                      onChange={event => changeValue(field.id, event.target.value)}
-                    />
-                  ) : (
-                    <input
-                      type={field.type || 'text'}
-                      readOnly={field.id === 'registerAuthority'}
-                      required={field.required}
-                      min={field.min}
-                      max={field.max}
-                      maxLength={field.maxLength || 500}
-                      value={effectiveValues[field.id] || ''}
-                      onChange={event => changeValue(field.id, event.target.value)}
-                    />
-                  )}
-                  {field.help && <small>{field.help}</small>}
-                </label>
-              ))}
+              {fields.map(field => {
+                const inputId = `field-${field.id}`
+                const isLocked = field.id === 'registerAuthority'
+                const isVerified = isProfileSyncedField(field.id)
+                return (
+                  <div
+                    className={`citizen-field${
+                      field.type === 'textarea' ||
+                      field.id === 'submissionRole' ||
+                      field.id === 'verificationMethod'
+                        ? ' field-wide'
+                        : ''
+                    }`}
+                    key={field.id}
+                  >
+                    <label htmlFor={inputId} className="hcds-field-label-row">
+                      <span>
+                        {field.label}
+                        {field.required && <RequiredMark />}
+                      </span>
+                      {isVerified && <VerifiedFieldBadge text="Đồng bộ từ hồ sơ cá nhân" />}
+                    </label>
+                    {field.type === 'select' ? (
+                      <select
+                        id={inputId}
+                        required={field.required}
+                        value={effectiveValues[field.id] || ''}
+                        onChange={event => changeValue(field.id, event.target.value)}
+                      >
+                        <option value="">Chọn…</option>
+                        {field.options?.map(option => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    ) : field.type === 'textarea' ? (
+                      <textarea
+                        id={inputId}
+                        rows={4}
+                        required={field.required}
+                        maxLength={field.maxLength || 500}
+                        value={effectiveValues[field.id] || ''}
+                        onChange={event => changeValue(field.id, event.target.value)}
+                      />
+                    ) : (
+                      <input
+                        id={inputId}
+                        type={field.type || 'text'}
+                        readOnly={isLocked}
+                        required={field.required}
+                        min={field.min}
+                        max={field.max}
+                        maxLength={field.maxLength || 500}
+                        value={effectiveValues[field.id] || ''}
+                        onChange={event => changeValue(field.id, event.target.value)}
+                      />
+                    )}
+                    {isLocked && (
+                      <LockedFieldNotice>
+                        Đồng bộ tự động theo cơ quan tiếp nhận đã chọn tại Bước 1.
+                      </LockedFieldNotice>
+                    )}
+                    {field.help && <small>{field.help}</small>}
+                  </div>
+                )
+              })}
             </div>
           </section>
         )}
 
         {step === 3 && (
           <section className="citizen-form-section">
-            <h2>4. Thành phần hồ sơ</h2>
-            <p>Đính kèm theo từng loại giấy tờ. {CITIZEN_UPLOAD_LIMIT_TEXT}</p>
+            <h2>4. Đính kèm thành phần hồ sơ</h2>
+            <p className="tabular-nums">
+              Đính kèm tệp điện tử tương ứng với từng thành phần giấy tờ. {CITIZEN_UPLOAD_LIMIT_TEXT}
+            </p>
+
+            <div className="citizen-source-note" role="note">
+              <b>Lưu ý khi lưu hồ sơ nháp:</b> Nội dung tờ khai và danh mục tên tệp đã chọn được lưu vào tài khoản. Tuy nhiên, nếu bạn đóng trình duyệt sau khi lưu nháp, bạn sẽ cần chọn lại tệp nhị phân từ thiết bị (hoặc từ kho tài liệu cá nhân) trước khi bấm gửi hồ sơ.
+            </div>
+
             {schema?.formSourceUrl && (
               <p>
                 <a href={schema.formSourceUrl} target="_blank" rel="noreferrer">
                   {schema.formSourceLabel ||
-                    'Xem thành phần hồ sơ và biểu mẫu trên nguồn chính thức ↗'}
+                    'Xem thành phần hồ sơ và tải biểu mẫu gốc trên Cổng chính thức'}
                 </a>
               </p>
             )}
 
-            {components.map(component => (
-              <div className="document-component" key={component.id}>
-                <label className="citizen-field">
-                  <b>
-                    {component.label}
-                    {component.required && <RequiredMark />}
-                  </b>
-                  {component.help && <small>{component.help}</small>}
-                  {component.officialAttachmentNames?.length ? (
-                    <small>
-                      Mẫu được nguồn chính thức liệt kê:{' '}
-                      {component.officialAttachmentNames.join('; ')}. Mở trang thủ tục chính thức ở trên để xem hoặc tải nếu được cung cấp.
-                    </small>
-                  ) : null}
-                  <span className="file-picker-control">
-                    Chọn tệp đính kèm
-                    <input
-                      type="file"
-                      aria-required={component.required || undefined}
-                      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                      multiple
-                      onChange={event => {
-                        setDocuments(old => ({
-                          ...old,
-                          [component.id]: Array.from(event.target.files || []),
-                        }))
-                        setKeys(null)
-                      }}
-                    />
-                  </span>
-                </label>
+            {components.map(component => {
+              const previouslyChosen = restoredAttachmentNames[component.id] || []
+              const currentlyChosen = documents[component.id] || []
+              const needsReselect = previouslyChosen.length > 0 && currentlyChosen.length === 0
 
-                {component.officialAttachments?.map(attachment => (
-                  <p key={attachment.id}>
-                    <a
-                      className="text-link"
-                      href={attachment.url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Tải {attachment.name}
-                    </a>
-                  </p>
-                ))}
-
-                <button
-                  type="button"
-                  className="text-button"
-                  disabled={libraryLoading}
-                  onClick={() => void openDocumentLibrary(component.id)}
-                >
-                  Chọn từ tài liệu đã nộp
-                </button>
-
-                {libraryComponent === component.id && (
-                  <div className="profile-reuse">
-                    <p>
-                      Chọn đúng giấy tờ còn giá trị sử dụng cho thành phần này. Việc dùng lại không thay thế kiểm tra của cơ quan.
-                    </p>
-                    {libraryLoading ? (
-                      <span role="status">Đang tải tài liệu…</span>
-                    ) : libraryDocuments.length ? (
-                      <>
-                        <label className="citizen-field">
-                          <span>Tài liệu trong tài khoản</span>
-                          <select
-                            value={librarySelection}
-                            onChange={event => setLibrarySelection(event.target.value)}
-                          >
-                            <option value="">Chọn tài liệu</option>
-                            {libraryDocuments.map(item => (
-                              <option value={item.id} key={item.id}>
-                                {item.name} · {item.code}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                        <button
-                          type="button"
-                          className="button secondary"
-                          disabled={!librarySelection}
-                          onClick={() => void reuseDocument()}
-                        >
-                          Dùng tài liệu này
-                        </button>
-                      </>
-                    ) : (
-                      <p>Chưa có tài liệu trong tài khoản.</p>
-                    )}
-                    {libraryError && (
-                      <p role="alert" className="form-error">
-                        {libraryError}
-                      </p>
-                    )}
-                    <button
-                      type="button"
-                      className="text-button"
-                      disabled={libraryLoading}
-                      onClick={() => setLibraryComponent('')}
-                    >
-                      Đóng
-                    </button>
-                  </div>
-                )}
-
-                {(documents[component.id] || []).map((file, fileIndex) => (
-                  <div className="selected-document" key={`${file.name}-${fileIndex}`}>
-                    <span>
-                      {file.name} · {(file.size / 1024).toFixed(0)} KB
-                    </span>
-                    <button
-                      type="button"
-                      className="text-button"
-                      onClick={() =>
-                        setDocuments(old => ({
-                          ...old,
-                          [component.id]: old[component.id].filter((_, idx) => fileIndex !== idx),
-                        }))
-                      }
-                    >
-                      Gỡ
-                    </button>
-                  </div>
-                ))}
-
-                {schema?.declarationMode === 'OFFICIAL_ATTACHMENTS' &&
-                  !documents[component.id]?.length && (
-                    <label className="citizen-field">
-                      <span>Căn cứ không phải nộp / cơ quan khai thác dữ liệu</span>
-                      <textarea
-                        rows={2}
-                        minLength={12}
-                        maxLength={1200}
-                        value={documentExemptions[component.id] || ''}
-                        onChange={event => {
-                          setDocumentExemptions(old => ({
-                            ...old,
-                            [component.id]: event.target.value,
-                          }))
-                          setKeys(null)
-                        }}
-                        placeholder="Ghi rõ trường hợp không áp dụng hoặc nguồn dữ liệu cơ quan được khai thác."
-                      />
+              return (
+                <div className="hcds-doc-flat-item" key={component.id}>
+                  <div className="citizen-field">
+                    <label htmlFor={`doc-${component.id}`}>
+                      <b>
+                        {component.label}
+                        {component.required && <RequiredMark />}
+                      </b>
                     </label>
+                    {component.help && <small>{component.help}</small>}
+                    {component.officialAttachmentNames?.length ? (
+                      <small>
+                        Biểu mẫu theo quy định:{' '}
+                        {component.officialAttachmentNames.join('; ')}.
+                      </small>
+                    ) : null}
+
+                    {needsReselect && (
+                      <div className="hcds-amber-alert" role="status">
+                        <div className="hcds-amber-alert__title">
+                          <AlertTriangle size={16} strokeWidth={1.75} aria-hidden="true" />
+                          <span>
+                            Tệp đã chọn trước khi đóng nháp (vui lòng chọn lại):{' '}
+                            {previouslyChosen.join(', ')}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="hcds-draft-bar__actions">
+                      <label className="file-picker-control" htmlFor={`doc-${component.id}`}>
+                        <Upload size={15} strokeWidth={1.75} aria-hidden="true" />
+                        <span>Chọn tệp từ thiết bị</span>
+                        <input
+                          id={`doc-${component.id}`}
+                          type="file"
+                          aria-required={component.required || undefined}
+                          accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                          multiple
+                          onChange={event => {
+                            const selectedFiles = Array.from(event.target.files || [])
+                            setDocuments(old => ({
+                              ...old,
+                              [component.id]: selectedFiles,
+                            }))
+                            setValidationErrors([])
+                            setKeys(null)
+                          }}
+                        />
+                      </label>
+
+                      <button
+                        type="button"
+                        className="button secondary"
+                        disabled={libraryLoading}
+                        onClick={() => void openDocumentLibrary(component.id)}
+                      >
+                        <FolderOpen size={15} strokeWidth={1.75} aria-hidden="true" />
+                        <span>Chọn từ kho tài liệu đã nộp</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {component.officialAttachments?.map(attachment => (
+                    <p key={attachment.id}>
+                      <a
+                        className="text-link"
+                        href={attachment.url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <FileText size={14} strokeWidth={1.75} aria-hidden="true" /> Tải mẫu:{' '}
+                        {attachment.name}
+                      </a>
+                    </p>
+                  ))}
+
+                  {libraryComponent === component.id && (
+                    <div className="profile-reuse">
+                      <p>
+                        Chọn tài liệu điện tử còn hiệu lực trong tài khoản của bạn để tái sử dụng cho thành phần hồ sơ này.
+                      </p>
+                      {libraryLoading ? (
+                        <span role="status">Đang tải danh sách tài liệu…</span>
+                      ) : libraryDocuments.length ? (
+                        <>
+                          <label
+                            className="citizen-field"
+                            htmlFor={`library-select-${component.id}`}
+                          >
+                            <span>Tài liệu lưu trong tài khoản</span>
+                            <select
+                              id={`library-select-${component.id}`}
+                              value={librarySelection}
+                              onChange={event => setLibrarySelection(event.target.value)}
+                            >
+                              <option value="">Chọn tài liệu</option>
+                              {libraryDocuments.map(item => (
+                                <option value={item.id} key={item.id}>
+                                  {item.name} · {item.code}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <button
+                            type="button"
+                            className="button secondary"
+                            disabled={!librarySelection}
+                            onClick={() => void reuseDocument()}
+                          >
+                            Đính kèm tài liệu này
+                          </button>
+                        </>
+                      ) : (
+                        <p>Chưa có tài liệu nào được lưu trong kho cá nhân.</p>
+                      )}
+                      {libraryError && (
+                        <p role="alert" className="form-error">
+                          {libraryError}
+                        </p>
+                      )}
+                      <button
+                        type="button"
+                        className="text-button"
+                        disabled={libraryLoading}
+                        onClick={() => setLibraryComponent('')}
+                      >
+                        Đóng kho tài liệu
+                      </button>
+                    </div>
                   )}
-              </div>
-            ))}
+
+                  {currentlyChosen.map((file, fileIndex) => (
+                    <div className="selected-document" key={`${file.name}-${fileIndex}`}>
+                      <span className="tabular-nums">
+                        {file.name} · {(file.size / 1024).toFixed(0)} KB
+                      </span>
+                      <button
+                        type="button"
+                        className="text-button"
+                        onClick={() =>
+                          setDocuments(old => ({
+                            ...old,
+                            [component.id]: old[component.id].filter((_, idx) => fileIndex !== idx),
+                          }))
+                        }
+                      >
+                        <Trash2 size={14} strokeWidth={1.75} aria-hidden="true" /> Gỡ tệp
+                      </button>
+                    </div>
+                  ))}
+
+                  {schema?.declarationMode === 'OFFICIAL_ATTACHMENTS' &&
+                    !currentlyChosen.length && (
+                      <label className="citizen-field" htmlFor={`exemption-${component.id}`}>
+                        <span>Căn cứ không phải nộp / cơ quan khai thác dữ liệu có sẵn</span>
+                        <textarea
+                          id={`exemption-${component.id}`}
+                          rows={2}
+                          minLength={12}
+                          maxLength={1200}
+                          value={documentExemptions[component.id] || ''}
+                          onChange={event => {
+                            setDocumentExemptions(old => ({
+                              ...old,
+                              [component.id]: event.target.value,
+                            }))
+                            setValidationErrors([])
+                            setKeys(null)
+                          }}
+                          placeholder="Ghi rõ trường hợp không áp dụng hoặc nguồn cơ sở dữ liệu quốc gia cơ quan được khai thác."
+                        />
+                      </label>
+                    )}
+                </div>
+              )
+            })}
           </section>
         )}
 
         {step === 4 && (
           <section className="citizen-form-section">
-            <h2>5. Kiểm tra hồ sơ và chọn cách nhận kết quả</h2>
-            <div className="submission-review">
-              <h3>{procedure?.name}</h3>
-              <p>
-                {selectedCode} · {serviceModeLabel(procedure?.level || '')}
-              </p>
-              <dl>
-                <div>
-                  <dt>Cơ quan tiếp nhận</dt>
-                  <dd>{effectiveAgency}</dd>
-                </div>
-                <div>
-                  <dt>Người yêu cầu</dt>
-                  <dd>{contact.name}</dd>
-                </div>
-                <div>
-                  <dt>Liên hệ</dt>
-                  <dd>{[contact.phone, contact.email].filter(Boolean).join(' · ')}</dd>
-                </div>
-                {fields.map(field => (
-                  <div key={field.id}>
-                    <dt>{field.label}</dt>
-                    <dd>{effectiveValues[field.id] || 'Không khai'}</dd>
-                  </div>
-                ))}
-              </dl>
-              <h3>Giấy tờ gửi kèm</h3>
-              {components.map(component => (
-                <p key={component.id}>
-                  <b>{component.label}:</b>{' '}
-                  {(documents[component.id] || []).map(file => file.name).join(', ') ||
-                    documentExemptions[component.id] ||
-                    'Không đính kèm'}
-                </p>
-              ))}
-            </div>
+            <h2>5. Kiểm tra nội dung kê khai và xác nhận gửi hồ sơ</h2>
+            <p>
+              Đối chiếu kỹ từng mục dưới đây. Bấm <b>Thay đổi</b> tại dòng tương ứng nếu cần quay lại chỉnh sửa.
+            </p>
 
-            <label className="citizen-field">
+            <dl className="hcds-kv-list" aria-label="Bảng kiểm tra thông tin hồ sơ trước khi gửi">
+              <div className="hcds-kv-row">
+                <dt>Thủ tục hành chính</dt>
+                <dd>
+                  <b>{procedure?.name}</b>{' '}
+                  <span className="tabular-nums">({selectedCode})</span>
+                </dd>
+                <dd className="hcds-kv-action">
+                  <button type="button" className="text-button" onClick={() => go(0)}>
+                    Thay đổi
+                  </button>
+                </dd>
+              </div>
+
+              <div className="hcds-kv-row">
+                <dt>Cơ quan tiếp nhận</dt>
+                <dd>{effectiveAgency}</dd>
+                <dd className="hcds-kv-action">
+                  <button type="button" className="text-button" onClick={() => go(0)}>
+                    Thay đổi
+                  </button>
+                </dd>
+              </div>
+
+              <div className="hcds-kv-row">
+                <dt>Người yêu cầu</dt>
+                <dd>
+                  {contact.name} (
+                  {applicantType === 'organization' ? 'Tổ chức / Doanh nghiệp' : 'Cá nhân'})
+                </dd>
+                <dd className="hcds-kv-action">
+                  <button type="button" className="text-button" onClick={() => go(1)}>
+                    Thay đổi
+                  </button>
+                </dd>
+              </div>
+
+              <div className="hcds-kv-row">
+                <dt>Thông tin liên hệ</dt>
+                <dd className="tabular-nums">
+                  {[contact.phone, contact.email].filter(Boolean).join(' · ') || 'Chưa cung cấp'}
+                </dd>
+                <dd className="hcds-kv-action">
+                  <button type="button" className="text-button" onClick={() => go(1)}>
+                    Thay đổi
+                  </button>
+                </dd>
+              </div>
+
+              {fields.map(field => (
+                <div className="hcds-kv-row" key={field.id}>
+                  <dt>{field.label}</dt>
+                  <dd>{effectiveValues[field.id] || 'Không kê khai'}</dd>
+                  <dd className="hcds-kv-action">
+                    <button type="button" className="text-button" onClick={() => go(2)}>
+                      Thay đổi
+                    </button>
+                  </dd>
+                </div>
+              ))}
+
+              {components.map(component => (
+                <div className="hcds-kv-row" key={component.id}>
+                  <dt>{component.label}</dt>
+                  <dd>
+                    {(documents[component.id] || []).map(file => file.name).join(', ') ||
+                      documentExemptions[component.id] ||
+                      'Không đính kèm'}
+                  </dd>
+                  <dd className="hcds-kv-action">
+                    <button type="button" className="text-button" onClick={() => go(3)}>
+                      Thay đổi
+                    </button>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            <label className="citizen-field" htmlFor="submission-delivery-method">
               <span>
-                Phương thức nhận kết quả
+                Phương thức nhận kết quả giải quyết
                 <RequiredMark />
               </span>
               <select
+                id="submission-delivery-method"
                 required
                 value={delivery}
                 onChange={event => {
                   setDelivery(event.target.value)
+                  setValidationErrors([])
                   setKeys(null)
                 }}
               >
-                <option value="">Chọn cách nhận</option>
+                <option value="">Chọn phương thức nhận kết quả</option>
                 {schema?.deliveryMethods.map(method => (
                   <option key={method} value={method}>
                     {method}
                   </option>
                 ))}
               </select>
-              <small>{schema?.deliveryNote}</small>
+              {schema?.deliveryNote && <small>{schema.deliveryNote}</small>}
             </label>
 
             {delivery === 'Bưu chính' && (
-              <label className="citizen-field">
-                <span>
-                  Địa chỉ nhận kết quả
-                  <RequiredMark />
-                </span>
+              <div className="citizen-field">
+                <label htmlFor="submission-delivery-address" className="hcds-field-label-row">
+                  <span>
+                    Địa chỉ nhận kết quả qua dịch vụ bưu chính
+                    <RequiredMark />
+                  </span>
+                  {isProfileSyncedDelivery() && (
+                    <VerifiedFieldBadge text="Đồng bộ từ hồ sơ cá nhân" />
+                  )}
+                </label>
                 <textarea
+                  id="submission-delivery-address"
                   required
                   minLength={10}
                   maxLength={500}
@@ -1379,43 +1839,42 @@ export function CitizenApplicationForm({
                     edited.current.delivery = true
                     setDeliveryAddress(event.target.value)
                     setConfirmed(false)
+                    setValidationErrors([])
                     setKeys(null)
                   }}
                 />
-              </label>
+              </div>
             )}
 
-            <p>{schema?.feeText}</p>
+            {schema?.feeText && <p className="tabular-nums">{schema.feeText}</p>}
 
-            <label className="citizen-consent">
+            <label className="citizen-consent" htmlFor="submission-confirm-checkbox">
               <input
+                id="submission-confirm-checkbox"
                 type="checkbox"
                 required
                 checked={confirmed}
-                onChange={event => setConfirmed(event.target.checked)}
+                onChange={event => {
+                  setConfirmed(event.target.checked)
+                  setValidationErrors([])
+                }}
               />
               <span>
-                Tôi đã kiểm tra tờ khai, giấy tờ và cơ quan; chịu trách nhiệm về thông tin đã khai.
+                Tôi cam đoan toàn bộ thông tin kê khai và tài liệu đính kèm là đúng sự thật, chịu trách nhiệm trước pháp luật về nội dung hồ sơ.
                 <RequiredMark />
               </span>
             </label>
 
             {!hasIntake && (
               <p className="form-error">
-                Cơ quan chưa có tài khoản tiếp nhận còn hiệu lực. Bạn đã chuẩn bị hồ sơ nhưng chưa thể gửi; cần đơn vị quản trị cấp tài khoản tiếp nhận.
+                Cơ quan chưa có tài khoản tiếp nhận còn hiệu lực. Bạn có thể lưu nháp hồ sơ và gửi lại sau khi đơn vị hoàn tất phân quyền tiếp nhận.
               </p>
             )}
 
-            <p>
-              Gửi hồ sơ vào hàng đợi kiểm tra. Việc gửi thành công chưa phải là xác nhận đã tiếp nhận hợp lệ.
+            <p className="citizen-source-note">
+              Hồ sơ sau khi gửi sẽ được cấp Mã hồ sơ và chuyển vào hàng đợi kiểm tra tính đầy đủ, hợp lệ của Bộ phận Một cửa.
             </p>
           </section>
-        )}
-
-        {error && (
-          <div className="form-error" role="alert">
-            {error}
-          </div>
         )}
 
         <div className="citizen-form-actions">
@@ -1426,7 +1885,7 @@ export function CitizenApplicationForm({
               disabled={busy}
               onClick={() => go(step - 1)}
             >
-              Quay lại
+              Quay lại bước trước
             </button>
           )}
           <button
@@ -1442,10 +1901,10 @@ export function CitizenApplicationForm({
                   procedure?.serviceMode === 'INFORMATION'))
             }
           >
-            {busy ? 'Đang lưu hồ sơ…' : step === 4 ? 'Xác nhận và gửi hồ sơ' : 'Tiếp tục'}
+            {busy ? 'Đang gửi hồ sơ…' : step === 4 ? 'Xác nhận và gửi hồ sơ' : 'Tiếp tục'}
           </button>
-          <span>
-            Bước {step + 1} / 5 · {step < 4 ? 'Chưa gửi hồ sơ' : 'Chỉ gửi khi bạn xác nhận'}
+          <span className="tabular-nums">
+            Bước {step + 1} / 5 · {step < 4 ? 'Chưa gửi hồ sơ' : 'Chỉ gửi khi xác nhận'}
           </span>
         </div>
       </form>

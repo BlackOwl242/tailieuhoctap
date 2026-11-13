@@ -1,7 +1,12 @@
+import { ChevronRight } from 'lucide-react'
+import type { CSSProperties } from 'react'
+import { PanelHeading, StatusTag, type SemanticTone } from './design-system'
 import type { ResolvedIndex766, ResolvedPeriodBalance } from './portalUtils'
 
+export type Index766PillarKey = keyof Omit<ResolvedIndex766, 'total' | 'classification'>
+
 const PILLARS: {
-  key: keyof Omit<ResolvedIndex766, 'total' | 'classification'>
+  key: Index766PillarKey
   label: string
   max: number
   note: string
@@ -38,45 +43,107 @@ const PILLARS: {
   },
 ]
 
+function classificationTone(total: number): SemanticTone {
+  if (total >= 80) return 'success'
+  if (total >= 70) return 'info'
+  if (total >= 50) return 'warning'
+  return 'danger'
+}
+
+function pillarBarTone(pct: number): 'high' | 'good' | 'warn' | 'low' {
+  if (pct >= 85) return 'high'
+  if (pct >= 70) return 'good'
+  if (pct >= 50) return 'warn'
+  return 'low'
+}
+
 export function Index766Panel({
   summary,
   subtitle,
+  onSelectPillar,
 }: {
   summary: ResolvedIndex766
   subtitle?: string
+  onSelectPillar?: (key: string) => void
 }) {
   return (
     <section className="panel index766-panel" aria-labelledby="index766-heading">
-      <div className="ops-panel-heading">
-        <div>
-          <h2 id="index766-heading">
-            Bộ chỉ số phục vụ người dân, doanh nghiệp (Quyết định 766/QĐ-TTg)
-          </h2>
-          {subtitle && <p>{subtitle}</p>}
-        </div>
-        <div className="index766-total-badge">
-          <small>Tổng điểm / 100</small>
-          <b className="tabular-nums">{summary.total.toFixed(1)}</b>
-          <span>{summary.classification}</span>
-        </div>
-      </div>
+      <PanelHeading
+        id="index766-heading"
+        title="Bộ chỉ số phục vụ người dân, doanh nghiệp (Quyết định 766/QĐ-TTg)"
+        description={subtitle}
+        actions={
+          <div className="hcds-766-summary" aria-label="Điểm tổng hợp Quyết định 766">
+            <div className="hcds-766-summary__score">
+              <span className="hcds-766-summary__label">Tổng điểm / 100</span>
+              <strong className="hcds-766-summary__value tabular-nums">
+                {summary.total.toFixed(1)}
+              </strong>
+            </div>
+            <StatusTag
+              tone={classificationTone(summary.total)}
+              label={summary.classification}
+            />
+          </div>
+        }
+      />
 
-      <div className="index766-grid">
+      <div className="hcds-766-pillars">
         {PILLARS.map(pillar => {
           const score = summary[pillar.key]
-          const pct = Math.min(100, Math.round((score / pillar.max) * 100))
-          return (
-            <article className="index766-card" key={pillar.key}>
-              <div className="index766-card-head">
-                <span>{pillar.label}</span>
-                <strong className="tabular-nums">
-                  {score.toFixed(1)} / {pillar.max}
+          const pct = Math.max(0, Math.min(100, Math.round((score / pillar.max) * 100)))
+          const barTone = pillarBarTone(pct)
+          const barStyle = { '--bar-pct': `${pct}%` } as CSSProperties
+
+          const content = (
+            <>
+              <div className="hcds-766-pillar__head">
+                <span className="hcds-766-pillar__title">{pillar.label}</span>
+                <strong className="hcds-766-pillar__score tabular-nums">
+                  {score.toFixed(1)}
+                  <span className="hcds-766-pillar__max"> / {pillar.max}</span>
                 </strong>
               </div>
-              <div className="index766-bar" aria-hidden="true">
-                <i style={{ width: `${pct}%` }} />
+
+              <div className="hcds-766-pillar__meter">
+                <div
+                  className={`hcds-766-bar hcds-766-bar--${barTone}`}
+                  style={barStyle}
+                  aria-hidden="true"
+                >
+                  <span className="hcds-766-bar__fill" />
+                </div>
+                <span className="hcds-766-pillar__pct tabular-nums">{pct}%</span>
               </div>
-              <small>{pillar.note}</small>
+
+              <div className="hcds-766-pillar__foot">
+                <span className="hcds-766-pillar__note">{pillar.note}</span>
+                {onSelectPillar && (
+                  <span className="hcds-766-pillar__drill">
+                    <span>Chi tiết</span>
+                    <ChevronRight size={14} strokeWidth={1.75} aria-hidden="true" />
+                  </span>
+                )}
+              </div>
+            </>
+          )
+
+          if (onSelectPillar) {
+            return (
+              <button
+                type="button"
+                key={pillar.key}
+                className="hcds-766-pillar hcds-766-pillar--interactive"
+                onClick={() => onSelectPillar(pillar.key)}
+              >
+                {content}
+              </button>
+            )
+          }
+
+          return (
+            <article className="hcds-766-pillar" key={pillar.key}>
+              {content}
             </article>
           )
         })}
@@ -92,20 +159,37 @@ export function PeriodBalancePanel({
   balance: ResolvedPeriodBalance
   subtitle?: string
 }) {
-  const cells: { label: string; value: number; note: string; tone?: string }[] = [
-    { label: 'Tồn đầu kỳ', value: balance.opening, note: 'Chuyển từ kỳ trước' },
-    { label: 'Nhận trong kỳ', value: balance.received, note: 'Phát sinh mới' },
+  const totalResolved = balance.resolvedOnTime + balance.resolvedOverdue
+  const onTimeRate =
+    totalResolved > 0 ? Math.round((balance.resolvedOnTime / totalResolved) * 100) : 100
+
+  const cells: {
+    label: string
+    value: number
+    note: string
+    tone?: SemanticTone
+  }[] = [
+    {
+      label: 'Tồn đầu kỳ',
+      value: balance.opening,
+      note: 'Chuyển từ kỳ trước',
+    },
+    {
+      label: 'Nhận trong kỳ',
+      value: balance.received,
+      note: 'Phát sinh mới',
+    },
     {
       label: 'Đúng hạn',
       value: balance.resolvedOnTime,
       note: 'Hoàn thành trước & đúng hạn',
-      tone: 'green',
+      tone: 'success',
     },
     {
       label: 'Quá hạn',
       value: balance.resolvedOverdue,
       note: 'Hoàn thành trễ hạn',
-      tone: balance.resolvedOverdue > 0 ? 'red' : undefined,
+      tone: balance.resolvedOverdue > 0 ? 'danger' : 'neutral',
     },
     {
       label: 'Dừng / Từ chối',
@@ -116,30 +200,40 @@ export function PeriodBalancePanel({
       label: 'Tồn cuối kỳ',
       value: balance.closing,
       note: 'Đang giải quyết chuyển kỳ sau',
-      tone: 'blue',
+      tone: 'info',
     },
   ]
 
   return (
     <section className="panel period-balance-panel" aria-labelledby="period-balance-heading">
-      <div className="ops-panel-heading">
-        <div>
-          <h2 id="period-balance-heading">
-            Báo cáo cân đối hồ sơ trong kỳ (Thông tư 09/2026/TT-BTP)
-          </h2>
-          {subtitle && <p>{subtitle}</p>}
-        </div>
-      </div>
+      <PanelHeading
+        id="period-balance-heading"
+        title="Báo cáo cân đối hồ sơ trong kỳ (Thông tư 09/2026/TT-BTP)"
+        description={subtitle}
+        actions={
+          <StatusTag
+            tone={balance.resolvedOverdue > 0 ? 'warning' : 'success'}
+            label={
+              totalResolved > 0
+                ? `Đúng hạn: ${onTimeRate}% (${balance.resolvedOnTime.toLocaleString('vi-VN')}/${totalResolved.toLocaleString('vi-VN')})`
+                : 'Chưa phát sinh hồ sơ kết thúc trong kỳ'
+            }
+            className="tabular-nums"
+          />
+        }
+      />
 
-      <div className="period-balance-grid">
+      <div className="hcds-balance-ledger">
         {cells.map(cell => (
           <article
-            className={`period-balance-cell${cell.tone ? ` tone-${cell.tone}` : ''}`}
+            className={`hcds-balance-cell${cell.tone ? ` hcds-balance-cell--${cell.tone}` : ''}`}
             key={cell.label}
           >
-            <small>{cell.label}</small>
-            <b className="tabular-nums">{cell.value.toLocaleString('vi-VN')}</b>
-            <span>{cell.note}</span>
+            <span className="hcds-balance-cell__label">{cell.label}</span>
+            <strong className="hcds-balance-cell__value tabular-nums">
+              {cell.value.toLocaleString('vi-VN')}
+            </strong>
+            <span className="hcds-balance-cell__note">{cell.note}</span>
           </article>
         ))}
       </div>

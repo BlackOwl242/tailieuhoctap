@@ -1,7 +1,9 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import type { ApiRequest, Procedure } from './types'
+import { ArrowLeft, Download, ExternalLink, FilePlus2, Printer } from 'lucide-react'
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react'
+import { LockedFieldNotice, ServiceLevelBadge, SummaryBox } from './design-system'
 import { normalizeAgency, procedureAgencies } from './procedureAgencies'
 import { serviceModeLabel } from './procedureLabels'
+import type { ApiRequest, Procedure } from './types'
 import './ProcedureDetail.css'
 
 type Named = {
@@ -115,7 +117,15 @@ function Block({ id, title, children }: { id: string; title: string; children: R
   )
 }
 
-function Fact({ label, children, wide = false }: { label: string; children: ReactNode; wide?: boolean }) {
+function Fact({
+  label,
+  children,
+  wide = false,
+}: {
+  label: string
+  children: ReactNode
+  wide?: boolean
+}) {
   return (
     <div className={wide ? 'procedure-info-fact wide' : 'procedure-info-fact'}>
       <dt>{label}</dt>
@@ -135,10 +145,10 @@ function duration(method: Method): string {
 function Fees({ fees }: { fees?: Fee[] }) {
   if (!fees?.length) return <span>Chưa có thông tin</span>
   return (
-    <div className="procedure-fees">
+    <div className="procedure-fees tabular-nums">
       {fees.map((fee, index) => (
         <div key={index}>
-          <b>
+          <b className="tabular-nums">
             {fee.type === 'CHARGE' ? 'Lệ phí' : 'Phí'}:{' '}
             {fee.value === 0
               ? fee.description?.trim()
@@ -155,8 +165,57 @@ function Fees({ fees }: { fees?: Fee[] }) {
   )
 }
 
+function summarizeDuration(detail: OfficialDetail | null, procedure: Procedure): string {
+  const onlineOrFirst =
+    detail?.methods.find(item => item.submissionMethod === 'ONLINE') || detail?.methods[0]
+  if (onlineOrFirst) {
+    const formatted = duration(onlineOrFirst)
+    if (formatted !== 'Chưa công bố') return formatted
+  }
+  if (procedure.submission?.deadlineText) {
+    const snippet = plain(procedure.submission.deadlineText)
+    return snippet.length > 96 ? `${snippet.slice(0, 96)}…` : snippet
+  }
+  return 'Theo quy định từng trường hợp'
+}
+
+function summarizeFee(detail: OfficialDetail | null, procedure: Procedure): string {
+  const allFees = (detail?.methods || []).flatMap(method => method.fees || [])
+  if (allFees.length > 0) {
+    const first = allFees[0]
+    if (first.value === 0) {
+      return first.description?.trim() ? 'Theo biểu mức thu quy định' : 'Miễn phí (0 đồng)'
+    }
+    if (first.value !== undefined && first.value !== null) {
+      return `${first.value.toLocaleString('vi-VN')} ${first.currencyName || 'đồng'}`
+    }
+    return 'Theo quy định pháp luật'
+  }
+  if (procedure.submission?.feeText) {
+    const snippet = plain(procedure.submission.feeText)
+    return snippet.length > 96 ? `${snippet.slice(0, 96)}…` : snippet
+  }
+  return 'Xem chi tiết tại bảng Cách thức thực hiện'
+}
+
 function isAbortError(reason: unknown): boolean {
   return reason instanceof DOMException && reason.name === 'AbortError'
+}
+
+function handleSpaNavigation(event: MouseEvent<HTMLAnchorElement>, href: string) {
+  if (
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return
+  }
+  event.preventDefault()
+  window.history.pushState({}, '', href)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 export function CitizenProcedureDetail({
@@ -268,7 +327,11 @@ export function CitizenProcedureDetail({
           <button type="button" className="button secondary" onClick={retry}>
             Thử lại
           </button>
-          <a href="/thu-tuc" className="button secondary">
+          <a
+            href="/thu-tuc"
+            className="button secondary"
+            onClick={event => handleSpaNavigation(event, '/thu-tuc')}
+          >
             Về danh mục thủ tục
           </a>
         </div>
@@ -296,6 +359,16 @@ export function CitizenProcedureDetail({
   const sourceUrl = detail?.sourceUrl || schema?.sourceUrl
   const fallbackDocuments = schema?.sourceStatus !== 'configured-standard' ? schema?.documents : []
   const checked = detail?.checkedAt ? new Date(detail.checkedAt).toLocaleDateString('vi-VN') : ''
+  const executingAgencySummary =
+    detail?.executingAgencies.join(', ') || procedure.agency || 'Theo phân cấp thẩm quyền tại Hà Nội'
+
+  const submitUrl = selectedAgency
+    ? `/nop-ho-so?${new URLSearchParams({
+        procedure: sourceCode,
+        agency: selectedAgency,
+        ...(formCase ? { case: formCase } : {}),
+      })}`
+    : ''
 
   return (
     <article className={`procedure-detail-page${staffView ? ' procedure-detail-staff' : ''}`}>
@@ -303,41 +376,146 @@ export function CitizenProcedureDetail({
         <header className="procedure-print-heading">
           <p>BẢN TRÍCH THÔNG TIN THỦ TỤC HÀNH CHÍNH</p>
           <h1>{detail?.name || procedure.name}</h1>
-          <p>Mã thủ tục: {sourceCode}{detail?.decisionNumber ? ` · Quyết định công bố: ${detail.decisionNumber}` : ''}</p>
+          <p className="tabular-nums">
+            Mã thủ tục: {sourceCode}
+            {detail?.decisionNumber ? ` · Quyết định công bố: ${detail.decisionNumber}` : ''}
+          </p>
         </header>
-        <p className="procedure-print-source">Bản trích từ dữ liệu thủ tục được hệ thống lưu để tra cứu; không thay thế văn bản công bố gốc.{checked ? ` Ngày đối chiếu: ${checked}.` : ''}{sourceUrl ? ` Nguồn: ${sourceUrl}` : ''}</p>
-        <section><h2>1. Trình tự thực hiện</h2>
-          {detail?.steps.length ? detail.steps.map((step, index) => <div key={index}>{step.name && <h3>{plain(step.name)}</h3>}<Text>{step.description}</Text></div>) : <Text>{undefined}</Text>}
+        <p className="procedure-print-source">
+          Bản trích từ dữ liệu thủ tục được hệ thống lưu để tra cứu; không thay thế văn bản công bố gốc.
+          {checked ? ` Ngày đối chiếu: ${checked}.` : ''}
+          {sourceUrl ? ` Nguồn: ${sourceUrl}` : ''}
+        </p>
+        <section>
+          <h2>1. Trình tự thực hiện</h2>
+          {detail?.steps.length ? (
+            detail.steps.map((step, index) => (
+              <div key={index}>
+                {step.name && <h3>{plain(step.name)}</h3>}
+                <Text>{step.description}</Text>
+              </div>
+            ))
+          ) : (
+            <Text>{undefined}</Text>
+          )}
         </section>
-        <section><h2>2. Cách thức thực hiện, thời hạn và phí, lệ phí</h2>
-          {detail?.methods.length ? detail.methods.map((method, index) => <div key={index} className="procedure-print-method">
-            <h3>{methodNames[method.submissionMethod || ''] || method.submissionMethod || 'Hình thức chưa công bố'}</h3>
-            <p>Thời hạn: {duration(method)}.</p>
-            {method.description && <Text>{method.description}</Text>}
-            <Fees fees={method.fees} />
-          </div>) : <Text>{undefined}</Text>}
+        <section>
+          <h2>2. Cách thức thực hiện, thời hạn và phí, lệ phí</h2>
+          {detail?.methods.length ? (
+            detail.methods.map((method, index) => (
+              <div key={index} className="procedure-print-method">
+                <h3>
+                  {methodNames[method.submissionMethod || ''] ||
+                    method.submissionMethod ||
+                    'Hình thức chưa công bố'}
+                </h3>
+                <p className="tabular-nums">Thời hạn: {duration(method)}.</p>
+                {method.description && <Text>{method.description}</Text>}
+                <Fees fees={method.fees} />
+              </div>
+            ))
+          ) : (
+            <Text>{undefined}</Text>
+          )}
         </section>
-        <section><h2>3. Thành phần, số lượng hồ sơ</h2>
-          {detail?.cases.length ? detail.cases.map((entry, index) => <div key={index}>
-            {entry.name && <h3>{plain(entry.name)}</h3>}
-            {entry.profileComponents?.length ? <ol>{entry.profileComponents.map((document, docIndex) => <li key={document.profileComponentId || docIndex}>
-              <Text>{document.name}</Text>
-              {(document.originalQty !== undefined || document.copyQty !== undefined) && <p>{document.originalQty !== undefined && `Bản chính: ${document.originalQty}`}{document.originalQty !== undefined && document.copyQty !== undefined && ' · '}{document.copyQty !== undefined && `Bản sao: ${document.copyQty}`}</p>}
-              {!!document.attachments?.length && <p>Biểu mẫu: {document.attachments.map(attachment => attachment.fileName || attachment.name).filter(Boolean).join('; ') || 'Xem bản công bố gốc'}</p>}
-            </li>)}</ol> : <Text>{undefined}</Text>}
-          </div>) : fallbackDocuments?.length ? <ol>{fallbackDocuments.map(document => <li key={document.id}><b>{document.label}</b>{document.help && <Text>{document.help}</Text>}</li>)}</ol> : <Text>{undefined}</Text>}
+        <section>
+          <h2>3. Thành phần, số lượng hồ sơ</h2>
+          {detail?.cases.length ? (
+            detail.cases.map((entry, index) => (
+              <div key={index}>
+                {entry.name && <h3>{plain(entry.name)}</h3>}
+                {entry.profileComponents?.length ? (
+                  <ol>
+                    {entry.profileComponents.map((document, docIndex) => (
+                      <li key={document.profileComponentId || docIndex}>
+                        <Text>{document.name}</Text>
+                        {(document.originalQty !== undefined || document.copyQty !== undefined) && (
+                          <p className="tabular-nums">
+                            {document.originalQty !== undefined && `Bản chính: ${document.originalQty}`}
+                            {document.originalQty !== undefined && document.copyQty !== undefined && ' · '}
+                            {document.copyQty !== undefined && `Bản sao: ${document.copyQty}`}
+                          </p>
+                        )}
+                        {!!document.attachments?.length && (
+                          <p>
+                            Biểu mẫu:{' '}
+                            {document.attachments
+                              .map(attachment => attachment.fileName || attachment.name)
+                              .filter(Boolean)
+                              .join('; ') || 'Xem bản công bố gốc'}
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <Text>{undefined}</Text>
+                )}
+              </div>
+            ))
+          ) : fallbackDocuments?.length ? (
+            <ol>
+              {fallbackDocuments.map(document => (
+                <li key={document.id}>
+                  <b>{document.label}</b>
+                  {document.help && <Text>{document.help}</Text>}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <Text>{undefined}</Text>
+          )}
         </section>
-        <section><h2>4. Đối tượng thực hiện</h2><Text>{detail?.targets.join(', ')}</Text></section>
-        <section><h2>5. Cơ quan giải quyết</h2><Text>{detail?.executingAgencies.join(', ') || procedure.agency}</Text>{!!detail?.authorities.length && <p>Cơ quan có thẩm quyền: {detail.authorities.join(', ')}</p>}{!!detail?.coordinatingAgencies.length && <p>Cơ quan phối hợp: {detail.coordinatingAgencies.join(', ')}</p>}</section>
-        <section><h2>6. Kết quả thực hiện</h2>{detail?.results.length ? detail.results.map((result, index) => <Text key={result.id || index}>{result.name}</Text>) : <Text>{undefined}</Text>}</section>
-        <section><h2>7. Yêu cầu, điều kiện thực hiện</h2><Text>{detail?.conditions}</Text></section>
-        <section><h2>8. Căn cứ pháp lý</h2>{detail?.legalBases.length ? <ol>{detail.legalBases.map((basis, index) => <li key={basis.id || index}>{plain(basis.name) || 'Chưa có tên văn bản'}{basis.code ? ` (${basis.code})` : ''}</li>)}</ol> : <Text>{schema?.sourceStatus !== 'configured-standard' ? schema?.legalBasis : undefined}</Text>}</section>
+        <section>
+          <h2>4. Đối tượng thực hiện</h2>
+          <Text>{detail?.targets.join(', ')}</Text>
+        </section>
+        <section>
+          <h2>5. Cơ quan giải quyết</h2>
+          <Text>{detail?.executingAgencies.join(', ') || procedure.agency}</Text>
+          {!!detail?.authorities.length && <p>Cơ quan có thẩm quyền: {detail.authorities.join(', ')}</p>}
+          {!!detail?.coordinatingAgencies.length && (
+            <p>Cơ quan phối hợp: {detail.coordinatingAgencies.join(', ')}</p>
+          )}
+        </section>
+        <section>
+          <h2>6. Kết quả thực hiện</h2>
+          {detail?.results.length ? (
+            detail.results.map((result, index) => <Text key={result.id || index}>{result.name}</Text>)
+          ) : (
+            <Text>{undefined}</Text>
+          )}
+        </section>
+        <section>
+          <h2>7. Yêu cầu, điều kiện thực hiện</h2>
+          <Text>{detail?.conditions}</Text>
+        </section>
+        <section>
+          <h2>8. Căn cứ pháp lý</h2>
+          {detail?.legalBases.length ? (
+            <ol>
+              {detail.legalBases.map((basis, index) => (
+                <li key={basis.id || index}>
+                  {plain(basis.name) || 'Chưa có tên văn bản'}
+                  {basis.code ? ` (${basis.code})` : ''}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <Text>{schema?.sourceStatus !== 'configured-standard' ? schema?.legalBasis : undefined}</Text>
+          )}
+        </section>
       </div>
+
       {!staffView && (
         <nav className="procedure-breadcrumb" aria-label="Đường dẫn">
-          <a href="/">Trang chủ</a>
+          <a href="/" onClick={event => handleSpaNavigation(event, '/')}>
+            Trang chủ
+          </a>
           <span aria-hidden="true">/</span>
-          <a href="/thu-tuc">Thủ tục hành chính</a>
+          <a href="/thu-tuc" onClick={event => handleSpaNavigation(event, '/thu-tuc')}>
+            Thủ tục hành chính
+          </a>
           <span aria-hidden="true">/</span>
           <span aria-current="page">Chi tiết thủ tục</span>
         </nav>
@@ -350,18 +528,44 @@ export function CitizenProcedureDetail({
             Mã thủ tục: <b className="tabular-nums">{sourceCode}</b>
           </span>
           <button className="button secondary" type="button" onClick={() => window.print()}>
-            In / Lưu PDF
+            <Printer size={16} strokeWidth={1.75} aria-hidden="true" />
+            <span>In / Lưu PDF</span>
           </button>
           {sourceUrl && (
             <a className="button secondary" href={sourceUrl} target="_blank" rel="noreferrer">
-              {detail ? 'Xem bản công bố gốc' : 'Tra cứu trên cổng chính thức'}
+              <span>{detail ? 'Xem bản công bố gốc' : 'Tra cứu trên cổng chính thức'}</span>
+              <ExternalLink size={15} strokeWidth={1.75} aria-hidden="true" />
             </a>
           )}
         </div>
       </header>
 
+      <SummaryBox
+        title="Thông tin cốt lõi dành cho người nộp hồ sơ"
+        items={[
+          {
+            label: 'Mức độ dịch vụ công',
+            value: (
+              <ServiceLevelBadge level={procedure.level} serviceMode={procedure.serviceMode} />
+            ),
+          },
+          {
+            label: 'Thời hạn giải quyết',
+            value: <span className="tabular-nums">{summarizeDuration(detail, procedure)}</span>,
+          },
+          {
+            label: 'Phí / Lệ phí',
+            value: <span className="tabular-nums">{summarizeFee(detail, procedure)}</span>,
+          },
+          {
+            label: 'Cơ quan thực hiện',
+            value: executingAgencySummary,
+          },
+        ]}
+      />
+
       {detail ? (
-        <p className="procedure-source-line">
+        <p className="procedure-source-line tabular-nums">
           Nguồn: Cổng Dịch vụ công quốc gia · Đối chiếu ngày {checked}.{' '}
           {staffView
             ? 'Nội dung theo bản công bố gốc; cấu hình nội bộ được hiển thị riêng ở trên.'
@@ -380,8 +584,14 @@ export function CitizenProcedureDetail({
               <Fact label="Tên thủ tục" wide>
                 {detail?.name || procedure.name}
               </Fact>
-              <Fact label="Mã thủ tục">{sourceCode}</Fact>
-              <Fact label="Số quyết định">{detail?.decisionNumber}</Fact>
+              <Fact label="Mã thủ tục">
+                <span className="tabular-nums">{sourceCode}</span>
+              </Fact>
+              <Fact label="Số quyết định">
+                {detail?.decisionNumber ? (
+                  <span className="tabular-nums">{detail.decisionNumber}</span>
+                ) : undefined}
+              </Fact>
               <Fact label="Cấp thực hiện">{detail?.executionLevel}</Fact>
               <Fact label="Loại thủ tục">{detail?.procedureType}</Fact>
               <Fact label="Lĩnh vực">{detail?.fields.join(', ') || procedure.field}</Fact>
@@ -402,7 +612,7 @@ export function CitizenProcedureDetail({
               detail.relatedProcedures.map((item, index) => (
                 <p key={item.id || index}>
                   {item.name}
-                  {item.code && ` (${item.code})`}
+                  {item.code && <span className="tabular-nums">{` (${item.code})`}</span>}
                 </p>
               ))
             ) : (
@@ -439,10 +649,14 @@ export function CitizenProcedureDetail({
                     {detail.methods.map((method, index) => (
                       <tr key={index}>
                         <td data-label="Hình thức nộp">
-                          {methodNames[method.submissionMethod || ''] || method.submissionMethod || 'Chưa công bố'}
+                          {methodNames[method.submissionMethod || ''] ||
+                            method.submissionMethod ||
+                            'Chưa công bố'}
                         </td>
-                        <td data-label="Thời hạn giải quyết">{duration(method)}</td>
-                        <td data-label="Phí, lệ phí">
+                        <td data-label="Thời hạn giải quyết" className="tabular-nums">
+                          {duration(method)}
+                        </td>
+                        <td data-label="Phí, lệ phí" className="tabular-nums">
                           <Fees fees={method.fees} />
                         </td>
                         <td data-label="Mô tả">
@@ -461,8 +675,8 @@ export function CitizenProcedureDetail({
           {configured && schema && (
             <section className="procedure-section" aria-labelledby="configured-deadline-heading">
               <h2 id="configured-deadline-heading">Thời hạn và khoản thu khi lập hồ sơ</h2>
-              <p className="procedure-text">{schema.deadlineText}</p>
-              <p className="procedure-text">{schema.feeText}</p>
+              <p className="procedure-text tabular-nums">{schema.deadlineText}</p>
+              <p className="procedure-text tabular-nums">{schema.feeText}</p>
               <p className="procedure-source-line">
                 Quy tắc tiếp nhận đã cấu hình cho cơ quan trong ứng dụng. Bảng phía trên giữ số liệu của bản công bố đã lưu; phần diễn giải này làm rõ mốc áp dụng cho hồ sơ.
               </p>
@@ -482,20 +696,32 @@ export function CitizenProcedureDetail({
             )}
 
             {detail && detail.cases.length > 1 && (
-              <label className="procedure-case-select" htmlFor="procedure-case-selector">
-                <span>Chọn trường hợp thực hiện</span>
-                <select
-                  id="procedure-case-selector"
-                  value={selectedCase}
-                  onChange={event => setSelectedCase(Number(event.target.value))}
-                >
-                  {detail.cases.map((item, index) => (
-                    <option value={index} key={index}>
-                      {index + 1}. {plain(item.name) || `Trường hợp ${index + 1}`}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <fieldset className="hcds-case-fieldset">
+                <legend>Chọn trường hợp thực hiện</legend>
+                <div className="hcds-case-options">
+                  {detail.cases.map((item, index) => {
+                    const isSelected = selectedCase === index
+                    const labelText = plain(item.name) || `Trường hợp ${index + 1}`
+                    return (
+                      <label
+                        key={index}
+                        className={`hcds-case-option${isSelected ? ' is-selected' : ''}`}
+                      >
+                        <input
+                          type="radio"
+                          name="procedure-case-selector"
+                          value={index}
+                          checked={isSelected}
+                          onChange={() => setSelectedCase(index)}
+                        />
+                        <span className="tabular-nums">
+                          {index + 1}. {labelText}
+                        </span>
+                      </label>
+                    )
+                  })}
+                </div>
+              </fieldset>
             )}
 
             {activeCase?.name && <h3>{plain(activeCase.name)}</h3>}
@@ -533,13 +759,21 @@ export function CitizenProcedureDetail({
                                         )
                                       }
                                     >
-                                      {downloading === attachment.id
-                                        ? 'Đang tải mẫu…'
-                                        : attachment.fileName || attachment.name || 'Tải mẫu đơn'}
+                                      <Download size={15} strokeWidth={1.75} aria-hidden="true" />
+                                      <span>
+                                        {downloading === attachment.id
+                                          ? 'Đang tải mẫu…'
+                                          : attachment.fileName || attachment.name || 'Tải mẫu đơn'}
+                                      </span>
                                     </button>
                                   ) : (
                                     <a href={detail?.sourceUrl} target="_blank" rel="noreferrer">
-                                      {attachment.fileName || attachment.name || 'Xem mẫu đơn trên Cổng quốc gia'}
+                                      <span>
+                                        {attachment.fileName ||
+                                          attachment.name ||
+                                          'Xem mẫu đơn trên Cổng quốc gia'}
+                                      </span>
+                                      <ExternalLink size={14} strokeWidth={1.75} aria-hidden="true" />
                                     </a>
                                   )}
                                   <small>Tệp mẫu gốc từ Cổng quốc gia</small>
@@ -551,9 +785,13 @@ export function CitizenProcedureDetail({
                           )}
                         </td>
                         <td data-label="Số lượng">
-                          <span className="procedure-quantity">
-                            {document.originalQty !== undefined && <span>Bản chính: {document.originalQty}</span>}
-                            {document.copyQty !== undefined && <span>Bản sao: {document.copyQty}</span>}
+                          <span className="procedure-quantity tabular-nums">
+                            {document.originalQty !== undefined && (
+                              <span>Bản chính: {document.originalQty}</span>
+                            )}
+                            {document.copyQty !== undefined && (
+                              <span>Bản sao: {document.copyQty}</span>
+                            )}
                             {document.originalQty === undefined &&
                               document.copyQty === undefined &&
                               'Chưa công bố'}
@@ -594,14 +832,18 @@ export function CitizenProcedureDetail({
                         <td data-label="Tên văn bản pháp lý">
                           <Text>{basis.name}</Text>
                         </td>
-                        <td data-label="Mã văn bản">{basis.code || 'Chưa công bố'}</td>
+                        <td data-label="Mã văn bản" className="tabular-nums">
+                          {basis.code || 'Chưa công bố'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             ) : (
-              <Text>{schema?.sourceStatus !== 'configured-standard' ? schema?.legalBasis : undefined}</Text>
+              <Text>
+                {schema?.sourceStatus !== 'configured-standard' ? schema?.legalBasis : undefined}
+              </Text>
             )}
           </Block>
 
@@ -618,7 +860,9 @@ export function CitizenProcedureDetail({
               detail.results.map((result, index) => (
                 <div key={result.id || index}>
                   <Text>{result.name}</Text>
-                  {result.code && <p className="procedure-result-code">Mã kết quả: {result.code}</p>}
+                  {result.code && (
+                    <p className="procedure-result-code tabular-nums">Mã kết quả: {result.code}</p>
+                  )}
                 </div>
               ))
             ) : (
@@ -639,11 +883,13 @@ export function CitizenProcedureDetail({
           {!staffView && (
             <section className="procedure-intake-panel" aria-labelledby="procedure-intake-title">
               <h2 id="procedure-intake-title">Chọn cơ quan thực hiện</h2>
-              <p>Chọn nơi tiếp nhận tại Hà Nội để bắt đầu lập hồ sơ.</p>
+              <p>Chọn nơi tiếp nhận tại Hà Nội để bắt đầu lập hồ sơ trực tuyến.</p>
               <label htmlFor="procedure-province-input">
                 <span>Tỉnh / Thành phố</span>
                 <input id="procedure-province-input" value="Thành phố Hà Nội" readOnly />
               </label>
+              <LockedFieldNotice>Phạm vi thẩm quyền cố định tại Thành phố Hà Nội.</LockedFieldNotice>
+
               <label htmlFor="procedure-agency-select">
                 <span>Cơ quan tiếp nhận</span>
                 <select
@@ -682,17 +928,16 @@ export function CitizenProcedureDetail({
               {selectedAgency && configured ? (
                 <a
                   className="button primary"
-                  href={`/nop-ho-so?${new URLSearchParams({
-                    procedure: sourceCode,
-                    agency: selectedAgency,
-                    ...(formCase ? { case: formCase } : {}),
-                  })}`}
+                  href={submitUrl}
+                  onClick={event => handleSpaNavigation(event, submitUrl)}
                 >
-                  Nộp hồ sơ
+                  <FilePlus2 size={16} strokeWidth={1.75} aria-hidden="true" />
+                  <span>Nộp hồ sơ trực tuyến</span>
                 </a>
               ) : (
                 <button className="button primary" disabled type="button">
-                  Nộp hồ sơ
+                  <FilePlus2 size={16} strokeWidth={1.75} aria-hidden="true" />
+                  <span>Nộp hồ sơ trực tuyến</span>
                 </button>
               )}
 
@@ -713,8 +958,13 @@ export function CitizenProcedureDetail({
           </nav>
 
           {!staffView && (
-            <a className="procedure-return-link" href="/thu-tuc">
-              Về danh mục thủ tục
+            <a
+              className="procedure-return-link"
+              href="/thu-tuc"
+              onClick={event => handleSpaNavigation(event, '/thu-tuc')}
+            >
+              <ArrowLeft size={15} strokeWidth={1.75} aria-hidden="true" />
+              <span>Về danh mục thủ tục</span>
             </a>
           )}
         </aside>
