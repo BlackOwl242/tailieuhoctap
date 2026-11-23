@@ -295,9 +295,7 @@ export default function DocumentsPage() {
               onChange={(e) => void pickFile(e.target.files?.[0] ?? null)} />
             {file ? <p className="text-xs text-muted-foreground">Đã chọn: {file.name} ({Math.ceil(file.sizeBytes / 1024)} KB)</p> : null}
           </div>
-          <div className="col-span-full flex justify-end gap-2">
-            <ModalFooterActions onCancel={() => setOpen(false)} pending={create.isPending} confirmLabel="Thêm tài liệu" />
-          </div>
+          <ModalFooterActions className="col-span-full" onCancel={() => setOpen(false)} pending={create.isPending} confirmLabel="Thêm tài liệu" />
         </form>
       </Modal>
     </>

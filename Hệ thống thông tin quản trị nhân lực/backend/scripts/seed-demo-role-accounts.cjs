@@ -101,8 +101,10 @@ async function main() {
       },
     });
     if (existing) {
-      await prisma.userRole.deleteMany({ where: { userId: user.id } });
-      await prisma.userRole.createMany({ data: roleCodes.map((roleCode) => ({ userId: user.id, roleCode })) });
+      const currentRoleCount = await prisma.userRole.count({ where: { userId: user.id } });
+      if (currentRoleCount === 0) {
+        await prisma.userRole.createMany({ data: roleCodes.map((roleCode) => ({ userId: user.id, roleCode })), skipDuplicates: true });
+      }
     }
   }
 

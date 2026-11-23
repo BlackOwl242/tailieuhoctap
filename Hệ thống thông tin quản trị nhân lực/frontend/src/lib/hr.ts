@@ -107,8 +107,29 @@ export const REQUEST_STATUS_TONE: Record<string, string> = {
   CANCELLED: 'bg-muted text-muted-foreground border-border border',
 };
 
+/** Danh mục tiền tệ chuẩn ISO 4217 được hệ thống hỗ trợ. */
+export const ISO_CURRENCY_OPTIONS = [
+  { code: 'VND', label: 'VND — Việt Nam Đồng' },
+  { code: 'USD', label: 'USD — Đô la Mỹ' },
+  { code: 'EUR', label: 'EUR — Euro' },
+  { code: 'SGD', label: 'SGD — Đô la Singapore' },
+  { code: 'GBP', label: 'GBP — Bảng Anh' },
+  { code: 'JPY', label: 'JPY — Yên Nhật' },
+] as const;
+
+/** Định dạng tiền tệ chuẩn ISO 4217 (mặc định VND). */
+export function formatCurrency(amount: number | null | undefined, currency = 'VND'): string {
+  if (amount == null) return 'Chưa cập nhật';
+  const code = (currency || 'VND').trim().toUpperCase();
+  const zeroDecimals = code === 'VND' || code === 'JPY';
+  return new Intl.NumberFormat(code === 'VND' ? 'vi-VN' : 'en-US', {
+    style: 'currency',
+    currency: code,
+    maximumFractionDigits: zeroDecimals ? 0 : 2,
+  }).format(amount);
+}
+
 /** Định dạng tiền Việt Nam đồng gọn gàng. */
 export function vnd(amount: number | null | undefined): string {
-  if (amount == null) return 'Chưa cập nhật';
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(amount);
+  return formatCurrency(amount, 'VND');
 }

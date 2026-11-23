@@ -2,55 +2,33 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Search, Users, Calendar, Calculator, Briefcase, Target,
-  Receipt, ShieldCheck, Clock4, FileSpreadsheet, Layers,
-  CreditCard, Laptop, Network, CornerDownLeft, Sparkles, X, Database
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Search, CornerDownLeft, Sparkles, X } from 'lucide-react';
+import { cn, matchesSearch } from '@/lib/utils';
 import { Portal } from '@/components/ui/portal';
-
-interface CommandItem {
-  id: string;
-  title: string;
-  category: 'Điều hướng nhanh' | 'Thao tác nghiệp vụ' | 'Cổng cá nhân ESS';
-  href: string;
-  icon: typeof Search;
-  shortcut?: string;
-  roles?: string[];
-}
-
-const COMMANDS: CommandItem[] = [
-  { id: 'ess', title: 'Cổng nhân viên (ESS)', category: 'Cổng cá nhân ESS', href: '/ess', icon: Users, shortcut: 'G E' },
-  { id: 'catalogs', title: 'Danh mục gốc', category: 'Thao tác nghiệp vụ', href: '/admin/catalogs', icon: Database, shortcut: 'G M', roles: ['ADMIN'] },
-  { id: 'org-chart', title: 'Sơ đồ tổ chức', category: 'Điều hướng nhanh', href: '/org-chart', icon: Network, shortcut: 'G O' },
-  { id: 'employees', title: 'Hồ sơ nhân sự', category: 'Điều hướng nhanh', href: '/employees', icon: Users, shortcut: 'G N', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR'] },
-  { id: 'shifts', title: 'Ca làm việc', category: 'Điều hướng nhanh', href: '/shifts', icon: Clock4, shortcut: 'G S', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB'] },
-  { id: 'attendance', title: 'Bảng chấm công', category: 'Điều hướng nhanh', href: '/attendance', icon: ShieldCheck, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB'] },
-  { id: 'payroll-engine', title: 'Bảng lương', category: 'Điều hướng nhanh', href: '/payroll-engine', icon: Calculator, shortcut: 'G P', roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
-  { id: 'loans', title: 'Tạm ứng & Vay', category: 'Thao tác nghiệp vụ', href: '/loans', icon: CreditCard, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
-  { id: 'assets', title: 'Quản lý tài sản', category: 'Thao tác nghiệp vụ', href: '/assets', icon: Laptop, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER'] },
-  { id: 'recruitment-ats', title: 'Tuyển dụng', category: 'Thao tác nghiệp vụ', href: '/recruitment-ats', icon: Briefcase, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER'] },
-  { id: 'performance-kpi', title: 'Đánh giá KPI', category: 'Thao tác nghiệp vụ', href: '/performance', icon: Target, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_RECRUITER', 'HR_TRAINER'] },
-  { id: 'expense-claims', title: 'Công tác phí', category: 'Thao tác nghiệp vụ', href: '/expense-claims', icon: Receipt, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB', 'ACCOUNTANT'] },
-  { id: 'reports', title: 'Báo cáo nhân sự', category: 'Điều hướng nhanh', href: '/personnel-reports', icon: FileSpreadsheet, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'LINE_MANAGER', 'HR_CB', 'HR_RECRUITER', 'HR_TRAINER', 'AUDITOR', 'ACCOUNTANT'] },
-  { id: 'salary-ranks', title: 'Ngạch bậc lương', category: 'Điều hướng nhanh', href: '/salary-ranks', icon: Layers, roles: ['ADMIN', 'KM_MANAGER', 'BOD', 'HR_CB'] },
-  { id: 'leave', title: 'Nghỉ phép', category: 'Cổng cá nhân ESS', href: '/leave', icon: Calendar },
-];
+import { getSearchableNavItems } from '@/lib/navigation';
+import { useOrgConfig } from '@/lib/org-config';
 
 export function CommandPalette({ isOpen, onClose, userRoles = [] }: { isOpen: boolean; onClose: () => void; userRoles?: string[] }) {
   const router = useRouter();
+  const [orgConfig] = useOrgConfig();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  const allItems = useMemo(
+    () => getSearchableNavItems(userRoles, orgConfig),
+    [userRoles, orgConfig],
+  );
+
   const filteredCommands = useMemo(() => {
-    const roleMatched = COMMANDS.filter((c) => !c.roles || c.roles.some((r) => userRoles.includes(r)));
-    if (!query.trim()) return roleMatched;
-    const q = query.toLowerCase();
-    return roleMatched.filter(
-      (c) => c.title.toLowerCase().includes(q) || c.category.toLowerCase().includes(q)
+    if (!query.trim()) return allItems;
+    return allItems.filter((item) =>
+      matchesSearch(query, item.label, item.domainLabel, item.folderLabel, ...item.keywords),
     );
-  }, [query, userRoles]);
+  }, [allItems, query]);
+
+  useEffect(() => {
+    if (!isOpen) setQuery('');
+  }, [isOpen]);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -90,102 +68,93 @@ export function CommandPalette({ isOpen, onClose, userRoles = [] }: { isOpen: bo
       <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 sm:pt-28 px-4">
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-150" onClick={onClose} />
 
-      <div className="relative w-full max-w-xl overflow-hidden rounded-lg border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-150">
-        {/* Search Input Bar */}
-        <div className="flex items-center gap-3 border-b border-border/60 px-4 py-3.5">
-          <Search className="h-4 w-4 text-primary shrink-0" />
-          <input
-            autoFocus
-            type="text"
-            placeholder="Tìm tính năng, hồ sơ nhân sự, tạo đơn từ nhanh... (Ctrl + K)"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-hidden"
-          />
-          {query && (
-            <button onClick={() => setQuery('')} className="text-xs text-muted-foreground hover:text-foreground">
-              <X className="h-4 w-4" />
-            </button>
-          )}
-          <kbd className="hidden sm:inline-flex items-center rounded-md border border-border bg-muted/60 px-1.5 py-0.5 text-xs font-mono text-muted-foreground">
-            ESC
-          </kbd>
-        </div>
+        <div className="relative w-full max-w-xl overflow-hidden rounded-lg border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-150">
+          {/* Search Input Bar */}
+          <div className="flex items-center gap-3 border-b border-border/60 px-4 py-3.5">
+            <Search className="h-4 w-4 text-primary shrink-0" />
+            <input
+              autoFocus
+              type="text"
+              placeholder="Tìm nhanh trang, chức năng (hỗ trợ gõ không dấu)..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-hidden"
+            />
+            {query && (
+              <button type="button" onClick={() => setQuery('')} className="text-xs text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            )}
+            <kbd className="hidden sm:inline-flex items-center rounded-md border border-border bg-muted/60 px-1.5 py-0.5 text-xs font-mono text-muted-foreground">
+              ESC
+            </kbd>
+          </div>
 
-        {/* Command Items List */}
-        <div className="max-h-80 overflow-y-auto p-2 [scrollbar-width:thin]">
-          {filteredCommands.length === 0 ? (
-            <div className="py-8 text-center text-xs text-muted-foreground">
-              Không tìm thấy lệnh hoặc trang nào khớp với &quot;{query}&quot;.
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {filteredCommands.map((cmd, idx) => {
-                const Icon = cmd.icon;
-                const isSelected = idx === selectedIndex;
-                return (
-                  <button
-                    key={cmd.id}
-                    onClick={() => {
-                      router.push(cmd.href);
-                      onClose();
-                    }}
-                    onMouseEnter={() => setSelectedIndex(idx)}
-                    className={cn(
-                      'flex w-full items-center justify-between rounded-md px-3 py-2.5 text-left text-xs transition-all',
-                      isSelected
-                        ? 'bg-primary text-primary-foreground shadow-xs font-semibold'
-                        : 'text-foreground hover:bg-muted/60'
-                    )}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div
-                        className={cn(
-                          'flex h-7 w-7 items-center justify-center rounded-md',
-                          isSelected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground'
-                        )}
-                      >
-                        <Icon className="h-3.5 w-3.5" />
-                      </div>
-                      <div className="truncate">
-                        <span className="block truncate">{cmd.title}</span>
-                        <span className={cn('text-xs block', isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground')}>
-                          {cmd.category}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {cmd.shortcut && (
-                        <span
+          {/* Command Items List */}
+          <div className="max-h-80 overflow-y-auto p-2 [scrollbar-width:thin]">
+            {filteredCommands.length === 0 ? (
+              <div className="py-8 text-center text-xs text-muted-foreground">
+                Không tìm thấy trang hoặc chức năng nào khớp với &quot;{query}&quot;.
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {filteredCommands.map((cmd, idx) => {
+                  const Icon = cmd.icon;
+                  const isSelected = idx === selectedIndex;
+                  return (
+                    <button
+                      type="button"
+                      key={cmd.href}
+                      onClick={() => {
+                        router.push(cmd.href);
+                        onClose();
+                      }}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-md px-3 py-2.5 text-left text-xs transition-all',
+                        isSelected
+                          ? 'bg-primary text-primary-foreground shadow-xs font-semibold'
+                          : 'text-foreground hover:bg-muted/60',
+                      )}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div
                           className={cn(
-                            'text-xs font-mono px-1.5 py-0.5 rounded-md',
-                            isSelected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted/80 text-muted-foreground'
+                            'flex h-7 w-7 items-center justify-center rounded-md',
+                            isSelected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground',
                           )}
                         >
-                          {cmd.shortcut}
-                        </span>
-                      )}
-                      {isSelected && <CornerDownLeft className="h-3.5 w-3.5 text-primary-foreground/80" />}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                          <Icon className="h-3.5 w-3.5" />
+                        </div>
+                        <div className="truncate">
+                          <span className="block truncate">{cmd.label}</span>
+                          <span className={cn('text-xs block', isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground')}>
+                            {cmd.domainLabel} › {cmd.folderLabel}
+                          </span>
+                        </div>
+                      </div>
 
-        {/* Footer Hint */}
-        <div className="border-t border-border/50 bg-muted/20 px-4 py-2 flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-3">
-            <span><b>↑↓</b> Chọn</span>
-            <span><b>Enter</b> Mở</span>
-            <span><b>Esc</b> Đóng</span>
+                      <div className="flex items-center gap-2">
+                        {isSelected && <CornerDownLeft className="h-3.5 w-3.5 text-primary-foreground/80" />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-          <span className="flex items-center gap-1 font-semibold text-primary">
-            <Sparkles className="h-3 w-3" /> HRMIS AI Navigation
-          </span>
-        </div>
+
+          {/* Footer Hint */}
+          <div className="border-t border-border/50 bg-muted/20 px-4 py-2 flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center gap-3">
+              <span><b>↑↓</b> Chọn</span>
+              <span><b>Enter</b> Mở</span>
+              <span><b>Esc</b> Đóng</span>
+            </div>
+            <span className="flex items-center gap-1 font-semibold text-primary">
+              <Sparkles className="h-3 w-3" /> Danh mục chức năng
+            </span>
+          </div>
         </div>
       </div>
     </Portal>

@@ -1,15 +1,20 @@
 import { HrAccessService } from '../../common/services/hr-access.service';
 import {
-  ConflictException, Controller, Get, Injectable, Module, NotFoundException, Param, Query,
+  ConflictException, Controller, Get, Injectable, Module, NotFoundException, Optional, Param, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../../common/prisma.service';
+import { FieldCryptoService } from '../../common/services/field-crypto.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 
 @Injectable()
 export class PersonnelReportsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly crypto: FieldCryptoService;
+
+  constructor(private readonly prisma: PrismaService, @Optional() fieldCrypto?: FieldCryptoService) {
+    this.crypto = fieldCrypto ?? new FieldCryptoService();
+  }
 
   private async scopedUnitIds(orgUnitId?: string): Promise<string[] | undefined> {
     if (!orgUnitId) return undefined;
@@ -85,7 +90,7 @@ export class PersonnelReportsService {
         hometown: profile.hometown,
         permanentAddress: profile.permanentAddress || profile.user.address,
         currentAddress: profile.currentAddress || profile.user.address,
-        idCardNo: profile.idCardNo,
+        idCardNo: this.crypto.decryptOptionalString(profile.idCardNo) ?? null,
         idCardIssueDate: profile.idCardIssueDate,
         idCardIssuePlace: profile.idCardIssuePlace,
         ethnicity: profile.ethnicity || 'Chưa khai báo',
@@ -110,7 +115,7 @@ export class PersonnelReportsService {
         overGradePercent: profile.overGradePercent || 0,
         positionAllowance: profile.positionAllowance || 0,
         otherAllowance: profile.otherAllowance || 0,
-        socialInsuranceNo: profile.socialInsuranceNo,
+        socialInsuranceNo: this.crypto.decryptOptionalString(profile.socialInsuranceNo) ?? null,
         generalEducation: profile.generalEducation || '12/12',
         highestDegree: profile.highestDegree,
         majorName: profile.majorName,
@@ -185,6 +190,7 @@ export class PersonnelReportsService {
           age50to54: { male: 0, female: 0, total: 0 },
           age55to59: { male: 0, female: 0, total: 0 },
           above60: { male: 0, female: 0, total: 0 },
+          unknownAge: { male: 0, female: 0, total: 0 },
         },
       };
     }
@@ -192,22 +198,20 @@ export class PersonnelReportsService {
     for (const p of profiles) {
       if (!p.rankCode || !rankMap[p.rankCode]) continue;
 
-      let age = 35; // Tuổi mặc định nếu chưa cập nhật ngày sinh
-      if (p.user.birthDate) {
-        age = nowYear - new Date(p.user.birthDate).getFullYear();
-      }
-
       const isFemale = p.gender?.toLowerCase() === 'nữ';
       const targetRank = rankMap[p.rankCode];
       targetRank.total++;
 
-      let groupKey = 'age30to39';
-      if (age < 30) groupKey = 'under30';
-      else if (age <= 39) groupKey = 'age30to39';
-      else if (age <= 49) groupKey = 'age40to49';
-      else if (age <= 54) groupKey = 'age50to54';
-      else if (age <= 59) groupKey = 'age55to59';
-      else groupKey = 'above60';
+      let groupKey = 'unknownAge';
+      if (p.user.birthDate) {
+        const age = nowYear - new Date(p.user.birthDate).getFullYear();
+        if (age < 30) groupKey = 'under30';
+        else if (age <= 39) groupKey = 'age30to39';
+        else if (age <= 49) groupKey = 'age40to49';
+        else if (age <= 54) groupKey = 'age50to54';
+        else if (age <= 59) groupKey = 'age55to59';
+        else groupKey = 'above60';
+      }
 
       targetRank.ageGroups[groupKey].total++;
       if (isFemale) targetRank.ageGroups[groupKey].female++;

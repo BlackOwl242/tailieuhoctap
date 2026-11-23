@@ -1,7 +1,10 @@
 'use client';
 
 import { AlertTriangle, Inbox, Loader2, RefreshCw } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/primitives';
+import { WorkspaceHeader } from '@/components/common/workspace-header';
+import { DOMAINS } from '@/lib/navigation';
 
 /** Trạng thái rỗng thống nhất (danh sách trống, không kết quả…). */
 export function EmptyState({
@@ -57,13 +60,30 @@ export const LoadingState = LoadingBlock;
  * luôn cách khối nội dung kế tiếp đúng một token `stack` (mb-stack).
  */
 export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: React.ReactNode }) {
+  const pathname = usePathname() || '/';
+  const domain = DOMAINS.find((d) =>
+    d.folders.some((f) =>
+      f.items.some((item) => {
+        const base = item.href.split('?')[0];
+        return pathname === base || pathname.startsWith(`${base}/`);
+      }),
+    ) || d.tags.some((t) => {
+      const base = t.href.split('?')[0];
+      return pathname === base || pathname.startsWith(`${base}/`);
+    }),
+  );
+  const breadcrumbs =
+    domain && domain.label !== title
+      ? [{ label: domain.label }, { label: title }]
+      : [{ label: title }];
+
   return (
-    <div className="no-print mb-stack flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h1>
-        {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
-      </div>
-      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
-    </div>
+    <WorkspaceHeader
+      title={title}
+      description={description}
+      actions={actions}
+      breadcrumbs={breadcrumbs}
+      className="no-print"
+    />
   );
 }

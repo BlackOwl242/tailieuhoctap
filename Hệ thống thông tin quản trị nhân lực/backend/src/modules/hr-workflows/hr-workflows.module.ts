@@ -7,6 +7,7 @@ import { HrAccessService, isHr } from '../../common/services/hr-access.service';
 import { PersonnelEffectsService } from '../../common/services/personnel-effects.service';
 import type { AuthUser } from '../../common/types/auth-user';
 import { dateKey, workDate } from '../../common/hr-time';
+import { toMoney } from '../../common/money';
 import { Prisma } from '@prisma/client';
 
 class BorrowDto {
@@ -43,7 +44,7 @@ export class HrWorkflowsService {
     const date = dateKey(effectiveDate);
     const band = await salaryBandForDate(db, user?.salaryBandId, date);
     const titleMatches = !band?.jobTitles.length || band.jobTitles.some(title => title.trim().toLocaleLowerCase('vi') === (user?.jobTitle ?? '').trim().toLocaleLowerCase('vi'));
-    if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== 'MONTHLY' || band.effectiveFrom > date || (band.effectiveTo && band.effectiveTo < date) || !titleMatches || salary < band.minSalary || salary > band.maxSalary) {
+    if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== 'MONTHLY' || band.effectiveFrom > date || (band.effectiveTo && band.effectiveTo < date) || !titleMatches || salary < toMoney(band.minSalary) || salary > toMoney(band.maxSalary)) {
       throw new ConflictException('Mức lương chính thức phải nằm trong khung lương tháng đã duyệt, đúng chức danh và còn hiệu lực vào ngày nhận chính thức.');
     }
   }
@@ -97,7 +98,7 @@ export class HrWorkflowsService {
         await this.ledgerGuard(tx, review.effectiveDate);
         if (review.recommendation === 'PASS') {
           if (!review.contractSalary || !review.contractType) throw new ConflictException('Thiếu điều khoản hợp đồng chính thức');
-          await this.assertProbationSalaryBand(tx, review.userId, review.contractSalary, review.effectiveDate);
+          await this.assertProbationSalaryBand(tx, review.userId, toMoney(review.contractSalary), review.effectiveDate);
         }
         await tx.personnelAction.create({ data: { type: review.recommendation === 'PASS' ? 'PROBATION_PASS' : 'PROBATION_FAIL', subjectId: review.userId, requestedById: review.managerId, decidedById: actor.id, decidedAt: new Date(), status: 'APPROVED', effectiveAt: review.effectiveDate, payload: { probationReviewId: id, reason: review.assessment, evidenceUrl: review.evidenceUrl, newSalary: review.contractSalary, contractType: review.contractType, contractEndDate: review.contractEndDate?.toISOString() ?? null } } });
         if (review.recommendation === 'FAIL') await tx.handoverChecklist.create({ data: { ownerUserId: review.userId, leavingDate: review.effectiveDate, items: { create: [

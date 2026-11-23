@@ -6,12 +6,18 @@ import { AuditService } from '../../common/services/audit.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 import { currentPayrollPolicies, VN_PAYROLL_POLICIES, type PayrollPolicy } from '../../common/payroll-calculator';
+import { isSupportedCurrency } from '../../common/money';
 import { effectiveHolidayCalendar } from '../../common/services/holiday-calendar';
 
 // Khóa cấu hình runtime và giá trị mặc định (tham số kiểu THAMSO của tài liệu)
 export const SETTING_DEFAULTS: Record<string, unknown> = {
   ANNUAL_LEAVE_DAYS: 12,
   LEAVE_ALLOCATION_MODE: 'PRORATED_YEAR',
+  EMPLOYEE_CODE_PREFIX: 'NV',
+  EMPLOYEE_CODE_PADDING: 4,
+  DEFAULT_CURRENCY: 'VND',
+  SYSTEM_TIMEZONE: process.env.TZ || 'Asia/Ho_Chi_Minh',
+  DEFAULT_USER_ROLES: ['USER'],
   ORG_PROFILE: {
     parentOrgName: '', orgName: 'CÔNG TY CỔ PHẦN SAIGON TECHNOLOGY',
     deptName: 'BAN TỔ CHỨC - HÀNH CHÍNH - NHÂN SỰ', orgLevel: 'DV_DNTN',
@@ -60,6 +66,41 @@ export class SettingsService {
         if (!['PRORATED_YEAR', 'ACCRUED', 'FULL_YEAR'].includes(String(value))) throw new BadRequestException('Cách phân bổ phép không hợp lệ');
       } else if (key === 'ANNUAL_LEAVE_DAYS') {
         if (typeof value !== 'number' || !Number.isInteger(value) || value < 12 || value > 60) throw new BadRequestException('Số ngày phép năm phải từ 12 đến 60');
+      } else if (key === 'EMPLOYEE_CODE_PREFIX') {
+        if (typeof value !== 'string' || !/^[A-Z0-9_-]{1,10}$/i.test(value.trim())) {
+          throw new BadRequestException('Tiền tố mã nhân viên phải từ 1 đến 10 ký tự (chữ cái, số, - hoặc _)');
+        }
+        values[key] = value.trim().toUpperCase();
+      } else if (key === 'EMPLOYEE_CODE_PADDING') {
+        if (typeof value !== 'number' || !Number.isInteger(value) || value < 3 || value > 8) {
+          throw new BadRequestException('Độ dài phần số của mã nhân viên phải từ 3 đến 8 chữ số');
+        }
+      } else if (key === 'DEFAULT_CURRENCY') {
+        if (typeof value !== 'string' || !isSupportedCurrency(value)) {
+          throw new BadRequestException('Mã tiền tệ ISO 4217 không hợp lệ hoặc chưa được hỗ trợ');
+        }
+        values[key] = value.trim().toUpperCase();
+      } else if (key === 'SYSTEM_TIMEZONE') {
+        const tz = typeof value === 'string' ? value.trim() : '';
+        try {
+          if (!tz) throw new Error('empty');
+          Intl.DateTimeFormat(undefined, { timeZone: tz });
+        } catch {
+          throw new BadRequestException(`Múi giờ IANA không hợp lệ: ${String(value)}`);
+        }
+        values[key] = tz;
+      } else if (key === 'DEFAULT_USER_ROLES') {
+        if (!Array.isArray(value) || value.length === 0 || value.some((r) => typeof r !== 'string' || !r.trim())) {
+          throw new BadRequestException('Phải chọn ít nhất 1 vai trò mặc định hợp lệ');
+        }
+        const normalized = Array.from(new Set(value.map((r) => String(r).trim().toUpperCase())));
+        const existingRoles = await this.prisma.role.findMany({ where: { code: { in: normalized } }, select: { code: true } });
+        const found = new Set(existingRoles.map((r) => r.code));
+        const missing = normalized.filter((r) => !found.has(r));
+        if (missing.length > 0) {
+          throw new BadRequestException(`Vai trò mặc định không tồn tại: ${missing.join(', ')}`);
+        }
+        values[key] = normalized;
       } else if (key === 'PAYROLL_POLICIES') {
         if (!Array.isArray(value) || !value.length) throw new BadRequestException('Cần ít nhất một chính sách lương có ngày hiệu lực');
         for (const candidate of value as PayrollPolicy[]) {

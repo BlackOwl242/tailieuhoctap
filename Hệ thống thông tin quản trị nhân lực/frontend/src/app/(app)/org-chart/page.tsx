@@ -8,6 +8,8 @@ import {
   Table as TableIcon, LayoutGrid, Eye, CheckCircle2, AlertCircle, ChevronRight
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { matchesSearch } from '@/lib/utils';
+import { Input } from '@/components/ui/primitives';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { LoadingState, ErrorState } from '@/components/common/states';
@@ -44,6 +46,7 @@ export default function OrgChartPage() {
   );
   const [activeTab, setActiveTab] = useState<'tree' | 'table'>('tree');
   const [selectedNode, setSelectedNode] = useState<OrgNode | null>(null);
+  const [treeSearch, setTreeSearch] = useState('');
 
   const { data: orgTree, isLoading, isError, error, refetch } = useQuery<OrgNode[]>({
     queryKey: ['org-units-tree'],
@@ -55,7 +58,7 @@ export default function OrgChartPage() {
 
   const { data: rawEmployees } = useQuery<any>({
     queryKey: ['employees-list'],
-    queryFn: async () => (await api.get('/employees?limit=200')).data,
+    queryFn: async () => (await api.get('/employees')).data,
     enabled: canViewEmployees,
     retry: false,
   });
@@ -172,6 +175,31 @@ export default function OrgChartPage() {
     if (!activeNode) return [];
     return employeeList.filter((e) => (e.orgUnitId || e.orgUnit?.id) === activeNode.id);
   }, [employeeList, activeNode]);
+
+  const findNodeById = (nodes: OrgNode[], id: string): OrgNode | null => {
+    for (const n of nodes) {
+      if (n.id === id) return n;
+      if (n.children) {
+        const found = findNodeById(n.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const treeUnitMatches = useMemo(() => {
+    if (!treeSearch.trim()) return [];
+    return tableRows
+      .filter((u) => matchesSearch(treeSearch, u.name, u.code, u.headName, u.parentName))
+      .slice(0, 6);
+  }, [tableRows, treeSearch]);
+
+  const treeEmployeeMatches = useMemo(() => {
+    if (!treeSearch.trim() || !canViewEmployees) return [];
+    return employeeList
+      .filter((e) => matchesSearch(treeSearch, e.fullName, e.employeeCode, e.jobTitle, e.orgUnit?.name))
+      .slice(0, 6);
+  }, [employeeList, treeSearch, canViewEmployees]);
 
   const assignedDirectCount = tableRows.reduce((sum, row) => sum + row.currentCount, 0);
   const populatedUnitCount = tableRows.filter((row) => row.currentCount > 0).length;
@@ -337,6 +365,73 @@ export default function OrgChartPage() {
       {/* Main Tab Content - Chiếm trọn 100% chiều rộng để sơ đồ cơ cấu mở rộng tối đa khoảng nhìn */}
       {activeTab === 'tree' ? (
         <div className="w-full space-y-3">
+          <div className="rounded-lg border border-border bg-card p-3 space-y-2.5">
+            <div className="relative max-w-md">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={treeSearch}
+                onChange={(e) => setTreeSearch(e.target.value)}
+                placeholder="Tìm nhanh đơn vị, mã phòng ban, phụ trách hoặc nhân sự..."
+                aria-label="Tìm nhanh trên sơ đồ tổ chức"
+                className="pl-9"
+              />
+            </div>
+            {treeSearch.trim() ? (
+              <div className="grid gap-3 pt-1 md:grid-cols-2">
+                <div className="space-y-1">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Đơn vị phù hợp ({treeUnitMatches.length})
+                  </p>
+                  {treeUnitMatches.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Không có đơn vị khớp từ khóa.</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {treeUnitMatches.map((u) => (
+                        <button
+                          key={u.id}
+                          type="button"
+                          onClick={() => {
+                            const matched = findNodeById(enrichedTree, u.id);
+                            if (matched) setSelectedNode(matched);
+                          }}
+                          className="rounded-md border border-border bg-muted/40 px-2.5 py-1 text-left text-xs hover:bg-accent"
+                        >
+                          <span className="font-medium text-foreground">{u.name}</span>{' '}
+                          <span className="text-muted-foreground">({u.code} · {u.currentCount} người)</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {canViewEmployees ? (
+                  <div className="space-y-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Nhân sự phù hợp ({treeEmployeeMatches.length})
+                    </p>
+                    {treeEmployeeMatches.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">Không có nhân sự khớp từ khóa.</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5">
+                        {treeEmployeeMatches.map((e) => (
+                          <button
+                            key={e.id}
+                            type="button"
+                            onClick={() => router.push(`/employees/${e.id}`)}
+                            className="rounded-md border border-border bg-muted/40 px-2.5 py-1 text-left text-xs hover:bg-accent"
+                          >
+                            <span className="font-medium text-foreground">{e.fullName}</span>{' '}
+                            <span className="text-muted-foreground">
+                              ({[e.employeeCode, e.orgUnit?.name].filter(Boolean).join(' · ')})
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
           <InteractiveOrgChart
             nodes={enrichedTree}
             onSelectNode={(node) => setSelectedNode(node)}
@@ -383,19 +478,9 @@ export default function OrgChartPage() {
                 icon: Eye,
                 onSelect: () => {
                   if (canViewEmployees) {
-                    router.push(`/employees?search=${r.name}`);
+                    router.push(`/employees?orgUnitId=${encodeURIComponent(r.id)}`);
                   } else {
-                    const findNode = (nodes: OrgNode[]): OrgNode | null => {
-                      for (const n of nodes) {
-                        if (n.id === r.id) return n;
-                        if (n.children) {
-                          const found = findNode(n.children);
-                          if (found) return found;
-                        }
-                      }
-                      return null;
-                    };
-                    setSelectedNode(findNode(enrichedTree));
+                    setSelectedNode(findNodeById(enrichedTree, r.id));
                   }
                 },
               },

@@ -39,6 +39,10 @@ model User {
   bio                 String?
   avatarUrl           String?
   faceConsentAt       DateTime?
+  mfaEnabled          Boolean    @default(false)
+  mfaSecretEnc        String?
+  mfaBackupCodes      String[]   @default([])
+  mfaEnrolledAt       DateTime?
   status              UserStatus @default(ACTIVE)
   failedLoginAttempts Int        @default(0)
   lockedUntil         DateTime?
@@ -56,7 +60,7 @@ model User {
   minimumWageRegion String           @default("I") // I/II/III/IV, based on work location
   hireDate          DateTime? // ngày vào làm việc
   employmentStatus  EmploymentStatus @default(PROBATION)
-  baseSalary        Float? // lương cơ bản theo tháng (VND)
+  baseSalary        Decimal?         @db.Decimal(18, 2) // lương cơ bản theo tháng
   birthDate         DateTime?
   phone             String?
   address           String?
@@ -601,6 +605,8 @@ model AuditLog {
   afterData  Json?
   ip         String?
   requestId  String?
+  prevHash   String?
+  entryHash  String?
   createdAt  DateTime @default(now())
 
   actor User? @relation("AuditActor", fields: [actorId], references: [id])
@@ -792,9 +798,10 @@ model Contract {
   type              ContractType
   startDate         DateTime          @db.Date
   endDate           DateTime?         @db.Date
-  baseSalary        Float
+  baseSalary        Decimal           @db.Decimal(18, 2)
   compensationBasis CompensationBasis @default(MONTHLY)
-  insuranceSalary   Float?
+  insuranceSalary   Decimal?          @db.Decimal(18, 2)
+  currency          String            @default("VND")
   status            ContractStatus    @default(ACTIVE)
   note              String?
   fileUrl           String? // bản mềm hợp đồng (PDF/scan) upload lên /uploads
@@ -936,14 +943,14 @@ model Payslip {
   userId      String
   workingDays Float    @default(0) // công hữu hiệu trong kỳ
   otHours     Float    @default(0) // giờ làm thêm ĐÃ DUYỆT
-  baseSalary  Float    @default(0)
-  otAmount    Float    @default(0) // hệ số 150% ngày thường (Điều 98 BLĐ)
-  allowance   Float    @default(0) // phụ cấp cố định (ăn trưa, đi lại…)
-  bonus       Float    @default(0)
-  insurance   Float    @default(0) // BHXH 10,5% người lao động đóng
-  incomeTax   Float    @default(0) // thuế TNCN lũy tiến giản lược
-  otherDeduct Float    @default(0)
-  netSalary   Float    @default(0)
+  baseSalary  Decimal  @default(0) @db.Decimal(18, 2)
+  otAmount    Decimal  @default(0) @db.Decimal(18, 2) // hệ số 150% ngày thường (Điều 98 BLĐ)
+  allowance   Decimal  @default(0) @db.Decimal(18, 2) // phụ cấp cố định (ăn trưa, đi lại…)
+  bonus       Decimal  @default(0) @db.Decimal(18, 2)
+  insurance   Decimal  @default(0) @db.Decimal(18, 2) // BHXH 10,5% người lao động đóng
+  incomeTax   Decimal  @default(0) @db.Decimal(18, 2) // thuế TNCN lũy tiến giản lược
+  otherDeduct Decimal  @default(0) @db.Decimal(18, 2)
+  netSalary   Decimal  @default(0) @db.Decimal(18, 2)
   note        String?
   createdAt   DateTime @default(now())
 
@@ -965,7 +972,8 @@ enum RequisitionStatus {
 }
 
 model JobRequisition {
-  budgetMonthly     Float             @default(0)
+  budgetMonthly     Decimal           @default(0) @db.Decimal(18, 2)
+  currency          String            @default("VND")
   orgUnitId         String?
   hrAssessedBy      String?
   financeAssessedBy String?
@@ -1331,7 +1339,7 @@ model PersonnelSalaryHistory {
   rank          PersonnelRank?                @relation(fields: [rankCode], references: [code])
   step          Int // Bậc lương
   coefficient   Float // Hệ số
-  baseAmount    Float?
+  baseAmount    Decimal?                      @db.Decimal(18, 2)
   overGradeRate Float?                        @default(0) // % Vượt khung
   positionAllowance Float?                     // Hệ số phụ cấp chức vụ theo quyết định hiệu lực
   otherAllowance    Float?                     // Hệ số phụ cấp khác theo quyết định hiệu lực
@@ -1544,9 +1552,10 @@ model HrmsSalaryBand {
   code              String
   name              String
   levelTitle        String
-  minSalary         Float
-  midSalary         Float
-  maxSalary         Float
+  minSalary         Decimal           @db.Decimal(18, 2)
+  midSalary         Decimal           @db.Decimal(18, 2)
+  maxSalary         Decimal           @db.Decimal(18, 2)
+  currency          String            @default("VND")
   compensationBasis CompensationBasis @default(MONTHLY)
   reviewCycleMonths Int               @default(12)
   jobTitles         String[]          @default([])
@@ -1582,7 +1591,7 @@ model HrmsSalaryComponent {
   isOvertimeApplicable  Boolean                   @default(false)
   isFormulaBased        Boolean                   @default(false)
   formula               String? // VD: "baseSalary * 0.08"
-  defaultAmount         Float                     @default(0)
+  defaultAmount         Decimal                   @default(0) @db.Decimal(18, 2)
   description           String?
   basisType             String                    @default("UNVERIFIED") // LAW, COMPANY_POLICY, CONTRACT, SYSTEM
   basisReference        String?
@@ -1618,7 +1627,7 @@ model HrmsSalaryStructureItem {
   id          String   @id @default(uuid())
   structureId String
   componentId String
-  amount      Float    @default(0)
+  amount      Decimal  @default(0) @db.Decimal(18, 2)
   formula     String?
   createdAt   DateTime @default(now())
 
@@ -1635,7 +1644,8 @@ model HrmsSalaryStructureAssignment {
   userId      String
   structureId String
   fromDate    DateTime
-  baseSalary  Float
+  baseSalary  Decimal  @db.Decimal(18, 2)
+  currency    String   @default("VND")
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
@@ -1662,9 +1672,10 @@ model HrmsPayrollRun {
   toDate             DateTime
   status             PayrollRunStatus       @default(DRAFT)
   totalEmployees     Int                    @default(0)
-  totalGrossPay      Float                  @default(0)
-  totalDeduction     Float                  @default(0)
-  totalNetPay        Float                  @default(0)
+  totalGrossPay      Decimal                @default(0) @db.Decimal(18, 2)
+  totalDeduction     Decimal                @default(0) @db.Decimal(18, 2)
+  totalNetPay        Decimal                @default(0) @db.Decimal(18, 2)
+  currency           String                 @default("VND")
   processedBy        String?
   processedAt        DateTime?
   legacyPeriodId     String?                @unique
@@ -1700,10 +1711,11 @@ model HrmsPayrollSlip {
   jobTitle       String?
   workingDays    Float    @default(22)
   actualWorkDays Float    @default(22)
-  baseSalary     Float    @default(0)
-  grossPay       Float    @default(0)
-  totalDeduction Float    @default(0)
-  netPay         Float    @default(0)
+  baseSalary     Decimal  @default(0) @db.Decimal(18, 2)
+  grossPay       Decimal  @default(0) @db.Decimal(18, 2)
+  totalDeduction Decimal  @default(0) @db.Decimal(18, 2)
+  netPay         Decimal  @default(0) @db.Decimal(18, 2)
+  currency       String   @default("VND")
   breakdown      Json     @default("{}") // Mảng chi tiết từng khoản cộng/trừ
   status         String   @default("DRAFT") // DRAFT, APPROVED, PAID
   createdAt      DateTime @default(now())
@@ -1823,7 +1835,8 @@ model HrmsJobOffer {
   applicantId         String
   offerDate           DateTime    @default(now())
   designation         String
-  offeredSalary       Float
+  offeredSalary       Decimal     @db.Decimal(18, 2)
+  currency            String      @default("VND")
   joiningDate         DateTime
   status              OfferStatus @default(DRAFT)
   terms               String?     @db.Text
@@ -2117,13 +2130,14 @@ model HrmsTravelRequest {
   toLocation         String
   departureDate      DateTime
   returnDate         DateTime
-  estimatedBudget    Float                 @default(0)
+  estimatedBudget    Decimal               @default(0) @db.Decimal(18, 2)
+  currency           String                @default("VND")
   status             ClaimStatus           @default(DRAFT)
   notes              String?
   settlementClosedAt DateTime?
   settlementClosedBy String?
-  advanceRefundDue   Float                 @default(0)
-  advanceRefundPaid  Float                 @default(0)
+  advanceRefundDue   Decimal               @default(0) @db.Decimal(18, 2)
+  advanceRefundPaid  Decimal               @default(0) @db.Decimal(18, 2)
   refundStatus       String                @default("NONE") // NONE/DUE/PARTIAL/REPAID
   createdAt          DateTime              @default(now())
   updatedAt          DateTime              @updatedAt
@@ -2139,7 +2153,8 @@ model HrmsEmployeeAdvance {
   userId          String
   employeeName    String
   travelRequestId String?
-  amount          Float
+  amount          Decimal     @db.Decimal(18, 2)
+  currency        String      @default("VND")
   purpose         String
   status          ClaimStatus @default(DRAFT)
   disbursedAt     DateTime?
@@ -2159,8 +2174,9 @@ model HrmsExpenseClaim {
   travelRequestId String?
   title           String // Thanh toán vé máy bay, hóa đơn tiếp khách...
   category        String      @default("TRAVEL") // TRAVEL, MEAL, LODGING, EQUIPMENT, OTHER
-  totalAmount     Float
-  approvedAmount  Float?
+  totalAmount     Decimal     @db.Decimal(18, 2)
+  approvedAmount  Decimal?    @db.Decimal(18, 2)
+  currency        String      @default("VND")
   status          ClaimStatus @default(DRAFT)
   items           Json        @default("[]") // Chi tiết từng khoản chi
   receiptUrls     String[]    @default([])
@@ -2246,12 +2262,13 @@ model HrmsEmployeeLoan {
   userId                       String
   employeeName                 String
   loanType                     String // Tạm ứng khẩn cấp, Vay mua thiết bị/nhà, Vay đào tạo
-  principalAmount              Float // Số tiền vay gốc (VND)
+  principalAmount              Decimal   @db.Decimal(18, 2) // Số tiền vay gốc
   interestRate                 Float     @default(0) // % Lãi suất hàng năm
   termMonths                   Int       @default(12) // Thời hạn vay (tháng)
-  monthlyEmi                   Float // Số tiền trả góp gốc + lãi mỗi tháng
-  totalRepaid                  Float     @default(0) // Số tiền đã hoàn trả
-  remainingAmount              Float // Dư nợ còn lại
+  monthlyEmi                   Decimal   @db.Decimal(18, 2) // Số tiền trả góp gốc + lãi mỗi tháng
+  totalRepaid                  Decimal   @default(0) @db.Decimal(18, 2) // Số tiền đã hoàn trả
+  remainingAmount              Decimal   @db.Decimal(18, 2) // Dư nợ còn lại
+  currency                     String    @default("VND")
   status                       String    @default("PENDING") // PENDING, APPROVED, DISBURSED, COMPLETED, REJECTED
   disbursedAt                  DateTime?
   disbursementMethod           String?
@@ -2283,7 +2300,8 @@ model HrmsAssetAllocation {
   returnedDate         DateTime?
   status               String    @default("AVAILABLE") // AVAILABLE, ALLOCATED, MAINTENANCE, DISPOSED
   condition            String    @default("EXCELLENT") // NEW, EXCELLENT, GOOD, DAMAGED
-  value                Float     @default(0)
+  value                Decimal   @default(0) @db.Decimal(18, 2)
+  currency             String    @default("VND")
   notes                String?   @db.Text
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
@@ -2336,7 +2354,7 @@ model PayrollLoanDeduction {
   payrollRunId String
   loanId       String
   userId       String
-  amount       Float
+  amount       Decimal        @db.Decimal(18, 2)
   appliedAt    DateTime?
   payrollRun   HrmsPayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
 
@@ -2408,10 +2426,10 @@ model ExpenseSettlement {
   claimId           String   @unique
   travelRequestId   String?
   userId            String
-  advanceApplied    Float
-  payableAmount     Float
-  advanceRefundDue  Float    @default(0)
-  advanceRefundPaid Float    @default(0)
+  advanceApplied    Decimal  @db.Decimal(18, 2)
+  payableAmount     Decimal  @db.Decimal(18, 2)
+  advanceRefundDue  Decimal  @default(0) @db.Decimal(18, 2)
+  advanceRefundPaid Decimal  @default(0) @db.Decimal(18, 2)
   refundStatus      String   @default("NONE")
   actorId           String
   settledAt         DateTime @default(now())
@@ -2452,7 +2470,7 @@ model ProbationReview {
   recommendation  String
   status          String       @default("SUBMITTED")
   decisionNote    String?
-  contractSalary  Float?
+  contractSalary  Decimal?     @db.Decimal(18, 2)
   contractType    ContractType?
   effectiveDate   DateTime     @db.Date
   contractEndDate DateTime?    @db.Date

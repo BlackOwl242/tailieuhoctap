@@ -264,6 +264,8 @@ export default function PayrollEnginePage() {
       router.replace('/payroll-engine?tab=policy');
     } else if (tabParam === 'components' || tabParam === 'structures' || tabParam === 'runs' || tabParam === 'policy') {
       setActiveTab(tabParam);
+    } else if (!tabParam) {
+      setActiveTab('runs');
     }
   }, [searchParams, router]);
 
@@ -791,12 +793,6 @@ export default function PayrollEnginePage() {
                 Chính sách lương
               </Button>
             </Link>
-            <Link href="/payroll-guide">
-              <Button variant="outline" size="sm" className="text-xs h-8">
-                <BookOpen className="h-3.5 w-3.5 mr-1.5" />
-                Cách tính lương
-              </Button>
-            </Link>
             {canConfigurePayroll && <Button
               variant="outline"
               size="sm"
@@ -988,7 +984,7 @@ export default function PayrollEnginePage() {
           {isEnterprise
             ? 'Chế độ doanh nghiệp tư nhân: phụ cấp trách nhiệm/nghiệp vụ hiện được tính bằng 10% lương cơ bản theo hợp đồng/quyết định của từng nhân viên và phân bổ theo ngày được hưởng.'
             : 'Chế độ khu vực nhà nước: không dùng mức phụ cấp doanh nghiệp. Phụ cấp trách nhiệm theo đúng nhóm vị trí/hệ số tại Thông tư 05/2005/TT-BNV; hỗ trợ chuyển đổi số 5.000.000 đ/tháng theo Nghị định 179/2025/NĐ-CP chỉ cho đối tượng chuyên trách đủ điều kiện. Bảng lương chưa tự suy ra các khoản này từ ngạch/bậc; phải khai báo căn cứ và gán theo quyết định đã duyệt.'}
-          {' '}<Link href="/payroll-guide" className="font-medium text-primary underline">Xem hướng dẫn và ví dụ theo chế độ đang chọn</Link>
+          {' '}<Link href="/payroll-engine?tab=policy" className="font-medium text-primary underline">Xem chính sách và quy tắc lương hiện hành</Link>
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Khoản Thu Nhập */}

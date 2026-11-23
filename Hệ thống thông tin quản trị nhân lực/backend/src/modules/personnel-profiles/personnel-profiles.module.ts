@@ -1,6 +1,6 @@
 import { HrAccessService } from '../../common/services/hr-access.service';
 import {
-  Body, Controller, Delete, Get, Injectable, Module, ConflictException, NotFoundException, Param, Patch, Post, Put, Query,
+  Body, Controller, Delete, Get, Injectable, Module, ConflictException, NotFoundException, Optional, Param, Patch, Post, Put, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import {
@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
+import { FieldCryptoService } from '../../common/services/field-crypto.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 
@@ -202,10 +203,27 @@ export class CreateSocialActivityDto {
 
 @Injectable()
 export class PersonnelProfilesService {
+  private readonly crypto: FieldCryptoService;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-  ) {}
+    @Optional() fieldCrypto?: FieldCryptoService,
+  ) {
+    this.crypto = fieldCrypto ?? new FieldCryptoService();
+  }
+
+  private decryptProfileRow<T extends Record<string, any>>(row: T): T {
+    if (!row) return row;
+    return {
+      ...row,
+      ...(row.idCardNo !== undefined ? { idCardNo: this.crypto.decryptOptionalString(row.idCardNo) ?? null } : {}),
+      ...(row.socialInsuranceNo !== undefined ? { socialInsuranceNo: this.crypto.decryptOptionalString(row.socialInsuranceNo) ?? null } : {}),
+      ...(row.user && typeof row.user === 'object' && 'bankAccount' in row.user
+        ? { user: { ...row.user, bankAccount: this.crypto.decryptOptionalString(row.user.bankAccount) ?? null } }
+        : {}),
+    };
+  }
 
   private async assertPublicSalaryMode() {
     const setting = await this.prisma.setting.findUnique({ where: { key: 'ORG_PROFILE' } });
@@ -218,7 +236,7 @@ export class PersonnelProfilesService {
   /** Lấy danh sách hồ sơ toàn diện (hỗ trợ phân trang, tìm kiếm, lọc ngạch/đơn vị). */
   async listProfiles(query: { q?: string; orgUnitId?: string; rankCode?: string; page?: number; limit?: number }) {
     const page = Math.max(1, Number(query.page) || 1);
-    const limit = Math.min(100, Math.max(1, Number(query.limit) || 20));
+    const limit = Math.min(1000, Math.max(1, Number(query.limit) || 20));
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -229,7 +247,6 @@ export class PersonnelProfilesService {
         { user: { fullName: { contains: query.q, mode: 'insensitive' } } },
         { user: { email: { contains: query.q, mode: 'insensitive' } } },
         { user: { employeeCode: { contains: query.q, mode: 'insensitive' } } },
-        { idCardNo: { contains: query.q, mode: 'insensitive' } },
         { govPosition: { contains: query.q, mode: 'insensitive' } },
       ];
     }
@@ -260,7 +277,7 @@ export class PersonnelProfilesService {
       this.prisma.personnelComprehensiveProfile.count({ where }),
     ]);
 
-    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return { items: items.map((item) => this.decryptProfileRow(item)), total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
   /** Lấy chi tiết hồ sơ toàn diện và đầy đủ 8 bảng quá trình con. */
@@ -325,10 +342,10 @@ export class PersonnelProfilesService {
           socialActivities: true,
         },
       });
-      return created;
+      return this.decryptProfileRow(created);
     }
 
-    return profile;
+    return this.decryptProfileRow(profile);
   }
 
   /** Cập nhật thông tin hồ sơ toàn diện (111 trường). */
@@ -369,6 +386,8 @@ export class PersonnelProfilesService {
     }
 
     const data: any = { ...dto };
+    if (dto.idCardNo !== undefined) data.idCardNo = this.crypto.encryptOptionalString(dto.idCardNo);
+    if (dto.socialInsuranceNo !== undefined) data.socialInsuranceNo = this.crypto.encryptOptionalString(dto.socialInsuranceNo);
     if (dto.recruitDate) data.recruitDate = new Date(dto.recruitDate);
     if (dto.currentOrgDate) data.currentOrgDate = new Date(dto.currentOrgDate);
     if (dto.officialDate) data.officialDate = new Date(dto.officialDate);

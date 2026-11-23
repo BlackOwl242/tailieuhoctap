@@ -8,6 +8,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { DecimalSerializerInterceptor } from './common/interceptors/decimal-serializer.interceptor';
 import { validateEnv } from './config/env.validation';
 import configuration from './config/configuration';
 
@@ -22,10 +23,29 @@ async function bootstrap(): Promise<void> {
   });
 
   const app = await NestFactory.create(AppModule, { logger: false, rawBody: false, bodyParser: false });
+  (app.getHttpAdapter().getInstance() as express.Express).disable('x-powered-by');
   // HR attachments are sent as base64 JSON (maximum 8 MB); keep the parser limit
   // just above that encoded size so uploads do not fail at Express's 100 KB default.
   app.use(express.json({ limit: '12mb' }));
   app.use(express.urlencoded({ extended: true, limit: '100kb' }));
+
+  // OWASP HTTP security headers
+  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=()');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    res.setHeader('Cross-Origin-Resource-Policy', 'same-site');
+    if (req.path.startsWith('/api/v1')) {
+      res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
+    }
+    const isHttps = req.secure || req.headers['x-forwarded-proto'] === 'https';
+    if (isHttps) {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    next();
+  });
 
   // Request id correlation (echoed back in every response and every log line)
   app.use((req: express.Request & { requestId?: string }, res: express.Response, next: express.NextFunction) => {
@@ -55,22 +75,28 @@ async function bootstrap(): Promise<void> {
       stopAtFirstError: false,
     }),
   );
+  app.useGlobalInterceptors(new DecimalSerializerInterceptor());
   app.useGlobalFilters(new AllExceptionsFilter(logger));
   app.enableShutdownHooks();
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('HRMIS Pro & KMS Unified API')
-    .setDescription('Hệ thống Thông tin Quản trị Nhân lực Toàn diện — RESTful API (v1)')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(app, swaggerConfig));
+  const swaggerEnabled = cfg.env !== 'production' || process.env.ENABLE_SWAGGER === 'true';
+  if (swaggerEnabled) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('HRMIS Pro & KMS Unified API')
+      .setDescription('Hệ thống Thông tin Quản trị Nhân lực Toàn diện — RESTful API (v1)')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(app, swaggerConfig));
+  }
 
   await app.listen(cfg.port, '0.0.0.0');
 
   const nestLogger = new NestLogger('Bootstrap');
   nestLogger.log(`API listening on http://0.0.0.0:${cfg.port} (env=${cfg.env})`);
-  nestLogger.log(`Swagger UI: http://localhost:${cfg.port}/api/docs`);
+  if (swaggerEnabled) {
+    nestLogger.log(`Swagger UI: http://localhost:${cfg.port}/api/docs`);
+  }
   nestLogger.log(`Demo admin account: ${cfg.defaultAdminEmail} (seeded on first run when DB is empty)`);
 }
 

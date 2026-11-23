@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -70,6 +70,22 @@ export default function EmployeesPage() {
   const enterpriseMode = isEnterpriseSector(orgConfig);
   const initialTab = searchParams.get('tab') === 'civil-servant' ? 'civil-servant' : searchParams.get('tab') === 'approvals' ? 'approvals' : 'standard';
   const [activeTab, setActiveTab] = useState<'standard' | 'civil-servant' | 'approvals'>(initialTab);
+  const urlSearch = searchParams.get('search') ?? '';
+  const urlStatus = searchParams.get('status') ?? '';
+  const urlOrgUnitId = searchParams.get('orgUnitId') ?? '';
+  const standardInitialFilters = useMemo(
+    () => ({
+      ...(urlStatus ? { status: urlStatus } : {}),
+      ...(urlOrgUnitId ? { orgUnitId: urlOrgUnitId } : {}),
+    }),
+    [urlStatus, urlOrgUnitId],
+  );
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    const next = tab === 'civil-servant' ? 'civil-servant' : tab === 'approvals' ? 'approvals' : 'standard';
+    setActiveTab(next);
+  }, [searchParams]);
 
   useEffect(() => {
     if (enterpriseMode && activeTab === 'civil-servant') setActiveTab('standard');
@@ -100,7 +116,6 @@ export default function EmployeesPage() {
     email: '',
     phone: '',
     password: '123',
-    employeeCode: '',
     jobTitle: '',
     orgUnitId: '',
     employmentStatus: 'PROBATION',
@@ -118,7 +133,7 @@ export default function EmployeesPage() {
   const qProfiles = useQuery({
     queryKey: ['personnel-profiles'],
     queryFn: async () => {
-      const res = await api.get('/personnel-profiles?limit=100');
+      const res = await api.get('/personnel-profiles?limit=1000');
       return (res.data.items || res.data) as ComprehensiveProfileRow[];
     },
     enabled: activeTab === 'civil-servant',
@@ -133,28 +148,26 @@ export default function EmployeesPage() {
 
   const createEmployee = useMutation({
     mutationFn: async () => {
-      return api.post('/users', {
+      return api.post('/employees', {
         fullName: form.fullName,
         email: form.email,
         password: form.password,
         phone: form.phone || undefined,
-        employeeCode: form.employeeCode || undefined,
         jobTitle: form.jobTitle || undefined,
         orgUnitId: form.orgUnitId || undefined,
         employmentStatus: form.employmentStatus,
         hireDate: form.hireDate || undefined,
-        roleCodes: ['USER'],
       });
     },
-    onSuccess: () => {
-      toast('Đã tiếp nhận và tạo hồ sơ nhân sự mới thành công!', 'success');
+    onSuccess: (res) => {
+      const code = (res?.data as { employeeCode?: string } | undefined)?.employeeCode;
+      toast(code ? `Đã tiếp nhận nhân sự mới (${code}) từ CSDL thành công!` : 'Đã tiếp nhận và tạo hồ sơ nhân sự mới thành công!', 'success');
       setIsCreateOpen(false);
       setForm({
         fullName: '',
         email: '',
         phone: '',
         password: '123',
-        employeeCode: '',
         jobTitle: '',
         orgUnitId: '',
         employmentStatus: 'PROBATION',
@@ -424,6 +437,8 @@ export default function EmployeesPage() {
                 loading={qEmployees.isLoading}
                 exportFilename="danh-sach-nhan-su"
                 printLabel="In danh sách"
+                initialSearch={urlSearch}
+                initialFilters={standardInitialFilters}
                 searchFields={(r) => [r.fullName, r.email, r.employeeCode ?? '', r.jobTitle ?? '', r.orgUnit?.name ?? '']}
                 filters={[
                   {
@@ -572,27 +587,17 @@ export default function EmployeesPage() {
         open={isCreateOpen}
         onOpenChange={setIsCreateOpen}
         title="Tiếp nhận nhân sự mới"
-        description="Dùng để nhập hồ sơ nhân sự hiện có. Nhân sự mới tuyển phải đi qua phiếu tuyển, phỏng vấn, đề nghị tuyển dụng và offer đã duyệt. Lương được ghi nhận từ hợp đồng đã ký."
+        description="Dùng để nhập hồ sơ nhân sự hiện có. Mã nhân viên và vai trò mặc định được hệ thống tự động cấp từ CSDL."
       >
-        <div className="space-y-4 py-2">
-          <p className="rounded-lg bg-muted p-3 text-sm">Với nhân sự mới tuyển, hãy hoàn tất quy trình tại mục <b>Tuyển dụng</b> rồi dùng chức năng chuyển ứng viên trúng tuyển thành hồ sơ nhân viên. Màn này chỉ dành cho nhập hồ sơ có sẵn hoặc cấp tài khoản nội bộ.</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Họ và tên *</Label>
-              <Input
-                value={form.fullName}
-                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                placeholder="Nguyễn Văn A"
-              />
-            </div>
-            <div>
-              <Label>Mã nhân viên</Label>
-              <Input
-                value={form.employeeCode}
-                onChange={(e) => setForm({ ...form, employeeCode: e.target.value })}
-                placeholder="NV-001"
-              />
-            </div>
+        <div className="space-y-3.5">
+          <p className="rounded-lg bg-muted p-3 text-sm">Với nhân sự mới tuyển, hãy hoàn tất quy trình tại mục <b>Tuyển dụng</b> rồi dùng chức năng chuyển ứng viên trúng tuyển thành hồ sơ nhân viên. Màn này chỉ dành cho nhập hồ sơ có sẵn hoặc cấp tài khoản nội bộ; mã nhân viên và vai trò mặc định do CSDL tự cấp khi lưu.</p>
+          <div>
+            <Label>Họ và tên *</Label>
+            <Input
+              value={form.fullName}
+              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+              placeholder="Nguyễn Văn A"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -659,14 +664,13 @@ export default function EmployeesPage() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <ModalFooterActions
-              onCancel={() => setIsCreateOpen(false)}
-              onConfirm={() => createEmployee.mutate()}
-              pending={createEmployee.isPending}
-              confirmLabel="Hoàn tất tiếp nhận"
-            />
-          </div>
+          <ModalFooterActions
+            className="mt-2"
+            onCancel={() => setIsCreateOpen(false)}
+            onConfirm={() => createEmployee.mutate()}
+            pending={createEmployee.isPending}
+            confirmLabel="Hoàn tất tiếp nhận"
+          />
         </div>
       </Modal>
 

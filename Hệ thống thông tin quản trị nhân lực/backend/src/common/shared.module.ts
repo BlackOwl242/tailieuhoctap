@@ -7,10 +7,11 @@ import { HrAccessService } from './services/hr-access.service';
 import { RuntimeSettingsService } from './services/runtime-settings.service';
 import { AttendanceLedgerService } from './services/attendance-ledger.service';
 import { PersonnelEffectsService } from './services/personnel-effects.service';
+import { FieldCryptoService } from './services/field-crypto.service';
 
 @Global()
 @Module({
-  providers: [PrismaService, AuditService, NotificationsService, SpaceAccessService, HrAccessService, RuntimeSettingsService, AttendanceLedgerService, PersonnelEffectsService],
-  exports: [PrismaService, AuditService, NotificationsService, SpaceAccessService, HrAccessService, RuntimeSettingsService, AttendanceLedgerService, PersonnelEffectsService],
+  providers: [PrismaService, AuditService, NotificationsService, SpaceAccessService, HrAccessService, RuntimeSettingsService, AttendanceLedgerService, PersonnelEffectsService, FieldCryptoService],
+  exports: [PrismaService, AuditService, NotificationsService, SpaceAccessService, HrAccessService, RuntimeSettingsService, AttendanceLedgerService, PersonnelEffectsService, FieldCryptoService],
 })
 export class SharedModule {}

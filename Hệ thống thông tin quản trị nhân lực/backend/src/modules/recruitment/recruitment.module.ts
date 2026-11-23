@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestj
 import { IsEmail, IsEnum, IsInt, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
+import { toMoney } from '../../common/money';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { BusinessException, ErrorCodes } from '../../common/errors/business.exception';
 import type { AuthUser } from '../../common/types/auth-user';
@@ -112,7 +113,7 @@ export class RecruitmentService {
     if (!roles.some(role => actor.roles.includes(role)) || !['HR','FINANCE'].includes(kind)) throw new ForbiddenException('Không có quyền thẩm định bước này');
     return this.prisma.$transaction(async tx => {
       const request = await tx.jobRequisition.findUniqueOrThrow({ where: { id } });
-      if (request.status !== 'PENDING_REVIEW' || request.budgetMonthly <= 0) throw new ConflictException('Phiếu phải chờ thẩm định và có ngân sách dương');
+      if (request.status !== 'PENDING_REVIEW' || toMoney(request.budgetMonthly) <= 0) throw new ConflictException('Phiếu phải chờ thẩm định và có ngân sách dương');
       if (actor.id === request.requestedById) throw new ForbiddenException('Không được tự thẩm định');
       const hrAssessedBy = kind === 'HR' ? actor.id : request.hrAssessedBy;
       const financeAssessedBy = kind === 'FINANCE' ? actor.id : request.financeAssessedBy;

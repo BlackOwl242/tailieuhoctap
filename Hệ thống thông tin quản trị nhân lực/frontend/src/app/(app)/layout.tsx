@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { api, errorMessage, isUnauthorized } from '@/lib/api';
+import { api, bootstrapSession, errorMessage, isUnauthorized } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
 import { AppShell } from '@/components/layout/app-shell';
 import { LoadingBlock, ErrorState } from '@/components/common/states';
@@ -12,31 +11,25 @@ import type { MeProfile } from '@/lib/types';
 
 /**
  * Layout cho toàn bộ khu vực đã đăng nhập:
+ * - Khi tải lại trang (F5), khôi phục access token trên RAM từ HttpOnly cookie;
  * - Chưa có token → chuyển trang login;
  * - Có token → tải hồ sơ /auth/me để biết vai trò rồi render AppShell.
  */
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const token = useAuthStore((s) => s.accessToken);
+  const sessionBootstrapped = useAuthStore((s) => s.sessionBootstrapped);
   const setUser = useAuthStore((s) => s.setUser);
 
-  /**
-   * Chờ zustand persist rehydrate xong TRƯỚC khi quyết định redirect —
-   * nếu không, F5 ở bất kỳ trang nào cũng bị đá về /login vì token chưa
-   * kịp nạp từ localStorage ở lần render đầu (lỗi thật đã bị bắt được
-   * bởi kiểm thử headless — Mục 5).
-   */
-  const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
-    // Chỉ chạy phía client — SSR không có localStorage nên không đụng đến persist
-    setHydrated(useAuthStore.persist.hasHydrated());
-    const unsub = useAuthStore.persist.onFinishHydration(() => setHydrated(true));
-    return unsub;
-  }, []);
+    if (!sessionBootstrapped) {
+      void bootstrapSession();
+    }
+  }, [sessionBootstrapped]);
 
   const meQuery = useQuery({
     queryKey: ['me'],
-    enabled: hydrated && !!token,
+    enabled: sessionBootstrapped && !!token,
     queryFn: async () => {
       const res = await api.get<MeProfile>('/auth/me');
       setUser({
@@ -44,6 +37,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         email: res.data.email,
         fullName: res.data.fullName,
         roles: res.data.roles,
+        mfaEnabled: res.data.mfaEnabled,
       });
       return res.data;
     },
@@ -51,15 +45,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    if (hydrated && !token) router.replace('/login');
-  }, [hydrated, token, router]);
+    if (sessionBootstrapped && !token) router.replace('/login');
+  }, [sessionBootstrapped, token, router]);
 
   /**
    * Token hết hạn/bị thu hồi (401/403 từ /auth/me) → TỰ ĐỘNG đăng xuất và
    * roll back về trang đăng nhập kèm ?next= để quay lại đúng trang cũ —
    * không để người dùng treo ở màn hình lỗi "Thử lại" vô nghĩa.
-   * (Interceptor đã thử refresh trước đó; tới được đây nghĩa là refresh
-   * cũng thất bại → phiên chết thật sự.)
    */
   const pathname = usePathname();
   useEffect(() => {
@@ -69,7 +61,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, [meQuery.isError, meQuery.error, router, pathname]);
 
-  if (!hydrated) return <LoadingBlock label="Đang khôi phục phiên đăng nhập…" />;
+  if (!sessionBootstrapped) return <LoadingBlock label="Đang khôi phục phiên đăng nhập…" />;
   if (!token) return null;
   if (meQuery.isLoading) return <LoadingBlock label="Đang tải không gian làm việc…" />;
   if (meQuery.isError || !meQuery.data) {

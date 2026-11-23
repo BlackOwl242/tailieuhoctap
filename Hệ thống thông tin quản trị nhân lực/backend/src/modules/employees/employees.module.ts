@@ -4,9 +4,10 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import {
-  IsDateString, IsEnum, IsIn, IsInt, IsNumber, IsObject, IsOptional, IsString, Max, MaxLength, Min,
+  IsDateString, IsEmail, IsEnum, IsIn, IsInt, IsNumber, IsObject, IsOptional, IsString, Max, MaxLength, Min, MinLength,
 } from 'class-validator';
 import { randomUUID } from 'node:crypto';
+import * as bcrypt from 'bcryptjs';
 import { writeFile } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 import { ConfigService } from '@nestjs/config';
@@ -14,12 +15,27 @@ import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { BusinessException, ErrorCodes } from '../../common/errors/business.exception';
+import { generateNextEmployeeCode } from '../../common/hr-code';
 import type { AuthUser } from '../../common/types/auth-user';
 import { dateKey, workDate } from '../../common/hr-time';
+import { toMoney, toMoneyOrNull } from '../../common/money';
 
 // ---------------------------------------------------------------------------
 // DTOs
 // ---------------------------------------------------------------------------
+
+class CreateEmployeeDto {
+  @ApiProperty() @IsString() @MaxLength(120) fullName!: string;
+  @ApiProperty() @IsEmail({}, { message: 'Email không hợp lệ' }) email!: string;
+  @ApiPropertyOptional({ minLength: 3 }) @IsOptional() @IsString() @MinLength(3, { message: 'Mật khẩu tối thiểu 3 ký tự' }) password?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(20) phone?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(120) jobTitle?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() orgUnitId?: string;
+  @ApiPropertyOptional({ enum: ['PROBATION', 'ACTIVE'] }) @IsOptional() @IsEnum(['PROBATION', 'ACTIVE']) employmentStatus?: 'PROBATION' | 'ACTIVE';
+  @ApiPropertyOptional() @IsOptional() @IsDateString() hireDate?: string;
+  /** Chấp nhận trường tùy chọn để tương thích ngược; hệ thống luôn tự động sinh mã nhân viên. */
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(40) employeeCode?: string;
+}
 
 class UpdateProfileDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(40) employeeCode?: string;
@@ -154,6 +170,7 @@ export class EmployeesService {
     const canReadContracts = canReadContractsAcrossOrganization(viewer)
       || viewer.id === id
       || viewer.roles.includes('LINE_MANAGER');
+    const isAdmin = viewer.roles.includes('ADMIN');
     const user = await this.prisma.user.findFirst({
       where: { id, deletedAt: null },
       select: {
@@ -161,6 +178,7 @@ export class EmployeesService {
         // Nhân viên được xem mức lương hồ sơ của chính mình; người khác chỉ thấy khi có quyền HR.
         ...(privileged || viewer.id === id ? { baseSalary: true } : {}),
         ...(viewer.id === id && !privileged ? { birthDate: true, phone: true, address: true } : {}),
+        ...(isAdmin ? { roles: { select: { roleCode: true } } } : {}),
         bio: true, expertise: true,
         ...(canReadContracts ? { contracts: { orderBy: { startDate: 'desc' as const } } } : {}),
         ...(canSeePersonalDetails ? { comprehensiveProfile: { select: { currentAddress: true, permanentAddress: true, verificationStatus: true, verifiedAt: true, dataSource: true } } } : {}),
@@ -182,10 +200,12 @@ export class EmployeesService {
     const profileAddress = user.comprehensiveProfile?.currentAddress?.trim()
       || user.comprehensiveProfile?.permanentAddress?.trim()
       || null;
+    const rawRoles = (user as { roles?: Array<{ roleCode: string }> }).roles;
     return {
       ...user,
       address: accountAddress?.trim() || profileAddress,
       comprehensiveProfile: undefined,
+      ...(Array.isArray(rawRoles) ? { roles: rawRoles.map((r) => r.roleCode) } : {}),
     };
   }
 
@@ -214,6 +234,63 @@ export class EmployeesService {
     };
   }
 
+  /** Tiếp nhận nhân sự mới (Admin/HR): hệ thống tự động cấp phát mã nhân viên NVxxxx. */
+  async create(dto: CreateEmployeeDto, actor: AuthUser, requestId?: string) {
+    const email = dto.email.trim().toLowerCase();
+    const exists = await this.prisma.user.findUnique({ where: { email } });
+    if (exists) {
+      throw new BusinessException(ErrorCodes.EMAIL_EXISTS, 'Email đã tồn tại trong hệ thống', HttpStatus.CONFLICT);
+    }
+    const passwordHash = await bcrypt.hash(dto.password || '123', 12);
+    const created = await this.prisma.$transaction(async (tx) => {
+      const employeeCode = await generateNextEmployeeCode(tx);
+      const defaultRoleSetting = await tx.setting.findUnique({ where: { key: 'DEFAULT_USER_ROLES' } });
+      const candidateRoles = Array.isArray(defaultRoleSetting?.value)
+        ? Array.from(new Set(defaultRoleSetting.value.map((r) => String(r).trim().toUpperCase()).filter(Boolean)))
+        : ['USER'];
+      const validRoles = candidateRoles.length
+        ? (await tx.role.findMany({ where: { code: { in: candidateRoles } }, select: { code: true } })).map((r) => r.code)
+        : ['USER'];
+      const finalRoles = validRoles.length ? validRoles : ['USER'];
+      const user = await tx.user.create({
+        data: {
+          email,
+          passwordHash,
+          mustChangePassword: true,
+          fullName: dto.fullName.trim(),
+          phone: dto.phone?.trim() || undefined,
+          jobTitle: dto.jobTitle?.trim() || undefined,
+          orgUnitId: dto.orgUnitId || undefined,
+          employeeCode,
+          hireDate: dto.hireDate ? new Date(dto.hireDate) : new Date(),
+          employmentStatus: dto.employmentStatus ?? 'PROBATION',
+          status: 'ACTIVE',
+          roles: { create: finalRoles.map((roleCode) => ({ roleCode })) },
+        },
+        select: EMPLOYEE_SELECT,
+      });
+      await tx.leaveBalance.createMany({
+        data: [{ userId: user.id, year: new Date().getUTCFullYear(), entitled: 12, used: 0 }],
+        skipDuplicates: true,
+      });
+      return { user, roles: finalRoles };
+    });
+    await this.audit.log({
+      actorId: actor.id,
+      action: 'EMPLOYEE_CREATED',
+      entityType: 'User',
+      entityId: created.user.id,
+      after: {
+        email: created.user.email,
+        employeeCode: created.user.employeeCode,
+        employmentStatus: created.user.employmentStatus,
+        roles: created.roles,
+      },
+      requestId,
+    });
+    return created.user;
+  }
+
   /** Cập nhật hồ sơ HR — mỗi thay đổi để lại dấu vết kiểm toán (tính pháp lý). */
   async updateProfile(id: string, dto: UpdateProfileDto, actor: AuthUser, requestId?: string) {
     const user = await this.prisma.user.findFirst({ where: { id, deletedAt: null } });
@@ -224,11 +301,10 @@ export class EmployeesService {
       (dto.jobTitle !== undefined && dto.jobTitle !== (user.jobTitle ?? '')) ||
       (dto.orgUnitId !== undefined && dto.orgUnitId !== (user.orgUnitId ?? ''));
     if (controlledChange) throw new ConflictException('Ngày vào làm, chức danh, đơn vị và trạng thái nhân sự phải thay đổi qua quy trình tuyển dụng/thử việc hoặc quyết định nhân sự để có người duyệt và ngày hiệu lực.');
-    if (dto.employeeCode && dto.employeeCode !== user.employeeCode) {
-      const dup = await this.prisma.user.findUnique({ where: { employeeCode: dto.employeeCode } });
-      if (dup) throw new BusinessException(ErrorCodes.CONFLICT, 'Mã nhân viên đã tồn tại', HttpStatus.CONFLICT);
+    if (dto.employeeCode !== undefined && dto.employeeCode.trim() !== '' && user.employeeCode && dto.employeeCode.trim() !== user.employeeCode) {
+      throw new BadRequestException('Mã nhân viên do hệ thống tự động cấp phát cố định, không thể tự đặt hoặc thay đổi thủ công.');
     }
-    const employeeCode = dto.employeeCode ?? user.employeeCode ?? (await this.suggestEmployeeCode());
+    const employeeCode = user.employeeCode ?? (await generateNextEmployeeCode(this.prisma));
     const updated = await this.prisma.user.update({
       where: { id },
       data: {
@@ -255,19 +331,6 @@ export class EmployeesService {
     return updated;
   }
 
-  /** Sinh mã nhân viên tự động NV0001, NV0002… khi chưa có. */
-  private async suggestEmployeeCode(): Promise<string> {
-    const count = await this.prisma.user.count({ where: { employeeCode: { not: null } } });
-    let n = count + 1;
-    // Đảm bảo không trùng dù có xóa rời rạc
-    for (;;) {
-      const code = `NV${String(n).padStart(4, '0')}`;
-      const dup = await this.prisma.user.findUnique({ where: { employeeCode: code } });
-      if (!dup) return code;
-      n += 1;
-    }
-  }
-
   // ------------------------------------------------------------------ hợp đồng
   async createContract(userId: string, dto: CreateContractDto, actor: AuthUser, requestId?: string) {
     const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
@@ -288,12 +351,12 @@ export class EmployeesService {
     if (overlaps) throw new ConflictException('Thời hạn hợp đồng bị trùng với hợp đồng gốc đã lưu; phụ lục lương cần đi qua quyết định điều chỉnh');
     const compensationBasis = dto.compensationBasis ?? 'MONTHLY';
     const changesPayTerms = activeAtStart
-      ? dto.baseSalary !== activeAtStart.baseSalary || compensationBasis !== activeAtStart.compensationBasis || (dto.insuranceSalary !== undefined && dto.insuranceSalary !== activeAtStart.insuranceSalary)
-      : dto.baseSalary !== (user.baseSalary ?? 0);
+      ? dto.baseSalary !== toMoney(activeAtStart.baseSalary) || compensationBasis !== activeAtStart.compensationBasis || (dto.insuranceSalary !== undefined && dto.insuranceSalary !== toMoneyOrNull(activeAtStart.insuranceSalary))
+      : dto.baseSalary !== toMoney(user.baseSalary, 0);
     if (changesPayTerms && activeAtStart) throw new ConflictException('Thay đổi lương, cách trả hoặc căn cứ bảo hiểm phải lập đề xuất ở mục Biến động nhân sự để được duyệt trước khi cập nhật hợp đồng.');
     if (changesPayTerms) {
       const band = user.salaryBandId ? await this.prisma.hrmsSalaryBand.findUnique({ where: { id: user.salaryBandId } }) : null;
-      if (!band || band.status !== 'ACTIVE' || band.effectiveFrom > contractStart || (band.effectiveTo && band.effectiveTo < contractStart) || band.compensationBasis !== compensationBasis || dto.baseSalary < band.minSalary || dto.baseSalary > band.maxSalary) {
+      if (!band || band.status !== 'ACTIVE' || band.effectiveFrom > contractStart || (band.effectiveTo && band.effectiveTo < contractStart) || band.compensationBasis !== compensationBasis || dto.baseSalary < toMoney(band.minSalary) || dto.baseSalary > toMoney(band.maxSalary)) {
         throw new ConflictException('Hợp đồng đầu tiên cần mức lương nằm trong khung lương đã duyệt và còn hiệu lực vào ngày bắt đầu.');
       }
     }
@@ -407,6 +470,12 @@ export class EmployeesController {
   @Get()
   list(@CurrentUser() user: AuthUser) {
     return this.service.list(user);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB')
+  @Post()
+  create(@Body() dto: CreateEmployeeDto, @CurrentUser() user: AuthUser) {
+    return this.service.create(dto, user);
   }
 
   @Get(':id')

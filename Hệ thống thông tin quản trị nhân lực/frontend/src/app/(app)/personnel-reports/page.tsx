@@ -268,8 +268,11 @@ export default function PersonnelReportsPage() {
                   <th className="border border-border p-1.5" colSpan={2}>50 - 54 tuổi</th>
                   <th className="border border-border p-1.5" colSpan={2}>55 - 59 tuổi</th>
                   <th className="border border-border p-1.5" colSpan={2}>Từ 60 tuổi</th>
+                  <th className="border border-border p-1.5" colSpan={2}>Chưa rõ ngày sinh</th>
                 </tr>
                 <tr className="bg-muted/40 text-foreground text-[10pt]">
+                  <th className="border border-border p-1">Nam</th>
+                  <th className="border border-border p-1">Nữ</th>
                   <th className="border border-border p-1">Nam</th>
                   <th className="border border-border p-1">Nữ</th>
                   <th className="border border-border p-1">Nam</th>
@@ -286,7 +289,7 @@ export default function PersonnelReportsPage() {
               </thead>
               <tbody>
                 {qBieu01.isLoading ? (
-                  <tr><td colSpan={15} className="text-center py-6 text-muted-foreground">Đang tổng hợp số liệu...</td></tr>
+                  <tr><td colSpan={17} className="text-center py-6 text-muted-foreground">Đang tổng hợp số liệu...</td></tr>
                 ) : (
                   qBieu01.data?.rows?.map((row: any, idx: number) => (
                     <tr key={idx} className="hover:bg-muted/30 text-center">
@@ -305,6 +308,8 @@ export default function PersonnelReportsPage() {
                       <td className="border border-black p-1">{row.ageGroups.age55to59.female ?? 0}</td>
                       <td className="border border-black p-1">{row.ageGroups.above60.male ?? 0}</td>
                       <td className="border border-black p-1">{row.ageGroups.above60.female ?? 0}</td>
+                      <td className="border border-black p-1 text-muted-foreground">{row.ageGroups.unknownAge?.male ?? 0}</td>
+                      <td className="border border-black p-1 text-muted-foreground">{row.ageGroups.unknownAge?.female ?? 0}</td>
                     </tr>
                   ))
                 )}

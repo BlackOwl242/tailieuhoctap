@@ -71,8 +71,27 @@ export const WORKFLOW_HELP = {
     steps: [
       { role: 'Nhân viên / quản lý / HR', action: 'Xử lý nghỉ phép, OT, giải trình thiếu cặp và xác nhận công tác. Tại Quy trình & xác nhận → Chốt công, chốt tháng đã kết thúc.', result: 'Bản công đã chốt là căn cứ tính lương.', href: '/hr-workflows?tab=attendance', link: 'Mở bước chốt công' },
       { role: 'HR và người đối soát độc lập', action: 'Tạo kỳ lương; kiểm tra phiếu rồi đăng nhập tài khoản khác người tính để đối soát. Giám đốc khác người tính/đối soát phê duyệt.', result: 'Bảng lương được duyệt và khóa theo vai trò.', href: '/payroll-engine', link: 'Mở Tiền lương' },
-      { role: 'Kế toán / quản trị có quyền', action: 'Sau khi chi trả thực tế, ghi hình thức và mã giao dịch/chứng từ để xác nhận đã trả.', result: 'Giữ bằng chứng thanh toán. Kỳ đã trả không được hủy để tính lại.', href: '/payroll-guide', link: 'Xem hướng dẫn lương chi tiết' },
+      { role: 'Kế toán / quản trị có quyền', action: 'Sau khi chi trả thực tế, ghi hình thức và mã giao dịch/chứng từ để xác nhận đã trả.', result: 'Giữ bằng chứng thanh toán. Kỳ đã trả không được hủy để tính lại.', href: '/payroll-engine?tab=policy', link: 'Xem chính sách lương' },
     ], blocked: 'Còn đơn chờ duyệt hoặc OT chưa xác nhận thì chưa chốt được công. Mở lại công làm bảng lương cũ hết căn cứ: hủy kỳ chưa trả, chốt lại và tính mới. Hồ sơ lương người vào giữa tháng phải có hiệu lực từ ngày vào làm.',
+  },
+  knowledge: {
+    title: 'Quản trị & xuất bản tri thức',
+    summary: 'Tạo Space → biên soạn phiên bản → gửi kiểm duyệt → xuất bản & gán lộ trình hội nhập.',
+    steps: [
+      { role: 'Tác giả / biên tập viên', action: 'Chọn hoặc tạo Space phù hợp, soạn nội dung Markdown và nộp yêu cầu kiểm duyệt.', result: 'Hệ thống lưu phiên bản bất biến và đưa vào hộp chờ duyệt.', href: '/knowledge', link: 'Mở Cổng tri thức' },
+      { role: 'Quản lý tri thức / chuyên gia', action: 'Xem xét tại tab Hộp duyệt bài và bấm Phê duyệt hoặc Từ chối kèm nhận xét.', result: 'Bài viết được xuất bản công khai và đánh chỉ mục PostgreSQL FTS.', href: '/knowledge?tab=reviews', link: 'Mở hộp duyệt bài' },
+      { role: 'Nhân sự mới & toàn công ty', action: 'Tra cứu toàn văn, đặt câu hỏi trực tiếp dưới bài hoặc hoàn thành lộ trình đọc hội nhập.', result: 'Tiến độ đọc và danh bạ chuyên gia được cập nhật theo thời gian thực.', href: '/knowledge?tab=onboarding', link: 'Xem lộ trình hội nhập' },
+    ],
+    blocked: 'Bài viết chỉ xuất hiện trên tìm kiếm toàn văn và lộ trình hội nhập khi đã ở trạng thái Đã xuất bản.',
+  },
+  analytics: {
+    title: 'Phân tích & hỗ trợ ra quyết định (DSS)',
+    summary: 'Chọn năm & đơn vị → đọc chỉ số biến động/quỹ lương/KPI → xử lý cảnh báo rủi ro.',
+    steps: [
+      { role: 'Lãnh đạo / HR / Kế toán', action: 'Chọn năm phân tích và lọc theo đơn vị phòng ban để tổng hợp số liệu thực tế từ PostgreSQL.', result: 'Hiển thị biến động nhân sự, phân bổ bậc lương, kết quả KPI và phễu tuyển dụng.', href: '/analytics', link: 'Mở Phân tích DSS' },
+      { role: 'Quản trị & HR C&B', action: 'Kiểm tra các cảnh báo chênh lệch dải lương, nguy cơ nghỉ việc và tỷ lệ tồn đọng phê duyệt.', result: 'Xác định đúng điểm nghẽn để điều chỉnh định mức hoặc xử lý tồn đọng.', href: '/payroll-engine', link: 'Mở Tiền lương' },
+    ],
+    blocked: 'Số liệu phản ánh trực tiếp từ các kỳ lương, hợp đồng, KPI và chấm công đã ghi nhận trong hệ thống.',
   },
 } satisfies Record<string, WorkflowHelp>;
 
@@ -80,4 +99,5 @@ export type WorkflowKey = keyof typeof WORKFLOW_HELP;
 export const ROUTE_WORKFLOW: Record<string, WorkflowKey> = {
   '/overtime': 'overtime', '/leave': 'leave', '/assets': 'assets', '/expense-claims': 'travel',
   '/personnel': 'promotion', '/recruitment-ats': 'recruitment', '/performance': 'kpi', '/payroll-engine': 'payroll',
+  '/knowledge': 'knowledge', '/analytics': 'analytics',
 };

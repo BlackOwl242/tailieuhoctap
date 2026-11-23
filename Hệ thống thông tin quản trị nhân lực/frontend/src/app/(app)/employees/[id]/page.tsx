@@ -4,13 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, BadgeCheck, FileText, Plus, Printer, Trash2, ArrowRightLeft } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, FileText, Plus, Printer, ShieldCheck, Trash2, ArrowRightLeft } from 'lucide-react';
 import { api, errorMessage, openProtectedFile } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useToast } from '@/components/ui/toaster';
 import { CONTRACT_STATUS_LABEL, CONTRACT_TYPE_LABEL, EMPLOYMENT_STATUS_LABEL, vnd } from '@/lib/hr';
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton, Textarea } from '@/components/ui/primitives';
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton, Textarea } from '@/components/ui/primitives';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { PageHeader, ErrorState } from '@/components/common/states';
 
@@ -26,6 +26,8 @@ interface CertificateRow {
 }
 interface EmployeeDetail {
   id: string; employeeCode: string | null; fullName: string; email: string;
+  status?: 'ACTIVE' | 'LOCKED' | 'DISABLED';
+  roles?: string[];
   jobTitle: string | null; orgUnit?: { name: string } | null;
   hireDate: string | null; employmentStatus: keyof typeof EMPLOYMENT_STATUS_LABEL;
   /** baseSalary và contracts được giới hạn theo quyền hồ sơ hoặc quyền xem hợp đồng. */
@@ -35,6 +37,26 @@ interface EmployeeDetail {
   comprehensiveProfile?: { verificationStatus?: string; verifiedAt?: string | null; dataSource?: string } | null;
   leaveBalances: { year: number; entitled: number; used: number }[];
 }
+
+const ACCOUNT_STATUS_LABEL: Record<string, string> = {
+  ACTIVE: 'Đang hoạt động',
+  LOCKED: 'Đang bị khóa',
+  DISABLED: 'Đã vô hiệu hóa',
+};
+
+const FALLBACK_ROLES = [
+  { code: 'USER', name: 'Nhân viên (Cổng ESS)' },
+  { code: 'LINE_MANAGER', name: 'Quản lý / Trưởng bộ phận' },
+  { code: 'KM_MANAGER', name: 'Cán bộ Quản trị Nhân sự' },
+  { code: 'HR_CB', name: 'Chuyên viên C&B (Lương & Phúc lợi)' },
+  { code: 'ACCOUNTANT', name: 'Kế toán Doanh nghiệp & Thanh toán' },
+  { code: 'HR_RECRUITER', name: 'Chuyên viên Tuyển dụng' },
+  { code: 'HR_TRAINER', name: 'Chuyên viên Đào tạo & Phát triển' },
+  { code: 'AUDITOR', name: 'Kiểm toán Nội bộ & Pháp chế' },
+  { code: 'SHAREHOLDER', name: 'Cổ đông & Hội đồng Quản trị' },
+  { code: 'BOD', name: 'Ban Giám Đốc (Executive)' },
+  { code: 'ADMIN', name: 'Quản trị viên Hệ thống' },
+];
 
 /** UC09/UC10/UC11 — Hồ sơ chi tiết: tab thông tin, hợp đồng, văn bằng chứng chỉ. */
 export default function EmployeeDetailPage() {
@@ -47,13 +69,23 @@ export default function EmployeeDetailPage() {
   const viewer = useAuthStore((s) => s.user);
   const roles = viewer?.roles ?? [];
   const isHr = roles.some((r) => ['ADMIN', 'KM_MANAGER', 'HR_CB'].includes(r));
+  const isAdmin = roles.includes('ADMIN');
 
   const q = useQuery({
     queryKey: ['employee', id],
     queryFn: async () => (await api.get<EmployeeDetail>(`/employees/${id}`)).data,
   });
 
+  const rolesQ = useQuery({
+    queryKey: ['system-roles'],
+    enabled: isAdmin,
+    queryFn: async () => (await api.get<{ code: string; name: string }[]>('/roles')).data,
+  });
+
   const [profileOpen, setProfileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [accountRoles, setAccountRoles] = useState<string[]>(['USER']);
+  const [accountStatus, setAccountStatus] = useState<'ACTIVE' | 'LOCKED' | 'DISABLED'>('ACTIVE');
   const [contractOpen, setContractOpen] = useState(false);
   const [certOpen, setCertOpen] = useState(false);
   const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
@@ -80,7 +112,6 @@ export default function EmployeeDetailPage() {
   const updateProfile = useMutation({
     mutationFn: async () => {
       const body: Record<string, unknown> = {};
-      if (profileForm.employeeCode) body.employeeCode = profileForm.employeeCode;
       if (profileForm.hireDate) body.hireDate = profileForm.hireDate;
       if (profileForm.employmentStatus) body.employmentStatus = profileForm.employmentStatus;
       if (profileForm.phone) body.phone = profileForm.phone;
@@ -132,6 +163,25 @@ export default function EmployeeDetailPage() {
   const deleteCert = useMutation({
     mutationFn: async (certId: string) => api.delete(`/employees/${id}/certificates/${certId}`),
     onSuccess: () => { toast('Đã xóa văn bằng', 'success'); invalidate(); },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const saveAccountAccess = useMutation({
+    mutationFn: async () => {
+      if (accountRoles.length === 0) throw new Error('Tài khoản phải có ít nhất 1 vai trò hệ thống');
+      return api.patch(`/users/${id}`, {
+        roleCodes: accountRoles,
+        status: accountStatus,
+      });
+    },
+    onSuccess: () => {
+      toast('Đã cập nhật tài khoản hệ thống và phân quyền vai trò', 'success');
+      setAccountOpen(false);
+      invalidate();
+      qc.invalidateQueries({ queryKey: ['admin-users'] });
+      qc.invalidateQueries({ queryKey: ['system-roles'] });
+      qc.invalidateQueries({ queryKey: ['me'] });
+    },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
 
@@ -198,6 +248,54 @@ export default function EmployeeDetailPage() {
             </dl>
           </CardContent>
         </Card>
+
+        {isAdmin ? (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-2">
+              <CardTitle className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4" /> Tài khoản hệ thống & Phân quyền
+              </CardTitle>
+              <Button
+                size="sm"
+                variant="outline"
+                className="no-print"
+                onClick={() => {
+                  setAccountRoles(emp.roles?.length ? [...emp.roles] : ['USER']);
+                  setAccountStatus(emp.status ?? 'ACTIVE');
+                  setAccountOpen(true);
+                }}
+              >
+                Cấu hình tài khoản & vai trò
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">Email đăng nhập</dt>
+                  <dd className="font-mono font-medium">{emp.email}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">Trạng thái tài khoản</dt>
+                  <dd className="font-medium">{ACCOUNT_STATUS_LABEL[emp.status ?? 'ACTIVE'] ?? emp.status ?? 'Đang hoạt động'}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">Vai trò hệ thống</dt>
+                  <dd className="mt-1 flex flex-wrap gap-1.5">
+                    {(emp.roles?.length ? emp.roles : ['USER']).map((code) => {
+                      const roleList = rolesQ.data ?? FALLBACK_ROLES;
+                      const roleName = roleList.find((r) => r.code === code)?.name ?? code;
+                      return (
+                        <Badge key={code} variant="secondary" className="border border-border bg-muted px-2 py-0.5 text-xs font-medium">
+                          {roleName} ({code})
+                        </Badge>
+                      );
+                    })}
+                  </dd>
+                </div>
+              </dl>
+            </CardContent>
+          </Card>
+        ) : null}
 
         {isHr && (missingProfileFields.length > 0 || hasNoActiveContract) ? (
           <Card>
@@ -360,18 +458,96 @@ export default function EmployeeDetailPage() {
           onSubmit={(e) => { e.preventDefault(); updateProfile.mutate(); }}
           className="grid grid-cols-1 gap-3 sm:grid-cols-2"
         >
-          <div className="space-y-1.5"><Label>Mã NV</Label>
-            <Input value={profileForm.employeeCode ?? emp.employeeCode ?? ''} onChange={(e) => setProfileForm({ ...profileForm, employeeCode: e.target.value })} /></div>
-          <p className="sm:col-span-2 rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">Chức danh, đơn vị, ngày vào làm và tình trạng công tác được cập nhật theo quyết định đã duyệt hoặc quy trình tuyển dụng/thử việc.</p>
+          <p className="sm:col-span-2 rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">Chức danh, đơn vị, ngày vào làm và tình trạng công tác được cập nhật theo quyết định đã duyệt hoặc quy trình tuyển dụng/thử việc; mã nhân viên do hệ thống cấp cố định.</p>
           <div className="space-y-1.5"><Label>Điện thoại</Label>
             <Input value={profileForm.phone ?? emp.phone ?? ''} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} /></div>
           <div className="space-y-1.5"><Label>Ngày sinh</Label>
             <Input type="date" value={profileForm.birthDate ?? (emp.birthDate ? emp.birthDate.slice(0, 10) : '')} onChange={(e) => setProfileForm({ ...profileForm, birthDate: e.target.value })} /></div>
           <div className="space-y-1.5 sm:col-span-2"><Label>Địa chỉ</Label>
             <Input value={profileForm.address ?? emp.address ?? ''} onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })} /></div>
-          <div className="col-span-full flex justify-end gap-2">
-            <ModalFooterActions onCancel={() => setProfileOpen(false)} pending={updateProfile.isPending} />
+          <ModalFooterActions className="col-span-full" onCancel={() => setProfileOpen(false)} pending={updateProfile.isPending} />
+        </form>
+      </Modal>
+
+      <Modal open={accountOpen} onOpenChange={setAccountOpen} title="Cấu hình tài khoản hệ thống & vai trò" description={`${emp.fullName} · ${emp.email}`} size="lg">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (accountRoles.length === 0) {
+              toast('Tài khoản phải có ít nhất 1 vai trò hệ thống', 'error');
+              return;
+            }
+            saveAccountAccess.mutate();
+          }}
+          className="space-y-4"
+        >
+          <div className="space-y-1.5">
+            <Label htmlFor="emp-account-status">Trạng thái tài khoản</Label>
+            <Select
+              id="emp-account-status"
+              disabled={id === viewer?.id}
+              value={accountStatus}
+              onChange={(e) => setAccountStatus(e.target.value as 'ACTIVE' | 'LOCKED' | 'DISABLED')}
+            >
+              <option value="ACTIVE">Đang hoạt động</option>
+              <option value="DISABLED">Vô hiệu hóa</option>
+              {emp.status === 'LOCKED' ? <option value="LOCKED">Đang bị khóa (tự động)</option> : null}
+            </Select>
+            {id === viewer?.id ? (
+              <p className="text-xs text-muted-foreground">Không thể tự vô hiệu hóa tài khoản đang đăng nhập.</p>
+            ) : null}
           </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>Vai trò hệ thống * (có thể chọn nhiều)</Label>
+              <span className="text-xs text-muted-foreground">Đã chọn {accountRoles.length} vai trò</span>
+            </div>
+            <div className="grid max-h-[260px] grid-cols-1 gap-1.5 overflow-y-auto rounded-lg border border-border p-2 sm:grid-cols-2">
+              {(rolesQ.data ?? FALLBACK_ROLES).map((r) => {
+                const checked = accountRoles.includes(r.code);
+                const lockSelfAdmin = r.code === 'ADMIN' && id === viewer?.id && isAdmin;
+                return (
+                  <label
+                    key={r.code}
+                    className={`flex items-start gap-2 rounded-md border px-2.5 py-2 text-xs transition-colors ${
+                      checked ? 'border-foreground bg-muted/40' : 'border-transparent hover:bg-muted/20'
+                    } ${lockSelfAdmin ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      disabled={lockSelfAdmin}
+                      onChange={(e) =>
+                        setAccountRoles((prev) =>
+                          e.target.checked
+                            ? Array.from(new Set([...prev, r.code]))
+                            : prev.filter((c) => c !== r.code),
+                        )
+                      }
+                      className="mt-0.5"
+                    />
+                    <span className="min-w-0">
+                      <span className="block font-medium text-foreground">{r.name}</span>
+                      <span className="block font-mono text-[10px] text-muted-foreground">
+                        {r.code}{lockSelfAdmin ? ' · Không thể tự gỡ' : ''}
+                      </span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+            {accountRoles.length === 0 ? (
+              <p className="text-xs text-rose-600">Vui lòng chọn ít nhất 1 vai trò hệ thống.</p>
+            ) : null}
+          </div>
+
+          <ModalFooterActions
+            onCancel={() => setAccountOpen(false)}
+            pending={saveAccountAccess.isPending}
+            disabled={accountRoles.length === 0}
+            confirmLabel="Lưu cấu hình tài khoản"
+          />
         </form>
       </Modal>
 
@@ -404,9 +580,7 @@ export default function EmployeeDetailPage() {
               onChange={(e) => void pickFile(e.target.files?.[0] ?? null, setContractFile)} />
             {contractFile ? <p className="text-xs text-muted-foreground">Đã chọn: {contractFile.name}</p> : null}
           </div>
-          <div className="col-span-full flex justify-end gap-2">
-            <ModalFooterActions onCancel={() => setContractOpen(false)} pending={createContract.isPending} confirmLabel="Tạo hợp đồng" />
-          </div>
+          <ModalFooterActions className="col-span-full" onCancel={() => setContractOpen(false)} pending={createContract.isPending} confirmLabel="Tạo hợp đồng" />
         </form>
       </Modal>
 
@@ -433,9 +607,7 @@ export default function EmployeeDetailPage() {
               onChange={(e) => void pickFile(e.target.files?.[0] ?? null, setCertFile)} />
             {certFile ? <p className="text-xs text-muted-foreground">Đã chọn: {certFile.name}</p> : null}
           </div>
-          <div className="col-span-full flex justify-end gap-2">
-            <ModalFooterActions onCancel={() => setCertOpen(false)} pending={createCert.isPending} confirmLabel="Thêm" />
-          </div>
+          <ModalFooterActions className="col-span-full" onCancel={() => setCertOpen(false)} pending={createCert.isPending} confirmLabel="Thêm" />
         </form>
       </Modal>
     </>

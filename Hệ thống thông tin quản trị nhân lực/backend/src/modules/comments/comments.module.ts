@@ -75,7 +75,7 @@ export class CommentsService {
       userIds: targets.filter((t) => t !== user.id),
       type: 'COMMENT_ADDED',
       title: `${user.fullName} đã bình luận trong "${article.title}"`,
-      linkPath: `/articles/${articleId}`,
+      linkPath: `/knowledge?article=${articleId}`,
     });
     return comment;
   }

@@ -8,6 +8,7 @@ import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestj
 import { IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsString, Min, Max, MinLength, MaxLength } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
+import { toMoney } from '../../common/money';
 
 export class ApplyLoanDto {
   @ApiProperty({ example: 'user-id' })
@@ -183,7 +184,7 @@ export class HrmsLoansService {
     }
 
     const availableNetPay = Math.max(0, Math.floor(Number.isFinite(netPayBeforeLoan) ? netPayBeforeLoan : 0));
-    const standardEmi = Math.min(loan.monthlyEmi, loan.remainingAmount);
+    const standardEmi = Math.min(toMoney(loan.monthlyEmi), toMoney(loan.remainingAmount));
     const isCapped = standardEmi > availableNetPay;
     const allowedDeduction = Math.min(standardEmi, availableNetPay);
     const rolloverAmount = standardEmi - allowedDeduction;
@@ -207,9 +208,10 @@ export class HrmsLoansService {
     const loan = await this.prisma.hrmsEmployeeLoan.findUnique({ where: { id: loanId } });
     if (!loan) throw new NotFoundException('Không tìm thấy khoản vay');
 
-    if (!Number.isFinite(paidAmount) || paidAmount <= 0 || paidAmount > loan.remainingAmount) throw new BadRequestException('Số tiền trả phải dương và không vượt dư nợ');
+    const currentRemaining = toMoney(loan.remainingAmount);
+    if (!Number.isFinite(paidAmount) || paidAmount <= 0 || paidAmount > currentRemaining) throw new BadRequestException('Số tiền trả phải dương và không vượt dư nợ');
     if (loan.status !== 'DISBURSED') throw new ConflictException('Khoản vay chưa giải ngân hoặc đã đóng');
-    const newRemaining = loan.remainingAmount - paidAmount;
+    const newRemaining = currentRemaining - paidAmount;
     const isCompleted = newRemaining === 0;
     const updated = await this.prisma.$transaction(async tx => {
       const changed = await tx.hrmsEmployeeLoan.updateMany({ where: { id: loanId, remainingAmount: loan.remainingAmount, status: 'DISBURSED' }, data: { remainingAmount: newRemaining, totalRepaid: { increment: paidAmount }, status: isCompleted ? 'COMPLETED' : 'DISBURSED' } });

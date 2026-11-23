@@ -9,7 +9,7 @@ import type { ApiErrorBody } from './types';
  * dev (Next rewrites) lẫn production (rewrite trong container web).
  * Tự động: gắn Bearer token → khi 401 thì refresh MỘT lần rồi thử lại.
  */
-export const api = axios.create({ baseURL: '/api/v1', timeout: 20_000 });
+export const api = axios.create({ baseURL: '/api/v1', timeout: 20_000, withCredentials: true });
 
 // Cờ chống vòng lặp refresh: nhiều request 401 song song chỉ refresh một lần
 let refreshing: Promise<string | null> | null = null;
@@ -33,17 +33,23 @@ api.interceptors.response.use(
       }
       return Promise.reject(error);
     }
-    // Chỉ bỏ qua refresh với các endpoint xác thực thuần (login/refresh/logout);
+    // Chỉ bỏ qua refresh với các endpoint xác thực thuần (login/mfa/refresh/logout);
     // /auth/me 401 do access token hết hạn → vẫn thử refresh rồi thử lại.
     const url = original?.url ?? '';
-    const isAuthCall = url.includes('/auth/login') || url.includes('/auth/refresh')
-      || url.includes('/auth/logout');
+    const isAuthCall =
+      url.includes('/auth/login') ||
+      url.includes('/auth/mfa/verify') ||
+      url.includes('/auth/refresh') ||
+      url.includes('/auth/logout');
 
     if (status === 401 && original && !original._retried && !isAuthCall) {
       original._retried = true;
-      refreshing = refreshing ?? doRefresh();
+      if (!refreshing) {
+        refreshing = doRefresh().finally(() => {
+          refreshing = null;
+        });
+      }
       const newToken = await refreshing;
-      refreshing = null;
       if (newToken) {
         original.headers.Authorization = `Bearer ${newToken}`;
         return api(original);
@@ -64,17 +70,49 @@ api.interceptors.response.use(
   },
 );
 
-/** Gọi /auth/refresh bằng refresh token hiện có; trả access token mới hoặc null. */
+/** Gọi /auth/refresh qua HttpOnly cookie `hrmis_rt`; trả access token mới (chỉ giữ trên RAM) hoặc null. */
 async function doRefresh(): Promise<string | null> {
-  const { refreshToken, setTokens } = useAuthStore.getState();
-  if (!refreshToken) return null;
   try {
-    const res = await axios.post('/api/v1/auth/refresh', { refreshToken });
-    setTokens({ accessToken: res.data.accessToken, refreshToken: res.data.refreshToken });
-    return res.data.accessToken as string;
+    const res = await axios.post(
+      '/api/v1/auth/refresh',
+      {},
+      { withCredentials: true, headers: { 'X-Auth-Transport': 'cookie' } },
+    );
+    const accessToken = res.data?.accessToken as string | undefined;
+    if (!accessToken) return null;
+    const store = useAuthStore.getState();
+    store.setAccessToken(accessToken);
+    store.markBootstrapped();
+    return accessToken;
   } catch {
     return null;
   }
+}
+
+/**
+ * Khôi phục phiên đăng nhập từ HttpOnly cookie khi tải lại trang (F5).
+ * Chia sẻ promise `refreshing` để tránh StrictMode double-mount gửi 2 request refresh song song.
+ */
+export async function bootstrapSession(): Promise<string | null> {
+  const state = useAuthStore.getState();
+  if (state.accessToken) {
+    if (!state.sessionBootstrapped) state.markBootstrapped();
+    return state.accessToken;
+  }
+  if (state.sessionBootstrapped) return null;
+  if (!refreshing) {
+    refreshing = doRefresh().finally(() => {
+      refreshing = null;
+    });
+  }
+  const token = await refreshing;
+  const current = useAuthStore.getState();
+  if (token) {
+    current.markBootstrapped();
+  } else {
+    current.clear();
+  }
+  return token;
 }
 
 /** Lỗi 401/403 → phiên không còn hợp lệ (hết hạn, bị thu hồi, bị khóa). */

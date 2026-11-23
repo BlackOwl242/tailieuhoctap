@@ -9,6 +9,7 @@ import { IsArray, IsDateString, IsEnum, IsIn, IsNumber, IsOptional, IsString, Ar
 import { AttendanceLedgerService } from '../../common/services/attendance-ledger.service';
 import { HrAccessService } from '../../common/services/hr-access.service';
 import { dateKey, workDate } from '../../common/hr-time';
+import { toMoney } from '../../common/money';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { ClaimStatus } from '@prisma/client';
@@ -312,9 +313,10 @@ export class HrmsExpensesService {
       if (status === 'PAID') {
         const advances = claim.travelRequestId ? await tx.hrmsEmployeeAdvance.aggregate({ where: { travelRequestId: claim.travelRequestId, userId: claim.userId, status: 'PAID' }, _sum: { amount: true } }) : { _sum: { amount: 0 } };
         const previous = claim.travelRequestId ? await tx.expenseSettlement.aggregate({ where: { travelRequestId: claim.travelRequestId }, _sum: { advanceApplied: true } }) : { _sum: { advanceApplied: 0 } };
-        const available = Math.max(0, (advances._sum.amount ?? 0) - (previous._sum.advanceApplied ?? 0));
-        const applied = Math.min(available, claim.approvedAmount ?? claim.totalAmount);
-        await tx.expenseSettlement.create({ data: { claimId: id, travelRequestId: claim.travelRequestId, userId: claim.userId, advanceApplied: applied, payableAmount: (claim.approvedAmount ?? claim.totalAmount) - applied, actorId } });
+        const available = Math.max(0, toMoney(advances._sum.amount, 0) - toMoney(previous._sum.advanceApplied, 0));
+        const payableBasis = toMoney(claim.approvedAmount ?? claim.totalAmount);
+        const applied = Math.min(available, payableBasis);
+        await tx.expenseSettlement.create({ data: { claimId: id, travelRequestId: claim.travelRequestId, userId: claim.userId, advanceApplied: applied, payableAmount: payableBasis - applied, actorId } });
       }
       await tx.auditLog.create({ data: { actorId, action: `EXPENSE_${status}`, entityType: 'HrmsExpenseClaim', entityId: id } });
       return tx.hrmsExpenseClaim.findUniqueOrThrow({ where: { id } });
@@ -332,8 +334,8 @@ export class HrmsExpensesService {
     return this.prisma.$transaction(async tx => {
       const paidAdvances = await tx.hrmsEmployeeAdvance.aggregate({ where: { travelRequestId, userId: travel.userId, status: 'PAID' }, _sum: { amount: true } });
       const paidClaims = await tx.hrmsExpenseClaim.aggregate({ where: { travelRequestId, userId: travel.userId, status: 'PAID' }, _sum: { approvedAmount: true } });
-      const totalAdvance = paidAdvances._sum.amount ?? 0;
-      const totalExpense = paidClaims._sum.approvedAmount ?? 0;
+      const totalAdvance = toMoney(paidAdvances._sum.amount, 0);
+      const totalExpense = toMoney(paidClaims._sum.approvedAmount, 0);
       const due = Math.max(0, totalAdvance - totalExpense);
       const latestSettlement = await tx.expenseSettlement.findFirst({ where: { travelRequestId }, orderBy: { settledAt: 'desc' } });
       if (due > 0 && latestSettlement) await tx.expenseSettlement.update({ where: { id: latestSettlement.id }, data: { advanceRefundDue: due, refundStatus: 'DUE' } });
@@ -352,13 +354,14 @@ export class HrmsExpensesService {
       const travel = await this.prisma.hrmsTravelRequest.findUnique({ where: { id: travelRequestId } });
       if (!travel) throw new NotFoundException('Không tìm thấy chuyến công tác');
       if (!travel.settlementClosedAt || travel.refundStatus === 'NONE') throw new ConflictException('Chuyến đi chưa có khoản tạm ứng dư cần thu hồi');
-      const outstanding = travel.advanceRefundDue - travel.advanceRefundPaid;
+      const outstanding = toMoney(travel.advanceRefundDue) - toMoney(travel.advanceRefundPaid);
       if (amount > outstanding) throw new BadRequestException(`Số tiền vượt dư nợ ${outstanding.toLocaleString('vi-VN')} VND`);
-      const paid = travel.advanceRefundPaid + amount;
-      const changed = await tx.hrmsTravelRequest.updateMany({ where: { id: travelRequestId, advanceRefundPaid: travel.advanceRefundPaid, settlementClosedAt: { not: null } }, data: { advanceRefundPaid: paid, refundStatus: paid >= travel.advanceRefundDue ? 'REPAID' : 'PARTIAL' } });
+      const paid = toMoney(travel.advanceRefundPaid) + amount;
+      const dueTotal = toMoney(travel.advanceRefundDue);
+      const changed = await tx.hrmsTravelRequest.updateMany({ where: { id: travelRequestId, advanceRefundPaid: travel.advanceRefundPaid, settlementClosedAt: { not: null } }, data: { advanceRefundPaid: paid, refundStatus: paid >= dueTotal ? 'REPAID' : 'PARTIAL' } });
       if (changed.count !== 1) throw new ConflictException('Khoản thu hồi vừa được ghi nhận bởi người khác');
       const settlement = await tx.expenseSettlement.findFirst({ where: { travelRequestId }, orderBy: { settledAt: 'desc' } });
-      if (settlement) await tx.expenseSettlement.update({ where: { id: settlement.id }, data: { advanceRefundPaid: { increment: amount }, refundStatus: paid >= travel.advanceRefundDue ? 'REPAID' : 'PARTIAL' } });
+      if (settlement) await tx.expenseSettlement.update({ where: { id: settlement.id }, data: { advanceRefundPaid: { increment: amount }, refundStatus: paid >= dueTotal ? 'REPAID' : 'PARTIAL' } });
       await tx.auditLog.create({ data: { actorId, action: 'ADVANCE_REFUND_RECEIVED', entityType: 'HrmsTravelRequest', entityId: travelRequestId, afterData: { amount, outstanding, note } } });
       return tx.hrmsTravelRequest.findUniqueOrThrow({ where: { id: travelRequestId } });
     }, { isolationLevel: 'Serializable' });

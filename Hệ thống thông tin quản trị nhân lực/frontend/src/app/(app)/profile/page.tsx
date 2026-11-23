@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Camera, LogOut, Trash2, Edit3, Send, Clock, FileText, CheckCircle2,
-  AlertCircle, ShieldCheck, Lock, UserCheck, Phone, MapPin, Building
+  AlertCircle, ShieldCheck, Lock, UserCheck, Phone, MapPin, Building,
+  KeyRound, Download, Copy, ShieldOff
 } from 'lucide-react';
 import { api, errorMessage, openProtectedFile } from '@/lib/api';
 import type { MeProfile } from '@/lib/types';
@@ -14,7 +15,7 @@ import { CONTRACT_STATUS_LABEL, CONTRACT_TYPE_LABEL, vnd } from '@/lib/hr';
 import { isEnterpriseSector, useOrgConfig } from '@/lib/org-config';
 import { useToast } from '@/components/ui/toaster';
 import {
-  Avatar, AvatarFallback, Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Textarea, Skeleton
+  Avatar, AvatarFallback, Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea, Skeleton
 } from '@/components/ui/primitives';
 import { PageHeader, ErrorState } from '@/components/common/states';
 import { ProfileChangeRequestModal } from '@/components/personnel/ProfileChangeRequestModal';
@@ -156,6 +157,92 @@ export default function ProfilePage() {
     onError: (e) => toast(errorMessage(e), 'error'),
   });
 
+  // 2FA TOTP state & mutations
+  const [mfaSetupData, setMfaSetupData] = useState<{
+    secret: string;
+    issuer: string;
+    accountName: string;
+    otpauthUrl: string;
+  } | null>(null);
+  const [mfaEnableCode, setMfaEnableCode] = useState('');
+  const [mfaBackupCodes, setMfaBackupCodes] = useState<string[] | null>(null);
+  const [showDisableMfa, setShowDisableMfa] = useState(false);
+  const [disableMfaPassword, setDisableMfaPassword] = useState('');
+  const [disableMfaCode, setDisableMfaCode] = useState('');
+
+  const setupMfa = useMutation({
+    mutationFn: async () =>
+      (await api.post<{ secret: string; issuer: string; accountName: string; otpauthUrl: string }>('/auth/mfa/setup')).data,
+    onSuccess: (data) => {
+      setMfaSetupData(data);
+      setMfaBackupCodes(null);
+      setMfaEnableCode('');
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const enableMfa = useMutation({
+    mutationFn: async () =>
+      (await api.post<{ enabled: boolean; backupCodes: string[] }>('/auth/mfa/enable', { code: mfaEnableCode.trim() })).data,
+    onSuccess: (data) => {
+      setMfaSetupData(null);
+      setMfaEnableCode('');
+      setMfaBackupCodes(data.backupCodes ?? []);
+      toast('Đã kích hoạt xác thực hai lớp (2FA)', 'success');
+      qc.invalidateQueries({ queryKey: ['me'] });
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const disableMfa = useMutation({
+    mutationFn: async () =>
+      (
+        await api.post<{ enabled: boolean }>('/auth/mfa/disable', {
+          currentPassword: disableMfaPassword,
+          code: disableMfaCode.trim(),
+        })
+      ).data,
+    onSuccess: () => {
+      setShowDisableMfa(false);
+      setDisableMfaPassword('');
+      setDisableMfaCode('');
+      setMfaBackupCodes(null);
+      toast('Đã tắt xác thực hai lớp (2FA)', 'success');
+      qc.invalidateQueries({ queryKey: ['me'] });
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  // Quyền riêng tư GDPR / Nghị định 13/2023/NĐ-CP
+  const withdrawFaceConsent = useMutation({
+    mutationFn: async () =>
+      (await api.post<{ success: boolean; deletedEmbeddings: number }>('/privacy/face-consent/withdraw')).data,
+    onSuccess: (data) => {
+      toast(`Đã rút đồng thuận & xóa vĩnh viễn ${data.deletedEmbeddings ?? 0} mẫu khuôn mặt`, 'success');
+      qc.invalidateQueries({ queryKey: ['face-status'] });
+      qc.invalidateQueries({ queryKey: ['me'] });
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const exportMyData = useMutation({
+    mutationFn: async () => (await api.get('/privacy/my-data')).data,
+    onSuccess: (data) => {
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `hrmis-my-data-${me?.employeeCode || me?.id || 'user'}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.setTimeout(() => URL.revokeObjectURL(url), 5_000);
+      toast('Đã tải xuống bản sao dữ liệu cá nhân (JSON)', 'success');
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
   // Mutation hủy yêu cầu đang chờ
   const cancelRequestMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -204,7 +291,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-base font-semibold text-foreground">{me.fullName}</h2>
               <span className="font-mono text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground border border-border">
-                {profile?.user?.employeeCode || me.employeeCode || 'EMP-2026'}
+                {profile?.user?.employeeCode || me.employeeCode || 'Chưa cấp mã'}
               </span>
               <span className="text-xs text-muted-foreground">
                 · {me.jobTitle || 'Chuyên viên'}{me.orgUnit ? ` · ${me.orgUnit.name}` : ''}
@@ -638,6 +725,201 @@ export default function ProfilePage() {
       {/* ================= TAB 3: BẢO MẬT & SINH TRẮC HỌC ================= */}
       {activeTab === 'security' && (
         <div className="grid gap-4 lg:grid-cols-2">
+          {/* Xác thực hai lớp (2FA / RFC 6238 TOTP) */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <KeyRound className="h-4 w-4 text-primary" /> Xác thực hai lớp (2FA — TOTP)
+              </CardTitle>
+              <Badge variant={me.mfaEnabled ? 'default' : 'secondary'}>
+                {me.mfaEnabled ? 'Đang bật' : 'Chưa bật'}
+              </Badge>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Bảo vệ tài khoản theo chuẩn RFC 6238 TOTP với Google Authenticator, Microsoft Authenticator hoặc Authy.
+              </p>
+
+              {!me.mfaEnabled ? (
+                !mfaSetupData ? (
+                  <Button
+                    size="sm"
+                    disabled={setupMfa.isPending}
+                    onClick={() => setupMfa.mutate()}
+                  >
+                    <ShieldCheck className="h-4 w-4" /> Thiết lập 2FA
+                  </Button>
+                ) : (
+                  <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-medium text-foreground">
+                      Bước 1: Thêm khóa bí mật vào ứng dụng Authenticator
+                    </p>
+                    <div className="flex items-center justify-between gap-2 rounded border border-border bg-background px-2.5 py-1.5">
+                      <code className="break-all font-mono text-xs">{mfaSetupData.secret}</code>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(mfaSetupData.secret);
+                            toast('Đã sao chép khóa bí mật TOTP', 'success');
+                          } catch {
+                            toast('Không thể sao chép tự động, vui lòng bôi đen để chép', 'error');
+                          }
+                        }}
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                    <details className="text-xs text-muted-foreground">
+                      <summary className="cursor-pointer font-medium hover:text-foreground">
+                        Xem liên kết otpauth:// đầy đủ
+                      </summary>
+                      <div className="mt-1.5 flex items-center justify-between gap-2 rounded border border-border bg-background p-2">
+                        <code className="break-all font-mono text-[11px]">{mfaSetupData.otpauthUrl}</code>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(mfaSetupData.otpauthUrl);
+                              toast('Đã sao chép URI otpauth://', 'success');
+                            } catch {
+                              toast('Không thể sao chép tự động', 'error');
+                            }
+                          }}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </details>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="mfa-enable-code" className="text-xs">
+                        Bước 2: Nhập mã 6 số để kích hoạt
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="mfa-enable-code"
+                          placeholder="Ví dụ: 123456"
+                          value={mfaEnableCode}
+                          onChange={(e) => setMfaEnableCode(e.target.value)}
+                          className="font-mono"
+                        />
+                        <Button
+                          size="sm"
+                          disabled={enableMfa.isPending || !mfaEnableCode.trim()}
+                          onClick={() => enableMfa.mutate()}
+                        >
+                          Kích hoạt
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setMfaSetupData(null);
+                            setMfaEnableCode('');
+                          }}
+                        >
+                          Hủy
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              ) : (
+                <div className="space-y-3">
+                  {mfaBackupCodes && mfaBackupCodes.length > 0 ? (
+                    <div className="space-y-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-xs font-semibold text-foreground">
+                          Mã dự phòng dùng một lần (chỉ hiển thị duy nhất lần này)
+                        </p>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(mfaBackupCodes.join('\n'));
+                              toast('Đã sao chép toàn bộ 8 mã dự phòng', 'success');
+                            } catch {
+                              toast('Không thể sao chép tự động', 'error');
+                            }
+                          }}
+                        >
+                          <Copy className="h-3.5 w-3.5" /> Sao chép
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+                        {mfaBackupCodes.map((code) => (
+                          <code
+                            key={code}
+                            className="rounded border border-border bg-background px-2 py-1 text-center font-mono text-xs"
+                          >
+                            {code}
+                          </code>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {!showDisableMfa ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setShowDisableMfa(true)}
+                    >
+                      <ShieldOff className="h-4 w-4" /> Tắt 2FA
+                    </Button>
+                  ) : (
+                    <div className="space-y-2.5 rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+                      <p className="text-xs font-medium text-foreground">
+                        Xác minh mật khẩu hiện tại và mã OTP / mã dự phòng để tắt 2FA
+                      </p>
+                      <Input
+                        type="password"
+                        placeholder="Mật khẩu hiện tại"
+                        value={disableMfaPassword}
+                        onChange={(e) => setDisableMfaPassword(e.target.value)}
+                      />
+                      <Input
+                        placeholder="Mã TOTP 6 số hoặc mã dự phòng"
+                        value={disableMfaCode}
+                        onChange={(e) => setDisableMfaCode(e.target.value)}
+                        className="font-mono"
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={disableMfa.isPending || !disableMfaPassword || !disableMfaCode.trim()}
+                          onClick={() => disableMfa.mutate()}
+                        >
+                          Xác nhận tắt 2FA
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setShowDisableMfa(false);
+                            setDisableMfaPassword('');
+                            setDisableMfaCode('');
+                          }}
+                        >
+                          Hủy
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Dữ liệu sinh trắc học */}
           <Card>
             <CardHeader>
@@ -672,13 +954,50 @@ export default function ProfilePage() {
                       <Button size="sm" variant="outline">Đăng ký / Điểm danh</Button>
                     </Link>
                     {faceQ.data!.samples.length > 0 ? (
-                      <Button size="sm" variant="destructive" onClick={() => delFace.mutate()}>
+                      <Button size="sm" variant="outline" disabled={delFace.isPending} onClick={() => delFace.mutate()}>
                         <Trash2 className="h-4 w-4" /> Xóa tất cả mẫu
+                      </Button>
+                    ) : null}
+                    {faceQ.data!.consentAt || faceQ.data!.samples.length > 0 ? (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={withdrawFaceConsent.isPending}
+                        onClick={() => {
+                          if (window.confirm('Bạn chắc chắn muốn rút đồng thuận và xóa vĩnh viễn toàn bộ vector khuôn mặt?')) {
+                            withdrawFaceConsent.mutate();
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" /> Rút đồng thuận & xóa vĩnh viễn
                       </Button>
                     ) : null}
                   </div>
                 </>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Quyền dữ liệu cá nhân (GDPR / Nghị định 13/2023/NĐ-CP) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <Download className="h-4 w-4 text-primary" /> Quyền dữ liệu cá nhân (GDPR / NĐ 13/2023/NĐ-CP)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Xuất toàn bộ dữ liệu cá nhân của bạn (tài khoản, hồ sơ 2C, hợp đồng, nghỉ phép, bảng lương đã duyệt và lịch sử thao tác) dưới dạng tệp JSON chuẩn mở.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={exportMyData.isPending}
+                onClick={() => exportMyData.mutate()}
+              >
+                <Download className="h-4 w-4" />{' '}
+                {exportMyData.isPending ? 'Đang xuất dữ liệu…' : 'Tải toàn bộ dữ liệu cá nhân (JSON)'}
+              </Button>
             </CardContent>
           </Card>
 
@@ -691,7 +1010,7 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-xs text-muted-foreground">
-                Đăng xuất khỏi mọi thiết bị sẽ thu hồi toàn bộ phiên đăng nhập của bạn. Các thiết bị khác sẽ phải đăng nhập lại ở lần truy cập kế tiếp.
+                Đăng xuất khỏi mọi thiết bị sẽ thu hồi toàn bộ refresh token trên tất cả trình duyệt và ứng dụng của bạn.
               </p>
               <Button variant="outline" size="sm" disabled={logoutAll.isPending} onClick={() => logoutAll.mutate()}>
                 <LogOut className="h-4 w-4" /> Đăng xuất khỏi mọi thiết bị

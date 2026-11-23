@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -11,7 +12,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { CurrentUser, Roles } from '../../common/decorators';
@@ -46,6 +47,26 @@ export class UpdateRoleDto {
   @MaxLength(255)
   description?: string;
 }
+
+export class AssignRoleUsersDto {
+  @IsArray()
+  @IsString({ each: true, message: 'Danh sách ID tài khoản phải là chuỗi hợp lệ' })
+  userIds!: string[];
+}
+
+export const SYSTEM_ROLE_CODES = [
+  'ADMIN',
+  'BOD',
+  'SHAREHOLDER',
+  'KM_MANAGER',
+  'LINE_MANAGER',
+  'HR_CB',
+  'ACCOUNTANT',
+  'HR_RECRUITER',
+  'HR_TRAINER',
+  'AUDITOR',
+  'USER',
+];
 
 export const DEFAULT_RBAC_MATRIX = [
   {
@@ -212,7 +233,7 @@ export class RolesController {
       name: r.name,
       description: r.description,
       userCount: r._count.users,
-      isSystem: ['ADMIN', 'KM_MANAGER', 'USER'].includes(r.code),
+      isSystem: SYSTEM_ROLE_CODES.includes(r.code),
     }));
   }
 
@@ -280,10 +301,10 @@ export class RolesController {
     return role;
   }
 
-  /** Xóa vai trò tùy biến (không cho phép xóa vai trò cốt lõi ADMIN, KM_MANAGER, USER) */
+  /** Xóa vai trò tùy biến (không cho phép xóa các vai trò chuẩn hệ thống) */
   @Delete(':code')
   async deleteRole(@Param('code') code: string, @CurrentUser() user: AuthUser) {
-    if (['ADMIN', 'KM_MANAGER', 'USER'].includes(code)) {
+    if (SYSTEM_ROLE_CODES.includes(code.trim().toUpperCase())) {
       throw new BadRequestException('Không thể xóa các vai trò cốt lõi của hệ thống');
     }
 
@@ -367,5 +388,76 @@ export class RolesController {
     });
 
     return { success: true, matrix: body.matrix };
+  }
+
+  /** Gán danh sách tài khoản trực tiếp vào một vai trò hệ thống */
+  @Put(':code/users')
+  async assignUsersToRole(
+    @Param('code') code: string,
+    @Body() dto: AssignRoleUsersDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    const roleCode = code.trim().toUpperCase();
+    const role = await this.prisma.role.findUnique({ where: { code: roleCode } });
+    if (!role) {
+      throw new NotFoundException(`Không tìm thấy vai trò "${roleCode}"`);
+    }
+
+    const wantedIds = Array.from(new Set((dto.userIds ?? []).map((id) => id.trim()).filter(Boolean)));
+    if (roleCode === 'ADMIN' && user.roles.includes('ADMIN') && !wantedIds.includes(user.id)) {
+      throw new ConflictException('Không thể tự gỡ vai trò ADMIN của chính tài khoản đang đăng nhập');
+    }
+
+    const validUsers = await this.prisma.user.findMany({
+      where: { id: { in: wantedIds }, deletedAt: null },
+      select: { id: true },
+    });
+    const validIdSet = new Set(validUsers.map((u) => u.id));
+
+    await this.prisma.$transaction(async (tx) => {
+      const current = await tx.userRole.findMany({
+        where: { roleCode },
+        select: { userId: true },
+      });
+      const currentIdSet = new Set(current.map((r) => r.userId));
+
+      const toAdd = validUsers.map((u) => u.id).filter((uid) => !currentIdSet.has(uid));
+      const toRemove = current.map((r) => r.userId).filter((uid) => !validIdSet.has(uid));
+
+      if (toAdd.length > 0) {
+        await tx.userRole.createMany({
+          data: toAdd.map((userId) => ({ userId, roleCode })),
+          skipDuplicates: true,
+        });
+      }
+
+      if (toRemove.length > 0) {
+        await tx.userRole.deleteMany({
+          where: { roleCode, userId: { in: toRemove } },
+        });
+        const remaining = await tx.userRole.findMany({
+          where: { userId: { in: toRemove } },
+          select: { userId: true },
+        });
+        const hasAnyRole = new Set(remaining.map((r) => r.userId));
+        const needDefault = toRemove.filter((uid) => !hasAnyRole.has(uid));
+        if (needDefault.length > 0) {
+          await tx.userRole.createMany({
+            data: needDefault.map((userId) => ({ userId, roleCode: 'USER' })),
+            skipDuplicates: true,
+          });
+        }
+      }
+    });
+
+    await this.audit.log({
+      actorId: user.id,
+      action: 'ROLE_USERS_ASSIGNED',
+      entityType: 'Role',
+      entityId: roleCode,
+      after: { userCount: validUsers.length, userIds: validUsers.map((u) => u.id) },
+    });
+
+    return { success: true, code: roleCode, userCount: validUsers.length };
   }
 }

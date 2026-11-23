@@ -17,6 +17,5 @@ export function WorkflowGuide({ workflow, expanded = false }: { workflow: Workfl
       </ol>
       <p className="mt-4 border-t pt-3 leading-6 text-muted-foreground"><strong className="text-foreground">Nếu chưa thao tác được: </strong>{help.blocked}</p>
     </details>
-    {!expanded && <Link href={`/workflow-guide#${workflow}`} className="mt-2 inline-block py-1 text-xs text-muted-foreground underline underline-offset-4">Hướng dẫn các quy trình liên quan</Link>}
   </section>;
 }

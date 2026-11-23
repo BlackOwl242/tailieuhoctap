@@ -720,9 +720,7 @@ export default function PersonnelActionsPage() {
             />
           </div>
 
-          <div className="col-span-full flex justify-end gap-2 pt-2 border-t">
-            <ModalFooterActions onCancel={() => setOpen(false)} pending={create.isPending} confirmLabel="Ban hành / Gửi đề xuất" />
-          </div>
+          <ModalFooterActions className="col-span-full" onCancel={() => setOpen(false)} pending={create.isPending} confirmLabel="Ban hành / Gửi đề xuất" />
         </form>
       </Modal>
 
@@ -755,13 +753,11 @@ export default function PersonnelActionsPage() {
               ))}
             </Select>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <ModalFooterActions
-              onCancel={() => setApprovalPrompt(null)}
-              pending={decide.isPending}
-              confirmLabel="Xác nhận & Duyệt quyết định"
-            />
-          </div>
+          <ModalFooterActions
+            onCancel={() => setApprovalPrompt(null)}
+            pending={decide.isPending}
+            confirmLabel="Xác nhận & Duyệt quyết định"
+          />
         </form>
       </Modal>
     </>

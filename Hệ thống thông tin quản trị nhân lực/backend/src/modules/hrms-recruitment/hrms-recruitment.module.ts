@@ -1,6 +1,6 @@
 import { salaryBandForDate } from '../../common/salary-band-version';
 import { BadRequestException, ConflictException } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
+import { generateNextEmployeeCode } from '../../common/hr-code';
 import { dateKey, workDate } from '../../common/hr-time';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
@@ -11,6 +11,7 @@ import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestj
 import { IsDateString, IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
+import { toMoney } from '../../common/money';
 import { ApplicantStage, InterviewRecommendation, OfferStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { assertApplicantTransition, syncLegacyCandidate } from '../../common/recruitment-sync';
@@ -189,7 +190,7 @@ export class HrmsRecruitmentService {
     const res = await this.prisma.hrmsJobOpening.create({
       data: {
         ...dto,
-        salaryRange: `${band.minSalary.toLocaleString('vi-VN')}–${band.maxSalary.toLocaleString('vi-VN')} đồng/tháng`,
+        salaryRange: `${toMoney(band.minSalary).toLocaleString('vi-VN')}–${toMoney(band.maxSalary).toLocaleString('vi-VN')} đồng/tháng`,
         closingDate: dto.closingDate ? new Date(dto.closingDate) : null,
       },
     });
@@ -317,14 +318,15 @@ export class HrmsRecruitmentService {
       const joiningDate = dateKey(dto.joiningDate);
       const band = await salaryBandForDate(tx, app.jobOpening.salaryBandId, joiningDate);
       if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== 'MONTHLY' || band.effectiveFrom > joiningDate || (band.effectiveTo && band.effectiveTo < joiningDate)) throw new ConflictException('Khung lương tháng của vị trí không còn hiệu lực vào ngày nhận việc');
-      if (dto.offeredSalary < band.minSalary || dto.offeredSalary > band.maxSalary) throw new ConflictException(`Mức đề nghị phải nằm trong khung ${band.minSalary.toLocaleString('vi-VN')}–${band.maxSalary.toLocaleString('vi-VN')} đồng/tháng`);
+      const bandMin = toMoney(band.minSalary), bandMax = toMoney(band.maxSalary);
+      if (dto.offeredSalary < bandMin || dto.offeredSalary > bandMax) throw new ConflictException(`Mức đề nghị phải nằm trong khung ${bandMin.toLocaleString('vi-VN')}–${bandMax.toLocaleString('vi-VN')} đồng/tháng`);
       const request = app.jobOpening.requisitionId ? await tx.jobRequisition.findUnique({ where: { id: app.jobOpening.requisitionId } }) : null;
       const existingOffers = await tx.hrmsJobOffer.findMany({
         where: { applicant: { jobOpeningId: app.jobOpeningId }, status: { in: ['SENT', 'ACCEPTED'] } },
         select: { offeredSalary: true },
       });
-      const committedBudget = existingOffers.reduce((sum, item) => sum + item.offeredSalary, 0);
-      if (!request || request.status !== 'APPROVED' || committedBudget + dto.offeredSalary > request.budgetMonthly) throw new ConflictException('Offer vượt ngân sách/chỉ tiêu chưa duyệt');
+      const committedBudget = existingOffers.reduce((sum, item) => sum + toMoney(item.offeredSalary), 0);
+      if (!request || request.status !== 'APPROVED' || committedBudget + dto.offeredSalary > toMoney(request.budgetMonthly)) throw new ConflictException('Offer vượt ngân sách/chỉ tiêu chưa duyệt');
       if (await tx.hrmsJobOffer.count({ where: { applicantId: app.id, status: { in: ['SENT','ACCEPTED'] } } })) throw new ConflictException('Đã có offer đang hiệu lực');
       const offer = await tx.hrmsJobOffer.create({ data: { ...dto, joiningDate, status: 'SENT' } });
       await tx.hrmsJobApplicant.update({ where: { id: app.id }, data: { stage: 'OFFER_SENT' } });
@@ -358,7 +360,7 @@ export class HrmsRecruitmentService {
       if (hired >= app.jobOpening.vacancies) throw new ConflictException('Đã đủ chỉ tiêu tuyển');
       const req = app.jobOpening.requisitionId ? await tx.jobRequisition.findUniqueOrThrow({ where: { id: app.jobOpening.requisitionId } }) : null;
       if (!req || req.status !== 'APPROVED') throw new ConflictException('Chỉ tiêu không còn hiệu lực');
-      const user = await tx.user.create({ data: { email: app.email, passwordHash, mustChangePassword: true, fullName: app.candidateName, phone: app.phone, employeeCode: `NV-${randomUUID().slice(0,8).toUpperCase()}`, jobTitle: offer.designation, salaryBandId: app.jobOpening.salaryBandId, baseSalary: offer.offeredSalary, hireDate: dateKey(offer.joiningDate), employmentStatus: 'PROBATION', status: 'ACTIVE', orgUnitId: req.orgUnitId, roles: { create: { roleCode: 'USER' } } }, select: { id: true, email: true, fullName: true, employeeCode: true, employmentStatus: true, status: true } });
+      const user = await tx.user.create({ data: { email: app.email, passwordHash, mustChangePassword: true, fullName: app.candidateName, phone: app.phone, employeeCode: await generateNextEmployeeCode(tx), jobTitle: offer.designation, salaryBandId: app.jobOpening.salaryBandId, baseSalary: offer.offeredSalary, hireDate: dateKey(offer.joiningDate), employmentStatus: 'PROBATION', status: 'ACTIVE', orgUnitId: req.orgUnitId, roles: { create: { roleCode: 'USER' } } }, select: { id: true, email: true, fullName: true, employeeCode: true, employmentStatus: true, status: true } });
       await tx.personnelComprehensiveProfile.create({ data: { userId: user.id, recruitDate: dateKey(offer.joiningDate), recruitOrg: app.jobOpening.department } });
       await tx.contract.create({ data: { userId: user.id, contractNo: `TV-${user.employeeCode}`, type: 'PROBATION', startDate: dateKey(offer.joiningDate), endDate: new Date(dateKey(offer.joiningDate).getTime() + (app.jobOpening.probationDays - 1) * 86400000), baseSalary: offer.offeredSalary, compensationBasis: 'MONTHLY', insuranceSalary: offer.offeredSalary, createdById: actorId } });
       await tx.hrmsJobApplicant.update({ where: { id: applicantId, stage: 'OFFER_SENT' }, data: { stage: 'HIRED' } });

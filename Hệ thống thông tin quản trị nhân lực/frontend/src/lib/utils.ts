@@ -46,3 +46,24 @@ export const DAY_STATUS_LABEL: Record<string, string> = {
   HOLIDAY: 'Ngày lễ',
   BUSINESS_TRIP: 'Công tác đã xác nhận',
 };
+
+/** Chuẩn hóa chuỗi tiếng Việt (bỏ dấu, đ->d, chữ thường) phục vụ tìm kiếm không dấu. */
+export function normalizeSearch(value?: string | number | null): string {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Khớp tìm kiếm không dấu theo từng từ khóa (hỗ trợ khớp xuyên trường, không phân biệt thứ tự). */
+export function matchesSearch(query: string, ...fields: Array<string | number | null | undefined>): boolean {
+  const normalizedQuery = normalizeSearch(query);
+  if (!normalizedQuery) return true;
+  const haystack = fields.map(normalizeSearch).filter(Boolean).join(' ');
+  if (!haystack) return false;
+  return normalizedQuery.split(' ').every((token) => haystack.includes(token));
+}

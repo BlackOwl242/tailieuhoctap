@@ -8,6 +8,7 @@ import {
   FileText, Check, X, ShieldCheck, Building2
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
+import { matchesSearch as matchesViSearch } from '@/lib/utils';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
@@ -176,10 +177,7 @@ export default function AssetsPage() {
 
   const assetList = assets ?? [];
   const filteredAssets = assetList.filter((a) => {
-    const matchesSearch =
-      a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.assetCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (a.assignedEmployeeName && a.assignedEmployeeName.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = matchesViSearch(searchTerm, a.name, a.assetCode, a.assignedEmployeeName, a.serialNumber);
     
     let matchesCategory = false;
     if (selectedCategory === 'ALL') {

@@ -70,6 +70,9 @@ export default function SalaryRanksPage() {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') === 'progression' ? 'progression' : 'ranks';
   const [mainTab, setMainTab] = useState<'ranks' | 'progression'>(initialTab);
+  useEffect(() => {
+    setMainTab(searchParams.get('tab') === 'progression' ? 'progression' : 'ranks');
+  }, [searchParams]);
 
   const queryClient = useQueryClient();
   const toast = useToast();

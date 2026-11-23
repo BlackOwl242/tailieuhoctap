@@ -10,6 +10,7 @@ import {
   TrendingUp, MapPin, User, Tag, Sparkles
 } from 'lucide-react';
 import { api, errorMessage, openProtectedFile } from '@/lib/api';
+import { matchesSearch } from '@/lib/utils';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
@@ -235,7 +236,7 @@ export default function ExpenseClaimsPage() {
     queryKey: ['hrms-employees-lookup'],
     queryFn: async () => {
       try {
-        const res = await api.get('/hrms/employees');
+        const res = await api.get('/employees');
         return Array.isArray(res.data) ? res.data : res.data?.items ?? [];
       } catch {
         return [];
@@ -470,28 +471,20 @@ export default function ExpenseClaimsPage() {
 
   // Filtered data
   const filteredClaims = claims.filter((c) => {
-    const matchSearch =
-      c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.employeeName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchSearch = matchesSearch(searchTerm, c.title, c.employeeName, c.category);
     const matchStatus = statusFilter === 'ALL' || c.status === statusFilter;
     const matchCategory = categoryFilter === 'ALL' || c.category === categoryFilter;
     return matchSearch && matchStatus && matchCategory;
   });
 
   const filteredTravels = travels.filter((t) => {
-    const matchSearch =
-      t.purpose.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.fromLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.toLocation.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchSearch = matchesSearch(searchTerm, t.purpose, t.employeeName, t.fromLocation, t.toLocation);
     const matchStatus = statusFilter === 'ALL' || t.status === statusFilter;
     return matchSearch && matchStatus;
   });
 
   const filteredAdvances = advances.filter((a) => {
-    const matchSearch =
-      a.purpose.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.employeeName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchSearch = matchesSearch(searchTerm, a.purpose, a.employeeName);
     const matchStatus = statusFilter === 'ALL' || a.status === statusFilter;
     return matchSearch && matchStatus;
   });

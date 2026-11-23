@@ -44,6 +44,7 @@ import { HrmsRegularizationModule } from './modules/hrms-regularization/hrms-reg
 import { CatalogsModule } from './modules/catalogs/catalogs.module';
 import { HrWorkflowsModule } from './modules/hr-workflows/hr-workflows.module';
 import { FilesModule } from './modules/files/files.module';
+import { PrivacyModule } from './modules/privacy/privacy.module';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { FilesModule } from './modules/files/files.module';
     CatalogsModule,
     HrWorkflowsModule,
     FilesModule,
+    PrivacyModule,
   ],
 })
 export class AppModule {}

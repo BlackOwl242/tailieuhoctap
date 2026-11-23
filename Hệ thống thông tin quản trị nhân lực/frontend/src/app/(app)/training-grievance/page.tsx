@@ -12,6 +12,7 @@ import {
   Sparkles, Check, X, FileText, Star,
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
+import { matchesSearch } from '@/lib/utils';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
@@ -336,10 +337,7 @@ export default function TrainingGrievancePage() {
   // Filtered Programs
   const filteredPrograms = useMemo(() => {
     return programs.filter((p) => {
-      const matchSearch =
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.trainerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (p.location && p.location.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchSearch = matchesSearch(searchTerm, p.name, p.trainerName, p.location);
       const matchStatus = trainingStatusFilter === 'ALL' || (p.status || 'UPCOMING') === trainingStatusFilter;
       return matchSearch && matchStatus;
     });
@@ -348,10 +346,7 @@ export default function TrainingGrievancePage() {
   // Filtered Grievances
   const filteredGrievances = useMemo(() => {
     return grievances.filter((g) => {
-      const matchSearch =
-        g.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        g.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        g.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchSearch = matchesSearch(searchTerm, g.subject, g.employeeName, g.description);
       const matchStatus = grievanceStatusFilter === 'ALL' || g.status === grievanceStatusFilter;
       return matchSearch && matchStatus;
     });

@@ -16,6 +16,15 @@ export function validateEnv(env: Record<string, unknown>): void {
   if (!env.DATABASE_URL) {
     errors.push('DATABASE_URL is required.');
   }
+  if (String(env.NODE_ENV ?? '') === 'production') {
+    const encKey = String(env.DATA_ENCRYPTION_KEY ?? env.FACE_EMBEDDING_KEY ?? '').trim();
+    const b64Len = encKey ? Buffer.from(encKey, 'base64').length : 0;
+    if (!encKey || (b64Len !== 32 && encKey.length < 32)) {
+      errors.push(
+        'DATA_ENCRYPTION_KEY (or FACE_EMBEDDING_KEY) must be a valid 32-byte base64 key or >= 32 characters in production.',
+      );
+    }
+  }
 
   const num = (key: string, fallback: number): number => {
     const raw = env[key];

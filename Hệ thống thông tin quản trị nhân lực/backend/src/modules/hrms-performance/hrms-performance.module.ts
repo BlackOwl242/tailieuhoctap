@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsBoolean, IsDateString, IsIn, IsNumber, IsOptional, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsBoolean, IsDateString, IsIn, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength, ValidateNested } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { calculateKpiScore, KpiMeasurementMode } from '../../common/kpi-calculator';
@@ -180,6 +180,44 @@ export class CreateKraEvidenceDto {
   @ApiProperty() @IsString() @MinLength(3) @MaxLength(2000) description!: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(300) metricValue?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) evidenceUrl?: string;
+}
+
+export class SubmitAppraisalReviewDto {
+  @ApiProperty() @IsString() cycleId!: string;
+  @ApiProperty() @IsString() userId!: string;
+  @ApiProperty({ enum: ['SELF', 'MANAGER', 'PEER', 'SUBORDINATE'] })
+  @IsIn(['SELF', 'MANAGER', 'PEER', 'SUBORDINATE'])
+  relationship!: 'SELF' | 'MANAGER' | 'PEER' | 'SUBORDINATE';
+  @ApiProperty({ minimum: 0, maximum: 100 }) @IsNumber() @Min(0) @Max(100) rating!: number;
+  @ApiProperty({ minLength: 10, maxLength: 2000 }) @IsString() @MinLength(10) @MaxLength(2000) feedback!: string;
+}
+
+export class CreateDevelopmentPlanDto {
+  @ApiProperty() @IsString() cycleId!: string;
+  @ApiProperty() @IsString() userId!: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(80) competencyCode?: string;
+  @ApiProperty({ minLength: 5, maxLength: 500 }) @IsString() @MinLength(5) @MaxLength(500) objective!: string;
+  @ApiProperty({ minLength: 5, maxLength: 500 }) @IsString() @MinLength(5) @MaxLength(500) successCriteria!: string;
+  @ApiPropertyOptional({ type: [String] }) @IsOptional() @IsArray() @IsString({ each: true }) actions?: string[];
+  @ApiProperty() @IsDateString() dueDate!: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(2000) managerNotes?: string;
+}
+
+export class UpdateDevelopmentPlanDto {
+  @ApiPropertyOptional({ enum: ['PROPOSED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] })
+  @IsOptional() @IsIn(['PROPOSED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'])
+  status?: 'PROPOSED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(2000) employeeNotes?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(2000) managerNotes?: string;
+  @ApiPropertyOptional({ minimum: 1, maximum: 5 }) @IsOptional() @IsNumber() @Min(1) @Max(5) resultLevel?: number;
+}
+
+export class ProposeKpiAwardDto {
+  @ApiProperty() @IsString() cycleId!: string;
+  @ApiProperty() @IsString() userId!: string;
+  @ApiProperty({ minimum: 100000 }) @IsNumber() @Min(100_000) amount!: number;
+  @ApiPropertyOptional() @IsOptional() @IsDateString() effectiveDate?: string;
+  @ApiProperty({ minLength: 10, maxLength: 500 }) @IsString() @MinLength(10) @MaxLength(500) reason!: string;
 }
 
 @Injectable()
@@ -920,6 +958,315 @@ export class HrmsPerformanceService {
     return appraisal;
   }
 
+  // -------------------------------------------------------------------------
+  // Đánh giá 360° / Tự đánh giá (HrmsAppraisalReview)
+  // -------------------------------------------------------------------------
+
+  async listReviews(actor: AuthUser, cycleId?: string, userId?: string) {
+    const visibleIds = await this.visibleUserIds(actor);
+    if (visibleIds && userId && !visibleIds.includes(userId)) {
+      throw new ForbiddenException('Không được xem phản hồi 360° của nhân sự ngoài phạm vi phụ trách');
+    }
+    const where: Prisma.HrmsAppraisalReviewWhereInput = {
+      ...(cycleId ? { cycleId } : {}),
+      ...(userId
+        ? { userId }
+        : visibleIds
+          ? { OR: [{ userId: { in: visibleIds } }, { reviewerId: actor.id }] }
+          : {}),
+    };
+    const rows = await this.prisma.hrmsAppraisalReview.findMany({
+      where,
+      orderBy: { submittedAt: 'desc' },
+    });
+    if (!rows.length) return [];
+    const subjectIds = [...new Set(rows.map((r) => r.userId))];
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: subjectIds } },
+      select: { id: true, fullName: true, employeeCode: true, orgUnit: { select: { name: true } } },
+    });
+    const userMap = new Map(users.map((u) => [u.id, u]));
+    return rows.map((r) => {
+      const subject = userMap.get(r.userId);
+      return {
+        ...r,
+        employeeName: subject?.fullName ?? '',
+        employeeCode: subject?.employeeCode ?? null,
+        orgUnitName: subject?.orgUnit?.name ?? null,
+      };
+    });
+  }
+
+  async submitReview(actor: AuthUser, dto: SubmitAppraisalReviewDto) {
+    await this.assertActive(dto.cycleId);
+    const subject = await this.prisma.user.findFirst({
+      where: { id: dto.userId, deletedAt: null },
+      select: { id: true, fullName: true },
+    });
+    if (!subject) throw new NotFoundException('Không tìm thấy nhân sự được đánh giá');
+
+    if (dto.relationship === 'SELF' && dto.userId !== actor.id) {
+      throw new BadRequestException('Tự đánh giá chỉ áp dụng cho chính tài khoản của bạn');
+    }
+    if (dto.relationship !== 'SELF' && dto.userId === actor.id) {
+      throw new BadRequestException('Không thể gửi đánh giá ngang hàng/quản lý/cấp dưới cho chính mình');
+    }
+    if (dto.relationship === 'MANAGER') {
+      await this.access.assertReviewer(actor, dto.userId);
+    }
+
+    const reviewerUser = await this.prisma.user.findUnique({
+      where: { id: actor.id },
+      select: { fullName: true },
+    });
+    const reviewerName = reviewerUser?.fullName || actor.email;
+
+    const review = await this.prisma.hrmsAppraisalReview.upsert({
+      where: {
+        cycleId_userId_reviewerId: { cycleId: dto.cycleId, userId: dto.userId, reviewerId: actor.id },
+      },
+      create: {
+        cycleId: dto.cycleId,
+        userId: dto.userId,
+        reviewerId: actor.id,
+        reviewerName,
+        relationship: dto.relationship,
+        rating: Math.round(dto.rating * 100) / 100,
+        feedback: dto.feedback.trim(),
+      },
+      update: {
+        reviewerName,
+        relationship: dto.relationship,
+        rating: Math.round(dto.rating * 100) / 100,
+        feedback: dto.feedback.trim(),
+        submittedAt: new Date(),
+      },
+    });
+
+    await this.audit.log({
+      actorId: actor.id,
+      action: 'APPRAISAL_360_REVIEW_SUBMITTED',
+      entityType: 'HrmsAppraisalReview',
+      entityId: review.id,
+      after: { cycleId: dto.cycleId, userId: dto.userId, relationship: dto.relationship, rating: review.rating },
+    });
+
+    if (dto.userId !== actor.id && this.prisma.notification?.create) {
+      await this.prisma.notification.create({
+        data: {
+          userId: dto.userId,
+          type: 'GENERIC',
+          title: 'Bạn nhận được phản hồi đánh giá 360° mới',
+          body: `${reviewerName} đã gửi đánh giá (${dto.relationship}) trong kỳ hiệu suất hiện tại.`,
+          linkPath: `/performance?tab=reviews-pip&cycleId=${encodeURIComponent(dto.cycleId)}`,
+        },
+      });
+    }
+
+    return review;
+  }
+
+  // -------------------------------------------------------------------------
+  // Kế hoạch cải thiện & phát triển (PIP — HrmsDevelopmentPlan)
+  // -------------------------------------------------------------------------
+
+  async listDevelopmentPlans(actor: AuthUser, cycleId?: string, userId?: string) {
+    const visibleIds = await this.visibleUserIds(actor);
+    if (visibleIds && userId && !visibleIds.includes(userId)) {
+      throw new ForbiddenException('Không được xem kế hoạch cải thiện của nhân sự ngoài phạm vi');
+    }
+    const where: Prisma.HrmsDevelopmentPlanWhereInput = {
+      ...(cycleId ? { cycleId } : {}),
+      ...(userId ? { userId } : visibleIds ? { userId: { in: visibleIds } } : {}),
+    };
+    const plans = await this.prisma.hrmsDevelopmentPlan.findMany({
+      where,
+      orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
+    });
+    if (!plans.length) return [];
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: [...new Set(plans.map((p) => p.userId))] } },
+      select: { id: true, fullName: true, employeeCode: true, orgUnit: { select: { name: true } } },
+    });
+    const userMap = new Map(users.map((u) => [u.id, u]));
+    return plans.map((p) => {
+      const u = userMap.get(p.userId);
+      return {
+        ...p,
+        employeeName: u?.fullName ?? '',
+        employeeCode: u?.employeeCode ?? null,
+        orgUnitName: u?.orgUnit?.name ?? null,
+      };
+    });
+  }
+
+  async createDevelopmentPlan(actor: AuthUser, dto: CreateDevelopmentPlanDto) {
+    if (dto.userId === actor.id) {
+      throw new ForbiddenException('Không thể tự lập kế hoạch cải thiện (PIP) cho chính mình');
+    }
+    const cycle = await this.prisma.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id: dto.cycleId } });
+    const subject = await this.prisma.user.findFirst({
+      where: { id: dto.userId, deletedAt: null },
+      select: { id: true, fullName: true },
+    });
+    if (!subject) throw new NotFoundException('Không tìm thấy nhân sự');
+
+    if (actor.roles.includes('LINE_MANAGER') && !actor.roles.some((r) => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(r))) {
+      await this.access.assertReviewer(actor, dto.userId);
+    }
+
+    const actions = (dto.actions ?? []).map((a) => a.trim()).filter(Boolean);
+    const plan = await this.prisma.hrmsDevelopmentPlan.create({
+      data: {
+        cycleId: cycle.id,
+        userId: dto.userId,
+        competencyCode: dto.competencyCode?.trim() || 'KPI_GAP',
+        objective: dto.objective.trim(),
+        successCriteria: dto.successCriteria.trim(),
+        actions,
+        dueDate: dateKey(dto.dueDate),
+        managerNotes: dto.managerNotes?.trim() || null,
+        status: 'PROPOSED',
+        createdBy: actor.id,
+      },
+    });
+
+    await this.audit.log({
+      actorId: actor.id,
+      action: 'DEVELOPMENT_PLAN_CREATED',
+      entityType: 'HrmsDevelopmentPlan',
+      entityId: plan.id,
+      after: { cycleId: cycle.id, userId: dto.userId, objective: plan.objective },
+    });
+
+    if (this.prisma.notification?.create) {
+      await this.prisma.notification.create({
+        data: {
+          userId: dto.userId,
+          type: 'GENERIC',
+          title: 'Bạn được giao Kế hoạch cải thiện / phát triển (PIP)',
+          body: `${cycle.name}: ${plan.objective}`,
+          linkPath: `/performance?tab=reviews-pip&cycleId=${encodeURIComponent(cycle.id)}`,
+        },
+      });
+    }
+
+    return plan;
+  }
+
+  async updateDevelopmentPlan(actor: AuthUser, id: string, dto: UpdateDevelopmentPlanDto) {
+    const plan = await this.prisma.hrmsDevelopmentPlan.findUniqueOrThrow({ where: { id } });
+    const isSubject = actor.id === plan.userId;
+
+    if (isSubject) {
+      if (dto.managerNotes !== undefined || dto.resultLevel !== undefined || (dto.status && dto.status !== 'IN_PROGRESS')) {
+        throw new ForbiddenException('Nhân sự không được tự phê duyệt hoàn thành, hủy PIP hoặc sửa nhận xét của quản lý');
+      }
+      if (dto.status === 'IN_PROGRESS' && plan.status !== 'PROPOSED') {
+        throw new ConflictException('Chỉ kế hoạch ở trạng thái đề xuất mới có thể bắt đầu thực hiện');
+      }
+      const updated = await this.prisma.hrmsDevelopmentPlan.update({
+        where: { id },
+        data: {
+          ...(dto.status ? { status: dto.status } : {}),
+          ...(dto.employeeNotes !== undefined ? { employeeNotes: dto.employeeNotes.trim() } : {}),
+        },
+      });
+      await this.audit.log({
+        actorId: actor.id,
+        action: 'DEVELOPMENT_PLAN_PROGRESS_UPDATED',
+        entityType: 'HrmsDevelopmentPlan',
+        entityId: id,
+      });
+      return updated;
+    }
+
+    if (!actor.roles.some((r) => ['ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'BOD'].includes(r))) {
+      await this.access.assertReviewer(actor, plan.userId);
+    }
+
+    const updated = await this.prisma.hrmsDevelopmentPlan.update({
+      where: { id },
+      data: {
+        ...(dto.status ? { status: dto.status } : {}),
+        ...(dto.managerNotes !== undefined ? { managerNotes: dto.managerNotes.trim() } : {}),
+        ...(dto.resultLevel !== undefined ? { resultLevel: dto.resultLevel } : {}),
+        reviewedBy: actor.id,
+        ...(dto.status === 'COMPLETED' ? { completedAt: new Date() } : {}),
+      },
+    });
+
+    await this.audit.log({
+      actorId: actor.id,
+      action: 'DEVELOPMENT_PLAN_UPDATED',
+      entityType: 'HrmsDevelopmentPlan',
+      entityId: id,
+      after: { status: updated.status, resultLevel: updated.resultLevel },
+    });
+
+    return updated;
+  }
+
+  // -------------------------------------------------------------------------
+  // Đề xuất khen thưởng từ kỳ KPI đã khóa -> PersonnelAction AWARD
+  // -------------------------------------------------------------------------
+
+  async proposeKpiAward(actor: AuthUser, dto: ProposeKpiAwardDto) {
+    if (dto.userId === actor.id) {
+      throw new ForbiddenException('Không thể tự đề xuất khen thưởng KPI cho chính mình');
+    }
+    const cycle = await this.prisma.hrmsAppraisalCycle.findUniqueOrThrow({ where: { id: dto.cycleId } });
+    if (cycle.status !== 'COMPLETED') {
+      throw new ConflictException('Chỉ được đề xuất khen thưởng sau khi kỳ đánh giá KPI đã khóa kết quả');
+    }
+
+    if (actor.roles.includes('LINE_MANAGER') && !actor.roles.some((r) => ['ADMIN', 'KM_MANAGER', 'HR_CB', 'BOD'].includes(r))) {
+      await this.access.assertReviewer(actor, dto.userId);
+    }
+
+    const kpiSummary = await this.summary(dto.cycleId, dto.userId);
+    if (!kpiSummary.complete || kpiSummary.score === null || kpiSummary.score < 75) {
+      throw new ConflictException('Nhân sự chưa hoàn tất đánh giá KPI hoặc điểm kỳ chưa đạt ngưỡng từ 75/100 trở lên');
+    }
+
+    const existingAwards = await this.prisma.personnelAction.findMany({
+      where: { subjectId: dto.userId, type: 'AWARD', status: { in: ['PENDING', 'APPROVED'] } },
+      select: { id: true, payload: true },
+    });
+    if (existingAwards.some((a) => (a.payload as Record<string, unknown> | null)?.kpiCycleId === dto.cycleId)) {
+      throw new ConflictException('Đã có đề xuất khen thưởng cho nhân sự này trong kỳ KPI đã chọn');
+    }
+
+    const action = await this.prisma.personnelAction.create({
+      data: {
+        type: 'AWARD',
+        subjectId: dto.userId,
+        requestedById: actor.id,
+        status: 'PENDING',
+        effectiveAt: dto.effectiveDate ? dateKey(dto.effectiveDate) : workDate(),
+        payload: {
+          amount: Math.round(dto.amount),
+          reason: dto.reason.trim(),
+          kpiCycleId: cycle.id,
+          kpiCycleName: cycle.name,
+          kpiScore: kpiSummary.score,
+          kpiClassification: kpiSummary.classification,
+          source: 'KPI_PERFORMANCE',
+        },
+      },
+    });
+
+    await this.audit.log({
+      actorId: actor.id,
+      action: 'KPI_AWARD_PROPOSED',
+      entityType: 'PersonnelAction',
+      entityId: action.id,
+      after: { cycleId: cycle.id, userId: dto.userId, amount: Math.round(dto.amount), kpiScore: kpiSummary.score },
+    });
+
+    return action;
+  }
+
 }
 
 @ApiTags('HRMS - KPI Appraisal')
@@ -1017,6 +1364,42 @@ export class HrmsPerformanceController {
       decisionNo?: string;
     }, @CurrentUser() actor: AuthUser) {
     return this.service.syncToPersonnelAppraisal(actor.id, dto);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER', 'ACCOUNTANT', 'HR_RECRUITER')
+  @Get('reviews')
+  listReviews(@CurrentUser() actor: AuthUser, @Query('cycleId') cycleId?: string, @Query('userId') userId?: string) {
+    return this.service.listReviews(actor, cycleId, userId);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER', 'ACCOUNTANT', 'HR_RECRUITER')
+  @Post('reviews')
+  submitReview(@CurrentUser() actor: AuthUser, @Body() dto: SubmitAppraisalReviewDto) {
+    return this.service.submitReview(actor, dto);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER', 'ACCOUNTANT', 'HR_RECRUITER')
+  @Get('development-plans')
+  listDevelopmentPlans(@CurrentUser() actor: AuthUser, @Query('cycleId') cycleId?: string, @Query('userId') userId?: string) {
+    return this.service.listDevelopmentPlans(actor, cycleId, userId);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD')
+  @Post('development-plans')
+  createDevelopmentPlan(@CurrentUser() actor: AuthUser, @Body() dto: CreateDevelopmentPlanDto) {
+    return this.service.createDevelopmentPlan(actor, dto);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_TRAINER', 'HR_CB', 'LINE_MANAGER', 'BOD', 'USER', 'ACCOUNTANT', 'HR_RECRUITER')
+  @Patch('development-plans/:id')
+  updateDevelopmentPlan(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: UpdateDevelopmentPlanDto) {
+    return this.service.updateDevelopmentPlan(actor, id, dto);
+  }
+
+  @Roles('ADMIN', 'KM_MANAGER', 'HR_CB', 'LINE_MANAGER', 'BOD')
+  @Post('propose-award')
+  proposeKpiAward(@CurrentUser() actor: AuthUser, @Body() dto: ProposeKpiAwardDto) {
+    return this.service.proposeKpiAward(actor, dto);
   }
 }
 

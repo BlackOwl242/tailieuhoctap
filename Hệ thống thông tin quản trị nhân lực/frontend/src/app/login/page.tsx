@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
-import { BookOpenText, Camera, Loader2, LogOut } from 'lucide-react';
+import { BookOpenText, Camera, Loader2, LogOut, ShieldCheck } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select } from '@/components/ui/primitives';
@@ -43,6 +43,8 @@ function LoginInner() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [quickAccount, setQuickAccount] = useState('');
+  const [mfaSession, setMfaSession] = useState<{ challengeToken: string; email: string } | null>(null);
+  const [mfaCode, setMfaCode] = useState('');
   const [passwordChangeSession, setPasswordChangeSession] = useState<{ accessToken: string; email: string } | null>(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -50,29 +52,73 @@ function LoginInner() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  async function completeSignIn(accessToken: string) {
+    // Bước 2: lấy hồ sơ đầy đủ kèm vai trò
+    const me = await api.get<AuthUser>('/auth/me', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (me.data.mustChangePassword) {
+      setPasswordChangeSession({ accessToken, email: me.data.email });
+      setPassword('');
+      setMfaSession(null);
+      setMfaCode('');
+      setError(null);
+      return;
+    }
+    setAuth(accessToken, me.data);
+    // Dọn sạch cache của tài khoản trước (nếu có) — chống lộ dữ liệu chéo tài khoản
+    queryClient.clear();
+    router.replace(nextPath);
+  }
+
   async function submit(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      // Bước 1: đổi credential lấy cặp token
-      const tokens = (await api.post('/auth/login', { email, password })).data;
-      // Xóa phiên cũ trước khi tải hồ sơ, để interceptor không ghi đè token mới.
-      quickLogout();
-      // Bước 2: lấy hồ sơ đầy đủ kèm vai trò
-      const me = await api.get<AuthUser>('/auth/me', {
-        headers: { Authorization: `Bearer ${tokens.accessToken}` },
-      });
-      if (me.data.mustChangePassword) {
-        setPasswordChangeSession({ accessToken: tokens.accessToken, email: me.data.email });
-        setPassword('');
+      // Xóa trạng thái in-memory cũ trước khi đăng nhập tài khoản mới (không gọi /logout để tránh race với cookie mới).
+      clear();
+      queryClient.clear();
+      // Bước 1: đổi credential lấy access token (refresh token giữ trong HttpOnly cookie hrmis_rt)
+      const res = (
+        await api.post(
+          '/auth/login',
+          { email, password },
+          { headers: { 'X-Auth-Transport': 'cookie' } },
+        )
+      ).data as { accessToken?: string; mfaRequired?: boolean; mfaChallengeToken?: string };
+
+      if (res.mfaRequired && res.mfaChallengeToken) {
+        setMfaSession({ challengeToken: res.mfaChallengeToken, email });
+        setMfaCode('');
         setError(null);
         return;
       }
-      setAuth(tokens, me.data);
-      // Dọn sạch cache của tài khoản trước (nếu có) — chống lộ dữ liệu chéo tài khoản
-      queryClient.clear();
-      router.replace(nextPath);
+      if (!res.accessToken) {
+        throw new Error('Phản hồi đăng nhập không hợp lệ');
+      }
+      await completeSignIn(res.accessToken);
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function submitMfa(e: React.FormEvent) {
+    e.preventDefault();
+    if (!mfaSession) return;
+    setError(null);
+    setLoading(true);
+    try {
+      const res = (
+        await api.post(
+          '/auth/mfa/verify',
+          { challengeToken: mfaSession.challengeToken, code: mfaCode.trim() },
+          { headers: { 'X-Auth-Transport': 'cookie' } },
+        )
+      ).data as { accessToken: string };
+      await completeSignIn(res.accessToken);
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -82,8 +128,7 @@ function LoginInner() {
 
   /** Đăng xuất nhanh ngay trên trang login khi còn phiên cũ (đổi tài khoản). */
   function quickLogout() {
-    const { refreshToken } = useAuthStore.getState();
-    if (refreshToken) void api.post('/auth/logout', { refreshToken }).catch(() => undefined);
+    void api.post('/auth/logout', {}, { headers: { 'X-Auth-Transport': 'cookie' } }).catch(() => undefined);
     clear();
     queryClient.clear();
   }
@@ -98,10 +143,13 @@ function LoginInner() {
     }
     setLoading(true);
     try {
-      const headers = { Authorization: `Bearer ${passwordChangeSession.accessToken}` };
+      const headers = {
+        Authorization: `Bearer ${passwordChangeSession.accessToken}`,
+        'X-Auth-Transport': 'cookie',
+      };
       const tokens = (await api.post('/auth/change-password', { currentPassword, newPassword }, { headers })).data;
       const me = await api.get<AuthUser>('/auth/me', { headers: { Authorization: `Bearer ${tokens.accessToken}` } });
-      setAuth(tokens, me.data);
+      setAuth(tokens.accessToken, me.data);
       queryClient.clear();
       router.replace(nextPath);
     } catch (err) {
@@ -137,7 +185,13 @@ function LoginInner() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{passwordChangeSession ? 'Đổi mật khẩu khởi tạo' : 'Đăng nhập'}</CardTitle>
+            <CardTitle>
+              {passwordChangeSession
+                ? 'Đổi mật khẩu khởi tạo'
+                : mfaSession
+                  ? 'Xác thực hai lớp (2FA)'
+                  : 'Đăng nhập'}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {passwordChangeSession ? (
@@ -161,6 +215,47 @@ function LoginInner() {
                   Đổi mật khẩu và tiếp tục
                 </Button>
                 <Button type="button" variant="ghost" className="w-full" disabled={loading} onClick={() => { setPasswordChangeSession(null); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setError(null); }}>
+                  Quay lại đăng nhập
+                </Button>
+              </form>
+            ) : mfaSession ? (
+              <form onSubmit={submitMfa} className="space-y-4">
+                <div className="flex items-start gap-2.5 rounded-lg border border-primary/20 bg-primary/5 p-3 text-xs text-muted-foreground">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>
+                    Tài khoản <strong className="text-foreground">{mfaSession.email}</strong> đã bật xác thực hai lớp. Nhập mã OTP 6 chữ số từ ứng dụng Authenticator hoặc mã dự phòng (<code className="font-mono">XXXX-XXXX</code>).
+                  </span>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="mfa-code">Mã xác thực 2FA / Mã dự phòng</Label>
+                  <Input
+                    id="mfa-code"
+                    type="text"
+                    inputMode="text"
+                    autoComplete="one-time-code"
+                    required
+                    autoFocus
+                    placeholder="123456 hoặc XXXX-XXXX"
+                    value={mfaCode}
+                    onChange={(e) => setMfaCode(e.target.value)}
+                  />
+                </div>
+                {error ? <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p> : null}
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Xác minh và đăng nhập
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  disabled={loading}
+                  onClick={() => {
+                    setMfaSession(null);
+                    setMfaCode('');
+                    setError(null);
+                  }}
+                >
                   Quay lại đăng nhập
                 </Button>
               </form>

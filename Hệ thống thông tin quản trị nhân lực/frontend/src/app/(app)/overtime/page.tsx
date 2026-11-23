@@ -226,9 +226,7 @@ export default function OvertimePage() {
           </div>
           <div className="space-y-1.5"><Label>Lý do *</Label>
             <Textarea required value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} /></div>
-          <div className="flex justify-end gap-2">
-            <ModalFooterActions onCancel={() => setOpen(false)} pending={create.isPending} confirmLabel="Gửi đăng ký" />
-          </div>
+          <ModalFooterActions onCancel={() => setOpen(false)} pending={create.isPending} confirmLabel="Gửi đăng ký" />
         </form>
       </Modal>
     </div>

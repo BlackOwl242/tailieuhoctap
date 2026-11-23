@@ -301,7 +301,7 @@ export class ArticlesService {
       type: 'REVIEW_REQUESTED',
       title: 'Có bản thảo chờ bạn duyệt',
       body: article.title,
-      linkPath: `/review`,
+      linkPath: `/knowledge?tab=reviews`,
     });
     await this.audit.log({ actorId: user.id, action: 'ARTICLE_SUBMITTED', entityType: 'Article', entityId: id, requestId });
     return this.getDetail(id, user);
@@ -338,7 +338,7 @@ export class ArticlesService {
       type: 'REVIEW_RESULT',
       title: `Bài "${article.title}" ${label}`,
       body: dto.comment,
-      linkPath: `/articles/${id}`,
+      linkPath: `/knowledge?article=${id}`,
     });
     await this.audit.log({ actorId: user.id, action: `ARTICLE_${dto.action}`, entityType: 'Article', entityId: id, after: { comment: dto.comment }, requestId });
 
@@ -349,7 +349,7 @@ export class ArticlesService {
         userIds: followers.map((f) => f.userId),
         type: 'ARTICLE_PUBLISHED',
         title: `Bài mới trong Space: ${article.title}`,
-        linkPath: `/articles/${id}`,
+        linkPath: `/knowledge?article=${id}`,
       });
     }
     return this.getDetail(id, user);

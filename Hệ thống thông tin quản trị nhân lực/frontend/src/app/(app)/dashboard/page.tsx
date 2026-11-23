@@ -93,13 +93,7 @@ export default function FrappeHrmsDeskDashboard() {
     }>;
   }>({
     queryKey: ['my-attendance-dashboard'],
-    queryFn: async () => {
-      try {
-        return (await api.get('/attendance/my')).data;
-      } catch {
-        return (await api.get('/attendance/me')).data;
-      }
-    },
+    queryFn: async () => (await api.get('/attendance/me')).data,
     enabled: !isManagerOrAdmin,
   });
 
@@ -119,7 +113,7 @@ export default function FrappeHrmsDeskDashboard() {
   if (isManagerOrAdmin && statsError) return <ErrorState message={errorMessage(statsErr)} onRetry={() => refetchStats()} />;
 
   const hr = stats?.hr;
-  const latestRun = payrollRuns?.[0];
+  const latestRun = payrollRuns?.find((r: { status?: string }) => r.status !== 'CANCELLED');
   const pendingTotal = (hr?.pendingLeave ?? 0) + (hr?.pendingOvertime ?? 0) + (hr?.pendingActions ?? 0);
 
   // Dữ liệu cho nhân viên (USER)
@@ -139,7 +133,16 @@ export default function FrappeHrmsDeskDashboard() {
     (d) => d.workDate?.startsWith(currentMonthPrefix) && ['PRESENT', 'LATE', 'EARLY_LEAVE', 'HALF_DAY', 'ON_LEAVE'].includes(d.status)
   );
   const actualWorkCount = currentMonthWorkDays.reduce((acc, d) => acc + (d.status === 'HALF_DAY' ? 0.5 : 1), 0);
-  const standardWorkDays = 22;
+  const countMonthWorkdays = (year: number, monthIdx: number) => {
+    const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+    let count = 0;
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const dow = new Date(year, monthIdx, day).getDay();
+      if (dow >= 1 && dow <= 5) count += 1;
+    }
+    return count || 22;
+  };
+  const standardWorkDays = hr?.workingDaysThisMonth ?? countMonthWorkdays(now.getFullYear(), now.getMonth());
   const attendanceRatePct = Math.min(100, Math.round((actualWorkCount / standardWorkDays) * 1000) / 10);
 
   const todayRecord = attendanceDays.find((d) => d.workDate?.startsWith(todayPrefix));
@@ -182,7 +185,7 @@ export default function FrappeHrmsDeskDashboard() {
         icon: Clock4,
         description: 'Phân ca tuần/tháng, giám sát chuyên cần, tính bù giờ và quản lý hạn mức phép.',
         links: [
-          { label: 'Ca làm việc & Ma trận Phân ca', href: '/shifts', count: shiftTypes?.length ?? 4 },
+          { label: 'Ca làm việc & Ma trận Phân ca', href: '/shifts', count: shiftTypes?.length },
           { label: 'Bảng Chấm công Thực tế', href: '/attendance' },
           { label: 'Quản lý Đơn Nghỉ phép', href: '/leave', count: hr?.pendingLeave },
           { label: 'Đăng ký Làm thêm giờ / Trực ca', href: '/overtime', count: hr?.pendingOvertime },
@@ -222,7 +225,6 @@ export default function FrappeHrmsDeskDashboard() {
         description: 'Mục tiêu KRA/KPI theo trọng số, kết quả thực tế, minh chứng và điểm do quản lý chấm.',
         links: [
           { label: 'Mục tiêu KPI Trọng số (KRA Goals)', href: '/performance' },
-          { label: 'Cách đánh giá KPI', href: '/performance-guide' },
           { label: 'Chu kỳ đánh giá KPI', href: '/performance' },
         ],
       },
@@ -248,33 +250,57 @@ export default function FrappeHrmsDeskDashboard() {
           { label: 'Khảo sát Đánh giá Sau Đào tạo', href: '/training-grievance' },
         ],
       },
-      {
-        title: 'Báo cáo & Phê duyệt',
-        subtitle: 'Reports & Governance',
-        icon: FileSpreadsheet,
-        description: 'Trung tâm báo cáo thống kê nhân sự, tổng hợp biến động lao động và nhật ký kiểm toán.',
-        links: [
-          { label: 'Trung tâm Báo cáo & Thống kê', href: '/personnel-reports' },
-          { label: 'Quyết định & Biến động nhân sự', href: '/personnel', count: pendingTotal },
-          { label: 'Tài liệu & Quy định Nội bộ', href: '/documents' },
-          { label: 'Cơ cấu Tổ chức & Phòng ban', href: '/admin/org-units' },
-        ],
-      },
+          {
+            title: 'Báo cáo, Tri thức & DSS',
+            subtitle: 'KMS & Decision Support',
+            icon: FileSpreadsheet,
+            description: 'Cổng tri thức nội bộ KMS, trung tâm phân tích DSS, báo cáo thống kê nhân sự và hồ sơ 2C.',
+            links: [
+              { label: 'Phân tích & Ra quyết định (DSS)', href: '/analytics' },
+              { label: 'Cổng Tri thức Nội bộ (KMS)', href: '/knowledge', count: stats?.content?.publishedCount },
+              { label: 'Hộp Duyệt bài Tri thức', href: '/knowledge?tab=reviews', count: stats?.me?.pendingReviews },
+              { label: 'Trung tâm Báo cáo & Thống kê', href: '/personnel-reports' },
+              { label: 'Kho Tài liệu & Biểu mẫu', href: '/documents' },
+            ],
+          },
     ];
+
+    const latestPayrollTotal = latestRun?.totalNetPay ?? hr?.latestPeriod?.totalNetPay ?? null;
+    const formatPayrollCardValue = (amount: number | null) => {
+      if (amount == null || amount <= 0) return 'Chưa có kỳ lương';
+      if (amount >= 1_000_000_000) {
+        return `${new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount / 1_000_000_000)} tỷ đ`;
+      }
+      return `${new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 1 }).format(amount / 1_000_000)} triệu đ`;
+    };
 
     return (
       <div className="space-y-6 pb-12">
         <WorkspaceHeader
           title="Tổng quan Điều hành Nhân lực"
-          description="Không gian điều hành quản trị nhân lực tích hợp: Tuyển dụng, Chấm công, Tiền lương, Hiệu suất và Đào tạo."
+          description="Không gian điều hành quản trị nhân lực tích hợp: Tuyển dụng, Chấm công, Tiền lương, KPI, Tri thức (KMS) và Phân tích (DSS)."
           actions={
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/analytics"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors shadow-2xs"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                Phân tích & DSS
+              </Link>
+              <Link
+                href="/knowledge"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shadow-2xs"
+              >
+                <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                Cổng Tri thức
+              </Link>
               <Link
                 href="/ess"
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shadow-2xs"
               >
                 <UserCheck className="h-3.5 w-3.5 text-muted-foreground" />
-                Cổng Tự Phục Vụ (ESS)
+                Cổng ESS
               </Link>
               {isAdmin && (
                 <Link
@@ -301,20 +327,20 @@ export default function FrappeHrmsDeskDashboard() {
           <NumberCard
             title="Tổng Nhân sự"
             value={hr ? String(hr.totalEmployees) : 'Chưa cập nhật'}
-            subtitle="100% hồ sơ đã định danh"
+            subtitle={hr ? `${hr.identifiedEmployees ?? 0}/${hr.totalEmployees} hồ sơ đủ mã NV & đơn vị` : 'Đang đồng bộ hồ sơ'}
             icon={Users}
           />
           <NumberCard
             title="Có mặt hôm nay"
             value={hr ? String(hr.presentToday) : 'Chưa cập nhật'}
-            subtitle={hr && hr.onLeaveToday > 0 ? `${hr.onLeaveToday} người nghỉ phép` : 'Tất cả đúng giờ'}
+            subtitle={hr ? `${hr.lateToday ?? 0} đi muộn · ${hr.onLeaveToday} nghỉ phép · ${hr.absentToday ?? 0} chưa chấm` : 'Chưa có dữ liệu công'}
             icon={ShieldCheck}
             trend={hr ? { value: `${hr.totalEmployees > 0 ? ((hr.presentToday / hr.totalEmployees) * 100).toFixed(1) : 0}%`, isPositive: true, label: 'chuyên cần' } : undefined}
           />
           <NumberCard
             title="Quỹ lương chu kỳ"
-            value={latestRun ? `${new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(latestRun.totalNetPay / 1_000_000_000)} tỷ đồng` : 'Chưa cập nhật'}
-            subtitle="Bảng lương chu kỳ gần nhất"
+            value={formatPayrollCardValue(latestPayrollTotal)}
+            subtitle={latestRun?.periodName ?? hr?.latestPeriod?.periodName ?? 'Bảng lương chu kỳ gần nhất'}
             icon={Wallet}
           />
           <NumberCard
@@ -428,6 +454,48 @@ export default function FrappeHrmsDeskDashboard() {
             })}
           </div>
         </div>
+
+        {/* Bài viết tri thức nội bộ mới nhất (từ KMS) */}
+        <div className="rounded-lg border border-border bg-card p-4 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-3 border-b border-border">
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                Tri thức nội bộ &amp; Hội nhập (KMS)
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {stats?.content?.publishedCount ?? 0} bài đã xuất bản · {stats?.me?.pendingReviews ?? 0} bài chờ duyệt · {stats?.me?.pendingOnboardingItems ?? 0} mục hội nhập cần đọc
+              </p>
+            </div>
+            <Link
+              href="/knowledge"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+            >
+              Mở Cổng Tri thức <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          {stats?.recentArticles?.length ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              {stats.recentArticles.map((art) => (
+                <Link
+                  key={art.id}
+                  href={`/knowledge?article=${art.id}`}
+                  className="group rounded-md border border-border/70 bg-muted/20 p-3 hover:border-foreground/30 hover:bg-muted/40 transition-colors"
+                >
+                  <p className="text-xs font-semibold text-foreground group-hover:text-primary line-clamp-1">
+                    {art.title}
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted-foreground truncate">
+                    {art.space?.name} · {art.author?.fullName}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Chưa có bài viết tri thức đã xuất bản trong phạm vi của bạn. Truy cập Cổng Tri thức để tạo bài viết mới.
+            </p>
+          )}
+        </div>
       </div>
     );
   }
@@ -478,6 +546,7 @@ export default function FrappeHrmsDeskDashboard() {
       description: 'Sơ đồ cây tổ chức công ty, danh bạ nhân sự và kho tài liệu quy định chung.',
       links: [
         { label: 'Sơ đồ Tổ chức Toàn công ty', href: '/org-chart' },
+        { label: 'Cổng Tri thức & Lộ trình Hội nhập', href: '/knowledge', count: stats?.me?.pendingOnboardingItems },
         { label: 'Kho Tài liệu & Biểu mẫu Công ty', href: '/documents' },
         { label: 'Hồ sơ Thông tin Cá nhân', href: '/profile' },
         { label: 'Cổng Tự phục vụ tập trung (ESS)', href: '/ess' },

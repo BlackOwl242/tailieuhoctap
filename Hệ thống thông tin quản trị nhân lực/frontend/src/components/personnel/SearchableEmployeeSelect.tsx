@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, ChevronDown, Check, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, matchesSearch } from '@/lib/utils';
 
 export interface EmployeeOption {
   id: string;
@@ -21,16 +21,6 @@ interface SearchableEmployeeSelectProps {
   onChange: (userId: string) => void;
   className?: string;
   placeholder?: string;
-}
-
-function removeAccents(str: string): string {
-  if (!str) return '';
-  return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
-    .toLowerCase();
 }
 
 /**
@@ -75,22 +65,9 @@ export function SearchableEmployeeSelect({
   const filteredEmployees = useMemo(() => {
     const q = search.trim();
     if (!q) return employees;
-
-    const cleanQ = removeAccents(q);
-    return employees.filter((emp) => {
-      const code = (emp.employeeCode || '').toLowerCase();
-      const rawName = emp.fullName || '';
-      const cleanName = removeAccents(rawName);
-      const title = removeAccents(emp.jobTitle || emp.department || emp.orgUnit?.name || '');
-      const email = (emp.email || '').toLowerCase();
-
-      return (
-        code.includes(cleanQ) ||
-        cleanName.includes(cleanQ) ||
-        title.includes(cleanQ) ||
-        email.includes(cleanQ)
-      );
-    });
+    return employees.filter((emp) =>
+      matchesSearch(q, emp.employeeCode, emp.fullName, emp.jobTitle, emp.department, emp.orgUnit?.name, emp.email),
+    );
   }, [employees, search]);
 
   // Chiều cao thanh topbar sticky (h-14 = 56px)

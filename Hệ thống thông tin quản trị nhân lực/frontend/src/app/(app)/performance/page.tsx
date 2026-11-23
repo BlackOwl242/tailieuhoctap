@@ -1,6 +1,7 @@
 'use client';
 
 import { KpiOverview } from '@/components/performance/kpi-overview';
+import { Kpi360PipPanel } from '@/components/performance/kpi-360-pip';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
@@ -11,7 +12,7 @@ import {
   Calendar, Layers, Sparkles, TrendingUp, Trash2, X, RefreshCw,
   Filter, User, Building2, Check, Award as Medal, ShieldAlert,
   ArrowRight, CheckCheck, FileSpreadsheet, BookOpen, FileText,
-  Printer, Calculator, BarChart3, HelpCircle, Eye, Sliders,
+  Printer, Calculator, BarChart3, Eye, Sliders,
   ChevronRight, Bookmark, ArrowUpRight, CheckSquare, ShieldCheck,
   Percent, Info, ExternalLink, Scale, Pencil
 } from 'lucide-react';
@@ -409,7 +410,7 @@ export default function PerformanceKpiPage() {
   const canManageKpiLibrary = Boolean(currentUser?.roles.includes('ADMIN'));
 
   const searchParams = useSearchParams();
-  const validTabs = useMemo(() => [...(isEnterprise && canViewTeamKpi ? ['overview'] : []), ...(canCalibrate && !isEnterprise ? ['goals', 'templates', 'rubrics', 'calibration', 'cycles'] : ['goals', 'templates', 'rubrics', 'cycles'])], [isEnterprise, canCalibrate, canViewTeamKpi]);
+  const validTabs = useMemo(() => [...(isEnterprise && canViewTeamKpi ? ['overview'] : []), ...(canCalibrate && !isEnterprise ? ['goals', 'templates', 'rubrics', 'calibration', 'reviews-pip', 'cycles'] : ['goals', 'templates', 'rubrics', 'reviews-pip', 'cycles'])], [isEnterprise, canCalibrate, canViewTeamKpi]);
   type TabType = typeof validTabs[number];
 
   const paramTab = searchParams.get('tab');
@@ -939,12 +940,6 @@ export default function PerformanceKpiPage() {
         breadcrumbs={[{ label: 'Phát triển' }, { label: 'Đánh giá KPI' }]}
         actions={
           <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
-            <Link href="/performance-guide">
-              <Button variant="outline" size="sm" className="h-9 w-full text-xs sm:h-8 sm:w-auto">
-                <HelpCircle className="h-3.5 w-3.5 mr-1.5" />
-                Cách đánh giá
-              </Button>
-            </Link>
             {canManageCycles && <Button
               variant="outline"
               size="sm"
@@ -1014,6 +1009,17 @@ export default function PerformanceKpiPage() {
             <Scale className="h-4 w-4" />
             Hiệu chuẩn công vụ
           </button>}
+          <button
+            onClick={() => handleTabChange('reviews-pip')}
+            className={`flex items-center gap-2 rounded-md px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+              activeTab === 'reviews-pip'
+                ? 'bg-muted text-foreground font-medium'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+            }`}
+          >
+            <TrendingUp className="h-4 w-4" />
+            360° &amp; PIP / Thưởng
+          </button>
           <button
             onClick={() => handleTabChange('cycles')}
             className={`flex items-center gap-2 rounded-md px-3.5 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
@@ -1615,6 +1621,21 @@ export default function PerformanceKpiPage() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* TAB 6: 360° REVIEWS, PIP & KPI AWARD PROPOSAL */}
+      {activeTab === 'reviews-pip' && (
+        <Kpi360PipPanel
+          cycle={
+            (selectedCycleFilter !== 'ALL' ? cycles.find((c) => c.id === selectedCycleFilter) : undefined) ??
+            cycles.find((c) => c.status === 'ACTIVE') ??
+            cycles[0]
+          }
+          currentUserId={currentUser?.id ?? ''}
+          employees={employees}
+          canManagePip={canManageGoals}
+          canProposeAward={canScoreGoals}
+        />
       )}
 
       {/* MODAL 1: KHỞI TẠO CHU KỲ MỚI */}

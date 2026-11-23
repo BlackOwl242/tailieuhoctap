@@ -1,14 +1,15 @@
 import {
-  Body, ConflictException, Controller, Delete, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
+  BadRequestException, Body, ConflictException, Controller, Delete, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsDateString, IsEmail, IsEnum, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { UserStatus } from '@prisma/client';
+import { Prisma, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { BusinessException, ErrorCodes } from '../../common/errors/business.exception';
+import { generateNextEmployeeCode } from '../../common/hr-code';
 import type { AuthUser } from '../../common/types/auth-user';
 
 // ---------------------------------------------------------------------------
@@ -96,33 +97,68 @@ export class UsersService {
     };
   }
 
+  /** Xác thực toàn bộ mã vai trò đều tồn tại trong CSDL trước khi gán. */
+  private async assertRolesExist(tx: Prisma.TransactionClient, roleCodes: string[]) {
+    const existingRoles = await tx.role.findMany({
+      where: { code: { in: roleCodes } },
+      select: { code: true },
+    });
+    const foundSet = new Set(existingRoles.map((r) => r.code));
+    const missingRoles = roleCodes.filter((r) => !foundSet.has(r));
+    if (missingRoles.length > 0) {
+      throw new BadRequestException(`Vai trò không tồn tại trên hệ thống: ${missingRoles.join(', ')}`);
+    }
+  }
+
+  /** Chuẩn hóa mảng mã vai trò (viết hoa, loại trùng và rỗng). */
+  private normalizeRoles(roleCodes?: string[]): string[] {
+    return Array.from(new Set((roleCodes ?? []).map((r) => r.trim().toUpperCase()).filter(Boolean)));
+  }
+
   /** Tạo người dùng mới kèm vai trò; mật khẩu được băm bcrypt cost 12. */
   async create(dto: CreateUserDto, actor: AuthUser, requestId?: string) {
-    const exists = await this.prisma.user.findUnique({ where: { email: dto.email.toLowerCase() } });
+    const email = dto.email.toLowerCase();
+    const exists = await this.prisma.user.findUnique({ where: { email } });
     if (exists) {
       throw new BusinessException(ErrorCodes.EMAIL_EXISTS, 'Email đã tồn tại trong hệ thống', HttpStatus.CONFLICT);
     }
     const passwordHash = await bcrypt.hash(dto.password, 12);
-    const code = dto.employeeCode || `NV${Math.floor(1000 + Math.random() * 9000)}`;
-    const roles = (dto.roleCodes && dto.roleCodes.length > 0) ? dto.roleCodes : ['USER'];
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email.toLowerCase(),
-        passwordHash,
-        mustChangePassword: false,
-        fullName: dto.fullName,
-        jobTitle: dto.jobTitle,
-        orgUnitId: dto.orgUnitId,
-        phone: dto.phone,
-        employeeCode: code,
-        hireDate: dto.hireDate ? new Date(dto.hireDate) : new Date(),
-        employmentStatus: (dto.employmentStatus as never) || 'ACTIVE',
-        expertise: dto.expertise ?? [],
-        roles: { create: roles.map((roleCode) => ({ roleCode })) },
-      },
-      include: { roles: true },
+    const normalized = this.normalizeRoles(dto.roleCodes);
+    const finalRoles = normalized.length > 0 ? normalized : ['USER'];
+    const user = await this.prisma.$transaction(async (tx) => {
+      await this.assertRolesExist(tx, finalRoles);
+      const code = await generateNextEmployeeCode(tx);
+      const created = await tx.user.create({
+        data: {
+          email,
+          passwordHash,
+          mustChangePassword: false,
+          fullName: dto.fullName,
+          jobTitle: dto.jobTitle,
+          orgUnitId: dto.orgUnitId,
+          phone: dto.phone,
+          employeeCode: code,
+          hireDate: dto.hireDate ? new Date(dto.hireDate) : new Date(),
+          employmentStatus: (dto.employmentStatus as never) || 'ACTIVE',
+          expertise: dto.expertise ?? [],
+          roles: { create: finalRoles.map((roleCode) => ({ roleCode })) },
+        },
+        include: { roles: true },
+      });
+      await tx.leaveBalance.createMany({
+        data: [{ userId: created.id, year: new Date().getUTCFullYear(), entitled: 12, used: 0 }],
+        skipDuplicates: true,
+      });
+      return created;
     });
-    await this.audit.log({ actorId: actor.id, action: 'USER_CREATED', entityType: 'User', entityId: user.id, after: { email: user.email, roles: dto.roleCodes }, requestId });
+    await this.audit.log({
+      actorId: actor.id,
+      action: 'USER_CREATED',
+      entityType: 'User',
+      entityId: user.id,
+      after: { email: user.email, employeeCode: user.employeeCode, roles: finalRoles },
+      requestId,
+    });
     return this.sanitize(user);
   }
 
@@ -135,6 +171,16 @@ export class UsersService {
     if (!before) throw new NotFoundException('Không tìm thấy người dùng');
     if ((dto.jobTitle !== undefined && dto.jobTitle !== (before.jobTitle ?? '')) || (dto.orgUnitId !== undefined && dto.orgUnitId !== (before.orgUnitId ?? ''))) {
       throw new ConflictException('Thay đổi chức danh hoặc đơn vị phải đi qua quyết định nhân sự để có phê duyệt và ngày hiệu lực. Trang này chỉ quản lý tài khoản và quyền truy cập.');
+    }
+
+    const nextRoles = dto.roleCodes !== undefined ? this.normalizeRoles(dto.roleCodes) : undefined;
+    if (nextRoles !== undefined) {
+      if (nextRoles.length === 0) {
+        throw new BadRequestException('Tài khoản phải được gán ít nhất 1 vai trò hệ thống');
+      }
+      if (id === actor.id && before.roles.some((r) => r.roleCode === 'ADMIN') && !nextRoles.includes('ADMIN')) {
+        throw new ConflictException('Không thể tự gỡ vai trò ADMIN của chính tài khoản đang đăng nhập');
+      }
     }
 
     const data: Record<string, unknown> = {};
@@ -151,9 +197,13 @@ export class UsersService {
     }
 
     const user = await this.prisma.$transaction(async (tx) => {
-      if (dto.roleCodes) {
+      if (nextRoles !== undefined) {
+        await this.assertRolesExist(tx, nextRoles);
         await tx.userRole.deleteMany({ where: { userId: id } });
-        await tx.userRole.createMany({ data: dto.roleCodes.map((roleCode) => ({ userId: id, roleCode })) });
+        await tx.userRole.createMany({
+          data: nextRoles.map((roleCode) => ({ userId: id, roleCode })),
+          skipDuplicates: true,
+        });
       }
       return tx.user.update({ where: { id }, data, include: { roles: true } });
     });

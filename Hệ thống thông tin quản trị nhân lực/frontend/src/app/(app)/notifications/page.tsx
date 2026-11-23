@@ -1,11 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BellRing, CheckCheck, ClipboardList, ArrowUpRight } from 'lucide-react';
+import { BellRing, CheckCheck, ClipboardList, ArrowUpRight, Search } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
-import { cn, formatDateTime } from '@/lib/utils';
-import { Button, Card, Skeleton } from '@/components/ui/primitives';
+import { cn, formatDateTime, matchesSearch } from '@/lib/utils';
+import { Button, Card, Input, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState, EmptyState } from '@/components/common/states';
 import type { NotificationItem } from '@/lib/types';
 
@@ -20,6 +21,8 @@ const roleNames: Record<string, string> = { ADMIN: 'Quản trị hệ thống', 
 /** KC17 — Thông báo in-app: chưa đọc nổi bật, đánh dấu đã đọc từng mục/tất cả. */
 export default function NotificationsPage() {
   const qc = useQueryClient();
+  const [search, setSearch] = useState('');
+  const [unreadOnly, setUnreadOnly] = useState(false);
   const q = useQuery({
     queryKey: ['notifications'],
     queryFn: async () =>
@@ -69,34 +72,67 @@ export default function NotificationsPage() {
       ) : q.data!.items.length === 0 ? (
         <EmptyState title="Chưa có thông báo nào" icon={BellRing} hint="Thông báo duyệt, bình luận và bài mới sẽ hiện ở đây." />
       ) : (
-        <div className="space-y-2">
-          {q.data!.items.map((n) => {
-            const inner = (
-              <Card className={cn('p-4 transition-colors', !n.readAt && 'border-primary/40 bg-primary/5')}>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className={cn('truncate text-sm', !n.readAt && 'font-semibold')}>{n.title}</p>
-                    {n.body ? <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{n.body}</p> : null}
-                    <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(n.createdAt)}</p>
-                  </div>
-                  {!n.readAt ? (
-                    <button
-                      onClick={(e) => { e.preventDefault(); readOne.mutate(n.id); }}
-                      className="shrink-0 rounded-md px-2 py-1 text-xs text-primary hover:bg-accent"
-                    >
-                      Đã đọc
-                    </button>
-                  ) : null}
-                </div>
-              </Card>
+        <div className="space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative flex-1 sm:max-w-sm">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Tìm nội dung thông báo…"
+                aria-label="Tìm thông báo"
+                className="pl-9"
+              />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Button size="sm" variant={!unreadOnly ? 'default' : 'outline'} onClick={() => setUnreadOnly(false)}>
+                Tất cả ({q.data!.items.length})
+              </Button>
+              <Button size="sm" variant={unreadOnly ? 'default' : 'outline'} onClick={() => setUnreadOnly(true)}>
+                Chưa đọc ({q.data!.unreadCount})
+              </Button>
+            </div>
+          </div>
+
+          {(() => {
+            const visibleNotifications = q.data!.items.filter((n) => {
+              if (unreadOnly && n.readAt) return false;
+              return matchesSearch(search, n.title, n.body);
+            });
+            if (visibleNotifications.length === 0) {
+              return <EmptyState title="Không có thông báo phù hợp" icon={BellRing} hint="Thử đổi từ khóa tìm kiếm hoặc chuyển bộ lọc Tất cả." />;
+            }
+            return (
+              <div className="space-y-2">
+                {visibleNotifications.map((n) => {
+                  const inner = (
+                    <Card className={cn('p-4 transition-colors', !n.readAt && 'border-primary/40 bg-primary/5')}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className={cn('truncate text-sm', !n.readAt && 'font-semibold')}>{n.title}</p>
+                          {n.body ? <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{n.body}</p> : null}
+                          <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(n.createdAt)}</p>
+                        </div>
+                        {!n.readAt ? (
+                          <button
+                            onClick={(e) => { e.preventDefault(); readOne.mutate(n.id); }}
+                            className="shrink-0 rounded-md px-2 py-1 text-xs text-primary hover:bg-accent"
+                          >
+                            Đã đọc
+                          </button>
+                        ) : null}
+                      </div>
+                    </Card>
+                  );
+                  return n.linkPath ? (
+                    <Link key={n.id} href={n.linkPath} className="block">{inner}</Link>
+                  ) : (
+                    <div key={n.id}>{inner}</div>
+                  );
+                })}
+              </div>
             );
-            // Có link → bọc bằng Link để điều hướng tới đúng bài/việc
-            return n.linkPath ? (
-              <Link key={n.id} href={n.linkPath} className="block">{inner}</Link>
-            ) : (
-              <div key={n.id}>{inner}</div>
-            );
-          })}
+          })()}
         </div>
       )}
     </>

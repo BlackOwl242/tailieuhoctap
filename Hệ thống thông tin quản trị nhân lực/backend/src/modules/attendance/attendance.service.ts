@@ -234,9 +234,8 @@ export class AttendanceService implements OnModuleInit, OnModuleDestroy {
 
   /** Xóa mẫu khuôn mặt (quyền riêng tư — cũng là mục mặc định của handover). */
   async deleteFaceEnrollment(userId: string, embeddingId?: string) {
-    await this.prisma.faceEmbedding.updateMany({
-      where: { userId, ...(embeddingId ? { id: embeddingId } : {}), active: true },
-      data: { active: false },
+    await this.prisma.faceEmbedding.deleteMany({
+      where: { userId, ...(embeddingId ? { id: embeddingId } : {}) },
     });
     return { success: true };
   }
@@ -423,7 +422,7 @@ export class AttendanceService implements OnModuleInit, OnModuleDestroy {
   async companyDays(dateIso: string | undefined, query?: string, rawPage?: number, rawLimit?: number) {
     await this.ledger.ensureAutoAttendanceUpToDate();
     const page = Math.max(1, Number(rawPage) || 1);
-    const limit = Math.min(100, Math.max(1, Number(rawLimit) || 50));
+    const limit = Math.min(1000, Math.max(1, Number(rawLimit) || 50));
     const date = startOfDay(dateIso ? new Date(dateIso) : new Date());
     const where = {
       workDate: date,
@@ -434,7 +433,7 @@ export class AttendanceService implements OnModuleInit, OnModuleDestroy {
     const [items, total] = await this.prisma.$transaction([
       this.prisma.attendanceDay.findMany({
         where,
-        include: { user: { select: { id: true, fullName: true, email: true, jobTitle: true } } },
+        include: { user: { select: { id: true, fullName: true, email: true, employeeCode: true, jobTitle: true } } },
         orderBy: [{ status: 'asc' }, { user: { fullName: 'asc' } }],
         skip: (page - 1) * limit,
         take: limit,

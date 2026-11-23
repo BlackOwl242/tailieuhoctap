@@ -271,19 +271,17 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
         }
       }
       let targetId = userId;
-      // 1. Nếu chưa có userId, tạo mới User trước
+      // 1. Nếu chưa có userId, tạo mới hồ sơ nhân sự qua /employees (mã NV được hệ thống tự cấp)
       if (!targetId) {
-        const userRes = await api.post('/users', {
+        const userRes = await api.post('/employees', {
           fullName: form.fullName,
           email: form.email,
           password: form.password,
           phone: form.phone || undefined,
-          employeeCode: form.employeeCode || undefined,
           jobTitle: form.jobTitle || undefined,
           orgUnitId: form.orgUnitId || undefined,
           employmentStatus: form.employmentStatus,
           hireDate: form.hireDate ? new Date(form.hireDate).toISOString() : undefined,
-          roleCodes: ['USER'],
         });
         targetId = userRes.data?.id;
       }
@@ -490,7 +488,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-base font-bold text-foreground">
                   {userId ? 'Chỉnh sửa Hồ sơ Nhân sự' : 'Khai báo Hồ sơ Nhân sự'}
                 </h2>
@@ -499,6 +497,11 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                     ? `Khu vực công · ${orgConfig.publicPersonnelType === 'PUBLIC_EMPLOYEE' ? 'Viên chức' : 'Công chức'} (cấu hình tham chiếu)`
                     : 'Doanh nghiệp tư nhân'}
                 </Badge>
+                {userId && form.employeeCode ? (
+                  <Badge variant="outline" className="font-mono text-xs">
+                    Mã cán bộ: {form.employeeCode}
+                  </Badge>
+                ) : null}
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Chế độ hồ sơ lấy từ Cấu hình tổ chức; biểu mẫu công vụ và dữ liệu tham chiếu cần được cơ quan xác minh trước khi dùng chính thức.
@@ -764,7 +767,7 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
                   <Briefcase className="w-4 h-4 text-primary" /> Khối 3: Quá trình Tuyển dụng & Đơn vị công tác
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                   <div className="space-y-1">
                     <label className="font-semibold text-foreground">Đơn vị / Phòng ban công tác *</label>
                     <Select
@@ -788,14 +791,6 @@ export function ComprehensivePersonnelModal({ isOpen, onClose, userId, onSuccess
                       onChange={(e) => setForm({ ...form, jobTitle: e.target.value })}
                       placeholder="VD: Chuyên viên Phân tích nghiệp vụ"
                       required
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="font-semibold text-foreground">Mã cán bộ / Mã NV</label>
-                    <Input
-                      value={form.employeeCode}
-                      onChange={(e) => setForm({ ...form, employeeCode: e.target.value })}
-                      placeholder="CB-2026..."
                     />
                   </div>
                 </div>

@@ -1,44 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
+import { Injectable, Optional } from '@nestjs/common';
+import { FieldCryptoService } from '../../common/services/field-crypto.service';
 
 /**
- * Mã hóa mẫu khuôn mặt khi lưu trữ; đây chỉ là một biện pháp bảo vệ dữ liệu:
- * - Vector khuôn mặt được mã hóa AES-256-GCM trước khi lưu;
- * - KHÔNG lưu ảnh gốc; log không bao giờ ghi nội dung vector;
- * - So khớp bằng cosine similarity trên vector đã giải mã trong RAM.
+ * Mã hóa mẫu khuôn mặt khi lưu trữ; ủy quyền quản lý khóa cho FieldCryptoService
+ * (AES-256-GCM, fail-fast khi thiếu khóa trong production).
  */
 @Injectable()
 export class FaceCryptoService {
-  private key(): Buffer {
-    const raw = process.env.FACE_EMBEDDING_KEY || '';
-    const buf = Buffer.from(raw, 'base64');
-    if (buf.length === 32) return buf;
-    if (buf.length > 0) {
-      return createHash('sha256').update(buf).digest();
-    }
-    return createHash('sha256').update('kms-default-face-embedding-key-saigon-tech').digest();
+  private readonly cryptoService: FieldCryptoService;
+
+  constructor(@Optional() fieldCrypto?: FieldCryptoService) {
+    this.cryptoService = fieldCrypto ?? new FieldCryptoService();
   }
 
   /** Mã hóa vector float[] → chuỗi base64(iv|tag|ciphertext). */
   encryptEmbedding(vector: number[]): string {
-    const iv = randomBytes(12);
-    const cipher = createCipheriv('aes-256-gcm', this.key(), iv);
-    const data = Buffer.from(new Float32Array(vector).buffer);
-    const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
-    const tag = cipher.getAuthTag();
-    return Buffer.concat([iv, tag, encrypted]).toString('base64');
+    return this.cryptoService.encryptVector(vector);
   }
 
   /** Giải mã ngược chuỗi base64 → vector float[]. */
   decryptEmbedding(encrypted: string): number[] {
-    const raw = Buffer.from(encrypted, 'base64');
-    const iv = raw.subarray(0, 12);
-    const tag = raw.subarray(12, 28);
-    const data = raw.subarray(28);
-    const decipher = createDecipheriv('aes-256-gcm', this.key(), iv);
-    decipher.setAuthTag(tag);
-    const decrypted = Buffer.concat([decipher.update(data), decipher.final()]);
-    return Array.from(new Float32Array(decrypted.buffer, decrypted.byteOffset, decrypted.byteLength / 4));
+    return this.cryptoService.decryptVector(encrypted);
   }
 
   /** Cosine similarity giữa hai vector cùng chiều. */

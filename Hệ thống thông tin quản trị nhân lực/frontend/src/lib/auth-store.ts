@@ -1,44 +1,42 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type { AuthUser } from './types';
 
-/** Khóa localStorage của phiên đăng nhập — dùng khi xóa sạch phiên. */
-const STORAGE_KEY = 'kms-auth';
+/** Khóa localStorage cũ từng lưu token — xóa sạch khi đăng xuất / khởi tạo để nâng chuẩn OWASP. */
+const LEGACY_STORAGE_KEY = 'kms-auth';
 
 export interface AuthState {
   accessToken: string | null;
-  refreshToken: string | null;
   user: AuthUser | null;
-  setAuth: (tokens: { accessToken: string; refreshToken: string }, user: AuthUser) => void;
-  setTokens: (tokens: { accessToken: string; refreshToken: string }) => void;
-  setUser: (user: AuthUser) => void;
+  sessionBootstrapped: boolean;
+  setAuth: (accessToken: string, user: AuthUser) => void;
+  setAccessToken: (accessToken: string | null) => void;
+  setUser: (user: AuthUser | null) => void;
+  markBootstrapped: () => void;
   clear: () => void;
 }
 
 /**
- * Lưu phiên đăng nhập vào localStorage (persist).
- * Access token ngắn hạn 15 phút — interceptor sẽ tự refresh khi hết hạn.
+ * Lưu access token và hồ sơ người dùng CHỈ TRONG BỘ NHỚ (in-memory).
+ * Refresh token được giữ hoàn toàn trong HttpOnly cookie `hrmis_rt` — không lưu JWT vào localStorage.
  */
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      accessToken: null,
-      refreshToken: null,
-      user: null,
-      setAuth: (tokens, user) => set({ ...tokens, user }),
-      setTokens: (tokens) => set(tokens),
-      setUser: (user) => set({ user }),
-      /**
-       * Xóa phiên SẠCH (Mục 3): reset state + xóa hẳn key persist trong
-       * localStorage để không còn dấu vết token của tài khoản cũ.
-       */
-      clear: () => {
-        set({ accessToken: null, refreshToken: null, user: null });
-        if (typeof window !== 'undefined') window.localStorage.removeItem(STORAGE_KEY);
-      },
-    }),
-    { name: STORAGE_KEY },
-  ),
-);
+export const useAuthStore = create<AuthState>()((set) => ({
+  accessToken: null,
+  user: null,
+  sessionBootstrapped: false,
+  setAuth: (accessToken, user) => set({ accessToken, user, sessionBootstrapped: true }),
+  setAccessToken: (accessToken) => set({ accessToken }),
+  setUser: (user) => set({ user }),
+  markBootstrapped: () => set({ sessionBootstrapped: true }),
+  clear: () => {
+    set({ accessToken: null, user: null, sessionBootstrapped: true });
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+      } catch {
+        // Ignored
+      }
+    }
+  },
+}));

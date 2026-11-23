@@ -7,12 +7,14 @@ import { endsEmployment } from '../../common/personnel-action-rules';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 import {
-  Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query,
+  Body, Controller, Delete, Get, Injectable, Module, NotFoundException, Optional, Param, Patch, Post, Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsDateString, IsEnum, IsIn, IsNumber, IsObject, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
+import { FieldCryptoService } from '../../common/services/field-crypto.service';
+import { toMoney, toMoneyOrNull } from '../../common/money';
 import { SalaryComponentType, PayrollRunStatus } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -155,12 +157,22 @@ class AddAttendanceEvidenceDto {
 
 @Injectable()
 export class HrmsPayrollService {
+  private readonly crypto: FieldCryptoService;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly settings: RuntimeSettingsService,
     private readonly ledger: AttendanceLedgerService,
-  ) {}
+    @Optional() fieldCrypto?: FieldCryptoService,
+  ) {
+    this.crypto = fieldCrypto ?? new FieldCryptoService();
+  }
+
+  private decryptSlipBank<T extends { bankAccount?: string | null }>(slip: T): T {
+    if (!slip || slip.bankAccount === undefined) return slip;
+    return { ...slip, bankAccount: this.crypto.decryptOptionalString(slip.bankAccount) ?? null };
+  }
 
   async listComponents() {
     return this.prisma.hrmsSalaryComponent.findMany({ orderBy: { type: 'asc' } });
@@ -293,9 +305,9 @@ export class HrmsPayrollService {
         minSalary: band.minSalary, midSalary: band.midSalary, maxSalary: band.maxSalary,
         compensationBasis: band.compensationBasis, effectiveFrom: band.effectiveFrom, effectiveTo: band.effectiveTo,
         jobTitles: band.jobTitles, employeeCount: matched.length,
-        withinRange: comparable.filter((user) => salaryOf(user) >= band.minSalary && salaryOf(user) <= band.maxSalary).length,
-        belowRange: comparable.filter((user) => salaryOf(user) < band.minSalary).length,
-        aboveRange: comparable.filter((user) => salaryOf(user) > band.maxSalary).length,
+        withinRange: comparable.filter((user) => salaryOf(user) >= toMoney(band.minSalary) && salaryOf(user) <= toMoney(band.maxSalary)).length,
+        belowRange: comparable.filter((user) => salaryOf(user) < toMoney(band.minSalary)).length,
+        aboveRange: comparable.filter((user) => salaryOf(user) > toMoney(band.maxSalary)).length,
       };
     });
   }
@@ -431,7 +443,7 @@ export class HrmsPayrollService {
   }
 
   async listPayrollRuns() {
-    return this.prisma.hrmsPayrollRun.findMany({
+    const runs = await this.prisma.hrmsPayrollRun.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
         slips: {
@@ -440,6 +452,7 @@ export class HrmsPayrollService {
         _count: { select: { slips: true } },
       },
     });
+    return runs.map((run) => ({ ...run, slips: run.slips.map((slip) => this.decryptSlipBank(slip)) }));
   }
 
   async getPayrollRun(id: string) {
@@ -452,7 +465,7 @@ export class HrmsPayrollService {
       },
     });
     if (!run) throw new NotFoundException('Không tìm thấy bảng lương');
-    return run;
+    return { ...run, slips: run.slips.map((slip) => this.decryptSlipBank(slip)) };
   }
 
   async deletePayrollRun(actorId: string, id: string) {
@@ -725,10 +738,10 @@ export class HrmsPayrollService {
           const hasAnyContractHistory = contracts.length > 0;
           // A current contract is the authoritative enterprise salary source.
           // Keep older assignment snapshots only for legacy employees with no contract history.
-          const assignmentSalary = assignment && !hasAnyContractHistory ? assignment.baseSalary : null;
+          const assignmentSalary = assignment && !hasAnyContractHistory ? toMoney(assignment.baseSalary) : null;
           const hasApplicableSalarySource = Boolean(publicPay) || assignmentSalary !== null || contract !== undefined;
-          const profileFallback = !isStateOrganization && !hasAnyContractHistory && assignmentSalary === null ? Number(user.baseSalary ?? 0) : 0;
-          const dailyBase = publicPay?.monthlyTotal ?? assignmentSalary ?? contract?.baseSalary ?? profileFallback;
+          const profileFallback = !isStateOrganization && !hasAnyContractHistory && assignmentSalary === null ? toMoney(user.baseSalary, 0) : 0;
+          const dailyBase = publicPay?.monthlyTotal ?? assignmentSalary ?? toMoneyOrNull(contract?.baseSalary) ?? profileFallback;
           if (publicPay) salarySourcesUsed.add('PUBLIC_SECTOR_PAY_SCALE');
           else if (assignmentSalary !== null) salarySourcesUsed.add('EMPLOYEE_ASSIGNMENT');
           else if (contract) {
@@ -768,10 +781,11 @@ export class HrmsPayrollService {
           else {
             const comparisonRate = salaryBand.compensationBasis === compensationBasis ? dailyBase
               : salaryBand.compensationBasis === 'MONTHLY' ? monthlyEquivalentBase : null;
+            const bandMin = toMoney(salaryBand.minSalary), bandMid = toMoney(salaryBand.midSalary), bandMax = toMoney(salaryBand.maxSalary);
             const status = comparisonRate === null ? 'BASIS_MISMATCH'
-              : comparisonRate < salaryBand.minSalary ? 'BELOW_RANGE'
-                : comparisonRate > salaryBand.maxSalary ? 'ABOVE_RANGE' : 'IN_RANGE';
-            const review = salaryBandReviews.get(salaryBand.id) ?? { code: salaryBand.code, name: salaryBand.name, minSalary: salaryBand.minSalary, midSalary: salaryBand.midSalary, maxSalary: salaryBand.maxSalary, compensationBasis: salaryBand.compensationBasis, statuses: new Set<string>(), days: 0 };
+              : comparisonRate < bandMin ? 'BELOW_RANGE'
+                : comparisonRate > bandMax ? 'ABOVE_RANGE' : 'IN_RANGE';
+            const review = salaryBandReviews.get(salaryBand.id) ?? { code: salaryBand.code, name: salaryBand.name, minSalary: bandMin, midSalary: bandMid, maxSalary: bandMax, compensationBasis: salaryBand.compensationBasis, statuses: new Set<string>(), days: 0 };
             review.statuses.add(status);
             review.days++;
             salaryBandReviews.set(salaryBand.id, review);
@@ -780,9 +794,10 @@ export class HrmsPayrollService {
           const formulaValues: Record<string, number> = { baseSalary: monthlyEquivalentBase, BASIC: monthlyEquivalentBase, standardDays: dates.length };
           let insurableAllowances = 0, overtimeApplicableAllowances = 0;
           for (const item of appliedComponentItems) {
-            formulaValues.unitAmount = item.amount;
+            const itemAmount = toMoney(item.amount);
+            formulaValues.unitAmount = itemAmount;
             const formula = item.formula ?? (item.component.isFormulaBased ? item.component.formula : null);
-            const amount = formula ? evaluateFormula(formula, formulaValues) : item.amount;
+            const amount = formula ? evaluateFormula(formula, formulaValues) : itemAmount;
             formulaValues[item.component.code] = amount;
             if (item.component.type === 'EARNING' && item.component.isInsuranceApplicable) insurableAllowances += amount;
             if (item.component.type === 'EARNING' && item.component.isOvertimeApplicable && item.component.code !== 'LUNCH_ALLOW') overtimeApplicableAllowances += amount;
@@ -791,7 +806,7 @@ export class HrmsPayrollService {
           overtimeHourlyRateByDate.set(day.toISOString().slice(0, 10), monthlyHourlyRate(monthlyEquivalentBase + overtimeApplicableAllowances, totalScheduledHours));
           insuranceBaseTotal += isStateOrganization
             ? monthlyEquivalentBase + insurableAllowances
-            : Math.max(contract?.insuranceSalary ?? 0, monthlyEquivalentBase + insurableAllowances);
+            : Math.max(toMoney(contract?.insuranceSalary, 0), monthlyEquivalentBase + insurableAllowances);
           const row = attendanceByDate.get(day.toISOString().slice(0, 10));
           const scheduledHours = (scheduledMinutesByDate.get(day.toISOString().slice(0, 10)) ?? 480) / 60;
           standardHours += scheduledHours;
@@ -831,9 +846,10 @@ export class HrmsPayrollService {
           }
           const componentFormulaValues: Record<string, number> = { baseSalary: monthlyEquivalentBase, BASIC: monthlyEquivalentBase, standardDays: dates.length, workingDays: 1, actualWorkDays: 1 };
           for (const item of appliedComponentItems) {
-            componentFormulaValues.unitAmount = item.amount;
+            const itemAmount = toMoney(item.amount);
+            componentFormulaValues.unitAmount = itemAmount;
             const formula = item.formula ?? (item.component.isFormulaBased ? item.component.formula : null);
-            const amount = formula ? evaluateFormula(formula, componentFormulaValues) : item.amount;
+            const amount = formula ? evaluateFormula(formula, componentFormulaValues) : itemAmount;
             componentFormulaValues[item.component.code] = amount;
             const fraction = item.component.code === 'LUNCH_ALLOW' ? actual : paidFraction;
             const earnedAmount = amount * fraction / dates.length;
@@ -887,7 +903,7 @@ export class HrmsPayrollService {
         const flatTenPercent = resident && (!taxContract || Boolean(taxContract.type !== 'INDEFINITE' && taxContract.endDate && isUnderThreeMonths(taxContract.startDate, taxContract.endDate)));
         let calculated: ReturnType<typeof calculatePayroll>;
         try {
-          calculated = calculatePayroll({ provisional: isPreview, year, earnedBase, overtimeTaxable, nightWorkBase, nightWorkPremium, insuranceRequired: unpaidFullDays + preEmploymentUnpaidDays + postEmploymentUnpaidDays < 14 || Boolean(firstMonthSick), baseSalary: base, standardDays: dates.length, paidDays, attendanceDays, insuranceSalary, insuranceCap, unemploymentCap, dependents: user.taxDependentCount, taxResidency: resident ? 'RESIDENT' : 'NON_RESIDENT', taxWithholdingMode: flatTenPercent ? 'FLAT_10' : 'PROGRESSIVE', policy, overtime: otPay, bonus, items, loans: loans.map(l => ({ id: l.id, emi: l.monthlyEmi, remaining: l.remainingAmount })), minimumWageAudit: { region, contractualMonthlyWage: overtimeBase, standardHours }, overtimeBasis: { contractualMonthlyWage: overtimeBase, standardHours, hourlyRate: hourly } });
+          calculated = calculatePayroll({ provisional: isPreview, year, earnedBase, overtimeTaxable, nightWorkBase, nightWorkPremium, insuranceRequired: unpaidFullDays + preEmploymentUnpaidDays + postEmploymentUnpaidDays < 14 || Boolean(firstMonthSick), baseSalary: base, standardDays: dates.length, paidDays, attendanceDays, insuranceSalary, insuranceCap, unemploymentCap, dependents: user.taxDependentCount, taxResidency: resident ? 'RESIDENT' : 'NON_RESIDENT', taxWithholdingMode: flatTenPercent ? 'FLAT_10' : 'PROGRESSIVE', policy, overtime: otPay, bonus, items, loans: loans.map(l => ({ id: l.id, emi: toMoney(l.monthlyEmi), remaining: toMoney(l.remainingAmount) })), minimumWageAudit: { region, contractualMonthlyWage: overtimeBase, standardHours }, overtimeBasis: { contractualMonthlyWage: overtimeBase, standardHours, hourlyRate: hourly } });
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Dữ liệu lương không hợp lệ';
           throw new ConflictException(`Không thể tính lương cho ${user.fullName} (${user.employeeCode ?? 'chưa có mã'}): ${message}`);
@@ -977,7 +993,7 @@ export class HrmsPayrollService {
             deductionReviewNote: calculated.netPay < 0 ? 'Thu nhập tích lũy chưa đủ bù các khoản bảo hiểm/khấu trừ dự kiến của tháng. Số dư âm chỉ để đối soát, không phải số tiền chi trả.' : undefined,
           });
         } else {
-          await tx.hrmsPayrollSlip.create({ data: { payrollRunId: run!.id, userId: user.id, employeeName: user.fullName, bankAccount: user.bankAccount, bankName: user.bankName, employeeCode: user.employeeCode, department: user.orgUnit?.name, jobTitle: user.jobTitle, workingDays: dates.length, actualWorkDays: paidDays, baseSalary: base, grossPay: calculated.grossPay, totalDeduction: calculated.totalDeduction, netPay: calculated.netPay, breakdown, status: 'DRAFT' } });
+          await tx.hrmsPayrollSlip.create({ data: { payrollRunId: run!.id, userId: user.id, employeeName: user.fullName, bankAccount: this.crypto.encryptOptionalString(this.crypto.decryptOptionalString(user.bankAccount)), bankName: user.bankName, employeeCode: user.employeeCode, department: user.orgUnit?.name, jobTitle: user.jobTitle, workingDays: dates.length, actualWorkDays: paidDays, baseSalary: base, grossPay: calculated.grossPay, totalDeduction: calculated.totalDeduction, netPay: calculated.netPay, breakdown, status: 'DRAFT' } });
           for (const deduction of calculated.loanDeductions) await tx.payrollLoanDeduction.create({ data: { payrollRunId: run!.id, userId: user.id, ...deduction } });
         }
         totalGrossPay += calculated.grossPay; totalDeduction += calculated.totalDeduction; totalNetPay += calculated.netPay;
@@ -1033,8 +1049,9 @@ export class HrmsPayrollService {
         const reservations = await tx.payrollLoanDeduction.findMany({ where: { payrollRunId: id, appliedAt: null } });
         for (const reservation of reservations) {
           const loan = await tx.hrmsEmployeeLoan.findUniqueOrThrow({ where: { id: reservation.loanId } });
-          if (loan.status !== 'DISBURSED' || !loan.payrollDeductionAuthorizedAt || loan.remainingAmount < reservation.amount) throw new ConflictException('Dư nợ hoặc ủy quyền đã thay đổi; phải đối soát trước thanh toán');
-          const remaining = loan.remainingAmount - reservation.amount;
+          const loanRemaining = toMoney(loan.remainingAmount), reservedAmount = toMoney(reservation.amount);
+          if (loan.status !== 'DISBURSED' || !loan.payrollDeductionAuthorizedAt || loanRemaining < reservedAmount) throw new ConflictException('Dư nợ hoặc ủy quyền đã thay đổi; phải đối soát trước thanh toán');
+          const remaining = loanRemaining - reservedAmount;
           await tx.hrmsEmployeeLoan.update({ where: { id: loan.id }, data: { remainingAmount: remaining, totalRepaid: { increment: reservation.amount }, status: remaining === 0 ? 'COMPLETED' : 'DISBURSED' } });
           await tx.payrollLoanDeduction.update({ where: { id: reservation.id }, data: { appliedAt: new Date() } });
         }
@@ -1062,7 +1079,7 @@ export class HrmsPayrollService {
       include: { payrollRun: true },
     });
     if (!slip) throw new NotFoundException('Không tìm thấy phiếu lương');
-    return slip;
+    return this.decryptSlipBank(slip);
   }
 
   async getSlipAttendance(id: string) {
@@ -1136,11 +1153,12 @@ export class HrmsPayrollService {
   }
 
   async listSlipsByUser(userId: string) {
-    return this.prisma.hrmsPayrollSlip.findMany({
+    const slips = await this.prisma.hrmsPayrollSlip.findMany({
       where: { userId, payrollRun: { status: { in: ['APPROVED', 'LOCKED', 'PAID'] } } },
       orderBy: { createdAt: 'desc' },
       include: { payrollRun: true },
     });
+    return slips.map((slip) => this.decryptSlipBank(slip));
   }
 }
 

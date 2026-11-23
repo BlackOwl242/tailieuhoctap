@@ -1,9 +1,12 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { WorkflowGuide } from '@/components/common/workflow-guide';
+import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, errorMessage } from '@/lib/api';
+import { matchesSearch } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { Button, Input, Label, Select, Textarea } from '@/components/ui/primitives';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
@@ -49,11 +52,17 @@ export default function HrWorkflowsPage() {
   const toast = useToast();
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState('');
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState('loans');
+  const [searchTerm, setSearchTerm] = useState('');
   useEffect(() => {
-    const selected = new URLSearchParams(window.location.search).get('tab');
-    if (selected && ['correction', 'bank', 'loans', 'probation', 'onboarding', 'requisition', 'attendance'].includes(selected)) setTab(selected);
-  }, []);
+    const selected = searchParams.get('tab');
+    if (selected && ['correction', 'bank', 'loans', 'probation', 'onboarding', 'requisition', 'attendance'].includes(selected)) {
+      setTab(selected);
+    } else if (!selected) {
+      setTab('loans');
+    }
+  }, [searchParams]);
   const [probationRecommendation, setProbationRecommendation] = useState('PASS');
   const [noteModal, setNoteModal] = useState<{
     title: string;
@@ -93,12 +102,25 @@ export default function HrWorkflowsPage() {
   const orgs = useRows('workflow-orgs', '/org-units', recruiter || canReviewWorkflow);
 
   const employeeList = toList(employees.data);
-  const correctionList = toList(corrections.data);
-  const loanList = toList(loans.data);
-  const probationList = toList(probation.data);
-  const reqList = toList(req.data);
-  const periodList = toList(periods.data);
-  const taskList = toList(tasks.data);
+  const correctionList = toList(corrections.data).filter((c) =>
+    matchesSearch(searchTerm, c.employeeName, c.workDate, c.reason, c.status, names[c.status])
+  );
+  const loanList = toList(loans.data).filter((l) =>
+    matchesSearch(searchTerm, l.itemDescription, l.itemKey, l.reason, l.status, names[l.status])
+  );
+  const probationList = toList(probation.data).filter((p) => {
+    const empName = employeeList.find((u) => u.id === p.userId)?.fullName ?? p.employeeName ?? '';
+    return matchesSearch(searchTerm, empName, p.assessment, p.recommendation, p.status, names[p.status]);
+  });
+  const reqList = toList(req.data).filter((q) =>
+    matchesSearch(searchTerm, q.title, q.position, q.reason, q.status, names[q.status])
+  );
+  const periodList = toList(periods.data).filter((p) =>
+    matchesSearch(searchTerm, `${p.month}/${p.year}`, p.month, p.year, p.status, names[p.status])
+  );
+  const taskList = toList(tasks.data).filter((t) =>
+    matchesSearch(searchTerm, t.employeeName, t.category, t.title, t.isCompleted ? 'Đã xác nhận' : 'Chờ xác nhận')
+  );
   const orgList = toList(orgs.data);
 
   async function act(url: string, body: Row = {}, method = 'post') {
@@ -131,11 +153,13 @@ export default function HrWorkflowsPage() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-semibold">Quy trình & xác nhận</h1>
-      <p className="text-sm text-muted-foreground">
-        Mỗi bước ghi nhận người thực hiện. Phê duyệt phải độc lập với người đề xuất; quyết định nhân sự áp dụng theo ngày hiệu lực.
-      </p>
-      <Link href="/workflow-guide" className="inline-block text-sm underline underline-offset-4">Tôi cần làm gì? Xem hướng dẫn theo công việc và vai trò</Link>
+      <WorkspaceHeader
+        title="Quy trình & xác nhận"
+        description="Mỗi bước ghi nhận người thực hiện. Phê duyệt phải độc lập với người đề xuất; quyết định nhân sự áp dụng theo ngày hiệu lực."
+        breadcrumbs={[{ label: 'Tổng quan' }, { label: 'Quy trình & xác nhận' }]}
+        className="mb-0"
+      />
+
       <div className="flex flex-wrap gap-2">
         {[
           ['correction', 'Giải trình công'],
@@ -151,6 +175,16 @@ export default function HrWorkflowsPage() {
           </Button>
         ))}
       </div>
+      {tab !== 'bank' && (
+        <div className="max-w-sm">
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Tìm theo nhân viên, lý do, trạng thái…"
+            aria-label="Tìm kiếm hồ sơ quy trình"
+          />
+        </div>
+      )}
       {tab === 'probation' && <WorkflowGuide workflow="probation" />}
       {tab === 'attendance' && <WorkflowGuide workflow="payroll" />}
       {actionError && <div role="alert" className="rounded-lg border border-destructive/30 p-4 text-sm text-destructive"><p>{actionError}</p><Button className="mt-2" size="sm" variant="outline" onClick={() => setActionError('')}>Đã hiểu</Button></div>}

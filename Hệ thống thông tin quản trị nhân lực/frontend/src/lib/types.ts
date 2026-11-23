@@ -6,6 +6,7 @@ export interface AuthUser {
   fullName?: string;
   roles: string[];
   mustChangePassword?: boolean;
+  mfaEnabled?: boolean;
 }
 
 export interface MeProfile extends Omit<AuthUser, 'roles'> {
@@ -102,12 +103,16 @@ export interface DashboardStats {
   recentArticles: Array<{ id: string; title: string; publishedAt: string; author: { fullName: string }; space: { name: string; slug: string } }>;
   hr: {
     totalEmployees: number;
+    identifiedEmployees?: number;
     presentToday: number;
+    lateToday?: number;
+    absentToday?: number;
     onLeaveToday: number;
     pendingLeave: number;
     pendingOvertime: number;
     pendingActions: number;
-    latestPeriod: { month: number; year: number; status: string } | null;
+    workingDaysThisMonth?: number;
+    latestPeriod: { id?: string; periodName?: string; month: number; year: number; status: string; totalNetPay?: number } | null;
   };
 }
 

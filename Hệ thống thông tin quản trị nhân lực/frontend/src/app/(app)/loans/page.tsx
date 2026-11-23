@@ -22,7 +22,7 @@ import { Button, Input, Select, Textarea } from '@/components/ui/primitives';
 import { Modal, ModalFooterActions } from '@/components/ui/modal';
 import { Portal } from '@/components/ui/portal';
 import { printDocumentElement } from '@/components/ui/print';
-import { formatDate } from '@/lib/utils';
+import { formatDate, matchesSearch } from '@/lib/utils';
 import { useOrgConfig } from '@/lib/org-config';
 
 export interface LoanItem {
@@ -266,10 +266,7 @@ export default function LoansPage() {
   // Filtered Loans
   const filteredLoans = useMemo(() => {
     return (loans ?? []).filter((l) => {
-      const matchSearch =
-        l.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        l.loanType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (l.reason && l.reason.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchSearch = matchesSearch(searchTerm, l.employeeName, l.loanType, l.reason);
 
       const matchStatus = statusFilter === 'ALL' || l.status === statusFilter;
       const matchCategory = categoryFilter === 'ALL' || l.loanType.includes(categoryFilter);

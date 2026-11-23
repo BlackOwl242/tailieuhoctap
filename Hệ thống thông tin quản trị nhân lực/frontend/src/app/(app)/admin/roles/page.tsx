@@ -21,7 +21,8 @@ import {
 } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
-import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/lib/auth-store';
+import { cn, matchesSearch } from '@/lib/utils';
 import { HoverMarquee } from '@/components/ui/hover-marquee';
 import {
   Button,
@@ -45,6 +46,7 @@ import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 interface UserRow {
   id: string;
   email: string;
+  employeeCode?: string | null;
   fullName: string;
   jobTitle: string | null;
   status: string;
@@ -64,6 +66,10 @@ interface RbacMatrixItem {
   moduleKey: string;
   moduleName: string;
   permissions: Record<string, string>;
+}
+
+function toggleRoleInList(list: string[], code: string, checked: boolean) {
+  return checked ? Array.from(new Set([...list, code])) : list.filter((c) => c !== code);
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -101,12 +107,16 @@ const CRITICAL_PERMISSION_ROWS = [
 export default function RolesManagementPage() {
   const qc = useQueryClient();
   const toast = useToast();
+  const currentUser = useAuthStore((s) => s.user);
 
   const [activeTab, setActiveTab] = useState<'users' | 'roles' | 'matrix'>('users');
 
   // Modal đổi vai trò người dùng
   const [editUser, setEditUser] = useState<UserRow | null>(null);
-  const [selectedUserRole, setSelectedUserRole] = useState<string>('USER');
+  const [selectedUserRoles, setSelectedUserRoles] = useState<string[]>(['USER']);
+  const [assignRoleItem, setAssignRoleItem] = useState<RoleItem | null>(null);
+  const [assignRoleUserIds, setAssignRoleUserIds] = useState<string[]>([]);
+  const [assignRoleSearch, setAssignRoleSearch] = useState('');
 
   // Modal thêm vai trò mới
   const [isCreateRoleOpen, setIsCreateRoleOpen] = useState(false);
@@ -198,7 +208,35 @@ export default function RolesManagementPage() {
       toast('Đã cập nhật vai trò phân quyền tài khoản', 'success');
       qc.invalidateQueries({ queryKey: ['admin-users'] });
       qc.invalidateQueries({ queryKey: ['system-roles'] });
+      qc.invalidateQueries({ queryKey: ['me'] });
       setEditUser(null);
+    },
+    onError: (e) => toast(errorMessage(e), 'error'),
+  });
+
+  const openAssignRoleModal = (role: RoleItem) => {
+    setAssignRoleItem(role);
+    setAssignRoleSearch('');
+    setAssignRoleUserIds(users.filter((u) => u.roles.includes(role.code)).map((u) => u.id));
+  };
+
+  const filteredAssignUsers = useMemo(() => {
+    if (!assignRoleSearch.trim()) return users;
+    return users.filter((u) =>
+      matchesSearch(assignRoleSearch, u.fullName, u.email, u.employeeCode, u.orgUnit?.name, u.jobTitle),
+    );
+  }, [users, assignRoleSearch]);
+
+  const assignUsersToRoleMutation = useMutation({
+    mutationFn: async (vars: { code: string; userIds: string[] }) => {
+      return (await api.put(`/roles/${vars.code}/users`, { userIds: vars.userIds })).data;
+    },
+    onSuccess: (data, vars) => {
+      toast(`Đã gán ${data?.userCount ?? vars.userIds.length} tài khoản cho vai trò ${vars.code}`, 'success');
+      qc.invalidateQueries({ queryKey: ['admin-users'] });
+      qc.invalidateQueries({ queryKey: ['system-roles'] });
+      qc.invalidateQueries({ queryKey: ['me'] });
+      setAssignRoleItem(null);
     },
     onError: (e) => toast(errorMessage(e), 'error'),
   });
@@ -285,7 +323,7 @@ export default function RolesManagementPage() {
       render: (u) => (
         <span>
           <span className="block font-medium text-foreground">{u.fullName}</span>
-          <span className="block text-xs text-muted-foreground font-mono">{u.email}</span>
+          <span className="block text-xs text-muted-foreground font-mono">{u.employeeCode ? `${u.employeeCode} · ` : ''}{u.email}</span>
         </span>
       ),
     },
@@ -307,17 +345,27 @@ export default function RolesManagementPage() {
       header: 'Vai trò hiện tại',
       minWidth: 240,
       sortable: true,
-      sortValue: (u) => u.roles[0] ?? '',
-      exportValue: (u) => roleLabelMap[u.roles[0] ?? 'USER'] ?? u.roles[0] ?? 'USER',
+      sortValue: (u) => (u.roles.length ? u.roles : ['USER']).join(', '),
+      exportValue: (u) => (u.roles.length ? u.roles : ['USER']).map((c) => roleLabelMap[c] ?? c).join(', '),
       render: (u) => {
-        const code = u.roles[0] ?? 'USER';
-        const label = roleLabelMap[code] ?? code;
-        const suffix = ' (' + code + ')';
-        const name = label.endsWith(suffix) ? label.slice(0, -suffix.length) : label;
+        const roleCodes = u.roles.length ? u.roles : ['USER'];
+
+
+
         return (
-          <div className="space-y-1 py-0.5">
-            <p className="text-sm font-medium leading-5 text-foreground">{name}</p>
-            {name !== code && <p className="font-mono text-xs leading-4 text-muted-foreground">{code}</p>}
+          <div className="flex flex-wrap gap-1.5 py-0.5">
+            {roleCodes.map((code) => {
+              const label = roleLabelMap[code] ?? code;
+              const suffix = ' (' + code + ')';
+              const name = label.endsWith(suffix) ? label.slice(0, -suffix.length) : label;
+              return (
+                <span key={code} className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-2 py-0.5 text-xs">
+                  <span className="font-medium text-foreground">{name}</span>
+                  {name !== code ? <span className="font-mono text-[10px] text-muted-foreground">({code})</span> : null}
+                </span>
+              );
+            })}
+
           </div>
         );
       },
@@ -351,7 +399,7 @@ export default function RolesManagementPage() {
           className="h-8 gap-1 text-xs text-muted-foreground hover:text-foreground"
           onClick={() => {
             setEditUser(u);
-            setSelectedUserRole(u.roles[0] ?? 'USER');
+            setSelectedUserRoles(u.roles.length ? [...u.roles] : ['USER']);
           }}
         >
           <UserCog className="h-3.5 w-3.5" />
@@ -421,7 +469,16 @@ export default function RolesManagementPage() {
                 {r.description || 'Chưa thiết lập mô tả vai trò.'}
               </p>
               <div className="pt-2 border-t border-border/80 text-xs flex items-center justify-between">
-                <span className="font-mono text-muted-foreground">{r.code}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-muted-foreground">{r.code}</span>
+                  <button
+                    type="button"
+                    onClick={() => openAssignRoleModal(r)}
+                    className="text-xs font-medium text-primary hover:underline"
+                  >
+                    Gán tài khoản
+                  </button>
+                </div>
                 {r.isSystem ? (
                   <span className="text-xs text-muted-foreground flex items-center gap-1">
                     <Lock className="h-3 w-3" /> Hệ thống
@@ -502,12 +559,13 @@ export default function RolesManagementPage() {
               loading={usersQ.isLoading}
               exportFilename="danh-sach-phan-quyen-tai-khoan"
               printLabel="In danh sách phân quyền"
-              searchFields={(u) => [u.fullName, u.email, u.jobTitle ?? '', u.orgUnit?.name ?? '']}
+              searchFields={(u) => [u.fullName, u.email, u.employeeCode ?? '', u.jobTitle ?? '', u.orgUnit?.name ?? '']}
               filters={[
                 {
                   key: 'role',
                   label: 'Vai trò',
                   value: (u) => u.roles[0] ?? 'USER',
+                  matches: (u, v) => (u.roles.length ? u.roles : ['USER']).includes(v),
                   options: roles.map((r) => ({ value: r.code, label: r.name })),
                 },
                 {
@@ -524,7 +582,7 @@ export default function RolesManagementPage() {
                   icon: ShieldCheck,
                   onSelect: () => {
                     setEditUser(u);
-                    setSelectedUserRole(u.roles[0] ?? 'USER');
+                    setSelectedUserRoles(u.roles.length ? [...u.roles] : ['USER']);
                   },
                 },
               ]}
@@ -557,9 +615,9 @@ export default function RolesManagementPage() {
                   <tr className="border-b border-border bg-muted/40 font-semibold text-foreground">
                     <th className="py-3 px-4 w-[15%]">Mã vai trò</th>
                     <th className="py-3 px-4 w-[25%]">Tên vai trò</th>
-                    <th className="py-3 px-4 w-[35%]">Mô tả nhiệm vụ & quyền hạn</th>
+                    <th className="py-3 px-4 w-[26%]">Mô tả nhiệm vụ & quyền hạn</th>
                     <th className="py-3 px-4 w-[12%] text-center">Số tài khoản</th>
-                    <th className="py-3 px-4 w-[13%] text-right">Thao tác</th>
+                    <th className="py-3 px-4 w-[22%] text-right">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -587,9 +645,27 @@ export default function RolesManagementPage() {
                       </td>
                       <td className="py-3 px-4 text-right">
                         {r.isSystem ? (
-                          <span className="text-xs text-muted-foreground italic">Khóa hệ thống</span>
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 px-2 text-xs"
+                              onClick={() => openAssignRoleModal(r)}
+                            >
+                              <UserCheck className="h-3 w-3 mr-1" /> Gán tài khoản
+                            </Button>
+                            <span className="text-xs text-muted-foreground italic">Mặc định</span>
+                          </div>
                         ) : (
                           <div className="flex items-center justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 px-2 text-xs"
+                              onClick={() => openAssignRoleModal(r)}
+                            >
+                              <UserCheck className="h-3 w-3 mr-1" /> Gán tài khoản
+                            </Button>
                             <Button
                               size="sm"
                               variant="ghost"
@@ -888,6 +964,93 @@ export default function RolesManagementPage() {
         )}
       </Modal>
 
+      {/* ================= MODAL GÁN TÀI KHOẢN CHO VAI TRÒ ================= */}
+      <Modal
+        open={!!assignRoleItem}
+        onOpenChange={(open) => {
+          if (!open) setAssignRoleItem(null);
+        }}
+        title={assignRoleItem ? `Gán tài khoản cho vai trò ${assignRoleItem.name} (${assignRoleItem.code})` : 'Gán tài khoản cho vai trò'}
+        description="Tích chọn các tài khoản hệ thống được mang vai trò này. Mỗi tài khoản có thể đồng thời giữ nhiều vai trò."
+        size="lg"
+      >
+        {assignRoleItem && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              assignUsersToRoleMutation.mutate({ code: assignRoleItem.code, userIds: assignRoleUserIds });
+            }}
+            className="space-y-4"
+          >
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <Input
+                value={assignRoleSearch}
+                onChange={(e) => setAssignRoleSearch(e.target.value)}
+                placeholder="Tìm nhanh theo họ tên, email, mã NV, đơn vị..."
+                className="text-xs sm:max-w-sm"
+              />
+              <span className="text-xs text-muted-foreground">
+                Đang chọn <strong className="text-foreground">{assignRoleUserIds.length}</strong> / {users.length} tài khoản
+              </span>
+            </div>
+
+            <div className="max-h-[340px] space-y-1.5 overflow-y-auto rounded-lg border border-border p-2">
+              {filteredAssignUsers.length === 0 ? (
+                <p className="py-6 text-center text-xs text-muted-foreground">Không tìm thấy tài khoản phù hợp.</p>
+              ) : (
+                filteredAssignUsers.map((u) => {
+                  const checked = assignRoleUserIds.includes(u.id);
+                  const lockSelfAdmin =
+                    assignRoleItem.code === 'ADMIN' &&
+                    u.id === currentUser?.id &&
+                    Boolean(currentUser?.roles?.includes('ADMIN'));
+                  return (
+                    <label
+                      key={u.id}
+                      className={`flex items-start gap-3 rounded-lg border p-2.5 text-xs transition-colors ${
+                        checked ? 'border-foreground bg-muted/40' : 'border-transparent hover:bg-muted/20'
+                      } ${lockSelfAdmin ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={lockSelfAdmin}
+                        onChange={(e) =>
+                          setAssignRoleUserIds((prev) => toggleRoleInList(prev, u.id, e.target.checked))
+                        }
+                        className="mt-0.5"
+                      />
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="font-semibold text-foreground">{u.fullName}</span>
+                          {u.employeeCode ? (
+                            <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-foreground">
+                              {u.employeeCode}
+                            </span>
+                          ) : null}
+                          <span className="font-mono text-[11px] text-muted-foreground">{u.email}</span>
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {u.orgUnit?.name ?? 'Chưa phân bổ'} · {u.jobTitle ?? 'Chưa cập nhật'} · Vai trò hiện tại:{' '}
+                          <span className="font-mono text-foreground">{u.roles.join(', ') || 'USER'}</span>
+                          {lockSelfAdmin ? ' · Không thể tự gỡ ADMIN khỏi chính bạn' : ''}
+                        </div>
+                      </div>
+                    </label>
+                  );
+                })
+              )}
+            </div>
+
+            <ModalFooterActions
+              onCancel={() => setAssignRoleItem(null)}
+              confirmLabel="Lưu danh sách tài khoản"
+              pending={assignUsersToRoleMutation.isPending}
+            />
+          </form>
+        )}
+      </Modal>
+
       {/* ================= MODAL XÁC NHẬN XÓA VAI TRÒ ================= */}
       <Modal
         open={!!deleteRoleCode}
@@ -1030,7 +1193,11 @@ export default function RolesManagementPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              updateUserRoleMutation.mutate({ id: editUser.id, roleCodes: [selectedUserRole] });
+              if (selectedUserRoles.length === 0) {
+                toast('Tài khoản phải có ít nhất 1 vai trò hệ thống', 'error');
+                return;
+              }
+              updateUserRoleMutation.mutate({ id: editUser.id, roleCodes: selectedUserRoles });
             }}
             className="space-y-4"
           >
@@ -1050,27 +1217,35 @@ export default function RolesManagementPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-xs font-semibold">Chọn vai trò phân quyền:</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-semibold">Chọn các vai trò phân quyền *:</Label>
+                <span className={`text-xs ${selectedUserRoles.length === 0 ? 'font-medium text-rose-600' : 'text-muted-foreground'}`}>
+                  {selectedUserRoles.length === 0 ? 'Cần tối thiểu 1 vai trò' : `Đã chọn ${selectedUserRoles.length} vai trò`}
+                </span>
+              </div>
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                 {roles.map((role) => (
                   <label
                     key={role.code}
                     className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                      selectedUserRole === role.code
+                      selectedUserRoles.includes(role.code)
                         ? 'border-foreground bg-muted/40 font-medium'
                         : 'border-border hover:bg-muted/20'
                     }`}
                   >
                     <input
-                      type="radio"
-                      name="roleCode"
+                      type="checkbox"
+                      disabled={role.code === 'ADMIN' && editUser.id === currentUser?.id && Boolean(currentUser?.roles?.includes('ADMIN'))}
                       value={role.code}
-                      checked={selectedUserRole === role.code}
-                      onChange={(e) => setSelectedUserRole(e.target.value)}
+                      checked={selectedUserRoles.includes(role.code)}
+                      onChange={(e) => setSelectedUserRoles((prev) => toggleRoleInList(prev, role.code, e.target.checked))}
                       className="mt-0.5"
                     />
                     <div className="space-y-0.5 min-w-0">
-                      <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <div className="text-xs font-semibold text-foreground flex flex-wrap items-center gap-1.5">
+                        {role.code === 'ADMIN' && editUser.id === currentUser?.id && currentUser?.roles?.includes('ADMIN') ? (
+                          <span className="order-last text-[10px] font-normal text-amber-700">(Đang đăng nhập)</span>
+                        ) : null}
                         <span>{role.name}</span>
                         <span className="font-mono text-[10px] text-muted-foreground">({role.code})</span>
                         {role.isSystem && (
@@ -1092,6 +1267,7 @@ export default function RolesManagementPage() {
               onCancel={() => setEditUser(null)}
               confirmLabel="Lưu phân quyền"
               pending={updateUserRoleMutation.isPending}
+              disabled={selectedUserRoles.length === 0}
             />
           </form>
         )}

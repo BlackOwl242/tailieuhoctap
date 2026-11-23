@@ -94,7 +94,7 @@ export function ModalFooterActions({
   className?: string;
 }) {
   return (
-    <div className={cn('mt-6 flex items-center justify-end gap-3 pt-3 border-t border-border/50', className)}>
+    <div className={cn('mt-4 flex items-center justify-end gap-3', className)}>
       <Button type="button" variant="outline" onClick={onCancel}>{cancelLabel}</Button>
       <Button type={onConfirm ? 'button' : 'submit'} variant={confirmVariant} disabled={disabled || pending} onClick={onConfirm}>
         {pending ? 'Đang lưu…' : confirmLabel}

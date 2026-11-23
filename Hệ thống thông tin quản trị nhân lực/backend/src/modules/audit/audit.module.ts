@@ -1,8 +1,9 @@
 import { Controller, Get, Module, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { Roles } from '../../common/decorators';
+import { verifyAuditChain } from '../../common/audit-hash';
 
 class AuditQueryDto {
   @IsOptional() @IsString() action?: string;
@@ -12,12 +13,12 @@ class AuditQueryDto {
 }
 
 /**
- * KC22 — Tra cứu nhật ký kiểm toán (CHỈ ĐỌC).
- * Bảng audit_logs là append-only: không có bất kỳ route ghi/sửa/xóa nào ở đây.
+ * KC22 — Tra cứu & kiểm chứng nhật ký kiểm toán (CHỈ ĐỌC).
+ * Bảng audit_logs được khóa append-only ở mức trigger PostgreSQL + SHA-256 hash chain.
  */
 @ApiTags('audit')
 @ApiBearerAuth()
-@Roles('ADMIN')
+@Roles('ADMIN', 'AUDITOR', 'BOD')
 @Controller('admin/audit-logs')
 export class AuditController {
   constructor(private readonly prisma: PrismaService) {}
@@ -40,7 +41,6 @@ export class AuditController {
       }),
       this.prisma.auditLog.count({ where }),
     ]);
-    // BigInt không serialize được bằng JSON.stringify → chuyển sang string
     const items = rows.map((r) => ({
       ...r,
       id: r.id.toString(),
@@ -48,6 +48,29 @@ export class AuditController {
       afterData: r.afterData ?? null,
     }));
     return { items, total, page, limit };
+  }
+
+  @Get('verify')
+  @ApiOperation({ summary: 'Kiểm chứng toàn vẹn chuỗi băm SHA-256 nhật ký kiểm toán (SOX / ISO 27001)' })
+  async verifyIntegrity() {
+    const rows = await this.prisma.auditLog.findMany({
+      orderBy: { id: 'asc' },
+      select: {
+        id: true,
+        actorId: true,
+        action: true,
+        entityType: true,
+        entityId: true,
+        requestId: true,
+        createdAt: true,
+        prevHash: true,
+        entryHash: true,
+      },
+    });
+    return {
+      ...verifyAuditChain(rows),
+      verifiedAt: new Date().toISOString(),
+    };
   }
 }
 

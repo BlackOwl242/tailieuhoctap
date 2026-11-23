@@ -970,9 +970,7 @@ export default function AdminOrgUnitsPage() {
               className="uppercase font-mono"
             />
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <ModalFooterActions onCancel={() => setAddingTo(null)} pending={create.isPending} confirmLabel="Thêm mới" />
-          </div>
+          <ModalFooterActions onCancel={() => setAddingTo(null)} pending={create.isPending} confirmLabel="Thêm mới" />
         </form>
       </Modal>
 
@@ -1011,9 +1009,7 @@ export default function AdminOrgUnitsPage() {
                 ))}
             </Select>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <ModalFooterActions onCancel={() => setEditing(null)} pending={update.isPending} confirmLabel="Lưu thay đổi" />
-          </div>
+          <ModalFooterActions onCancel={() => setEditing(null)} pending={update.isPending} confirmLabel="Lưu thay đổi" />
         </form>
       </Modal>
 

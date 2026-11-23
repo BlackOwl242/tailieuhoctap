@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import * as AvatarPrimitive from '@radix-ui/react-avatar';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { ChevronDown, Search, Check, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, matchesSearch } from '@/lib/utils';
 import { HoverMarquee } from './hover-marquee';
 
 /** Ảnh đại diện: fallback chữ cái đầu khi chưa có ảnh. */
@@ -182,16 +182,6 @@ function getNodeText(node: React.ReactNode): string {
   return '';
 }
 
-function removeAccents(str: string): string {
-  if (!str) return '';
-  return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
-    .toLowerCase();
-}
-
 export interface CustomSelectOption {
   value: string | number;
   label: string;
@@ -301,13 +291,7 @@ export function Select({
   const filteredOptions = React.useMemo(() => {
     const q = search.trim();
     if (!q) return allOptions;
-    const cleanQ = removeAccents(q);
-    return allOptions.filter((opt) => {
-      const lbl = removeAccents(String(opt.label || ''));
-      const val = removeAccents(String(opt.value || ''));
-      const sub = removeAccents(String(opt.sublabel || ''));
-      return lbl.includes(cleanQ) || val.includes(cleanQ) || sub.includes(cleanQ);
-    });
+    return allOptions.filter((opt) => matchesSearch(q, opt.label, opt.value, opt.sublabel));
   }, [allOptions, search]);
 
   // Chiều cao thanh topbar sticky chuẩn của hệ thống (h-14 = 56px)

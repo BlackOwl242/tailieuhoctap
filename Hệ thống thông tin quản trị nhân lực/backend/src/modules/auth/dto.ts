@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class LoginDto {
   @ApiProperty({ example: 'admin@demo.local' })
@@ -13,10 +13,44 @@ export class LoginDto {
 }
 
 export class RefreshDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  refreshToken?: string;
+}
+
+export class MfaVerifyDto {
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  refreshToken!: string;
+  @IsNotEmpty({ message: 'Thiếu mã phiên xác thực 2FA' })
+  challengeToken!: string;
+
+  @ApiProperty({ example: '123456' })
+  @IsString()
+  @IsNotEmpty({ message: 'Vui lòng nhập mã xác thực 6 chữ số hoặc mã dự phòng' })
+  @MaxLength(32)
+  code!: string;
+}
+
+export class MfaCodeDto {
+  @ApiProperty({ example: '123456' })
+  @IsString()
+  @IsNotEmpty({ message: 'Vui lòng nhập mã xác thực 6 chữ số' })
+  @MaxLength(32)
+  code!: string;
+}
+
+export class MfaDisableDto {
+  @ApiProperty({ writeOnly: true })
+  @IsString()
+  @IsNotEmpty({ message: 'Vui lòng nhập mật khẩu hiện tại' })
+  currentPassword!: string;
+
+  @ApiProperty({ example: '123456' })
+  @IsString()
+  @IsNotEmpty({ message: 'Vui lòng nhập mã xác thực 2FA hoặc mã dự phòng' })
+  @MaxLength(32)
+  code!: string;
 }
 
 export class ChangePasswordDto {

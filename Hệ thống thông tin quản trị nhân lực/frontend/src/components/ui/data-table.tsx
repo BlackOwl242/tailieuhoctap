@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { createPortal, flushSync } from 'react-dom';
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, FileSpreadsheet, MoreVertical, Search, SlidersHorizontal } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, matchesSearch, normalizeSearch } from '@/lib/utils';
 import { exportRowsToExcel } from '@/lib/export';
 import { Button, Input, Select, Skeleton } from '@/components/ui/primitives';
 import { EmptyState } from '@/components/common/states';
@@ -53,13 +53,14 @@ function defaultColumnMinWidth(column: { minWidth?: number; key: string; header:
 }
 
 function normalizeColumnText(value: string) {
-  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase();
+  return normalizeSearch(value);
 }
 
 export interface DataFilterDef<T> {
   key: string;
   label: string;
   value: (row: T) => string;
+  matches?: (row: T, filterValue: string) => boolean;
   options: { value: string; label: string }[];
 }
 
@@ -89,6 +90,10 @@ interface DataTableProps<T> {
   onPrint?: () => void | Promise<void>;
   /** Hiện nút in ngay cả khi không có exportFilename. */
   showPrint?: boolean;
+  /** Giá trị tìm kiếm khởi tạo (hoặc đồng bộ từ URL ?search=). */
+  initialSearch?: string;
+  /** Bộ lọc khởi tạo (hoặc đồng bộ từ URL ?status=, ?orgUnitId=). */
+  initialFilters?: Record<string, string>;
 }
 
 type SortState = { key: string; dir: 'asc' | 'desc' } | null;
@@ -215,25 +220,35 @@ export function DataTable<T>({
   printSubtitle,
   onPrint,
   showPrint,
+  initialSearch = '',
+  initialFilters,
 }: DataTableProps<T>) {
   const [snapshotOpen, setSnapshotOpen] = React.useState(false);
   const snapshotRef = React.useRef<HTMLTableElement>(null);
   const rootRef = React.useRef<HTMLDivElement>(null);
-  const [search, setSearch] = React.useState('');
-  const [filterValues, setFilterValues] = React.useState<Record<string, string>>({});
+  const [search, setSearch] = React.useState(initialSearch);
+  const [filterValues, setFilterValues] = React.useState<Record<string, string>>(() => initialFilters ?? {});
   const [sort, setSort] = React.useState<SortState>(null);
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(initialPageSize);
+  const initialFiltersKey = JSON.stringify(initialFilters ?? {});
+
+  React.useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
+
+  React.useEffect(() => {
+    setFilterValues(initialFilters ?? {});
+  }, [initialFiltersKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = React.useMemo(() => {
     let out = rows;
-    const q = search.trim().toLowerCase();
-    if (q && searchFields) {
-      out = out.filter((r) => searchFields(r).some((v) => v?.toLowerCase().includes(q)));
+    if (search.trim() && searchFields) {
+      out = out.filter((r) => matchesSearch(search, ...searchFields(r)));
     }
     for (const f of filters) {
       const v = filterValues[f.key];
-      if (v) out = out.filter((r) => f.value(r) === v);
+      if (v) out = out.filter((r) => (f.matches ? f.matches(r, v) : f.value(r) === v));
     }
     return out;
   }, [rows, search, searchFields, filters, filterValues]);

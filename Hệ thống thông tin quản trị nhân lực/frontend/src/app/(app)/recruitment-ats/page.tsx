@@ -9,7 +9,7 @@ import {
   X, Clock, DollarSign, Users, Building2, FileText, Check, ShieldCheck,
   GripVertical, UserCheck, MoveRight, Info,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, matchesSearch } from '@/lib/utils';
 import { api, errorMessage } from '@/lib/api';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
@@ -88,6 +88,7 @@ export default function RecruitmentAtsPage() {
   const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [filterOpeningId, setFilterOpeningId] = useState<string>('ALL');
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Modal tạo tin tuyển dụng & tiếp nhận ứng viên
   const [isCreateOpeningModalOpen, setIsCreateOpeningModalOpen] = useState(false);
@@ -260,9 +261,15 @@ export default function RecruitmentAtsPage() {
   const offerResponse = useMutation({ mutationFn: async({id,accepted,evidenceUrl}:{id:string;accepted:boolean;evidenceUrl:string})=>api.patch(`/hrms/recruitment/offers/${id}/respond`,{accepted,evidenceUrl}), onSuccess:()=>{queryClient.invalidateQueries({queryKey:['hrms-job-applicants']});setIsApplicantDetailModalOpen(false);toast('Đã ghi nhận phản hồi ứng viên','success');},onError:e=>toast(errorMessage(e),'error') });
   if (isLoadingOpenings || isLoadingApps) return <LoadingState text="Đang tải Đường ống Tuyển dụng ATS..." />;
 
-  const filteredApplicants = filterOpeningId === 'ALL'
-    ? (applicants ?? [])
-    : (applicants ?? []).filter((a) => a.jobOpeningId === filterOpeningId);
+  const filteredApplicants = (applicants ?? []).filter((a) => {
+    const matchesOpening = filterOpeningId === 'ALL' || a.jobOpeningId === filterOpeningId;
+    const matchesTerm = matchesSearch(searchTerm, a.candidateName, a.email, a.phone, a.jobOpening?.title, a.notes);
+    return matchesOpening && matchesTerm;
+  });
+
+  const filteredOpenings = (openings ?? []).filter((o) =>
+    matchesSearch(searchTerm, o.title, o.department, o.designation, o.description),
+  );
 
   const hiredCount = applicants?.filter((a) => a.stage === 'HIRED').length ?? 0;
   const inInterviewCount = applicants?.filter((a) => a.stage.includes('INTERVIEW')).length ?? 0;
@@ -382,23 +389,35 @@ export default function RecruitmentAtsPage() {
           </button>
         </div>
 
-        {activeTab === 'kanban' && openings && openings.length > 0 && (
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-muted-foreground font-medium">Lọc theo vị trí:</span>
-            <Select
-              value={filterOpeningId}
-              onChange={(e) => setFilterOpeningId(e.target.value)}
-              className="w-[240px] text-xs h-9"
-            >
-              <option value="ALL">Tất cả vị trí ({applicants?.length ?? 0})</option>
-              {openings.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.title} ({o._count?.applicants ?? 0})
-                </option>
-              ))}
-            </Select>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <div className="relative w-60">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm ứng viên, vị trí, email…"
+              aria-label="Tìm kiếm tuyển dụng"
+              className="h-9 pl-8 text-xs"
+            />
           </div>
-        )}
+          {activeTab === 'kanban' && openings && openings.length > 0 && (
+            <>
+              <span className="text-muted-foreground font-medium">Lọc theo vị trí:</span>
+              <Select
+                value={filterOpeningId}
+                onChange={(e) => setFilterOpeningId(e.target.value)}
+                className="w-[240px] text-xs h-9"
+              >
+                <option value="ALL">Tất cả vị trí ({applicants?.length ?? 0})</option>
+                {openings.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.title} ({o._count?.applicants ?? 0})
+                  </option>
+                ))}
+              </Select>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Tab 1: Kanban Board với Kéo Thả (Drag & Drop) */}
@@ -652,7 +671,7 @@ export default function RecruitmentAtsPage() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg bg-card border border-border shadow-xs">
             <div>
-              <h3 className="text-sm font-semibold text-foreground">Danh Sách Vị Trí Tuyển Dụng ({openings?.length ?? 0})</h3>
+              <h3 className="text-sm font-semibold text-foreground">Danh Sách Vị Trí Tuyển Dụng ({filteredOpenings.length})</h3>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Quản lý các vị trí việc làm đang mở, số lượng chỉ tiêu định biên và xem danh sách ứng viên theo từng đợt tuyển.
               </p>
@@ -668,7 +687,7 @@ export default function RecruitmentAtsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {openings?.map((o) => (
+            {filteredOpenings.map((o) => (
               <div
                 key={o.id}
                 onClick={() => {
@@ -721,11 +740,11 @@ export default function RecruitmentAtsPage() {
               </div>
             ))}
 
-            {(!openings || openings.length === 0) && (
+            {filteredOpenings.length === 0 && (
               <div className="col-span-2 p-8 rounded-lg border border-dashed border-border bg-card text-center space-y-3">
                 <Briefcase className="h-8 w-8 text-muted-foreground/50 mx-auto" />
-                <p className="text-sm font-semibold text-foreground">Chưa có tin tuyển dụng nào</p>
-                <p className="text-xs text-muted-foreground">Bấm nút bên dưới để tạo vị trí tuyển dụng đầu tiên của công ty.</p>
+                <p className="text-sm font-semibold text-foreground">{openings && openings.length > 0 ? 'Không có tin tuyển dụng khớp từ khóa' : 'Chưa có tin tuyển dụng nào'}</p>
+                <p className="text-xs text-muted-foreground">{openings && openings.length > 0 ? 'Thử xóa bộ lọc tìm kiếm để xem toàn bộ vị trí.' : 'Bấm nút bên dưới để tạo vị trí tuyển dụng đầu tiên của công ty.'}</p>
                 <Button
                   size="sm"
                   onClick={() => setIsCreateOpeningModalOpen(true)}

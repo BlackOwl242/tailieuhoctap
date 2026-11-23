@@ -2,6 +2,7 @@ import { ConflictException, ForbiddenException } from '@nestjs/common';
 import { PersonnelEffectsService } from '../../common/services/personnel-effects.service';
 import { HrAccessService, isHr } from '../../common/services/hr-access.service';
 import { dateKey, workDate } from '../../common/hr-time';
+import { toMoney, toMoneyOrNull } from '../../common/money';
 import { endsEmployment, validatePersonnelPayload } from '../../common/personnel-action-rules';
 import {
   Body, Controller, Get, HttpStatus, Injectable, Module, NotFoundException, Param, Post, Query,
@@ -114,9 +115,10 @@ export class PersonnelActionsService {
         if (salaryReason === 'PROMOTION' && band?.jobTitles.length && !band.jobTitles.some(title => title.trim().toLocaleLowerCase('vi') === String(dto.payload.newJobTitle).trim().toLocaleLowerCase('vi'))) throw new ConflictException('Khung lương không áp dụng cho chức danh mới');
         if (!band || band.status !== 'ACTIVE' || band.effectiveFrom > effectiveAt || (band.effectiveTo && band.effectiveTo < effectiveAt)) throw new ConflictException('Khung lương cần áp dụng chưa được duyệt hoặc không còn hiệu lực vào ngày điều chỉnh');
         if (band.compensationBasis !== activeContract.compensationBasis) throw new ConflictException('Đơn vị của khung lương phải khớp hợp đồng: theo tháng, ngày hoặc giờ');
-        if (newSalary < band.minSalary || newSalary > band.maxSalary) {
+        const bandMin = toMoney(band.minSalary), bandMax = toMoney(band.maxSalary);
+        if (newSalary < bandMin || newSalary > bandMax) {
           const unit = activeContract.compensationBasis === 'HOURLY' ? 'giờ' : activeContract.compensationBasis === 'DAILY' ? 'ngày công' : 'tháng';
-          throw new ConflictException(`Mức lương mới phải nằm trong khoảng của khung ${band.code}: ${band.minSalary.toLocaleString('vi-VN')}–${band.maxSalary.toLocaleString('vi-VN')} đồng/${unit}`);
+          throw new ConflictException(`Mức lương mới phải nằm trong khoảng của khung ${band.code}: ${bandMin.toLocaleString('vi-VN')}–${bandMax.toLocaleString('vi-VN')} đồng/${unit}`);
         }
         dto.payload.salaryBandId = targetBandId;
       }
@@ -146,7 +148,7 @@ export class PersonnelActionsService {
         effectiveAt: dto.effectiveDate ? dateKey(dto.effectiveDate) : workDate(),
         payload: {
           ...dto.payload,
-          oldSalary: subject.baseSalary,
+          oldSalary: toMoneyOrNull(subject.baseSalary),
           ...(dto.type === 'TRANSFER' || dto.payload.salaryReason === 'PROMOTION' ? { oldOrgUnitId: subject.orgUnitId, oldJobTitle: subject.jobTitle } : {}),
           effectiveDate: dto.effectiveDate ?? null,
         },
@@ -187,7 +189,7 @@ export class PersonnelActionsService {
         if (!activeContract || !bandId) throw new ConflictException('Cần hợp đồng còn hiệu lực và khung lương trước khi duyệt');
         const band = await this.prisma.hrmsSalaryBand.findUnique({ where: { id: bandId } });
         if (payload.salaryReason === 'PROMOTION' && band?.jobTitles.length && !band.jobTitles.some(title => title.trim().toLocaleLowerCase('vi') === String(payload.newJobTitle).trim().toLocaleLowerCase('vi'))) throw new ConflictException('Khung lương không áp dụng cho chức danh mới');
-        if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== activeContract.compensationBasis || band.effectiveFrom > effectiveAt || (band.effectiveTo && band.effectiveTo < effectiveAt) || salary < band.minSalary || salary > band.maxSalary) throw new ConflictException('Mức lương phải nằm trong khung đã duyệt cùng đơn vị hợp đồng và có hiệu lực vào ngày áp dụng');
+        if (!band || band.status !== 'ACTIVE' || band.compensationBasis !== activeContract.compensationBasis || band.effectiveFrom > effectiveAt || (band.effectiveTo && band.effectiveTo < effectiveAt) || salary < toMoney(band.minSalary) || salary > toMoney(band.maxSalary)) throw new ConflictException('Mức lương phải nằm trong khung đã duyệt cùng đơn vị hợp đồng và có hiệu lực vào ngày áp dụng');
       }
     }
     const updated = await this.prisma.$transaction(async tx => {

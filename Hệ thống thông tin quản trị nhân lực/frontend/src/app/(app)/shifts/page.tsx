@@ -8,6 +8,7 @@ import {
   Check, X, Sparkles, FileText,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { matchesSearch } from '@/lib/utils';
 import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { NumberCard } from '@/components/common/number-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/states';
@@ -227,11 +228,8 @@ export default function ShiftsPage() {
     return <LoadingState text="Đang tải dữ liệu Ca kíp & Bảng phân ca..." />;
   }
 
-  const filteredUsers = rosterData?.users.filter(
-    (u) =>
-      u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (u.employeeCode && u.employeeCode.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (u.orgUnit?.name && u.orgUnit.name.toLowerCase().includes(searchTerm.toLowerCase())),
+  const filteredUsers = rosterData?.users.filter((u) =>
+    matchesSearch(searchTerm, u.fullName, u.employeeCode, u.orgUnit?.name),
   );
 
   // Column definitions for Shift Types

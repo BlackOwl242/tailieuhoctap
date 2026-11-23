@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Play, Plus, RefreshCw } from 'lucide-react';
 import { api, errorMessage } from '@/lib/api';
-import { formatDate, DAY_STATUS_LABEL } from '@/lib/utils';
+import { formatDate, DAY_STATUS_LABEL, matchesSearch } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Select, Skeleton } from '@/components/ui/primitives';
 import { PageHeader, ErrorState } from '@/components/common/states';
@@ -14,7 +14,7 @@ interface AttendancePeriod { id: string; month: number; year: number; status: st
 interface DayRow {
   userId: string; workDate: string; firstInAt: string | null; lastOutAt: string | null;
   lateMinutes: number; status: string;
-  user: { id: string; fullName: string; email: string };
+  user: { id: string; fullName: string; email: string; employeeCode?: string | null };
 }
 
 /** KC25–KC26 — Quản trị chấm công: thiết bị, mô phỏng, bảng công & hiệu chỉnh. */
@@ -31,6 +31,8 @@ export default function AdminAttendancePage() {
   const [lastSecret, setLastSecret] = useState<string | null>(null);
   const [correction, setCorrection] = useState<{ userId: string; date: string } | null>(null);
   const [corrValue, setCorrValue] = useState({ field: 'firstInAt', newValue: '08:00', reason: '' });
+  const [daySearch, setDaySearch] = useState('');
+  const [dayStatusFilter, setDayStatusFilter] = useState('ALL');
   const correctionReasonValid = corrValue.reason.trim().length >= 3;
 
   const devicesQ = useQuery({
@@ -40,7 +42,7 @@ export default function AdminAttendancePage() {
   const daysQ = useQuery({
     queryKey: ['company-days', date],
     queryFn: async () =>
-      (await api.get<{ items: DayRow[] }>('/attendance/days', { params: { date } })).data,
+      (await api.get<{ items: DayRow[]; total: number }>('/attendance/days', { params: { date, limit: 1000 } })).data,
   });
   const periodQ = useQuery({
     queryKey: ['attendance-period', monthToFinalize],
@@ -177,26 +179,72 @@ export default function AdminAttendancePage() {
           <CardContent>
             {daysQ.isLoading ? <Skeleton className="h-48" /> : null}
             {daysQ.isError ? <ErrorState message={errorMessage(daysQ.error)} onRetry={() => daysQ.refetch()} /> : null}
-            {daysQ.data && daysQ.data.items.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Chưa có dữ liệu cho ngày này.</p>
-            ) : null}
-            <div className="max-h-80 space-y-1.5 overflow-y-auto">
-              {(daysQ.data?.items ?? []).map((d) => (
-                <div key={d.userId} className="flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm">
-                  <span className="min-w-0">
-                    <span className="block truncate font-medium">{d.user.fullName}</span>
-                    <span className="block text-xs text-muted-foreground">
-                      {formatDate(d.workDate)} · {DAY_STATUS_LABEL[d.status] ?? d.status}
-                      {d.lateMinutes > 0 ? ` (+${d.lateMinutes}')` : ''}
-                    </span>
-                  </span>
-                  <Button size="sm" variant="ghost"
-                    onClick={() => setCorrection({ userId: d.userId, date: d.workDate.slice(0, 10) })}>
-                    <RefreshCw className="h-3.5 w-3.5" /> Hiệu chỉnh
-                  </Button>
-                </div>
-              ))}
-            </div>
+            {(() => {
+              const allDays = daysQ.data?.items ?? [];
+              const filteredDays = allDays.filter((d) => {
+                if (dayStatusFilter !== 'ALL' && d.status !== dayStatusFilter) return false;
+                return matchesSearch(
+                  daySearch,
+                  d.user.fullName,
+                  d.user.email,
+                  d.user.employeeCode,
+                  DAY_STATUS_LABEL[d.status] ?? d.status,
+                );
+              });
+              return (
+                <>
+                  {allDays.length > 0 ? (
+                    <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <Input
+                        value={daySearch}
+                        onChange={(e) => setDaySearch(e.target.value)}
+                        placeholder="Tìm theo tên, mã NV, email…"
+                        aria-label="Tìm nhân sự trong bảng công ngày"
+                        className="h-8 flex-1 text-xs"
+                      />
+                      <Select
+                        value={dayStatusFilter}
+                        onChange={(e) => setDayStatusFilter(e.target.value)}
+                        aria-label="Lọc trạng thái công"
+                        className="h-8 w-full text-xs sm:w-44"
+                      >
+                        <option value="ALL">Tất cả trạng thái</option>
+                        {Object.entries(DAY_STATUS_LABEL).map(([code, label]) => (
+                          <option key={code} value={code}>{label}</option>
+                        ))}
+                      </Select>
+                      <span className="shrink-0 text-xs text-muted-foreground">
+                        Hiển thị {filteredDays.length} / {daysQ.data?.total ?? allDays.length}
+                      </span>
+                    </div>
+                  ) : null}
+                  {daysQ.data && allDays.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Chưa có dữ liệu cho ngày này.</p>
+                  ) : allDays.length > 0 && filteredDays.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Không có nhân sự phù hợp bộ lọc hiện tại.</p>
+                  ) : null}
+                  <div className="max-h-80 space-y-1.5 overflow-y-auto">
+                    {filteredDays.map((d) => (
+                      <div key={d.userId} className="flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm">
+                        <span className="min-w-0">
+                          <span className="block truncate font-medium">
+                            {d.user.employeeCode ? `[${d.user.employeeCode}] ` : ''}{d.user.fullName}
+                          </span>
+                          <span className="block text-xs text-muted-foreground">
+                            {formatDate(d.workDate)} · {DAY_STATUS_LABEL[d.status] ?? d.status}
+                            {d.lateMinutes > 0 ? ` (+${d.lateMinutes}')` : ''}
+                          </span>
+                        </span>
+                        <Button size="sm" variant="ghost"
+                          onClick={() => setCorrection({ userId: d.userId, date: d.workDate.slice(0, 10) })}>
+                          <RefreshCw className="h-3.5 w-3.5" /> Hiệu chỉnh
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
 
             {/* Form hiệu chỉnh có lý do — mọi thay đổi để lại vết */}
             {correction ? (

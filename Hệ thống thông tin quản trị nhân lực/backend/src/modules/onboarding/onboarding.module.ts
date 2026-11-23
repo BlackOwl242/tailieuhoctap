@@ -100,7 +100,7 @@ export class OnboardingService {
       userIds: [dto.userId],
       type: 'ONBOARDING_ASSIGNED',
       title: `Bạn có lộ trình hội nhập mới: ${path.title}`,
-      linkPath: '/ess',
+      linkPath: '/knowledge?tab=onboarding',
     });
     await this.audit.log({ actorId: actor.id, action: 'ONBOARDING_ASSIGNED', entityType: 'OnboardingAssignment', entityId: assignment.id, requestId });
     return assignment;

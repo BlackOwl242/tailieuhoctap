@@ -35,7 +35,9 @@ import {
 } from '@/components/ui/primitives';
 import { PrintFrame, PrintSignatureBlock } from '@/components/ui/print';
 import { Portal } from '@/components/ui/portal';
+import { WorkspaceHeader } from '@/components/common/workspace-header';
 import { api, errorMessage } from '@/lib/api';
+import { matchesSearch } from '@/lib/utils';
 import { useToast } from '@/components/ui/toaster';
 
 interface CatalogItem {
@@ -153,10 +155,7 @@ export default function MasterCatalogsPage() {
   const filteredCatalogs = useMemo(() => {
     return allCatalogs.filter(item => {
       const matchGroup = selectedGroupId === 'all' || item.groupId === selectedGroupId;
-      const matchSearch =
-        !catalogSearch ||
-        item.catalog.name.toLowerCase().includes(catalogSearch.toLowerCase()) ||
-        item.catalog.id.toLowerCase().includes(catalogSearch.toLowerCase());
+      const matchSearch = !catalogSearch || matchesSearch(catalogSearch, item.catalog.name, item.catalog.id);
       return matchGroup && matchSearch;
     });
   }, [allCatalogs, selectedGroupId, catalogSearch]);
@@ -174,12 +173,8 @@ export default function MasterCatalogsPage() {
   const filteredItems = useMemo(() => {
     if (!currentCatalog?.catalog?.items) return [];
     if (!itemSearch) return currentCatalog.catalog.items;
-    const q = itemSearch.toLowerCase();
     return currentCatalog.catalog.items.filter(it =>
-      (it.code && it.code.toLowerCase().includes(q)) ||
-      (it.name && it.name.toLowerCase().includes(q)) ||
-      (it.sector && it.sector.toLowerCase().includes(q)) ||
-      (it.type && it.type.toLowerCase().includes(q))
+      matchesSearch(itemSearch, it.code, it.name, it.sector, it.type)
     );
   }, [currentCatalog, itemSearch]);
 
@@ -339,37 +334,28 @@ export default function MasterCatalogsPage() {
 
   return (
     <div className="space-y-6">
-      {/* ================= HEADER TRANG ================= */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Database className="h-5 w-5" />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Danh mục gốc
-            </h1>
+      <WorkspaceHeader
+        title="Danh mục gốc"
+        description={`${allCatalogs.length} danh mục nghiệp vụ chuẩn hóa · ${totalAllRecords.toLocaleString('vi-VN')} bản ghi · Dữ liệu từ API backend`}
+        breadcrumbs={[{ label: 'Quản trị' }, { label: 'Danh mục gốc' }]}
+        className="mb-0"
+        actions={
+          <div className="flex flex-wrap items-center gap-2 no-print">
+            <Button variant="outline" size="sm" onClick={handleResetDefault} disabled={isMutating} title="Khôi phục danh mục gốc">
+              <RefreshCw className={`h-4 w-4 ${resetMutation.isPending ? 'animate-spin' : ''}`} /> Khôi phục gốc
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportCsv} title="Xuất CSV">
+              <FileSpreadsheet className="h-4 w-4" /> Xuất CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => window.print()} title="In danh mục nội bộ">
+              <Printer className="h-4 w-4" /> In danh mục
+            </Button>
+            <Button size="sm" onClick={handleOpenAdd} className="bg-primary text-primary-foreground shadow-xs" disabled={isMutating}>
+              <Plus className="h-4 w-4" /> Thêm mục mới
+            </Button>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {allCatalogs.length} danh mục nghiệp vụ chuẩn hóa · {totalAllRecords.toLocaleString('vi-VN')} bản ghi · Dữ liệu từ API backend
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 no-print">
-          <Button variant="outline" size="sm" onClick={handleResetDefault} disabled={isMutating} title="Khôi phục danh mục gốc">
-            <RefreshCw className={`h-4 w-4 ${resetMutation.isPending ? 'animate-spin' : ''}`} /> Khôi phục gốc
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleExportCsv} title="Xuất CSV">
-            <FileSpreadsheet className="h-4 w-4" /> Xuất CSV
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => window.print()} title="In danh mục nội bộ">
-            <Printer className="h-4 w-4" /> In danh mục
-          </Button>
-          <Button size="sm" onClick={handleOpenAdd} className="bg-primary text-primary-foreground shadow-xs" disabled={isMutating}>
-            <Plus className="h-4 w-4" /> Thêm mục mới
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* ================= THẺ THỐNG KÊ 4 NHÓM DANH MỤC ================= */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 no-print">

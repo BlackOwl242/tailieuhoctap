@@ -7,6 +7,7 @@ import {
   Injectable,
   Module,
   NotFoundException,
+  Optional,
   Param,
   Patch,
   Post,
@@ -16,6 +17,7 @@ import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestj
 import { IsArray, IsEnum, IsInt, IsNotEmpty, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/services/audit.service';
+import { FieldCryptoService } from '../../common/services/field-crypto.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import type { AuthUser } from '../../common/types/auth-user';
 
@@ -174,10 +176,15 @@ export class ListProfileChangeRequestsQueryDto {
 
 @Injectable()
 export class ProfileChangeRequestsService {
+  private readonly crypto: FieldCryptoService;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-  ) {}
+    @Optional() fieldCrypto?: FieldCryptoService,
+  ) {
+    this.crypto = fieldCrypto ?? new FieldCryptoService();
+  }
 
   /** Cán bộ/nhân viên tạo đề xuất thay đổi thông tin cá nhân. */
   async createRequest(userId: string, dto: CreateProfileChangeRequestDto) {
@@ -392,10 +399,14 @@ export class ProfileChangeRequestsService {
       const currentUser = await tx.user.findUniqueOrThrow({ where: { id: request.userId } });
       const currentProfile = await tx.personnelComprehensiveProfile.findUnique({ where: { userId: request.userId } });
       for (const [key, item] of Object.entries(changes)) {
-        const currentValue = ['fullName','birthDate','bankAccount','bankName','taxDependentCount'].includes(key) ? (currentUser as any)[key] : (currentProfile as any)?.[key];
+        const rawCurrent = ['fullName','birthDate','bankAccount','bankName','taxDependentCount'].includes(key) ? (currentUser as any)[key] : (currentProfile as any)?.[key];
+        const currentValue = ['bankAccount', 'idCardNo', 'socialInsuranceNo'].includes(key) && typeof rawCurrent === 'string' ? this.crypto.decryptOptionalString(rawCurrent) : rawCurrent;
         const normalize = (v: any) => v instanceof Date ? v.toISOString().slice(0,10) : v == null ? '' : String(v);
         if (normalize(currentValue) !== normalize(item.oldValue)) throw new BadRequestException(`Dữ liệu ${key} đã thay đổi; cần gửi yêu cầu mới`);
       }
+      if (userUpdates.bankAccount !== undefined) userUpdates.bankAccount = this.crypto.encryptOptionalString(userUpdates.bankAccount);
+      if (profileUpdates.idCardNo !== undefined) profileUpdates.idCardNo = this.crypto.encryptOptionalString(profileUpdates.idCardNo);
+      if (profileUpdates.socialInsuranceNo !== undefined) profileUpdates.socialInsuranceNo = this.crypto.encryptOptionalString(profileUpdates.socialInsuranceNo);
       // 1. Cập nhật bảng User nếu có trường liên quan
       if (Object.keys(userUpdates).length > 0) {
         await tx.user.update({
